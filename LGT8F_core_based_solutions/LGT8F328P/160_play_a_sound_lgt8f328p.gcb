@@ -1,0 +1,139 @@
+'''A demonstration program for GCB
+'''---------------------------------------------------------------------------------
+''' This demonstration
+'''
+'''
+''' Connect a piezo buzzer to the port... and listen.
+'''
+'''
+''' -------------------PORTB-----------------
+''' Bit#:  -7---6---5---4---3---2---1---0---
+''' PCB
+''' Constants
+''' SOUND --------|SND|---------------------
+'''-----------------------------------------
+''' -------------------PORTC-----------------
+''' Bit#:  -7---6---5---4---3---2---1---0---
+''' PCB    NA--A6--A5--A4--A3--A2--A1--A0---
+''' Constants
+''' LED    ---------------|L4 |L3 |L2 |L1 |-  where L equates to LED
+'''-----------------------------------------
+'''
+''' Connect the switch via suitable resistors using a standard switch connection.
+''' -------------------PORTE-----------------
+''' Bit#:  -7---6---5---4---3---2---1---0---
+''' PCB                  --A7--
+''' Constants
+''' SOUND ----------------|SW |--------------
+'''-----------------------------------------
+'''
+'''
+'''
+
+
+'''@author  Evan Venn
+'''@licence GPL
+'''@version 1.0
+'''@date    08/10/2020
+'''********************************************************************************
+
+
+; ----- Configuration
+#chip  LGT8F328P
+#option Explicit
+'Great Cow BASIC simplifies the configuration by setting the frequency and the configuration for you.   'Set constants to refer to the LEDs.
+    #DEFINE LED1 portc.0
+    #DEFINE LED2 portc.1
+    #DEFINE LED3 portc.2
+    #DEFINE LED4 portc.3
+
+
+   'Set constants to refer to the LEDs.
+    #DEFINE SoundOut PORTB.5          ; output pin for Tone
+
+    #DEFINE SWITCH porte.3
+
+    'Set LED as an output
+    Dir LED1 Out
+    Dir LED2 Out
+    Dir LED3 Out
+    Dir LED4 Out
+
+    'Set Switch as an input
+    Dir SWITCH In
+
+    ''' Most programs run in a loop such as this one
+    Dim keyPressed As Bit
+
+    On Interrupt PICI3Ready  call KeyDowbInterruptHandler
+    PCINT27 = 1
+
+    'Make music ininitally
+    Call MaryHadALittleLamb
+
+    Do Forever
+        Wait 10 ms
+        LED1 = 1
+        LED2 = 1
+        LED3 = 1
+        LED4 = 1
+
+        If  keyPressed = TRUE Then
+            LED1 = 0
+            LED2 = 0
+            LED3 = 0
+            LED4 = 0
+
+            Call MaryHadALittleLamb
+
+            keyPressed = False
+
+        End If
+
+    Loop
+
+
+Sub KeyDowbInterruptHandler
+
+    keyPressed = True
+
+End Sub
+
+
+Sub MaryHadALittleLamb
+
+            'push button pressed
+            Tone 554, 50
+            Tone 494, 50
+            Tone 440, 50
+            Tone 494, 50
+            Tone 554, 50
+            Tone 0, 50
+            Tone 554, 50
+            Tone 554, 50
+            Tone 494, 50
+            Tone 0, 50
+            Tone 494, 50
+            Tone 0, 50
+            Tone 494, 50
+            Tone 554, 50
+            Tone 659, 50
+            Tone 0, 50
+            Tone 659, 50
+            Tone 554, 50
+            Tone 494, 50
+            Tone 440, 50
+            Tone 494, 50
+            Tone 554, 50
+            Tone 0, 50
+            Tone 554, 50
+            Tone 0, 50
+            Tone 554, 50
+            Tone 494, 50
+            Tone 0, 50
+            Tone 494, 50
+            Tone 554, 50
+            Tone 494, 50
+            Tone 440, 50
+            Tone 0, 50
+End Sub

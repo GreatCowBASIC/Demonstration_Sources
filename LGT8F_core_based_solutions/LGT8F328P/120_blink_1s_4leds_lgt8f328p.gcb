@@ -1,0 +1,66 @@
+'''A demonstration program for GCB
+'''---------------------------------------------------------------------------------
+''' This demonstration simply turns the LED on and off with a wait of 1000 ms.   You can change the wait period, just change the constant.
+'''
+''' This used the millis() library to setup and expose a function that is the running time of the chip in milliseconds ( ms )
+''' Using millis() hides the complexity of setting up the timer.
+'''
+''' In this demo we connect four LEDs and flash them.
+''' Connect the LEDs via suitable resistors using a standard LED connection.
+'''
+'''
+''' -------------------PORTC-----------------
+''' Bit#:  -7---6---5---4---3---2---1---0---
+''' PCB    NA--A6--A5--A4--A3--A2--A1--A0---
+''' Constants
+''' LED    ---------------|L4 |L3 |L2 |L1 |-  where L equates to LED
+'''-----------------------------------------
+''
+'''@author  Evan Venn
+'''@licence GPL
+'''@version 1.0
+'''@date    08/10/2020
+'''********************************************************************************
+
+
+; ----- Configuration
+#chip  LGT8F328P, 1
+#option Explicit
+'Great Cow BASIC simplifies the configuration by setting the frequency and the configuration for you.   'Set constants to refer to the LEDs.
+    #DEFINE LED1 portc.0
+    #DEFINE LED2 portc.1
+    #DEFINE LED3 portc.2
+    #DEFINE LED4 portc.3
+
+    'Set LED as an output
+    Dir LED1 Out
+    Dir LED2 Out
+    Dir LED3 Out
+    Dir LED4 Out
+
+    ' Main program
+    InitTimer0 Osc, PS_256
+    StartTimer 0
+
+
+    ' This loop runs over and over forever.
+    Do
+
+      if ( TOV0 = 1 ) then
+
+        ' Toggle LED off
+        LED1 = NOT LED1
+        LED2 = NOT LED2
+        LED3 = NOT LED3
+        LED4 = NOT LED4
+
+        TOV0 = 1
+
+      end if
+
+    Loop
+
+    ' The program should never get to this line
+    '
+    ' End execution and put the device into low power sleep mode.
+    End

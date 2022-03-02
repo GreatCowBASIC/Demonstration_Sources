@@ -1,0 +1,31 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''This program demonstrates the capabilities controlling LEDs
+'''@author  EvanV
+'''@licence GPL
+'''@version 1.0a
+'''@date    10.12.2018
+'''********************************************************************************
+
+;Set chip model required:
+#chip 16f59, 20
+#option explicit
+
+#define USELEGACYFORNEXT
+
+dir porta out
+dir portb out
+dir portc out
+dir portd out
+dir porte out
+
+do Forever
+  for bits = 0 to 255
+    porta = bits
+    portb = porta
+    portc = portb
+    portd = portc
+    porte = portd
+    wait 100 ms
+  next
+Loop
