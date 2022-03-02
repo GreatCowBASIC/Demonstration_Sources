@@ -1,0 +1,84 @@
+'''A demonstration program for GCB
+'''---------------------------------------------------------------------------------
+''' This program shows how to use software serial.
+'''
+'''
+'''@author  Evan Venn
+'''@licence GPL
+'''@version 1.0
+'''@date    03/07/2020
+'''********************************************************************************
+
+
+
+#chip  TINY104, 8
+#option Explicit
+
+
+  ; Start of board specific configuration
+
+  ;Adjust Oscillator frequency to ensure operation of Serial, if required
+  OSCCAL = OSCCAL - 5
+
+  #Define SWITCH  portb.1
+  #Define LED     porta.5
+
+  'Set Internal Pullup for SWITCH port
+  PUEB.PORTB1 = 1
+  'Set direction of Switch
+  Dir SWITCH in
+
+  'Use Volatile to ensure the compiler does not try to optimize the code
+  #option Volatile LED
+  'Set direction of LED
+  Dir LED out
+
+    'USART settings for USART1
+    #define USART_BAUD_RATE 9600
+    #define USART_TX_BLOCKING
+
+
+  ; End of board specific configuration
+
+; ----- Variables
+    Dim StringLenByte, RecByte, STxDataByte  As Byte
+
+; ----- Main body of program commences here.
+
+    wait 3 s      'To give you time to connect the terminal
+
+    HserSend 1
+    HserSend 1
+    HserSend 10
+    HserSend 13
+    HserSend 10
+    HserSend 13
+    for RecByte = 1 to 31
+     ReadTable Strings, RecByte, STxDataByte
+     HserSend STxDataByte
+    next
+    HserSend 10
+    HserSend 13
+' or
+'    dim var as string * 7
+'    var = "Hello t"
+'    HSerPrint var
+'    var="his is "
+'    HSerPrint var
+'    var = "a string"
+'    HSerPrint var
+' or
+'    Enable to show constraint
+'     HSerPrint "Hello this is a string"
+
+    table Strings
+    87,101,108,99,111,109,101,32,116,111,32,71,114,101,97,116,32,67,111,119,32,66,65,83,73,67,32,50,48,50,48
+    end table
+
+    Do
+
+        wait 100 ms
+        HSerSend "."
+        LED = ! LED
+
+    Loop
