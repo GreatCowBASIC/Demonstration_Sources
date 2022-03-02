@@ -1,0 +1,154 @@
+'''
+'''******************************************************************
+''' DS18B20 demonstration for the board. We have added the DS18B20  section to specift the DS18B20 port.
+''' All the DS18B20 commands are standard Great Cow BASIC LCD commands.
+'''
+''' Set the section "DS18B20 setup section" for the specification of the setup Configuration.
+'''
+''' This demonstration show the tempature on the LCD as an Integer value and a Decimal Value.
+'''
+'''************************************************************************
+'''
+'''  PIC: 18f26k22
+'''  Compiler: GCB
+'''  IDE: GCB@SYN
+'''
+'''  Board: SmartPIC 18 Board
+'''  Date: 29.8.17
+'''
+' ----- Configuration
+'Chip Settings.
+#CHIP 18f26k22, 16
+#CONFIG MCLRE=On
+#OPTION Explicit
+
+'' -------------------PORTA----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---|RS |RW | E |D7 |D6 |D5 |D4
+''-----------------------------------------
+''
+
+'' -------------------PORTB----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    -------| O | A |-------| O | I |-
+''-----------------------------------------
+''
+
+'' ------------------PORTC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---| TX| A |-------| X |---------
+''-----------------------------------------
+''
+
+
+#DEFINE LEDD1 PORTB.1
+#DEFINE LEDD2 PORTB.5
+#DEFINE Potentiometer   PORTC.5
+#DEFINE LDR             PORTB.4
+#DEFINE SwitchIn        PORTB.0
+#DEFINE LCDControl      PORTC.2
+
+Dir     LEDD1         Out
+Dir     LEDD2         Out
+'this is the AN17 port
+Dir     Potentiometer In
+'this is the AN11 port
+Dir     LDR           In
+Dir     SwitchIn      In
+Dir     LCDControl    Out
+
+LCDControl = 0
+
+'Setup LCD Parameters
+#DEFINE LCD_IO 4
+#DEFINE LCD_SPEED FAST
+
+'Define LCD Hardware settings
+#DEFINE LCD_RS      PORTA.6
+#DEFINE LCD_RW      PORTA.5
+#DEFINE LCD_Enable  PORTA.4
+#DEFINE LCD_DB4     PORTA.0
+#DEFINE LCD_DB5     PORTA.1
+#DEFINE LCD_DB6     PORTA.2
+#DEFINE LCD_DB7     PORTA.3
+
+'DS18B20 setup section
+#INCLUDE <ds18b20.h>
+
+' ----- Constants
+' DS18B20 port settings
+#DEFINE DQ PortA.7
+
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+
+' ----- Variables
+' a variabler to handle the temperature calculations
+Dim TempC_100 As Word
+Dim CCOUNT, SIGNBIT, WHOLE, FRACT, DIG As Byte
+
+
+' ----- Main body of program commences here.
+
+ccount = 0
+CLS
+Print "GCBASIC 2019"
+Locate 1,0
+Print "DS18B20 Demo"
+Wait 2 s
+CLS
+
+Do Forever
+    ' The function readtemp returns the integer value of the sensor
+    DSdata = ReadTemp()
+
+    ' Display the integer value of the sensor on the LCD
+    Locate 0,0
+    Print Hex(ccount)
+    Print ":"
+    Print DSdata
+    Print CHR(223)+"C"
+
+
+
+    ' Display the integer and decimal value of the sensor on the LCD
+
+    ' The function readtemp12 returns the raw value of the sensor.
+    ' The sensor is read as a 12 bit value therefore each unit equates to 0.0625 of a degree
+    DSdata = ReadTemp12()
+    SignBit = DSdata / 256 / 128
+    If SignBit = 0 Then Goto Positive
+    ' its negative!
+    ' take twos comp
+    DSdata = ( DSdata # 0xffff ) + 1
+
+Positive:
+
+    ' Convert value * 0.0625. Mulitple value by 6 then add result to multiplication of the value with 25 then divide result by 100.
+    TempC_100 =  DSdata * 6
+    DSdata = ( DSdata * 25 ) / 100
+    TempC_100 = TempC_100 + DSdata
+
+    Whole = TempC_100 / 100
+    Fract = TempC_100 % 100
+    If SignBit = 0 Then Goto DisplayTemp
+    Print "-"
+
+DisplayTemp:
+    Locate 1,0
+    Print Hex(ccount)
+    Print ":"
+    Print Str(Whole)
+    Print "."
+    ' To ensure the decimal part is two digits
+    Dig = Fract / 10
+    Print Dig
+    Dig = Fract % 10
+    Print Dig
+    Print CHR(223)
+    Print "C"
+    Wait 2 s
+    ccount++
+
+Loop

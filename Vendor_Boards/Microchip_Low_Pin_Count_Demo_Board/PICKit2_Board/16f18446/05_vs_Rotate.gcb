@@ -1,0 +1,29 @@
+'''
+''' Great Cow BASIC Header block Header block
+'''
+'''@author  Chris Roper
+'''@licence GPL
+'''@version 1.00
+'''@date    03/05/2018
+'''********************************************************************
+
+#CHIP 16F18446
+#CONFIG MCLRE_OFF
+
+' as found by A2D example
+#DEFINE  ADC_Fudge 0x0739
+
+Dir portc Out
+portc = 0
+portc.3 = 1
+
+Do
+
+    Wait Scale( ReadAD12 ( AN0 ), 0, ADC_Fudge, 100, 1000) ms
+    Set C Off
+    Rotate portc Right
+    If C = 1 Then portc.3 = 1
+
+Loop
+
+End

@@ -1,0 +1,121 @@
+'  FILE:    PIC_GCB_16F877A_READ_ROM_DS18B20_and_Temp_with_LCD_Example.gcb
+'  DATE:    26/09/14
+'  VERSION: 0.1a
+'  AUTHOR:  Anobium
+'
+'This program was written using the Great Cow Basic IDE for use with the PIC
+'16F8777A development board (HCDVBD0003) and a 1602 parallel LCD module
+'(HCMODU0013 or HCMODU0038) to display the unique 64-BIT LASERED ROM CODE of a DS18B20 sensor.
+
+
+'Chip Settings. Assumes the development board with with a 16F877A
+#CHIP 16F877A,20
+#OPTION Explicit
+#INCLUDE <ds18b20.h>
+
+'Use LCD in 4 pin mode and define LCD pins
+#DEFINE LCD_IO 4
+#DEFINE LCD_RW PORTE.1
+#DEFINE LCD_RS PORTE.0
+#DEFINE LCD_Enable PORTE.2
+#DEFINE LCD_DB4 PORTD.4
+#DEFINE LCD_DB5 PORTD.5
+#DEFINE LCD_DB6 PORTD.6
+#DEFINE LCD_DB7 PORTD.7
+
+' DS18B20 port settings - this is required
+#DEFINE DQ PortC.3
+
+
+' READ ROM [33h]
+' This command can only be used when there is one slave on the bus.
+' It allows the bus master to read the slave’s 64-bit ROM code without using the Search ROM procedure.
+' If this command is used when there is more than one slave present on the bus, a data collision will occur when all the slaves attempt to respond at the same time.
+
+' 64-BIT LASERED ROM CODE
+' Each DS18B20 contains a unique 64–bit code (see Figure 6) stored in ROM.
+' The least significant 8 bits of the ROM code contain the DS18B20’s 1-Wire family code: 28h.
+' The next 48 bits contain a unique serial number.
+' The most significant 8 bits contain a cyclic redundancy check (CRC) byte that is calculated from the first 56 bits of the ROM code. A detailed explanation of the CRC bits is provided in the CRC Generation section. The 64-bit ROM code and associated ROM function control logic allow the DS18B20 to operate as a 1-Wire device using the protocol detailed in the 1-Wire Bus System section.
+' 64-Bit Lasered ROM Code
+'
+' 8-BIT CRC      48-BIT SERIAL NUMBER          8-BIT FAMILY CODE (28h)
+' MSB  LSB       MSB              LSB          MSB                 LSB
+
+Dim YPOS, OLDDSDATA, XPOS, EIGHTBYTES, CLOCKS As Byte
+
+
+CLS
+Print "Great Cow Basic "
+Locate 1 , 0
+Print "DS18B20   @2014 "
+Wait 3 s
+CLS
+Print "SHOW 64BIT LASERED"
+Locate 1 , 0
+Print "ROM CODE ON LCD"
+Wait 3 s
+CLS
+' Ypos on the LCD
+ypos = 0
+
+' show 64-BIT LASERED ROM CODE on both rows of the LCD
+Wait 100 ms
+' Reset ds18b20
+MasterRST
+' Request a presence pulse
+PPulse
+Wait 100 us
+' Send 64-BIT LASERED ROM CODE read code
+OWout ReadRom
+Wait 100 us
+' Process and display the 64-BIT LASERED ROM CODE
+OWinRom
+
+
+oldDSdata = 255
+Do Forever
+    ' The function readtemp returns the integer value of the sensor
+    DSdata = ReadTemp
+
+    If oldDSdata <> DSdata Then
+        ' Display the integer value of the sensor on the LCD
+        Locate 1,0
+        Print "Currently "
+        Print DSdata
+        Print CHR(223)+"C "
+        oldDSdata = DSdata
+    End If
+    Wait 1 s
+Loop
+
+
+
+
+
+End
+
+Sub OWinRom
+    ' XPos on the LCD
+    xpos = 14
+    For EightBytes = 1 To 8
+        For Clocks = 1 To 8
+            'The DS18s20 wants data LSB first
+            Rotate RxData Right
+            Dir DQ Out
+            'Read time slot
+            Set DQ Off
+            Wait 4 us
+            'Release bus for one wire transmission
+            Dir DQ In
+            Wait 7 us
+            If DQ On  Then Set RxData.7 1
+            If DQ Off Then Set RxData.7 0
+            Wait 50 us
+        Next
+        Locate ypos , xpos
+        Print Hex(RxData)
+        xpos = xpos - 2
+
+    Next
+End Sub

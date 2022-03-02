@@ -1,0 +1,52 @@
+'''
+''' This demonstration uses a simple software delay routine to avoid the initial noise on the switch
+''' pin. The code will delay for only 5 ms, but should overcome most of the noise. The
+''' required delay amount differs with the switch being used. Some switches are worse
+''' than others.
+'''
+''' When the switch is held down, D1 will be lit. When the switch is not held down, all
+''' LEDs are OFF.
+'''
+'''
+'''  PIC: 16F18326
+'''  Compiler: GCB
+'''  IDE: GCB@SYN
+'''
+'''  Board: Xpress Evaluation Board
+'''  Date: 13.3.2016
+'''
+' ----- Configuration
+'Chip Settings.
+#CHIP 16F18326,32
+
+
+
+'' -------------------LATC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' LED:   ---------------|D5 |D4 |D3 |D2 |-
+''-----------------------------------------
+''
+
+#DEFINE DOWN        0
+#DEFINE UP          1
+#DEFINE SWITCH      PORTA.1
+#DEFINE LED         PortC.0
+
+Dir LED Out
+LED = 0
+
+'setup switch (SW1)
+Dir SWITCH In
+
+Do
+
+    If ( SWITCH = DOWN ) Then
+        Wait 10 ms
+        If ( SWITCH = DOWN ) Then
+            Set LED On
+        End If
+    Else
+        Set LED Off
+    End If
+
+Loop

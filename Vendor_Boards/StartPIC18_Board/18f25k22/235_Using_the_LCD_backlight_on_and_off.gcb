@@ -1,0 +1,97 @@
+'''
+'''******************************************************************
+''' LCD demonstration for the board. We have added the LCD section to specific the ports.
+''' All the LCD commands are standard Great Cow BASIC LCD commands..
+'''
+''' The program turns the LCD backlight on and off dependent upon the state of the switch
+'''
+''' These are all standard Great Cow BASIC commands
+'''
+''' See the section "Setup LCD Parameters" for the specification of the LCD commands.
+'''
+'''
+'''************************************************************************
+'''
+'''  PIC: 18f25k22
+'''  Compiler: GCB
+'''  IDE: GCB@SYN
+'''
+'''  Board: SmartPIC 18 Board
+'''  Date: 29.8.17
+'''
+' ----- Configuration
+'Chip Settings.
+#CHIP 18f25k22, 16
+#CONFIG MCLRE=On
+#OPTION Explicit
+
+'' -------------------PORTA----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---|RS |RW | E |D7 |D6 |D5 |D4
+''-----------------------------------------
+''
+
+'' -------------------PORTB----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    -------| O | A |-------| O | I |-
+''-----------------------------------------
+''
+
+'' ------------------PORTC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---| TX| A |-------| X |---------
+''-----------------------------------------
+''
+
+
+#DEFINE LEDD1 PORTB.1
+#DEFINE LEDD2 PORTB.5
+#DEFINE Potentiometer   PORTC.5
+#DEFINE LDR             PORTB.4
+#DEFINE SwitchIn        PORTB.0
+#DEFINE LCDControl      PORTC.2
+
+Dir     LEDD1         Out
+Dir     LEDD2         Out
+'this is the AN17 port
+Dir     Potentiometer In
+'this is the AN11 port
+Dir     LDR           In
+Dir     SwitchIn      In
+Dir     LCDControl    Out
+#DEFINE LCD_Backlight   LCDControl
+'Invert the LCD Backlight States to suit the circuit board
+#DEFINE LCD_Backlight_On_State  0
+#DEFINE LCD_Backlight_Off_State 1
+
+'Setup LCD Parameters
+#DEFINE LCD_IO 4
+#DEFINE LCD_SPEED FAST
+
+'Define LCD Hardware settings
+#DEFINE LCD_RS      PORTA.6
+#DEFINE LCD_RW      PORTA.5
+#DEFINE LCD_Enable  PORTA.4
+#DEFINE LCD_DB4     PORTA.0
+#DEFINE LCD_DB5     PORTA.1
+#DEFINE LCD_DB6     PORTA.2
+#DEFINE LCD_DB7     PORTA.3
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+
+CLS
+Print "GCBASIC"
+LCDBacklight On
+Do Forever
+    Locate 1, 0
+    If  SwitchIn = Off Then
+        LCDBacklight Off
+        Print "OFF"
+    Else
+        LCDBacklight On
+        Print "ON "
+    End If
+Loop
+
+

@@ -1,0 +1,93 @@
+''' A demonstration program for GCGB and GCB.
+'''
+'''******************************************************************
+'''
+''' This shows using a table lookup function to implement a
+''' binary to gray code conversion.  The POT is read by the ADC,
+''' The high order 4 bits are averged the displayed on the LEDs.
+
+''' The ADC value is averaged in the sub soutine.
+'''
+''' This returns coded binary on the LEDs in accordance with the POT reading
+'''
+'''
+'''   You need four LEDs connnect to portc.0, portc.1, portc.2 and portc.3 connected via suitable resistors.
+'''  You will to connect a pot to porta.0.  The needs to be connected the supply voltage and 0v using an appropiate method.
+'''  You will a switch connect to porta.1.  The needs to be connected the supply voltage via a 1-k pullup resistor.
+'''  ************************************************************************************************************************************************************************************
+'''
+'''
+'''  PIC: 16f18326
+'''  Compiler: GCB
+'''  IDE: GCB@SYN
+'''
+'''
+'''@author   EvanV
+'''@licence  GPL
+'''@version  1.0
+'''@date     29.07.2016
+
+
+
+'Chip Settings.
+#CHIP 16f18326
+
+
+'' -------------------LATC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' LED:   ---------------|D5 |D4 |D3 |D2 |-
+''-----------------------------------------
+''
+#DEFINE LEDD2  PORTC.0
+#DEFINE LEDD3  PORTC.1
+#DEFINE LEDD4  PORTC.2
+#DEFINE LEDD5  PORTC.3
+#DEFINE LEDBANK portc
+#DEFINE SWITCH      PORTA.1
+
+Dir     LEDD2 Out
+Dir     LEDD3 Out
+Dir     LEDD4 Out
+Dir     LEDD5 Out
+Dir      SWITCH In
+
+'    Set LEDS off
+LEDBANK = 0
+
+
+
+#DEFINE SWITCH_DOWN         1
+#DEFINE SWITCH_UP           0
+
+
+#DEFINE NUM_READINGS 8
+
+'Dimension and set the variables
+Dim _sum As Long
+Dim yloop, xloop As Byte
+_sum = 0
+
+Dim queue(8)
+queue = 0, 0, 0, 0, 0, 0, 0, 0
+
+Do
+    For xloop = 1 To NUM_READINGS
+        ' This will set the whole port
+        ' a little calculation to ensure max value is 15, equates to all 4 LEDS on
+        LEDBANK = ( average_reading ( queue() ) * 10 / 138 )
+        ' Set the next array point with the next reading
+        queue( xloop ) = ReadAD ( AN0 )
+    Next
+Loop
+
+
+Function average_reading ( In analyze_queue() ) As Word
+
+    _sum = 0
+    For yloop = 1 To  NUM_READINGS
+        _sum = [Long]queue ( yloop ) + _sum
+    Next
+
+    average_reading = _sum / NUM_READINGS
+
+End Function

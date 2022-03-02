@@ -1,0 +1,183 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''This program is a simple GLCD demonstration of the SSD1306 GLCD capabilities.
+'''This program draws lines, boxes, circles and prints strings and numbers.
+'''The SSD1306 controller a small graphical OLED, suitable for a lot of various projects.
+'''The display is 38*35 mm, with an active display surface of 0.96inches, and a 128*64 pixel resolution.
+'''The display is easy to interface, using an I2C type of communication.
+'''The GLCD is connected to the microprocessor as shown in the hardware section of this code.
+'''
+'''This version is compatible will all version of Great Cow BASIC as this demonstration uses Full Memory GLCD mode only.  This can be adapted to Low Memory GLCD mode.
+'''
+'''************************************************************************
+'''@author  EvanV
+'''@licence GPL
+'''@version 2.1
+'''@date    27.8.17
+'''************************************************************************
+'''
+'''  PIC: 18f25k22
+'''  Compiler: GCB
+'''  IDE: GCB@SYN
+'''
+'''  Board: SmartPIC 18 Board
+'''  Date: 29.8.17
+'''
+' ----- Configuration
+'Chip Settings.
+#CHIP 18f25k22, 16
+#CONFIG MCLRE=On
+#OPTION Explicit
+
+'' -------------------PORTA----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---------------------------------
+''-----------------------------------------
+''
+
+'' -------------------PORTB----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    -------| O | A |-------| O | I |-
+''-----------------------------------------
+''
+
+'' ------------------PORTC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---| TX|---|SDA|CLK| X |---------
+''-----------------------------------------
+''
+
+
+#DEFINE LEDD1 PORTB.1
+#DEFINE LEDD2 PORTB.5
+#DEFINE Potentiometer   PORTC.5
+#DEFINE LDR             PORTB.4
+#DEFINE SwitchIn        PORTB.0
+#DEFINE LCDControl      PORTC.2
+
+Dir     LEDD1         Out
+Dir     LEDD2         Out
+'this is the AN17 port
+Dir     Potentiometer In
+'this is the AN11 port
+Dir     LDR           In
+Dir     SwitchIn      In
+Dir     LCDControl    Out
+
+'Always set the LCD on (high) to Shut OFF the LCD-Backlight. This is required when powered from a PicKit.
+LCDControl = 1
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+
+' Define I2C settings
+#DEFINE HI2C_BAUD_RATE 400
+#DEFINE HI2C_DATA PORTC.4
+#DEFINE HI2C_CLOCK PORTC.3
+'Initialise I2C Slave
+'I2C pins need to be input for SSP module - this is not an option
+Dir HI2C_DATA In
+Dir HI2C_CLOCK In
+'MASTER
+HI2CMode Master
+
+
+#INCLUDE <glcd.h>
+#DEFINE GLCD_TYPE GLCD_TYPE_SSD1306
+#DEFINE GLCD_I2C_Address 0x78
+
+' ----- Define variables
+
+'These constants allow you to change the GLCD memory usage.
+#DEFINE GLCD_PROTECTOVERRUN
+
+' ----- Define variables
+
+Dim BYTENUMBER, CCOUNT As Byte
+
+CCount = 0
+Dim longNumber As Long
+' max value = 4294967290
+longNumber = 123456
+Dim wordNumber As Word
+Dim outstring As String
+wordNumber = 0
+byteNumber = 0
+
+' ----- Main program
+
+GLCDPrint 0, 0,   "Great Cow BASIC"
+GLCDPrint (0, 16, "Anobium 2019")
+GLCDPrint (0, 32, "Portability Demo")
+GLCDPrint (0, 48, ChipNameStr )
+
+
+
+
+Wait 3 s
+GLCDCLS
+
+' Prepare the static components of the screen
+' Print some text
+GLCDPrint ( 0,   0, "PrintStr")
+' Print some more text
+GLCDPrint ( 64,  0, "@")
+' Print chip speed
+GLCDPrint ( 72,  0, ChipMHz)
+' Print some text
+GLCDPrint ( 86, 0, "Mhz")
+' Draw some text
+GLCDDrawString( 0,8,"DrawStr")
+' Draw a box
+Box 0,0,GLCD_WIDTH-1, GLCD_HEIGHT-1
+' Draw a box
+Box GLCD_WIDTH-5, GLCD_HEIGHT-5,GLCD_WIDTH-1, GLCD_HEIGHT-1
+' Draw a circle
+Circle( 44,41,15)
+' Draw a line
+Line 64,31,0,31
+
+Do Forever
+
+    For CCount = 32 To 127
+
+        ' Print a HEX string
+        GLCDPrint ( 64 ,  36,  Hex(longNumber_E ) )
+        ' Print a HEX string
+        GLCDPrint ( 76 ,  36,  Hex(longNumber_U ) )
+        ' Print a HEX string
+        GLCDPrint ( 88 ,  36,  Hex(longNumber_H ) )
+        ' Print a HEX string
+        GLCDPrint ( 100 ,  36, Hex(longNumber   ) )
+        ' Print a HEX string
+        GLCDPrint ( 112 ,  36, "h" )
+
+
+        ' Print a padded string
+        GLCDPrint ( 64 ,  44, Pad(Str(wordNumber), 5 ) )
+        ' Print a padded string
+        GLCDPrint ( 64 ,  52, Pad(Str(byteNumber), 3 ) )
+
+
+        ' Draw a Box
+        Box (46,9,56,19)
+        ' Draw a character
+        GLCDDrawChar(48, 10, CCount )
+        ' Prepare a string
+        outString = Str( CCount )
+        ' Draw a string
+        GLCDDrawString(64, 9, Pad(outString,3) )
+
+        ' Draw a filled box
+        FilledBox 3,43,11,51, wordNumber
+
+        ' Draw a filled box
+        FilledCircle( 44,41,9, longNumber XOR 1)
+        ' Draw a line
+        Line 0,63,64,31
+
+        ' Do some simple maths
+        longNumber = longNumber + 7 : wordNumber = wordNumber + 3 : byteNumber++
+    Next
+Loop
+End

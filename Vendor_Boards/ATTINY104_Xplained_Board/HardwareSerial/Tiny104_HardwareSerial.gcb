@@ -1,0 +1,124 @@
+'''A demonstration program for GCB
+'''---------------------------------------------------------------------------------
+''' This program shows how to use hardware serial.
+'''
+'''
+'''@author  Evan Venn
+'''@licence GPL
+'''@version 1.0
+'''@date    03/07/2020
+'''********************************************************************************
+
+/*
+Diagram Author : Ardunaut
+                 __________
+           VCC--|1       14|--GND (TPI CLK)
+           PA0--|2       13|--PB3 (CDC TX) -->USART_Transmit()
+(TPI DATA) PA1--|3       12|--PB2 (CDC RX) <--USART_Receive()
+   (RESET) PA2--|4       11|--PB1 (BUTTON)
+           PA3--|5       10|--PB0
+           PA4--|6        9|--PA7
+     (LED) PA5--|7        8|--PA6
+                \__________/
+        Atmel ATtiny104 Xplained Nano
+*/
+
+
+
+#chip  TINY104, 8
+#option Explicit
+
+
+  ; Start of board specific configuration
+
+  ;Adjust Oscillator frequency to ensure operation of Serial, if required
+  OSCCAL = OSCCAL - 5
+
+  #Define SWITCH  portb.1
+  #Define LED     porta.5
+
+  'Set Internal Pullup for SWITCH port
+  PUEB.PORTB1 = 1
+  'Set direction of Switch
+  Dir SWITCH in
+
+  'Use Volatile to ensure the compiler does not try to optimize the code
+  #option Volatile LED
+  'Set direction of LED
+  Dir LED out
+
+  'USART settings for USART1
+  #define USART_BAUD_RATE 9600
+  #define USART_TX_BLOCKING
+
+
+  ; End of board specific configuration
+
+; ----- Variables
+    Dim StringLenByte, RecByte As Byte
+    Dim STxDataByte alias Serdata  'Alias the table data direct to the variable used by the library to send the data to the port
+
+; ----- Main body of program commences here.
+
+    wait 3 s      'To give you time to connect the terminal
+
+    HserSend 1
+    HserSend 1
+    HserSend 10
+    HserSend 13
+    HserSend 10
+    HserSend 13
+    for RecByte = 1 to 31
+     ReadTable Strings, RecByte, STxDataByte
+     HserSend STxDataByte
+    next
+    HserSend 10
+    HserSend 13
+
+
+    for RecByte = 1 to 28
+     ReadTable String2, RecByte, STxDataByte
+     HserSend STxDataByte
+    next
+    HserSend 10
+    HserSend 13
+
+    for RecByte = 1 to 75
+     ReadTable String3, RecByte, STxDataByte
+     HserSend STxDataByte
+    next
+    HserSend 10
+    HserSend 13
+
+' or
+'    dim var as string * 7
+'    var = "Hello t"
+'    HSerPrint var
+'    var="his is "
+'    HSerPrint var
+'    var = "a string"
+'    HSerPrint var
+' or
+'    Enable to show constraint
+'     HSerPrint "Hello this is a string"
+
+    Do
+
+        wait 100 ms
+        HSerSend 0x2E  'send a FullStop character
+        LED = ! LED
+
+    Loop
+
+
+    table Strings  'Welcome to Great Cow BASIC 2020
+    87,101,108,99,111,109,101,32,116,111,32,71,114,101,97,116,32,67,111,119,32,66,65,83,73,67,32,50,48,50,48
+    end table
+
+    table String2   'This is using Harware Serial
+    84,104,105,115,32,105,115,32,117,115,105,110,103,32,72,97,114,119,97,114,101,32,83,101,114,105,97,108,0
+    end table
+
+    table String3   'This program uses 2 bytes of precious RAM on this ATTINY104 microcontroller
+    84,104,105,115,32,112,114,111,103,114,97,109,32,117,115,101,115,32,50,32,98,121,116,101,115,32,111,102,32,112,114,101,99,105,111,117,115,32,82,65,77,32,111,110,32,116,104,105,115,32,65,84,84,73,78,89,49,48,52,32,109,105,99,114,111,99,111,110,116,114,111,108,108,101,114
+    end table

@@ -1,0 +1,34 @@
+'''
+''' Great Cow BASIC Header block Header block
+'''
+'''@author  Chris Roper
+'''@licence GPL
+'''@version 1.00
+'''@date    03/05/2018
+'''********************************************************************
+
+#CHIP 16F18446
+#CONFIG MCLRE_OFF
+' as found by A2D example
+#DEFINE  ADC_Fudge 0x0739
+
+#STARTUP InitPPS, 85
+
+Sub InitPPS
+
+    'Module: CCP2
+    'CCP2 > RC2
+    RC2PPS = 0x000A
+    'RC2 > CCP2 (bi-directional)
+    CCP2PPS = 0x0012
+
+End Sub
+
+Dir portc.2 Out
+
+Do
+    Wait 5 ms
+    HPWM 2, 40, Scale(ReadAD12(An0), 0, ADC_Fudge, 1, 255)
+Loop
+
+End

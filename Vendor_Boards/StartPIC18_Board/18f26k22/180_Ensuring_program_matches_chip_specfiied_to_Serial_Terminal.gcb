@@ -1,0 +1,86 @@
+''' This demonstration is for Great Cow BASIC
+'''
+''' This demonstration how you can check your program is intented for a specific Microcontroller
+'''
+''************************************************************************
+'''
+'''  PIC: 18f26k22
+'''  Compiler: GCB
+'''  IDE: GCB@SYN
+'''
+'''  Board: SmartPIC 18 Board
+'''  Date: 29.8.17
+'''
+' ----- Configuration
+'Chip Settings.
+#CHIP 18f26k22, 16
+
+'' -------------------PORTA----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---|RS |RW | E |D7 |D6 |D5 |D4
+''-----------------------------------------
+''
+
+'' -------------------PORTB----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    -------| O | A |-------| O | I |-
+''-----------------------------------------
+''
+
+'' ------------------PORTC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---| TX| A |-------| X |---------
+''-----------------------------------------
+''
+
+
+#DEFINE LEDD1 PORTB.1
+#DEFINE LEDD2 PORTB.5
+#DEFINE Potentiometer   PORTC.5
+#DEFINE SwitchIn        PORTB.0
+#DEFINE LCDControl      PORTC.2
+#DEFINE EventPort       PORTB.7
+
+Dir     LEDD1         Out
+Dir     LEDD2         Out
+'this is the AN17 port
+Dir     Potentiometer In
+Dir     SwitchIn      In
+Dir     LCDControl    Out
+
+'Always set the LCD on (high) to Shut OFF the LCD-Backlight. This is required when powered from a PicKit.
+LCDControl = 1
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+
+
+'Setup Serial port
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+
+
+HSerPrintCRLF
+HSerPrint  ChipNameStr + " Great Cow BASIC Demo"
+HSerPrintCRLF
+Wait 1 s
+
+If Trim( UCase( "18f26k22") )  <> ChipNameStr Then
+    HSerPrint "Wrong Microcontroller program intended for 18f26k22"
+    HSerPrintCRLF
+    HSerPrint "The Microcontroller is a "+ChipNameStr
+    HSerPrintCRLF
+    Wait While TRUE
+Else
+    HSerPrint "The Microcontroller program intended for the "+ChipNameStr
+    HSerPrintCRLF
+    Wait While TRUE
+End If
+
+
+
+
+
+End
+
+' ----- Support methods.  Subroutines and Functions

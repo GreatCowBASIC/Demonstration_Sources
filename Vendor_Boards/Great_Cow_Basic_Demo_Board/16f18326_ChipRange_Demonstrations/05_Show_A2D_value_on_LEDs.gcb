@@ -1,0 +1,56 @@
+''' A demonstration program for GCGB and GCB.
+'''
+''' This shows how to read the A2D converter and display the
+''' A proportioanal value on the 4 bit LED display.
+''' The pot on the board varies the voltage coming in on in A0.
+'''
+''' The A2D is referenced to the same Vdd as the device, which
+''' is nominally is 5V.  The A2D returns the ratio of the voltage
+''' on Pin RA0 to 5V.  The A2D has a resolution of 10 bits, with 1023
+''' representing 5V and 0 representing 0V.
+'''
+'''
+''' The four LSbs of the ADC are mirrored onto the LEDs.
+''' Rotate the potentiometer to change the LEDs displayed.
+'''
+'''   You need four LEDs connnect to portc.0, portc.1, portc.2 and portc.3 connected via suitable resistors.
+'''  You will to connect a pot to porta.0.  The needs to be connected the supply voltage and 0v using an appropiate method.
+'''
+''':***********************************************************************
+'''
+'''  PIC: 16F18326
+'''  Compiler: GCB
+'''  IDE: GCB@SYN
+'''
+'''@author   EvanV
+'''@licence  GPL
+'''@version  1.0
+'''@date     29.07.2016
+
+' ----- Configuration
+#CHIP 16F18326, 32
+
+
+'' -------------------LATC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' LED:   ---------------|D5 |D4 |D3 |D2 |-
+''-----------------------------------------
+''
+#DEFINE LEDD2  PORTC.0
+#DEFINE LEDD3  PORTC.1
+#DEFINE LEDD4  PORTC.2
+#DEFINE LEDD5  PORTC.3
+#DEFINE Potentiometer   PORTA.0
+
+Dir     LEDD2 Out
+Dir     LEDD3 Out
+Dir     LEDD4 Out
+Dir     LEDD5 Out
+Dir      Potentiometer In
+
+Do
+
+    Wait 100 ms
+    portc =  ReadAD10 ( AN0 ) / 64
+
+Loop

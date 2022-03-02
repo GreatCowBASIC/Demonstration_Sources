@@ -1,0 +1,121 @@
+'''
+'''******************************************************************
+''' Lesson 13 - "EEPROM"
+'''
+''' This lesson will provide code for writing and reading a single byte onto
+''' the on-board EEPROM. EEPROM is non-volatile memory, meaning that it does
+''' not lose its value when power is shut off. This is unlike RAM, which will
+''' lose its value when no power is applied. The EEPROM is useful for storing
+''' variables that must still be present during no power.
+''' It is also convenient to use if the entire RAM space is used up.
+''' Writes and reads to the EEPROM are practically instant and are much faster
+''' than program memory operations.
+
+''' This will show the value of the EEPROM on the serial Terminal.
+''' You can experiment by changing the variable 'Outdata' from Random function to a specific range.  Enjoy.
+'''
+'''  PIC: 16F18855
+'''  Compiler: GCB
+'''  IDE: GCB@SYN
+'''
+'''  Board: Xpress Evaluation Board
+'''  Date: 13.3.2016
+'''
+
+'Chip Settings.
+#CHIP 16f18855,32
+#OPTION Explicit
+
+
+
+'' -------------------LATA-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' LED:   ---------------|D5 |D4 |D3 |D1 |-
+''-----------------------------------------
+''
+
+'Set the PPS of the PWM and the RS232 ports.
+'Set the PPS for this solution.
+#STARTUP InitPPS, 85
+
+Sub InitPPS
+    UNLOCKPPS
+    'RC0->EUSART:TX;
+    RC0PPS = 0x0010
+    'RC1->EUSART:RX;
+    RXPPS  = 0x0011
+    LOCKPPS
+End Sub
+
+Dim DISPLAYNEWLINE, OUTDATA, INDATA As Byte
+
+#DEFINE USART_BAUD_RATE 19200
+#DEFINE USART_TX_BLOCKING
+
+#DEFINE LEDD2 PORTA.0
+#DEFINE LEDD3 PORTA.1
+#DEFINE LEDD4 PORTA.2
+#DEFINE LEDD5 PORTA.3
+Dir     LEDD2 Out
+Dir     LEDD3 Out
+Dir     LEDD4 Out
+Dir     LEDD5 Out
+
+#DEFINE SWITCH_DOWN         0
+#DEFINE SWITCH_UP           1
+
+#DEFINE SWITCH              PORTA.5
+
+' Now assumes Serial Terminal is operational
+Dim EEPromAddress As Byte
+
+HSerPrintCRLF
+HSerPrint "EEPROM Test and Show EEProm Results"
+HSerPrintCRLF 2
+
+Do Forever
+    Set LEDD2 Off
+    Set LEDD3 Off
+    Set LEDD4 Off
+    Set LEDD5 Off
+
+    HSerPrint "     "
+    For EEPromAddress = 0 To 15
+        HSerPrint Hex(EEPromAddress)
+        HSerPrint " "
+    Next
+
+    For EEPromAddress = 0 To 255
+        DisplayNewLine = EEPromAddress % 16
+        If DisplayNewLine = 0 Then
+            HSerPrintCRLF
+            HSerPrint Hex(EEPromAddress)
+            HSerPrint ": "
+        End If
+        HSerPrint " "
+
+        Outdata = Random
+        'Outdata = EEPromAddress
+        EPWrite ( EEPromAddress, Outdata )
+        EPRead  ( EEPromAddress, Indata )
+
+        If Outdata = Indata Then
+            HSerPrint  Hex(Indata)
+        Else
+            HSerPrint  "--"
+        End If
+
+    Next
+
+    HSerPrintCRLF 2
+    HSerPrint   "End of EEProm Program and Display"
+    HSerPrintCRLF 2
+    Set LEDD2 On
+    Set LEDD3 On
+    Set LEDD4 On
+    Set LEDD5 On
+
+    Wait While SWITCH = On
+Loop
+End
+

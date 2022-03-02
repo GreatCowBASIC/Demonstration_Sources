@@ -1,0 +1,121 @@
+'''
+'''******************************************************************
+'''  Lesson 10 - "Interrupts and Pull-ups"
+'''
+'''  This lesson will introduce interrupts and how they are useful. It will
+'''  also introduce internal weak pull-ups that are available on most PICs.
+'''
+'''  It should be noted that this lesson is more efficent than the last
+'''  one, "Timer0". Notice how the processor is no longer waiting for
+'''  Timer0 to roll over. Instead, we let the hardware modules do the work,
+'''  freeing the CPU to do other things in the main loop
+'''
+'''  The switch is no longer continuously polled for a button press. Instead,
+'''  an interrupt will occur which will automically place the program counter
+'''  inside of the ISR where we can change directions outisde of normal code execution
+'''
+'''  LEDs rotate at a constant speed and the switch reverses their direction
+'''
+'''  PIC: 18F14K22
+'''  Compiler: GCB
+'''  IDE: GCB@SYN
+'''
+'''  Board: PICkit 2 Low Pin Count Demo Board
+'''  Date: 04/05/18
+'''
+''''''******************************************************************
+''' See Low Pin Count Demo Board User's Guide for Lesson Information*
+''''''*****************************************************************
+'''
+
+#CHIP 18F14K22,1
+#OPTION Explicit
+#CONFIG MCLRE_OFF
+
+#DEFINE DOWN                0
+#DEFINE UP                  1
+
+#DEFINE SWITCH              PORTA.3
+
+#DEFINE LED_RIGHT           1
+#DEFINE LED_LEFT            0
+
+'if this is uncommented, the trace under JP5 can be cut
+#DEFINE PULL_UPS
+'with no affect on the output
+
+Dir portc Out
+portc = 0
+portc.3 = 1
+'start with LEDs rotating from right to left
+_direction = LED_RIGHT
+
+'setup switch (SW1)
+Dir switch In
+
+Dim _DIRECTION As Byte
+
+
+#IFDEF PULL_UPS
+    'enable the weak pull-up for the switch
+    WPUA2 = 1
+#ENDIF
+
+'Set up timer to overflow then call the subroutine to reset the timer for us
+TMR0IE = 1
+InitTimer0 Osc, PS0_256
+On Interrupt Timer0Overflow Call InterruptHandler
+
+'Set up the button event and call the subroutine to handler the button press
+IOCA3 = 1
+On Interrupt PORTChange  Call InterruptHandler
+
+
+Do
+
+Loop
+
+
+
+Sub InterruptHandler
+
+    If  RABIF = 1 Then
+        ' SW1 was just pressed
+        ' must clear the flag in software
+        RABIF = 0
+        ' debounce by waiting and seeing if still held down
+        Wait 5 ms
+        If ( SWITCH = DOWN ) Then
+            ' change directions
+            _direction = 1 XOR _direction
+        End If
+    End If
+
+    If T0IF = 1 Then
+        ' Timer has overflowed
+        T0IF = 0
+        If  _direction.0 = LED_RIGHT  Then
+            'shift to the right by 1
+            Set C Off
+            Rotate portc Right
+
+            ' when the last LED is lit, restart the pattern
+            If C = 1 Then
+                portc.3 = 1
+            End If
+
+        Else
+            'shift to the left by 1
+            Set C Off
+            Rotate portc Left
+
+            'when the last LED is lit, restart the pattern
+            If  portC.4 = 1 Then
+                portC.0 = 1
+                portC.4 = 0
+            End If
+        End If
+    End If
+
+
+End Sub

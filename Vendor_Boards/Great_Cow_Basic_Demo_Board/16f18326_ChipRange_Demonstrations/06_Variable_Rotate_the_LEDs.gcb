@@ -1,0 +1,64 @@
+''' A demonstration program for GCGB and GCB.
+'''
+'''  This demonstration combines all of the previous lessons to produce a variable speed rotating
+'''  LED display that is proportional to the ADC value. The ADC value and LED rotate
+'''  speed are inversely proportional to each other.
+'''
+'''  Rotate the POT counterclockwise to see the LEDs shift faster.
+'''
+''' The top LSbs of the ADC are mirrored onto the LEDs. Rotate the potentiometer
+''' to change the display.
+'''
+'''   You need four LEDs connnect to portc.0, portc.1, portc.2 and portc.3 connected via suitable resistors.
+'''  You will to connect a pot to porta.0.  The needs to be connected the supply voltage and 0v using an appropiate method.
+'''
+'''  PIC: 16F18326
+'''  Compiler: GCB
+'''  IDE: GCB@SYN
+'''
+'''
+'''
+'''@author   EvanV
+'''@licence  GPL
+'''@version  1.0
+'''@date     29.07.2016
+
+
+' ----- Configuration
+#CHIP 16F18326,32
+
+
+'' -------------------LATC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' LED:   ---------------|D5 |D4 |D3 |D2 |-
+''-----------------------------------------
+''
+#DEFINE LEDD2  PORTC.0
+#DEFINE LEDD3  PORTC.1
+#DEFINE LEDD4  PORTC.2
+#DEFINE LEDD5  PORTC.3
+#DEFINE Potentiometer   PORTA.0
+
+Dir     LEDD2 Out
+Dir     LEDD3 Out
+Dir     LEDD4 Out
+Dir     LEDD5 Out
+Dir      Potentiometer In
+
+
+Do Forever
+
+
+    'Clear the LEDS
+    PortC = 0
+    'Set the first value
+    LEDD2 = 1
+
+    Repeat 4
+
+        Wait  ( ReadAD10 ( AN0 ) + 32 / 32 ) ms
+        Wait 5 ms
+        Rotate portC Left
+
+    End Repeat
+Loop

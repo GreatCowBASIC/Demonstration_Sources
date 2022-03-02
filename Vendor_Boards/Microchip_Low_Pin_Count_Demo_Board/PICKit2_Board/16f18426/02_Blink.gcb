@@ -1,0 +1,35 @@
+''' Great Cow BASIC Header block Header block
+'''
+'''@author  Chris Roper
+'''@licence GPL
+'''@version 1.00
+'''@date    03/05/2018
+'''********************************************************************
+
+' Specify the Device you are compiling for
+#CHIP 16f18426
+
+' Set the Port that has LED's as an output
+Dir PortC Out
+
+' Most programs run in a loop such as this one
+'
+' Start here
+Do
+
+    ' Set the 4 lower PIN's to high by using a hexidecimal value.  0x0F equate to 0b00001111
+    PortC = 0x0F
+    ' Sit in a tight loop for a while
+    Wait 500 ms
+    ' Turn them all off
+    PortC = 0x00
+    ' Waist some more time
+    Wait 500 ms
+
+    ' Return to the top and do it again
+Loop
+
+' The program should never get to this line but if it does we stop.
+'
+' End execution and put the device into low power sleep mode.
+End

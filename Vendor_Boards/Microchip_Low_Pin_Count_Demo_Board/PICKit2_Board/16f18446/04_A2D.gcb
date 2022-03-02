@@ -1,0 +1,61 @@
+'''
+''' Great Cow BASIC Header block Header block
+'''
+'''@author  Chris Roper
+'''@licence GPL
+'''@version 1.00
+'''@date    03/05/2018
+'''********************************************************************
+
+' Run and adjust POT to maximum
+' Press Button to save Values
+' Use PICKit to Read the EEPROM
+' Change #Define  ADC_Fudge to the value in EEPROM
+' Recompile and Test - all LEDS should now be lit at maiximum
+
+#CHIP 16F18446
+' Allows RA3 to be used as an Input
+#CONFIG MCLRE_OFF
+
+' 12 Bit ADC maximum
+#DEFINE  ADC_Fudge 0x0739
+
+#DEFINE DOWN        0
+#DEFINE UP          1
+#DEFINE SWITCH      PortA.3
+#DEFINE LED         PortC.0
+
+Dir PortC Out
+PortC = 0
+
+'setup switch (SW1)
+Dir SWITCH In
+
+Dim ADC_Value As Word
+
+
+Do
+
+    ' Scale the 12 bit ADC to display as a 4 bit binary Count
+    ADC_Value = ReadAD12 ( AN0 )
+    PortC = Scale( ADC_Value, 0, ADC_Fudge, 0, 15)
+
+    If ( SWITCH = DOWN ) Then
+        Wait 10 ms
+        If ( SWITCH = DOWN ) Then
+            Save_ADC_Value
+        End If
+    End If
+
+Loop
+
+End
+
+Sub Save_ADC_Value()
+    ' Flash LED's to indicate action
+    PortC = 0
+    EPWrite (0, ADC_Value)
+    Wait 100 ms
+    EPWrite (1, ADC_Value_H)
+    Wait 100 ms
+End Sub

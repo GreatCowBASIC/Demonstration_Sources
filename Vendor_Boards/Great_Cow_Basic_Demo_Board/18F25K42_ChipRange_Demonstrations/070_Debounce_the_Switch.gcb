@@ -1,0 +1,96 @@
+'''
+''' This demonstration uses a simple software routine to avoid the initial noise on the switch
+''' pin. The code will inspect the switch status, but should overcome most of the noise from a switch.
+'''
+''' Some switches are worse than others.
+'''
+''' When the switch is held down, one LED will toggle.
+'''
+'''
+'''************************************************************************
+'''@author  EvanV
+'''@licence GPL
+'''@version 1.01
+'''@date    22.10.2017
+' ----- Configuration
+
+'Chip Settings.
+#CHIP 18f25k42, 16
+#OPTION Explicit
+'This Configuration change is needed to enable programming in Low Voltage Programming Mode
+
+
+'' -------------------PORTA----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---------------------------------
+''-----------------------------------------
+''
+
+'' -------------------PORTB----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    -------| O | ----------| O | I |-
+''-----------------------------------------
+''
+
+'' ------------------PORTC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    -------------------| X |---------
+''-----------------------------------------
+''
+
+
+#DEFINE LEDD1 PORTB.1
+#DEFINE LEDD2 PORTB.5
+#DEFINE Potentiometer   PORTC.5
+#DEFINE SwitchIn        PORTB.0
+
+Dir     LEDD1         Out
+Dir     LEDD2         Out
+'this is the ANC5 port
+Dir     Potentiometer In
+Dir     SwitchIn      In
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+
+Dim lastKeyDown As Byte
+
+'Debouncing a switch
+
+Do Forever
+    Wait 10 ms
+
+    If  keyPressed( lastKeyDown ) = TRUE Then
+
+        'push button pressed
+        LEDD1 = !LEDD1
+
+    End If
+
+Loop
+
+
+Function  keyPressed ( In lastKeyDown )
+
+    Dim actKeyDown As Byte
+
+    If ( !SwitchIn ) Then
+
+        actKeyDown = TRUE
+
+    Else
+
+        actKeyDown = FALSE
+
+    End If
+
+    If (actKeyDown <> lastKeyDown) Then
+        lastKeyDown = actKeyDown
+        keyPressed =  actKeyDown
+    Else
+        keyPressed = FALSE
+    End If
+
+
+
+End Function

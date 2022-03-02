@@ -1,0 +1,148 @@
+''' A demonstration program for GCGB and GCB.
+'''
+'''  This demonstration produces a variable speed rotating LED display that is proportional to the ADC value.
+'''  The ADC value and LED rotate speed are inversely proportional to each other.
+'''
+'''  Rotate the POT counterclockwise to see the LEDs shift faster.
+'''
+'''  Press the switch to reverse the direction of the LEDs.
+'''
+'''  The four LSbs of the ADC are mirrored onto the LEDs. Rotate the potentiometer
+'''  to change the display.
+'''
+'''
+'''  PIC: 16F18877
+'''  Compiler: GCB
+'''  IDE: GCB@SYN
+'''
+'''   You need four LEDs connnect to PORTD.0, PORTD.1, PORTD.2 and PORTD.3 connected via suitable resistors.
+'''  You will to connect a pot to porta.0.  The needs to be connected the supply voltage and 0v using an appropiate method.
+'''  You will a switch connect to porta.1.  The needs to be connected the supply voltage via a 1-k pullup resistor.
+'''
+'''@author   EvanV
+'''@licence  GPL
+'''@version  1.0
+'''@date     04.12.2016
+
+'''
+' ----- Configuration
+#CHIP 16F18877,32
+#OPTION Explicit
+
+
+
+'' -------------------LATD-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' LED:   ---------------|D5 |D4 |D3 |D2 |-
+''-----------------------------------------
+''
+#DEFINE LEDD2  PORTD.0
+#DEFINE LEDD3  PORTD.1
+#DEFINE LEDD4  PORTD.2
+#DEFINE LEDD5  PORTD.3
+#DEFINE LEDBANK PORTD
+
+#DEFINE SWITCH_DOWN         0
+#DEFINE SWITCH_UP           1
+
+#DEFINE LED_RIGHT           TRUE
+#DEFINE LED_LEFT            FALSE
+
+#DEFINE SWITCH              PORTA.1
+
+Dim mydelay, leds  As Byte
+Dim DIRECTION As Byte
+
+'start from the right to left
+direction = LED_RIGHT
+
+Dir LEDBANK Out
+leds = 8
+
+'Potentitor is connected to RA0...set as input
+Dir porta.0 In
+
+'setup switch (SW1)
+Dir SWITCH In
+
+Do
+
+    mydelay = ReadAD10( AN0 ) / 4
+
+    ' Factor the ADC reading to delay steps
+    mydelay = mydelay / 16
+
+    ' decrement the 4 LSbs of the ADC and delay 20ms for each
+    Do While ( mydelay <> 0 )
+        mydelay--
+        Wait 20 ms
+        If check_switch = TRUE Then
+            ' toggle the direction
+            direction = !direction
+        End If
+    Loop
+
+    LEDBANK = leds
+
+    If  direction = LED_RIGHT  Then
+        'shift to the right by 1
+
+        Rotate leds Right Simple
+
+        ' when the ROTATE moves the bit to bit 7, restart the pattern
+        If leds = 128 Then
+            leds = 8
+        End If
+
+    Else
+        'Set C off to ensure the carry bit does not impact
+        Set C Off
+        Rotate leds Left
+
+        'when the last LED is lit, restart the pattern
+        If  leds = 16 Then
+            leds = 1
+        End If
+    End If
+
+Loop
+
+
+
+'global variable - if button is held down, we don't want to keep on switching directions
+Dim previous_state As BIT
+previous_state = SWITCH_UP
+
+Function  check_switch
+    'switch is normally open to 5V ...when pressed, RA3 is connected to GND
+    If (SWITCH = SWITCH_DOWN) Then
+        'debounce by delaying and checking if switch is still pressed
+        Wait 1 ms
+        If ( (previous_state =  SWITCH_DOWN) & (SWITCH = SWITCH_DOWN) ) Then
+            ' don't toggle
+            check_switch = FALSE
+            Exit Function
+        Else
+            ' check if still down
+            If (SWITCH = SWITCH_DOWN) Then
+                previous_state = SWITCH_DOWN
+                ' reverse the LEDs
+                check_switch = TRUE
+                Exit Function
+            Else
+                'switch not properly held down
+                previous_state = SWITCH_UP
+                ' don't reverse
+                check_switch = FALSE
+                Exit Function
+            End If
+        End If
+    Else
+        'switch not pressed
+        previous_state = SWITCH_UP
+        'don't reverse
+        check_switch = FALSE
+        Exit Function
+    End If
+
+End Function

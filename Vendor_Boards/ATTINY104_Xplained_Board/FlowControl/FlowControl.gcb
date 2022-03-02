@@ -1,0 +1,76 @@
+'''A demonstration program for GCB
+'''---------------------------------------------------------------------------------
+''' This program shows logic test board.
+'''
+'''
+'''@author  Evan Venn
+'''@licence GPL
+'''@version 1.0
+'''@date    28/06/2020
+'''********************************************************************************
+
+/*
+Diagram Author : Ardunaut
+                 __________
+           VCC--|1       14|--GND (TPI CLK)
+           PA0--|2       13|--PB3 (CDC TX) -->USART_Transmit()
+(TPI DATA) PA1--|3       12|--PB2 (CDC RX) <--USART_Receive()
+   (RESET) PA2--|4       11|--PB1 (BUTTON)
+           PA3--|5       10|--PB0
+           PA4--|6        9|--PA7
+     (LED) PA5--|7        8|--PA6
+                \__________/
+        Atmel ATtiny104 Xplained Nano
+*/
+
+
+; ----- Configuration
+#chip  TINY104, 4
+#option Explicit
+
+
+  #Define SWITCH  portb.1
+  #Define LED     porta.5
+
+  'Set Internal Pullup for SWITCH port
+  PUEB.PORTB1 = 1
+  'Set direction of Switch
+  Dir SWITCH in
+
+  'Use Volatile to ensure the compiler does not try to optimize the code
+  #option Volatile LED
+  'Set direction of LED
+  Dir LED out
+
+
+; ----- Variables
+  'See inline
+
+; ----- Main body of program commences here.
+
+    Do
+      'Turn on RedLED
+      Gosub TestSub1
+
+      'Turn on GreenLED
+      Goto TestMethod2
+      main:
+
+      PulseOut LED, 1 s
+      wait 1 s
+
+    Loop
+
+
+
+End
+
+Sub TestSub1
+  Dir LED out
+  LED = !LED
+End Sub
+
+TestMethod2:
+  Dir LED out
+  LED = !LED
+goto main

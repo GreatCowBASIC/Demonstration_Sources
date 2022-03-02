@@ -1,0 +1,137 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''This program demonstrates the use of the Infrarad (IRR) TSOP4838 type IRR receiver sensor.
+''':
+'''The sensor is connnect to portb.0 and the GLCD as shown below.
+''':
+'''The demonstration show how to read and display the value of the remote, when pressed.
+'''This demonstration also shows how to update the GLCD upon a button change.
+''':
+''':
+'''          Vdd (5vdc)                                          *
+'''            |                                                 *
+''' '-10K------+                                                 *
+''' |  Sensor  |                                                 *
+''' | .-----.  |                                                 *
+''' | | \  /|  |                                                 *
+''' | |1/2\3|  |                                                 *
+''' | 'o-o-o'  |                                                 *
+''' |  | | |   |  PIC16F1939                                     *
+''' |  | | |   |    ___                                          *
+''' |  | '-----o--o|º  |o---.                                    *
+''' '--|   |     -o|   |o                                        *
+'''    |   |     -o|   |o-                                       *
+'''    '- - )-B.0-o|   |o-                                       *
+'''        |                                 600uS   600uS       *
+'''        o                          ________    ____    __     *
+'''        |                         | Start  |__| 1  |__| 0|    *
+'''       ===    Sony SIRC Signal:                               *
+'''       GND                          2.4mS      1.2mS  600uS   *
+''':
+'''@author   EvanV
+'''@licence  GPL
+'''@version  1.0a
+'''@date     08.01.2016
+'''********************************************************************************
+
+' ----- Configuration
+
+#CHIP 16f1939,32
+
+#INCLUDE <glcd.h>
+' include the header file
+#INCLUDE <sonyremote.h>           							
+
+' This is the Default value, not really required.
+#DEFINE GLCD_TYPE GLCD_TYPE_KS0108
+' Invert display, not always required
+#DEFINE GLCDDirection 1													
+
+'D12 to actually since CS1, CS2 can be reversed on some devices
+#DEFINE GLCD_CS1 PORTC.1
+#DEFINE GLCD_CS2 PORTC.0
+'D0 to pin 7 on LCD
+#DEFINE GLCD_DB0 PORTD.0
+'D1 to pin 8 on LCD
+#DEFINE GLCD_DB1 PORTD.1
+'D2 to pin 9 on LCD
+#DEFINE GLCD_DB2 PORTD.2
+'D3 to pin 10 on LCD
+#DEFINE GLCD_DB3 PORTD.3
+'D4 to pin 11 on LCD
+#DEFINE GLCD_DB4 PORTD.4
+'D5 to pin 12 on LCD
+#DEFINE GLCD_DB5 PORTD.5
+'D6 to pin 13 on LCD
+#DEFINE GLCD_DB6 PORTD.6
+'D7 to pin 14 on LCD
+#DEFINE GLCD_DB7 PORTD.7
+
+#DEFINE GLCD_RS PORTe.0
+#DEFINE GLCD_Enable PORTe.2
+#DEFINE GLCD_RW PORTe.1
+#DEFINE GLCD_RESET PORTC.2
+
+' Changed timing for 32 mhz device
+' = 2 normal usage, 6 or above is OK at 32 mhz!
+#DEFINE KS0108ReadDelay    2
+' = 1 normal usage you may get away with 0, 2 or above is OK at 32 mhz!
+#DEFINE KS0108WriteDelay   0
+' = 1 normal usage you may get away with 0, 2 or above is OK at 32 mhz!
+#DEFINE KS0108ClockDelay   0
+
+
+' IRR specific configuration
+'sensor on pin 17
+#DEFINE IR_DATA_PIN PortB.0
+' IR input
+Dir IR_DATA_PIN In
+
+
+'----- Variables
+
+' IRR specific variables
+Dim device, button As Byte
+device = 255
+
+'----- Program
+GLCDCLS
+GLCDPrint 0,0,"GCBasic 2019"
+GLCDPrint 0,8, "IRR Demo"
+
+GLCDPrint 0,32, "Device: "
+GLCDPrint 48,32, "*"
+
+GLCDPrint 0, 40, "Button: "
+GLCDPrint 48, 40, "*"
+
+Do
+
+    If  device <> 255 Then
+
+        'show device code on glcd
+        GLCDPrint 0,32, "Device: "
+        GLCDPrint 48,32, Pad( Str(device), 3 )
+
+        'show button code on glcd
+        GLCDPrint 0, 40, "Button: "
+        GLCDPrint 48, 40, Pad( Str(button), 3 )
+
+        'Set these variables to ensure GLCD is only updated on change
+        device = 255
+
+    End If
+
+    If IR_DATA_PIN = 0 Then
+
+        'wait for button press
+        readIR_Remote(device, button)
+        'ignore any repeats
+        Wait 10 ms
+
+    End If
+
+
+    'repeat forever
+Loop
+

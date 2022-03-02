@@ -1,0 +1,42 @@
+''' Great Cow BASIC Header block Header block
+'''
+'''@author  Chris Roper
+'''@licence GPL
+'''@version 1.00
+'''@date    03/05/2018
+'''********************************************************************
+
+' ----- Configuration
+#CHIP 16f18426, 32
+#OPTION Explicit
+
+#STARTUP InitPPS, 85
+
+Sub InitPPS
+    'Module: EUSART1
+    'TX1 > RC4
+    RC4PPS   = 0x000F
+    'RC5 > RX1
+    RX1DTPPS = 0x0015
+End Sub
+
+'Config UART
+#DEFINE USART_BLOCKING
+#DEFINE USART_BAUD_RATE 19200
+
+Wait 100 ms
+
+' ----- Variables
+Dim INCHAR As Byte
+
+' ----- Main body of program commences here.
+'Message after reset
+HSerPrintStringCRLF "Hello World!"
+
+'Main routine
+Do
+    'wait for char from UART
+    HSerReceive InChar
+    'send back char to UART
+    HSerSend InChar
+Loop

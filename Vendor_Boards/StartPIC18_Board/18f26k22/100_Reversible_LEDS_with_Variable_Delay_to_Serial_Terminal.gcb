@@ -1,0 +1,168 @@
+'''
+'''  This demonstration produces a variable speed rotating LED display that is proportional to the ADC value.
+'''  The ADC value and LED rotate speed are  proportional to each other.
+'''
+'''  Rotate the POT to see the LEDs shift faster.
+'''
+'''  Press the switch to reverse the direction of the LEDs.
+'''
+'''  The Serial port shows the value of the ADC and the direction!
+'''
+'''************************************************************************
+'''
+'''  PIC: 18f26k22
+'''  Compiler: GCB
+'''  IDE: GCB@SYN
+'''
+'''  Board: SmartPIC 18 Board
+'''  Date: 29.8.17
+'''
+' ----- Configuration
+'Chip Settings.
+#CHIP 18f26k22, 16
+#OPTION Explicit
+
+'' -------------------PORTA----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---|RS |RW | E |D7 |D6 |D5 |D4
+''-----------------------------------------
+''
+
+'' -------------------PORTB----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    -------| O | A |-------| O | I |-
+''-----------------------------------------
+''
+
+'' ------------------PORTC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---| TX| A |-------| X |---------
+''-----------------------------------------
+''
+
+
+#DEFINE LEDD1 PORTB.1
+#DEFINE LEDD2 PORTB.5
+#DEFINE Potentiometer   PORTC.5
+#DEFINE SwitchIn        PORTB.0
+#DEFINE LCDControl      PORTC.2
+
+Dir     LEDD1         Out
+Dir     LEDD2         Out
+'this is the AN17 port
+Dir     Potentiometer In
+Dir     SwitchIn      In
+Dir     LCDControl    Out
+
+'Always set the LCD on (high) to Shut OFF the LCD-Backlight. This is required when powered from a PicKit.
+LCDControl = 1
+
+'USART settings - setup the serial port - connects to PortC.6
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+
+#DEFINE DOWN        0
+#DEFINE UP          1
+
+
+Dim DIRECTION As Byte
+Dim mydelay, leds  As Byte
+#DEFINE LED_RIGHT 0
+#DEFINE LED_LEFT  1
+
+'start from the right to left
+direction = LED_RIGHT
+
+'Initialise the value
+leds = 8
+
+Do
+
+    'Turn the LEDS off so we can see them Flash
+    LEDD1 = 0
+    LEDD2 = 0
+
+    'Get a value for the ADC port
+    mydelay = ReadAD( AN17 )
+
+    'Show state
+    If direction = LED_RIGHT Then
+        HSerPrint ">> "
+    Else
+        HSerPrint "<< "
+    End If
+
+    HSerPrint mydelay
+    HSerPrintCRLF
+
+    'Set the LEDs
+    If  direction = LED_RIGHT  Then
+
+        LEDD1 = 1
+        LEDD2 = 0
+
+    Else
+
+        LEDD1 = 0
+        LEDD2 = 1
+
+    End If
+
+    'wait, and then check the switch is DOWN
+    If mydelay > 0 Then
+        Wait mydelay ms
+        If check_switch = TRUE Then
+            ' toggle the direction
+            direction = !direction
+        End If
+    End If
+
+
+Loop
+
+
+
+'global variable - if button is held down, we don't want to keep on switching directions
+#DEFINE SWITCH_UP   1
+#DEFINE SWITCH_DOWN 0
+
+Dim previous_state As BIT
+previous_state = SWITCH_UP
+
+Function  check_switch
+    'switch is normally open to 5V ...when pressed, RA3 is connected to GND
+    If (SwitchIn = SWITCH_DOWN) Then
+        'debounce by delaying and checking if switch is still pressed
+        Wait 1 ms
+        If ( (previous_state =  SWITCH_DOWN) & (SwitchIn = SWITCH_DOWN) ) Then
+            ' don't toggle
+            check_switch = FALSE
+            Exit Function
+        Else
+            ' check if still down
+            If (SwitchIn = SWITCH_DOWN) Then
+                previous_state = SWITCH_DOWN
+                ' reverse the LEDs
+                check_switch = TRUE
+                Exit Function
+            Else
+                'switch not properly held down
+                previous_state = SWITCH_UP
+                ' don't reverse
+                check_switch = FALSE
+                Exit Function
+            End If
+        End If
+    Else
+        'switch not pressed
+        previous_state = SWITCH_UP
+        'don't reverse
+        check_switch = FALSE
+        Exit Function
+    End If
+
+End Function

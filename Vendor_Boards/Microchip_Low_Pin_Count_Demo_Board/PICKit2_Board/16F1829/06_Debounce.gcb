@@ -1,0 +1,63 @@
+'''******************************************************************
+''' Lesson 6 - "Debounce"
+'''
+''' This lesson uses a simple software delay routine to avoid the initial noise on the switch
+''' pin. The code will delay for only 5 ms, but should overcome most of the noise. The
+''' required delay amount differs with the switch being used. Some switches are worse
+''' than others.
+
+''' This lesson also introduces the  #define preprocessing symbol in both 'C' and assembly.
+''' Hard coding pin locations is bad practice. Values that may be changed in the future
+''' should always be defined once in preprocessing. Imagine if another user wanted to use
+''' these lessons in a different PIC device and all of the pins changed! This would require
+''' going into the code and finding every instance of any pin reference.
+
+''' When the switch is held down, DS1 will be lit. When the switch is not held down, all
+''' LEDs are OFF.
+'''
+'''
+'''  PIC: 16F1829
+'''  Compiler: GCB
+'''  IDE: GCB@SYN
+'''
+'''  Board: PICkit 2 Low Pin Count Demo Board
+'''  Date: 10.4.2015
+'''
+''''''******************************************************************
+''' See Low Pin Count Demo Board User's Guide for Lesson Information*
+''''''*****************************************************************
+'''
+
+
+#CHIP 16f1829,8
+
+
+
+'' -------------------LATC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' LED:   ---------------|DS4|DS3|DS2|DS1|-
+''-----------------------------------------
+''
+
+#DEFINE DOWN        0
+#DEFINE UP          1
+#DEFINE SWITCH      PORTA.3
+#DEFINE LED         PortC.0
+
+Dir portc Out
+portc = 0
+
+'setup switch (SW1)
+Dir porta.3 In
+
+Do
+    If ( SWITCH = DOWN ) Then
+        Wait 10 ms
+
+        If ( SWITCH = DOWN ) Then
+            Set LED On
+        End If
+    Else
+        Set LED Off
+    End If
+Loop

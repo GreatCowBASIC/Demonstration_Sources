@@ -1,0 +1,39 @@
+''' A demonstration program for GCGB and GCB.
+'''
+'''  One way to create a delay is to spend time decrementing to a value.
+'''  The demonstration will use a Great Cow BASIC method to toggle the LED.
+'''
+'''  LED DS1 blinks at a rate of approximately 1.0 seconds.
+'''
+''' This demonstration use an LED attached to portc.0 via a suitable resistor.
+''':***********************************************************************
+'''
+'''  PIC: 16F18326
+'''  Compiler: GCB
+'''  IDE: GCB@SYN
+'''
+'''
+'''@author   EvanV
+'''@licence  GPL
+'''@version  1.0
+'''@date     29.07.2016
+
+
+' ----- Configuration
+'Chip Settings.
+#CHIP 16F18326,32
+
+'' -------------------LATC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' LED:   ---------------|D5 |D4 |D3 |D2 |-
+''-----------------------------------------
+''
+
+Dir portc.0 Out
+
+Do
+    Wait 1000 ms
+    'An alternative Great Cow BASIC method.
+    SetWith ( portc.0, FnNotBit (portc.0) )
+
+Loop

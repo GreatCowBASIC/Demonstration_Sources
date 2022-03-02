@@ -1,0 +1,100 @@
+'''
+''' Great Cow BASIC Header block Header block
+'''
+'''@author  Chris Roper
+'''@licence GPL
+'''@version 1.00
+'''@date    03/05/2018
+'''********************************************************************
+
+#CHIP 16f18426
+#CONFIG MCLRE_OFF
+
+#OPTION Explicit
+
+#DEFINE DOWN                0
+#DEFINE UP                  1
+
+#DEFINE SWITCH              PORTA.3
+
+#DEFINE LED_RIGHT           1
+#DEFINE LED_LEFT            0
+
+Dir portc Out
+portc = 0
+portc.3 = 1
+'start with LEDs rotating from right to left
+_direction = LED_RIGHT
+
+'setup switch (SW1)
+Dir switch In
+
+Dim _DIRECTION As Byte
+
+' Initialise the timer.
+' Firstly tell the compiler to use a 16bit timer for this demonstration
+#DEFINE TMR0_16BIT
+TMR0IE = 1
+InitTimer0 Osc, PRE0_256 + TMR0_HFINTOSC ,  POST0_2
+
+' setup Timer Interrupt
+On Interrupt Timer0Overflow Call RotateLEDsNow
+
+' Start the clock
+SetTimer ( 0 , 0x0bdc  )
+StartTimer 0
+
+'setup Push Button Interrupt
+IOCAN3 = 1
+On Interrupt PORTChange  Call DirChange
+
+Do
+    ' Empty Loop - All the action happens in the Interrupts
+Loop
+
+End
+
+Sub DirChange
+
+    If IOCAF3 = 1 Then
+
+        ' Disable Port Change Interruts to Prevent renter of the same event
+        IOCIE  = 0
+        ' Ackowlage the Interrupt by Clearing this Flag
+        IOCAF3 = 0
+        ' Reverse direction
+        _direction = !_direction
+        ' Reenable Port change interrupts
+        IOCIE = 1
+    End If
+
+End Sub
+
+Sub RotateLEDsNow
+
+    TMR0IF = 0
+    If  _direction.0 = LED_RIGHT  Then
+        'shift to the right by 1
+        Set C Off
+        Rotate portc Right
+
+        ' when the last LED is lit, restart the pattern
+        If C = 1 Then
+            portc.3 = 1
+        End If
+
+    Else
+        'shift to the left by 1
+        Set C Off
+        Rotate portc Left
+
+        'when the last LED is lit, restart the pattern
+        If  portC.4 = 1 Then
+            portC.0 = 1
+            portC.4 = 0
+        End If
+    End If
+
+    SetTimer ( 0 , 0x0bdc  )
+
+End Sub

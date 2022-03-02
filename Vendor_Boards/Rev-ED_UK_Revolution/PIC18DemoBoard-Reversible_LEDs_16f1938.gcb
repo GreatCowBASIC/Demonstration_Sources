@@ -1,0 +1,131 @@
+'''
+'''******************************************************************
+'''  "Reversible"
+'''
+'''  This demonstration combines using the button to reverse the
+'''  direction of rotation of the LEDs when the button is pressed. The speed of rotation is controlled
+'''  using the potentiometers.
+'''
+'''  The program needs to keep track of rotation direction and new code needs to be added
+'''  to rotate in the other direction. This rotates right and checks for a '1' in the carry
+'''  bit to determine when to restart the sequence. The program needs to rotate
+'''  both ways and check for a '1' in bit 7 of the display when rotating to the left. When the
+'''  '1' shows up in Carry bit 4, it will be re-inserted into bit 7.
+'''
+'''
+'''  LEDs will rotate at a speed that is proportional to the ADC value. The switch will toggle
+'''  the direction of the LEDs
+'''
+'''  PIC: 16F1847
+'''  Compiler: GCB
+'''  IDE: GCB@SYN
+'''
+'''  Board: Rev UK Pic18 Demo Board
+'''  Date: 10.6.2015
+'''
+
+
+#CHIP 16f1847, 32
+#OPTION Explicit
+
+
+
+#DEFINE LED_RIGHT           TRUE
+#DEFINE LED_LEFT            FALSE
+
+#DEFINE SWITCH1      PORTA.2
+#DEFINE SWITCH2      PORTA.3
+
+#DEFINE SoundOut PORTA.7
+
+Dim DIRECTION As Byte
+Dim mydelay As Byte
+
+'start from the right to left
+direction = LED_RIGHT
+
+Dir portb Out
+
+'Potentiamtor is connected to RA4...set as input
+Dir porta.4 In
+
+'setup switches
+Dir SWITCH1 In
+Dir SWITCH2 In
+
+Dir SoundOut Out
+
+
+Repeat 4
+
+    portb = 255
+    SoundOut = 1
+    Wait 100 ms
+    SoundOut = 0
+    portb = 0
+    Wait 100 ms
+
+End Repeat
+
+'Initialise the port
+portb.7 = 1
+Do
+
+    If  direction = LED_RIGHT  Then
+        mydelay = ReadAD10 ( AN0 )  / 64
+        ' decrement the 8 MSbs of the ADC and delay 20ms for each
+        Do While ( mydelay <> 0 )
+            mydelay--
+            Wait 20 ms
+        Loop
+
+        If SWITCH1 = On Then
+            ' toggle the direction
+            direction = !direction
+            Set SoundOut On
+            Wait 100 ms
+            Set SoundOut Off
+        End If
+    Else
+        mydelay = ReadAD10 ( AN1 )  / 64
+        ' decrement the 8 MSbs of the ADC and delay 20ms for each
+        Do While ( mydelay <> 0 )
+            mydelay--
+            Wait 20 ms
+        Loop
+
+        If SWITCH2 = On Then
+            ' toggle the direction
+            direction = !direction
+            Set SoundOut On
+            Wait 100 ms
+            Set SoundOut Off
+        End If
+
+
+    End If
+    If  direction = LED_RIGHT  Then
+        'shift to the right by 1
+        Set C Off
+        Rotate portb Right
+
+        ' when the last LED is lit, restart the pattern
+        If C = 1 Then
+            portb.7 = 1
+        End If
+
+    Else
+        'shift to the left by 1
+        Set C Off
+        Rotate portb Left
+
+        'when the last LED is lit, restart the pattern
+        If C = 1 Then
+            portb.0 = 1
+        End If
+    End If
+
+Loop
+
+
+

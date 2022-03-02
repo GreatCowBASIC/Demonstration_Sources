@@ -1,0 +1,59 @@
+'''
+'''  This lesson will introduce shifting instructions as well as bit-oriented skip operations to
+'''  move the LEDs.
+''' A demonstration program for GCGB and GCB.
+'''
+'''  LEDs rotate from right to left at a rate of 1.0s.  This shows the use of Rotate and testing the Carry Bit.
+'''
+'''   You need four LEDs connnect to PORTD.0, PORTD.1, PORTD.2 and PORTD.3 connected via suitable resistors.
+''':***********************************************************************
+'''
+'''  PIC: 16F18877
+'''  Compiler: GCB
+'''  IDE: GCB@SYN
+'''
+'''
+'''@author   EvanV
+'''@licence  GPL
+'''@version  1.0
+'''@date     29.07.2016
+
+
+' ----- Configuration
+'Chip Settings.
+#CHIP 16F18877,32
+#OPTION Explicit
+
+
+'' -------------------LATD-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' LED:   ---------------|D5 |D4 |D3 |D2 |-
+''-----------------------------------------
+''
+
+Dim CURRENTSTATE As Byte
+
+
+Dir portD Out
+'    Set the first LED on
+portD = 0b0001000
+
+
+Do
+    'get current status of the four bits
+    currentstate = portD & 0x0F
+
+    'Just rotate the bottom four bits
+    'Set the carry flag
+    C = 0
+    Rotate  currentstate Right
+    'Test the Carry flag
+    If C = 1 Then currentstate.3 = 1
+    'set the BIT on
+
+    'Set the four bits
+    portD = ( portD & 0xF0 ) OR currentstate
+
+    Wait 1 s
+
+Loop

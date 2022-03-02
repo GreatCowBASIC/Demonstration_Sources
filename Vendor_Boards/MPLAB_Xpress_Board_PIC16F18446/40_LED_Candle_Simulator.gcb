@@ -1,0 +1,76 @@
+''' Great Cow BASIC demonstration
+'''
+''' This demonstration simply turns the LED into a flickering 'candle' using software Pule Width Module (PWM).
+''' Great Cow BASIC support many different methods of PWM - this method is Available on all microcontrollers.
+''' This method does NOT require a PWM module within the microcontroller.
+''' This command uses a software PWM routine within Great Cow BASIC to produce a PWM signal on the selected port of the chip.
+''' The method PWMOut does not make use of any special hardware within the microcontroller. The PWM signal is generated only while the PWMOut command is executing - therefore, when the PWMOut is not executing by moving onto the next command, the PWM signal will stop.
+'''
+''' There is one yellow LED available on the MPLAB® Xpress PIC16F18446 board that can be turned ON and OFF using software PWM.
+'''
+'''
+'''@author  Evan R. Venn
+'''@licence GPL
+'''@version 1.00
+'''@date    30/06/2018
+'''********************************************************************
+
+'Specify the Device you are compiling for - this board is the 16F18446
+#CHIP 16F18446
+'Great Cow BASIC simplifies the configuration by setting the frequency and the configuration for you.
+
+'This option ensures that all variables are dimensioned in the user program.  See http://gcbasic.sourceforge.net/help/__option_explicit.html
+#OPTION Explicit
+
+'Set a constant.  The LED can be activated by driving the connected I/O line to GND, see section 3.3.2 of the MPLAB-Xpress-PIC16F18446-Evaluation-Board.pdf
+#DEFINE LEDOn  = 0
+'Set a constant.  The LED can be de-activated by driving the connected I/O line to the supply voltage, see section 3.3.2 of the MPLAB-Xpress-PIC16F18446-Evaluation-Board.pdf
+#DEFINE LEDOff = 1
+
+'Set a constant to refer to the LED.  RA2 is a Yellow LED called LED0 Edge connector, see section 3.3.1 of the MPLAB-Xpress-PIC16F18446-Evaluation-Board.pdf
+#DEFINE LED0 porta.2
+'Set LED as an output
+Dir LED0 Out
+'Setup the port as a SOFTWARE PWM output.  http://gcbasic.sourceforge.net/help/_pwmout.html
+#DEFINE PWM_Out1 porta.2
+
+'Dimension a byte variable
+Dim PWMValue As Byte
+
+''' Most programs run in a loop such as this one
+Do
+    'Repeat 8 times
+    Repeat 8
+        'Lower the LED instensity
+        For PWMValue = 255 To 150
+            'Activate PWM software channel number 1, using the value of PWMValue for 1 cycle.
+            PWMOut 1, PWMValue, 1
+        Next
+        'Wait
+        Wait 5 ms
+        'Raise the LED instensity
+        For PWMValue = 150 To 255
+            'Activate PWM software channel
+            PWMOut 1, PWMValue, 1
+        Next
+        'Wait
+        Wait 5 ms
+    End Repeat
+    'Repeat 2 times
+    Repeat 2
+        'Lower the LED instensity
+        For PWMValue = 255 To 10
+            'Activate PWM software channel
+            PWMOut 1, PWMValue, 1
+        Next
+        'Raise the LED instensity
+        For PWMValue = 10 To 255
+            'Activate PWM software channel
+            PWMOut 1, PWMValue, 1
+        Next
+
+    End Repeat
+Loop
+
+End
+

@@ -1,0 +1,48 @@
+'''
+''' Great Cow BASIC Header block Header block
+'''
+'''@author  Chris Roper
+'''@licence GPL
+'''@version 1.00
+'''@date    03/05/2018
+'''********************************************************************
+
+#CHIP 16f18426
+#CONFIG MCLRE_OFF
+
+Dir portc Out
+portc = 0
+portc.5 = 1
+
+'   Initialise the timer.
+'   Firstly tell the compiler to use a 16bit timer for this demonstration
+#DEFINE TMR0_16BIT
+
+'     For this we need the following:
+'       Prescaler
+'           1:256
+'            HF int Osc, and
+'            NOT to sync Timer
+'       Post scaler
+'           1:2
+InitTimer0 Osc, PRE0_256 + TMR0_HFINTOSC ,  POST0_2
+'     Start the Timer
+StartTimer 0
+
+'Every 1 sec
+SetTimer ( 0 , 0x0bdc  )
+
+Do
+
+    Wait While !TMR0IF
+    TMR0IF = 0
+    Set C Off
+    Rotate portc Right
+    If C = 1 Then portc.3 = 1
+
+    'Set timer to 1s before the next event occurs.  This as close as you can get to 1s
+    SetTimer ( 0 , 0x0bdc )
+
+Loop
+
+End

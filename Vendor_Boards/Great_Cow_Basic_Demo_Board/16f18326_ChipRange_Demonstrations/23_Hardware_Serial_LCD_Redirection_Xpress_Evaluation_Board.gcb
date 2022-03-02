@@ -1,0 +1,85 @@
+''' A demonstration program for GCGB and GCB.
+'''
+''' This program redirects the normal LCD output to an ANSI serial terminal.
+''' On the Microchip MPLab Xpress Evaluation Board
+''' It requires the inclusion of the support file "LCD2SerialRedirect.h".
+'''
+'''
+'''   You need four LEDs connnect to portc.0, portc.1, portc.2 and portc.3 connected via suitable resistors.
+'''  You will to connect a pot to porta.0.  The needs to be connected the supply voltage and 0v using an appropiate method.
+'''   You will also need to connect a serial Terminal to portc.4.  Using PUTTY.EXE for an excellent terminal program.  Also, you msy need to connect the microcontroller via a TTL converter.
+'''  ************************************************************************************************************************************************************************************
+'''
+'''
+'''@author   EvanV
+'''@licence  GPL
+'''@version  1.0
+'''@date     29.07.2016
+
+'''********************************************************************************
+
+' ----- Configuration
+#CHIP     16f18326
+#OPTION Explicit
+
+
+#INCLUDE   <lcd2serialredirect.h>
+
+' ----- Define Hardware settings
+'Set the PPS of the RS232 port to USB.
+'Set the PPS for this solution.
+#STARTUP InitPPS, 85
+
+Sub InitPPS
+    UNLOCKPPS
+    'Pin RC5 source is an input for RX
+    RXPPS  = 0x15
+    'Pin RC4 source is TX/CK
+    RC4PPS = 0x14
+    LOCKPPS
+End Sub
+
+#DEFINE USART_BAUD_RATE 19200
+#DEFINE USART_TX_BLOCKING
+
+' Required to LCD to Serial redirection
+#DEFINE LCD_IO 0
+
+Dim YPOS, XPOS As Byte
+
+Wait 500 ms
+
+' ----- Main body of program commences here.
+
+Do Forever
+
+    ' Bell Character
+    Print CHR(7)
+    CLS
+    Print "START TEST"
+
+    Locate 1,0
+
+    Print "DISPLAY ON"
+    Wait 3 s
+
+    Locate 0,0
+
+    For ypos = 0 To 1
+        For xpos = 0 To 16
+            Locate ypos, xpos
+            Print "*"
+            ' flush HSerPrint buffer
+            Print ""
+            Wait 100 ms
+        Next
+    Next
+
+
+    CLS
+    Locate 0,0
+    LCDCursor LCDON
+    Print "END TEST"
+    Wait 3 s
+
+Loop

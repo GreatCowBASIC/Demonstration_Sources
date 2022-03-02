@@ -1,0 +1,170 @@
+'''
+'''This demonstration program is an SPI capaibility demonstration.
+'''This show the commands you can use to send SPI data - it is hard to show SPI working... so, review the code and enjoy.
+'''
+'''************************************************************************
+'''@author  EvanV
+'''@licence GPL
+'''@version 1.01
+'''@date    22.10.2017
+' ----- Configuration
+
+'Chip Settings.
+#CHIP 18f25k42, 64
+#OPTION Explicit
+#CONFIG mclr=On
+
+#STARTUP InitPPS, 85
+
+Sub InitPPS
+
+    'Module: SPI1
+    ' RC3->SPI1:SCK1
+    SPI1SCKPPS = 0x13
+    ' RC5->SPI1:SDO1
+    RC5PPS = 0x1F
+    ' RC4->SPI1:SDI1
+    SPI1SDIPPS = 0x14
+    ' RC3->SPI1:SCK1
+    RC3PPS = 0x1E
+
+End Sub
+
+'Template comment at the end of the config file
+
+
+'' -------------------PORTA----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---------------------------------
+''-----------------------------------------
+''
+
+'' -------------------PORTB----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    -------| O | ----------| O | I |-
+''-----------------------------------------
+''
+
+'' ------------------PORTC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    -------------------| X |---------
+''-----------------------------------------
+''
+
+
+#DEFINE LEDD1 PORTB.1
+#DEFINE LEDD2 PORTB.5
+#DEFINE SwitchIn        PORTB.0
+
+Dir     LEDD1         Out
+Dir     LEDD2         Out
+Dir     SwitchIn      In
+
+
+'Pin mappings for SPI - this GLCD driver supports Hardware SPI and Software SPI
+' Data command line
+#DEFINE SPI1_DC       Porta.4
+' Chip select line
+#DEFINE SPI1_CS       Porta.5
+' Reset line
+#DEFINE SPI1_RESET    porta.3
+
+' Data in | MISO
+#DEFINE SPI1_DI       portc.4
+' Data out | MOSI
+#DEFINE SPI1_DO       portc.5
+' Clock Line
+#DEFINE SPI1_SCK      portc.3
+
+' remove/comment out if you want to use software SPI. And, also remove PPS for SPI Module
+#DEFINE _HardwareSPI1
+
+'*******************************************************************************************
+
+
+Dim byte1 As Byte
+Dim byte2 As Byte
+Dim byte3 As Byte
+
+byte1 = 0x12
+byte2 = 0x23
+byte3 = 0x45
+
+InitSPIMode
+
+Do
+    Set SPI1_DC Off
+    'send some data
+    SendByteviaSPI (byte1)
+    Set SPI1_DC On
+
+    Set SPI1_DC Off
+    'send some data
+    SendByteviaSPI (byte2)
+    Set SPI1_DC On
+
+    Set SPI1_DC Off
+    'send some data
+    SendByteviaSPI (byte3)
+    Set SPI1_DC On
+
+    Wait 10 ms
+Loop
+
+
+'We call this method to setup the Hardware SPI module and the support for Software SPI
+Sub InitSPIMode
+
+    Dir SPI1_DC       Out
+    Dir SPI1_CS       Out
+    Dir SPI1_RESET    Out
+
+    Dir SPI1_DI       In
+    Dir SPI1_DO       Out
+    Dir SPI1_SCK      Out
+
+    #IFDEF _HardwareSPI1
+        SPIMode ( MasterFast, SPI_CPOL_0 + SPI_CPHA_0 )
+    #ENDIF
+
+    'Set the Port appropiately
+    Set SPI1_DO Off
+    Set SPI1_CS On
+    'deselect - this can be Data or Command
+    Set SPI1_DC On
+
+End Sub
+
+
+'This method sends via Hardware SPI or Software SPI (bit-banging) if the constant is defined, or not.
+Sub  SendByteviaSPI( In SPISendByte As Byte )
+
+    Set SPI1_CS Off
+
+    #IFDEF _HardwareSPI1
+        FastHWSPITransfer ( SPISendByte )
+        Set SPI1_CS On
+        Exit Sub
+    #ENDIF
+
+    'A softare implementation of SPI!
+    #IFNDEF _HardwareSPI1
+        Repeat 8
+
+            If SPISendByte.7 = On  Then
+                Set SPI1_DO On
+            Else
+                Set SPI1_DO Off
+            End If
+            ' therefore CPOL=0 ==ON, and, where CPOL=1==ON
+            Set SPI1_SCK On
+            Rotate SPISendByte Left
+            ' therefore CPOL=0  =OFF, and, where CPOL=1==OFF
+            Set SPI1_SCK Off
+
+        End Repeat
+        Set SPI1_CS On
+        Set SPI1_DO Off
+    #ENDIF
+
+End Sub

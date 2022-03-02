@@ -1,0 +1,36 @@
+'''
+''' Great Cow BASIC Header block Header block
+'''
+'''@author  Chris Roper
+'''@licence GPL
+'''@version 1.00
+'''@date    03/05/2018
+'''********************************************************************
+
+#CHIP 16f18426
+' Allow RA3 to be used as an Input
+#CONFIG MCLRE_OFF
+
+#DEFINE DOWN        0
+#DEFINE UP          1
+#DEFINE SWITCH      PORTA.3
+#DEFINE LED         PortC.0
+
+Dir portc Out
+portc = 0
+
+'setup switch (SW1)
+Dir porta.3 In
+
+Do
+    If ( SWITCH = DOWN ) Then
+        Wait 10 ms
+        If ( SWITCH = DOWN ) Then
+            Set LED On
+        End If
+    Else
+        Set LED Off
+    End If
+Loop
+
+End

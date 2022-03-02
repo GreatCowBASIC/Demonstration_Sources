@@ -1,0 +1,46 @@
+'''A demonstration program for GreatCowBASIC.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''This program is a demonstration of a simple dimmer.
+'''acting on PORTB.0.
+'''The potentiometer on port RA.0\ANO controls the value of the dimmer state.
+'''
+'''EasyPICv7 version 29/3/2109
+'''
+'''@author  EvanV/HiB
+'''@licence GPL
+'''@version 1.0a
+'''@date    08.11.2014
+'''********************************************************************************
+
+' ----- Configuration
+#CHIP 18F45K22,8
+#OPTION Explicit
+
+
+
+' ----- Define Hardware settings
+Dir PORTA.0 In
+Dir PORTB.0 Out
+
+
+'----- Variables
+Dim PWMCOUNT, PWMLEVEL As Byte
+
+' ----- Main body of program commences here.
+Main:
+' Get value of the Pot connected to 0
+' You can use 0 [zero], or ADC0 or ANO they are mapped to the correct analog port.
+PWMLevel = ReadAD( 0 )
+
+' Turn on the LED
+Set PORTB.0 On
+
+' Loop through the byte variable
+For PWMCount = 1 To 255
+    ' if the Pot value is greater than the byte value then turn LED off
+    If PWMCount > PWMLevel Then
+        Set PORTB.0 Off
+    End If
+Next
+Goto Main
+End

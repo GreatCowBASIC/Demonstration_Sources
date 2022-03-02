@@ -1,0 +1,86 @@
+'''
+''' Great Cow BASIC Header block Header block
+'''
+'''@author  Chris Roper
+'''@licence GPL
+'''@version 1.00
+'''@date    03/05/2018
+'''********************************************************************
+
+#CHIP 16F18446, 8
+#CONFIG MCLRE_OFF
+
+#OPTION Explicit
+
+' as found by A2D example
+#DEFINE ADC_Fudge 0x0739
+
+Dim _DIRECTION As Byte
+
+#DEFINE SWITCH_DOWN         0
+#DEFINE SWITCH_UP           1
+
+#DEFINE LED_RIGHT           TRUE
+#DEFINE LED_LEFT            FALSE
+
+#DEFINE SWITCH      PORTA.3
+
+Dim mydelay As Word
+
+'start from the right to left
+_direction = LED_RIGHT
+
+Dir portc Out
+portc.3 = 1
+
+'Potentiamtor is connected to RA4...set as input
+Dir porta.0 In
+
+'setup switch (SW1)
+Dir porta.3 In
+
+'setup Interrupt
+IOCAN3 = 1
+On Interrupt PORTChange  Call DirChange
+
+Do
+
+    Wait Scale( ReadAD12 ( AN0 ), 0, ADC_Fudge, 100, 1000) ms
+
+    If  _direction = LED_RIGHT  Then
+        'shift to the right by 1
+        Set C Off
+        Rotate portc Right
+
+        ' when the last LED is lit, restart the pattern
+        If C = 1 Then portc.3 = 1
+    Else
+        'shift to the left by 1
+        Set C Off
+        Rotate portc Left
+
+        'when the last LED is lit, restart the pattern
+        If  portC.4 = 1 Then
+            portC.0 = 1
+            portC.4 = 0
+        End If
+    End If
+Loop
+
+' End execution and put the device into low power sleep mode.
+End
+
+Sub DirChange
+
+    If IOCAF3 = 1 Then
+        ' Disable Port Change Interruts to Prevent renter of the same event
+        IOCIE  = 0
+        ' Ackowlage the Interrupt by Clearing this Flag
+        IOCAF3 = 0
+        ' Reverse direction
+        _direction = !_direction
+        ' Reenable Port change interrupts
+        IOCIE = 1
+    End If
+
+End Sub

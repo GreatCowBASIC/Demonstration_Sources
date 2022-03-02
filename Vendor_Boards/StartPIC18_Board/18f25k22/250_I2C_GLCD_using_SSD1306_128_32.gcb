@@ -1,0 +1,212 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''This program is a simple GLCD demonstration of the SSD1306 GLCD capabilities.
+'''This program draws lines, boxes, circles and prints strings and numbers.
+'''The SSD1306 controller a small graphical OLED, suitable for a lot of various projects.
+'''The display is 38*17 mm, with an active display surface of 0.96inches , and a 128*32 pixel resolution.
+'''The display is easy to interface, using an I2C type of communication.
+'''The GLCD is connected to the microprocessor as shown in the hardware section of this code.
+'''
+'''This version is compatible will all version of Great Cow BASIC but only version greater than v0.98.00 support low memory GLCD modes.
+'''
+'''@author  EvanV
+'''@licence GPL
+'''@version 2.1
+'''@date    27.8.17
+'''************************************************************************
+'''
+'''  PIC: 18f25k22
+'''  Compiler: GCB
+'''  IDE: GCB@SYN
+'''
+'''  Board: SmartPIC 18 Board
+'''  Date: 29.8.17
+'''
+' ----- Configuration
+'Chip Settings.
+#CHIP 18f25k22, 16
+#CONFIG MCLRE=On
+#OPTION Explicit
+
+'' -------------------PORTA----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---------------------------------
+''-----------------------------------------
+''
+
+'' -------------------PORTB----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    -------| O | A |-------| O | I |-
+''-----------------------------------------
+''
+
+'' ------------------PORTC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---| TX|---|SDA|CLK| X |---------
+''-----------------------------------------
+''
+
+#DEFINE LEDD1 PORTB.1
+#DEFINE LEDD2 PORTB.5
+#DEFINE Potentiometer   PORTC.5
+#DEFINE LDR             PORTB.4
+#DEFINE SwitchIn        PORTB.0
+#DEFINE LCDControl      PORTC.2
+
+Dir     LEDD1         Out
+Dir     LEDD2         Out
+'this is the AN17 port
+Dir     Potentiometer In
+'this is the AN11 port
+Dir     LDR           In
+Dir     SwitchIn      In
+Dir     LCDControl    Out
+
+'Always set the LCD on (high) to Shut OFF the LCD-Backlight. This is required when powered from a PicKit.
+LCDControl = 1
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+
+' Define I2C settings
+#DEFINE HI2C_BAUD_RATE 400
+#DEFINE HI2C_DATA PORTC.4
+#DEFINE HI2C_CLOCK PORTC.3
+'Initialise I2C Slave
+'I2C pins need to be input for SSP module - this is not an option
+Dir HI2C_DATA In
+Dir HI2C_CLOCK In
+'MASTER
+HI2CMode Master
+
+
+#INCLUDE <glcd.h>
+#DEFINE GLCD_TYPE GLCD_TYPE_SSD1306_32
+#DEFINE GLCD_I2C_Address 0x78
+
+' ----- Define variables
+
+'These constants allow you to change the GLCD memory usage.
+'We have set this demonstration to use only 128bytes of RAM for GLCD operations.
+#DEFINE GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+#DEFINE GLCD_TYPE_SSD1306_CHARACTER_MODE_ONLY
+#DEFINE GLCD_PROTECTOVERRUN
+
+Dim BYTENUMBER, CCOUNT As Byte
+
+CCount = 0
+Dim longNumber As Long
+' max value = 4294967290
+longNumber = 0
+Dim wordNumber, adcval, ldrval As Word
+Dim outstring As String
+wordNumber = 0
+byteNumber = 0
+
+Dir PORTB.1 Out
+Dir PORTB.5 Out
+Dir PORTB.0 In
+
+' ----- Main program
+
+#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCD_Open_PageTransaction 0,3
+#ENDIF
+
+GLCDPrint 0, 0,   "Great Cow BASIC"
+GLCDPrint (0, 16, "Anobium 2019")
+GLCDPrint (76, 16, GLCD_WIDTH )
+GLCDPrint (96, 16, "*" )
+GLCDPrint (104, 16, GLCD_HEIGHT )
+
+#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCD_Close_PageTransaction
+#ENDIF
+
+Wait 3 s
+GLCDCLS
+
+#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCD_Open_PageTransaction 0, 3
+#ENDIF
+
+GLCDPrint 0, 0,   "Version 0.98.00"
+
+
+#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCDPrint (0, 16, "LM GLCD MODE")
+#ENDIF
+
+#IFNDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCDPrint (0, 16, "FULL GLCD MODE")
+#ENDIF
+
+
+#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCD_Close_PageTransaction
+#ENDIF
+
+Wait 3 s
+GLCDCLS
+
+
+Do Forever
+
+    For CCount = 32 To 127
+
+        ' Prepare a string
+        outString = Str( CCount )
+        adcval = ReadAD ( an17 )
+        ldrval = ReadAD ( an11 )
+
+        GLCDSetContrast ( ldrval )
+        ' Prepare the static components of the screen
+        #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+            GLCD_Open_PageTransaction 0,3
+        #ENDIF
+
+        ' Print some text
+        GLCDPrint ( 1,   1, "PrintStr")
+        ' Print some more text
+        GLCDPrint ( 64,  1, "@")
+        ' Print chip speed
+        GLCDPrint ( 72,  1, ChipMHz)
+        ' Print some text
+        GLCDPrint ( 86, 1, "Mhz")
+        ' Draw some text
+        GLCDDrawString( 1,11,"DrawStr")
+        ' Draw a box
+        Box 0,0,GLCD_WIDTH-1, GLCD_HEIGHT-1
+        ' Draw a box
+        Box GLCD_WIDTH-5, GLCD_HEIGHT-5,GLCD_WIDTH-1, GLCD_HEIGHT-1
+        ' Draw a circle
+        Circle( 44,24,5)
+        ' Draw a line
+        Line 0,GLCD_HEIGHT-1,44,19
+
+        GLCDPrint ( 75 ,  20,  "ADC:"+Pad(Str(adcval),4 ) )
+        GLCDPrint ( 75 ,  11,  "LDR:"+Pad(Str(ldrval),4 ) )
+
+        ' Draw a Box
+        Box (3,24,6,27)
+
+        ' Draw a string
+        GLCDDrawString(44, 11, CHR(CCount)+"="+Pad(outString,3) )
+
+        Ellipse 118, 6, 7, 4
+        If ldrval > adcval Then
+            FilledEllipse 118, 6, 5, 2
+        Else
+            FilledEllipse 118, 6, 5, 2, GLCDBackground
+        End If
+
+        #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+            GLCD_Close_PageTransaction
+        #ENDIF
+
+        longNumber = longNumber + 7
+
+
+    Next
+Loop
+End

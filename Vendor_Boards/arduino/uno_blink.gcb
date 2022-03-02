@@ -1,0 +1,37 @@
+'''********************************************************************************'
+'''@author  C.A.Roper
+'''@licence GPL
+'''@version 1.0
+'''@date  29/12/2018
+'''********************************************************************************'
+'
+'  UNO_Blink.gcb
+'
+'  Turns an LED on for one second, then off for one second, repeatedly.
+'
+'  Most Arduinos have an on-board LED you can control.
+'  On the UNO, MEGA and ZERO it is attached to PORTB.5 (digital pin 13)
+'  If you want to know what pin the on-board LED is connected to on
+'  your Arduino model, check the Technical Specs of your board at:
+'  https://www.arduino.cc/en/Main/Products
+'
+' This example code is in the public domain.
+'
+' Declare the Target Processor and Speed
+#CHIP mega328p, 16
+' Require Explicit declaration of Variables
+#OPTION Explicit
+
+' Define the LED Pin
+#DEFINE LED PORTB.5
+
+' Setup
+' Make the LED Pin an Output
+Dir LED Out
+
+' Main                ' This loop runs over and over forever.
+Do
+    ' Toggle state of LED
+    LED = !LED
+    Wait 1 s
+Loop

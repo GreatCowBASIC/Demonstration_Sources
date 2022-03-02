@@ -1,0 +1,622 @@
+'   FILE:    DS1307 with LCD Demonstration.gcb
+'   DATE:    28/08/14
+'   VERSION: 1.1a
+'   AUTHOR:  Anobium
+
+'    Demo of a complete clock/calendar using the DS1307 RTC for a 16F877a 40 PIN Prototype board.
+'    Install GCB - you are recommended to use GCB@SYN from the Great Cow Basic website.
+
+'    This code is free software; you can redistribute it and/or
+'    modify it under the terms of the GNU Lesser General Public
+'    License as published by the Free Software Foundation; either
+'    version 2.1 of the License, or (at your option) any later version.
+
+'    This code is distributed in the hope that it will be useful,
+'    but WITHOUT ANY WARRANTY; without even the implied warranty of
+'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+'    Lesser General Public License for more details.
+
+'    If you require a copy of the GNU Lesser General Public
+'    License along with this code; please write to the Free Software
+'    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+'    Thomas Henry --- 5/26/2014
+'    Evan R Venn/Anobium  --- 8/29/2014
+
+'    There are two pushbuttons: Mode and Set these equate to Key1 and Key2
+
+'    During normal operation, the Mode button will toggle
+'    between 12- and 24-hours modes.
+
+'    This has two modes US date and UK date style.
+'    Change 'clocktype' to 0 for US and 1 for UK
+
+'    To set a new date and time, press the Set button
+'    which will take you consecutively to Month, Day, Year,
+'    Day of the Week, Hour, Minute and Second. Within each of
+'    these, press Mode to cycle through the possible values.
+'    You may hold the Mode button to increment automatically,
+'    or press momentarily for a single increment. Time is
+'    always set in 24-hour clock format.
+'
+'    The DS1307 is attached as follows:
+'    I2C Data line to RC3
+'    I2C Clock line to RC4
+'
+'    The LCD is attached to the LCD Header
+
+
+'----- Configuration
+
+'PIC16F887a running at 20 Mhz
+#CHIP 16F877a, 20
+#OPTION Explicit
+
+#INCLUDE <ds1307.h>
+
+'----- Constants
+
+'Use LCD in 4 pin mode and define LCD pins
+'4-bit mode
+#DEFINE LCD_IO 4
+'LCD R/W Select
+#DEFINE LCD_RW PORTE.1
+'LCD Register Select
+#DEFINE LCD_RS PORTE.0
+'LCD Enable
+#DEFINE LCD_Enable PORTE.2
+
+'LCD PIN DB4
+#DEFINE LCD_DB4 PORTD.4
+'LCD PIN DB5
+#DEFINE LCD_DB5 PORTD.5
+'LCD PIN DB6
+#DEFINE LCD_DB6 PORTD.6
+'LCD PIN DB7
+#DEFINE LCD_DB7 PORTD.7
+#DEFINE LCD_SPEED FAST
+
+'Define ports
+Dir portb.0 In
+Dir portb.1 In
+Dir portb.2 In
+Dir portb.4 In
+' Enable enable weak pull-up function on portB.  This IS required.
+OPTION_REG.NOT_RBPU = 0
+
+'0 is US or 1 is UK style
+#DEFINE clocktype   1
+'settling time for switches
+#DEFINE debounce    5 ms
+'delay time for pushbutton
+#DEFINE delay       100 ms
+'flag for pressed pushbutton
+#DEFINE pressed     0
+'Set pushbutton
+#DEFINE setBut      portb.0
+'Mode pushbutton
+#DEFINE modeBut     portb.1
+
+'SCL on pin 1
+#DEFINE I2C_CLOCK   PortC.3
+'SDA on pin 2
+#DEFINE I2C_DATA    PortC.4
+
+
+#DEFINE I2C_MODE Master
+#DEFINE I2C_DISABLE_INTERRUPTS On
+'width of data bit on SDA
+#DEFINE I2C_BIT_DELAY   20 us
+'width of clock pulse on SCL
+#DEFINE I2C_CLOCK_DELAY 10 us
+'interval between clock pulses
+#DEFINE I2C_END_DELAY   10 us
+
+
+'----- Variables
+
+Dim changed As BIT
+Dim hour, min, sec, am_pm As Byte
+Dim date, month, year, DOW As Byte
+Dim mode, Oldmode, dayMax As Byte
+Dim DAYSMAX, DAYSMAX As Byte
+
+
+'----- Tables
+
+'# of days in months
+Table monthDays
+    31
+    'leap years only
+    29
+    31
+    30
+    31
+    30
+    31
+    31
+    30
+    31
+    30
+    31
+End Table
+
+'----- Program
+
+Print "DS1307 Clock"
+Locate 1,0
+Print "Great Cow Basic"
+Wait 3 s
+CLS
+
+
+' is DS1307 present?
+I2CStart
+I2CSend(DS_AddrWrite)
+I2CStop
+
+If I2CSendState = FALSE  Then
+    ' is DS1307 present?
+    ' user message
+    Print "No DS1307"
+    Locate 1,0
+    ' user message
+    Print "Stopped"
+End
+End If
+
+
+'get initial date
+DS1307_ReadDate(DOW, date, month, year)
+'and the current mode
+DS1307_ReadHourMode(mode)
+'update hour mode from RTC
+DS1307_SetHourMode(mode)
+
+Do
+    'show time and date
+    updateDisp
+    If setBut = pressed Then
+        'change time and date
+        changeSetting
+    End If
+
+    If modeBut = pressed Then
+        '12 or 24 hour mode
+        changeMode
+    End If
+Loop
+
+'----- Subroutines
+
+Sub printTime
+    If mode = 24 Then
+        If hour < 10 Then
+            'left pad with zero
+            Print "0"
+        End If
+    End If
+    Print hour
+
+    Print ":"
+    If min < 10 Then
+        'left pad with zero
+        Print "0"
+    End If
+    Print min
+
+    Print ":"
+    If sec < 10 Then
+        'left pad with zero
+        Print "0"
+    End If
+    Print sec
+
+    If mode = 12 Then
+        'print a.m or p.m
+        If am_pm Then
+            'only in 12-hour mode
+            Print " p.m. "
+        Else
+            Print " a.m. "
+        End If
+    Else
+        'wipe out garbage
+        Print "     "
+    End If
+End Sub
+
+'-----
+
+Sub printDate
+    'day of the week
+    Select Case DOW
+    Case 1:
+        Print "Sun. "
+    Case 2:
+        Print "Mon. "
+    Case 3:
+        Print "Tue. "
+    Case 4:
+        Print "Wed. "
+    Case 5:
+        Print "Thu. "
+    Case 6:
+        Print "Fri. "
+    Case 7:
+        Print "Sat. "
+    End Select
+
+    If clocktype = 0 Then
+        Print month
+        Print "/"
+        Print date
+        'make four-digit year
+        Print "/20"
+        If year < 10 Then
+            Print "0"
+        End If
+    Else
+        Print date
+        Print "/"
+        Print month
+        'make four-digit year
+        Print "/20"
+        If year < 10 Then
+            Print "0"
+        End If
+    End If
+    Print year
+    'blank any garbage
+    Print "  "
+End Sub
+
+'-----
+
+Sub updateDisp
+    'for best efficiency, date is only updated once a day
+    DS1307_ReadTime(hour, min, sec, am_pm)
+    If !(hour | min | sec) Then
+        'time to update
+        DS1307_ReadDate(DOW, date, month, year)
+    End If
+
+    'home the cursor
+    Locate 0,0
+    'show time
+    printTime
+
+    'show the date
+    Locate 1,0
+    printDate
+End Sub
+
+'-----
+
+Sub changeSetting
+    'assume no change will be made
+    changed = FALSE
+    'and the current mode
+    DS1307_ReadHourMode(Oldmode)
+    'ensure the display is correct
+    mode = 24
+    'change settings in 24-hour mode
+    DS1307_SetHourMode(24)
+
+    'wait for Set release
+    Do While setBut = pressed
+        Wait debounce
+    Loop
+
+    If clocktype = 0 Then
+        ' handle US and UK clock type
+        SetMonth
+        SetDate
+    Else
+        SetDate
+        SetMonth
+    End If
+    SetYear
+
+    '***** Day of the Week
+
+    CLS
+    Print "Set Weekday:"
+    Locate 1,0
+    printDate
+
+    Do
+        'Mode button held
+        Do While modeBut = pressed
+            'increment while pressed
+            DOW++
+            If DOW > 7 Then
+                '1 = Sunday, etc.
+                DOW = 1
+            End If
+
+            'print updated display
+            Locate 1,0
+            printDate
+            'wait for repeat
+            Wait While modeBut = pressed
+            'a change was made
+            changed = TRUE
+        Loop
+    Loop While setBut <> pressed
+
+    'wait for Set release
+    Do While setBut = pressed
+        Wait debounce
+    Loop
+
+    '***** Hour
+
+    CLS
+    Print "Set Hours:"
+    Locate 1,0
+    If OldMode = 12 AND am_pm Then
+        ' make correction of AM_PM mode by adding 12 hours to handle mode changes
+        hour = hour + 12
+    End If
+
+    printTime
+
+    Do
+        'Mode button held
+        Do While modeBut = pressed
+            'increment while pressed
+            hour++
+            If hour > 23 Then
+                'remember, set in 24-hour mode
+                hour = 0
+            End If
+
+            'print updated display
+            Locate 1,0
+            printTime
+            'wait for repeat
+            Wait While modeBut = pressed
+            'a change was made
+            changed = TRUE
+        Loop
+    Loop While setBut <> pressed
+
+    'wait for Set release
+    Do While setBut = pressed
+        Wait debounce
+    Loop
+
+    '***** Minutes
+
+    CLS
+    Print "Set Minutes:"
+    Locate 1,0
+    printTime
+
+    Do
+        'Mode button held
+        Do While modeBut = pressed
+            'increment while pressed
+            min++
+            If min > 59 Then
+                '0 to 59 minutes
+                min = 0
+            End If
+
+            'print updated display
+            Locate 1,0
+            printTime
+            'wait for repeat
+            Wait While modeBut = pressed
+            'a change was made
+            changed = TRUE
+        Loop
+    Loop While setBut <> pressed
+
+    'wait for Set release
+    Do While setBut = pressed
+        Wait debounce
+    Loop
+
+    '***** Second
+
+    CLS
+    Print "Set Seconds:"
+    Locate 1,0
+    printTime
+
+    Do
+        'Mode button held
+        Do While modeBut = pressed
+            'increment while pressed
+            sec++
+            If sec > 59 Then
+                '0 to 59 seconds
+                sec = 0
+            End If
+
+            'print updated display
+            Locate 1,0
+            printTime
+            'wait for repeat
+            Wait While modeBut = pressed
+            'a change was made
+            changed = TRUE
+        Loop
+    Loop While setBut <> pressed
+
+    'wait for Set release
+    Do While setBut = pressed
+        Wait debounce
+    Loop
+
+    '***** Execute the new settings
+
+    If changed Then
+        CLS
+        Print "Press Set, or"
+        Locate 1,0
+        Print "Mode to revert"
+
+        'wait for the Set button
+        Do While (setBut <> pressed)
+            Wait debounce
+            If ModeBut = pressed Then
+                'clear last message
+                CLS
+                'restore current mode
+                DS1307_SetHourMode(Oldmode)
+                'do not set, exit set routine
+                Exit Sub
+            End If
+        Loop
+
+        'change settings in 24-hour mode
+        DS1307_SetHourMode(24)
+        DS1307_SetClock(hour, min, sec, DOW, date, month, year)
+    End If
+
+    'wait for Set release
+    Do While (setBut = pressed)
+    Loop
+
+    'let it settle
+    Wait debounce
+    'clear last message
+    CLS
+    'restore current mode
+    DS1307_SetHourMode(Oldmode)
+    'restore mode
+    mode = Oldmode
+End Sub
+
+'-----
+
+Sub changeMode
+    'change settings in 24-hour mode
+    DS1307_SetHourMode(24)
+
+    If mode = 12 Then
+        'toggle between 12 and 24
+        mode = 24
+    Else
+        mode = 12
+    End If
+
+    'change to new mode
+    DS1307_SetHourMode(mode)
+
+    'wait for a release
+    Do While modeBut = pressed
+        Wait debounce
+    Loop
+End Sub
+
+Sub setMonth
+    '***** Month
+    CLS
+    Print "Set Month:"
+    Locate 1,0
+    printDate
+
+    Do
+        'Mode button held
+        Do While modeBut = pressed
+            'increment while pressed
+            month++
+            If month > 12 Then
+                month = 1
+            End If
+
+            'print updated display
+            Locate 1,0
+            printDate
+            'wait for repeat
+            Wait While modeBut = pressed
+            'a change was made
+            changed = TRUE
+        Loop
+        'Set moves you on
+    Loop While setBut <> pressed
+
+    ReadTable monthDays, month, daysMax
+
+    'wait for Set release
+    Do While setBut = pressed
+        Wait debounce
+    Loop
+End Sub
+
+
+
+Sub SetDate
+    '***** Date
+
+    CLS
+    Print "Set Date:"
+    Locate 1,0
+    printDate
+    ReadTable monthDays, month, daysMax
+    Do
+        'Mode button held
+        Do While modeBut = pressed
+            'increment while pressed
+            date++
+            If date > daysMax Then
+                'stay within legal days
+                date = 1
+            End If
+
+            'print updated display
+            Locate 1,0
+            printDate
+            'wait for repeatt
+            Wait While modeBut = pressed
+            'a change was made
+            changed = TRUE
+        Loop
+    Loop While setBut <> pressed
+
+    'wait for Set release
+    Do While setBut = pressed
+        Wait debounce
+    Loop
+End Sub
+
+
+Sub SetYear
+    '***** Year
+
+    CLS
+    Print "Set Year:"
+    Locate 1,0
+    printDate
+
+    Do
+        'Mode button held
+        Do While modeBut = pressed
+            'increment while pressed
+            year++
+            If year > 99 Then
+                'this millennium only
+                year = 0
+            End If
+
+            'print updated display
+            Locate 1,0
+            printDate
+            'wait for repeat
+            Wait While modeBut = pressed
+            'a change was made
+            changed = TRUE
+        Loop
+    Loop While setBut <> pressed
+
+    'wait for Set release
+    Do While setBut = pressed
+        Wait debounce
+    Loop
+
+
+End Sub
