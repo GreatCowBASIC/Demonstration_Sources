@@ -1,20 +1,20 @@
 '''A most simple sample for GCGB and GCB.
 '''------------------------------------------------------------------------
-'''This program blinks the onboard LED of a microcontroller - simple.
+'''This program blinks the onboard LED of a microcontroller - simple - the demonstration should work across many microcontrollers.
 '''
-'''This sample file can be adapted to any of the supported microcontrollers
-'''by simply changing the #chip creating and removing the comment.
+'''This sample file can be adapted to any of the supported microcontrollers by simply changing the #chip - do this by changing to your chip. Other common chips are shown.
 '''
 '''To make your programmer or your bootloader work, simply do the following.
 '''
-'''From within this IDE, select from the menu 'IDE Tools/GCB Tools/Edit Programmer Preferences' or press Ctrl-Alt-E.
-'''this will show you the 'Programmer Preferences', select the 'Programmer' tab.
+'''From within this IDE, press function key F4, then select  'Edit Programmer Preferences'.   This will show you the 'Programmer Preferences', select the 'Programmer' tab.
 '''
-'''For PIC:  Typically, if you are using a PICKIT2 then 'Microchip PICKit 2 CLI - Default' will work for you.
-'''For AVR:  Typically, for an UNO the programmer 'Arduino UNO/328p@115200' will work - but, please edit the communication 'PORT'.
-'''then, select OK to save your changes.
+'''For PIC:  Typically, if you are using a PICKIT2 then select 'Microchip PICKit 2 CLI - Default' will work for you - select and drag this to the top of the dialog area.
 '''
-'''For further adventures with Great Cow BASIC .... Click button "view Demos" for 1000's of sample programs.
+'''For AVR:  Typically, for an UNO the programmer 'Arduino UNO/328p@115200' will work, select the option from the list of programmers, then, select 'Edit', 
+'''   please edit the communication 'Port', select 'OK', and, then select this option again and drag this to the top of the dialog area.
+'''
+'''
+'''For further adventures with Great Cow BASIC .... Select F4 and then "view Demos" for 1000's of sample programs.
 '''
 '''
 '''Enjoy.
