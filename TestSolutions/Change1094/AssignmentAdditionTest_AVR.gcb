@@ -1,0 +1,109 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------
+'''This program verifies the compiler correctly assigns a calculated value.
+'''
+'''
+'''@author    Evan
+'''@license   GPL
+'''@version   1.00
+'''@date      2022-03-08
+'''********************************************************************************
+#DEFINE DISABLE1094 
+#DEFINE DEBUG1094
+
+#chip mega328p, 16
+#option explicit
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
+Dim Descend_start_i as Integer
+Dim Delay_time_i as Integer
+Dim Delay_result_i as Integer
+
+
+    Do
+        wait 3 s
+
+        ' Calc is
+        ' 291-134 = 157
+
+        Descend_start_i   = 291
+        Delay_time_i      = 134
+        Delay_time_i = Delay_time_i + Descend_start_i
+        HSerPrint Delay_time_i
+        HSerPrint " : "
+
+        Descend_start_i   = 291
+        Delay_time_i      = 134
+        Delay_time_i =  Delay_time_i +  Descend_start_i
+        HSerPrint Delay_time_i
+        HSerPrint " : "
+
+
+        Descend_start_i   = 291
+        Delay_time_i      = 134
+        Delay_time_i = (Descend_start_i + Delay_time_i)*1
+        HSerPrint Delay_time_i
+        HSerPrintCRLF
+
+
+        Dim Descend_start_b as byte
+        Dim Delay_time_b as byte
+        Dim Delay_result_b as byte
+
+        ' Calc is
+        ' 191-34 = 57
+        Descend_start_b   = 191
+        Delay_time_b      = 100
+        Delay_time_b = (Descend_start_b + Delay_time_b)
+        HSerPrint Delay_time_b
+        HSerPrint " : "
+
+        Descend_start_b   = 191
+        Delay_time_b      = 100
+        Delay_time_b = (Descend_start_b + Delay_time_b)*1
+        HSerPrint Delay_time_b
+        HSerPrintCRLF
+
+
+        Dim Descend_start_w as Word
+        Dim Delay_time_w as Word
+        Dim Delay_result_w as Word
+
+        ' Calc is
+        ' 291-134 = 157
+
+        Descend_start_w   = 291
+        Delay_time_w      = 134
+        Delay_time_w = ( Delay_time_w + Descend_start_w)
+        HSerPrint Delay_time_w
+        HSerPrint " : "
+
+        Descend_start_w   = 291
+        Delay_time_w      = 134
+        Delay_time_w = (Descend_start_w + Delay_time_w)*1
+        HSerPrint Delay_time_w
+        HSerPrintCRLF
+
+
+        Dim Descend_start_l as Long
+        Dim Delay_time_l as Long
+        Dim Delay_result_l as Long
+
+        ' Calc is
+        ' 291-134 = 157
+
+        Descend_start_l   = 291
+        Delay_time_l      = 134
+        Delay_time_l = ( Delay_time_l + Descend_start_l)
+        HSerPrint Delay_time_l
+        HSerPrint " : "
+
+        Descend_start_l   = 291
+        Delay_time_l      = 134
+        Delay_time_l = (Descend_start_l + Delay_time_l)*1
+        HSerPrint Delay_time_l
+        HSerPrintCRLF
+    loop
