@@ -11,8 +11,21 @@
 ' #DEFINE DISABLE1094 
 ' #DEFINE DEBUG1094
 
-#chip mega328p, 16
+#chip 16F18855
 #option explicit
+
+'Set the PPS of the PWM and the RS232 ports.
+'Set the PPS for this solution.
+#STARTUP InitPPS, 85
+
+Sub InitPPS
+    UNLOCKPPS
+    'RC0->EUSART:TX;
+    RC0PPS = 0x0010
+    'RC1->EUSART:RX;
+    RXPPS  = 0x0011
+    LOCKPPS
+End Sub
 
 #DEFINE USART_BAUD_RATE 9600
 #DEFINE USART_TX_BLOCKING
@@ -22,13 +35,12 @@ Dim Descend_start_i as Integer
 Dim Delay_time_i as Integer
 Dim Delay_result_i as Integer
 
-
-    Do
-        wait 3 s
-
-        ' Calc is
-        ' 291-134 = 157
-
+' Calc is
+' 291-134 = 157
+    do
+        Wait 3 s
+        HSerPrintCRLF    
+    
         Descend_start_i   = 291
         Delay_time_i      = 134
         Delay_time_i = Delay_time_i + Descend_start_i
@@ -106,4 +118,4 @@ Dim Delay_result_i as Integer
         Delay_time_l = (Descend_start_l + Delay_time_l)*1
         HSerPrint Delay_time_l
         HSerPrintCRLF
-    loop
+    Loop
