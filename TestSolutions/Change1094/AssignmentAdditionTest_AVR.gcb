@@ -26,9 +26,9 @@ Dim Delay_result_i as Integer
     Do
         wait 3 s
 
-        ' Calc is
-        ' 291-134 = 157
-
+        ' For calc see line code
+        
+        'Integer calcs
         Descend_start_i   = 291
         Delay_time_i      = 134
         Delay_time_i = Delay_time_i + Descend_start_i
@@ -53,7 +53,7 @@ Dim Delay_result_i as Integer
         Dim Delay_time_b as byte
         Dim Delay_result_b as byte
 
-        ' Calc is
+        ' Byte calcs
         ' 191-34 = 57
         Descend_start_b   = 191
         Delay_time_b      = 100
@@ -72,9 +72,7 @@ Dim Delay_result_i as Integer
         Dim Delay_time_w as Word
         Dim Delay_result_w as Word
 
-        ' Calc is
-        ' 291-134 = 157
-
+        ' Word calcs
         Descend_start_w   = 291
         Delay_time_w      = 134
         Delay_time_w = ( Delay_time_w + Descend_start_w)
@@ -92,7 +90,7 @@ Dim Delay_result_i as Integer
         Dim Delay_time_l as Long
         Dim Delay_result_l as Long
 
-        ' Calc is
+        ' Long calcs
         ' 291-134 = 157
 
         Descend_start_l   = 291
