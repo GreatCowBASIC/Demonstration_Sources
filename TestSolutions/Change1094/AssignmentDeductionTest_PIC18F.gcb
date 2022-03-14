@@ -44,8 +44,7 @@
     Dim Delay_time_i as Integer
     Dim Delay_result_i as Integer
 
-' Calc is
-' 291-134 = 157
+' For calc see line code
 
     do
       
@@ -53,6 +52,7 @@
 
       HSerPrintCRLF
   
+      'Integer calcs
       Descend_start_i   = 291
       Delay_time_i      = 134
       Delay_time_i = (Descend_start_i - Delay_time_i)
@@ -70,8 +70,7 @@
       Dim Delay_time_b as byte
       Dim Delay_result_b as byte
 
-      ' Calc is
-      ' 191-34 = 57
+      'Byte calcs
       Descend_start_b   = 191
       Delay_time_b      = 34
       Delay_time_b = (Descend_start_b - Delay_time_b)
@@ -89,9 +88,7 @@
       Dim Delay_time_w as Word
       Dim Delay_result_w as Word
 
-      ' Calc is
-      ' 291-134 = 157
-
+      'Word calcs
       Descend_start_w   = 291
       Delay_time_w      = 134
       Delay_time_w = (Descend_start_w - Delay_time_w)
@@ -109,9 +106,7 @@
       Dim Delay_time_l as Long
       Dim Delay_result_l as Long
 
-      ' Calc is
-      ' 291-134 = 157
-
+      'Long calcs
       Descend_start_l   = 291
       Delay_time_l      = 134
       Delay_time_l = (Descend_start_l - Delay_time_l)
