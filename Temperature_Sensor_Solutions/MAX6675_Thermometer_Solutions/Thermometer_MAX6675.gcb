@@ -19,34 +19,35 @@
 
   SPIMODE MASTERSLOW
 
-  DIM Temperature as Word ' Temperature value from thermocouple
+    DIM Temperature as Word ' Temperature value from thermocouple
  
-  DIM SegmentsBuffer(3) as Byte ' Symbol buffer for display on the indicator
-  DIM Symbols(13) ' Character values from 0 to 9, empty, E, r
-  Symbols = 111, 40, 31, 62, 120, 118, 119, 44, 127, 126, 0, 87, 17
- 
-  #DEFINE SYMBOLE 11 
-  #DEFINE SYMBOLR 12 
-  #DEFINE CLEAR 10   
-  #DEFINE DELAY 5    ' TIME TO DISPLAY ONE CHARACTER
-  DIM L_byte as Byte
-  DIM Timer as Byte
+    DIM SegmentsBuffer(3) as Byte ' Symbol buffer for display on the indicator
+    DIM Symbols(13) ' Character values from 0 to 9, empty, E, r
+    Symbols = 111, 40, 31, 62, 120, 118, 119, 44, 127, 126, 0, 87, 17
+  
+    #DEFINE SYMBOLE 11 
+    #DEFINE SYMBOLR 12 
+    #DEFINE CLEAR 10   
+    #DEFINE DELAY 5    ' TIME TO DISPLAY ONE CHARACTER
+    DIM L_byte as Byte
+    DIM Timer as Byte
 
   ' SPI
-  #DEFINE CS  PORTA.5
-  #DEFINE SCK PORTB.6
-  #DEFINE SO  PORTB.4
-  Dir SO in
-  Dir SCK out
-  Dir CS out
+    #DEFINE CS  PORTA.5
+    #DEFINE SCK PORTB.6
+    #DEFINE SO  PORTB.4
+    Dir SO in
+    Dir SCK out
+    Dir CS out
+
   ' 7 Segments
-  #DEFINE SEG1 PORTA.4
-  #DEFINE SEG2 PORTA.2
-  #DEFINE SEG3 PORTB.5
-  Dir PORTC out
-  Dir SEG1 out
-  Dir SEG2 out
-  Dir SEG3 out
+    #DEFINE SEG1 PORTA.4
+    #DEFINE SEG2 PORTA.2
+    #DEFINE SEG3 PORTB.5
+    Dir PORTC out
+    Dir SEG1 out
+    Dir SEG2 out
+    Dir SEG3 out
 
   Wait 1 s
 
