@@ -1,0 +1,75 @@
+/*
+A demonstration program for GCGB and GCB.
+--------------------------------------------------------------------------------
+This program is for an UNO SPI Master and it send data to a Slave UNO.
+
+@author    Evan
+@license   GPL
+@version   1.00
+@date      2022-03-18
+
+You need to connect the Gnd/0V; Data/Chip Select/Clock lines as listed below.
+*/
+
+
+#CHIP mega328p, 16
+#OPTION EXPLICIT
+
+
+ #INCLUDE <UNO_MEGA328P.H >
+
+
+    'Pin mappings for SPI - this SPI driver supports Hardware SPI
+    #DEFINE SPI_DC       DIGITAL_8          ' DATA COMMAND LINE
+    #DEFINE SPI_CS       DIGITAL_10         ' CHIP SELECT LINE
+    #DEFINE SPI_RESET    DIGITAL_9          ' RESET LINE
+
+    #DEFINE SPI_DI       DIGITAL_12         ' DATA IN | MISO
+    #DEFINE SPI_DO       DIGITAL_11         ' DATA OUT | MOSI
+    #DEFINE SPI_SCK      DIGITAL_13         ' CLOCK LINE
+
+    DIR SPI_DC    OUT
+    DIR SPI_CS    OUT
+    DIR SPI_RESET OUT
+    DIR SPI_DO    OUT
+    DIR SPI_DI    IN
+    DIR SPI_SCK   OUT
+
+
+
+
+    DIM byte1 As byte
+    byte1 = 65 'Values (will come from for-next loop later)
+   
+    InitSPIMode
+
+
+    do forever
+
+        'Send 64 bytes of data
+        For Byte1 = 65 to 65+64
+          SendByteviaSPI (byte1)
+        Next
+
+        wait 1 s
+    loop
+
+
+
+sub InitSPIMode
+
+  SPIMode ( Master, SPI_CPOL_0 + SPI_CPHA_0 )
+
+End sub
+
+sub  SendByteviaSPI( in SPISendByte as byte )
+
+  set SPI_CS OFF
+  set SPI_DC OFF
+
+  FastHWSPITransfer  SPISendByte
+  set SPI_CS ON
+
+end Sub
+
+

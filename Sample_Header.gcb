@@ -12,11 +12,6 @@
 ; ----- Configuration
 
  #chip mega8
-' #config  :'[todo]
-
-' #include :'[todo]
-
-
 
 ; ----- Constants
   ' No Constants specified in this example.
@@ -30,7 +25,7 @@
   ' No Variables specified in this example. All byte variables are defined upon use.
 '  [todo]
 
-; ----- Quick Command Reference:
+; ----- Quick Command Reference
 '  [todo]
 
 

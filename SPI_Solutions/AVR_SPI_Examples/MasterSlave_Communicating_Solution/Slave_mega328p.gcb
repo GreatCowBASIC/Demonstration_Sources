@@ -1,0 +1,100 @@
+/*
+A demonstration program for GCGB and GCB.
+--------------------------------------------------------------------------------
+This program is for an UNO received SPI data from a SPI Master and shows on the serial terminal.
+
+
+
+
+@author    Evan
+@license   GPL
+@version   1.00
+@date      2022-03-18
+
+You need to connect the Gnd/0V; Data/Chip Select/Clock lines as listed below.
+*/
+
+
+#CHIP mega328p, 16
+#OPTION EXPLICIT
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
+
+ #INCLUDE <UNO_MEGA328P.H >
+
+    'Pin mappings for SPI - this SPI driver only supports Hardware SPI
+    #DEFINE SPI_DC       DIGITAL_8          ' DATA COMMAND LINE
+    #DEFINE SPI_CS       DIGITAL_10         ' CHIP SELECT LINE
+    #DEFINE SPI_RESET    DIGITAL_9          ' RESET LINE
+
+    #DEFINE SPI_DI       DIGITAL_12         ' DATA IN | MISO
+    #DEFINE SPI_DO       DIGITAL_11         ' DATA OUT | MOSI
+    #DEFINE SPI_SCK      DIGITAL_13         ' CLOCK LINE
+
+    DIR SPI_DC    OUT
+    DIR SPI_CS    IN
+    DIR SPI_RESET OUT
+    DIR SPI_DO    OUT
+    DIR SPI_DI    IN
+    DIR SPI_SCK   OUT
+
+    InitSPIMode
+
+' Constants etc required for Buffer Ring
+    #DEFINE BUFFER_SIZE 128
+    #DEFINE BKBHIT (NEXT_IN <> NEXT_OUT)
+    ;Variables for Fuffer
+    Dim buffer(BUFFER_SIZE)
+
+    Dim next_in as byte: next_in = 1
+    Dim next_out as byte: next_out = 1
+
+
+'Demo code
+
+    Wait 2 s
+    HSerPrint "Start of Slave"
+    HSerPrintCRLF
+
+    do forever
+
+        'Get data    
+        wait while !bkbhit
+        'Show data
+        HSerSend bgetc
+          
+    loop
+
+
+
+sub InitSPIMode
+
+    SPIMode ( SlaveSS, SPI_CPOL_0 + SPI_CPHA_0 )
+    On Interrupt SPIReady Call readSPI
+
+End sub
+
+Sub readSPI
+
+    Dim temppnt as Byte
+
+    buffer(next_in) = SPDR
+
+    temppnt = next_in
+    next_in = ( next_in + 1 ) % BUFFER_SIZE
+    if ( next_in = next_out ) then  ' buffer is full!!
+        next_in = temppnt
+    end if
+
+End Sub
+
+function bgetc
+
+    wait while !(bkbhit)
+    bgetc = buffer(next_out)
+    next_out=(next_out+1) % BUFFER_SIZE
+
+end Function
