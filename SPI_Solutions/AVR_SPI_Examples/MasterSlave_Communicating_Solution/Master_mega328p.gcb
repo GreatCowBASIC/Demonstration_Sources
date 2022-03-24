@@ -50,6 +50,7 @@ You need to connect the Gnd/0V; Data/Chip Select/Clock lines as listed below.
         For Byte1 = 65 to 65+64
           SendByteviaSPI (byte1)
         Next
+        SendByteviaSPI (13)
 
         wait 1 s
     loop
