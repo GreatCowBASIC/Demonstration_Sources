@@ -1,0 +1,125 @@
+'''
+'''******************************************************************
+'''
+'''
+'''
+'''  PIC: 16F18855
+'''  Compiler: GCB
+'''  IDE: GCB@SYN
+'''
+'''  Date: 13.3.2016
+'''
+
+
+' ----- Configuration
+'Chip Settings.
+#CHIP mega328p, 16
+#OPTION Explicit
+
+
+#DEFINE SWITCH_DOWN         0
+#DEFINE SWITCH_UP           1
+
+#DEFINE SWITCH      PORTA.5
+
+#DEFINE USART_BAUD_RATE 19200
+#DEFINE USART_TX_BLOCKING
+
+
+' ----- Define Hardware settings for hwi2c
+' Define I2C settings - CHANGE PORTS if required for your specific device.
+#DEFINE HI2C_BAUD_RATE 100
+#DEFINE HI2C_DATA PORTC.4
+#DEFINE HI2C_CLOCK PORTC.5
+'Initialise I2C Master
+'I2C pins need to be input for I2C module
+Dir HI2C_DATA In
+Dir HI2C_CLOCK In
+
+HI2CMode Master
+
+#include <AMS_5600.h>
+
+'Power the Device - YOU NEED TO POWER CYCLE THE DEVICE EVERY TIME!!
+DIR PORTC.0 Out
+PORTC.0 = 1
+Wait 100 ms
+
+DIM valor, oldvalor, regvalues as Word
+
+HSerPrintCRLF
+HSerPrint "Started device address: 0x"
+HSerPrint Hex( AMS_5600_getAddress )
+HSerPrintCRLF
+HSerPrint "Device Burn count     : "
+HSerPrint AMS_5600_getBurnCount
+HSerPrintCRLF
+HSerPrint "Device Config         : "
+
+regvalues = AMS_5600_getConf
+HSerPrint ByteToBin(regvalues_h) 
+HSerPrint " "
+HSerPrint ByteToBin( regvalues ) 
+HSerPrintCRLF
+
+AMS_5600_setConf (  0xFF3F )  'Change PWM Frequency
+regvalues = AMS_5600_getConf
+HSerPrint "Device Config PWM     : "
+HSerPrint ByteToBin(regvalues_h) 
+HSerPrint " "
+HSerPrint ByteToBin( regvalues ) 
+HSerPrintCRLF
+
+
+HSerPrint "Device Magnitude      : 0x"
+HSerPrint Right(Hex( AMS_5600_getMagnitude_h) ,1)
+HSerPrint Hex( AMS_5600_getMagnitude )
+HSerPrintCRLF
+
+HSerPrint "Device AGC            : " 
+HSerPrint AMS_5600_getAgc
+HSerPrintCRLF
+
+HSerPrint "Magnet  Present       : " 
+If AMS_5600_detectMagnet then 
+    HSerPrint "Yes"
+Else
+    HSerPrint "No"
+End If
+HSerPrintCRLF
+
+regvalues = AMS_5600_getMagnetStrength
+HSerPrint "Magnet  Status        : " 
+HSerPrint regvalues
+
+Dir PortB.5 out
+
+
+'Throw away 20 readings to get the device to settle
+Repeat 20
+    valor = AMS_5600_getRawAngle
+    oldvalor = valor
+End Repeat
+
+Do
+
+    valor = AMS_5600_getRawAngle
+
+    If valor <> oldvalor then
+        HSerPrintCRLF 
+        HSerPrint valor
+        If  [integer]valor - [integer]oldvalor > 0 Then
+            HserPrint " +"
+            PortB.5 = 1
+            
+        Else
+            HserPrint " -"
+            PortB.5 = 0
+
+        End If
+        oldvalor = valor
+        
+    End if
+Loop
+
+' ----- Support methods.  Subroutines and Functions
