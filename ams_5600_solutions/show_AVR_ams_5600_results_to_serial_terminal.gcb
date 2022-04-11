@@ -28,7 +28,7 @@
 
 ' ----- Define Hardware settings for hwi2c
 ' Define I2C settings - CHANGE PORTS if required for your specific device.
-#DEFINE HI2C_BAUD_RATE 100
+#DEFINE HI2C_BAUD_RATE  100
 #DEFINE HI2C_DATA PORTC.4
 #DEFINE HI2C_CLOCK PORTC.5
 'Initialise I2C Master
@@ -48,6 +48,8 @@ Wait 100 ms
 DIM valor, oldvalor, regvalues as Word
 
 HSerPrintCRLF
+HserPrint ChipNameStr
+HSerPrintCRLF
 HSerPrint "Started device address: 0x"
 HSerPrint Hex( AMS_5600_getAddress )
 HSerPrintCRLF
@@ -62,7 +64,7 @@ HSerPrint " "
 HSerPrint ByteToBin( regvalues ) 
 HSerPrintCRLF
 
-AMS_5600_setConf (  0xFF3F )  'Change PWM Frequency
+AMS_5600_setConf (  0xFC3F )  'Change PWM Frequency
 regvalues = AMS_5600_getConf
 HSerPrint "Device Config PWM     : "
 HSerPrint ByteToBin(regvalues_h) 
@@ -94,20 +96,17 @@ HSerPrint regvalues
 
 Dir PortB.5 out
 
-
-'Throw away 20 readings to get the device to settle
-Repeat 20
-    valor = AMS_5600_getRawAngle
-    oldvalor = valor
-End Repeat
-
 Do
+   ' Do
+        valor = AMS_5600_getRawAngle 
+   ' Loop While (valor AND 0XF000) <> 0
 
-    valor = AMS_5600_getRawAngle
-
+    
+    
+    wait 100 ms
     If valor <> oldvalor then
         HSerPrintCRLF 
-        HSerPrint valor
+        HSerPrint scale(valor,0,4095,0,359)
         If  [integer]valor - [integer]oldvalor > 0 Then
             HserPrint " +"
             PortB.5 = 1
@@ -117,6 +116,7 @@ Do
             PortB.5 = 0
 
         End If
+        If valor > 4095 then HserPrint "ERROR"
         oldvalor = valor
         
     End if

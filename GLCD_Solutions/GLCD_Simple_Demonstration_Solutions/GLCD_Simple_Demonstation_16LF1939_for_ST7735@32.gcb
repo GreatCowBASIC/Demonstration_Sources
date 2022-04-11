@@ -6,7 +6,7 @@
 '''@author  EvanV
 '''@licence GPL
 '''@version 1.1
-'''@date    14.04.2019
+'''@date    01/04/2022
 '''********************************************************************************
 
   'Chip Settings. Assumes the my development board 'C' with with a 16LF1939
@@ -153,7 +153,7 @@ sub ShowCase1
         GLCDRotate ( Portrait_Rev )
 
         GLCDDrawString (2, 1, "GCB", TFT_WHITE )
-        GLCDDrawString (26,1,"v0.98", TFT_YELLOW )
+        GLCDDrawString (26,1,"v0.99", TFT_YELLOW )
         GLCDDrawString (2, 20, "DrawStr", TFT_WHITE )
 
         GLCDDrawString ( 2, 31, "Long#" )
@@ -178,7 +178,7 @@ sub ShowCase1
         GLCDDrawString ( 36, GLCDDeviceHeight - 30 , "ST7735" , TFT_WHITE )
 
         GLCDfntDefaultsize = 1
-        GLCDDrawString ( GLCDDeviceWidth - 57, 1 , "Apr 2019" , TFT_WHITE )
+        GLCDDrawString ( GLCDDeviceWidth - 57, 1 , "Apr 2022" , TFT_WHITE )
         #ifdef ST7735_HardwareSPI
             GLCDDrawString ( GLCDDeviceWidth - 42, 10 , "HW SPI" , TFT_WHITE )
         #endif
@@ -222,7 +222,7 @@ sub ShowCase2
 
         GLCDRotate ( Landscape_rev )
         GLCDDrawString (2, 1, "GCB", TFT_WHITE )
-        GLCDDrawString (26,1,"v0.98", TFT_YELLOW )
+        GLCDDrawString (26,1,"v0.99", TFT_YELLOW )
         GLCDDrawString (2, 10, "DrawStr", TFT_WHITE )
 
         GLCDDrawString ( 64, 10, "Asc:" )
@@ -248,7 +248,7 @@ sub ShowCase2
         GLCDDrawString ( 50, GLCDDeviceHeight - 30 , "ST7735 " , TFT_WHITE )
 
         GLCDfntDefaultsize = 1
-        GLCDDrawString ( GLCDDeviceWidth - 57, 1 , "Apr 2019" , TFT_WHITE )
+        GLCDDrawString ( GLCDDeviceWidth - 57, 1 , "Apr 2022" , TFT_WHITE )
         #ifdef ST7735_HardwareSPI
             GLCDDrawString ( GLCDDeviceWidth - 42, 10 , "HW SPI" , TFT_WHITE )
         #endif

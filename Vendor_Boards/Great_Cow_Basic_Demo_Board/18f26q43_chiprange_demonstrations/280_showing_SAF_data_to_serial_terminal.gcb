@@ -253,12 +253,13 @@ sub SAFM_Dump
 
            HserPrint "Block"
            HSerprint BlockNum
-           HSerprint "  1 0   3 2   5 4   7 6   9 8   B A   D C   F E"
+           HSerprint "   1 0   3 2   5 4   7 6   9 8   B A   D C   F E"
            BlockNum++
         End if
 
         IF NVM_Address  % 16 = 0 then
            HSerPrintCRLF
+           hserprint right(hex(NVM_Address_U),1)
            hserprint hex(NVM_Address_H)
            hserprint hex(NVM_Address)
            hserprint "    "
