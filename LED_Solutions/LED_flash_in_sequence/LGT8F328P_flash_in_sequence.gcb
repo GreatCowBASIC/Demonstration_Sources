@@ -1,0 +1,50 @@
+/*
+A demonstration program for GCGB and GCB.
+--------------------------------------------------------------------------------
+This program is for an UNO to flash in sequence 
+
+
+@author    Evan
+@license   GPL
+@version   Version
+@date      2022-04-24
+
+       ------------PORTA---------------
+Bit#:  -7---6---5---4---3---2---1---0---
+IO:    ---------------------------------
+IO:    ---------------------------------
+
+       ------------PORTB----------------
+Bit#:  -7---6---5---4---3---2---1---0---
+IO:    --------LED-LED-LED-LED-LED-LED--
+IO:    ---------------------------------
+
+       ------------PORTC----------------
+Bit#:  -7---6---5---4---3---2---1---0---
+IO:    ---------------------------------
+IO:    ---------------------------------
+
+*/
+
+
+#CHIP LGT8F328P
+#OPTION EXPLICIT
+
+    //! Set the port as an output
+    DIR PORTB OUT
+    //! Set the LED on
+    PORTB.5 = 1
+
+    //! Loop for ever    
+    do
+    
+        //! Rotate to shift the port values to the right.  We use the carry bit to reset the sequence
+        ROTATE PORTB RIGHT
+        
+        //! Set the port.bit to the value of C.  This will only be 1 when the portb.0 is shifted to the carry by the ROTATE
+        PORTB.5 = C
+        
+        //! Wait 100 ms
+        Wait 100 ms
+
+    loop
