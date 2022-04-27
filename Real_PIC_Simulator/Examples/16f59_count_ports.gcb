@@ -19,6 +19,8 @@ dir portc out
 dir portd out
 dir porte out
 
+dim bits as byte
+
 do Forever
   for bits = 0 to 255
     porta = bits
