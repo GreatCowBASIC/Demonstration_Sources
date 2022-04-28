@@ -1,0 +1,67 @@
+/*
+A demonstration program for GCGB and GCB.
+--------------------------------------------------------------------------------------------------------------------------------
+This program demonstrates fix 1113
+  Resolves match =  times_array(1) + 2 >= times_array(3) error
+   where the times_array(1) + 2 is treated a SYSTEMP byte variable  when the array is a word element array .. thus messes up the ASM and the users code.
+   the cause of the issue is that the TypeAV = TypeOfValue(AV, Subroutine(GetDestSub(Origin))) above returns a byte not a word
+   so, this code tests that TypeAV is not empty, when empty then the compiler has not determine a type, so, it is not of interest
+   then, it test for > or M then this is a calculation that could impact the type cast.  
+   If all these tests are valid, then simply choose the largest of the two variables.
+
+********************************************************************************
+*/
+
+#CHIP 16f877a, 20
+// #CHIP mega328p, 16
+
+// Setup LCD Parameters
+    #DEFINE LCD_IO 4
+    #DEFINE LCD_NO_RW
+    #DEFINE LCD_SPEED OPTIMAL
+
+    // Change as necessary
+    // #DEFINE LCD_RW PortB.1
+    #DEFINE LCD_RS PortB.2
+    #DEFINE LCD_Enable PortB.3
+    #DEFINE LCD_DB4 PortB.4
+    #DEFINE LCD_DB5 PortB.5
+    #DEFINE LCD_DB6 PortB.6
+    #DEFINE LCD_DB7 PortB.7
+
+// Print "Great Cow BASIC"
+// Locate 1,0
+// Print "@2022"
+// Wait 1 s
+
+// CLS
+
+Dim times_array(4) as WORD
+Dim match as Bit
+
+times_array(1)=8          //! Test values are 7 and 8
+times_array(3)=10         //! Test value should always 10  
+
+// //!  Correct as the values involved in the conditional expression do not exceed a Byte type.  The calc is treated as a byte ..does not show the error
+match =  times_array(1) + 2 >= times_array(3)
+Print match
+
+// //!  Correct as the involved in the conditional expression are managed as Word type, as forced by the braces 
+match =  (times_array(1) + 2) >= times_array(3)
+Locate 0, 10
+Print match
+
+times_array(1)=times_array(1)+250  //! Ensure the values are Word type 
+times_array(3)=times_array(3)+250  //! Ensure the values are Word type
+
+//!  InCorrect as the values involved in the conditional expression is treated as a Byte type.  The high Byte of the Word variable is cleared
+match =  times_array(1) + 2 >= times_array(3)
+Locate 1,0
+Print match
+
+// //!  Correct as the values involved in the conditional expression are managed as Word range 
+match =  (times_array(1) + 2) >= times_array(3)
+Locate 1, 10
+Print match
+
+
