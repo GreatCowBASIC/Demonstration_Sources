@@ -8,7 +8,7 @@ This program demonstrates fix 1113
    so, this code tests that TypeAV is not empty, when empty then the compiler has not determine a type, so, it is not of interest
    then, it test for > or M then this is a calculation that could impact the type cast.  
    If all these tests are valid, then simply choose the largest of the two variables.
-
+#CHIP mega328, 16
 ********************************************************************************
 */
 
@@ -37,7 +37,7 @@ This program demonstrates fix 1113
 // CLS
 
 Dim times_array(4) as WORD
-Dim match as Bit
+Dim match as BIT
 
 times_array(1)=8          //! Test values are 7 and 8
 times_array(3)=10         //! Test value should always 10  

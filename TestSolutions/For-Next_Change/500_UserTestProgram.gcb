@@ -1,0 +1,147 @@
+#chip mega328p, 16
+#option Explicit
+
+'USART settings for USART1
+#define USART_BAUD_RATE 57600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+Dim Testbyte as Byte
+Dim Testword as Word
+Dim TestInteger as Integer
+Dim TestLong as Long
+Dim ccount as byte
+
+HSerPrint "Over positive"
+HSerPrintcrlf
+HSerPrint"Byte"
+HSerPrintcrlf
+for Testbyte= 240 to 10
+  HSerPrint Testbyte
+  HSerPrint " "
+  HSerPrint VartoBin(Testbyte)
+  HSerPrintcrlf
+next
+HSerPrint"Word"
+HSerPrintcrlf
+for Testword= 65530 to 10
+  HSerPrint Testword
+  HSerPrint " "
+  HSerPrint VarWtoBin(Testword)
+  HSerPrintcrlf
+next
+HSerPrint"Integer"
+HSerPrintcrlf
+for TestInteger= 32758 to -32758
+  HSerPrint TestInteger
+  HSerPrint " "
+  HSerPrint IntegertoBin(TestInteger)
+  HSerPrintcrlf
+next
+
+HSerPrint"Long"
+HSerPrintcrlf
+for TestLong= 4294967285 to 10
+  HSerPrint TestLong
+  HSerPrint " "
+  HSerPrint LongtoBin(TestLong)
+  HSerPrintcrlf
+next
+
+HSerPrint " Over Negative"
+HSerPrintcrlf
+HSerPrint"Byte"
+HSerPrintcrlf
+for Testbyte= 10 to 240 step -1
+  HSerPrint Testbyte
+  HSerPrint " "
+  HSerPrint VartoBin(Testbyte)
+  HSerPrintcrlf
+next
+HSerPrint"Word"
+HSerPrintcrlf
+for Testword= 10 to 65530 step -1
+  HSerPrint Testword
+  HSerPrint " "
+  HSerPrint VarWtoBin(Testword)
+  HSerPrintcrlf
+next
+HSerPrint"Integer"
+HSerPrintcrlf
+ccount=0
+for TestInteger= -32758 to 32758 step -1
+  HSerPrint TestInteger
+  HSerPrint " "
+  HSerPrint IntegertoBin(TestInteger)
+  HSerPrintcrlf
+next
+
+HSerPrint"Long"
+HSerPrintcrlf
+for TestLong= 10 to 4294967285 step -1
+  HSerPrint TestLong
+  HSerPrint " "
+  HSerPrint LongtoBin(TestLong)
+  HSerPrintcrlf
+next
+
+Function VarToBin (In __ByteNum as Byte ) as String * 8
+  VarToBin = ""
+  Repeat 8
+      If __ByteNum.7 = 1 Then
+         VarToBin = VarToBin +"1"
+      Else
+         VarToBin = VarToBin +"0"
+      End If
+      Rotate __ByteNum Left
+  End Repeat
+End Function
+
+Function VarWToBin (In __WordNum as Word ) as String * 16
+  VarWToBin = ""
+  Repeat 16
+      If __WordNum.15 = 1 Then
+         VarWToBin = VarWToBin +"1"
+      Else
+         VarWToBin = VarWToBin +"0"
+      End If
+      Rotate __WordNum Left
+  End Repeat
+End Function
+
+Function IntegerToBin (In __IntegerNum as Integer ) as String * 16
+  IntegerToBin = ""
+    If __IntegerNum.15 = 1 Then
+      IntegerToBin = "-"
+    Else
+       IntegerToBin = "+"
+    End If
+  Repeat 15
+    If __IntegerNum.15 = 1 Then
+      If __IntegerNum.14 = 1 Then
+         IntegerToBin = IntegerToBin +"0"
+      Else
+        IntegerToBin = IntegerToBin +"1"
+      End If
+    Else
+      If __IntegerNum.14 = 1 Then
+         IntegerToBin = IntegerToBin +"1"
+      Else
+        IntegerToBin = IntegerToBin +"0"
+      End If
+    End if
+      Rotate __IntegerNum Left
+  End Repeat
+End Function
+
+Function LongToBin (In __LongNum as Long ) as String * 32
+  LongToBin = ""
+  Repeat 32
+      If __LongNum.31 = 1 Then
+         LongToBin = LongToBin +"1"
+      Else
+         LongToBin = LongToBin +"0"
+      End If
+      Rotate __LongNum Left
+  End Repeat
+End Function

@@ -1,0 +1,56 @@
+
+
+#chip mega328p, 16
+#option Explicit
+
+    'USART settings for USART1
+    #define USART_BAUD_RATE 57600
+    #define USART_TX_BLOCKING
+    #define USART_DELAY OFF
+
+
+    dim _LoopVar, _from, _to as Integer
+    dim _StepValue as Integer
+    dim _ccount as long
+
+    //Set the value here.
+    _from = 6
+    _to =   2
+    _StepValue = 2
+    _ccount = 0
+
+    wait 2 s
+    HSerPrintCRLF 2
+    HSerPrint "Test increment."
+    HSerPrintCRLF
+    HSerPrint "Range "
+    HSerPrint _from
+    HSerPrint " to "
+    HSerPrint _to
+    HSerPrint " step "
+    HSerPrint _StepValue
+    HSerSend 9
+    HSerPrint "0x"
+    HserPrint Hex(_StepValue_h)
+    HserPrint Hex(_StepValue)
+    HSerPrintCRLF
+    wait 100 ms
+
+    for _LoopVar = _from to _to step _StepValue   ' 6 to 2 step 2 yields 32768
+        HSerPrint _LoopVar
+        HSerPrint ", "
+        _ccount++
+
+    next
+
+    HSerPrintCRLF 2
+    HSerPrint _LoopVar
+    HSerPrint ", "
+    HSerPrint _ccount
+    HSerPrintCRLF 2
+
+    If _ccount = 32767 then
+      HSerPrint "Pass"
+    else
+      HSerPrint "Fail"
+    End if

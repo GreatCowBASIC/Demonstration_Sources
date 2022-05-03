@@ -1,0 +1,42 @@
+#chip mega328p, 16
+#option Explicit
+
+    'USART settings for USART1
+    #define USART_BAUD_RATE 57600
+    #define USART_TX_BLOCKING
+    #define USART_DELAY OFF
+
+
+    dim _LoopVar as LONG
+    dim _StepValue as Integer
+    dim _ccount as long
+
+    //Set the value here.
+    #define _from = 1
+    #define _to =   65536
+
+    _ccount = 0
+
+    wait 2 s
+    HSerPrintCRLF 2
+    HSerPrint "Test increment."
+    HSerPrintCRLF
+    HSerPrint "Range "
+    HSerPrint _from
+    HSerPrint " to "
+    HSerPrint _to
+    HSerPrintCRLF
+    wait 100 ms
+
+    for _LoopVar = _from to _to
+        HSerPrint _LoopVar
+        HSerPrint ", "
+        _ccount++
+
+    next
+
+    HSerPrintCRLF 2
+    HSerPrint _LoopVar
+    HSerPrint ", "
+    HSerPrint _ccount
+    HSerPrintCRLF 2

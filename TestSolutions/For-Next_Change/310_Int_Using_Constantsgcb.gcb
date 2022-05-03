@@ -1,0 +1,46 @@
+#chip mega328p, 16
+#option Explicit
+
+#define USART_BAUD_RATE 57600
+#define USART_TX_BLOCKING
+#define USART_DELAY On
+
+Wait 2 s
+Dim _LoopVar  As integer
+Dim _ccount as long
+_ccount = 0
+
+
+    HSerPrintCRLF 2
+    HSerPrint "Test increment."
+    HSerPrintCRLF
+    HSerPrint "Range "
+    HSerPrint -6
+    HSerPrint " to "
+    HSerPrint -2
+    HSerPrint " step "
+    HSerPrint -2
+
+
+    For _LoopVar = -6 To -2 Step -2    ' -6 To -2 Step -2
+
+'      HSerPrint _LoopVar
+'      HSerPrint ", "
+      _ccount ++
+
+    Next
+
+    HSerPrintCRLF 2
+    HSerPrint _LoopVar
+    HSerPrint ", "
+    HSerPrint _ccount
+    HSerPrintCRLF 2
+
+    If _ccount = 32767 then
+      HSerPrint "Pass"
+    else
+      HSerPrint "Fail"
+    End if
+
+    wait 1 s
+

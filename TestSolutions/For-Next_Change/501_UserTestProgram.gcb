@@ -1,0 +1,21 @@
+#chip mega328p, 16
+#option Explicit
+
+'USART settings for USART1
+#define USART_BAUD_RATE 57600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+
+Dim TestInteger as Integer
+
+HSerPrint " Over Negative"
+HSerPrintcrlf
+HSerPrint"Integer"
+HSerPrintcrlf
+for TestInteger= -1 to -10 step -1
+  HSerPrint leftpad( StrInteger(TestInteger),8," ")
+  HSerPrint " "
+  HSerPrint IntegertoBin(TestInteger)
+  HSerPrintcrlf
+next
