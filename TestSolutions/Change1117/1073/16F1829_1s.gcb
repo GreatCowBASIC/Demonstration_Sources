@@ -1,0 +1,46 @@
+#chip 16F1829             ' Declare the Target Processor and Speed
+#option explicit          ' Require Explicit declaration of Variables
+
+#include <Millis_do_not_use.h>       ' Include the Library
+
+#Define LCD_IO 4
+#Define LCD_SPEED FAST
+#Define LCD_NO_RW
+
+'Port assignments
+#Define LCD_RS        PortA.0
+#Define LCD_Enable    PortA.1
+#Define LCD_DB4       PortA.2
+#Define LCD_DB5       PortC.0
+#Define LCD_DB6       PortC.1
+#Define LCD_DB7       PortC.2
+#Define LED PortB.6      ' Define the LED Pin - Pin 11
+#Define LEDRate 1000     ' Flash rate in mS
+
+        ' Setup
+        Dir LED Out               ' Make the LED Pin an Output
+        LED = 0
+
+        Dim CurMs, LstMs as word  ' declare working variables
+        ' Main                    ' This loop runs over and over forever.
+        LstMs = 0
+        CurMs = 0
+
+        ' Main                    ' This loop runs over and over forever.
+        Do
+
+          CurMs = millis()
+
+          Locate 0,0
+          Print CurMs
+
+          if CurMs - LstMs >= LEDRate then  ' required Time has Elapsed
+            Locate 1, 0
+            Print CurMs
+            LED = !LED                      ' So Toggle state of LED
+            LstMs = CurMs                   ' And Record Toggle Time
+          end if
+
+        Loop
+
+END

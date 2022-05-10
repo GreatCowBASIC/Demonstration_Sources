@@ -1,0 +1,77 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------
+'''This program has new USART with handler for this chip.
+'''
+'''
+'''@author    name   
+'''@license   GPL
+'''@version   version   
+'''@date      2022-04-01
+'''********************************************************************************
+
+; ----- Configuration
+
+#CHIP MEGA32U4, 16
+#OPTION EXPLICIT
+
+; ----- Include library
+#include <softserial.h>
+
+; ----- Config Serial UART (we use the onboard USB-serial converter):
+    #define SER1_BAUD 9600     ; baudrate must be defined
+    #define SER1_DATABITS 8    ; databits optional (default = 8)
+    #define SER1_STOPBITS 1    ; stopbits optional (default = 1)
+    #define SER1_INVERT Off    ; inverted polarity optional (default = Off)
+    ; Config I/O ports for transmitting:
+    #define SER1_TXPORT PORTD  ; I/O port (without .bit) must be defined
+    #define SER1_TXPIN 3       ; portbit  must be defined
+    ; Config I/O ports for receiving:
+    #define SER1_RXPORT PORTD  ; I/O port (without .bit) must be defined
+    #define SER1_RXPIN 2       ; portbit  must be defined
+    #define SER1_RXNOWAIT Off ; don't wait for stopbit optional (default = Off)
+
+
+  dir PORTC.7 out
+  
+    repeat 10
+
+        PORTC.7 = ! PORTC.7
+        wait 50 ms
+
+    end Repeat
+
+    dim MyString as string * 20
+    dim InChar as Byte
+
+
+    Main:
+        MyString = ""
+        Do 
+            Do 
+                InChar = Ser1Receive
+            Loop While InChar = 255
+
+            If ( InChar <> 13 and InChar <> 10 ) Then 
+                If len(MyString) < 20 Then
+                  MyString = MyString + chr(InChar)
+                End If
+            End If
+        Loop While InChar <> 13 
+
+        If MyString = "pin0=on" Then
+          Set PORTC.7 On
+          Ser1Print "pin0=on"
+          Ser1Send  13               'new line in Terminal
+          Ser1Send  10               '
+        End If
+        If MyString = "pin0=off" Then
+          Set PORTC.7 Off
+          Ser1Print "pin0=off"
+          Ser1Send  13               'new line in Terminal
+          Ser1Send  10               '
+        End If
+
+    Goto Main
+    End
+
+

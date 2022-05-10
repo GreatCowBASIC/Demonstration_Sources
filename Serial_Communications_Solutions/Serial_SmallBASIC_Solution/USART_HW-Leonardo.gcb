@@ -1,0 +1,49 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------
+'''This program has new USART with handler for this chip.
+'''
+'''
+'''@author    name
+'''@license   GPL
+'''@version   version
+'''@date      2022-04-01
+'''********************************************************************************
+
+
+; ----- Configuration
+
+#CHIP MEGA32U4, 16
+#OPTION EXPLICIT
+
+  'USART settings- there is NO Serial 1 (which equates to USART1 with GCB) on the mega32u4, so, we have to user USART2
+  #DEFINE USART2_BAUD_RATE 9600
+  #DEFINE USART2_TX_BLOCKING
+
+  dir PORTC.7 out
+
+    repeat 10
+
+        PORTC.7 = ! PORTC.7
+        wait 50 ms
+
+    end Repeat
+
+    dim MyString as string
+
+    Main:
+
+        HSerGetString MyString, 2
+
+        If MyString = "pin0=on" Then
+          Set PORTC.7 On
+          HSerPrint "pin0=on", 2
+          HSerPrintCRLF, 2
+          End If
+        If MyString = "pin0=off" Then
+          Set PORTC.7 Off
+          HSerPrint "pin0=off", 2
+          HSerPrintCRLF, 2
+        End If
+
+    Goto Main
+    End

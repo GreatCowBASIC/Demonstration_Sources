@@ -1,0 +1,54 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------
+'''This program has new USART with handler for this chip.
+'''
+'''
+'''@author    name   
+'''@license   GPL
+'''@version   version   
+'''@date      2022-04-01
+'''********************************************************************************
+
+
+; ----- Configuration
+
+#chip Mega328p, 16
+#option Explicit
+
+  'USART settings- uses serial port 1.
+  #DEFINE USART_BAUD_RATE 9600
+  #DEFINE USART_TX_BLOCKING
+
+  dir PORTB.5 out
+  
+    HserPrintCRLF 2
+    HserPrint ChipnameStr
+    HserPrint " - application demo "
+
+    repeat 10
+
+        PORTB.5 = ! PORTB.5
+        wait 50 ms
+        hSerSend "."
+    end Repeat
+    HserPrintCRLF
+
+    dim MyString as string
+
+    Main:
+
+        HSerGetString MyString
+
+        HserPrint MyString
+        HserPrintCRLF
+
+        If MyString = "pin0=on" Then
+        Set PORTB.5 On
+        End If
+        If MyString = "pin0=off" Then
+        Set PORTB.5 Off
+        End If
+
+
+    Goto Main
+    End

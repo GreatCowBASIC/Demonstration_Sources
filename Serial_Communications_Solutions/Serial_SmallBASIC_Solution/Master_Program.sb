@@ -1,0 +1,262 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''This program will enable the control of the UNO LED from the PC control application written in Microsoft Small BASIC
+'''A really simply communications tools for Great Cow BASIC
+'''Critical things to do...
+'''  1.Load the UNO with the UNO slave program called uno_msb_slave_program.gcb
+''' 2.Ensure you get the comPort (shown below correct).
+''' 3.Enjoy
+''''
+'''@author  EvanV
+'''@licence GPL
+'''@version 1.0a
+'''@date    04.02.2019
+'''********************************************************************************
+
+
+
+
+Initialise()
+
+While ("True")
+  Program.Delay(10)
+EndWhile
+
+Sub Initialise
+
+ 
+  Controls_Init()
+  'Set-up the communication port to the UNO
+  ports= LDCommPort.AvailablePorts()
+  sortString()
+  item = ""
+  For portslist = 1 to Array.GetItemCount(ports)
+  item = Text.Append( item, portslist )
+  item = Text.Append( item, "=")
+  item = Text.Append( item, ports[portslist])
+  item = Text.Append( item, ";")
+  EndFor 
+  ' constructs....   item = "1=1;2=2;3=3;4=4;5=20"
+
+  left = 10
+  top = 10
+  Controls_AddComboBox()
+
+  selected = 0
+  While selected = 0
+    If Controls_triggered Then
+      Controls_Proc()
+    Else
+      Program.Delay(200)
+    EndIf
+  EndWhile
+  comPort = ports[selected]
+  GraphicsWindow.Clear()
+  
+
+
+
+  'draw window'
+  GraphicsWindow.Width = 500
+  GraphicsWindow.Height = 100
+  GraphicsWindow.Title = "Great Cow BASIC UNO LED Controller"
+
+ 
+  'draw pin control buttons'
+  pin0high = Controls.AddButton("PIN0 High", 20, 10)
+  pin0low = Controls.AddButton("PIN0 Low", 100, 10)
+
+  'draw status and command buttons & boxes'
+  statusbox = Controls.AddTextBox(20,50)
+  value = Controls.AddTextBox(210,13)
+  send = Controls.AddButton("Send Command", 380, 10)
+  
+  Controls.SetTextBoxText(statusbox,"Connect UNO via USB")
+  'GraphicsWindow.ShowMessage("Click 'OK' when you have the UNO connected","Great Cow BASIC")
+  
+  'Open connection to UNO'
+  Controls.SetTextBoxText(statusbox,"COM port link: "+ LDCommPort.OpenPort(comPort, 9600))
+
+
+  'Assign variables'
+  Controls.ButtonClicked = OnButtonClicked
+  nl = Text.GetCharacter(13) 'new line character'
+EndSub
+
+Sub OnButtonClicked
+  button = Controls.LastClickedButton
+  val = Controls.GetTextBoxText(value)
+
+  'if button pressed, send command and new line character'
+  If (button = pin0high) Then
+    LDCommPort.TXString("pin0=on"+nl)
+  ElseIf (button = pin0low) Then
+    LDCommPort.TXString("pin0=off"+nl)
+  EndIf
+  If (button = send) And (val <> "") Then
+    LDCommPort.TXString(val+nl)
+  EndIf
+EndSub
+
+
+
+
+'**********************
+
+Sub Controls_AddComboBox
+  ' param item - array of items
+  ' param left - the x co-ordinate of the combo box
+  ' param top - the y co-ordinate of the combo box
+  ' return cbox - the combo box
+  ' version 0.1a
+  nCBox = nCBox + 1
+
+  
+  fs = GraphicsWindow.FontSize
+  cbProp[nCBox]["height"] = fs * 1.8
+  nItem = Array.GetItemCount(item)
+  cbProp[nCBox]["nItem"] = nItem
+  cbProp[nCBox]["item"] = item
+  widthMax = 0
+  For i = 1 To nItem
+    len = Text.GetLength(item[i])
+    width = 0
+    For j = 1 To len
+      width = width + Math.Floor(luw[Text.GetSubText(item[i], j, 1)] * fs / 100)
+    EndFor
+    If widthMax < width Then
+      widthMax = width
+    EndIf
+  EndFor
+  tboxWidth = widthMax + fs
+  cbProp[nCBox]["width"] = tboxWidth
+  cbProp[nCBox]["x"] = left
+  cbProp[nCBox]["y"] = top
+  cbProp[nCBox]["tbox"] = Controls.AddTextBox(left, top)
+  Controls.SetSize(cbProp[nCBox]["tbox"], tboxWidth, cbProp[nCBox]["height"])
+  cbProp[nCBox]["btn"] = Controls.AddButton("▾", left + tboxWidth - 1, top)
+  Controls.SetSize(cbProp[nCBox]["btn"], fs * 1.8, cbProp[nCBox]["height"])
+  cbox = "ComboBox" + nCBox
+  Controls.ButtonClicked = Controls_OnButtonClicked
+  GraphicsWindow.MouseMove = Controls_OnMouseMove
+  GraphicsWindow.MouseDown = Controls_OnMouseDown
+EndSub
+Sub Controls_Proc
+  ' version 0.1a
+  For i = 1 To nCBox
+    If Controls.LastClickedButton = cbProp[i]["btn"] Then
+      GraphicsWindow.PenColor = "LightGray"
+      GraphicsWindow.PenWidth = 1
+      GraphicsWindow.BrushColor = "White"
+      rect = Shapes.AddRectangle(cbProp[i]["width"], cbProp[i]["height"] * cbProp[i]["nItem"])
+      Shapes.Move(rect, cbProp[i]["x"], cbProp[i]["y"] + cbProp[i]["height"] - 1)
+      GraphicsWindow.BrushColor = "Black"
+      For j = 1 To cbProp[i]["nItem"]
+        it[j] = Shapes.AddText(cbProp[i]["item"][j])
+        Shapes.Move(it[j], cbProp[i]["x"] + cbProp[i]["height"] * 0.3, cbProp[i]["y"] + (j + 0.2) * cbProp[i]["height"])
+      EndFor
+      Controls_mouseDown = "False"
+      While Not[Controls_mouseDown]
+        If Controls_mouseMove Then
+          Controls_Select()
+          Controls_mouseMove = "False"
+        Else
+          Program.Delay(200)
+        EndIf
+      EndWhile
+      Controls_Select()
+      Shapes.Remove(cbSelect)
+      cbSelect = ""
+      For j = 1 To cbProp[i]["nItem"]
+        Shapes.Remove(it[j])
+      EndFor
+      Shapes.Remove(rect)
+      If selected <> 0 Then
+        Controls.SetTextBoxText(cbProp[i]["tbox"],cbProp[i]["item"][selected])
+      EndIf
+    EndIf
+  EndFor
+  Controls_triggered = "False"
+EndSub
+Sub Controls_Init
+  ' version 0.1a
+  Not = "False=True;True=False;"
+  GraphicsWindow.FontName = "Lucida UI"
+  GraphicsWindow.BrushColor = "Black"
+  WQ = Text.GetCharacter(34)
+  ' Lucida UI font width [px] table while the size (height) 100 [px]
+  luw = " =60;!=65;" + WQ + "=82;#=92;$=90;%=119;&=117;'=62;(=69;)=69;"
+  luw = luw + "*=78;+=103;,=59;-=73;.=59;/=77;0=90;1=90;2=90;3=90;4=90;"
+  luw = luw + "5=90;6=90;7=90;8=90;9=90;:=59;\;=59;<=103;\==103;>=103;"
+  luw = luw + "?=76;@=128;A=86;B=94;C=80;D=94;E=86;F=71;G=94;H=93;I=61;"
+  luw = luw + "J=61;K=88;L=61;M=124;N=93;O=94;P=94;Q=94;R=72;S=76;T=71;"
+  luw = luw + "U=93;V=87;W=112;X=88;Y=86;Z=80;[=69;\\=76;]=69;^=103;_=74;"
+  luw = luw + "`=64;{=69;|=65;}=69;~=103; =60;¡=65;¢=90;£=90;¤=88;¥=90;"
+  luw = luw + "¦=65;§=81;¨=79;©=120;ª=73;«=90;¬=103;­=32;®=120;¯=74;°=70;"
+  luw = luw + "±=103;²=73;³=73;´=63;µ=94;¶=83;·=59;¸=54;¹=72;º=78;»=90;"
+  luw = luw + "¼=128;½=129;¾=130;¿=76;À=86;Á=86;Â=86;Ã=86;Ä=86;Å=86;Æ=115;"
+  luw = luw + "Ç=80;È=86;É=86;Ê=86;Ë=86;Ì=61;Í=61;Î=61;Ï=61;Ð=92;Ñ=93;Ò=93;"
+  luw = luw + "Ó=93;Ô=93;Õ=93;Ö=93;×=103;Ø=94;Ù=93;Ú=93;Û=93;Ü=93;Ý=86;"
+  luw = luw + "Þ=94;ß=95;÷=103;ÿ=86;"
+  Controls_triggered = "False"
+EndSub
+Sub Controls_OnButtonClicked
+  ' version 0.1a
+  Controls_triggered = "True"
+EndSub
+Sub Controls_OnMouseMove
+  ' version 0.1a
+  Controls_mx = GraphicsWindow.MouseX
+  Controls_my = GraphicsWindow.MouseY
+  Controls_mouseMove = "True"
+EndSub
+Sub Controls_OnMouseDown
+  ' version 0.1a
+  Controls_mx = GraphicsWindow.MouseX
+  Controls_my = GraphicsWindow.MouseY
+  Controls_mouseDown = "True"
+EndSub
+Sub Controls_Select
+  ' version 0.1a
+  selected = 0
+  If cbProp[i]["x"] <= Controls_mx And Controls_mx <= cbProp[i]["x"] + cbProp[i]["width"] Then
+    For j = 1 To cbProp[i]["nItem"]
+      y1 = cbProp[i]["y"] + j * cbProp[i]["height"]
+      y2 = y1 + cbProp[i]["height"]
+      If y1 <= Controls_my And Controls_my <= y2 Then
+        GraphicsWindow.BrushColor = "#663399FF"
+        GraphicsWindow.PenWidth = 0
+        If cbSelect = "" Then
+          cbSelect = Shapes.AddRectangle(cbProp[i]["width"], cbProp[i]["height"])
+        EndIf
+        Shapes.Move(cbSelect, cbProp[i]["x"], y1 - 1)
+        selected = j
+      EndIf
+    EndFor
+  EndIf
+EndSub
+  
+Sub sortString
+For i = 1 To Array.GetItemCount(Ports)-1
+  For j = i+1 To Array.GetItemCount(Ports)
+    iVar = Ports[i]
+    jVar = Ports[j]    
+    iValue = 0
+    jValue = 0
+    char = 0
+    While (iValue = jValue)
+      char = char+1
+
+      iValue = Text.GetSubTextToEnd(iVar,4)
+      jValue = Text.GetSubTextToEnd(jVar,4)
+
+      
+    EndWhile
+    If (  jValue < iValue) Then
+      store = Ports[i]
+      Ports[i] = Ports[j]
+      Ports[j] = store
+    EndIf
+  EndFor
+EndFor
+EndSub
