@@ -1,0 +1,152 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''MCP9808degPIC16F88.gcb
+'''This test program reads I2C temperature sensor MCP9808 and displays degC on an attached PC terminal.
+'''It uses a software implementation of I2C for Microchip microprocessors.
+'''The hardware serial connections are shown in the program.
+'''@author Jon Nelson
+'''@licence GPL
+'''@version 1.0a
+'''@date 09 Jun 2022
+'''The PIC16F88 has an attached MAX483 RS-422/RS-485 Interface IC
+'''The resultant RS-485 serial is passed through a RS-485 to USB convertor into a PC terminal eg CuteCom 
+'''A software UART is used to allow bit invert catering for RS-485 or RS-232 serial output e.g. using a MAX232 or equiv
+'''softserialLinux.h is GCB's softserial.h with include file names case-changed to match actual file names
+'''as Linux has case sensitive file naming.
+'''Note: Negative degC mechanism awaiting inspiration (not yet added).
+'''SER1_TXPORT and SER1_TXPIN are set for the PIC16F88. These may need changing for other PICs
+'''********************************************************************************
+
+; ----- Configuration
+#chip 16F88,8
+#option explicit
+#config MCLR_OFF
+
+; ----- Include files
+#include <softserial.h>
+
+; ----- Define Hardware settings
+' Define I2C settings - CHANGE PORTS
+#define I2C_MODE Master
+#define I2C_DATA PORTB.1        'RB1 SDA
+#define I2C_CLOCK PORTB.4       'RB4 SCL
+#define I2C_DISABLE_INTERRUPTS ON
+ 
+;Below if 1 enables MAX483
+#Define MAX483ENABL PORTb.3
+Dir MAX483ENABL Out
+
+; ----- Config Serial Software-UART :
+#define SER1_BAUD 9600   ; baudrate must be defined
+#define SER1_DATABITS 8    ; databits optional (default = 8)
+#define SER1_STOPBITS 1    ; stopbits optional (default = 1)
+#define SER1_INVERT On    ; inverted polarity optional (default = Off)
+; Config I/O ports for transmitting:
+#define SER1_TXPORT PORTB  ; I/O port (without .bit) must be defined
+#define SER1_TXPIN 5       ; portbit  must be defined
+
+;----- Variables
+dim bDeviceI2Caddress as byte 'AddressByte
+dim bUpperByte, bLowerByte as byte
+dim bTeest as byte
+dim wDegC as word 'to handle the temperature calculations
+dim sDegC, sOutL, sOutR as string
+
+; ----- Main body of program commences here.
+' Now assumes Serial Terminal is operational
+Ser1Send 13
+Ser1Send 10
+Ser1Print "Read MCP9808 Temperature sensor"
+Ser1Send 13
+Ser1Send 10
+
+/*
+https://ww1.microchip.com/downloads/en/DeviceDoc/25095A.pdf Page DS25095A-page 25 
+I2CStart(); // send START command
+I2CSend (AddressByte & 0xFE); //WRITE Command (see Section 4.1.4 “Address Byte”)
+//also, make sure bit 0 is cleared ‘0’
+I2CSend(0x05); // Write T A Register Address
+I2CStart(); //Repeat START
+I2CSend(AddressByte | 0x01); // READ Command (see Section 4.1.4 “Address Byte”)
+//also, make sure bit 0 is Set ‘1’
+bUpperByte = i2c_read(ACK); // READ 8 bits
+//and Send ACK bit
+bLowerByte = i2c_read(NAK); // READ 8 bits
+//and Send NAK bit
+i2c_stop(); // send STOP command
+
+//Convert the temperature data
+//First Check flag bits
+if ((bUpperByte & 0x80) == 0x80){ //T A ³ T CRIT
+}
+if ((bUpperByte & 0x40) == 0x40)
+{ 
+  //T A > T UPPER
+}
+if ((bUpperByte & 0x20) == 0x20)
+{ 
+  //T A < T LOWER
+}
+bUpperByte = bUpperByte & 0x1F; //Clear flag bits
+if ((bUpperByte & 0x10) == 0x10)
+{ 
+  //T A < 0°C
+  bUpperByte = bUpperByte & 0x0F; //Clear SIGN
+  Temperature = 256 - (bUpperByte x 16 + bLowerByte / 16);
+}
+else
+{
+  //T A ³ 0°C
+  Temperature = (bUpperByte x 16 + bLowerByte / 16);
+}  
+*/
+'Implement essentials to read Temperature. See above, copied from the MCP9808 manual.
+bTeest = 1
+bDeviceI2Caddress = 48 '30 hex
+do forever
+  I2CStart 'send START command
+  I2CSend bDeviceI2Caddress & 0xFE 'WRITE Command (see Section 4.1.4 “Address Byte”) also, make sure bit 0 is cleared ‘0’
+  I2CSend 0x05 'Write T A Register Address
+  I2CStart 'send Repeat START command
+  I2CSend bDeviceI2Caddress | 0x01 'READ Command, also, make sure bit 0 is set ‘1’
+  I2CReceive bUpperByte, ACK 'bUpperByte = i2c_read(ACK) 'READ 8 bits and Send ACK bit
+  I2CReceive bLowerByte, ACK 'bLowerByte = i2c_read(NAK) 'READ 8 bits and Send NAK bit    
+  i2cstop 'send STOP command
+  
+  'Convert the temperature data
+  bUpperByte = bUpperByte & 0x1F 'Clear flag bits
+    
+  'Test display on startup  
+  if bTeest = 1 then
+    bUpperByte = 0: bLowerByte = 3 'Test for 0.1 degC
+    bTeest++
+  else if bTeest = 2 then 
+    bUpperByte = 0: bLowerByte = 128 'Test for 8.0 degC
+    bTeest++
+  else if bTeest = 3 then 
+    bUpperByte = 6: bLowerByte = 56 'Test for 99.5 degC
+    bTeest++
+  end if
+  
+  'wDegC = (bUpperByte * 16) + (bLowerByte / 16)
+  wDegC = ([WORD]bUpperByte * [WORD]160) + (([WORD]bLowerByte * [WORD]5) / [WORD]8) 'degrees times 10
+
+  Ser1Print Str(bUpperByte)
+  Ser1Print " "
+  Ser1Print Str(bLowerByte)
+  Ser1Print " "
+  Ser1Print Str(wDegC) 'Show degrees times 10
+  Ser1Print " "
+  sDegC = Str(wDegC)
+  if Len(sDegC) = 1 then
+    sOutR = sDegC: sOutL = "0"
+  else
+    sOutR = Right(sDegC,1)
+    sOutL = Mid(sDegC,1,Len(sDegC)-1) 'Remove RHS decimal digit
+  end if
+  Ser1Print sOutL + "." + sOutR + " degC" 'The interesting part
+  Ser1Send 13
+  Ser1Send 10
+  wait 20 s
+loop
+END
