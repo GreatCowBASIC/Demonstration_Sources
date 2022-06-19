@@ -1,0 +1,100 @@
+'''A demonstration program for GCGB and GCB. 
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''i2csoftwarediscovery_to_terminal_16f88.gcb
+'''This program searches for I2C devices and display their adresses to the attached PC terminal.
+'''This program uses the software implementation of I2C for the Microchip microprocessors.
+'''The hardware serial connections are shown in the program.
+'''@author  EvanV
+'''@licence GPL
+'''@version 1.0a
+'''@date    14.02.15 modified 07Jun2022
+'''Modified from i2csoftwarediscovery_to_terminal_16f1938.gcb for PIC16F88 with MAX483 output
+'''The resultant RS485 serial is passed through a RS485 to USB convertor into a PC terminal eg CuteCom 
+'''A software UART is used to allow bit invert catering for RS485 or RS232 serial output e.g. using a MAX232 or equiv
+'''softserialLinux.h is GCB's softserial.h with include file names case-changed to match actual file names
+'''as Linux has case sensitive file naming.
+'''********************************************************************************
+
+; ----- Configuration
+  #chip 16F88,8
+  #option explicit
+  '#include "displaydevices.h"
+  #include "/opt/GCBASIC/demos/i2c_solutions/i2c_discovery/displaydevices.h"
+  #include "./softserialLinux.h"
+
+; ----- Define Hardware settings
+  ' Define I2C settings - CHANGE PORTS
+ #define I2C_MODE Master
+ #define I2C_DATA PORTB.1 'RB1 SDA
+ #define I2C_CLOCK PORTB.4 'RB4 SCL
+ #define I2C_DISABLE_INTERRUPTS ON
+
+ ' THIS CONFIG OF THE SERIAL PORT WORKS WITH A  MAX232 (or equiv) THEN TO PC
+ ' USART settings - CHANGE PORTS if required
+ '#define USART_BAUD_RATE 9600
+ 'Dir PORTc.6 Out
+ 'Dir PORTc.7 In
+ '#define USART_DELAY 5 ms
+ '#define SerSendDelayms 10
+ '#define USART_BLOCKING
+ 'wait 500 ms
+ 
+'----working begin
+;Below if 1 enables MAX483
+#Define MAX483ENABL PORTb.3
+Dir MAX483ENABL Out
+
+; ----- Define Hardware settings
+' THIS CONFIG OF THE SERIAL PORT TO A PC TERMINAL via a TTL Converter
+;Dir PORTb.5 Out 'TX
+;Dir PORTb.2 In 'RX
+
+; ----- Config Serial Software-UART :
+#define SER1_BAUD 9600   ; baudrate must be defined
+#define SER1_DATABITS 8    ; databits optional (default = 8)
+#define SER1_STOPBITS 1    ; stopbits optional (default = 1)
+#define SER1_INVERT On    ; inverted polarity optional (default = Off)
+; Config I/O ports for transmitting:
+#define SER1_TXPORT PORTB  ; I/O port (without .bit) must be defined
+#define SER1_TXPIN 5       ; portbit  must be defined
+'----working end
+
+;----- Variables
+  Dim TESTID as Byte
+
+; ----- Main body of program commences here.
+' Now assumes Serial Terminal is operational
+  Ser1Send 13
+  Ser1Send 10
+  Ser1Print "Software I2C "
+  Ser1Send 13
+  Ser1Send 10
+
+  wait 2 s
+  dim DeviceID as byte
+
+  for DeviceID = 0 to 255
+    I2CStart
+    I2CSend ( deviceID )
+    I2CSend ( 0 )
+    i2cstop
+
+    if I2CSendState = True  then
+      Ser1Print "__"
+      Ser1Print "ID: 0x"
+      Ser1Print hex(deviceID)
+      Ser1Print " (d"
+      Ser1Print Str(deviceID)
+      Ser1Print ") - "
+      Ser1Send 9
+      Ser1Print "I2C Port "
+      testid = deviceID | 1
+      DisplayDevices '?????
+      Ser1Send 13
+      Ser1Send 10
+    end if
+  next
+  Ser1Print "End of Search": 
+  Ser1Send  13
+  Ser1Send  10
+  END
