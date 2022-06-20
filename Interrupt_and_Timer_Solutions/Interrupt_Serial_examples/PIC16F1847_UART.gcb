@@ -27,27 +27,27 @@ ConfigPins
 '       ---> Data arrival on the serial port
 On Interrupt UsartRX1Ready Call INT_Serial
 
-#Define USART_BAUD_RATE 9600 
-#Define USART_TX_BLOCKING
+#DEFINE USART_BAUD_RATE 9600 
+#DEFINE USART_TX_BLOCKING
 
 ;LCD I2C
-#Define LCD_IO 10                 ' This is required for this type of I2C LCD
-#Define LCD_I2C_ADDRESS_1 0x4e    ' Default = 0x4e
-#Define LCD_BACKLIGHT_ON_STATE  1 ' type 10 LCD
-#Define LCD_BACKLIGHT_OFF_STATE 0 ' type 10 LCD
+#DEFINE LCD_IO 10                 ' This is required for this type of I2C LCD
+#DEFINE LCD_I2C_ADDRESS_1 0x4e    ' Default = 0x4e
+#DEFINE LCD_BACKLIGHT_ON_STATE  1 ' type 10 LCD
+#DEFINE LCD_BACKLIGHT_OFF_STATE 0 ' type 10 LCD
 
 ; ----- Define Hardware settings imported
 ' Define I2C settings - CHANGE PORTS
-#define I2C_MODE Master
-#define I2C_DATA PORTB.1 'SDA
-#define I2C_CLOCK PORTB.4 'SCL
-#define I2C_DISABLE_INTERRUPTS ON
+#DEFINE I2C_MODE Master
+#DEFINE I2C_DATA PORTB.1 'SDA
+#DEFINE I2C_CLOCK PORTB.4 'SCL
+#DEFINE I2C_DISABLE_INTERRUPTS ON
 'Optionally, you can reduce the I2C timings.
-#define I2C_BIT_DELAY 0 us
-#define I2C_CLOCK_DELAY 1 us
-#define I2C_END_DELAY 0 us
+#DEFINE I2C_BIT_DELAY 0 us
+#DEFINE I2C_CLOCK_DELAY 1 us
+#DEFINE I2C_END_DELAY 0 us
 
-#Define LED_KEYBOARD LATA.0        ' was LATA.2 Led on the keyboard
+#DEFINE LED_KEYBOARD LATA.0        ' was LATA.2 Led on the keyboard
 
 'http://ww1.microchip.com/downloads/en/devicedoc/41453b.pdf DS41453B-page 300 
 SCKP = 1 'Asynchronous mode, Transmit inverted data to the TX/CK pin  
@@ -70,7 +70,7 @@ Dir PORTB.2  In 'RX
     */
 
 ;Below if 1 enables MAX483
-#Define MAX483ENABL PORTb.3
+#DEFINE MAX483ENABL PORTb.3
 Dir MAX483ENABL Out
 
 main:
