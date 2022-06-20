@@ -1,0 +1,123 @@
+'''A demonstration program for GCGB and GCB.
+'''
+'''A program for read interrupt on the serial port using UART on PIC16F1847.
+'''Adapted from https://sourceforge.net/p/gcbasic/discussion/579126/thread/88f6e6de/
+'''to include suggestions.
+'''Type in a character, it is incremented and echoed back to the terminal. e.g. a returns b etc
+'''The LED toggles on every character input. 
+'''The LCD is not doing much but kept as in the original, it may be useful if nothing appears on the terminal.
+'''DS41453B http://ww1.microchip.com/downloads/en/devicedoc/41453b.pdf PIC16F1847 manual
+'''
+'''Note: UART output here is to a MAX483 hence SCKP is set for TX and a transistor inverts received
+'''serial from the MAX483. Both inverts likely not needed if a MAX232 was used instead.
+'''The MAX483 is connected via twisted pair to a RS-485/USB convertor then into a PC terminal e.g. CuteCom
+'''
+'''@author    Jon Nelson   
+'''@license   GPL
+'''@version   1.00   
+'''@date      2022-06-20
+'''********************************************************************************
+#OPTION EXPLICIT
+#CHIP 16F1847, 8 'MHZ
+
+ConfigPins
+'       ---------------------------------------------------------------
+'       Preparation of interrupts
+'       ---------------------------------------------------------------
+'       ---> Data arrival on the serial port
+On Interrupt UsartRX1Ready Call INT_Serial
+
+#Define USART_BAUD_RATE 9600 
+#Define USART_TX_BLOCKING
+
+;LCD I2C
+#Define LCD_IO 10                 ' This is required for this type of I2C LCD
+#Define LCD_I2C_ADDRESS_1 0x4e    ' Default = 0x4e
+#Define LCD_BACKLIGHT_ON_STATE  1 ' type 10 LCD
+#Define LCD_BACKLIGHT_OFF_STATE 0 ' type 10 LCD
+
+; ----- Define Hardware settings imported
+' Define I2C settings - CHANGE PORTS
+#define I2C_MODE Master
+#define I2C_DATA PORTB.1 'SDA
+#define I2C_CLOCK PORTB.4 'SCL
+#define I2C_DISABLE_INTERRUPTS ON
+'Optionally, you can reduce the I2C timings.
+#define I2C_BIT_DELAY 0 us
+#define I2C_CLOCK_DELAY 1 us
+#define I2C_END_DELAY 0 us
+
+#Define LED_KEYBOARD LATA.0        ' was LATA.2 Led on the keyboard
+
+'http://ww1.microchip.com/downloads/en/devicedoc/41453b.pdf DS41453B-page 300 
+SCKP = 1 'Asynchronous mode, Transmit inverted data to the TX/CK pin  
+
+Dim Tmp        As Byte
+Dim Cnt        As Byte
+Dim bSerial    As Bit
+
+Dir PORTA.0 Out ' LED LED_TASTIERA was PORTA.2
+Dir PORTB.2  In 'RX
+
+    /*  
+    DS41453B-page 291 TX and DS41453B-page 296 RX (NB GCB attends to the six below)
+    TXSTA.SYNC = 0 'Async mode
+    RCSTA.SPEN = 1 'Enable the serial port and automatically configures the TX/CK I/O pin as an output
+    TXSTA.TXEN = 1 'Transmit enable
+    PIE1.RCIE = 1 'For RX interrupt
+    INTCON.GIE = 1 'For RX interrupt
+    INTCON.PEIE = 1 'For RX interrupt 
+    */
+
+;Below if 1 enables MAX483
+#Define MAX483ENABL PORTb.3
+Dir MAX483ENABL Out
+
+main:
+  CLS
+  LCDBacklight ON
+  Print "Hi LCD"
+  MAX483ENABL = 1 ;Enable MAX483 TX
+  HSerPrint "Hello PIC16F1847 UART"
+  HSerSend 13
+  HSerSend 10
+  MAX483ENABL = 0 ;Disable MAX483 TX on startup
+  bSerial = FALSE ;initialise
+
+  IntOn
+  Do ForEver
+      If RCSTA.OERR = 1 then
+        'Receive Overrun Error
+        RCSTA.SPEN = 0 'DS41453B-page 295
+      End If
+      If bSerial Then
+        bSerial = FALSE
+        MAX483ENABL = 1     'Enable MAX483 TX
+        HSerSend Tmp+1      'Send a from PC get b echoed back etc
+        MAX483ENABL = 0     'Disable MAX483 TX
+      End If
+      'Wait 200 ms 'slows output down as IncCnt did
+  Loop
+
+Sub INT_Serial
+    Tmp = HSerReceive1    
+    LED_KEYBOARD = !LED_KEYBOARD      'Toggle LED state
+    bSerial = TRUE                    'Tell main routine a character came in 
+End Sub
+
+    /*
+       =============================================
+       Serial port and I2C port configuration
+       Uscite così configurate:
+       RB1 --> SDA1
+       RB2 --> RX usart
+       RB4 --> SCL1
+       RB5 --> TX usart
+       ---------------------------------------------- 
+       */
+Sub ConfigPins
+    RXDTSEL = 1 ' 1 = RX/DT Function is On RB2
+    TXCKSEL = 1 ' RB5 As TX UART
+    WUE     = 1 ' Wake-up Enable Bit  0 = Receiver is operating normally see DS41453B-page 300
+    CPSCON0 = 0 ' CAPACTIVE SENSE Module Off
+End Sub
