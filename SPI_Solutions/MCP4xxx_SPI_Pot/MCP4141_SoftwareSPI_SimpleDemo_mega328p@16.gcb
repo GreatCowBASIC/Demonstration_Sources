@@ -27,23 +27,26 @@
 '''********************************************************************************
 
 ; ----- Configuration
-  #chip mega328p, 16
-  #include <uno_mega328p.h>
-  #include <mcp4xxxdigitalpot.h>
+  #CHIP MEGA328P, 16
+  #INCLUDE <UNO_MEGA328P.H>
+  #INCLUDE <MCP4XXXDIGITALPOT.H>
 
-; ----- Constants
+; ----- CONSTANTS
 
-  #define _ShowDialog
+  #DEFINE _SHOWDIALOG
 
 	' SPI SETUP
-  #define DigitalPot_CS DIGITAL_10
-  #define DigitalPot_SCK DIGITAL_13
-  #define DigitalPot_DO DIGITAL_11
-  #define DigitalPot_DI DIGITAL_12
+  #DEFINE DIGITALPOT_CS DIGITAL_10
+  #DEFINE DIGITALPOT_SCK DIGITAL_13
+  #DEFINE DIGITALPOT_DO DIGITAL_11
+  #DEFINE DIGITALPOT_DI DIGITAL_12
 
 
 ; ----- Define Hardware settings
-	' None
+	#DEFINE USART_BAUD_RATE 9600
+  #DEFINE USART_TX_BLOCKING
+  #DEFINE USART_DELAY OFF
+  
 ; ----- Variables
 	dim loopx as word
 

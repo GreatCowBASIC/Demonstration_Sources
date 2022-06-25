@@ -21,7 +21,7 @@
 #chip 16F88,8
 #option explicit
 #config MCLR_OFF
-
+#Skiptest
 ; ----- Include files
 '#include "displaydevices.h"
 #include "/opt/GCBASIC/demos/i2c_solutions/i2c_discovery/displaydevices.h"

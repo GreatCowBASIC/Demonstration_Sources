@@ -68,7 +68,7 @@ Dir     POTENTIOMETER In
   Do
 
       adcVal =  ReadAD ( AN0 )
-      HSerSend adcVal
+      
       Select Case adcVal
 
           Case 0 to 49
