@@ -1,7 +1,7 @@
 #chip 16F1829             ' Declare the Target Processor and Speed
 #option explicit          ' Require Explicit declaration of Variables
 
-#include <Millis_do_not_use.h>       ' Include the Library
+#include <Millis.h>       ' Include the Library
 
 #Define LCD_IO 4
 #Define LCD_SPEED FAST

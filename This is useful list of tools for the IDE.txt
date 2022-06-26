@@ -5,7 +5,7 @@
         Press <F4>  - this will list all the tasks that are set up for GCBASIC
 
 
-## 2, What keys do what?
+## 2. What keys do what?
 
         <F1>                    Help - opens GCBASIC Help, when a word is selected <F1> will open a Word Help Specific Page.
         <F2>                    The IDE Command Pallete - a long list of all the options
