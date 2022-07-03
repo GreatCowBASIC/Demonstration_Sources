@@ -60,20 +60,20 @@ This is support by 18F, LGT, Mega328p, 16F1939 etc.  Try your chip.
 // #chip   16F1939
 // #CONFIG MCLRE=ON
 
-// #chip 18F26K83
-// #config MCLRE=EXTMCLR
-//     'Module: UART pin directions
-//     Dir PORTC.6 Out    ' Make TX1 pin an output
-//     'Module: UART1
+#chip 18F26K83
+#config MCLRE=EXTMCLR
+    'Module: UART pin directions
+    Dir PORTC.6 Out    ' Make TX1 pin an output
+    'Module: UART1
 
-//     RC6PPS = 0x0013    'TX1 > RC6
+    RC6PPS = 0x0013    'TX1 > RC6
 
-//     'Module: UART pin directionsz
-//     Dir PORTC.7 In    ' Make RX1 pin an input
-//     'Module: UART1
-//     U1RXPPS = 0x0017    'RC7 > RX1
+    'Module: UART pin directionsz
+    Dir PORTC.7 In    ' Make RX1 pin an input
+    'Module: UART1
+    U1RXPPS = 0x0017    'RC7 > RX1
 
-#chip mega328p, 16
+// #chip mega328p, 16
 
     'USART settings for USART1
     #DEFINE USART_BAUD_RATE 115200
