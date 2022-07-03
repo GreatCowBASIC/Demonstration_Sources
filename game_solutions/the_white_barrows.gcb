@@ -52,7 +52,7 @@ This is support by 18F, LGT, Mega328p, 16F1939 etc.  Try your chip.
 
 '''@author    EvanV   
 '''@license   GPL
-'''@version   1.00   
+'''@version   1.01   
 '''@date      2022-07-03
 '''********************************************************************************
 
@@ -520,7 +520,7 @@ Sub ViewRooms ( in chamberlocation  )
                         case MAGIC_SPOT
                             HSerPrint "Magic Spot"
                         case else
-                            HSerPrintStringCRLF "There is nothing in that Chamber"                        
+                            HSerPrintStringCRLF "Chamber that is empty"                        
                     end select
                 End If
                 HSerPrintCRLF
