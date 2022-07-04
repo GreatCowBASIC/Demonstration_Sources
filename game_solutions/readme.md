@@ -1,4 +1,4 @@
-The White Barrows (c)
+*The White Barrows (c)*
 - Argus Press Software, Personal Software, Computing Today 1982
 - ASP Software Ltd. 1983
 - Evan R. Venn 2022, Open Source GPL v2 license. Published on GitHub
@@ -15,7 +15,7 @@ The game is now ported to micro controllers by Evan R Venn in 2022 to showcase t
 
 -----
 
-The Game
+*The Game*
 
 Your mission is to trap the Evil Sorcerer and return the Magic Chalice
 
