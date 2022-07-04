@@ -62,15 +62,12 @@ This is support by 18F, LGT, Mega328p, 16F1939 etc.  Try your chip.
 
 '''@author    EvanV   
 '''@license   GPL
-'''@version   1.01   
-'''@date      2022-07-03
+'''@version   1.03  
+'''@date      2022-07-04
 '''********************************************************************************
 
 
-// #chip   16F1939
-// #CONFIG MCLRE=ON
-
-#chip 18F26K83
+#chip 18F26K83, 64
 #config MCLRE=EXTMCLR
     'Module: UART pin directions
     Dir PORTC.6 Out    ' Make TX1 pin an output
@@ -83,6 +80,9 @@ This is support by 18F, LGT, Mega328p, 16F1939 etc.  Try your chip.
     'Module: UART1
     U1RXPPS = 0x0017    'RC7 > RX1
 
+// #chip   16F1939
+// #CONFIG MCLRE=ON
+
 // #chip mega328p, 16
 
     'USART settings for USART1
@@ -90,9 +90,8 @@ This is support by 18F, LGT, Mega328p, 16F1939 etc.  Try your chip.
     #DEFINE USART_BLOCKING
     #DEFINE USART_DELAY OFF
 
-
     // #DEFINE DEBUGCODE    'add 'X' option and some movement debug
-    // #DEFINE REDUCEDINTRO 'enable to fit this into a 16f
+    // #DEFINE REDUCEDINTRO 'reduce the strings to less than 2048 bytes of data
 
     #DEFINE EMPTY_CHAMBER       0
     #DEFINE NOT_VALID_CHAMBER   0
@@ -128,6 +127,11 @@ This is support by 18F, LGT, Mega328p, 16F1939 etc.  Try your chip.
         Str_FRIENDLY_GNOME = "Friendly Gnome"
     #DEFINE MAGIC_SPOT          11
 
+
+    Dim Str_YOUAREINCHAMBER as String * 19
+        Str_YOUAREINCHAMBER = "You are in Chamber "
+    Dim Str_SORCERER as String * 12
+        Str_SORCERER = "The Sorcerer"
     Dim CurrentKey as String
     Dim CurrentChamber, DesiredRoom as byte
     Dim CurrentPotofMoney as Integer
@@ -150,7 +154,7 @@ _Restart:
     IntitChamberStatus
 
     HSerPrintCRLF
-    HSerPrintStringCRLF "You are in Chamber "+str( CurrentChamber )
+    HSerPrintStringCRLF Str_YOUAREINCHAMBER + str( CurrentChamber )
     DesiredRoom = CurrentChamber
     BeMagicInConnectedRooms ( CurrentChamber, true )
     BeChaliceInConnectedRooms ( CurrentChamber, true )
@@ -163,7 +167,7 @@ _Restart:
             Do While Len(CurrentKey) = 0
 
                 HSerPrintCRLF
-                HSerPrint "[M]ove, [V]iew, [S]how map, [C]reate wall (you are in Chamber "
+                HSerPrint "[M]ove, [V]iew, [S]how map, [C]reate wall (" + Str_YOUAREINCHAMBER
                 HSerPrint Str( CurrentChamber )+ ") ? $> "
                 HSerGetString CurrentKey
             Loop
@@ -193,12 +197,12 @@ _Restart:
                 ShowMap
                 FirstRun = True
 
-                HSerPrintStringCRLF "You are in Chamber "+str(CurrentChamber)
+                HSerPrintStringCRLF Str_YOUAREINCHAMBER+str(CurrentChamber)
                 BeMagicInConnectedRooms ( CurrentChamber, true )
 
             case "I"
                 ShowIntro
-                HSerPrintStringCRLF "You are in Chamber "+str(CurrentChamber)
+                HSerPrintStringCRLF Str_YOUAREINCHAMBER+str(CurrentChamber)
 
             case "V"
                 ViewRooms ( CurrentChamber)
@@ -271,7 +275,7 @@ Sub MoveChamber
         If MoveRoom( CurrentChamber, DesiredRoom ) or  CurrentChamber = DesiredRoom  Then
                                     
             If DesiredRoom = SorcererChamber Then
-                HSerPrintStringCRLF "You have walked in .. the Sorcerer with the Chalice !"
+                HSerPrintStringCRLF "You have walked in .. " + Str_SORCERER +  " with the Chalice !"
                 HSerSend 7
                 HSerSend 7
                 
@@ -311,8 +315,8 @@ Sub MoveChamber
                             HserPrint "MagicSpot.."
                         #endif
                         
-                        HSerPrintStringCRLF "Sorcerer has just trodden on a Magic Spot"
-                        HSerPrintStringCRLF "Sorcerer has been moved by Magic to another Chamber"
+                        HSerPrintStringCRLF Str_SORCERER + " has just trodden on a Magic Spot"
+                        HSerPrintStringCRLF Str_SORCERER + " has been moved by Magic to another Chamber"
                         HSerSend 7
                         // Place user in a new chamber
                         Dim relocateToNewChamber as Byte
@@ -347,7 +351,7 @@ Sub MoveChamber
                 Next
                 If DesiredRoom = SorcererChamber Then
                     HserPrintCRLF
-                    HSerPrintStringCRLF "The Sorcerer is trapped - you get to take the Chalice from the Sorcerer!!"
+                    HSerPrintStringCRLF Str_SORCERER + " is trapped - you get to take the Chalice from " + Str_SORCERER + "!!"
                     repeat 4
                         HSerSend 7
                         wait 100 ms
@@ -367,7 +371,7 @@ Sub MoveChamber
                         goto _Restart
                     #endif
                 Else
-                    HSerPrintStringCRLF "The Sorcerer has run off !"
+                    HSerPrintStringCRLF Str_SORCERER + " has run off !"
                 End if
 
                 CurrentChamber= DesiredRoom
@@ -401,7 +405,7 @@ Sub MoveChamber
                         CurrentKey = ""
                         Do
                             If (CurrentKey(1) = 89) OR (CurrentKey(1) = 78) then Exit Do  'Y or N test
-                            HSerPrint "The Friendly gnome will tell you where the Sorcerer is for "
+                            HSerPrint "The Friendly gnome will tell you where " + Str_SORCERER + " is for "
                             HserPrint cost
                             HSerPrint " Thaums. Agreed ? $> "
                             CurrentKey = ""
@@ -410,7 +414,7 @@ Sub MoveChamber
                             CurrentKey(1) = CurrentKey(1) and 0xDF
                         Loop
                         If CurrentKey(1) = "Y"  Then
-                                HSerPrintStringCRLF "The Sorcerer is in Chamber " + str( SorcererChamber )
+                                HSerPrintStringCRLF Str_SORCERER + " is in Chamber " + str( SorcererChamber )
                                 HSerPrintCRLF
                                 SpendSomeMoney ( cost )
                         End if
@@ -455,7 +459,7 @@ Sub MoveChamber
 
 
 
-            HSerPrintStringCRLF "You are in Chamber "+str(CurrentChamber)
+            HSerPrintStringCRLF Str_YOUAREINCHAMBER+str(CurrentChamber)
             MerlinHealthStateatRisk =  0
             
             // If BeMagicInConnectedRooms ( CurrentChamber, false ) Then
@@ -500,7 +504,7 @@ Sub ViewRooms ( in chamberlocation  )
             If chamberconnectionsArray( connections )  <> 0 then
 
                 If viewRoom = SorcererChamber Then
-                    HSerPrintStringCRLF "You have found the Sorcerer !"
+                    HSerPrintStringCRLF "You have found " + Str_SORCERER + " !"
                     HSerSend 7
                     HSerSend 7
                 Else
@@ -885,15 +889,26 @@ Sub ShowMap
     // HSerPrintCRLF
 
     Dim Mapreader, MapSize, MapData as Word
+    Dim _char, _chars as word
+    _char = 0
+    _chars = 0
+
     // Read the size of the map table
     ReadTable MapDataTable, 0, MapSize
-    For Mapreader = 1 to MapSize
-        ReadTable MapDataTable, Mapreader, MapData
-        HSerSend MapData
+    For Mapreader = 1 to MapSize Step 2
+        ReadTable MapDataTableCompressed, Mapreader, _char
+        ReadTable MapDataTableCompressed, Mapreader + 1, _chars
+        Repeat _chars
+            HSerSend _char
+        End Repeat      
     Next
 
-    // Use a table to ensure the table data fits in a 16F page size.
+    // Use a compressed table to ensure the table data fits in a 16F page size.
+    Table MapDataTableCompressed
+    13,1,10,1,13,1,10,1,32,23,95,28,32,1,49,1,32,1,95,28,13,1,10,1,32,22,124,1,32,29,124,1,32,29,124,1,13,1,10,1,32,22,124,1,32,29,124,1,32,29,124,1,13,1,10,1,32,17,45,5,50,1,45,5,32,19,45,5,51,1,45,6,32,18,45,5,52,1,45,5,13,1,10,1,32,15,47,1,32,6,124,1,32,6,92,1,32,15,47,1,32,6,124,1,32,7,92,1,32,14,47,1,32,6,124,1,32,5,92,1,13,1,10,1,32,14,47,1,32,7,124,1,32,7,92,1,32,13,47,1,32,7,124,1,32,8,92,1,32,12,47,1,32,7,124,1,32,7,92,1,13,1,10,1,32,13,47,1,32,8,124,1,32,8,92,1,32,11,47,1,32,8,124,1,32,9,92,1,32,10,47,1,32,8,124,1,32,8,92,1,13,1,10,1,32,12,53,1,32,9,54,1,32,9,55,1,32,9,56,1,32,9,57,1,32,9,49,1,48,1,32,8,49,2,32,8,49,1,50,1,32,8,49,1,51,1,13,1,10,1,32,10,47,1,32,1,124,1,32,1,92,1,32,5,47,1,32,1,124,1,32,1,92,1,32,5,47,1,32,1,124,1,32,1,92,1,32,5,47,1,32,1,124,1,32,1,92,1,32,5,47,1,32,1,124,1,32,1,92,1,32,5,47,1,32,1,124,1,32,1,92,1,32,5,47,1,32,1,124,1,32,1,92,1,32,5,47,1,32,1,124,1,32,1,92,1,32,5,47,1,32,1,124,1,32,1,92,1,13,1,10,1,32,9,47,1,32,2,124,1,32,2,92,1,32,3,47,1,32,2,124,1,32,2,92,1,32,3,47,1,32,2,124,1,32,2,92,1,32,3,47,1,32,2,124,1,32,2,92,1,32,3,47,1,32,2,124,1,32,2,92,1,32,3,47,1,32,2,124,1,32,2,92,1,32,3,47,1,32,2,124,1,32,2,92,1,32,3,47,1,32,2,124,1,32,2,92,1,32,3,47,1,32,2,124,1,32,2,92,1,13,1,10,1,32,9,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,1,13,1,10,1,32,1,40,1,52,1,48,1,41,1,60,1,45,2,32,1,49,1,52,1,32,1,124,1,32,2,49,1,54,1,45,2,49,1,55,1,32,1,124,1,32,2,49,1,57,1,45,2,50,1,48,1,32,1,124,1,32,2,50,2,45,2,50,1,51,1,32,1,124,1,32,2,50,1,53,1,45,2,50,1,54,1,32,1,124,1,32,2,50,1,56,1,45,2,50,1,57,1,32,1,124,1,32,2,51,1,49,1,45,2,51,1,50,1,32,1,124,1,32,2,51,1,52,1,45,2,51,1,53,1,32,1,124,1,32,2,51,1,55,1,45,2,51,1,56,1,32,1,124,1,32,2,52,1,48,1,32,1,45,2,62,1,40,1,49,1,52,1,41,1,13,1,10,1,32,9,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,1,13,1,10,1,32,9,92,1,32,2,118,1,32,2,47,1,32,3,92,1,32,2,118,1,32,2,47,1,32,3,92,1,32,2,118,1,32,2,47,1,32,3,92,1,32,2,118,1,32,2,47,1,32,3,92,1,32,2,124,1,32,2,47,1,32,3,92,1,32,2,118,1,32,2,47,1,32,3,92,1,32,2,118,1,32,2,47,1,32,3,92,1,32,2,118,1,32,2,47,1,32,3,92,1,32,2,118,1,32,2,47,1,13,1,10,1,32,10,45,5,32,5,45,5,32,5,45,5,32,5,45,5,32,6,45,1,50,1,55,1,45,1,32,5,45,5,32,5,45,5,32,5,45,5,32,5,45,5,32,1,13,1,10,1,32,12,94,1,32,9,94,1,32,9,94,1,32,9,94,1,32,19,94,1,32,9,94,1,32,9,94,1,32,9,94,1,13,1,10,1,32,12,49,1,53,1,32,8,49,1,56,1,32,8,50,1,49,1,32,8,50,1,52,1,32,18,51,1,48,1,32,8,51,2,32,8,51,1,54,1,32,8,51,1,57,1,13,1,10,1,32,12,124,1,32,9,124,1,32,9,124,1,32,9,124,1,32,19,124,1,32,9,124,1,32,9,124,1,32,9,124,1,13,1,10,1,32,12,124,1,32,9,124,1,95,4,32,2,95,3,124,1,32,9,124,1,32,19,124,1,32,9,124,1,95,4,32,2,95,3,124,1,32,9,124,1,13,1,10,1,32,12,124,1,32,14,124,2,32,13,124,1,32,19,124,1,32,14,124,2,32,13,124,1,13,1,10,1,32,12,124,1,95,14,52,1,49,1,95,13,124,1,32,19,124,1,95,14,52,1,50,1,95,13,124,1,13,1,10,1,13,1,10,1,13,1
+    End Table
 
+    // Use a table to ensure the table data fits in a 16F page size.
     Table MapDataTable
     13,10
     13,10
