@@ -62,8 +62,8 @@ This is support by 18F, LGT, Mega328p, 16F1939 etc.  Try your chip.
 
 '''@author    EvanV   
 '''@license   GPL
-'''@version   1.03  
-'''@date      2022-07-04
+'''@version   1.04  
+'''@date      2022-07-05
 '''********************************************************************************
 
 
@@ -93,45 +93,31 @@ This is support by 18F, LGT, Mega328p, 16F1939 etc.  Try your chip.
     // #DEFINE DEBUGCODE    'add 'X' option and some movement debug
     // #DEFINE REDUCEDINTRO 'reduce the strings to less than 2048 bytes of data
 
-    #DEFINE EMPTY_CHAMBER       0
-    #DEFINE NOT_VALID_CHAMBER   0
-    #DEFINE RED_DRAGON          1
-        Dim Str_RED_DRAGON as String * 10
-        Str_RED_DRAGON = "Red Dragon"
-    #DEFINE GREEN_DRAGON        2
-        Dim Str_GREEN_DRAGON as String * 12
-        Str_GREEN_DRAGON = "Green Dragon"
-    #DEFINE YELLOW_DRAGON       3
-        Dim Str_YELLOW_DRAGON as String * 13
-        Str_YELLOW_DRAGON = "Yellow Dragon"
-    #DEFINE PLATINUM_SERPENT    4
-        Dim Str_PLATINUM_SERPENT as String * 16
-        Str_PLATINUM_SERPENT = "Platinum Serpent"
-    #DEFINE GOLD_SERPENT        5
-        Dim Str_GOLD_SERPENT as String * 12
-        Str_GOLD_SERPENT = "Gold Serpent"
-    #DEFINE SILVER_SERPENT      6
-        Dim Str_SILVER_SERPENT as String * 14
-        Str_SILVER_SERPENT = "Silver Serpent"
-    #DEFINE DWARF_SABRE         7
-        Dim Str_DWARF_SABRE as String * 18
-        Str_DWARF_SABRE = "Dward with a Sabre"    
-    #DEFINE DWARF_SWORD         8
-        Dim Str_DWARF_SWORD as String * 18
-        Str_DWARF_SWORD = "Dward with a Sword"
-    #DEFINE DWARF_KNIFE         9
-        Dim Str_DWARF_KNIFE as String * 18
-        Str_DWARF_KNIFE = "Dward with a Knife"
-    #DEFINE FRIENDLY_GNOME      10
-        Dim Str_FRIENDLY_GNOME as String * 18
-        Str_FRIENDLY_GNOME = "Friendly Gnome"
-    #DEFINE MAGIC_SPOT          11
-
-
-    Dim Str_YOUAREINCHAMBER as String * 19
-        Str_YOUAREINCHAMBER = "You are in Chamber "
-    Dim Str_SORCERER as String * 12
-        Str_SORCERER = "The Sorcerer"
+    #DEFINE EMPTY_CHAMBER           0
+    #DEFINE NOT_VALID_CHAMBER       0
+    #DEFINE RED_DRAGON              1
+    #DEFINE STR_RED_DRAGON          "Red Dragon"
+    #DEFINE GREEN_DRAGON            2
+    #DEFINE STR_GREEN_DRAGON        "Green Dragon"
+    #DEFINE YELLOW_DRAGON           3
+    #DEFINE STR_YELLOW_DRAGON       "Yellow Dragon"
+    #DEFINE PLATINUM_SERPENT        4
+    #DEFINE STR_PLATINUM_SERPENT    "Platinum Serpent"
+    #DEFINE GOLD_SERPENT            5
+    #DEFINE STR_GOLD_SERPENT        "Gold Serpent"
+    #DEFINE SILVER_SERPENT          6
+    #DEFINE STR_SILVER_SERPENT      "Silver Serpent"
+    #DEFINE DWARF_SABRE             7
+    #DEFINE STR_DWARF_SABRE         "Dward with a Sabre"    
+    #DEFINE DWARF_SWORD             8
+    #DEFINE STR_DWARF_SWORD         "Dward with a Sword"
+    #DEFINE DWARF_KNIFE             9
+    #DEFINE  STR_DWARF_KNIFE        "Dward with a Knife"
+    #DEFINE FRIENDLY_GNOME          10
+    #DEFINE STR_FRIENDLY_GNOME      "Friendly Gnome"
+    #DEFINE MAGIC_SPOT              11
+    #DEFINE STR_YOUAREINCHAMBER     "You are in Chamber "
+    #DEFINE STR_SORCERER            "The Sorcerer"
     Dim CurrentKey as String
     Dim CurrentChamber, DesiredRoom as byte
     Dim CurrentPotofMoney as Integer
