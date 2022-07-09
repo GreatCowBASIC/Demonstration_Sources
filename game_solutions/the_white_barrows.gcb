@@ -67,14 +67,13 @@ This is support by 18F, LGT, Mega328p, 16F1939 etc.  Try your chip.
 '''********************************************************************************
 
 
-#chip 18F26K83, 64
+#chip 18F27Q43
 #config MCLRE=EXTMCLR
     'Module: UART pin directions
     Dir PORTC.6 Out    ' Make TX1 pin an output
     'Module: UART1
-
-    RC6PPS = 0x0013    'TX1 > RC6
-
+            'Module: UART1
+            RC6PPS = 0x0020    'TX1 > RC6
     'Module: UART pin directionsz
     Dir PORTC.7 In    ' Make RX1 pin an input
     'Module: UART1
@@ -167,6 +166,9 @@ _Restart:
 
             #ifdef DEBUGCODE
             case "X"
+                HserPrint "S:"
+                HserPrint SorcererChamber
+                HserPrint ", "
                 dim mloop
                 for mloop = 0 to 42
                     HSerPrint mloop
@@ -268,35 +270,48 @@ Sub MoveChamber
                 EstablishChanmberConnections ( SorcererChamber )
                 Dim Chaliceconnections, orginalSorcererChamber as Byte
                 Dim canseeChamber as Bit
+                Dim SorcererTrappedTracker(5)
+                SorcererTrappedTracker = 0,0,0,0
+                Dim SorcererTrapped as String
                 
+                SorcererTrapped = ""
                 orginalSorcererChamber = SorcererChamber
                 canseeChamber = 1
                 For Chaliceconnections = 1 to 4
+                    EstablishChanmberConnections ( SorcererChamber )
                     #ifdef DEBUGCODE
                         HSerPrint "Debug "
                         HserPrint chamberconnectionsArray( Chaliceconnections ) 
+                        HserPrint ": "
+                        HSerPrint RoomStatus( chamberconnectionsArray( Chaliceconnections ) )
+                        HserPrint " = "
                     #endif
-                    If chamberconnectionsArray( Chaliceconnections ) = CurrentChamber Then  'where you came from
-                        #ifdef DEBUGCODE
-                            HSerPrint "Cant go here you were here... "
-                        #endif    
-                    Else If chamberconnectionsArray( Chaliceconnections ) = NOT_VALID_CHAMBER Then
+
+                    If chamberconnectionsArray( Chaliceconnections ) = NOT_VALID_CHAMBER Then
                         #ifdef DEBUGCODE
                             HSerPrint "No chamber.. "
                         #endif
+                    Else If chamberconnectionsArray( Chaliceconnections ) = CurrentChamber Then  'where you came from
+                        SorcererTrappedTracker(2) = chamberconnectionsArray( Chaliceconnections ) 
+                        #ifdef DEBUGCODE
+                            HSerPrint "Cant go here you were here... "
+                        #endif    
                     Else If RoomStatus( chamberconnectionsArray( Chaliceconnections ) ) = FRIENDLY_GNOME Then
+                        SorcererTrappedTracker(3) = chamberconnectionsArray( Chaliceconnections ) 
                         #ifdef DEBUGCODE
                             HSerPrint "FRIENDLY_GNOME.."
                         #endif
                     Else If chamberconnectionsArray( Chaliceconnections )  = MagicWallRoom  Then
+                        SorcererTrappedTracker(4) = chamberconnectionsArray( Chaliceconnections ) 
                         #ifdef DEBUGCODE
                             HserPrint "MagicWall.."
                         #endif
                     Else If chamberconnectionsArray( Chaliceconnections )  = orginalSorcererChamber  Then
+                        SorcererTrappedTracker(5) = chamberconnectionsArray( Chaliceconnections ) 
                         #ifdef DEBUGCODE
-                            HserPrint "Cant got back there from where you can from.."
+                            HserPrint "Cant got back there .. Sorcerer started here.."
                         #endif
-                    Else If chamberconnectionsArray( Chaliceconnections )  = MAGIC_SPOT  Then    
+                    Else If RoomStatus( chamberconnectionsArray( Chaliceconnections ) )  = MAGIC_SPOT  Then    
                         #ifdef DEBUGCODE
                             HserPrint "MagicSpot.."
                         #endif
@@ -312,7 +327,7 @@ Sub MoveChamber
                         Loop
                         SorcererChamber = relocateToNewChamber
                     Else
-                        If canseeChamber = 1 or GenRandom(255) < 127 Then
+                        If canseeChamber = 1 or GenRandom(255) < 127  Then
                             // Initially, always set chamber, then, if random is less then 127 set again.
                             // so, a minimum of one attempt but it could up up to four chamber moves
                             canseeChamber = 0
@@ -336,13 +351,44 @@ Sub MoveChamber
                         #endif
                 Next
                 If DesiredRoom = SorcererChamber Then
+
+                dim mloop
+                HserPrintCRLF
+                for mloop = 0 to 42
+                    HSerPrint mloop
+                    HserPrint ":="
+                    HserPrint RoomStatus ( mloop )
+                    HserPrint ", "
+                next
                     HserPrintCRLF
                     HSerPrintStringCRLF Str_SORCERER + " is trapped - you get to take the Chalice from " + Str_SORCERER + "!!"
+                    HserPrintCRLF
+                    If SorcererTrappedTracker(1) <> 0 Then 
+                        HserPrint " Chamber "+ str(SorcererTrappedTracker(1))+ ", is not empty and the Sorcerer cannot enter"
+                        HserPrintCRLF
+                    End If
+                    If SorcererTrappedTracker(2) <> 0 Then 
+                        HserPrint " You just came from Chamber "+ str(SorcererTrappedTracker(2))+ ", and, you are in the doorway stopping the Sorcerer from leaving"
+                        HserPrintCRLF
+                    End If
+                    If SorcererTrappedTracker(3) <> 0 Then 
+                        HserPrint " There is a Friendly Gnome in Chamber " + str(SorcererTrappedTracker(3)) + " the Sorcerer cannot go into the same Chamber"
+                        HserPrintCRLF
+                    End If
+                    If SorcererTrappedTracker(4) <> 0 Then 
+                        HserPrint " Sorcerer cannot go into Chamber " + str(SorcererTrappedTracker(4)) + " as there is a Magic Wall... the Sorcerer cannot enter that Chamber"
+                        HserPrintCRLF
+                    End If
+                    If SorcererTrappedTracker(5) <> 0 Then
+                        HserPrint " Sorcerer cannot go back to Chamber " + str(SorcererTrappedTracker(5)) + ".. he just where he came from there"
+                        HserPrintCRLF
+                    End If 
+                    HserPrintCRLF
                     repeat 4
                         HSerSend 7
                         wait 100 ms
                     end Repeat
-                    HserPrintCRLF
+                    
                     
                     wait 5 s
                     
@@ -560,8 +606,8 @@ Sub EntityAttacks ( attack_entity, entity_name as String, entity_baseline )
 
     Loop
 
-    OptionPrice = 0
-    Do While  OptionPrice = 0 or  OptionPrice > CurrentPotofMoney  'repeat if empty string
+    OptionPrice = -1
+    Do While  OptionPrice < 0 or  OptionPrice > CurrentPotofMoney  'repeat if empty string
         HSerPrint "How many Thaums ? $> "
         HSerGetNum OptionPrice
         HSerPrintCRLF
@@ -759,8 +805,7 @@ Sub IntitChamberStatus
         RoomStatus( ChamberState ) = 0
     Next
 
-
-
+// goto HardCodeLocations
     // Put the enities into chambers
     For ChamberState = RED_DRAGON to DWARF_KNIFE
         CurrentChamber = GenRandom ( 42 )
@@ -806,8 +851,9 @@ Sub IntitChamberStatus
     // RoomStatus ( 3 ) = 5
     // RoomStatus ( 4 ) = 10
 
+    // RoomStatus ( 12 ) = 11
     // SorcererChamber= 36
-    // CurrentChamber = 1
+    // CurrentChamber = 42
 
 End Sub
 
