@@ -1,0 +1,68 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------
+'''This program shows the config as read from the chip.  This information is useful to ensure the config write operations are correct.
+'''
+'''
+'''@author    Bill Roth  
+'''@license   GPL
+'''@version   1.00   
+'''@date      2022-07-10
+'''********************************************************************************
+
+
+#chip 18F26Q43
+#OPTION Explicit
+
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+
+#startup InitPPS, 85
+
+Sub InitPPS
+      'Module: UART pin directions
+      Dir PORTC.6 Out    ' Make TX1 pin an output
+      'Module: UART1
+      RC6PPS = 0x0020    'TX1 > RC6
+End Sub
+
+
+// Show a message
+Wait 200 ms
+HSerPrint ChipNameStr
+HserPrintStringCRLF " specific solution - address and registers must be checked when used"
+HserprintCRLF 2
+
+Dim ii as Byte
+
+Read_CONFIG_DATA:
+  // Address of Config on this specific chip
+  NVMADRU = 0x30
+  NVMADRH = 0x00
+  NVMADRL = 0x00
+  NVMCON1 = 1
+
+  For ii =  1 to 10
+
+      NVMGO = 1
+      Wait until NVMGO = 0
+
+      Hserprint "CONFIG "
+      
+      Hserprint LeftPad( Str(ii), 2, " " )
+      HSerprint " = "
+      HSerprint HEX(NVMDATL)
+      HSersend 32 : HSersend 32 : HSersend 32
+      HSerprint bytetobin(NVMDATL)
+      HSerprintCRLF
+  NExt
+
+  HSerprintCRLF
+  HSerprint "Config 9 is not implemented on this chip"
+  HSerprintCRLF 2
+  HSerprint "Completed"
+  HSerprintCRLF 2
+
+Do
+Loop
+
