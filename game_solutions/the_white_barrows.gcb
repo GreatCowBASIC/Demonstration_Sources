@@ -62,8 +62,8 @@ This is support by 18F, LGT, Mega328p, 16F1939 etc.  Try your chip.
 
 '''@author    EvanV   
 '''@license   GPL
-'''@version   1.04  
-'''@date      2022-07-05
+'''@version   1.05  
+'''@date      2022-10-05
 '''********************************************************************************
 
 
@@ -266,19 +266,23 @@ Sub MoveChamber
                 HSerPrintStringCRLF "You have walked in .. " + Str_SORCERER +  " with the Chalice !"
                 HSerSend 7
                 HSerSend 7
+                HserPrintCRLF
                 
                 EstablishChanmberConnections ( SorcererChamber )
-                Dim Chaliceconnections, orginalSorcererChamber as Byte
+                Dim Chaliceconnections, orginalSorcererChamber, examineChamber as Byte
                 Dim canseeChamber as Bit
                 Dim SorcererTrappedTracker(5)
-                SorcererTrappedTracker = 0,0,0,0
+                SorcererTrappedTracker = 0,0,0,0,0
                 Dim SorcererTrapped as String
                 
                 SorcererTrapped = ""
                 orginalSorcererChamber = SorcererChamber
                 canseeChamber = 1
                 For Chaliceconnections = 1 to 4
+                    
                     EstablishChanmberConnections ( SorcererChamber )
+                    examineChamber = RoomStatus( chamberconnectionsArray( Chaliceconnections ) ) 
+
                     #ifdef DEBUGCODE
                         HSerPrint "Debug "
                         HserPrint chamberconnectionsArray( Chaliceconnections ) 
@@ -287,79 +291,72 @@ Sub MoveChamber
                         HserPrint " = "
                     #endif
 
-                    If chamberconnectionsArray( Chaliceconnections ) = NOT_VALID_CHAMBER Then
+                    If chamberconnectionsArray( Chaliceconnections ) <> NOT_VALID_CHAMBER Then
                         #ifdef DEBUGCODE
-                            HSerPrint "No chamber.. "
+                            HSerPrint "Valid chamber.. "
                         #endif
-                    Else If chamberconnectionsArray( Chaliceconnections ) = CurrentChamber Then  'where you came from
-                        SorcererTrappedTracker(2) = chamberconnectionsArray( Chaliceconnections ) 
-                        #ifdef DEBUGCODE
-                            HSerPrint "Cant go here you were here... "
-                        #endif    
-                    Else If RoomStatus( chamberconnectionsArray( Chaliceconnections ) ) = FRIENDLY_GNOME Then
-                        SorcererTrappedTracker(3) = chamberconnectionsArray( Chaliceconnections ) 
-                        #ifdef DEBUGCODE
-                            HSerPrint "FRIENDLY_GNOME.."
-                        #endif
-                    Else If chamberconnectionsArray( Chaliceconnections )  = MagicWallRoom  Then
-                        SorcererTrappedTracker(4) = chamberconnectionsArray( Chaliceconnections ) 
-                        #ifdef DEBUGCODE
-                            HserPrint "MagicWall.."
-                        #endif
-                    Else If chamberconnectionsArray( Chaliceconnections )  = orginalSorcererChamber  Then
-                        SorcererTrappedTracker(5) = chamberconnectionsArray( Chaliceconnections ) 
-                        #ifdef DEBUGCODE
-                            HserPrint "Cant got back there .. Sorcerer started here.."
-                        #endif
-                    Else If RoomStatus( chamberconnectionsArray( Chaliceconnections ) )  = MAGIC_SPOT  Then    
-                        #ifdef DEBUGCODE
-                            HserPrint "MagicSpot.."
-                        #endif
-                        
-                        HSerPrintStringCRLF Str_SORCERER + " has just trodden on a Magic Spot"
-                        HSerPrintStringCRLF Str_SORCERER + " has been moved by Magic to another Chamber"
-                        HSerSend 7
-                        // Place user in a new chamber
-                        Dim relocateToNewChamber as Byte
-                        relocateToNewChamber = GenRandom ( 42 )
-                        Do While relocateToNewChamber> 42 Or CurrentChamber = relocateToNewChamber Or RoomStatus( relocateToNewChamber ) <> 0
+                        If chamberconnectionsArray( Chaliceconnections ) = CurrentChamber Then  'where you came from
+                            SorcererTrappedTracker(2) = chamberconnectionsArray( Chaliceconnections ) 
+                            #ifdef DEBUGCODE
+                                HSerPrint "Cant go here you were here... "
+                            #endif    
+                        Else If examineChamber = FRIENDLY_GNOME Then
+                            SorcererTrappedTracker(3) = chamberconnectionsArray( Chaliceconnections ) 
+                            #ifdef DEBUGCODE
+                                HSerPrint "FRIENDLY_GNOME.."
+                            #endif
+                        Else If chamberconnectionsArray( Chaliceconnections )  = MagicWallRoom  Then
+                            SorcererTrappedTracker(4) = chamberconnectionsArray( Chaliceconnections ) 
+                            #ifdef DEBUGCODE
+                                HserPrint "MagicWall.."
+                            #endif
+                        Else If chamberconnectionsArray( Chaliceconnections )  = orginalSorcererChamber  Then
+                            SorcererTrappedTracker(5) = orginalSorcererChamber
+                            #ifdef DEBUGCODE
+                                HserPrint "Cant got back there .. Sorcerer started here.."
+                            #endif
+                        Else If examineChamber  = MAGIC_SPOT  Then    
+                            #ifdef DEBUGCODE
+                                HserPrint "MagicSpot.."
+                            #endif
+                            
+                            HSerPrintStringCRLF Str_SORCERER + " has just trodden on a Magic Spot"
+                            HSerPrintStringCRLF Str_SORCERER + " has been moved by Magic to another Chamber"
+                            HSerSend 7
+                            // Place user in a new chamber
+                            Dim relocateToNewChamber as Byte
                             relocateToNewChamber = GenRandom ( 42 )
-                        Loop
-                        SorcererChamber = relocateToNewChamber
-                    Else
-                        If canseeChamber = 1 or GenRandom(255) < 127  Then
-                            // Initially, always set chamber, then, if random is less then 127 set again.
-                            // so, a minimum of one attempt but it could up up to four chamber moves
-                            canseeChamber = 0
-                            #ifdef DEBUGCODE
-                                HserPrint " Move Sorcerer to "
-                                HserPrint chamberconnectionsArray( Chaliceconnections )
-                                HSerPrintCRLF
-                            #endif
-                            SorcererChamber = chamberconnectionsArray( Chaliceconnections )
-                            // establish new Chambers connect to the new Chamber. Permits, movement of up to four moves away
-                            EstablishChanmberConnections ( SorcererChamber )
+                            Do While relocateToNewChamber> 42 Or CurrentChamber = relocateToNewChamber Or RoomStatus( relocateToNewChamber ) <> 0
+                                relocateToNewChamber = GenRandom ( 42 )
+                            Loop
+                            SorcererChamber = relocateToNewChamber
                         Else
-                            NOP ' no action ignore the Chamber
-                            #ifdef DEBUGCODE
-                                HserPrint "canseeChamber = "+str(canseeChamber)+" or > 128"
+                            If canseeChamber = 1 or GenRandom(255) < 127  Then
+                                // Initially, always set chamber, then, if random is less then 127 set again.
+                                // so, a minimum of one attempt but it could up up to four chamber moves
+                                canseeChamber = 0
+                                #ifdef DEBUGCODE
+                                    HserPrint " Move Sorcerer to "
+                                    HserPrint chamberconnectionsArray( Chaliceconnections )
+                                    HSerPrintCRLF
                             #endif
-                        End if
-                    End If
-                        #ifdef DEBUGCODE
-                            HserPrintCRLF
-                        #endif
+                                SorcererChamber = chamberconnectionsArray( Chaliceconnections )
+                                // establish new Chambers connect to the new Chamber. Permits, movement of up to four moves away
+                                EstablishChanmberConnections ( SorcererChamber )
+                            Else
+                                NOP ' no action ignore the Chamber
+                                #ifdef DEBUGCODE
+                                    HserPrint "canseeChamber = "+str(canseeChamber)+" or > 128"
+                                #endif
+                            End if
+                        End If
+                    End if
+                    #ifdef DEBUGCODE
+                        HserPrintCRLF
+                    #endif
                 Next
                 If DesiredRoom = SorcererChamber Then
 
-                dim mloop
-                HserPrintCRLF
-                for mloop = 0 to 42
-                    HSerPrint mloop
-                    HserPrint ":="
-                    HserPrint RoomStatus ( mloop )
-                    HserPrint ", "
-                next
                     HserPrintCRLF
                     HSerPrintStringCRLF Str_SORCERER + " is trapped - you get to take the Chalice from " + Str_SORCERER + "!!"
                     HserPrintCRLF
@@ -408,88 +405,72 @@ Sub MoveChamber
 
                 CurrentChamber= DesiredRoom
 
-            Else
-                CurrentChamber= DesiredRoom
-                'handle events in Chanbers
-                Select case RoomStatus( CurrentChamber )
-                    case RED_DRAGON
-                        EntityAttacks (  RED_DRAGON, Str_RED_DRAGON , 30  )
-                    case GREEN_DRAGON
-                        EntityAttacks (  GREEN_DRAGON,  Str_GREEN_DRAGON, 25 )
-                    case YELLOW_DRAGON
-                        EntityAttacks (  YELLOW_DRAGON,  Str_YELLOW_DRAGON, 20 )
-                    case PLATINUM_SERPENT
-                        EntityAttacks (  PLATINUM_SERPENT,  Str_PLATINUM_SERPENT, 28 )
-                    case GOLD_SERPENT
-                        EntityAttacks (  GOLD_SERPENT,  Str_GOLD_SERPENT, 23 )
-                    case SILVER_SERPENT
-                        EntityAttacks (  SILVER_SERPENT,  Str_SILVER_SERPENT, 18 )
-                    case DWARF_SABRE
-                        EntityAttacks ( DWARF_SABRE, Str_DWARF_SABRE, 24 )
-                    case DWARF_SWORD
-                        EntityAttacks ( DWARF_SWORD, Str_DWARF_SWORD, 19 )
-                    case DWARF_KNIFE
-                        EntityAttacks ( DWARF_KNIFE, Str_DWARF_KNIFE, 14 )
-                    case FRIENDLY_GNOME
+            End if
+            CurrentChamber= DesiredRoom
+            'handle events in Chanbers
+            Select case RoomStatus( CurrentChamber )
+                case RED_DRAGON
+                    EntityAttacks (  RED_DRAGON, Str_RED_DRAGON , 30  )
+                case GREEN_DRAGON
+                    EntityAttacks (  GREEN_DRAGON,  Str_GREEN_DRAGON, 25 )
+                case YELLOW_DRAGON
+                    EntityAttacks (  YELLOW_DRAGON,  Str_YELLOW_DRAGON, 20 )
+                case PLATINUM_SERPENT
+                    EntityAttacks (  PLATINUM_SERPENT,  Str_PLATINUM_SERPENT, 28 )
+                case GOLD_SERPENT
+                    EntityAttacks (  GOLD_SERPENT,  Str_GOLD_SERPENT, 23 )
+                case SILVER_SERPENT
+                    EntityAttacks (  SILVER_SERPENT,  Str_SILVER_SERPENT, 18 )
+                case DWARF_SABRE
+                    EntityAttacks ( DWARF_SABRE, Str_DWARF_SABRE, 24 )
+                case DWARF_SWORD
+                    EntityAttacks ( DWARF_SWORD, Str_DWARF_SWORD, 19 )
+                case DWARF_KNIFE
+                    EntityAttacks ( DWARF_KNIFE, Str_DWARF_KNIFE, 14 )
+                case FRIENDLY_GNOME
 
-                        Dim cost as Word
-                        cost = GenRandom ( 20 ) + 19
+                    Dim cost as Word
+                    cost = GenRandom ( 20 ) + 19
+                    CurrentKey = ""
+                    Do
+                        If (CurrentKey(1) = 89) OR (CurrentKey(1) = 78) then Exit Do  'Y or N test
+                        HSerPrint "The Friendly gnome will tell you where " + Str_SORCERER + " is for "
+                        HserPrint cost
+                        HSerPrint " Thaums. Agreed ? $> "
                         CurrentKey = ""
-                        Do
-                            If (CurrentKey(1) = 89) OR (CurrentKey(1) = 78) then Exit Do  'Y or N test
-                            HSerPrint "The Friendly gnome will tell you where " + Str_SORCERER + " is for "
-                            HserPrint cost
-                            HSerPrint " Thaums. Agreed ? $> "
-                            CurrentKey = ""
-                            HSerGetString CurrentKey
-                            HserPrintCRLF
-                            CurrentKey(1) = CurrentKey(1) and 0xDF
-                        Loop
-                        If CurrentKey(1) = "Y"  Then
-                                HSerPrintStringCRLF Str_SORCERER + " is in Chamber " + str( SorcererChamber )
-                                HSerPrintCRLF
-                                SpendSomeMoney ( cost )
-                        End if
-
-                    case MAGIC_SPOT
-                        HSerPrintStringCRLF "Powww! you have just trodden on a Magic Spot"
-                        HSerPrintStringCRLF "You are being moved by Magic to another Chamber"
-                        HSerSend 7
-                        // Place user in a new chamber
-                        Dim relocateToNewChamber as Byte
-                        relocateToNewChamber = GenRandom ( 42 )
-                        Do While relocateToNewChamber> 42 Or CurrentChamber = relocateToNewChamber Or RoomStatus( relocateToNewChamber ) <> 0 or relocateToNewChamber = SorcererChamber
-                            relocateToNewChamber = GenRandom ( 42 )
-                        Loop
-                        CurrentChamber = relocateToNewChamber
-
-                    case EMPTY_CHAMBER
-
-                    case else
-                        HSerPrint "other magic....to be resolved  "
-                        HSerSend 9
-                        HSerPrint RoomStatus( CurrentChamber )
+                        HSerGetString CurrentKey
                         HserPrintCRLF
+                        CurrentKey(1) = CurrentKey(1) and 0xDF
+                    Loop
+                    If CurrentKey(1) = "Y"  Then
+                            HSerPrintStringCRLF Str_SORCERER + " is in Chamber " + str( SorcererChamber )
+                            HSerPrintCRLF
+                            SpendSomeMoney ( cost )
+                    End if
 
-                end select
+                case MAGIC_SPOT
+                    HSerPrintStringCRLF "Powww! you have just trodden on a Magic Spot"
+                    HSerPrintStringCRLF "You are being moved by Magic to another Chamber"
+                    HSerSend 7
+                    // Place user in a new chamber
+                    Dim relocateToNewChamber as Byte
+                    relocateToNewChamber = GenRandom ( 42 )
+                    Do While relocateToNewChamber> 42 Or CurrentChamber = relocateToNewChamber Or RoomStatus( relocateToNewChamber ) <> 0 or relocateToNewChamber = SorcererChamber
+                        relocateToNewChamber = GenRandom ( 42 )
+                    Loop
+                    CurrentChamber = relocateToNewChamber
 
-            End If
-            If MerlinDead = 1 then
-                If CurrentPotofMoney = 0 then
-                    HSerPrintStringCRLF "Your Staff is useless and an evil force attacks you from within the White Barrows!"
-                End if
-                HSerPrint "Oh dear, you appear to be dead"
-                wait 2 s
-                HserPrintCRLF 5
-                #ifdef PIC
-                    reset
-                #endif
-                #ifdef AVR
-                    goto _Restart
-                #endif
-            End If
+                case EMPTY_CHAMBER
 
+                case else
+                    HSerPrint "other magic....to be resolved  "
+                    HSerSend 9
+                    HSerPrint RoomStatus( CurrentChamber )
+                    HserPrintCRLF
 
+            end select
+
+            IsMerlineDead ( MerlinDead )
 
             HSerPrintStringCRLF Str_YOUAREINCHAMBER+str(CurrentChamber)
             MerlinHealthStateatRisk =  0
@@ -507,6 +488,26 @@ Sub MoveChamber
     End If
 End Sub
 
+
+Sub IsMerlineDead ( MerlinDead )
+
+    If MerlinDead = 1 then
+        If CurrentPotofMoney < 1 then
+            HSerPrintCRLF
+            HSerPrintStringCRLF "Your Staff is useless and an evil force attacks you from within the White Barrows!"
+        End if
+        HSerPrint "Oh dear, you appear to be dead"
+        wait 2 s
+        HserPrintCRLF 5
+        #ifdef PIC
+            reset
+        #endif
+        #ifdef AVR
+            goto _Restart
+        #endif
+    End If
+
+End Sub
 // View the room
 Sub ViewRooms ( in chamberlocation  )
 
@@ -699,6 +700,8 @@ Sub EntityAttacks ( attack_entity, entity_name as String, entity_baseline )
         End If
     End If
 
+    IsMerlineDead( MerlinDead )
+
 End Sub
 
 
@@ -805,7 +808,8 @@ Sub IntitChamberStatus
         RoomStatus( ChamberState ) = 0
     Next
 
-// goto HardCodeLocations
+    // goto HardCodeLocations
+
     // Put the enities into chambers
     For ChamberState = RED_DRAGON to DWARF_KNIFE
         CurrentChamber = GenRandom ( 42 )
@@ -845,13 +849,15 @@ Sub IntitChamberStatus
     Loop
 
 
-    HardCodeLocations:
+    // HardCodeLocations:
 
     // RoomStatus ( 2 ) = 2
     // RoomStatus ( 3 ) = 5
-    // RoomStatus ( 4 ) = 10
+    // RoomStatus ( 13 ) = 10
+    // RoomStatus ( 36 ) = 6
+    
 
-    // RoomStatus ( 12 ) = 11
+    // RoomStatus ( 12 ) = MAGIC_SPOT
     // SorcererChamber= 36
     // CurrentChamber = 42
 
