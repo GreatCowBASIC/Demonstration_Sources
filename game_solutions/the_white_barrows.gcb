@@ -284,8 +284,11 @@ Sub MoveChamber
                 EstablishChanmberConnections ( SorcererChamber )
                 Dim Chaliceconnections, orginalSorcererChamber, examineChamber as Byte
                 Dim canseeChamber as Bit
-                Dim SorcererTrappedTracker(5)
+                Dim SorcererTrappedTracker(5) 
                 SorcererTrappedTracker = 0,0,0,0,0
+                Dim FoundFriendlyGnome(3)
+                FoundFriendlyGnome = 0,0,0
+
                 Dim SorcererTrapped as String
                 
                 SorcererTrapped = ""
@@ -314,7 +317,12 @@ Sub MoveChamber
                                 HSerPrint "Cant go here you were here... "
                             #endif    
                         Else If examineChamber = FRIENDLY_GNOME Then
-                            SorcererTrappedTracker(3) = chamberconnectionsArray( Chaliceconnections ) 
+                            'SorcererTrappedTracker(3) = chamberconnectionsArray( Chaliceconnections ) 
+
+                            SorcererTrappedTracker(3) = SorcererTrappedTracker(3) + 1
+                            'Store the three potention Chambers
+                            FoundFriendlyGnome ( SorcererTrappedTracker(3) ) = chamberconnectionsArray( Chaliceconnections ) 
+
                             #ifdef DEBUGCODE
                                 HSerPrint "FRIENDLY_GNOME.."
                             #endif
@@ -384,9 +392,14 @@ Sub MoveChamber
                             HserPrint " You just came from Chamber "+ str(SorcererTrappedTracker(2))+ ", and, you are in the doorway stopping the Sorcerer from leaving"
                             HserPrintCRLF
                         End If
-                        If SorcererTrappedTracker(3) <> 0 Then 
-                            HserPrint " There is a Friendly Gnome in Chamber " + str(SorcererTrappedTracker(3)) + " the Sorcerer cannot go into the same Chamber"
-                            HserPrintCRLF
+                        'Show all Gnomes
+                        If SorcererTrappedTracker(3) <> 0 Then
+                            For examineChamber = 1 to 3
+                                if FoundFriendlyGnome ( examineChamber ) <> 0 then
+                                    HserPrint " There is a Friendly Gnome in the Chamber " + str(FoundFriendlyGnome ( examineChamber )) + ", the Sorcerer cannot go into that Chamber"
+                                    HserPrintCRLF
+                                End if
+                            Next
                         End If
                         If SorcererTrappedTracker(4) <> 0 Then 
                             HserPrint " Sorcerer cannot go into Chamber " + str(SorcererTrappedTracker(4)) + " as there is a Magic Wall... the Sorcerer cannot enter that Chamber"
@@ -870,15 +883,15 @@ Sub IntitChamberStatus
 
     // HardCodeLocations:
 
-    // RoomStatus ( 2 ) = 2
-    // RoomStatus ( 3 ) = 5
+    // RoomStatus ( 8 ) = FRIENDLY_GNOME
+    // RoomStatus ( 22 ) = FRIENDLY_GNOME
     // RoomStatus ( 13 ) = 10
     // RoomStatus ( 36 ) = 6
     
 
     // RoomStatus ( 12 ) = MAGIC_SPOT
-    // SorcererChamber= 36
-    // CurrentChamber = 42
+    // SorcererChamber= 23
+    // CurrentChamber = 25
 
 End Sub
 
