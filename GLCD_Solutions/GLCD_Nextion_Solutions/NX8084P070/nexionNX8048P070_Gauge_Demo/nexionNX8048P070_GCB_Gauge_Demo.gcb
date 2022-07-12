@@ -19,7 +19,7 @@
 '''
 '''@author     EvanV
 '''@licence    GPL
-'''@version    1.00
+'''@version    1.10
 '''@date       24.04.18
 '''********************************************************************************
 
@@ -45,12 +45,12 @@
     ;VERY IMPORTANT!!
     ;The Nextion MUST be setup for 9600 bps.
     #define USART_BAUD_RATE 9600
-    #define USART_BLOCKING
+    #define USART_BLOCKING 0
 
     ;VERY IMPORTANT!!
     ;These two are optional, but very important. These constants are set in the library to use hardware serial by default.
-    #define GLCDSerialPrint HSerPrint
-    #define GLCDSerialSend  HSerSend
+    #define GLCDGLCD_NextionSerialPrint HSerPrint
+    #define GLCD_NextionSerialSend  HSerSend
 
 
 ' ----- Set up for Software Serial - this is optional - shown to explain the method.
@@ -65,8 +65,8 @@
 '
 '    ;VERY IMPORTANT!!
 '    ;These two constants are required to support the the library.
-'    #define GLCDSerialPrint        Ser1Print
-'    #define GLCDSerialSend         Ser1Send
+'    #define GLCD_NextionSerialPrint        Ser1Print
+'    #define GLCD_NextionSerialSend         Ser1Send
 '
 ' ----- End of set up for Serial
 
@@ -106,15 +106,16 @@
     dim myString as string * 32
 
     'Write to the page page.object
+    repeat 3
     GLCDUpdateObject_Nextion( "gauges.t0.txt",  "Awaiting Touch" )
-
+    End Repeat
 
     InitNextionAwaitTouchEvent
     wait while NOT NextionAwaitTouchEvent
 
     'Send a page change to the device
     GLCDSendOpInstruction_Nextion( "page",  "gauges" )
-
+    wait 1 s
 
     do
 
@@ -132,7 +133,7 @@
 
               'Update t0.txt object with the ADC and the Scaled value - this Nextion objects must exist
               myString = "ADC="+str(adcval)
-              myString = myString +":SCD="+str(( 360 + ScaledValue ) mod 360)
+              myString = myString +":SCD="+StrInteger( ScaledValue ) 
               GLCDUpdateObject_Nextion( "t0.txt",  myString )
 
               wait 1 ms
@@ -198,7 +199,6 @@
 
 
   Sub InitNextionAwaitTouchEvent
-
     'wait for a touch Event
     dim myDummyByteIn as byte
     dim myWordX, oldWordX  as word
@@ -219,5 +219,4 @@
 
          oldWordX = myWordX
     end Repeat
-
   End Sub
