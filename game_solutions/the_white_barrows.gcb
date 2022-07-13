@@ -62,8 +62,8 @@ This is support by 18F, LGT, Mega328p, 16F1939 etc.  Try your chip.
 
 '''@author    EvanV   
 '''@license   GPL
-'''@version   1.05  
-'''@date      2022-10-05
+'''@version   1.06  
+'''@date      2022-07-13
 '''********************************************************************************
 
 
@@ -342,11 +342,11 @@ Sub MoveChamber
                             HSerPrintStringCRLF Str_SORCERER + " has just trodden on a Magic Spot"
                             HSerPrintStringCRLF Str_SORCERER + " has been moved by Magic to another Chamber"
                             HSerSend 7
-                            // Place user in a new chamber
+                            // Place in a new chamber
                             Dim relocateToNewChamber as Byte
-                            relocateToNewChamber = GenRandom ( 42 )
-                            Do While relocateToNewChamber> 42 Or CurrentChamber = relocateToNewChamber Or RoomStatus( relocateToNewChamber ) <> 0
-                                relocateToNewChamber = GenRandom ( 42 )
+                            relocateToNewChamber = GenRandom ( 41 ) + 1
+                            Do While  relocateToNewChamber> 42 Or CurrentChamber = relocateToNewChamber Or RoomStatus( relocateToNewChamber ) <> 0
+                                relocateToNewChamber = GenRandom ( 41 ) + 1
                             Loop
                             SorcererChamber = relocateToNewChamber
                         Else
@@ -488,9 +488,9 @@ Sub MoveChamber
                     HSerSend 7
                     // Place user in a new chamber
                     Dim relocateToNewChamber as Byte
-                    relocateToNewChamber = GenRandom ( 42 )
+                    relocateToNewChamber = GenRandom ( 41 ) + 1
                     Do While relocateToNewChamber> 42 Or CurrentChamber = relocateToNewChamber Or RoomStatus( relocateToNewChamber ) <> 0 or relocateToNewChamber = SorcererChamber
-                        relocateToNewChamber = GenRandom ( 42 )
+                        relocateToNewChamber = GenRandom ( 41 ) + 1
                     Loop
                     CurrentChamber = relocateToNewChamber
 
