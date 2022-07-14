@@ -177,7 +177,7 @@ _Restart:
 
         Select case Ucase(CurrentKey)
 
-            // #ifdef DEBUGCODE
+            #ifdef DEBUGCODE
             case "X"
                 HserPrint "S:"
                 HserPrint SorcererChamber
@@ -189,7 +189,7 @@ _Restart:
                     HserPrint RoomStatus ( mloop )
                     HserPrint ", "
                 next
-            // #endif
+            #endif
             
             case "M"
                 MoveChamber
@@ -522,7 +522,7 @@ Sub MoveChamber
     End If
 End Sub
 
-
+// Check is Merlin dead
 Sub IsMerlineDead ( MerlinDead )
 
     If MerlinDead = 1 then
@@ -542,6 +542,7 @@ Sub IsMerlineDead ( MerlinDead )
     End If
 
 End Sub
+
 // View the room
 Sub ViewRooms ( in chamberlocation  )
 
@@ -738,7 +739,6 @@ Sub EntityAttacks ( attack_entity, entity_name as String, entity_baseline )
 
 End Sub
 
-
 // Handle move chamber
 Function MoveRoom ( in chamberlocation, in DesiredRoom )
 
@@ -827,7 +827,6 @@ Function BeChaliceInConnectedRooms ( in chamberlocation, optional in displayoutp
         Next
 
 End Function
-
 
 // Initialise the chambers
 Sub IntitChamberStatus
@@ -924,19 +923,23 @@ Sub ShowIntro
         HSerGetString CurrentKey
         HSerPrintCRLF
 
-        Dim connections as Byte
-        For chamberlocation = 1 to 42
-                // HSerPrint "Chamber ":HSerPrint chamberlocation: HSerPrint ": "
-                EstablishChanmberConnections ( chamberlocation )
-                // For connections = 1 to 4
-                //     HSerPrint chamberconnectionsArray( connections )
-                //     HSerPrint " "
-                // Next
-                // HSerPrintCRLF
-        Next
+        #ifdef DEBUGCODE
+            Dim connections as Byte
+            For chamberlocation = 1 to 42
+                    HSerPrint "Chamber ":HSerPrint chamberlocation: HSerPrint ": "
+                    EstablishChanmberConnections ( chamberlocation )
+                    For connections = 1 to 4
+                        HSerPrint chamberconnectionsArray( connections )
+                        HSerPrint " "
+                    Next
+                    HSerPrintCRLF
+            Next
+        #endif
 End Sub
 
 // Handle showing the map
+// There are many different approaches - you could just print, use MapDataTableCompressed or use MapDataTable
+// The solution uses MapDataTableCompressed
 Sub ShowMap
     // HSerPrintCRLF 2
     // HSerPrintStringCRLF   "                           ____________________________ 1 ____________________________"
@@ -1032,7 +1035,7 @@ Sub ShowMap
     End Table
 End Sub
 
-// Initialise the structure of the cahmbers
+// Initialise the structure of the cahmbers - populate chamberconnectionsArray() each time called 
 Sub EstablishChanmberConnections ( in chamberlocation )
 
     Dim chamberdata, connections as Byte
@@ -1053,7 +1056,7 @@ Function GenRandom ( in RandomRange as Word ) as Word
 
 End Function
 
-// Chamber Data
+// Chamber Data - the Chamber connections
 Table Chambers
         2, 3, 4, 0
         1, 5, 6, 7
@@ -1099,8 +1102,7 @@ Table Chambers
         30, 33, 36, 39
 End Table
 
-
-// Overloead sub routine to handle integer numbers
+// Overloader sub routine to handle integer numbers - this is not part of the standard libraries
 Sub HSerGetNum (Out HSerNum As Integer, optional In comport = 1)
   Dim HSerDataIn(5)
   Dim HSerNumIsNegative as Bit
