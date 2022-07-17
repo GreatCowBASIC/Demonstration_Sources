@@ -96,7 +96,12 @@
     // #chip   16F1939
     // #CONFIG MCLRE=ON
 
+    // #chip 18f27j53,8
+    // #CONFIG OSC=INTOSCPLL
+    
+        
     #chip LGT8F328P
+
 
     'USART settings for USART1
     #DEFINE USART_BAUD_RATE 115200
@@ -249,7 +254,7 @@ _Restart:
     End
 
 
-// Spent some money - parameter is spend value
+    // Spent some money - parameter is spend value
 Sub SpendSomeMoney (  in lcost  as Word )
     Dim CurrentPotofMoney As Integer
     If CurrentPotofMoney > 0 then
@@ -264,8 +269,8 @@ Sub SpendSomeMoney (  in lcost  as Word )
 End Sub
 
 // Move the user
-//   - Handle meeting the Sorcerer - move the Sorcerer away - if possible
-//   - Handle entities attacks - if the entities you may get killed... or run out of money!  Restart game
+    //   - Handle meeting the Sorcerer - move the Sorcerer away - if possible
+    //   - Handle entities attacks - if the entities you may get killed... or run out of money!  Restart game
 Sub MoveChamber
     HSerPrintCRLF
     HSerPrint "Move to which Chamber ? $> "
