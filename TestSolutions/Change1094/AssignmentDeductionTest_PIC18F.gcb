@@ -24,14 +24,14 @@
     #define PPSToolPart 18f27q43
 
     Sub InitPPS
-        #UNLOCKPPS
+        UNLOCKPPS
         
             'Module: UART pin directions
             Dir PORTC.6 Out    ' Make TX1 pin an output
            'Module: UART1
             RC6PPS = 0x0020    'TX1 > RC6
         
-        #LOCKPPS
+        LOCKPPS
     End Sub
     'Template comment at the end of the config file
 

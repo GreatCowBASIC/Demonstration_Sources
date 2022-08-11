@@ -3,6 +3,8 @@
 'have to be called within a subroutine.
 '#StartUp is only allowed in header files
 
+
+#Option UserInclude
 'LCD connection settings
 #DEFINE LCD_IO 4
 #DEFINE LCD_SPEED FAST
