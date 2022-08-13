@@ -164,22 +164,6 @@
 
 Sub GLCDInit
 
-      #define GLCD_RST GLCD_RST
-      #define GLCD_CS GLCD_CS
-      #define GLCD_RS GLCD_RS
-      #define GLCD_WR GLCD_WR
-      #define GLCD_RD GLCD_RD
-
-
-      #define GLCD_DB0 GLCD_DB0
-      #define GLCD_DB1 GLCD_DB1
-      #define GLCD_DB2 GLCD_DB2
-      #define GLCD_DB3 GLCD_DB3
-      #define GLCD_DB4 GLCD_DB4
-      #define GLCD_DB5 GLCD_DB5
-      #define GLCD_DB6 GLCD_DB6
-      #define GLCD_DB7 GLCD_DB7
-
       'Set pin directions
       Dir GLCD_RD  Out
       Dir GLCD_WR  Out

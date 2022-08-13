@@ -36,7 +36,7 @@
 
 ; ----- Variables
   dim Buffern as Byte
-  dim Ext as BIT
+  dim ExtBit as BIT
   dim RTR as BIT
   dim DLC as Byte
   dim ID as Long
@@ -50,7 +50,7 @@
   Buffern    = 0     'we will use the RX0 Bufer, we have 2
   ExpectedID = 0x400 'Our expected Frame ID will be  1024 (you can enter it in decimal or hex)
   'ID                  What ID we receive?
-  'Ext                 do we receive an extended ID?
+  'ExtBit                 do we receive an extended ID?
   'RTR                 do we receive a Remote Request Frame?
   'DLC                 how many bytes of data we receive?
   'Rx0Full             did the mail arrive?
@@ -66,7 +66,7 @@
 
     if Rx0Full = 1 then
       'lets read the frame!
-      CanBus_ReadMessage Buffern, Ext, ID, RTR, DLC
+      CanBus_ReadMessage Buffern, ExtBit, ID, RTR, DLC
 
       'WARNING: in this example we are filtering the data whit the microcontroler and wasting resources, the library have the capability to do mask and message filtering on the CAN controller
       '         and get interrupts whitout any sacrificies; But this is a simple Hello world program.

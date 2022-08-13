@@ -13,8 +13,8 @@
 #option Explicit
 
 
-    #define TINYWIRE_CONTROL portc.3
-    dir     TINYWIRE_CONTROL out
+    #define TINYWIRE_PORT   portc.3
+    dir     TINYWIRE_PORT   out
 
     do
 
@@ -23,8 +23,8 @@
         TinyWireTX ( TINYWIRE_PULSE1, 0x55 )
         TinyWireTX ( TINYWIRE_SLEW2,  0x55 )
         TinyWireTX ( TINYWIRE_PULSE2, 0x00 )
-        TinyWireTX ( TINYWIRE_CONTROL,0x02 )
-        TINYWIRE_CONTROL = ON
+        TinyWireTX ( TINYWIRE_CONTROL  ,0x02 )
+        TINYWIRE_PORT   = ON
 
         wait 10 s
 
@@ -33,8 +33,8 @@
         TinyWireTX ( TINYWIRE_PULSE1, 0x55 )
         TinyWireTX ( TINYWIRE_SLEW2,  0x00 )
         TinyWireTX ( TINYWIRE_PULSE2, 0x00 )
-        TinyWireTX ( TINYWIRE_CONTROL,0x02 )
-        TINYWIRE_CONTROL = ON
+        TinyWireTX ( TINYWIRE_CONTROL  ,0x02 )
+        TINYWIRE_PORT   = ON
 
 
         'Set-up the LED controller per the datasheet, table 11.
@@ -42,8 +42,8 @@
         TinyWireTX ( TINYWIRE_PULSE1, 0xA9 )
         TinyWireTX ( TINYWIRE_SLEW2,  0x11 )
         TinyWireTX ( TINYWIRE_PULSE2, 0x25 )
-        TinyWireTX ( TINYWIRE_CONTROL,0x02 )
-        TINYWIRE_CONTROL = ON
+        TinyWireTX ( TINYWIRE_PORT  ,0x02 )
+        TINYWIRE_PORT   = ON
 
         wait 10 s
 
@@ -64,7 +64,7 @@
     #define TINYWIRE_PULSE1      1
     #define TINYWIRE_SLEW2       2
     #define TINYWIRE_PULSE2      3
-    #define TINYWIRE_CONTROL     4
+    #define TINYWIRE_CONTROL       4
 
     #define TINYWIRE_CONTROL_FOLLOW     1
     #define TINYWIRE_CONTROL_PLAY       2
@@ -86,9 +86,9 @@ Sub TinyWireTX ( in TinyWireTX_address as byte, in TinyWireTX_data as byte )
     TinyWireTX_SendBit TinyWireTX_data.6
     TinyWireTX_SendBit TinyWireTX_data.7
 
-    TINYWIRE_CONTROL = 1
+    TINYWIRE_PORT   = 1
     wait TINYWIRETX_LOGIC1_ON
-    TINYWIRE_CONTROL = 0
+    TINYWIRE_PORT   = 0
     wait TINYWIRETX_TRESET
 
 
@@ -98,14 +98,14 @@ End Sub
 Sub TinyWireTX_SendBit ( in TinyWireTX_bit as bit )
 
   if TinyWireTX_bit = 0 then
-      TINYWIRE_CONTROL = 1
+      TINYWIRE_PORT   = 1
       wait TINYWIRETX_LOGIC0_ON
-      TINYWIRE_CONTROL = 0
+      TINYWIRE_PORT   = 0
       wait TINYWIRETX_LOGIC0_OFF
   else
-      TINYWIRE_CONTROL = 1
+      TINYWIRE_PORT   = 1
       wait TINYWIRETX_LOGIC1_ON
-      TINYWIRE_CONTROL = 0
+      TINYWIRE_PORT   = 0
       wait TINYWIRETX_LOGIC1_OFF
   end if
 

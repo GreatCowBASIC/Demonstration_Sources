@@ -65,7 +65,7 @@ Circle 64, 32, 30
     FilledBox 10, 20, 117, 43
     GLCDPrint 10,24,  "Real PIC Simulator"
     GLCDPrint 20,32,  "on Graphic LCD"
-    GLCDPrint 100,56,  "v1.2c"
+    GLCDPrint 100,56,  "v1.2d"
 #ENDIF
 
 
@@ -73,5 +73,5 @@ Circle 64, 32, 30
     FilledBox 27, 20, 98 , 43
     GLCDPrint 27,24,  "Real PIC Simulator"
     GLCDPrint 34,32,  "on Graphic LCD"
-    GLCDPrint 100,56,  "v1.2c"
+    GLCDPrint 100,56,  "v1.2e"
 #ENDIF

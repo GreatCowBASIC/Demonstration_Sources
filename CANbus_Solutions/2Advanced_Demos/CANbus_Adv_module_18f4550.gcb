@@ -47,7 +47,7 @@
 
 ; ----- Variables.
   dim id as Long
-  dim ext as BIT
+  dim ExtBit as BIT
   dim rtr as BIT
   dim dl as Byte
   dim rx0 as bit
@@ -144,7 +144,7 @@
 sub CANinterrupt
   if CanBus_INT = 0 Then
     if ReadingAn = 0 Then
-      CanBus_ReadMessage 0, ext, id, rtr, dl, filhit
+      CanBus_ReadMessage 0, ExtBit, id, rtr, dl, filhit
       CanCommands
       INT2IF = 0
       if CanBus_INT = 0 Then

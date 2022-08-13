@@ -34,12 +34,12 @@
 
     ' Pin mappings for SPI for Nokia 3310 Device
     'For this port we need to rename GLCD_ to PCD8544_ so we can reuse all the functions and methods
-    #define PCD8544_DO portb.5
-    #define PCD8544_SCK portb.4
-    #define PCD8544_DC portb.6
-    #define PCD8544_CS1 portb.3
-    #define PCD8544_CS2 portb.2
-    #define PCD8544_RST portb.7
+    #define GLCD_DO portb.5
+    #define GLCD_SCK portb.4
+    #define GLCD_DC portb.6
+    #define GLCD_CS1 portb.3
+    #define GLCD_CS2 portb.2
+    #define GLCD_RST portb.7
 
     'Set other connected ports low
     dir portb.0 out
@@ -200,48 +200,48 @@ Sub Local_InitGLCD_PCD8544
 
     'Pin directions
     'ERV adapted ports
-    Dir PCD8544_CS1 Out
-    Dir PCD8544_CS2 Out
-    Dir PCD8544_DC Out
-    Dir PCD8544_RST Out
+    Dir GLCD_CS1 Out
+    Dir GLCD_CS2 Out
+    Dir GLCD_DC Out
+    Dir GLCD_RST Out
 
-    Dir PCD8544_DO Out
-    Dir PCD8544_SCK Out
+    Dir GLCD_DO Out
+    Dir GLCD_SCK Out
 
 
 
     'Reset ports
     'ERV adapted ports
-    PCD8544_CS1 = OFF
-    PCD8544_CS2 = OFF
-    Set PCD8544_DC off
-    Set PCD8544_RST off
-    Set PCD8544_DO off
-    Set PCD8544_SCK off
+    GLCD_CS1 = OFF
+    GLCD_CS2 = OFF
+    Set GLCD_DC off
+    Set GLCD_RST off
+    Set GLCD_DO off
+    Set GLCD_SCK off
 
     'Chip Select - will do both at once
-    PCD8544_CS1 = OFF
-    PCD8544_CS2 = OFF
+    GLCD_CS1 = OFF
+    GLCD_CS2 = OFF
     Wait 10 ms
     'Reset display
-    Set PCD8544_RST On
+    Set GLCD_RST On
     Wait 10 ms
     'Reset sequence (lower line for at least 10 us)
-    Set PCD8544_RST Off
+    Set GLCD_RST Off
     Wait 25 us
-    Set PCD8544_RST On
+    Set GLCD_RST On
     Wait 10 ms
-    PCD8544_CS1 = ON
-    PCD8544_CS2 = ON
+    GLCD_CS1 = ON
+    GLCD_CS2 = ON
     wait 10 us
-    PCD8544_CS1 = OFF
-    PCD8544_CS2 = OFF
+    GLCD_CS1 = OFF
+    GLCD_CS2 = OFF
     wait 10 ms
 
 ' /*********SEE DATASHEET FOR ALL THIS********/
 
-    PCD8544_CS1 = OFF
-    PCD8544_CS2 = ON
+    GLCD_CS1 = OFF
+    GLCD_CS2 = ON
     Write_Command_PCD8544(0x21);     Activate Chip and H=1.
     Write_Command_PCD8544(0x21);     Activate Chip and H=1.
     Write_Command_PCD8544(0xC2);     Set LCD Voltage to about 7V.
@@ -253,8 +253,8 @@ Sub Local_InitGLCD_PCD8544
     Write_Command_PCD8544(0x0C);     Display Normal.
     GOTO_Pixel_PCD8544(0,0);         Cursor Home.
 
-    PCD8544_CS1 = ON
-    PCD8544_CS2 = OFF
+    GLCD_CS1 = ON
+    GLCD_CS2 = OFF
     Write_Command_PCD8544(0x21);     Activate Chip and H=1.
     Write_Command_PCD8544(0x21);     Activate Chip and H=1.
     Write_Command_PCD8544(0xC2);     Set LCD Voltage to about 7V.
@@ -273,8 +273,8 @@ Sub Local_InitGLCD_PCD8544
     GLCDfntDefault = 0
     GLCDfntDefaultsize = 1
 
-    PCD8544_CS1 = OFF
-    PCD8544_CS2 = OFF
+    GLCD_CS1 = OFF
+    GLCD_CS2 = OFF
 
 
 End Sub
@@ -358,7 +358,7 @@ End Sub
 
 sub Local_Write_Command_PCD8544(in  PCD8544SendByte  )
 
-      SET PCD8544_DC OFF;   'Data/Command is set to zero to give Command of PCD8544 Controller
+      SET GLCD_DC OFF;   'Data/Command is set to zero to give Command of PCD8544 Controller
       SPI_Send_Data_PCD8544(PCD8544SendByte);
       WAIT PCD8544WriteDelay us
 end sub
@@ -366,7 +366,7 @@ end sub
 
 sub Local_Write_Data_PCD8544(in PCD8544SendByte )
 
-      SET PCD8544_DC ON;        'Data/Command is set to One to give Data of PCD8544 Controller
+      SET GLCD_DC ON;        'Data/Command is set to One to give Data of PCD8544 Controller
       SPI_Send_Data_PCD8544(PCD8544SendByte)
 
       WAIT PCD8544WriteDelay us
@@ -374,20 +374,20 @@ end sub
 
 
 sub SelectDisplay1
-    PCD8544_CS1 = 0
-    PCD8544_CS2 = 1
+    GLCD_CS1 = 0
+    GLCD_CS2 = 1
     display = 1
 
 End sub
 
 sub SelectDisplay2
-    PCD8544_CS1 = 1
-    PCD8544_CS2 = 0
+    GLCD_CS1 = 1
+    GLCD_CS2 = 0
     display = 2
 End sub
 
 sub SelectDisplays
-    PCD8544_CS1 = 0
-    PCD8544_CS2 = 0
+    GLCD_CS1 = 0
+    GLCD_CS2 = 0
     display = 3
 End sub

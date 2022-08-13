@@ -3,7 +3,7 @@
   #chip tiny85, 8
 
   #OPTION EXPLICIT
-  #RANDOMIZE_SEED Timer0
+  #DEFINE RANDOMIZE_SEED Timer0
   #DEFINE AVRTC0 'Timer0 Compare Match B Output is used
   #DEFINE AVRCHAN2 'declare Timer0 chan. 2 to be used
   #DEFINE LED1 PortB.1 'the hardware pin used

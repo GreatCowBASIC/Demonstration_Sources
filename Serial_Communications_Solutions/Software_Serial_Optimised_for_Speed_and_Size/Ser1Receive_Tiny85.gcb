@@ -38,7 +38,6 @@ Dim RecByte As Byte
  Ser1Send 10   'new line in Terminal
  Ser1Send 13
  Ser1Print "Please send a byte!"  'send a text
- Ser1Print SRX1_HALFDELAY
 
  Do Forever
 

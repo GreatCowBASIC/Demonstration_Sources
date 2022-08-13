@@ -72,11 +72,10 @@ Dir porta.3 Out
 
 Dim BRIGHT As Byte
 
-'    Do Forever
-'          for bright = 0 to 255
-'              wait 10 ms
-HPWM ( 6, 1000, 127 , 2  )
-'        next
-'        wait 10 ms
-Do Forever
-Loop
+    Do Forever
+        for bright = 0 to 255
+            wait 10 ms
+            HPWM ( 6, 1000, bright , 2  )
+        next
+        wait 10 ms
+    Loop

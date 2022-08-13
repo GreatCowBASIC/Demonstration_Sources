@@ -108,7 +108,7 @@ Dir HI2C_CLOCK In
 #DEFINE CURSOR_BACK             0X4C
 #DEFINE CURSOR_FORWARD          0X4D
 #DEFINE DISPLAY_ON              0X46    'DEFAULT IS ON
-#DEFINE DISPLAY_OFF             0X42
+#DEFINE DISPLAY_OFF_            0X42
 #DEFINE SET_LARGE_FONT          0X30    'DEFAULT IS LARGE FONT
 #DEFINE SET_SMALL_FONT          0X31
 #DEFINE ENABLE_NEW_LINE_CLEAR   0X32    'DEFAULT IS ENABLED
@@ -296,7 +296,7 @@ Do Forever
                 'This is not needed as these are variable width fonts
                 GLCDFontWidth = 5
 
-            Case DISPLAY_OFF
+            Case DISPLAY_OFF_
                 For GLCD_I2C_Device_Address  = 0x78 To 0x7A Step 2
                     Write_Command_TwinSSD1306(SSD1306_DISPLAYOFF)
                 Next

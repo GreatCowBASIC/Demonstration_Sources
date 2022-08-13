@@ -14,7 +14,7 @@
 
 
 ; ----- Konfiguration/Configuration
-; verfügbare CPU Taktfrequenz/Available cpu clock speed: 48*, 20, 8, 4, 2, 1, 0.5, 0.25, 0.125   *para 48mhz habilitar flags
+; verfï¿½gbare CPU Taktfrequenz/Available cpu clock speed: 48*, 20, 8, 4, 2, 1, 0.5, 0.25, 0.125   *para 48mhz habilitar flags
   #chip 18F4550, 48
 
   ;Konfigurationsflag 48 MHZ
@@ -68,10 +68,10 @@
   #define HI2C_BAUD_RATE 600
   #define HI2C_DATA PORTB.0
   #define HI2C_CLOCK PORTB.1
-  'Für das SSP-Modul müssen Pins eingegeben werden/pins need to be input for SSP module
+  'Fï¿½r das SSP-Modul mï¿½ssen Pins eingegeben werden/pins need to be input for SSP module
   Dir HI2C_DATA in
   Dir HI2C_CLOCK in
-  'Gerätemodus/Device mode
+  'Gerï¿½temodus/Device mode
   HI2CMode Master
 
   '''Kombi High
@@ -126,7 +126,7 @@
   dim Flags as Byte
   dim DLC as Byte
   dim newmsg as BIT
-  dim ext as BIT
+  dim ExtBit as BIT
   dim rtr as BIT
   dim USBConnected as bit
   dim dl as Byte
@@ -184,7 +184,7 @@
 //Self Logger Program
 SelfLoger:
   'clear buffer
-  CanBus_ReadMessage 0, ext, id, rtr, dl
+  CanBus_ReadMessage 0, ExtBit, id, rtr, dl
   GLCDfntDefaultSize = 1
 
   GLCDCLS
@@ -203,7 +203,7 @@ SelfLoger:
     if CanBus_INT = 0 Then
       //dir ldbtn out
 
-      CanBus_ReadMessage 0, ext, id, rtr, dl
+      CanBus_ReadMessage 0, ExtBit, id, rtr, dl
 
       IDBytes(1).0 =ID.0
       IDBytes(1).1 =ID.1
@@ -264,14 +264,14 @@ SelfLoger:
 
       //ldbtn = 0
       LineLoc += 1
-      if ext = 1 then
+      if ExtBit = 1 then
         extchar = "'"
       else
         extchar = " "
       end if
 
       if rtr = 0 then
-        if ext = 0 then
+        if ExtBit = 0 then
           FrameLine = IDstring4 + IDstring3 + IDstring2 + IDstring1 + extchar + " " + DLstring + " |" + D1 +  "|" + D2 + "|" + D3 + "|" + D4 + "|" + D5 + "|" + D6 + "|" + D7 + "|" + D8 + "|"
         else
           FrameLine = IDstring4 + IDstring3 + IDstring2 + IDstring1 + extchar + DLstring + "|" + D1 +  "" + D2 + "" + D3 + "" + D4 + "" + D5 + "" + D6 + "" + D7 + "" + D8
@@ -282,43 +282,43 @@ SelfLoger:
 
       select case LineLoc
         case 1
-          if ext = 1 then
+          if ExtBit = 1 then
             GLCDPrint 0, 8,  Right(FrameLine, Len(FrameLine) )
           else
             GLCDPrint 0, 8,  Right(FrameLine, Len(FrameLine)-5 )
           end if
         case 2
-          if ext = 1 then
+          if ExtBit = 1 then
             GLCDPrint 0, 16, Right(FrameLine, Len(FrameLine))
           else
             GLCDPrint 0, 16, Right(FrameLine, Len(FrameLine)-5)
           end if
         case 3
-          if ext = 1 then
+          if ExtBit = 1 then
             GLCDPrint 0, 24, Right(FrameLine, Len(FrameLine))
           else
             GLCDPrint 0, 24, Right(FrameLine, Len(FrameLine) - 5)
           end if
         case 4
-          if ext = 1 then
+          if ExtBit = 1 then
             GLCDPrint 0, 32, Right(FrameLine, Len(FrameLine) )
           else
             GLCDPrint 0, 32, Right(FrameLine, Len(FrameLine) - 5)
           end if
         case 5
-          if ext = 1 then
+          if ExtBit = 1 then
             GLCDPrint 0, 40, Right(FrameLine, Len(FrameLine) )
           else
             GLCDPrint 0, 40, Right(FrameLine, Len(FrameLine) - 5)
           end if
         case 6
-          if ext = 1 then
+          if ExtBit = 1 then
             GLCDPrint 0, 48, Right(FrameLine, Len(FrameLine) )
           else
             GLCDPrint 0, 48, Right(FrameLine, Len(FrameLine) - 5)
           end if
         case 7
-          if ext = 1 then
+          if ExtBit = 1 then
             GLCDPrint 0, 56,  Right(FrameLine, Len(FrameLine) )
           else
             GLCDPrint 0, 56,  Right(FrameLine, Len(FrameLine) - 5)

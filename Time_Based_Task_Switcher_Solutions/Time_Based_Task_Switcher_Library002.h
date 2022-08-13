@@ -89,7 +89,7 @@
 '
 '      do
 '          Do_Task2
-'          if PORTB.0 on then Do_LTask1
+'          if PORTB.0= 1 Then Do_LTask1
 '      loop
 '
 '
@@ -226,7 +226,7 @@ Sub Init_Multitask
         #ifdef Task1_ms
             time_Task1 = Task1_ms*1000/base_time
         #endif
-        #define flag_Task1 mtsk_flags.0
+        #define flag_Task1 = mtsk_flags.0
     #endif
 
     #ifdef LTask1
@@ -907,8 +907,8 @@ End Sub
 
 #ifdef Task1
     Sub Do_Task1
-        if flag_Task1 on then
-            set flag_Task1 off
+        if flag_Task1= 1 Then
+            flag_Task1 = 0
             call Task1
         End if
     End Sub
@@ -916,8 +916,8 @@ End Sub
 
 #ifdef Task2
     Sub Do_Task2
-        if flag_Task2 on then
-            set flag_Task2 off
+        if flag_Task2= 1 Then
+            flag_Task2 = 0
             call Task2
         End if
     End Sub
@@ -925,8 +925,8 @@ End Sub
 
 #ifdef Task3
     Sub Do_Task3
-        if flag_Task3 on then
-            set flag_Task3 off
+        if flag_Task3= 1 Then
+            flag_Task3 = 0
             call Task3
         End if
     End Sub
@@ -934,8 +934,8 @@ End Sub
 
 #ifdef Task4
     Sub Do_Task4
-        if flag_Task4 on then
-            set flag_Task4 off
+        if flag_Task4= 1 Then
+            flag_Task4 = 0
             call Task4
         End if
     End Sub
@@ -943,8 +943,8 @@ End Sub
 
 #ifdef Task5
     Sub Do_Task5
-        if flag_Task5 on then
-            set flag_Task5 off
+        if flag_Task5= 1 Then
+            flag_Task5 = 0
             call Task5
         End if
     End Sub
@@ -952,8 +952,8 @@ End Sub
 
 #ifdef Task6
     Sub Do_Task6
-        if flag_Task6 on then
-            set flag_Task6 off
+        if flag_Task6= 1 Then
+            flag_Task6 = 0
             call Task6
         End if
     End Sub
@@ -961,8 +961,8 @@ End Sub
 
 #ifdef Task7
     Sub Do_Task7
-        if flag_Task7 on then
-            set flag_Task7 off
+        if flag_Task7= 1 Then
+            flag_Task7 = 0
             call Task7
         End if
     End Sub
@@ -970,8 +970,8 @@ End Sub
 
 #ifdef Task8
     Sub Do_Task8
-        if flag_Task8 on then
-            set flag_Task8 off
+        if flag_Task8= 1 Then
+            flag_Task8 = 0
             call Task8
         End if
     End Sub
@@ -979,8 +979,8 @@ End Sub
 
 #ifdef Task9
     Sub Do_Task9
-        if flag_Task9 on then
-            set flag_Task9 off
+        if flag_Task9= 1 Then
+            flag_Task9 = 0
             call Task9
         End if
     End Sub
@@ -988,8 +988,8 @@ End Sub
 
 #ifdef Task10
     Sub Do_Task10
-        if flag_Task10 on then
-            set flag_Task10 off
+        if flag_Task10= 1 Then
+            flag_Task10 = 0
             call Task10
         End if
     End Sub
@@ -997,8 +997,8 @@ End Sub
 
 #ifdef Task11
     Sub Do_Task11
-        if flag_Task11 on then
-            set flag_Task11 off
+        if flag_Task11= 1 Then
+            flag_Task11 = 0
             call Task11
         End if
     End Sub
@@ -1006,8 +1006,8 @@ End Sub
 
 #ifdef Task12
     Sub Do_Task12
-        if flag_Task12 on then
-            set flag_Task12 off
+        if flag_Task12= 1 Then
+            flag_Task12 = 0
             call Task12
         End if
     End Sub
@@ -1015,8 +1015,8 @@ End Sub
 
 #ifdef Task13
     Sub Do_Task13
-        if flag_Task13 on then
-            set flag_Task13 off
+        if flag_Task13= 1 Then
+            flag_Task13 = 0
             call Task13
         End if
     End Sub
@@ -1024,8 +1024,8 @@ End Sub
 
 #ifdef Task14
     Sub Do_Task14
-        if flag_Task14 on then
-            set flag_Task14 off
+        if flag_Task14= 1 Then
+            flag_Task14 = 0
             call Task14
         End if
     End Sub
@@ -1033,8 +1033,8 @@ End Sub
 
 #ifdef Task15
     Sub Do_Task15
-        if flag_Task15 on then
-            set flag_Task15 off
+        if flag_Task15= 1 Then
+            flag_Task15 = 0
             call Task15
         End if
     End Sub
@@ -1042,8 +1042,8 @@ End Sub
 
 #ifdef Task16
     Sub Do_Task16
-        if flag_Task16 on then
-            set flag_Task16 off
+        if flag_Task16= 1 Then
+            flag_Task16 = 0
             call Task16
         End if
     End Sub
@@ -1053,8 +1053,8 @@ End Sub
 
 #ifdef LTask1
     Sub Do_LTask1
-        if flag_LTask1 on then
-            set flag_LTask1 off
+        if flag_LTask1= 1 Then
+            set flag_LTask1 = 0
             call LTask1
         End if
     End Sub
@@ -1063,8 +1063,8 @@ End Sub
 
 #ifdef LTask2
     Sub Do_LTask2
-        if flag_LTask2 on then
-            set flag_LTask2 off
+        if flag_LTask2= 1 Then
+            set flag_LTask2 = 0
             call LTask2
         End if
     End Sub
@@ -1072,8 +1072,8 @@ End Sub
 
 #ifdef LTask3
     Sub Do_LTask3
-        if flag_LTask3 on then
-            set flag_LTask3 off
+        if flag_LTask3= 1 Then
+            set flag_LTask3 = 0
             call LTask3
         End if
     End Sub
@@ -1081,8 +1081,8 @@ End Sub
 
 #ifdef LTask4
     Sub Do_LTask4
-        if flag_LTask4 on then
-            set flag_LTask4 off
+        if flag_LTask4= 1 Then
+            set flag_LTask4 = 0
             call LTask4
         End if
     End Sub
@@ -1090,8 +1090,8 @@ End Sub
 
 #ifdef LTask5
     Sub Do_LTask5
-        if flag_LTask5 on then
-            set flag_LTask5 off
+        if flag_LTask5= 1 Then
+            set flag_LTask5 = 0
             call LTask5
         End if
     End Sub
@@ -1099,8 +1099,8 @@ End Sub
 
 #ifdef LTask6
     Sub Do_LTask6
-        if flag_LTask6 on then
-            set flag_LTask6 off
+        if flag_LTask6= 1 Then
+            set flag_LTask6 = 0
             call LTask6
         End if
     End Sub
@@ -1108,8 +1108,8 @@ End Sub
 
 #ifdef LTask7
     Sub Do_LTask7
-        if flag_LTask7 on then
-            set flag_LTask7 off
+        if flag_LTask7= 1 Then
+            set flag_LTask7 = 0
             call LTask7
         End if
     End Sub
@@ -1117,8 +1117,8 @@ End Sub
 
 #ifdef LTask8
     Sub Do_LTask8
-        if flag_LTask8 on then
-            set flag_LTask8 off
+        if flag_LTask8= 1 Then
+            set flag_LTask8 = 0
             call LTask8
         End if
     End Sub

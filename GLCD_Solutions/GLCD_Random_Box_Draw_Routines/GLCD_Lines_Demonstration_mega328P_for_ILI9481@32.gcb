@@ -25,22 +25,23 @@
     #define GLCD_TYPE GLCD_TYPE_ILI9481
 
     'Pin mappings for SPI - this GLCD driver supports Hardware SPI and Software SPI
-    #define GLCD_RD       ANALOG_0          ' read command line
-    #define GLCD_WR       ANALOG_1          ' write command line
-    #define GLCD_RS       ANALOG_2          ' Command/Data line
-    #define GLCD_CS       ANALOG_3          ' Chip select line
-    #define GLCD_RST      ANALOG_4          ' Reset line
+
+    #define ILI9481_GLCD_RD       ANALOG_0          ' read command line
+    #define ILI9481_GLCD_WR       ANALOG_1          ' write command line
+    #define ILI9481_GLCD_RS       ANALOG_2          ' Command/Data line
+    #define ILI9481_GLCD_CS       ANALOG_3          ' Chip select line
+    #define ILI9481_GLCD_RST      ANALOG_4          ' Reset line
 
 
 
-    #define GLCD_DB0       DIGITAL_8
-    #define GLCD_DB1       DIGITAL_9
-    #define GLCD_DB2       DIGITAL_2
-    #define GLCD_DB3       DIGITAL_3
-    #define GLCD_DB4       DIGITAL_4
-    #define GLCD_DB5       DIGITAL_5
-    #define GLCD_DB6       DIGITAL_6
-    #define GLCD_DB7       DIGITAL_7
+    #define ILI9481_GLCD_DB0       DIGITAL_8
+    #define ILI9481_GLCD_DB1       DIGITAL_9
+    #define ILI9481_GLCD_DB2       DIGITAL_2
+    #define ILI9481_GLCD_DB3       DIGITAL_3
+    #define ILI9481_GLCD_DB4       DIGITAL_4
+    #define ILI9481_GLCD_DB5       DIGITAL_5
+    #define ILI9481_GLCD_DB6       DIGITAL_6
+    #define ILI9481_GLCD_DB7       DIGITAL_7
 
 
 

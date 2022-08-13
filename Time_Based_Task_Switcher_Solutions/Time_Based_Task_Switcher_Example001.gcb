@@ -22,7 +22,6 @@
 
 
 
-
     '---------------- TASK's DEFINITIONS -------------------
     '------------------------------------------------
     #include "time_based_task_switcher_library001.h"
