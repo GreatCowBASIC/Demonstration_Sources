@@ -57,8 +57,7 @@ End Sub
 #DEFINE USART_TX_BLOCKING
 
 #DEFINE USE_HPWM6 TRUE
-#DEFINE USE_HPWM7 TRUE
-
+#DEFINE USE_HPWM7 FALSE
 '' -------------------LATC-----------------
 '' Bit#:  -7---6---5---4---3---2---1---0---
 '' LED:   ---------------|DS4|DS3|DS2|DS1|-
@@ -70,12 +69,12 @@ Dir porta.1 Out
 Dir porta.2 Out
 Dir porta.3 Out
 
-Dim BRIGHT As Byte
+Dim bright As Byte
 
     Do Forever
-        for bright = 0 to 255
-            wait 10 ms
-            HPWM ( 6, 1000, bright , 2  )
+          for bright = 0 to 255
+              wait 10 ms
+              HPWM ( 6, 1000, bright , 2  )
         next
         wait 10 ms
     Loop
