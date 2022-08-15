@@ -100,7 +100,7 @@
     // #CONFIG OSC=INTOSCPLL
     
         
-    #chip LGT8F328P
+    #chip Mega328p, 16
 
 
     'USART settings for USART1
@@ -110,8 +110,8 @@
     #DEFINE USART_DELAY OFF
 
     // #DEFINE DEBUGCODE        'add 'X' option and some movement debug
-    // #DEFINE REDUCEDVERBAGE   'reduce the strings to less than 2048 bytes of data
-
+    #DEFINE REDUCEDVERBAGE   'reduce the strings to less than 2048 bytes of data
+    #DEFINE EMPTY_CHAMBER           0
     #DEFINE EMPTY_CHAMBER           0
     #DEFINE NOT_VALID_CHAMBER       0
     #DEFINE RED_DRAGON              1
@@ -391,36 +391,52 @@ Sub MoveChamber
                     HSerPrintStringCRLF Str_SORCERER + " is trapped - you get to take the Chalice from " + Str_SORCERER + "!!"
                     HserPrintCRLF
                     
-                    #IFNDEF REDUCEDVERBAGE
-
                         If SorcererTrappedTracker(1) <> 0 Then 
-                            HserPrint " Chamber "+ str(SorcererTrappedTracker(1))+ ", is not empty and the Sorcerer cannot enter"
+                            #IFNDEF REDUCEDVERBAGE
+                                HserPrint " Chamber "+ str(SorcererTrappedTracker(1))+ ", is not empty and the Sorcerer cannot enter"
+                            #ELSE
+                                HserPrint " Chamber "+ str(SorcererTrappedTracker(1))+ ", Sorcerer cannot enter"
+                            #ENDIF
                             HserPrintCRLF
                         End If
-                        If SorcererTrappedTracker(2) <> 0 Then 
-                            HserPrint " You just came from Chamber "+ str(SorcererTrappedTracker(2))+ ", and, you are in the doorway stopping the Sorcerer from leaving"
+                        If SorcererTrappedTracker(2) <> 0 Then
+                            #IFNDEF REDUCEDVERBAGE
+                                HserPrint " You just came from Chamber "+ str(SorcererTrappedTracker(2))+ ", and, you are in the doorway stopping the Sorcerer from leaving"
+                            #ELSE 
+                                HserPrint " You just came from Chamber"+ str(SorcererTrappedTracker(2))+ ", Sorcerer cannot pass"
+                            #ENDIF
                             HserPrintCRLF
                         End If
                         'Show all Gnomes
                         If SorcererTrappedTracker(3) <> 0 Then
                             For examineChamber = 1 to 3
                                 if FoundFriendlyGnome ( examineChamber ) <> 0 then
-                                    HserPrint " There is a Friendly Gnome in the Chamber " + str(FoundFriendlyGnome ( examineChamber )) + ", the Sorcerer cannot go into that Chamber"
+                                    #IFNDEF REDUCEDVERBAGE
+                                        HserPrint " There is a Friendly Gnome in the Chamber " + str(FoundFriendlyGnome ( examineChamber )) + ", the Sorcerer cannot go into that Chamber"
+                                    #ELSE 
+                                        HserPrint " a Friendly Gnome in Chamber " + str(FoundFriendlyGnome ( examineChamber )) + ", stops the Sorcerer"
+                                    #ENDIF 
                                     HserPrintCRLF
                                 End if
                             Next
                         End If
-                        If SorcererTrappedTracker(4) <> 0 Then 
-                            HserPrint " Sorcerer cannot go into Chamber " + str(SorcererTrappedTracker(4)) + " as there is a Magic Wall... the Sorcerer cannot enter that Chamber"
+                        If SorcererTrappedTracker(4) <> 0 Then
+                            #IFNDEF REDUCEDVERBAGE
+                                HserPrint " Sorcerer cannot go into Chamber " + str(SorcererTrappedTracker(4)) + " as there is a Magic Wall... the Sorcerer cannot enter that Chamber"
+                            #ELSE 
+                                HserPrint " Sorcerer cannot go into Chamber " + str(SorcererTrappedTracker(4)) + " a Magic Wall exists"
+                            #ENDIF
                             HserPrintCRLF
                         End If
                         If SorcererTrappedTracker(5) <> 0 Then
-                            HserPrint " Sorcerer cannot go back to Chamber " + str(SorcererTrappedTracker(5)) + ".. he just where he came from there"
+                            #IFNDEF REDUCEDVERBAGE
+                                HserPrint " Sorcerer cannot go back to Chamber " + str(SorcererTrappedTracker(5)) + ", he just came from there"
+                            #ELSE 
+                                HserPrint " Sorcerer came from Chamber " + str(SorcererTrappedTracker(5)) + ", cannot go back"
+                            #ENDIF
                             HserPrintCRLF
                         End If 
                     
-                    #ENDIF
-
                     HserPrintCRLF
                     repeat 4
                         HSerSend 7
@@ -721,7 +737,7 @@ Sub EntityAttacks ( attack_entity, entity_name as String, entity_baseline )
         End If
     End If
     IF OptionKey = 3 Then
-        ' S*4+RND(2*S)-S
+
         cost = ( entity_baseline * 4 )  +  GenRandom ( 2 * entity_baseline ) - entity_baseline
         If OptionPrice > cost Then
                 HSerPrintStringCRLF " is destroyed"
@@ -992,7 +1008,7 @@ Sub ShowMap
     13,1,10,1,13,1,10,1,32,23,95,28,32,1,49,1,32,1,95,28,13,1,10,1,32,22,124,1,32,29,124,1,32,29,124,1,13,1,10,1,32,22,124,1,32,29,124,1,32,29,124,1,13,1,10,1,32,17,45,5,50,1,45,5,32,19,45,5,51,1,45,6,32,18,45,5,52,1,45,5,13,1,10,1,32,15,47,1,32,6,124,1,32,6,92,1,32,15,47,1,32,6,124,1,32,7,92,1,32,14,47,1,32,6,124,1,32,5,92,1,13,1,10,1,32,14,47,1,32,7,124,1,32,7,92,1,32,13,47,1,32,7,124,1,32,8,92,1,32,12,47,1,32,7,124,1,32,7,92,1,13,1,10,1,32,13,47,1,32,8,124,1,32,8,92,1,32,11,47,1,32,8,124,1,32,9,92,1,32,10,47,1,32,8,124,1,32,8,92,1,13,1,10,1,32,12,53,1,32,9,54,1,32,9,55,1,32,9,56,1,32,9,57,1,32,9,49,1,48,1,32,8,49,2,32,8,49,1,50,1,32,8,49,1,51,1,13,1,10,1,32,10,47,1,32,1,124,1,32,1,92,1,32,5,47,1,32,1,124,1,32,1,92,1,32,5,47,1,32,1,124,1,32,1,92,1,32,5,47,1,32,1,124,1,32,1,92,1,32,5,47,1,32,1,124,1,32,1,92,1,32,5,47,1,32,1,124,1,32,1,92,1,32,5,47,1,32,1,124,1,32,1,92,1,32,5,47,1,32,1,124,1,32,1,92,1,32,5,47,1,32,1,124,1,32,1,92,1,13,1,10,1,32,9,47,1,32,2,124,1,32,2,92,1,32,3,47,1,32,2,124,1,32,2,92,1,32,3,47,1,32,2,124,1,32,2,92,1,32,3,47,1,32,2,124,1,32,2,92,1,32,3,47,1,32,2,124,1,32,2,92,1,32,3,47,1,32,2,124,1,32,2,92,1,32,3,47,1,32,2,124,1,32,2,92,1,32,3,47,1,32,2,124,1,32,2,92,1,32,3,47,1,32,2,124,1,32,2,92,1,13,1,10,1,32,9,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,1,13,1,10,1,32,1,40,1,52,1,48,1,41,1,60,1,45,2,32,1,49,1,52,1,32,1,124,1,32,2,49,1,54,1,45,2,49,1,55,1,32,1,124,1,32,2,49,1,57,1,45,2,50,1,48,1,32,1,124,1,32,2,50,2,45,2,50,1,51,1,32,1,124,1,32,2,50,1,53,1,45,2,50,1,54,1,32,1,124,1,32,2,50,1,56,1,45,2,50,1,57,1,32,1,124,1,32,2,51,1,49,1,45,2,51,1,50,1,32,1,124,1,32,2,51,1,52,1,45,2,51,1,53,1,32,1,124,1,32,2,51,1,55,1,45,2,51,1,56,1,32,1,124,1,32,2,52,1,48,1,32,1,45,2,62,1,40,1,49,1,52,1,41,1,13,1,10,1,32,9,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,3,124,1,32,2,124,1,32,2,124,1,32,1,13,1,10,1,32,9,92,1,32,2,118,1,32,2,47,1,32,3,92,1,32,2,118,1,32,2,47,1,32,3,92,1,32,2,118,1,32,2,47,1,32,3,92,1,32,2,118,1,32,2,47,1,32,3,92,1,32,2,124,1,32,2,47,1,32,3,92,1,32,2,118,1,32,2,47,1,32,3,92,1,32,2,118,1,32,2,47,1,32,3,92,1,32,2,118,1,32,2,47,1,32,3,92,1,32,2,118,1,32,2,47,1,13,1,10,1,32,10,45,5,32,5,45,5,32,5,45,5,32,5,45,5,32,6,45,1,50,1,55,1,45,1,32,5,45,5,32,5,45,5,32,5,45,5,32,5,45,5,32,1,13,1,10,1,32,12,94,1,32,9,94,1,32,9,94,1,32,9,94,1,32,19,94,1,32,9,94,1,32,9,94,1,32,9,94,1,13,1,10,1,32,12,49,1,53,1,32,8,49,1,56,1,32,8,50,1,49,1,32,8,50,1,52,1,32,18,51,1,48,1,32,8,51,2,32,8,51,1,54,1,32,8,51,1,57,1,13,1,10,1,32,12,124,1,32,9,124,1,32,9,124,1,32,9,124,1,32,19,124,1,32,9,124,1,32,9,124,1,32,9,124,1,13,1,10,1,32,12,124,1,32,9,124,1,95,4,32,2,95,3,124,1,32,9,124,1,32,19,124,1,32,9,124,1,95,4,32,2,95,3,124,1,32,9,124,1,13,1,10,1,32,12,124,1,32,14,124,2,32,13,124,1,32,19,124,1,32,14,124,2,32,13,124,1,13,1,10,1,32,12,124,1,95,14,52,1,49,1,95,13,124,1,32,19,124,1,95,14,52,1,50,1,95,13,124,1,13,1,10,1,13,1,10,1,13,1
     End Table
 
-    // Use a table to ensure the table data fits in a 16F page size.
+    // A table of the diagram
     Table MapDataTable
     13,10
     13,10
