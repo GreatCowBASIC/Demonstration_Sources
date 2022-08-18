@@ -112,7 +112,6 @@
     // #DEFINE DEBUGCODE        'add 'X' option and some movement debug
     #DEFINE REDUCEDVERBAGE   'reduce the strings to less than 2048 bytes of data
     #DEFINE EMPTY_CHAMBER           0
-    #DEFINE EMPTY_CHAMBER           0
     #DEFINE NOT_VALID_CHAMBER       0
     #DEFINE RED_DRAGON              1
     #DEFINE STR_RED_DRAGON          "Red Dragon"

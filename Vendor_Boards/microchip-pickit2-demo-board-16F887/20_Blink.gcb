@@ -1,0 +1,51 @@
+/*
+A demonstration program for GCGB and GCB.
+--------------------------------------------------------------------------------
+The first lesson showed how to turn on a LED, this lesson shows how to make it blink. 
+While this might seem a trivial change from Lesson 1, it gives a context to explore several more instructions.
+
+@author    EvanV   
+@license   GPL
+@version   1.00   
+@date      2022-08-17
+********************************************************************************
+*/
+
+
+#chip 16F887
+#option explicit
+
+
+/*
+           ------------PORTA---------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------------------AN0--
+    IO:    ---------------------------------
+
+           ------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------------------SW---
+    IO:    ---------------------------------
+
+           ------------PORTC----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ---------------------------------
+    IO:    ---------------------------------
+
+           ------------PORTD----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:   -DS8-DS7-DS6-DS5-DS4-DS3-DS2-DS1--
+    IO:    ---------------------------------
+
+*/
+
+Do
+
+    PORTD.0 = 1
+    Wait 50 ms
+    PORTD.0 = 0
+    Wait 50 ms
+
+Loop
+
+End

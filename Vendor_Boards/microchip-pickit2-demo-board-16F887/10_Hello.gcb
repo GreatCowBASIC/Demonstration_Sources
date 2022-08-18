@@ -1,0 +1,58 @@
+/*
+A demonstration program for GCGB and GCB.
+--------------------------------------------------------------------------------
+TThe first lesson shows how to turn on a LED and discusses the I/O pin structures. This
+is the PIC microcontroller version of “Hello World”.
+
+The LEDs are connected to PORTD from RD0 to RD7 in common cathode configuration. 
+When one of these I/O pins drives high, the LED turns on. The I/O pins can be configured for input or output. 
+On start-up, the default is input. The TRIS Special Function Register bits use the convention of ‘0’ for output and ‘1’ for input. 
+Digital output is targeted, so these must be configured using the DIR command.
+The PORTD register acts as buffer to the output value on the port pin in output configuration.
+
+After setting PORTD as output port in the program, assigning logic ‘1’ to the LATD0 bit of the LATD register turns LED on and vice versa.
+
+----
+
+The compiler sorts ouf the oscillator for you by setting to the fastest support internal frequency.  This can be changed - see later demos.
+The compiler also set ports to be digital - the compiler does a lot for you.
+
+@author    EvanV   
+@license   GPL
+@version   1.00   
+@date      2022-08-17
+********************************************************************************
+*/
+
+
+#chip 16F887
+#option explicit
+
+
+/*
+           ------------PORTA---------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------------------AN0--
+    IO:    ---------------------------------
+
+           ------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------------------SW---
+    IO:    ---------------------------------
+
+           ------------PORTC----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ---------------------------------
+    IO:    ---------------------------------
+
+           ------------PORTD----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:   -DS8-DS7-DS6-DS5-DS4-DS3-DS2-DS1--
+    IO:    ---------------------------------
+
+*/
+
+Dir PortD.0 Out 
+PortD.0 = 1
+
+End
