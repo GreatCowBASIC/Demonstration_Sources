@@ -1,0 +1,138 @@
+#CHIP 18F27K40, 32
+#CONFIG MCLRE = ON
+
+
+Sub InitPPS
+
+    #IF ChipName = 18F27K40
+       'Module: EUSART1
+        RC6PPS = 0x0009    'TX1 > RC6
+       'Module: EUSART2
+        RC0PPS = 0x000B    'TX2 > RC0
+
+        Dir PORTC.0 OUT
+        Dir PORTC.6 OUT
+
+    #ENDIF
+
+End Sub
+
+
+#option explicit
+
+#startup InitPPS, 85
+Wait 500 ms 'stabilize/stop spurrious TX data when programming
+
+#Define USART_BAUD_RATE 9600
+#Define USART_TX_BLOCKING
+#define USART_DELAY 2 ms
+
+#Define USART2_BAUD_RATE 9600
+#Define USART2_TX_BLOCKING
+
+
+
+Dim _ByteVar as Byte
+Dim _WordVar as Word
+Dim _IntegerVar as Integer
+Dim _LongVar as Long
+
+_ByteVar = 125
+_WordVar = 12500
+_IntegerVar= -12500
+_LongVar = 12500000  '12,500,000
+
+'Clear Terminals
+Hsersend 12       ' ==> USART1
+HSersend 12,2     ' ==> USART1
+
+
+HserPrint "Hello USART 1"   ' ==> USART1
+HserPrintCRLF 2             ' ==> USART1
+
+HserPrint "Hello USART 2",2  ' ==> USART2
+HserPrintCRLF 2,2            ' ==> USART2
+
+'test bytes
+Hserprint "----- Test Bytes (USART1) -----"   ' ==> USART1
+Hserprint "----- Test Bytes (USART2) -----",2 ' ==> USART2
+HserprintCRLF
+HSerprintCRLF,2
+
+Repeat 10
+    HserPrint _ByteVar     ' ==> USART1
+    Hserprint _ByteVar,2   ' ==> USART2
+
+    HserPrintCRLF          ' ==> USART1
+    HserprintCRLF,2        ' ==> USART1
+
+    _ByteVar++
+
+End Repeat
+HserPrintCRLF
+HserprintCRLF,2
+
+'Test Words
+Hserprint "----- Test Words (USART1) -----"   ' ==> USART1
+Hserprint "----- Test Words (USART2) -----",2
+HserprintCRLF
+HSerprintCRLF,2
+
+Repeat 10
+    HserPrint _WordVar     ' ==> USART1
+    Hserprint _WordVar,2   ' ==> USART2
+
+    HserPrintCRLF          ' ==> USART1
+    HserprintCRLF,2        ' ==> USART1
+
+    _WordVar++
+End Repeat
+HserPrintCRLF
+HserprintCRLF,2
+
+'Test integers
+Hserprint "----- Test Integers -12500 (USART1) -----"    ' ==> USART1
+Hserprint "----- Test Integers -12500 (USART2) -----",2  ' ==> USART2
+HserprintCRLF
+HSerprintCRLF,2
+
+Repeat 10
+
+    HserPrint _IntegerVar,1     ' ==> USART1
+    Hserprint _IntegerVar,2   ' ==> USART2
+
+    HserPrintCRLF,1          ' ==> USART1
+    HserprintCRLF,2        ' ==> USART1
+
+    _IntegerVar++
+
+End Repeat
+HserPrintCRLF
+HserprintCRLF,2
+
+'Test Longs
+Hserprint "----- Test Longs (USART1) -----"   ' ==> USART1
+Hserprint "----- Test Longs (USART2) -----",2 ' ==> USART2
+HserprintCRLF
+HSerprintCRLF,2
+
+Repeat 10
+    HserPrint _LongVar        ' ==> USART1
+    Hserprint _LongVar,2      ' ==> USART2
+
+    HserPrintCRLF          ' ==> USART1
+    HserprintCRLF,2        ' ==> USART1
+
+    _LongVar++
+
+End Repeat
+HSerprintCRLF 2
+HserprintCRLF 2,2
+
+Hserprint "      ----- End of Test -----"     ' ==> USART1
+Hserprint "      ----- End of Test -----",2   ' ==> USART2
+
+
+
+Do
+Loop
