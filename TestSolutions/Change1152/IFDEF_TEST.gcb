@@ -1,0 +1,78 @@
+ #OPTION EXPLICIT
+ ; -----  Add the following line to USE.ini ------------------
+ ;        conditionaldebugfile = IFDEF_TEST.gcb
+ ; -----------------------------------------------------------
+
+ DIM _VAR1 As Byte
+#CHIP 18F16Q41, 4
+
+#IFNOT CHIPMHZ = 16
+_VAR1 = 255
+#ENDIF
+
+#IF CHIPMHZ = 64
+    _VAR1 = 64
+#ElSE
+    #IF CHIPMHZ = 32
+        _VAR1 = 32
+    #Else
+        #IF CHIPMHZ = 24
+            _VAR1 = 24
+        #Else
+            #IF CHIPMHZ = 16
+                _VAR1 = 16
+            #Else
+                #IF CHIPMHZ = 8
+                    _VAR1 = 8
+                #Else
+                    #IF CHIPMHZ = 4
+                        _VAR1 = 4
+                    #Else
+                        #IF CHIPMHZ = 2
+                            _VAR1 = 2
+                        #ELSE
+                            #IF CHIPMHZ = 1
+                                _VAR1 = 1
+                            #ELSE
+                                _VAR1 = 0
+                            #ENDIF
+                        #ENDIF
+                    #ENDIF
+                #ENDIF
+            #ENDIF
+        #ENDIF
+    #ENDIF
+#ENDIF
+
+DIM _BAR1 as Byte
+// #DEFINE VAR
+// #DEFINE BAR
+
+#IFDEF PIC
+    #IFDEF VAR
+            _VAR1 = 1
+            #IFDEF BAR
+                _BAR1 = 11
+            #ELSE
+                _BAR1= 111
+            #ENDIF
+    #ELSE
+            _VAR1 = 2
+            #IFDEF BAR
+                _BAR1 = 22
+            #ELSE
+                _BAR1= 222
+            #ENDIF
+    #ENDIF
+#ELSE
+    #IFDEF VAR
+            _VAR1 = 2
+    #ELSE
+            _VAR1 = 3
+    #ENDIF
+#ENDIF
+
+
+Do
+Loop
+

@@ -1,0 +1,35 @@
+#CHIP 16F886
+#OPTION EXPLICIT
+
+Do
+    Readinputs()
+    #INSERT "TESTCODE.IL"
+    SetOutputs()
+    ResetWatchdog()
+Loop
+
+
+    Sub Readinputs
+
+    End Sub
+
+    Sub SetOutputs
+
+    End Sub
+
+    Sub ResetWatchdog
+
+    End Sub
+
+Macro LD ( __port )
+    Set __port ON
+End Macro
+
+Macro AN ( __port )
+    Set __port OFF
+End Macro
+
+Macro SetOut ( __port )
+    Dir __port Out
+End Macro
+

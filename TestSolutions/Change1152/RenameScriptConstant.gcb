@@ -1,0 +1,53 @@
+ #OPTION EXPLICIT
+ ; This shows the phase of constant definition.
+ ; -----------------------------------------------------------
+
+#CHIP 18F16Q41, 16
+DIM _VAR1 as WORD
+
+// Phase 1 - CODE
+    // Starting value
+    #DEFINE CONSTANT_D  5
+
+    // Set the constant to any value.. as this will be overwritten. This is used to as a cache in this code
+    #DEFINE CONSTANT_TMP 100
+
+// Phase 2 - SCRIPT
+    #script
+        //show constant exists
+        IF DEF(CONSTANT_D) THEN
+            WARNING "CONSTANT_D_EXISTS"
+        END If
+        IF NODEF(CONSTANT_D) THEN
+            WARNING "CONSTANT_D_DOES_NOT_EXISTS"
+        END If
+
+        // show value
+        Warning "CONSTANT_TMP AS PER PHASE 1 =" CONSTANT_TMP
+
+        // Double the value...
+        CONSTANT_D = INT(CONSTANT_D * 2)
+
+        // CONSTANT_TMP constant value is overwritten, therefore, the value is not retained
+        CONSTANT_TMP = CONSTANT_D
+
+        // show value
+        Warning "CONSTANT_TMP NOW =" CONSTANT_TMP
+
+        Warning "AND, THE IFDEFs WILL DOUBLE THE INITIAL VALUE AGAIN"
+    #endscript
+
+// Phase 3 - IFDEFs
+    #IF TRUE   ' use TRUE as a generic case
+
+        'Remove the constant
+        #UNDEFINE CONSTANT_D
+
+        'Double the value... AGAIN
+        #DEFINE CONSTANT_D  CONSTANT_TMP*2
+
+    #ENDIF
+
+    //CHECK THE ASM!
+    _VAR1 = [WORD]CONSTANT_D
+
