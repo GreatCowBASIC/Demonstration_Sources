@@ -34,7 +34,7 @@
     ' ----- Constants for the usb.h
     'Define a name - 30 chars max long
     '#define USB_PRODUCT_NAME versionString
-    #define USB_PRODUCT_NAME  "GCB USB 230822"
+    #define USB_PRODUCT_NAME  "GCB USB v1.4.2"
     #define USB_VID 0x1209      'Should not be changed unless you have your own Vendor Identity - this VID is allocate to Great Cow BASIC Lib/WinUSB Solutions.
     #define USB_PID 0x2006      'Should not be changed unless you have your own Vendor Identity - this PID is allocate to Great Cow BASIC Lib/WinUSB Solutions.
     #define USB_REV 0x0000      'You MUST obtain a REV number from https://github.com/Anobium/GreatCowBASICpidcodes1209_2006 to develop your own Open Source USB solutions
