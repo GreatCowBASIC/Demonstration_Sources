@@ -1,0 +1,55 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''This program will show the functionality of the TM1637a.h library.
+'''The TM1637 module is connected to PortD.2 CLK and PortD.3 DIO
+'''@author  Friderik Back
+'''@licence GPL
+'''@version 2.0a
+'''@date    9.9.2020
+'''********************************************************************************
+
+; ----- Configuration
+'
+#chip 16F886,8
+#include "TM1638.h"
+#define TM1638_STB PortC.2
+#define TM1638_CLK PortC.1
+#define TM1638_DIO PortC.0
+
+
+  wait 2 sec
+  TM_reset
+  TM_setbrightness 7
+Do
+  TM_Reset
+  TM_Print("read")
+  wait 2 s
+  'TM_Reset
+  TM_Print(255)
+  wait 2 s
+  TM_Reset
+  TM_Print(256)
+  wait 2 s
+  TM_Reset
+  TM_Print(29345)
+  wait 2 s
+  TM_Reset
+  TM_Print(-29876)
+  wait 2 s
+  TM_Reset
+  TM_Print(12755666)
+  wait 2 s
+  TM1638_readButtons
+  If buttons <> 0 Then
+    TM1638_setLED(1,  1)
+    'TMDec buttons/16
+    TM_Reset
+    TM_Print buttons/16
+    wait 2 s
+    TM1638_setLED(1,  0)
+    TMDec 0
+  end if
+
+loop
+
+

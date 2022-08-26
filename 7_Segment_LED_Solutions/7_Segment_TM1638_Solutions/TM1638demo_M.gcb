@@ -1,0 +1,215 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''This program will show the functionality of the TM1637a.h library.
+'''The TM1637 module is connected to PortD.2 CLK and PortD.3 DIO
+'''@author  Friderik Back
+'''@licence GPL
+'''@version 2.0a
+'''@date    9.9.2020
+'''********************************************************************************
+
+; ----- Configuration
+'
+
+
+
+
+#chip 16F886,8
+#include "TM1638.h"
+#define TM1638_STB PortC.2
+#define TM1638_CLK PortC.1
+#define TM1638_DIO PortC.0
+
+  Dim letter,small_chr, dig, Num0, Num1 as byte
+
+  TMchar_Bright = 10
+'---- main program --------
+Do
+  TM_reset
+  Write4Dig (17, 16, 17, 16, 0) 'clear display
+  wait 2 s
+Write4Dig (17, 16, 17, 16, 10,0) '- -
+  wait 2 s
+
+
+
+'All segments Fade in test
+For bri = 8 to 15
+Write4Dig(8,8,8,8,bri,1) 'All segments test
+wait 500 ms
+Next bri
+' Letters Fade in
+  For TMchar_Bright = 8 to 15
+    WriteChar (0 , "G")
+    WriteChar (1 , "c")
+    WriteChar (2 , "b")
+    WriteChar (3 , " ")
+    wait 500 ms
+  Next TMchar_Bright
+'
+TM_reset
+' Fade out demo
+For TMchar_Bright = 15 to 7 step -1
+WriteChar (0 , "d")
+WriteChar (1 , "e")
+WriteChar (2 , "m")
+WriteChar (3 , "o")
+wait 500 ms
+Next TMchar_Bright
+TM_reset
+' Letters demo
+TMchar_Bright = 10
+WriteChar (0 , "C")
+WriteChar (1 , "h")
+WriteChar (2 , "a")
+WriteChar (3 , "r")
+wait 2 s
+TM_reset
+' All letters demo
+  For letter = 65 to 90
+
+    small_chr = letter + 32 'Siekoo a�phabet
+
+    WriteChar (0 , letter)
+    WriteChar (1 , " ")
+    WriteChar (2 , small_chr)
+    WriteChar (3 , " ")
+    wait 1 s
+  Next letter
+TM_reset
+' Special signs
+WriteChar (0 , "S")
+WriteChar (1 , "P")
+WriteChar (2 , "E")
+WriteChar (3 , "C")
+WriteChar (4 , "I")
+WriteChar (5 , "A")
+WriteChar (6 , "L")
+WriteChar (7 , " ")
+wait 2 s
+TM_reset
+Write4Dig(17,18,19,20,10,0)
+wait 2 s
+
+'Alternative command
+WriteChar (0 , "?")
+WriteChar (1 , "-")
+WriteChar (2 , CHR(176))
+WriteChar (3 , ")")
+wait 2 s
+
+'Hex number demo
+WriteChar (0 , "H")
+WriteChar (1 , "e")
+WriteChar (2 , "x")
+WriteChar (3 , "a")
+wait 2 s
+
+TMhex(255) '00FF
+wait 2 s
+
+TMhex(65535) 'FFFF
+wait 2 s
+
+TMhex(0xABCD) 'ABCD
+wait 2 s
+
+'decimal numbers
+'decimal numbers without leading zeroes
+WriteChar (0 , "D")
+WriteChar (1 , "e")
+WriteChar (2 , "c")
+WriteChar (3 , " ")
+wait 2 s
+
+TMdec(8095) '8095
+wait 2 s
+TMdec(2,0) '   2
+wait 2 s
+TMdec(134) ' 134
+wait 2 s
+WriteChar (0 , "-")'-134
+wait 2 s
+TMdec(134,2) ' 1:34
+wait 2 s
+TMdec(67) '  67
+wait 2 s
+TMdec(12345) '----
+wait 2 s
+
+'decimal numbers with leading zeroes
+WriteChar (0 , "Z")
+WriteChar (1 , "e")
+WriteChar (2 , "r")
+WriteChar (3 , "o")
+wait 2 s
+
+TMdec(8095,1) '8095
+wait 2 s
+TMdec(2,1) '0002
+wait 2 s
+TMdec(134,1) '0134
+wait 2 s
+TMdec(67,1) '0067
+wait 2 s
+TMdec(12345,1) '----
+wait 2 s
+
+'Thermometer demo
+
+WriteChar (0 , "T")
+WriteChar (1 , "e")
+WriteChar (2 , "r")
+WriteChar (3 , "m")
+wait 2 s
+Write4Dig(2,2,18,12,10,0)  ' 22�C
+wait 2 s
+Write4Dig(9,3,18,15,11,0)  ' 93�F
+wait 2 s
+Write4Dig(16,9,18,12,10,0)  ' 3�C
+wait 2 s
+Write4Dig(17,7,18,12,9,0)  ' -7�C
+wait 2 s
+
+'Clock demo
+WriteChar (0 , "C")
+WriteChar (1 , "l")
+WriteChar (2 , "o")
+WriteChar (3 , "C")
+WriteChar (4 , "k")
+WriteChar (5 , " ")
+WriteChar (6 , " ")
+WriteChar (7 , " ")
+wait 2 s
+
+WriteChar (4 , " ")
+Repeat 3
+Write4Dig(1,1,5,9,10,1)  ' clock disp , no leading zero, minimum brightness, Colon On
+wait 500 ms
+Write4Dig(1,1,5,9,10,0)  ' clock disp , no leading zero, minimum brightness, Colon Off
+wait 500 ms
+End Repeat
+
+Repeat 3
+Write4Dig(1,2,0,0,10,1)  ' clock disp , no leading zero, minimum brightness, Colon On
+wait 500 ms
+Write4Dig(1,2,0,0,10,0)  ' clock disp , no leading zero, minimum brightness, Colon Off
+wait 500 ms
+End Repeat
+
+'Countdown demo
+WriteChar (0 , "C")
+WriteChar (1 , "O")
+WriteChar (2 , "U")
+WriteChar (3 , "n")
+wait 2 s
+
+
+For bri = 123 to 117 step -1
+    TMdec(bri,1)
+    wait 500 ms
+    TMdec(bri,3)
+    wait 500 ms
+  next bri
+
+Loop

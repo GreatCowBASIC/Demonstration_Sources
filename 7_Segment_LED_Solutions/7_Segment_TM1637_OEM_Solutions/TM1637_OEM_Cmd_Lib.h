@@ -81,7 +81,9 @@ Dim TM_ButnVal as Byte
 
 ' Default             (#Define in Main will override)
 #Define KeyMap ButnMap1
-#Define TM_DispLen 6   ' 7seg display No. of digits
+#IFNDEF TM_DispLen
+  #Define TM_DispLen 6   ' 7seg display No. of digits
+#ENDIF
 #Define TM_LEDs 0       ' LEDs other than 7Seg display
 
 #startup tmInit
@@ -266,7 +268,7 @@ Sub GetChrTblIndx
           If StrChr =  61 Then ChrTblIndx = 5  : Chr_ok = 1    ' =
           If StrChr =  63 Then ChrTblIndx = 6  : Chr_ok = 1    ' ?
           If StrChr =  95 Then ChrTblIndx = 7  : Chr_ok = 1    ' _ Uscore
-          If StrChr = 176 Then ChrTblIndx = 8  : Chr_ok = 1    ' ° deg
+          If StrChr = 176 Then ChrTblIndx = 8  : Chr_ok = 1    ' ï¿½ deg
           If StrChr = 126 Then ChrTblIndx = 9  : Chr_ok = 1    ' ~ Oscore
           If StrChr =  34 Then ChrTblIndx = 10 : Chr_ok = 1    ' " Dquote
           If StrChr = 124 Then ChrTblIndx = 11 : Chr_ok = 1    ' | left 1
@@ -292,7 +294,7 @@ Table Seg7Alpha  'chr maps
    63, 6, 91, 79, 102, 109, 125, 7, 127, 111  '<  TblPtr2
   ' 119, 124, 57, 94, 121, 113        '<- Just for now... until code offset in table to 1 for hex
 
-'  spc  [   ]  -   =   ?   _   deg° "   '   |   Special Characters
+'  spc  [   ]  -   =   ?   _   degï¿½ "   '   |   Special Characters
 '  32, 40, 41, 45, 61, 63, 95, 176 126 34  124  [ASCII]
     0, 57, 15, 64, 72, 83,  8, 99,  1, 34, 48  '< TblPtr3
 End Table

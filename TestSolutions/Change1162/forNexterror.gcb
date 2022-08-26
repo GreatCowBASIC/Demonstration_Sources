@@ -1,0 +1,6 @@
+// Test change 1162
+#Skiptest
+#chip 16f88
+
+for loop to  = 0 status - 1
+next

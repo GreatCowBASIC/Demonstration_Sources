@@ -1,0 +1,130 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''This program reads a 4 * $ keypad to create a combination lock demonstration using the keypad.
+'''The solution will stay locked until pre-programmed 4 digit code is entered.
+''':
+'''Port c.4 switched on when locked, c.5 is switched on when unlocked
+''':
+'''The rows of the keypad are connected to portb.3 to portb.0.
+'''The columns of the keypad are connected to c.0 to c.3
+'''The column pins must also be pulled up (high) to 5v through 10k Resistors.
+''':
+'''PortC.4 and PortC.5 have LEDs connected via suitable resistors.
+''':
+'''@author  EvanV based on works of HughC
+'''@licence GPL
+'''@version 1.0a
+'''@date    08.04.2015
+'''********************************************************************************
+
+; ----- Configuration
+
+  #chip 16f886,8
+  #option explicit
+
+
+
+; ----- Constants
+
+  #define LOCKED PORTB.0
+  #define UNLOCKED PORTB.1
+
+; ----- Define Hardware settings
+  'Set to locked initially
+
+#include "TM1638.h"
+#define TM1638_STB PortC.2
+#define TM1638_CLK PortC.1
+#define TM1638_DIO PortC.0
+Set LOCKED On
+; ----- Variables
+  Dim PressedKey As byte
+  Dim KeyBuffer(4)
+  Dim RESETBUFFER,TMchar_Bright as Byte
+
+
+; ----- Main body of program commences here.
+   For TMchar_Bright = 8 to 10
+    WriteChar (0 , "G")
+    WriteChar (1 , "c")
+    WriteChar (2 , "b")
+    WriteChar (3 , " ")
+    WriteChar (4 , "L")
+    WriteChar (5 , "o")
+    WriteChar (6 , "c")
+    WriteChar (7 , "k")
+    wait 100 ms
+  Next
+  wait 2 sec
+  TM_reset
+  Do Forever
+
+  'Read current pressed key
+    TM1638_readButtons
+  If buttons <> 0 Then
+    TM1638_setLED(1,  1)
+
+
+    PressedKey = buttons/16
+    TMDec buttons/16
+    wait 2 s
+    TM1638_setLED(1,  0)
+    TMDec 0
+
+
+    'Store the pressed key in a list of pressed keys
+    StoreKey PressedKey
+
+    'Check the list of pressed keys
+    CheckCode
+
+    End If
+
+  Loop
+
+  end
+
+; ----- Support methods.  Subroutines and Functions
+
+'''Store a pressed key
+'''@param NewKey Key to store
+  Sub StoreKey (In NewKey)
+    'Move the last 3 keys along in the array
+    KeyBuffer(1) = KeyBuffer(2)
+    KeyBuffer(2) = KeyBuffer(3)
+    KeyBuffer(3) = KeyBuffer(4)
+
+    'Store the most recently pressed key at the end of the array
+    KeyBuffer(4) = NewKey
+  End Sub
+
+'''Check entered code
+  Sub CheckCode
+    'Check each of the last 4 pressed keys to see if it matches the correct sequence.
+    'The sequence is 4242, and can be changed by editing the If commands
+    If KeyBuffer(1) = 4 Then
+      If KeyBuffer(2) = 2 Then
+        If KeyBuffer(3) = 4 Then
+          If KeyBuffer(4) = 2 Then
+
+            'If the correct sequence was entered, turn off the LOCKED output, and turn on the UNLOCKED output
+            Set LOCKED Off
+            Set UNLOCKED On
+            for ResetBuffer = 1 to 4
+                KeyBuffer(ResetBuffer) = 255
+            next
+
+            'Then, exit from the subroutine to avoid the locking code below
+            Exit Sub
+          End If
+        End If
+      End If
+    End If
+
+    PulseOut locked, 10 ms
+    Wait 10 ms
+
+    'If the program gets to this point, then the code was incorrect. Lock again!
+    Set LOCKED On
+    Set UNLOCKED Off
+  End Sub
