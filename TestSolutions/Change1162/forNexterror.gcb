@@ -1,6 +1,11 @@
 // Test change 1162
-#Skiptest
-#chip 16f88
 
+#chip 16f88
+#option Explicit
+#skiptest
+dim Loop as BYte
+
+//The error line - a type locks up the compiler - for loop to  = 0 status - 1
 for loop to  = 0 status - 1
+
 next
