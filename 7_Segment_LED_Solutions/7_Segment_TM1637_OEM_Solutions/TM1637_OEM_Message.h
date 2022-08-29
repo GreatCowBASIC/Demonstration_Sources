@@ -59,6 +59,7 @@ Dim TM_lp2 as Byte'< re-mapped value
         TM1637_WrVal (TMcmd2) : TM1637_Ack
        TM1637_Stop
      For TMlp2 = Dig_pos - (Num_Digs - 1)  to  Dig_pos
+          TM_lp2 = TMlp2  '< If not remap
         If TM_6dReMap = 1 then ReadTable Digit_ReMap, TMlp2, TM_lp2 'reMap_Addr
         TM1637_Start
           TM1637_WrVal (TMaddr + (TM_lp2 -1)) : TM1637_Ack  ' Digit addr
