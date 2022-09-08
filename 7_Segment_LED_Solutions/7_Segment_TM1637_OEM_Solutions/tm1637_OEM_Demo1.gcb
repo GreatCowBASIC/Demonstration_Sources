@@ -2,7 +2,8 @@
 
 'Set below configuration first for #chip, pins, display etc...
 '*******************************************************
-#Include "TM1637_OEM_Cmd_Lib.h"
+'#Include "TM1637_OEM_Cmd_Lib.h"
+#Include <TM1637_OEM_Cmd_Lib.h>
 
 #OPTION explicit
 ''#chip 12F683, 8
@@ -12,32 +13,31 @@
 Dim Value as Long   ' number to display
 Dim lp1 as Byte       ' Loops etc
 Dim lp2 as Byte
-'Dim tmp1 as byte     ' Temp var
-'Dim tmp2 as Byte
+
 Dim cnt1 as Byte     ' count
 Dim cnt2 as Word     ' count
 Dim Mybuf1(TM_DispLen+1+TM_LEDs) as Byte  ' user buffer
 
 #define TM1637_CLK PortB.4
 #define TM1637_DIO PortB.5
-'      (Port Dir is set in include file)
 
+'      (Port Dir is set in include file)
 ''#Define TM1637_CLK GPIO.0 '#Define TM1637_CLK = PORTB.2
 ''#Define TM1637_DIO GPIO.1 '#Define TM1637_DIO = PORTB.1
 
 #Define TM_DispLen 6     ' Number of digits on display
 TM_6dReMap = On          ' Remap digits for 6d module with swapped com pins
-'#Define NackCount         ' Enable NACK counts (for testing comm issues)
-'NackCnt = 0               '
-'#Define SndMode_SEQ       ' Enable sequential register addressing mode
-'#Define KeyMap ButnMap2   ' Only used for weird datasheet map
-'#Define TM_LEDs 2         ' Use when TM_DispLen=4, TM_DispBuf(5 & 6) for other LED's
-'#Define TMdly 25          ' Modify clk <-> DIO delay us  - Use with care !
+
+'Optional Constants
+  '#Define NackCount         ' Enable NACK counts (for testing comm issues)
+  'NackCnt = 0               '
+  '#Define SndMode_SEQ       ' Enable sequential register addressing mode
+  '#Define KeyMap ButnMap2   ' Only used for weird datasheet map
+  '#Define TM_LEDs 2         ' Use when TM_DispLen=4, TM_DispBuf(5 & 6) for other LED's
+  '#Define TMdly 25          ' Modify clk <-> DIO delay us  - Use with care !
 
 '*******************************************************
 Value = 314159
-
-
 
 '-------------------
 ' Most of the subs will work with 4d or 6d module (just set TM_DispLen & TM_6dReMap appropriately)

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Compilation Report</title>
+</head>
+<body>
+<h1>Compilation Report</h1>
+<p>Compiler Version (YYYY-MM-DD): 1.00.00 Release Candidate 2022-08-27 (Windows 64 bit) : Build 1163</p>
+<h2>Compilation time</h2>
+<p> (Compile time: 1.21875 seconds)</p>
+<p> (Assembly time: 0.09375 seconds)</p>
+<p> (Download time: 6.3125 seconds)</p>
+<p> (Total time: 7.625 seconds)</p>
+<h2>Chip resource usage:</h2>
+<p>Chip Model: 16F1829</p>
+<p>Program Memory: 1705/8192 words (20.81%)</p>
+<p>RAM: 87/1024 bytes (8.5%)</p>
+<p> OSC: INTOSC, 8Mhz (Internal oscillator)</p>
+<h2>RAM Allocation</h2>
+<table border="1">
+</table>
+<h2>Subroutines</h2>
+<table border="1">
+<tr><th>Name</th><th>Code Size (lines)</th><th>Compiled Size (words)</th><th>Page</th><th>Outgoing calls</th></tr>
+<tr><td>Main</td><td>156</td><td>797</td><td>1</td><td>INITTM1638(8), SYSCOMPLESSTHANINT(4), Delay_MS(9), Delay_S(32), TMDEC(13), TMHEX(3), CHR(1), WRITECHAR(58), WRITE4DIG(12), TM_RESET(6), INITSYS(32)</td></tr>
+<tr><td>INITTM1638</td><td>18</td><td>20</td><td>1</td><td>TM_RESET(1), SENDCOMMAND(2)</td></tr>
+<tr><td>SENDCOMMAND</td><td>3</td><td>12</td><td>1</td><td>SENDDATA(1)</td></tr>
+<tr><td>SENDDATA</td><td>13</td><td>40</td><td>1</td><td>FNLSR(1)</td></tr>
+<tr><td>TM_RESET</td><td>7</td><td>19</td><td>1</td><td>SENDDATA(2), SENDCOMMAND(1)</td></tr>
+<tr><td>WRITE4DIG</td><td>14</td><td>57</td><td>1</td><td>TM_DISPLAY7SEG(4), SENDCOMMAND(2)</td></tr>
+<tr><td>TM_DISPLAY7SEG</td><td>5</td><td>22</td><td>1</td><td>SENDDATA(2), SENDCOMMAND(1)</td></tr>
+<tr><td>WRITECHAR</td><td>41</td><td>92</td><td>1</td><td>SYSCOMPLESSTHAN(2), TM_DISPLAY7SEG(1), SENDCOMMAND(1)</td></tr>
+<tr><td>TMDEC</td><td>50</td><td>160</td><td>1</td><td>SYSCOMPEQUAL(6), SYSCOMPLESSTHAN16(4), WRITE4DIG(1)</td></tr>
+<tr><td>TMHEX</td><td>17</td><td>113</td><td>1</td><td>SYSDIVSUB16(6), SYSCOMPLESSTHAN16(3), WRITE4DIG(1)</td></tr>
+<tr><td>FNLSR</td><td>5</td><td>11</td><td>1</td><td></td></tr>
+<tr><td>INITSYS</td><td>895</td><td>20</td><td>1</td><td></td></tr>
+<tr><td>SYSDIVSUB16</td><td>38</td><td>52</td><td>1</td><td>SYSCOMPEQUAL16(1)</td></tr>
+<tr><td>SYSCOMPEQUAL</td><td>20</td><td>6</td><td>1</td><td></td></tr>
+<tr><td>SYSCOMPEQUAL16</td><td>34</td><td>11</td><td>1</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHAN</td><td>23</td><td>7</td><td>1</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHAN16</td><td>38</td><td>15</td><td>1</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHANINT</td><td>48</td><td>42</td><td>1</td><td></td></tr>
+<tr><td>CHR</td><td>6</td><td>17</td><td>1</td><td></td></tr>
+<tr><td>Delay_MS</td><td>0</td><td>14</td><td>1</td><td></td></tr>
+<tr><td>Delay_S</td><td>0</td><td>8</td><td>1</td><td>Delay_MS(1)</td></tr>
+<tr><td>SysStringTables</td><td>0</td><td>69</td><td>1</td><td></td></tr>
+<tr><td>SEVENSEGDISPDIGIT</td><td>0</td><td>35</td><td>1</td><td></td></tr>
+<tr><td>SEVENSEGDISPLETTER</td><td>0</td><td>66</td><td>1</td><td></td></tr>
+</table>
+</body>
+</html>

@@ -14,11 +14,12 @@
 
 
 
-#chip 16F886,8
+#chip 16F1829,8
 #include "TM1638.h"
 #define TM1638_STB PortC.2
 #define TM1638_CLK PortC.1
 #define TM1638_DIO PortC.0
+
 
   Dim letter,small_chr, dig, Num0, Num1 as byte
 
