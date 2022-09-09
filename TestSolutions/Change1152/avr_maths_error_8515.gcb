@@ -49,8 +49,17 @@ Test code for compiler
                     // Travail=17+2*Numero_train_interactif+fnLSL(Mode_passage_interactif,5)
                     // Travail=32*Mode_passage_interactif+17+2*Numero_train_interactif
                 #ELSE
-'                    Travail = 17 + 2*Numero_train_interactif
-'                    Travail = Travail + 32*Mode_passage_interactif
+                    Travail = 17 + 2*Numero_train_interactif
+                    Travail = Travail + 32*Mode_passage_interactif
+
+
+                    //Nicer...
+                    // Travail = Mode_passage_interactif
+                    // Repeat 5
+                    // Set C Off
+                    // ROTATE Travail Left 
+                    // End Repeat
+                    // Travail = 17 + Travail + 2 * Numero_train_interactif
                 #ENDIF
                 HserPrintByteCRLF Travail
             Next
