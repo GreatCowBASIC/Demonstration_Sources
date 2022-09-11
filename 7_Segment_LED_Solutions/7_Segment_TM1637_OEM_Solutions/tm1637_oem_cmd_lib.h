@@ -80,8 +80,14 @@ Dim TM_ButnVal as Byte
 
 ' Default             (#Define in Main will override)
 #Define KeyMap ButnMap1
-#Define TM_DispLen 6   ' 7seg display No. of digits
-#Define TM_LEDs 0      ' LEDs other than 7Seg display
+#script 
+  IF NODEF(TM_DispLen) Then
+    TM_DispLen=6    ' 7seg display No. of digits
+  END IF
+  IF NODEF(TM_LEDs) Then 
+    TM_LEDs=0       ' LEDs other than 7Seg display (use high buffer bytes)
+  END IF
+#endscript
 
 #startup tmInit
 
