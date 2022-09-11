@@ -78,20 +78,23 @@ Dim Tmp_1 as Byte    ' Temp, eg. var->array bitset, not var bitset
 Dim TM_ButnVal as Byte
 'Other Vars Declared in Subs.
 
-' Default             (#Define in Main will override)
-#Define KeyMap ButnMap1
-#script 
+' Default Constants            (#Define in Main will override)
+#script
   IF NODEF(TM_DispLen) Then
     TM_DispLen=6    ' 7seg display No. of digits
   END IF
-  IF NODEF(TM_LEDs) Then 
+  IF NODEF(TM_LEDs) Then
     TM_LEDs=0       ' LEDs other than 7Seg display (use high buffer bytes)
+  END IF
+  IF NODEF(KeyMap) Then
+    KeyMap=ButnMap1 ' Sensible button map (TM_ButnVal lookup table)
   END IF
 #endscript
 
+
 #startup tmInit
 
-' Variable Default & clear
+' Variable Defaults & clear
 Sub tmInit
    #ifdef TM1637_DIO
      Dir TM1637_DIO Out
