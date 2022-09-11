@@ -1,3 +1,4 @@
+ #SKIPTEST
  #OPTION EXPLICIT
  ; This shows the phase of constant definition.
  ; -----------------------------------------------------------

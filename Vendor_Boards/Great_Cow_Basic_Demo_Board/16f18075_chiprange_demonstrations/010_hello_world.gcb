@@ -1,7 +1,7 @@
 '''
 ''' The  most simple sample for GCGB and GCB.
 '''
-''' This simply set an LED on.  The LED is attached to portb shown below via a suitable resistor to 0v.
+''' This simply set an LED on.  The LED is attached to portb as shown below via a suitable resistor to 0v.
 '''
 '''
 '''************************************************************************
@@ -19,10 +19,10 @@
 'Main program commences here.. everything before this is setup for the board.
 
 
-    'Set the a port as an output, we will use only one BIT to connect to the LED
+    ' Set the a port as an output, we will use only one BIT to connect to the LED
     Dir PORTB.1 OUT
 
-    'Set one bit of the port on.
+    ' Set one bit of the port on.
     ' You can try set andother portb bit - another LED, remember you will need a resistor!
     PORTB.1 = 1
 

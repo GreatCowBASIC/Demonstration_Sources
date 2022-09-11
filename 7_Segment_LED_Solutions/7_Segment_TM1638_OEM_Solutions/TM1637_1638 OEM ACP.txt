@@ -1,0 +1,33 @@
+-> tmSndDec (Value, [Optional position{Disp_Len}], [Optional number of digits{Disp_Len}]) |- TM1637/1638 OEM Lib:  Disp. value as decimal (Max. value 999999)
+-> tmSndHex (Value, [Optional position{Disp_Len}], [Optional number of digits{Disp_Len}]) |- TM1637/1638 OEM Lib:  Disp. value as Hex (Max. value 16777215)
+-> tmSndDig (byte value, position )|- TM1637/1638 OEM Lib:  Send 1 raw byte to Disp. *
+-> tmSndStr ("Text",  [Optional buffer name{DispBuf}], [Optional send buffer On/Off {On}])|- TM1637/1638 OEM Lib:  Disp. String (Set TMscroll = On for long strings)
+-> tmSndChr ("chr", position)|- Send 1 alphanumeric character to TM1637/1638
+-> tmChrBuf ("chr", position, [Optional buffer name{DispBuf}])|- Load display buffer with 1 ASCII character
+-> tmDecBuf (Value, [Optional position{Disp_Len}], [Optional number of digits{Disp_Len}], [Optional buffer name{DispBuf}]) | TM1637/1638 OEM Lib: - Load display buffer with Decimal digits
+-> tmHexBuf (Value, [Optional position{Disp_Len}], [Optional number of digits{Disp_Len}], [Optional buffer name{DispBuf}]) | TM1637/1638 OEM Lib: - Load display buffer with Hex digits
+-> tmSegBuf (digit number, segment number, On/Off, [Optional buffer name{DispBuf}], [Optional send digit {Off}]) | - TM1637/1638 OEM Lib: Set segment in display buffer [send option{Off}]
+-> tmSndBuf ([Optional position{Disp_Len}], [Optional number of digits{Disp_Len}], [Optional buffer name{DispBuf}]) | - TM1637/1638 OEM Lib: Send display buffer *
+-> tmFlashDsp Flash display | TM1637/1638 OEM Lib:  - Flash display
+-> tmFlashDig (Digit number, [Optional number of digits{1}], [Optional Buffer name{DispBuf}]) | - TM1637/1638 OEM Lib: Flash digit(s)  Buffer must be current
+-> tmFlashSeg (Digit number, Segment number, [Optional Buffer name{DispBuf}]) | - TM1637/1638 OEM Lib: Flash segment  Buffer must be current
+-> tmCLRbuf  ([Optional position{Disp_Len}], [Optional number of digits{Disp_Len}], [Optional buffer name{DispBuf}]) | - TM1637/1638 OEM Lib: Clear display buffer
+-> tmCLRdisp  Clear all display | TM1637/1638 OEM Lib - Clear all display digits
+-> tmCtrlSnd Send Control Byte | TM1637/1638 OEM Lib - Send TM1637/1638 Control Byte *
+-> tmGetKey  Read Button/Key press | TM1637/1638 OEM Lib - Get Key pressed,  Button Number set in 'BtnVal' Var *
+-> tmScrlBuf (Array name, [Optional Buffer name{DispBuf}]) | - TM1637/1638 OEM Lib: Scroll Buffer
+
+-> TM_1637/1638_OEM_Lib-Variables - Settings/Options list...  | Following is a list of Variables to set for TM1637/1638_OEM_Cmd_Lib.h
+-> TM_DispLen - (byte constant) TM1637/1638 Digit Length of 7seg display | use as reference to right digit
+-> TM_6dReMap  (bit var) TM1637 Remap for 6d module (with swapped pins) | TM_6dReMap = On/Off {default = Off}
+-> TM_Blank0 - (bit var) TM1637/1638 Enable zero Blanking | TM_blank0 = On/Off {default = ON}
+-> TM_Bright - (byte var) TM1637/1638 Set LED brightness |  TM_bright = Value (0 - 7) {default = 0}
+-> TM_Disp - (bit var) Set TM1637/1638 display On or Off |  TM_disp = On/Off {default = ON}
+-> TM_dpPos  - (byte var) TM1637/1638 Position of DecimalPoint  | TMdpPos = Value (1 - 6){default = 0} 0 = off
+-> TM_FlashRate - (byte var) TM1637/1638 Set Flash Rate | TM_FlashRate = Value (1 - 255) {default = 100} val*4ms eg. 100 = 400ms
+-> TM_Scroll - (bit var) TM1637/1638 Scroll long strings |  TM_Scroll = On/Off {default = Off}
+-> TM_ScrollRate - (byte var) TM1637/1638 Set scroll speed |  ScrollSpd = Value (1 - 255){default = 75} val*4ms eg. 100 = 400ms
+-> TM_ButnVal - (byte var) TM1637 Button pressed value | Set by tmGetKey (1 - 16/24)
+-> TM_KeyChk - (bit var) TM1637/1638 Enable check keypress in TM_FlashRate |  TM_KeyChk = On/Off {default = Off}
+-> TM_LEDs - (byte constant) TM1637/1638 buffer use for discrete LED's |
+-> TM_DispBuf - (byte array) TM1637/1638 Display Buffer |  7seg digit values (0 - 255)

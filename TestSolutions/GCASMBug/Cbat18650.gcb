@@ -1,0 +1,375 @@
+'Use MPASM to resolve.
+'see assembly.bi lines 684 where the issue may lie
+'emailed Hugh on 5/9/2020
+
+'add ?  B=(Val(HashMapGetStr(ASMSymbols, Trim(Mid(DataSource, 8)) )) AND 6144) /2048
+
+'I used real PIC Sim with USART to show results
+
+'****************************************************************
+'*  Date    : 19/04/2019                                          *
+'*  Version :                    *
+'*  Notes   : Controller banco batteria 4X piombo 12V tubolari     *
+'*          : 48V totali                                     *
+'****************************************************************
+#chip 16F877A,8    ' Clock
+#option explicit
+
+' -- MPASM config
+#config OSC=HS, PWRTE=ON, BOREN=ON, LVP=OFF, WDTE=OFF, DEBUG=OFF
+
+'===========================================================================
+'*****  SETTAGGIO PORTE
+#define AD0     PORTA.0     ' A/D tensione Batt1
+#define AD1     PORTA.1     ' A/D tensione 2
+#define AD2     PORTA.2     ' A/D 3
+#define AD3     PORTA.3     ' A/D 4
+'#define Buzz    PORTA.4     ' buzzer errore o avviso problema attivo LOW
+#define AD4     PORTA.5     ' A/D corrente linea 48V  Inp/Out
+'-------------------
+#define buzz       PORTB.0    '
+#define Rl2       PORTB.1    '    "     2
+#define Rl3       PORTB.2    '    "     3
+#define rst       PORTB.3    ' RESET ESP8266 (in caso di mancata connessione) OUT
+#define Grid      PORTB.4    ' Inverter Grid 1=ON
+#define conn      PORTB.5    ' input connesione=1 OK  0=OFF
+#define Rxdb      PORTB.6    '
+#define Txdb      PORTB.7    '
+'-- PORTA C indirizzo=7
+#define Ds      PORTC.0      ' DS1820 temperatura ambiente
+#define Inv     PORTC.1      ' INVERTER Sine Wave 48V 1=ON
+#define Vent    PORTC.2      ' ventilatore ambiente 1=ON
+#define Rele    PORTC.3      ' Disattivazione banco batteria
+#define C4      PORTC.4      '
+#define C5      PORTC.5      '
+#define C6      PORTC.6     ' TX dati ESP8266
+#define C7      PORTC.7     ' RX dati ESP8266
+'-- PORTA D
+#define D0      PORTD.0      '
+#define D1      PORTD.1      '
+#define D2      PORTD.2      '
+#define D3      PORTD.3      '
+#define D4      PORTD.4      '
+#define D5      PORTD.5      '
+#define D6      PORTD.6     '
+#define D7      PORTD.7     '
+'-- PORTA E
+#define AD5      PORTE.0    ' A/D temperatura NTC batterie
+#define AD6      PORTE.1    ' A/D corrente GRID immessa in linea
+#define AD7      PORTE.2    ' A/D Tensione pannelli (tensione negativa)
+
+#define USART_BAUD_RATE 9600  'Hser baud rate
+#DEFINE USART_TX_BLOCKING
+#define USART_DELAY off
+#define USART_BLOCKING
+
+/*   seriale SOFTWARE
+#define SerInPort PORTc.7
+#define SerOutPort PORTc.6
+  'Set pin directions
+  Dir SerOutPort Out
+  Dir SerInPort In
+*/
+
+On Interrupt UsartRX1Ready Call RX_USART
+initTimer0 Osc, PS0_256    ' 0.5 uS Ticket
+
+
+' -------- Setup ADC
+#define ADSpeed LowSpeed 0
+#define AD_Acquisition_Time_Select_bits 0b110
+' -------
+#include <DS18s20.h>
+#define   DQ DS ; change port configuration as required
+
+
+'--------------------------------------------------------------
+'--- VARIABILI PROGRAMMA PRINCIPALE  banco 0 - 96 BYTE max ----
+#define OF_amp      515       ' OFFSET corrente
+#define AG_volt     54        ' aggiusta tensione ADC
+
+Dim buffer(5)   'seriale BUFFER
+Dim byte_buf  as Byte
+byte_buf=1
+
+' --
+dim Tmp,Tmp1,Tmp2      as byte
+dim Tmpw,Tmpw1        as word
+dim Tmpl              as long
+dim default           as byte
+
+' ---
+dim Med(7)     as long
+dim Vbat(10)    as word   ' tensione elementi batteria
+dim Vpan        as Word   ' tensione pannelli solari
+dim I_inp       as Word   ' Corrente carica
+dim I_out       as word   ' Corrente scarica
+dim I_grid      as Word   ' Corrente immessa rete
+dim watt        as Word
+
+dim Tc_amb      as byte  ' temperatura ambiente
+dim Tc_delta    as word     ' DELTA temperatura
+dim Vtot        as word     ' tensione totale banco
+dim ventola     as byte
+dim attiva      as byte
+'==== SETTAGGI DELLE PORTE DEL PIC I/O ecc. ======================
+
+' --------  bit a bit controllo 0=output  1=input
+dir porta b'00101111'    ' Impostazioni INP/OUT delle porte
+dir portb b'01100000'    '
+dir portc b'10110000'
+dir portd b'10111111'
+dir porte b'10111111'
+
+'--------- ripristina comportamento RESET ---------
+epread    18,attiva
+epread    17,ventola         ' temperatura accensione ventola (default 30)
+epread    16,default        ' impostazioni di DEFAULT (default 0)
+'- default.0  1= attiva registrazione EEPROM
+'- default.1  1= flag batteria LIMITI TENSIONE ALLERTA
+'- default.2  1= flag temperatura BATTERIA ALLERTA
+'- default.3  1= flag invia Min/Max su ESP8266
+'- default.7  1= ventola manuale
+
+'start initialization process
+Buzz= 1   ' Buzzer ON
+
+'
+' "4=Inverter SineWave   5=Ventola"
+' --------  bit0=GRID,1=SINE,2 ,4=ventola,5=batteria // 1=attiva 0=disable
+grid= attiva.0  'Grid= 1   ' GRID attiva inverter
+inv=  attiva.1   'inv =1  SINE WAVE INVERTER ON
+vent= attiva.2   ' vent=1 ventola ON
+rele= attiva.3  ' rele=1 rele batterie ON
+' .....
+
+wait 2 S
+
+buzz= ! buzz    'buzzer off
+byte_buf=1      ' RESET buffer RX (elimina tx ESP avviso)
+
+' ------ MENU PRINCIPALE
+
+do
+
+ad_let      ' -- legge entrate ADC
+
+' -- Tensione totale controllo
+Vtot=0
+for tmp=1 to 4
+  Vtot= Vtot + vbat(tmp)
+  if vbat(tmp) < 110 or vbat(tmp) > 142 Then  ' superamento limiti vitali
+    default.1=1   ' ALLERTA TENSIONE
+    buzz=1
+   Else
+    default.1=0: buzz=0
+  end if
+Next
+
+' --- controlla temperatura BATTERIE (ponte NTC meta tensione)
+TC_delta= 0
+if vbat(6) >= OF_amp then TC_delta= vbat(6)- OF_amp
+if vbat(6) < OF_amp then TC_delta= OF_amp - vbat(6)
+
+if default.7=1 then     'accende ventola manuale
+  vent=1
+  goto esc_vent
+end If
+
+if tc_amb > ventola and vent=0 then    ' temperatura ambiente elevata
+  vent=1      ' attiva ventilatore
+  buzz= ! buzz:wait 5 s:buzz= ! buzz
+end if
+if tc_amb < ventola-1 then vent=0
+
+esc_vent:
+
+'--- lettura e calcolo corrente carica scarica 60mV X amp
+i_inp=0:i_out=0
+if vbat(5) <>  OF_amp then
+  if vbat(5) > OF_amp then I_out= vbat(5)- OF_amp
+  if vbat(5) < OF_amp then I_inp= OF_amp - vbat(5)
+  I_out= (i_out*10)/14: I_inp= (I_inp*10)/12
+end If
+
+' -- SCRITTURA su web esp8266 SERIALE
+HSerprint "TENSIONI "
+for tmp=1 to 4
+    HSerprint "-(":HSerprint tmp:HSerPrint ")"
+    HSerprint vbat(tmp)/10:HSerprint "."
+    if vbat(tmp)%100 < 10 then HSerprint "0"
+    HSerPrint vbat(tmp)%10
+next
+HSerPrint " - Vout="
+HSerprint Vtot/10:HSerprint "."
+if Vtot%100 < 10 then HSerprint "0"
+HSerprint vtot%10
+vpan= vpan/5: vpan=(204-vpan)' + vtot
+HSerPrint " - Volt Pann="
+HSerprint Vpan/10:HSerprint "."
+if Vpan%100 < 10 then HSerprint "0"
+HSerprint vpan%10
+HSerSend 13   ' FINE  LINEA 1
+
+' ------------------------------
+HSerprint "CORRENTE BATT. "
+HSerprint " Carica=":HSerprint I_inp/10:HSerprint ".":HSerprint I_inp%10
+HSerprint " Scarica=":HSerprint I_out/10:HSerprint ".":HSerprint I_out%10
+HSerprint " GRID =":HSerprint watt:HSerprint " Watt"
+HSerSend 13   ' FINE  LINEA 2
+' ------------------------------
+HSerprint "TEMPERATURA "
+HSerprint "-(Batteria)=":HSerprint TC_delta
+HSerprint " (Ambiente)=":HSerprint tc_amb:HSerprint "C "
+
+HSerSend 13   ' FINE  LINEA 3
+
+' manda registrazioni se attivato
+if default.3=1  then
+  read_ep   ' manda WEB registrazione Min/Max
+  HSerSend 13   ' FINE  LINEA 4
+end If
+
+' ------ Messaggi di stato su ESP8266
+if tc_delta > 20 then
+  buzz=1
+  HSerprint " ! ALLERTA Tc. batt. !"
+  default.2=1
+' -- Blocco carica scarica DISATTIVA MOSFET
+  rele=0 'then HSerprint " ! STOP ERRORE !"
+ Else
+  default.2=0
+  buzz=0
+end If
+
+if default.1=1 then HSerprint "! ALLERTA Tensione batt. !"
+hserprint " -Byte.":hserprint attiva:hserprint "- "  ' invia byte controllo attivazioni
+
+HSerSend 10  ' FINE  invio seriale messaggi
+
+if default.0=1 then registra  ' salva valori Min/Max in EEPROM
+
+' ---- verifica comandi da WEB ESP8266 'ricevuto comandi byte1=comandi,2=255,3=10,4=13,4=255
+repeat 35  ' cicla X 6 secondi
+  if byte_buf > 5 then   ' buffer is full!!
+    if buffer(2)=255 and buffer(3)=10 and buffer(4)=13 and buffer(5)=255 then
+      grid= buffer(1).0
+      inv=  buffer(1).1
+      vent= buffer(1).2
+      rele= buffer(1).3
+      ' .....
+      default.3= buffer(1).7     ' se=1 imposta visualizzazione WEB
+      if buffer(1).6= 1 then canc_e   ' RESET registrazioni Min/Max
+      buffer(1).6= 0
+      attiva=buffer(1)
+      epwrite 18,attiva:epwrite 16,default   ' salva  attivazioni
+
+    end if
+    byte_buf=1    ' resetta buffer
+  end if
+  wait 100 ms
+end repeat
+
+
+
+loop
+
+
+sub ad_let    'legge i 4 ADC delle batterie
+  for tmp=1 to 6
+    med(tmp)=0
+  next
+ repeat 100
+  vbat(1)= (ReadAD10(an0) * AG_volt)/100      'batteria 1� /10
+  vbat(2)= (ReadAD10(an1) * 55)/102      ' /10
+  vbat(3)= (ReadAD10(an2) * 52)/97      ' /10
+  vbat(4)= (ReadAD10(an3) * 65)/101      ' /11
+  ' legge ADC corrente temperatura
+  vbat(5)= ReadAD10(an4)       ' corrente carica scarica
+  vbat(6)= ReadAD10(an5)      ' PORTE 0  delta temperatura
+  med(1) += vbat(1):med(2) += vbat(2):med(3) += vbat(3):med(4) += vbat(4):
+  med(5) += vbat(5):med(6) += vbat(6)
+ end repeat
+  for tmp=1 to 6
+    vbat(tmp)= med(tmp)/100
+  next
+  vbat(4)= vbat(4)-vbat(3)
+  vbat(3)= vbat(3)-vbat(2)
+  vbat(2)= vbat(2)-vbat(1)
+
+ tc_amb = readtemp          ' legge DS1820 temperatura ambiente
+
+' lettura sensore corrente INVERTER GRID immessa rete 230V
+  i_grid=0
+  tmr0=0
+  do    ' leggi ADC X 20 mS circa
+    tmpw= ReadAD10(an6)   'letture max  corrente alternata ACS712-20A
+    if tmpw > i_grid then i_grid=tmpw
+  loop While tmr0 < 150
+  watt=0
+  if i_grid > OF_amp+1 then watt= (i_grid - OF_amp+1)* 9
+
+' lettura tensione pannelli solari TENSIONE NEGATIVA
+  vpan= ReadAD10(an7)
+end sub
+
+
+
+
+
+sub registra
+  for tmp=1 to 4
+    epread tmp,tmp1
+    if vbat(tmp) > tmp1 then epwrite tmp,vbat(tmp)
+    if vbat(tmp) < tmp1 then epwrite tmp+4,vbat(tmp)
+  next
+  tmp= vtot/10
+  epread 9,tmp1:if tmp > tmp1 then epwrite 9,Tmp
+  epread 10,tmp1:if tmp < tmp1 then epwrite 10,Tmp
+end sub
+        
+sub read_ep
+HSerprint "Max:"
+for tmp=1 to 4
+  epread tmp,tmp1
+  HSerprint tmp1/10:HSerprint "."
+  if tmp1%100 < 10 then HSerprint "0"
+  HSerPrint tmp1%10:HSerprint "-"
+next
+HSerprint " Min:"
+for tmp=5 to 8
+  epread tmp,tmp1
+  HSerprint tmp1/10:HSerprint "."
+  if tmp1%100 < 10 then HSerprint "0"
+  HSerPrint tmp1%10:HSerprint "-"
+next
+HSerprint " Vout_Min:"
+epread 9,tmp1
+HSerprint tmp1/10:HSerprint "."
+if tmp1%100 < 10 then HSerprint "0"
+HSerPrint tmp1%10:HSerprint "-"
+HSerprint " Vout_Max:"
+epread 10,tmp1
+HSerprint tmp1/10:HSerprint "."
+if tmp1%100 < 10 then HSerprint "0"
+HSerPrint tmp1%10:HSerprint "-"
+end sub
+
+sub canc_e
+  for tmp=1 to 4
+    epwrite tmp,0
+    epwrite tmp+4,255
+  next
+  epwrite 9,0
+  epwrite 10,255
+end sub
+
+Sub RX_USART
+  if byte_buf > 5 then
+    buffer(0)= HSerReceive  ' scarta BYTE in eccesso
+    exit sub
+  end if
+  buffer(byte_buf) = HSerReceive
+  byte_buf ++
+
+End Sub
