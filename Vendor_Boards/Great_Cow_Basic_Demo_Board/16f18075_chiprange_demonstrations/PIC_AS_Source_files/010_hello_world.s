@@ -58,44 +58,93 @@
 
 ;START OF PROGRAM MEMORY PAGE 0
 	ORG	5
+GLOBAL	BASPROGRAMSTART
 BASPROGRAMSTART:
 ;CALL INITIALISATION ROUTINES
 	CALL	INITSYS
 
 ;START OF THE MAIN PROGRAM
+;''
+;'' The  most simple sample for GCGB and GCB.
+;''
+;'' This simply set an LED on.  The LED is attached to portb as shown below via a suitable resistor to 0v.
+;''
+;''
+;''************************************************************************
+;''
+;''@author  EvanV
+;''@licence GPL
+;''@version 1.01
+;''@date    15/09/2022
+;----- Configuration
+;Chip Settings.
+;*****************************************************************************************************
+;Main program commences here.. everything before this is setup for the board.
+;Set the a port as an output, we will use only one BIT to connect to the LED
+;Dir PORTB.1 OUT
 	BCF	TRISB,1
+;Set one bit of the port on.
+;You can try set andother portb bit - another LED, remember you will need a resistor!
+;PORTB.1 = 1
 	BSF	LATB,1
+;End
+;End
 	GOTO	BASPROGRAMEND
+GLOBAL	BASPROGRAMEND
 BASPROGRAMEND:
 	SLEEP
 	GOTO	BASPROGRAMEND
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (159)
+GLOBAL	INITSYS
 INITSYS:
 ;asm showdebug This code block sets the internal oscillator to ChipMHz
+;OSCCON2 = 0
 	BANKSEL	OSCCON2
 	CLRF	OSCCON2
+;OSCCON3 = 0
 	CLRF	OSCCON3
+;Set OSCFRQ values for MCUs with OSCSTAT... the 16F180xx MCU family 32 mhz
+;OSCFRQ = 0b00000101
 	MOVLW	5
 	MOVWF	OSCFRQ
 ;asm showdebug _Complete_the_chip_setup_of_BSR,ADCs,ANSEL_and_other_key_setup_registers_or_register_bits
+;Ensure all ports are set for digital I/O and, turn off A/D
+;SET ADFM OFF
 	BANKSEL	ADCON0
 	BCF	ADCON0,2
+;Switch off A/D Var(ADCON0)
+;SET ADCON0.ADON OFF
 	BCF	ADCON0,7
+;ANSELA = 0
 	BANKSEL	ANSELA
 	CLRF	ANSELA
+;ANSELB = 0
 	CLRF	ANSELB
+;ANSELC = 0
 	CLRF	ANSELC
+;ANSELD = 0
 	CLRF	ANSELD
+;ANSELE = 0
 	CLRF	ANSELE
+;Set comparator register bits for many MCUs with register CM2CON0
+;C1EN = 0
 	BANKSEL	CM1CON0
 	BCF	CM1CON0,7
+;
+;'Turn off all ports
+;PORTA = 0
 	BANKSEL	PORTA
 	CLRF	PORTA
+;PORTB = 0
 	CLRF	PORTB
+;PORTC = 0
 	CLRF	PORTC
+;PORTD = 0
 	CLRF	PORTD
+;PORTE = 0
 	CLRF	PORTE
 	RETURN
 

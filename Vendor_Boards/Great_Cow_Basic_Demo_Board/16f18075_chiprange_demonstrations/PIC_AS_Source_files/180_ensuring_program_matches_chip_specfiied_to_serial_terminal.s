@@ -45,75 +45,141 @@
 ;********************************************************************************
 
 ;Set aside RAM memory locations for variables. All variables are global.
+GLOBAL	ASC
  ASC                              EQU 32          ; 0X20
+GLOBAL	COMPORT
  COMPORT                          EQU 33          ; 0X21
+GLOBAL	DELAYTEMP
  DELAYTEMP                        EQU 112          ; 0X70
+GLOBAL	DELAYTEMP2
  DELAYTEMP2                       EQU 113          ; 0X71
+GLOBAL	HSERPRINTCRLFCOUNT
  HSERPRINTCRLFCOUNT               EQU 34          ; 0X22
+GLOBAL	LTRIM
  LTRIM                            EQU 9159          ; 0X23C7
+GLOBAL	MID
  MID                              EQU 9118          ; 0X239E
+GLOBAL	PRINTLEN
  PRINTLEN                         EQU 35          ; 0X23
+GLOBAL	RTRIM
  RTRIM                            EQU 9077          ; 0X2375
+GLOBAL	SERDATA
  SERDATA                          EQU 36          ; 0X24
+GLOBAL	STRINGPOINTER
  STRINGPOINTER                    EQU 37          ; 0X25
+GLOBAL	SYSARRAYTEMP1
  SYSARRAYTEMP1                    EQU 38          ; 0X26
+GLOBAL	SYSARRAYTEMP2
  SYSARRAYTEMP2                    EQU 39          ; 0X27
+GLOBAL	SYSBYTETEMPA
  SYSBYTETEMPA                     EQU 117          ; 0X75
+GLOBAL	SYSBYTETEMPB
  SYSBYTETEMPB                     EQU 121          ; 0X79
+GLOBAL	SYSBYTETEMPX
  SYSBYTETEMPX                     EQU 112          ; 0X70
+GLOBAL	SYSCALCTEMPA
  SYSCALCTEMPA                     EQU 117          ; 0X75
+GLOBAL	SYSCHAR
  SYSCHAR                          EQU 40          ; 0X28
+GLOBAL	SYSCHARCOUNT
  SYSCHARCOUNT                     EQU 41          ; 0X29
+GLOBAL	SYSCHARLT
  SYSCHARLT                        EQU 42          ; 0X2A
+GLOBAL	SYSCHARLTCOUNT
  SYSCHARLTCOUNT                   EQU 43          ; 0X2B
+GLOBAL	SYSCHARRT
  SYSCHARRT                        EQU 44          ; 0X2C
+GLOBAL	SYSCHARRTCOUNT
  SYSCHARRTCOUNT                   EQU 45          ; 0X2D
+GLOBAL	SYSCHARSTART
  SYSCHARSTART                     EQU 46          ; 0X2E
+GLOBAL	SYSDIVMULTA
  SYSDIVMULTA                      EQU 119          ; 0X77
+GLOBAL	SYSDIVMULTA_H
  SYSDIVMULTA_H                    EQU 120          ; 0X78
+GLOBAL	SYSFORLOOPSTEP4
  SYSFORLOOPSTEP4                  EQU 47          ; 0X2F
+GLOBAL	SYSFORLOOPSTEP4_H
  SYSFORLOOPSTEP4_H                EQU 48          ; 0X30
+GLOBAL	SYSINTEGERTEMPA
  SYSINTEGERTEMPA                  EQU 117          ; 0X75
+GLOBAL	SYSINTEGERTEMPA_H
  SYSINTEGERTEMPA_H                EQU 118          ; 0X76
+GLOBAL	SYSINTEGERTEMPB
  SYSINTEGERTEMPB                  EQU 121          ; 0X79
+GLOBAL	SYSINTEGERTEMPB_H
  SYSINTEGERTEMPB_H                EQU 122          ; 0X7A
+GLOBAL	SYSPRINTDATAHANDLER
  SYSPRINTDATAHANDLER              EQU 49          ; 0X31
+GLOBAL	SYSPRINTDATAHANDLER_H
  SYSPRINTDATAHANDLER_H            EQU 50          ; 0X32
+GLOBAL	SYSPRINTTEMP
  SYSPRINTTEMP                     EQU 51          ; 0X33
+GLOBAL	SYSREPEATTEMP1
  SYSREPEATTEMP1                   EQU 52          ; 0X34
+GLOBAL	SYSSTRDATA
  SYSSTRDATA                       EQU 53          ; 0X35
+GLOBAL	SYSSTRINGA
  SYSSTRINGA                       EQU 119          ; 0X77
+GLOBAL	SYSSTRINGA_H
  SYSSTRINGA_H                     EQU 120          ; 0X78
+GLOBAL	SYSSTRINGLENGTH
  SYSSTRINGLENGTH                  EQU 118          ; 0X76
+GLOBAL	SYSSTRINGPARAM1
  SYSSTRINGPARAM1                  EQU 8945          ; 0X22F1
+GLOBAL	SYSSTRINGTEMP
  SYSSTRINGTEMP                    EQU 54          ; 0X36
+GLOBAL	SYSSYSINSTRING2HANDLER
  SYSSYSINSTRING2HANDLER           EQU 55          ; 0X37
+GLOBAL	SYSSYSINSTRING2HANDLER_H
  SYSSYSINSTRING2HANDLER_H         EQU 56          ; 0X38
+GLOBAL	SYSSYSINSTRING3HANDLER
  SYSSYSINSTRING3HANDLER           EQU 57          ; 0X39
+GLOBAL	SYSSYSINSTRING3HANDLER_H
  SYSSYSINSTRING3HANDLER_H         EQU 58          ; 0X3A
+GLOBAL	SYSSYSINSTRINGAHANDLER
  SYSSYSINSTRINGAHANDLER           EQU 59          ; 0X3B
+GLOBAL	SYSSYSINSTRINGAHANDLER_H
  SYSSYSINSTRINGAHANDLER_H         EQU 60          ; 0X3C
+GLOBAL	SYSSYSINSTRINGHANDLER
  SYSSYSINSTRINGHANDLER            EQU 61          ; 0X3D
+GLOBAL	SYSSYSINSTRINGHANDLER_H
  SYSSYSINSTRINGHANDLER_H          EQU 62          ; 0X3E
+GLOBAL	SYSTEMP1
  SYSTEMP1                         EQU 63          ; 0X3F
+GLOBAL	SYSTEMP2
  SYSTEMP2                         EQU 64          ; 0X40
+GLOBAL	SYSTEMP2_H
  SYSTEMP2_H                       EQU 65          ; 0X41
+GLOBAL	SYSTEMP3
  SYSTEMP3                         EQU 66          ; 0X42
+GLOBAL	SYSTEMPARRAY
  SYSTEMPARRAY                     EQU 9036          ; 0X234C
+GLOBAL	SYSTEMPLT
  SYSTEMPLT                        EQU 67          ; 0X43
+GLOBAL	SYSTEMPRT
  SYSTEMPRT                        EQU 68          ; 0X44
+GLOBAL	SYSWAITTEMPMS
  SYSWAITTEMPMS                    EQU 114          ; 0X72
+GLOBAL	SYSWAITTEMPMS_H
  SYSWAITTEMPMS_H                  EQU 115          ; 0X73
+GLOBAL	SYSWAITTEMPS
  SYSWAITTEMPS                     EQU 116          ; 0X74
+GLOBAL	TRIM
  TRIM                             EQU 8995          ; 0X2323
+GLOBAL	UCASE
  UCASE                            EQU 8954          ; 0X22FA
 
 ;********************************************************************************
 
 ;ALIAS VARIABLES
+GLOBAL	AFSR0
  AFSR0                            EQU 4
+GLOBAL	AFSR0_H
  AFSR0_H                          EQU 5
+GLOBAL	SYSMID_0
  SYSMID_0                         EQU 1486
+GLOBAL	SYSUCASE_0
  SYSUCASE_0                       EQU 1226
 
 ;********************************************************************************
@@ -131,6 +197,7 @@
 
 ;START OF PROGRAM MEMORY PAGE 0
 	ORG	5
+GLOBAL	BASPROGRAMSTART
 BASPROGRAMSTART:
 ;CALL INITIALISATION ROUTINES
 	CALL	INITSYS
@@ -138,17 +205,71 @@ BASPROGRAMSTART:
 	CALL	INITUSART
 
 ;START OF THE MAIN PROGRAM
+;''
+;'' This demonstration will show how you can determine the chip parameters, we show the ChipNameStr
+;''
+;'' This demonstration how you can check your program is intented for a specific Microcontroller
+;''
+;''************************************************************************
+;''@author  EvanV
+;''@licence GPL
+;''@version 1.01
+;''@date    15/09/2022
+;----- Configuration
+;----- Configuration
+;Chip Settings.
+;Generated by PIC PPS Tool for Great Cow Basic
+;PPS Tool version: 0.0.6.2
+;PinManager data: Not available (3)
+;Generated for 16F18075
+;
+;Template comment at the start of the config file
+;
+;Template comment at the end of the config file
+;' -------------------PORTA----------------
+;' Bit#:  -7---6---5---4---3---2---1---0---
+;' IO:    ----------------------------ADC--
+;'-----------------------------------------
+;'
+;' -------------------PORTB----------------
+;' Bit#:  -7---6---5---4---3---2---1---0---
+;' IO:    --------IN-LED--LED-LED LED -----
+;'-----------------------------------------
+;'
+;' ------------------PORTC-----------------
+;' Bit#:  -7---6---5---4---3---2---1---0---
+;' IO:    ----TX---------------------------
+;'-----------------------------------------
+;'
+;' ------------------PORTE-----------------
+;' Bit#:  -7---6---5---4---3---2---1---0---
+;' IO:    ----------------RST--------------
+;'-----------------------------------------
+;'
+;Define constants to make things easier. We can reuse these at any time.
+;Dir     LEDD1         Out
 	BCF	TRISB,1
+;Dir     LEDD2         Out
 	BCF	TRISB,2
+;Dir     LEDD3         Out
 	BCF	TRISB,3
+;Dir     LEDD4         Out
 	BCF	TRISB,4
+;Dir     POTENTIOMETER In
 	BSF	TRISA,0
+;Dir     SWITCHIN      In
 	BSF	TRISB,5
+;Setup Serial port
+;*****************************************************************************************************
+;Main program commences here.. everything before this is setup for the board.
+;Now assumes Serial Terminal is operational
+;HSerPrintCRLF
 	MOVLW	1
 	MOVWF	HSERPRINTCRLFCOUNT
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINTCRLF
+;HSerPrint  ChipNameStr + " Great Cow BASIC Demo"
 	MOVLW	LOW SYSSTRINGPARAM1
 	MOVWF	FSR1L
 	MOVLW	HIGH SYSSTRINGPARAM1
@@ -176,15 +297,19 @@ BASPROGRAMSTART:
 	MOVWF	SYSPRINTDATAHANDLER_H
 	MOVLW	1
 	MOVWF	COMPORT
+;USING SYSSTRINGPARAM1*8
 	CALL	HSERPRINT304
+;HSerPrintCRLF
 	MOVLW	1
 	MOVWF	HSERPRINTCRLFCOUNT
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINTCRLF
+;Wait 1 s
 	MOVLW	1
 	MOVWF	SYSWAITTEMPS
 	CALL	DELAY_S
+;If Trim( UCase( "16F18075") )  <> ChipNameStr Then
 	MOVLW	LOW STRINGTABLE2
 	MOVWF	SYSSYSINSTRINGHANDLER
 	MOVLW	(HIGH STRINGTABLE2) | 128
@@ -216,6 +341,7 @@ BASPROGRAMSTART:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ELSE1_1
+;HSerPrint "Wrong Microcontroller program intended for 16F18075"
 	MOVLW	LOW STRINGTABLE3
 	MOVWF	SYSPRINTDATAHANDLER
 	MOVLW	(HIGH STRINGTABLE3) | 128
@@ -223,11 +349,13 @@ BASPROGRAMSTART:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT304
+;HSerPrintCRLF
 	MOVLW	1
 	MOVWF	HSERPRINTCRLFCOUNT
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINTCRLF
+;HSerPrint "The Microcontroller is a "
 	MOVLW	LOW STRINGTABLE4
 	MOVWF	SYSPRINTDATAHANDLER
 	MOVLW	(HIGH STRINGTABLE4) | 128
@@ -235,6 +363,7 @@ BASPROGRAMSTART:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT304
+;HSerPrint ChipNameStr
 	MOVLW	LOW STRINGTABLE72
 	MOVWF	SYSPRINTDATAHANDLER
 	MOVLW	(HIGH STRINGTABLE72) | 128
@@ -242,15 +371,21 @@ BASPROGRAMSTART:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT304
+;HSerPrintCRLF
 	MOVLW	1
 	MOVWF	HSERPRINTCRLFCOUNT
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINTCRLF
+;Wait While TRUE
+GLOBAL	SYSWAITLOOP1
 SYSWAITLOOP1:
 	GOTO	SYSWAITLOOP1
+;Else
 	GOTO	ENDIF1
+GLOBAL	ELSE1_1
 ELSE1_1:
+;HSerPrint "The Microcontroller program intended for the "
 	MOVLW	LOW STRINGTABLE5
 	MOVWF	SYSPRINTDATAHANDLER
 	MOVLW	(HIGH STRINGTABLE5) | 128
@@ -258,6 +393,7 @@ ELSE1_1:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT304
+;HSerPrint ChipNameStr
 	MOVLW	LOW STRINGTABLE72
 	MOVWF	SYSPRINTDATAHANDLER
 	MOVLW	(HIGH STRINGTABLE72) | 128
@@ -265,36 +401,57 @@ ELSE1_1:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT304
+;HSerPrintCRLF
 	MOVLW	1
 	MOVWF	HSERPRINTCRLFCOUNT
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINTCRLF
+;Wait While TRUE
+GLOBAL	SYSWAITLOOP2
 SYSWAITLOOP2:
 	GOTO	SYSWAITLOOP2
+;End If
+GLOBAL	ENDIF1
 ENDIF1:
+;End
 	GOTO	BASPROGRAMEND
+;----- Support methods.  Subroutines and Functions
+GLOBAL	BASPROGRAMEND
 BASPROGRAMEND:
 	SLEEP
 	GOTO	BASPROGRAMEND
 
 ;********************************************************************************
 
+;SOURCE: STRING.H (524)
+GLOBAL	FN_ASC
 FN_ASC:
+;Asc = 0
 	CLRF	ASC
+;Get length of string, don't try _asc ing if it's empty
+;SysCharCount = SysInStringA(0)
 	MOVF	SYSSYSINSTRINGAHANDLER,W
 	MOVWF	FSR0L
 	MOVF	SYSSYSINSTRINGAHANDLER_H,W
 	MOVWF	FSR0H
 	MOVF	INDF0,W
 	MOVWF	SYSCHARCOUNT
+;If SysCharCount = 0 Then Exit Function
 	MOVF	SYSCHARCOUNT,F
 	BTFSC	STATUS,2
+;If SysCharCount = 0 Then Exit Function
 	RETURN
+;If SysCharCount = 0 Then Exit Function
+;if Syschar > SysCharCount Then Exit Function
 	MOVF	SYSCHAR,W
 	SUBWF	SYSCHARCOUNT,W
 	BTFSS	STATUS,0
+;if Syschar > SysCharCount Then Exit Function
 	RETURN
+;if Syschar > SysCharCount Then Exit Function
+;Get first char of string, only first character is of interest, Syschar if provided
+;Asc = SysInStringA( Syschar )
 	MOVF	SYSCHAR,W
 	ADDWF	SYSSYSINSTRINGAHANDLER,W
 	MOVWF	FSR0L
@@ -307,14 +464,18 @@ FN_ASC:
 
 ;********************************************************************************
 
+GLOBAL	DELAY_MS
 DELAY_MS:
 	INCF	SYSWAITTEMPMS_H, F
+GLOBAL	DMS_START
 DMS_START:
 	MOVLW	14
 	MOVWF	DELAYTEMP2
+GLOBAL	DMS_OUTER
 DMS_OUTER:
 	MOVLW	189
 	MOVWF	DELAYTEMP
+GLOBAL	DMS_INNER
 DMS_INNER:
 	DECFSZ	DELAYTEMP, F
 	GOTO	DMS_INNER
@@ -328,7 +489,9 @@ DMS_INNER:
 
 ;********************************************************************************
 
+GLOBAL	DELAY_S
 DELAY_S:
+GLOBAL	DS_START
 DS_START:
 	MOVLW	232
 	MOVWF	SYSWAITTEMPMS
@@ -341,19 +504,27 @@ DS_START:
 
 ;********************************************************************************
 
+;OVERLOADED SIGNATURE: STRING:BYTE:, SOURCE: USART.H (1526)
+GLOBAL	HSERPRINT304
 HSERPRINT304:
+;PrintLen = PrintData(0)
 	MOVF	SYSPRINTDATAHANDLER,W
 	MOVWF	FSR0L
 	MOVF	SYSPRINTDATAHANDLER_H,W
 	MOVWF	FSR0H
 	MOVF	INDF0,W
 	MOVWF	PRINTLEN
+;If PrintLen <> 0 then
 	MOVF	PRINTLEN,F
 	BTFSC	STATUS,2
 	GOTO	ENDIF12
+;Write Data
+;for SysPrintTemp = 1 to PrintLen
 	MOVLW	1
 	MOVWF	SYSPRINTTEMP
+GLOBAL	SYSFORLOOP3
 SYSFORLOOP3:
+;HSerSend(PrintData(SysPrintTemp),comport )
 	MOVF	SYSPRINTTEMP,W
 	ADDWF	SYSPRINTDATAHANDLER,W
 	MOVWF	FSR0L
@@ -363,6 +534,8 @@ SYSFORLOOP3:
 	MOVF	INDF0,W
 	MOVWF	SERDATA
 	CALL	HSERSEND294
+;next
+;POSITIVE VALUE STEP HANDLER IN FOR-NEXT STATEMENT :#4P 
 	MOVF	SYSPRINTTEMP,W
 	SUBWF	PRINTLEN,W
 	MOVWF	SYSTEMP1
@@ -372,61 +545,97 @@ SYSFORLOOP3:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF13
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	INCF	SYSPRINTTEMP,F
 	GOTO	SYSFORLOOP3
+;END IF
+GLOBAL	ENDIF13
 ENDIF13:
+GLOBAL	SYSFORLOOPEND3
 SYSFORLOOPEND3:
+;End If
+GLOBAL	ENDIF12
 ENDIF12:
+;CR
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: USART.H (1683)
+GLOBAL	HSERPRINTCRLF
 HSERPRINTCRLF:
+;repeat HSerPrintCRLFCount
 	MOVF	HSERPRINTCRLFCOUNT,W
 	MOVWF	SYSREPEATTEMP1
 	BTFSC	STATUS,2
 	GOTO	SYSREPEATLOOPEND1
+GLOBAL	SYSREPEATLOOP1
 SYSREPEATLOOP1:
+;HSerSend(13,comport)
 	MOVLW	13
 	MOVWF	SERDATA
 	CALL	HSERSEND294
+;HSerSend(10,comport)
 	MOVLW	10
 	MOVWF	SERDATA
 	CALL	HSERSEND294
+;end Repeat
 	DECFSZ	SYSREPEATTEMP1,F
 	GOTO	SYSREPEATLOOP1
+GLOBAL	SYSREPEATLOOPEND1
 SYSREPEATLOOPEND1:
 	RETURN
 
 ;********************************************************************************
 
+;OVERLOADED SIGNATURE: BYTE:BYTE:, SOURCE: USART.H (974)
+GLOBAL	HSERSEND294
 HSERSEND294:
+;Registers/Bits determined by #samevar at top of library
+;if comport = 1 Then
 	DECF	COMPORT,W
 	BTFSS	STATUS,2
 	GOTO	ENDIF25
+;USART_TX_BLOCKING
+;Wait While TXIF = Off
+GLOBAL	SYSWAITLOOP3
 SYSWAITLOOP3:
 	BANKSEL	PIR3
 	BTFSS	PIR3,2
 	GOTO	SYSWAITLOOP3
+;ensure any previous operation has completed
+;Wait until TRMT = 1
+GLOBAL	SYSWAITLOOP4
 SYSWAITLOOP4:
 	BANKSEL	TX1STA
 	BTFSS	TX1STA,1
 	GOTO	SYSWAITLOOP4
+;Write the data byte to the USART.
+;Sets register to value of SerData - where register could be TXREG or TXREG1 or U1TXB set via the #samevar
+;TXREG = SerData
 	BANKSEL	SERDATA
 	MOVF	SERDATA,W
 	BANKSEL	TX1REG
 	MOVWF	TX1REG
+;Add USART_DELAY after the byte is sent by the USART module
+;Wait USART_DELAY
 	MOVLW	1
 	MOVWF	SYSWAITTEMPMS
 	CLRF	SYSWAITTEMPMS_H
 	BANKSEL	STATUS
 	CALL	DELAY_MS
+;end if
+GLOBAL	ENDIF25
 ENDIF25:
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: 180_ENSURING_PROGRAM_MATCHES_CHIP_SPECFIIED_TO_SERIAL_TERMINAL.GCB (28)
+GLOBAL	INITPPS
 INITPPS:
+;Module: EUSART
+;RC6PPS = 0x000E    'TX > RC6
 	MOVLW	14
 	BANKSEL	RC6PPS
 	MOVWF	RC6PPS
@@ -435,36 +644,64 @@ INITPPS:
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (159)
+GLOBAL	INITSYS
 INITSYS:
 ;asm showdebug This code block sets the internal oscillator to ChipMHz
+;OSCCON2 = 0
 	BANKSEL	OSCCON2
 	CLRF	OSCCON2
+;OSCCON3 = 0
 	CLRF	OSCCON3
+;Set OSCFRQ values for MCUs with OSCSTAT... the 16F180xx MCU family 32 mhz
+;OSCFRQ = 0b00000101
 	MOVLW	5
 	MOVWF	OSCFRQ
 ;asm showdebug _Complete_the_chip_setup_of_BSR,ADCs,ANSEL_and_other_key_setup_registers_or_register_bits
+;Ensure all ports are set for digital I/O and, turn off A/D
+;SET ADFM OFF
 	BANKSEL	ADCON0
 	BCF	ADCON0,2
+;Switch off A/D Var(ADCON0)
+;SET ADCON0.ADON OFF
 	BCF	ADCON0,7
+;ANSELA = 0
 	BANKSEL	ANSELA
 	CLRF	ANSELA
+;ANSELB = 0
 	CLRF	ANSELB
+;ANSELC = 0
 	CLRF	ANSELC
+;ANSELD = 0
 	CLRF	ANSELD
+;ANSELE = 0
 	CLRF	ANSELE
+;Set comparator register bits for many MCUs with register CM2CON0
+;C1EN = 0
 	BANKSEL	CM1CON0
 	BCF	CM1CON0,7
+;
+;'Turn off all ports
+;PORTA = 0
 	BANKSEL	PORTA
 	CLRF	PORTA
+;PORTB = 0
 	CLRF	PORTB
+;PORTC = 0
 	CLRF	PORTC
+;PORTD = 0
 	CLRF	PORTD
+;PORTE = 0
 	CLRF	PORTE
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: USART.H (630)
+GLOBAL	INITUSART
 INITUSART:
+;Set the default value for comport
+;comport = 1
 	MOVLW	1
 	MOVWF	COMPORT
 ;asm showdebug Values_calculated_in_the_script
@@ -472,25 +709,49 @@ INITUSART:
 ;asm showdebug _SPBRGL_TEMP=_ SPBRGL_TEMP
 ;asm showdebug _BRG16_TEMP=_ BRG16_TEMP
 ;asm showdebug _BRGH_TEMP=_ BRGH_TEMP
+;Set baud rate for legacy chips
+;SPBRG = SPBRGL_TEMP
 	MOVLW	64
 	BANKSEL	SP1BRGL
 	MOVWF	SP1BRGL
+;Set baud rate for chips with BRG16 bit
+;SPBRGH = SPBRGH_TEMP
 	MOVLW	3
 	MOVWF	SP1BRGH
+;SPBRGL = SPBRGL_TEMP
 	MOVLW	64
 	MOVWF	SP1BRGL
+;BRG16: 16-bit Baud Rate Generator bit
+;1 = 16-bit Baud Rate Generator is used
+;0 = 8-bit Baud Rate Generator is used
+;BRG16 = BRG16_TEMP
 	BSF	BAUD1CON,3
+;Set High Baud Rate Select bit
+;BRGH = BRGH_TEMP
 	BSF	TX1STA,2
+;Enable async and TX mode for most non K42
+;Set SYNC Off
+;Set TXEN On
+;Changed to canskip to silently exit when no USART
+;[canskip]SYNC=0
 	BCF	TX1STA,4
+;[canskip]TXEN=1
 	BSF	TX1STA,5
+;SPEN=1
 	BSF	RC1STA,7
+;Enable TX and RX
+;CREN=1
 	BSF	RC1STA,4
 	BANKSEL	STATUS
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: STRING.H (457)
+GLOBAL	FN_LTRIM
 FN_LTRIM:
+;Get length of string, return empty string.  If you dont do this you will return an uninitialize value... ooops
+;Ltrim = ""
 	MOVLW	LOW LTRIM
 	MOVWF	FSR1L
 	MOVLW	HIGH LTRIM
@@ -500,19 +761,28 @@ FN_LTRIM:
 	MOVLW	(HIGH STRINGTABLE37) & 127
 	MOVWF	SYSSTRINGA_H
 	CALL	SYSREADSTRING
+;SysCharLTCount = SysInString2(0)
 	MOVF	SYSSYSINSTRING2HANDLER,W
 	MOVWF	FSR0L
 	MOVF	SYSSYSINSTRING2HANDLER_H,W
 	MOVWF	FSR0H
 	MOVF	INDF0,W
 	MOVWF	SYSCHARLTCOUNT
+;If SysCharLTCount = 0 Then Exit Function
 	MOVF	SYSCHARLTCOUNT,F
 	BTFSC	STATUS,2
+;If SysCharLTCount = 0 Then Exit Function
 	RETURN
+;If SysCharLTCount = 0 Then Exit Function
+;find first non white space in the string
+;SysCharLT = 0
 	CLRF	SYSCHARLT
+;For SysTempLT = 1 to SysCharLTCount
 	MOVLW	1
 	MOVWF	SYSTEMPLT
+GLOBAL	SYSFORLOOP1
 SYSFORLOOP1:
+;if Asc(Mid (SysInString2, SysTempLT , 1)) <> 32 then
 	MOVF	SYSSYSINSTRING2HANDLER,W
 	MOVWF	SYSSYSINSTRINGHANDLER
 	MOVF	SYSSYSINSTRING2HANDLER_H,W
@@ -533,10 +803,16 @@ SYSFORLOOP1:
 	SUBWF	ASC,W
 	BTFSC	STATUS,2
 	GOTO	ENDIF3
+;SysCharLT = SysTempLT
 	MOVF	SYSTEMPLT,W
 	MOVWF	SYSCHARLT
+;goto FoundNonSpaceChar1
 	GOTO	FOUNDNONSPACECHAR1
+;end if
+GLOBAL	ENDIF3
 ENDIF3:
+;Next
+;POSITIVE VALUE STEP HANDLER IN FOR-NEXT STATEMENT :#4P 
 	MOVF	SYSTEMPLT,W
 	SUBWF	SYSCHARLTCOUNT,W
 	MOVWF	SYSTEMP1
@@ -546,14 +822,21 @@ ENDIF3:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF4
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	INCF	SYSTEMPLT,F
 	GOTO	SYSFORLOOP1
+;END IF
+GLOBAL	ENDIF4
 ENDIF4:
+GLOBAL	SYSFORLOOPEND1
 SYSFORLOOPEND1:
+GLOBAL	FOUNDNONSPACECHAR1
 FOUNDNONSPACECHAR1:
+;if SysCharLT <> 0 then
 	MOVF	SYSCHARLT,F
 	BTFSC	STATUS,2
 	GOTO	ENDIF5
+;Ltrim = Mid (SysInString2, SysCharLT )
 	MOVF	SYSSYSINSTRING2HANDLER,W
 	MOVWF	SYSSYSINSTRINGHANDLER
 	MOVF	SYSSYSINSTRING2HANDLER_H,W
@@ -572,13 +855,20 @@ FOUNDNONSPACECHAR1:
 	MOVLW	HIGH MID
 	MOVWF	FSR0H
 	CALL	SYSCOPYSTRING
+;Exit Function
 	RETURN
+;end if
+GLOBAL	ENDIF5
 ENDIF5:
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: STRING.H (394)
+GLOBAL	FN_MID
 FN_MID:
+;Empty input?
+;If SysInString(0) = 0 Then
 	MOVF	SYSSYSINSTRINGHANDLER,W
 	MOVWF	FSR0L
 	MOVF	SYSSYSINSTRINGHANDLER_H,W
@@ -586,18 +876,29 @@ FN_MID:
 	MOVF	INDF0,F
 	BTFSS	STATUS,2
 	GOTO	ENDIF14
+;Mid(0) = 0
 	BANKSEL	SYSMID_0
 	CLRF	SYSMID_0
+;Exit Function
 	BANKSEL	STATUS
 	RETURN
+;End If
+GLOBAL	ENDIF14
 ENDIF14:
+;Starting position too low?
+;If SysCharStart < 1 Then SysCharStart = 1
 	MOVLW	1
 	SUBWF	SYSCHARSTART,W
 	BTFSC	STATUS,0
 	GOTO	ENDIF15
+;If SysCharStart < 1 Then SysCharStart = 1
 	MOVLW	1
 	MOVWF	SYSCHARSTART
+;If SysCharStart < 1 Then SysCharStart = 1
+GLOBAL	ENDIF15
 ENDIF15:
+;Starting position too high?
+;If SysCharStart > SysInString(0) Then
 	MOVF	SYSSYSINSTRINGHANDLER,W
 	MOVWF	FSR0L
 	MOVF	SYSSYSINSTRINGHANDLER_H,W
@@ -606,12 +907,19 @@ ENDIF15:
 	SUBWF	INDF0,W
 	BTFSC	STATUS,0
 	GOTO	ENDIF16
+;Mid(0) = 0
 	BANKSEL	SYSMID_0
 	CLRF	SYSMID_0
+;Exit Function
 	BANKSEL	STATUS
 	RETURN
+;End If
+GLOBAL	ENDIF16
 ENDIF16:
+;Input length too high?
+;SysCharStart -= 1
 	DECF	SYSCHARSTART,F
+;SysStringTemp = SysInString(0) - SysCharStart 'Max number of characters
 	MOVF	SYSSYSINSTRINGHANDLER,W
 	MOVWF	FSR0L
 	MOVF	SYSSYSINSTRINGHANDLER_H,W
@@ -619,16 +927,24 @@ ENDIF16:
 	MOVF	SYSCHARSTART,W
 	SUBWF	INDF0,W
 	MOVWF	SYSSTRINGTEMP
+;If SysCharCount > SysStringTemp Then
 	MOVF	SYSCHARCOUNT,W
 	SUBWF	SYSSTRINGTEMP,W
 	BTFSC	STATUS,0
 	GOTO	ENDIF17
+;SysCharCount = SysStringTemp
 	MOVF	SYSSTRINGTEMP,W
 	MOVWF	SYSCHARCOUNT
+;End If
+GLOBAL	ENDIF17
 ENDIF17:
+;Copy characters
+;For SysStringTemp = 1 To SysCharCount
 	MOVLW	1
 	MOVWF	SYSSTRINGTEMP
+GLOBAL	SYSFORLOOP4
 SYSFORLOOP4:
+;Mid(SysStringTemp) = SysInString(SysCharStart + SysStringTemp)
 	MOVF	SYSSTRINGTEMP,W
 	ADDWF	SYSCHARSTART,W
 	MOVWF	SYSTEMP1
@@ -649,6 +965,8 @@ SYSFORLOOP4:
 	MOVWF	FSR0H
 	MOVF	SYSARRAYTEMP2,W
 	MOVWF	INDF0
+;Next
+;POSITIVE VALUE STEP HANDLER IN FOR-NEXT STATEMENT :#4P 
 	MOVF	SYSSTRINGTEMP,W
 	SUBWF	SYSCHARCOUNT,W
 	MOVWF	SYSTEMP1
@@ -658,10 +976,15 @@ SYSFORLOOP4:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF18
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	INCF	SYSSTRINGTEMP,F
 	GOTO	SYSFORLOOP4
+;END IF
+GLOBAL	ENDIF18
 ENDIF18:
+GLOBAL	SYSFORLOOPEND4
 SYSFORLOOPEND4:
+;Mid(0) = SysCharCount
 	MOVF	SYSCHARCOUNT,W
 	BANKSEL	SYSMID_0
 	MOVWF	SYSMID_0
@@ -670,7 +993,11 @@ SYSFORLOOPEND4:
 
 ;********************************************************************************
 
+;SOURCE: STRING.H (426)
+GLOBAL	FN_RTRIM
 FN_RTRIM:
+;Get length of string, return empty string.  If you dont do this you will return an uninitialize value... ooops
+;RTrim = ""
 	MOVLW	LOW RTRIM
 	MOVWF	FSR1L
 	MOVLW	HIGH RTRIM
@@ -680,23 +1007,33 @@ FN_RTRIM:
 	MOVLW	(HIGH STRINGTABLE37) & 127
 	MOVWF	SYSSTRINGA_H
 	CALL	SYSREADSTRING
+;SysCharRTCount = SysInString3(0)
 	MOVF	SYSSYSINSTRING3HANDLER,W
 	MOVWF	FSR0L
 	MOVF	SYSSYSINSTRING3HANDLER_H,W
 	MOVWF	FSR0H
 	MOVF	INDF0,W
 	MOVWF	SYSCHARRTCOUNT
+;If SysCharRTCount = 0 Then Exit Function
 	MOVF	SYSCHARRTCOUNT,F
 	BTFSC	STATUS,2
+;If SysCharRTCount = 0 Then Exit Function
 	RETURN
+;If SysCharRTCount = 0 Then Exit Function
+;find first non white space in the string from the Right
+;SysCharRT = 0
 	CLRF	SYSCHARRT
+;For SysTempRT = SysCharRTCount to 1 step -1
 	MOVF	SYSCHARRTCOUNT,W
 	MOVWF	SYSTEMPRT
+GLOBAL	SYSFORLOOP5
 SYSFORLOOP5:
 ;INIT SYSFORLOOPSTEP4 :#0
 	MOVLW	255
 	MOVWF	SYSFORLOOPSTEP4
 	MOVWF	SYSFORLOOPSTEP4_H
+;was Asc(Mid (SysInString3, SysTempRT , 1))
+;if SysInString3(SysTempRT) <> 32 then
 	MOVF	SYSTEMPRT,W
 	ADDWF	SYSSYSINSTRING3HANDLER,W
 	MOVWF	FSR0L
@@ -707,12 +1044,19 @@ SYSFORLOOP5:
 	SUBWF	INDF0,W
 	BTFSC	STATUS,2
 	GOTO	ENDIF20
+;SysCharRT = SysTempRT
 	MOVF	SYSTEMPRT,W
 	MOVWF	SYSCHARRT
+;goto FoundNonSpaceChar2
 	GOTO	FOUNDNONSPACECHAR2
+;end if
+GLOBAL	ENDIF20
 ENDIF20:
+;Next
+;INTEGER NEGATIVE STEP HANDLER IN FOR-NEXT STATEMENT
 	BTFSS	SYSFORLOOPSTEP4_H,7
 	GOTO	ELSE21_1
+;IF ( SYSTEMPRT - 1) } -SYSFORLOOPSTEP4 THEN :#3N
 	DECF	SYSTEMPRT,W
 	MOVWF	SYSTEMP1
 	COMF	SYSFORLOOPSTEP4,W
@@ -733,12 +1077,18 @@ ENDIF20:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF23
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A NEGATIVE VALUE
 	MOVF	SYSFORLOOPSTEP4,W
 	ADDWF	SYSTEMPRT,F
 	GOTO	SYSFORLOOP5
+;END IF
+GLOBAL	ENDIF23
 ENDIF23:
 	GOTO	ENDIF21
+GLOBAL	ELSE21_1
 ELSE21_1:
+;INTEGER POSITIVE STEP HANDLER IN FOR-NEXT STATEMENT
+;IF (1 - SYSTEMPRT) } SYSFORLOOPSTEP4 THEN :#3P
 	MOVF	SYSTEMPRT,W
 	SUBLW	1
 	MOVWF	SYSTEMP1
@@ -752,16 +1102,25 @@ ELSE21_1:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF24
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	MOVF	SYSFORLOOPSTEP4,W
 	ADDWF	SYSTEMPRT,F
 	GOTO	SYSFORLOOP5
+;END IF
+GLOBAL	ENDIF24
 ENDIF24:
+;END IF
+GLOBAL	ENDIF21
 ENDIF21:
+GLOBAL	SYSFORLOOPEND5
 SYSFORLOOPEND5:
+GLOBAL	FOUNDNONSPACECHAR2
 FOUNDNONSPACECHAR2:
+;if SysCharRT <> 0 then
 	MOVF	SYSCHARRT,F
 	BTFSC	STATUS,2
 	GOTO	ENDIF22
+;Rtrim = Mid (SysInString3, 1, SysCharRT )
 	MOVF	SYSSYSINSTRING3HANDLER,W
 	MOVWF	SYSSYSINSTRINGHANDLER
 	MOVF	SYSSYSINSTRING3HANDLER_H,W
@@ -780,56 +1139,113 @@ FOUNDNONSPACECHAR2:
 	MOVLW	HIGH MID
 	MOVWF	FSR0H
 	CALL	SYSCOPYSTRING
+;Exit Function
 	RETURN
+;end if
+GLOBAL	ENDIF22
 ENDIF22:
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (3078)
+GLOBAL	SYSCOMPEQUAL
 SYSCOMPEQUAL:
+;Dim SysByteTempA, SysByteTempB, SysByteTempX as byte
+;clrf SysByteTempX
 	CLRF	SYSBYTETEMPX
+;movf SysByteTempA, W
 	MOVF	SYSBYTETEMPA, W
+;subwf SysByteTempB, W
 	SUBWF	SYSBYTETEMPB, W
+;btfsc STATUS, Z
 	BTFSC	STATUS,2
+;comf SysByteTempX,F
 	COMF	SYSBYTETEMPX,F
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (1772)
+GLOBAL	SYSCOMPEQUALSTRING
 SYSCOMPEQUALSTRING:
+;Dim SysByteTempA As Byte
+;Dim SysByteTempX As Byte
+;SysByteTempX = 0
 	CLRF	SYSBYTETEMPX
+;Check length matches
+;movf INDF0, W
 	MOVF	INDF0, W
+;movwf SysByteTempA
 	MOVWF	SYSBYTETEMPA
+;subwf INDF1, W
 	SUBWF	INDF1, W
+;btfss STATUS, Z
 	BTFSS	STATUS,2
+;return
 	RETURN
+;Check if empty
+;movf SysByteTempA, F
 	MOVF	SYSBYTETEMPA, F
+;btfsc STATUS, Z
 	BTFSC	STATUS,2
+;goto SCEStrTrue
 	GOTO	SCESTRTRUE
+;Check each char, exit if not equal
+GLOBAL	SYSSTRINGCOMP
 SYSSTRINGCOMP:
+;Move to next char
+;addfsr 0, 1
 	ADDFSR	0, 1
+;addfsr 1, 1
 	ADDFSR	1, 1
+;Compare, exit if <>
+;movf INDF0, W
 	MOVF	INDF0, W
+;subwf INDF1, W
 	SUBWF	INDF1, W
+;btfss STATUS, Z
 	BTFSS	STATUS,2
+;return
 	RETURN
+;decfsz SysByteTempA, F
 	DECFSZ	SYSBYTETEMPA, F
+;goto SysStringComp
 	GOTO	SYSSTRINGCOMP
+GLOBAL	SCESTRTRUE
 SCESTRTRUE:
+;comf SysByteTempX, F
 	COMF	SYSBYTETEMPX, F
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (3714)
+GLOBAL	SYSCOMPLESSTHANINT
 SYSCOMPLESSTHANINT:
+;Dim SysIntegerTempA, SysIntegerTempB, SysDivMultA as Integer
+;Clear result
+;SysByteTempX = 0
 	CLRF	SYSBYTETEMPX
+;Compare sign bits
+;-A
+;If SysIntegerTempA.15 = On Then
 	BTFSS	SYSINTEGERTEMPA_H,7
 	GOTO	ELSE26_1
+;-A, +B, return true
+;If SysIntegerTempB.15 = Off Then
 	BTFSC	SYSINTEGERTEMPB_H,7
 	GOTO	ENDIF27
+;Set SysByteTempX to 255
+;SysByteTempX = Not SysByteTempX
 	COMF	SYSBYTETEMPX,F
+;Exit Sub
 	RETURN
+;End If
+GLOBAL	ENDIF27
 ENDIF27:
+;-A, -B, negate both and swap
+;SysDivMultA = -SysIntegerTempA
 	COMF	SYSINTEGERTEMPA,W
 	MOVWF	SYSDIVMULTA
 	COMF	SYSINTEGERTEMPA_H,W
@@ -837,6 +1253,7 @@ ENDIF27:
 	INCF	SYSDIVMULTA,F
 	BTFSC	STATUS,2
 	INCF	SYSDIVMULTA_H,F
+;SysIntegerTempA = -SysIntegerTempB
 	COMF	SYSINTEGERTEMPB,W
 	MOVWF	SYSINTEGERTEMPA
 	COMF	SYSINTEGERTEMPB_H,W
@@ -844,80 +1261,165 @@ ENDIF27:
 	INCF	SYSINTEGERTEMPA,F
 	BTFSC	STATUS,2
 	INCF	SYSINTEGERTEMPA_H,F
+;SysIntegerTempB = SysDivMultA
 	MOVF	SYSDIVMULTA,W
 	MOVWF	SYSINTEGERTEMPB
 	MOVF	SYSDIVMULTA_H,W
 	MOVWF	SYSINTEGERTEMPB_H
+;+A
+;Else
 	GOTO	ENDIF26
+GLOBAL	ELSE26_1
 ELSE26_1:
+;+A, -B, return false
+;If SysIntegerTempB.15 = On Then
 	BTFSC	SYSINTEGERTEMPB_H,7
+;Exit Sub
 	RETURN
+;End If
+;End If
+GLOBAL	ENDIF26
 ENDIF26:
+;Test High, exit if more
+;movf SysIntegerTempA_H,W
 	MOVF	SYSINTEGERTEMPA_H,W
+;subwf SysIntegerTempB_H,W
 	SUBWF	SYSINTEGERTEMPB_H,W
+;btfss STATUS,C
 	BTFSS	STATUS,0
+;return
 	RETURN
+;Test high, exit true if less
+;movf SysIntegerTempB_H,W
 	MOVF	SYSINTEGERTEMPB_H,W
+;subwf SysIntegerTempA_H,W
 	SUBWF	SYSINTEGERTEMPA_H,W
+;btfss STATUS,C
 	BTFSS	STATUS,0
+;goto SCLTIntTrue
 	GOTO	SCLTINTTRUE
+;Test Low, exit if more or equal
+;movf SysIntegerTempB,W
 	MOVF	SYSINTEGERTEMPB,W
+;subwf SysIntegerTempA,W
 	SUBWF	SYSINTEGERTEMPA,W
+;btfsc STATUS,C
 	BTFSC	STATUS,0
+;return
 	RETURN
+GLOBAL	SCLTINTTRUE
 SCLTINTTRUE:
+;comf SysByteTempX,F
 	COMF	SYSBYTETEMPX,F
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (1374)
+GLOBAL	SYSCOPYSTRING
 SYSCOPYSTRING:
+;Dim SysCalcTempA As Byte
+;Dim SysStringLength As Byte
+;Get and copy length
+;movf INDF0, W
 	MOVF	INDF0, W
+;movwf SysCalcTempA
 	MOVWF	SYSCALCTEMPA
+;movwf INDF1
 	MOVWF	INDF1
+;goto SysCopyStringCheck
 	GOTO	SYSCOPYSTRINGCHECK
+;When appending, add length to counter
+GLOBAL	SYSCOPYSTRINGPART
 SYSCOPYSTRINGPART:
+;movf INDF0, W
 	MOVF	INDF0, W
+;movwf SysCalcTempA
 	MOVWF	SYSCALCTEMPA
+;addwf SysStringLength, F
 	ADDWF	SYSSTRINGLENGTH, F
+GLOBAL	SYSCOPYSTRINGCHECK
 SYSCOPYSTRINGCHECK:
+;Exit if length = 0
+;movf SysCalcTempA,F
 	MOVF	SYSCALCTEMPA,F
+;btfsc STATUS,Z
 	BTFSC	STATUS,2
+;return
 	RETURN
+GLOBAL	SYSSTRINGCOPY
 SYSSTRINGCOPY:
+;Increment pointers
+;addfsr 0, 1
 	ADDFSR	0, 1
+;addfsr 1, 1
 	ADDFSR	1, 1
+;Copy character
+;movf INDF0, W
 	MOVF	INDF0, W
+;movwf INDF1
 	MOVWF	INDF1
+;decfsz SysCalcTempA, F
 	DECFSZ	SYSCALCTEMPA, F
+;goto SysStringCopy
 	GOTO	SYSSTRINGCOPY
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (1571)
+GLOBAL	SYSREADSTRING
 SYSREADSTRING:
+;Dim SysCalcTempA As Byte
+;Dim SysStringLength As Byte
+;Get length
+;call SysStringTables
 	CALL	SYSSTRINGTABLES
+;movwf SysCalcTempA
 	MOVWF	SYSCALCTEMPA
+;movwf INDF1
 	MOVWF	INDF1
+;goto SysStringReadCheck
 	GOTO	SYSSTRINGREADCHECK
+GLOBAL	SYSREADSTRINGPART
 SYSREADSTRINGPART:
+;Get length
+;call SysStringTables
 	CALL	SYSSTRINGTABLES
+;movwf SysCalcTempA
 	MOVWF	SYSCALCTEMPA
+;addwf SysStringLength,F
 	ADDWF	SYSSTRINGLENGTH,F
+;Check length
+GLOBAL	SYSSTRINGREADCHECK
 SYSSTRINGREADCHECK:
+;If length is 0, exit
+;movf SysCalcTempA,F
 	MOVF	SYSCALCTEMPA,F
+;btfsc STATUS,Z
 	BTFSC	STATUS,2
+;return
 	RETURN
+;Copy
+GLOBAL	SYSSTRINGREAD
 SYSSTRINGREAD:
+;Get char
+;call SysStringTables
 	CALL	SYSSTRINGTABLES
+;Set char
+;addfsr 1,1
 	ADDFSR	1,1
+;movwf INDF1
 	MOVWF	INDF1
+;decfsz SysCalcTempA, F
 	DECFSZ	SYSCALCTEMPA, F
+;goto SysStringRead
 	GOTO	SYSSTRINGREAD
 	RETURN
 
 ;********************************************************************************
 
+GLOBAL	SYSSTRINGTABLES
 SYSSTRINGTABLES:
 	MOVF	SYSSTRINGA_H,W
 	MOVWF	PCLATH
@@ -927,6 +1429,7 @@ SYSSTRINGTABLES:
 	INCF	SYSSTRINGA_H,F
 	MOVWF	PCL
 
+GLOBAL	STRINGTABLE1
 STRINGTABLE1:
 	RETLW	21
 	RETLW	32	; 
@@ -952,6 +1455,7 @@ STRINGTABLE1:
 	RETLW	111	;O
 
 
+GLOBAL	STRINGTABLE2
 STRINGTABLE2:
 	RETLW	8
 	RETLW	49	;1
@@ -964,6 +1468,7 @@ STRINGTABLE2:
 	RETLW	53	;5
 
 
+GLOBAL	STRINGTABLE3
 STRINGTABLE3:
 	RETLW	51
 	RETLW	87	;W
@@ -1019,6 +1524,7 @@ STRINGTABLE3:
 	RETLW	53	;5
 
 
+GLOBAL	STRINGTABLE4
 STRINGTABLE4:
 	RETLW	25
 	RETLW	84	;T
@@ -1048,6 +1554,7 @@ STRINGTABLE4:
 	RETLW	32	; 
 
 
+GLOBAL	STRINGTABLE5
 STRINGTABLE5:
 	RETLW	45
 	RETLW	84	;T
@@ -1097,10 +1604,12 @@ STRINGTABLE5:
 	RETLW	32	; 
 
 
+GLOBAL	STRINGTABLE37
 STRINGTABLE37:
 	RETLW	0
 
 
+GLOBAL	STRINGTABLE72
 STRINGTABLE72:
 	RETLW	8
 	RETLW	49	;1
@@ -1115,7 +1624,10 @@ STRINGTABLE72:
 
 ;********************************************************************************
 
+;SOURCE: STRING.H (453)
+GLOBAL	FN_TRIM
 FN_TRIM:
+;trim = rtrim(ltrim(SysInString))
 	MOVF	SYSSYSINSTRINGHANDLER,W
 	MOVWF	SYSSYSINSTRING2HANDLER
 	MOVF	SYSSYSINSTRINGHANDLER_H,W
@@ -1138,22 +1650,34 @@ FN_TRIM:
 
 ;********************************************************************************
 
+;SOURCE: STRING.H (488)
+GLOBAL	FN_UCASE
 FN_UCASE:
+;Get length of string, don't try copying if it's empty
+;SysCharCount = SysInString(0)
 	MOVF	SYSSYSINSTRINGHANDLER,W
 	MOVWF	FSR0L
 	MOVF	SYSSYSINSTRINGHANDLER_H,W
 	MOVWF	FSR0H
 	MOVF	INDF0,W
 	MOVWF	SYSCHARCOUNT
+;UCase(0) = SysCharCount
 	BANKSEL	SYSUCASE_0
 	MOVWF	SYSUCASE_0
+;If SysCharCount = 0 Then Exit Function
 	BANKSEL	SYSCHARCOUNT
 	MOVF	SYSCHARCOUNT,F
 	BTFSC	STATUS,2
+;If SysCharCount = 0 Then Exit Function
 	RETURN
+;If SysCharCount = 0 Then Exit Function
+;Search string for lowercase letters, change to uppercase
+;For SysStringTemp = 1 to SysCharCount
 	MOVLW	1
 	MOVWF	SYSSTRINGTEMP
+GLOBAL	SYSFORLOOP2
 SYSFORLOOP2:
+;SysStrData = SysInString(SysStringTemp)
 	MOVF	SYSSTRINGTEMP,W
 	ADDWF	SYSSYSINSTRINGHANDLER,W
 	MOVWF	FSR0L
@@ -1162,18 +1686,26 @@ SYSFORLOOP2:
 	MOVWF	FSR0H
 	MOVF	INDF0,W
 	MOVWF	SYSSTRDATA
+;If SysStrData >= 97 Then
 	MOVLW	97
 	SUBWF	SYSSTRDATA,W
 	BTFSS	STATUS,0
 	GOTO	ENDIF7
+;If SysStrData <= 122 Then SysStrData -= 32
 	MOVF	SYSSTRDATA,W
 	SUBLW	122
 	BTFSS	STATUS,0
 	GOTO	ENDIF9
+;If SysStrData <= 122 Then SysStrData -= 32
 	MOVLW	32
 	SUBWF	SYSSTRDATA,F
+;If SysStrData <= 122 Then SysStrData -= 32
+GLOBAL	ENDIF9
 ENDIF9:
+;End If
+GLOBAL	ENDIF7
 ENDIF7:
+;UCase(SysStringTemp) = SysStrData
 	MOVLW	LOW(UCASE)
 	ADDWF	SYSSTRINGTEMP,W
 	MOVWF	FSR0L
@@ -1183,6 +1715,8 @@ ENDIF7:
 	MOVWF	FSR0H
 	MOVF	SYSSTRDATA,W
 	MOVWF	INDF0
+;Next
+;POSITIVE VALUE STEP HANDLER IN FOR-NEXT STATEMENT :#4P 
 	MOVF	SYSSTRINGTEMP,W
 	SUBWF	SYSCHARCOUNT,W
 	MOVWF	SYSTEMP1
@@ -1192,9 +1726,13 @@ ENDIF7:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF8
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	INCF	SYSSTRINGTEMP,F
 	GOTO	SYSFORLOOP2
+;END IF
+GLOBAL	ENDIF8
 ENDIF8:
+GLOBAL	SYSFORLOOPEND2
 SYSFORLOOPEND2:
 	RETURN
 

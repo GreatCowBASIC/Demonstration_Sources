@@ -46,132 +46,255 @@
 ;********************************************************************************
 
 ;Set aside RAM memory locations for variables. All variables are global.
+GLOBAL	BLOCKNUM
  BLOCKNUM                         EQU 32          ; 0X20
+GLOBAL	COMPORT
  COMPORT                          EQU 33          ; 0X21
+GLOBAL	DATABYTE
  DATABYTE                         EQU 34          ; 0X22
+GLOBAL	DATAWORD
  DATAWORD                         EQU 35          ; 0X23
+GLOBAL	DATAWORD_H
  DATAWORD_H                       EQU 36          ; 0X24
+GLOBAL	DELAYTEMP
  DELAYTEMP                        EQU 112          ; 0X70
+GLOBAL	DELAYTEMP2
  DELAYTEMP2                       EQU 113          ; 0X71
+GLOBAL	HSERPRINTCRLFCOUNT
  HSERPRINTCRLFCOUNT               EQU 37          ; 0X25
+GLOBAL	INDEX
  INDEX                            EQU 38          ; 0X26
+GLOBAL	INDEXWORD
  INDEXWORD                        EQU 39          ; 0X27
+GLOBAL	INDEXWORD_H
  INDEXWORD_H                      EQU 40          ; 0X28
+GLOBAL	MYBUFFER
  MYBUFFER                         EQU 9167          ; 0X23CF
+GLOBAL	NUMBYTES
  NUMBYTES                         EQU 41          ; 0X29
+GLOBAL	NVM_ADDRESS
  NVM_ADDRESS                      EQU 42          ; 0X2A
+GLOBAL	NVM_ADDRESS_E
  NVM_ADDRESS_E                    EQU 45          ; 0X2D
+GLOBAL	NVM_ADDRESS_H
  NVM_ADDRESS_H                    EQU 43          ; 0X2B
+GLOBAL	NVM_ADDRESS_U
  NVM_ADDRESS_U                    EQU 44          ; 0X2C
+GLOBAL	OUTVALUETEMP
  OUTVALUETEMP                     EQU 46          ; 0X2E
+GLOBAL	PRINTLEN
  PRINTLEN                         EQU 47          ; 0X2F
+GLOBAL	REL_ADDRESS
  REL_ADDRESS                      EQU 48          ; 0X30
+GLOBAL	SAFREAD
  SAFREAD                          EQU 49          ; 0X31
+GLOBAL	SAFREADWORD
  SAFREADWORD                      EQU 50          ; 0X32
+GLOBAL	SAFREADWORD_H
  SAFREADWORD_H                    EQU 51          ; 0X33
+GLOBAL	SERDATA
  SERDATA                          EQU 52          ; 0X34
+GLOBAL	SERPRINTVAL
  SERPRINTVAL                      EQU 53          ; 0X35
+GLOBAL	STRINGPOINTER
  STRINGPOINTER                    EQU 54          ; 0X36
+GLOBAL	SYSBYTETEMPA
  SYSBYTETEMPA                     EQU 117          ; 0X75
+GLOBAL	SYSBYTETEMPB
  SYSBYTETEMPB                     EQU 121          ; 0X79
+GLOBAL	SYSBYTETEMPX
  SYSBYTETEMPX                     EQU 112          ; 0X70
+GLOBAL	SYSCALCTEMPA
  SYSCALCTEMPA                     EQU 117          ; 0X75
+GLOBAL	SYSCALCTEMPX
  SYSCALCTEMPX                     EQU 112          ; 0X70
+GLOBAL	SYSDIVLOOP
  SYSDIVLOOP                       EQU 116          ; 0X74
+GLOBAL	SYSDIVMULTA
  SYSDIVMULTA                      EQU 119          ; 0X77
+GLOBAL	SYSDIVMULTA_H
  SYSDIVMULTA_H                    EQU 120          ; 0X78
+GLOBAL	SYSDIVMULTB
  SYSDIVMULTB                      EQU 123          ; 0X7B
+GLOBAL	SYSDIVMULTB_H
  SYSDIVMULTB_H                    EQU 124          ; 0X7C
+GLOBAL	SYSDIVMULTX
  SYSDIVMULTX                      EQU 114          ; 0X72
+GLOBAL	SYSDIVMULTX_H
  SYSDIVMULTX_H                    EQU 115          ; 0X73
+GLOBAL	SYSLONGDIVMULTA
  SYSLONGDIVMULTA                  EQU 55          ; 0X37
+GLOBAL	SYSLONGDIVMULTA_E
  SYSLONGDIVMULTA_E                EQU 58          ; 0X3A
+GLOBAL	SYSLONGDIVMULTA_H
  SYSLONGDIVMULTA_H                EQU 56          ; 0X38
+GLOBAL	SYSLONGDIVMULTA_U
  SYSLONGDIVMULTA_U                EQU 57          ; 0X39
+GLOBAL	SYSLONGDIVMULTB
  SYSLONGDIVMULTB                  EQU 59          ; 0X3B
+GLOBAL	SYSLONGDIVMULTB_E
  SYSLONGDIVMULTB_E                EQU 62          ; 0X3E
+GLOBAL	SYSLONGDIVMULTB_H
  SYSLONGDIVMULTB_H                EQU 60          ; 0X3C
+GLOBAL	SYSLONGDIVMULTB_U
  SYSLONGDIVMULTB_U                EQU 61          ; 0X3D
+GLOBAL	SYSLONGDIVMULTX
  SYSLONGDIVMULTX                  EQU 63          ; 0X3F
+GLOBAL	SYSLONGDIVMULTX_E
  SYSLONGDIVMULTX_E                EQU 66          ; 0X42
+GLOBAL	SYSLONGDIVMULTX_H
  SYSLONGDIVMULTX_H                EQU 64          ; 0X40
+GLOBAL	SYSLONGDIVMULTX_U
  SYSLONGDIVMULTX_U                EQU 65          ; 0X41
+GLOBAL	SYSLONGTEMPA
  SYSLONGTEMPA                     EQU 117          ; 0X75
+GLOBAL	SYSLONGTEMPA_E
  SYSLONGTEMPA_E                   EQU 120          ; 0X78
+GLOBAL	SYSLONGTEMPA_H
  SYSLONGTEMPA_H                   EQU 118          ; 0X76
+GLOBAL	SYSLONGTEMPA_U
  SYSLONGTEMPA_U                   EQU 119          ; 0X77
+GLOBAL	SYSLONGTEMPB
  SYSLONGTEMPB                     EQU 121          ; 0X79
+GLOBAL	SYSLONGTEMPB_E
  SYSLONGTEMPB_E                   EQU 124          ; 0X7C
+GLOBAL	SYSLONGTEMPB_H
  SYSLONGTEMPB_H                   EQU 122          ; 0X7A
+GLOBAL	SYSLONGTEMPB_U
  SYSLONGTEMPB_U                   EQU 123          ; 0X7B
+GLOBAL	SYSLONGTEMPX
  SYSLONGTEMPX                     EQU 112          ; 0X70
+GLOBAL	SYSLONGTEMPX_E
  SYSLONGTEMPX_E                   EQU 115          ; 0X73
+GLOBAL	SYSLONGTEMPX_H
  SYSLONGTEMPX_H                   EQU 113          ; 0X71
+GLOBAL	SYSLONGTEMPX_U
  SYSLONGTEMPX_U                   EQU 114          ; 0X72
+GLOBAL	SYSPRINTDATAHANDLER
  SYSPRINTDATAHANDLER              EQU 67          ; 0X43
+GLOBAL	SYSPRINTDATAHANDLER_H
  SYSPRINTDATAHANDLER_H            EQU 68          ; 0X44
+GLOBAL	SYSPRINTTEMP
  SYSPRINTTEMP                     EQU 69          ; 0X45
+GLOBAL	SYSREPEATTEMP1
  SYSREPEATTEMP1                   EQU 70          ; 0X46
+GLOBAL	SYSREPEATTEMP2
  SYSREPEATTEMP2                   EQU 71          ; 0X47
+GLOBAL	SYSREPEATTEMP3
  SYSREPEATTEMP3                   EQU 72          ; 0X48
+GLOBAL	SYSSTRINGA
  SYSSTRINGA                       EQU 119          ; 0X77
+GLOBAL	SYSSTRINGA_H
  SYSSTRINGA_H                     EQU 120          ; 0X78
+GLOBAL	SYSSTRINGLENGTH
  SYSSTRINGLENGTH                  EQU 118          ; 0X76
+GLOBAL	SYSSTRINGPARAM1
  SYSSTRINGPARAM1                  EQU 9117          ; 0X239D
+GLOBAL	SYSSTRINGTEMP
  SYSSTRINGTEMP                    EQU 73          ; 0X49
+GLOBAL	SYSTEMP1
  SYSTEMP1                         EQU 74          ; 0X4A
+GLOBAL	SYSTEMP1_E
  SYSTEMP1_E                       EQU 77          ; 0X4D
+GLOBAL	SYSTEMP1_H
  SYSTEMP1_H                       EQU 75          ; 0X4B
+GLOBAL	SYSTEMP1_U
  SYSTEMP1_U                       EQU 76          ; 0X4C
+GLOBAL	SYSTEMP2
  SYSTEMP2                         EQU 78          ; 0X4E
+GLOBAL	SYSTEMP2_H
  SYSTEMP2_H                       EQU 79          ; 0X4F
+GLOBAL	SYSTEMP3
  SYSTEMP3                         EQU 80          ; 0X50
+GLOBAL	SYSVALTEMP
  SYSVALTEMP                       EQU 81          ; 0X51
+GLOBAL	SYSWAITTEMPMS
  SYSWAITTEMPMS                    EQU 114          ; 0X72
+GLOBAL	SYSWAITTEMPMS_H
  SYSWAITTEMPMS_H                  EQU 115          ; 0X73
+GLOBAL	SYSWORDTEMPA
  SYSWORDTEMPA                     EQU 117          ; 0X75
+GLOBAL	SYSWORDTEMPA_H
  SYSWORDTEMPA_H                   EQU 118          ; 0X76
+GLOBAL	SYSWORDTEMPB
  SYSWORDTEMPB                     EQU 121          ; 0X79
+GLOBAL	SYSWORDTEMPB_H
  SYSWORDTEMPB_H                   EQU 122          ; 0X7A
+GLOBAL	SYSWORDTEMPX
  SYSWORDTEMPX                     EQU 112          ; 0X70
+GLOBAL	SYSWORDTEMPX_H
  SYSWORDTEMPX_H                   EQU 113          ; 0X71
+GLOBAL	SYS_HEF_BUFFERHANDLER
  SYS_HEF_BUFFERHANDLER            EQU 82          ; 0X52
+GLOBAL	SYS_HEF_BUFFERHANDLER_H
  SYS_HEF_BUFFERHANDLER_H          EQU 83          ; 0X53
+GLOBAL	WORD1
  WORD1                            EQU 84          ; 0X54
+GLOBAL	WORD1_H
  WORD1_H                          EQU 85          ; 0X55
+GLOBAL	WORD2
  WORD2                            EQU 86          ; 0X56
+GLOBAL	WORD2_H
  WORD2_H                          EQU 87          ; 0X57
+GLOBAL	WORD3
  WORD3                            EQU 88          ; 0X58
+GLOBAL	WORD3_H
  WORD3_H                          EQU 89          ; 0X59
+GLOBAL	WORD4
  WORD4                            EQU 90          ; 0X5A
+GLOBAL	WORD4_H
  WORD4_H                          EQU 91          ; 0X5B
+GLOBAL	_GIE_SAVE
  _GIE_SAVE                        EQU 92          ; 0X5C
+GLOBAL	_HEF_BLOCKNUM
  _HEF_BLOCKNUM                    EQU 93          ; 0X5D
+GLOBAL	_HEF_BUFFER
  _HEF_BUFFER                      EQU 9134          ; 0X23AE
+GLOBAL	_HEF_COUNT
  _HEF_COUNT                       EQU 94          ; 0X5E
+GLOBAL	_HEF_COUNT_H
  _HEF_COUNT_H                     EQU 95          ; 0X5F
+GLOBAL	_HEF_DATABYTE
  _HEF_DATABYTE                    EQU 96          ; 0X60
+GLOBAL	_HEF_DATAWORD
  _HEF_DATAWORD                    EQU 97          ; 0X61
+GLOBAL	_HEF_DATAWORD_H
  _HEF_DATAWORD_H                  EQU 98          ; 0X62
+GLOBAL	_HEF_DUMMY
  _HEF_DUMMY                       EQU 99          ; 0X63
+GLOBAL	_HEF_INDEX
  _HEF_INDEX                       EQU 100          ; 0X64
+GLOBAL	_HEF_INDEX_H
  _HEF_INDEX_H                     EQU 101          ; 0X65
+GLOBAL	_HEF_OFFSET
  _HEF_OFFSET                      EQU 102          ; 0X66
+GLOBAL	_HEF_OFFSET_H
  _HEF_OFFSET_H                    EQU 103          ; 0X67
+GLOBAL	_HEF_REL_ADDR
  _HEF_REL_ADDR                    EQU 104          ; 0X68
+GLOBAL	_HEXPICAS
  _HEXPICAS                        EQU 9113          ; 0X2399
 
 ;********************************************************************************
 
 ;ALIAS VARIABLES
+GLOBAL	AFSR0
  AFSR0                            EQU 4
+GLOBAL	AFSR0_H
  AFSR0_H                          EQU 5
+GLOBAL	SYS_HEXPICAS_0
  SYS_HEXPICAS_0                   EQU 1481
+GLOBAL	SYS_HEXPICAS_1
  SYS_HEXPICAS_1                   EQU 1482
+GLOBAL	SYS_HEXPICAS_2
  SYS_HEXPICAS_2                   EQU 1483
+GLOBAL	_HEF_ABS_ADDR
  _HEF_ABS_ADDR                    EQU 7308
+GLOBAL	_HEF_ABS_ADDR_H
  _HEF_ABS_ADDR_H                  EQU 7309
+GLOBAL	_HEF_ABS_ADDR_U
  _HEF_ABS_ADDR_U                  EQU 99
+GLOBAL	_HEF_ABS_ADDR_E
  _HEF_ABS_ADDR_E                  EQU 99
 
 ;********************************************************************************
@@ -189,6 +312,7 @@
 
 ;START OF PROGRAM MEMORY PAGE 0
 	ORG	5
+GLOBAL	BASPROGRAMSTART
 BASPROGRAMSTART:
 ;CALL INITIALISATION ROUTINES
 	CALL	INITSYS
@@ -196,16 +320,118 @@ BASPROGRAMSTART:
 	CALL	INITUSART
 
 ;START OF THE MAIN PROGRAM
+;''
+;''  This demonstration shows the SAF values on the Serial Terminal.
+;''
+;'' This lesson will provide code for writing and reading values onto
+;'' the on-board SAF. SAF is non-volatile memory, meaning that it does
+;'' not lose its value when power is shut off. This is unlike RAM, which will
+;'' lose its value when no power is applied. The SAF is useful for storing
+;'' variables that must still be present during no power.
+;'' It is also convenient to use if the entire RAM space is used up.
+;'' This will show the value of the SAF on the serial Terminal.
+;''
+;'' There are several system Constants available for use with SAF. These are:
+;''
+;''   SAF_BYTES                 The number of Bytes of SAF Memory
+;''   SAF_ROWSIZE_BYTES         The number of Bytes in a Block of SAFM
+;''   SAF_NUM_BLOCKS            The number blocks of SAFM  (Either 2 or 4)
+;''   SAF_START_ADDRESS         The Absolute Address of the Start of SAFM
+;''   SAF_BLOCK0_ADDR           The Absolute Address of the Start of SAF Block 0
+;''   SAF_BLOCK1_ADDR           The Absolute Address of the Start of SAF Block 1
+;''   SAF_BLOCK2_ADDR           The Absolute Address of the Start of SAF Block 2
+;''   SAF_BLOCK3_ADDR           The Absolute Address of the Start of SAF Block 3
+;''
+;''  The most useful of these is  SAF_ROWSIZE_BYTES.  This constant should be
+;''  used to size the necessary buffer array used with SAF commands
+;''
+;''      Example:  Dim MyBufffer(SAF_ROWSIZE_BYTES)
+;''
+;''  Sometimes it may be necessary to know the SAF block  and offset where
+;''  a relative address resides. This can be calculated as follows:
+;''
+;''      Block number = relative address / SAF_ROWSIZE_BYTES
+;''
+;''      offset =  relative address % SAF_ROWSIZE_BYTES
+;''
+;''     Example:
+;''
+;''    Relative address = 184
+;''
+;''    Blocknum = 184 /  64  =  2   (integer math)
+;''    offset =   184 %  64  =  56  (Modulo divide)
+;''
+;''   So a byte of data stored in rel address 184 is
+;''   located in the 56th  location of block 2
+;''************************************************************************
+;''@author  EvanV
+;''@licence GPL
+;''@version 1.01
+;''@date    15/09/2022
+;----- Configuration
+;Chip Settings.
+;Generated by PIC PPS Tool for Great Cow Basic
+;PPS Tool version: 0.0.6.1
+;PinManager data: v1.79.0
+;Generated for 16F18075
+;
+;Template comment at the start of the config file
+;
+;Template comment at the end of the config file
+;' -------------------PORTA----------------
+;' Bit#:  -7---6---5---4---3---2---1---0---
+;' IO:    ---------------------------------
+;'-----------------------------------------
+;'
+;' -------------------PORTB----------------
+;' Bit#:  -7---6---5---4---3---2---1---0---
+;' IO:    --------IN-LED--LED-LED LED -----
+;'-----------------------------------------
+;'
+;' ------------------PORTC-----------------
+;' Bit#:  -7---6---5---4---3---2---1---0---
+;' IO:    ----TX---------------------------
+;'-----------------------------------------
+;'
+;' ------------------PORTE-----------------
+;' Bit#:  -7---6---5---4---3---2---1---0---
+;' IO:    ----------------RST--------------
+;'-----------------------------------------
+;'
+;Define constants to make things easier. We can reuse these at any time.
+;Dir     LEDD1         Out
 	BCF	TRISB,1
+;Dir     LEDD2         Out
 	BCF	TRISB,2
+;Dir     LEDD3         Out
 	BCF	TRISB,3
+;Dir     LEDD4         Out
 	BCF	TRISB,4
+;Dir     POTENTIOMETER In
 	BSF	TRISA,0
+;Dir     SWITCHIN      In
 	BSF	TRISB,5
+;Setup Serial port
+;*****************************************************************************************************
+;Main program commences here.. everything before this is setup for the board.
+;Now assumes Serial Terminal is operational
+;Dim Rel_Address, numbytes, DataByte, Index as Byte
+;Dim NVM_Address as Long  ' Absolute Address
+;Dim DataWord as Word
+;Dim IndexWord as Word
+;Dim MyBuffer(SAF_ROWSIZE_BYTES)
+;Define the constant to control the size of system created string variables called SYSSTRINGPARAM1, SYSSTRINGPARAM2 etc.
+;Wait 200 ms 'Stabilize
 	MOVLW	200
 	MOVWF	SYSWAITTEMPMS
 	CLRF	SYSWAITTEMPMS_H
 	CALL	DELAY_MS
+;------- Main Program Starts Here --------------
+;'' Store 8 Bytes of Data in SAF Memory using SAFWriteBlock
+;'' MyBuffer is sized using the system constant SAF_ROWSIZE_BYTES
+;''------------------------------------------------------------------
+;Write  8 Bytes of data into the buffer/array
+;MyBuffer = 0x20, 0x2C, 0x58, 0x5B,  0x4D, 0x4E, 0x3F, 0x63
 	MOVLW	LOW MYBUFFER
 	MOVWF	FSR0L
 	MOVLW	HIGH MYBUFFER
@@ -236,13 +462,17 @@ BASPROGRAMSTART:
 	INCF	FSR0L,F
 	MOVLW	99
 	MOVWF	INDF0
+;Write the 8 bytes to SAF Block 0
+;numbytes = 8
 	MOVLW	8
 	MOVWF	NUMBYTES
+;HSerPrintCRLF 2
 	MOVLW	2
 	MOVWF	HSERPRINTCRLFCOUNT
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINTCRLF
+;HSerPrint "Buffer test: Three lines should read the same."
 	MOVLW	LOW STRINGTABLE1
 	MOVWF	SYSPRINTDATAHANDLER
 	MOVLW	(HIGH STRINGTABLE1) | 128
@@ -250,11 +480,13 @@ BASPROGRAMSTART:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;HSerPrintCRLF 1
 	MOVLW	1
 	MOVWF	HSERPRINTCRLFCOUNT
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINTCRLF
+;HSerPrint "Buffer being sent to SAF        : "
 	MOVLW	LOW STRINGTABLE2
 	MOVWF	SYSPRINTDATAHANDLER
 	MOVLW	(HIGH STRINGTABLE2) | 128
@@ -262,9 +494,12 @@ BASPROGRAMSTART:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;For index = 1 to numbytes
 	MOVLW	1
 	MOVWF	INDEX
+GLOBAL	SYSFORLOOP1
 SYSFORLOOP1:
+;Hserprint "0x"
 	MOVLW	LOW STRINGTABLE3
 	MOVWF	SYSPRINTDATAHANDLER
 	MOVLW	(HIGH STRINGTABLE3) | 128
@@ -272,6 +507,7 @@ SYSFORLOOP1:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;HSerPrint hex(MyBuffer(index))
 	MOVLW	LOW(MYBUFFER)
 	ADDWF	INDEX,W
 	MOVWF	FSR0L
@@ -289,9 +525,12 @@ SYSFORLOOP1:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;Hsersend 32 'space
 	MOVLW	32
 	MOVWF	SERDATA
 	CALL	HSERSEND294
+;Next
+;POSITIVE VALUE STEP HANDLER IN FOR-NEXT STATEMENT :#4P 
 	MOVF	INDEX,W
 	SUBWF	NUMBYTES,W
 	MOVWF	SYSTEMP1
@@ -301,10 +540,15 @@ SYSFORLOOP1:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF1
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	INCF	INDEX,F
 	GOTO	SYSFORLOOP1
+;END IF
+GLOBAL	ENDIF1
 ENDIF1:
+GLOBAL	SYSFORLOOPEND1
 SYSFORLOOPEND1:
+;SAFWriteBlock (0, MyBuffer, numbytes)
 	CLRF	_HEF_BLOCKNUM
 	MOVLW	LOW MYBUFFER
 	MOVWF	SYS_HEF_BUFFERHANDLER
@@ -314,9 +558,13 @@ SYSFORLOOPEND1:
 	MOVWF	_HEF_COUNT
 	CLRF	_HEF_COUNT_H
 	CALL	SAFWRITEBLOCK
+;Clear the buffer
+;For IndexWord = 0 to SAF_ROWSIZE_BYTES-1
 	CLRF	INDEXWORD
 	CLRF	INDEXWORD_H
+GLOBAL	SYSFORLOOP2
 SYSFORLOOP2:
+;MyBuffer(IndexWord) = 0xFF
 	MOVLW	LOW(MYBUFFER)
 	ADDWF	INDEXWORD,W
 	MOVWF	FSR0L
@@ -325,6 +573,8 @@ SYSFORLOOP2:
 	MOVWF	FSR0H
 	MOVLW	255
 	MOVWF	INDF0
+;Next
+;POSITIVE VALUE STEP HANDLER IN FOR-NEXT STATEMENT :#4P 
 	MOVF	INDEXWORD,W
 	SUBLW	31
 	MOVWF	SYSTEMP1
@@ -342,12 +592,18 @@ SYSFORLOOP2:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF2
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	INCF	INDEXWORD,F
 	BTFSC	STATUS,2
 	INCF	INDEXWORD_H,F
 	GOTO	SYSFORLOOP2
+;END IF
+GLOBAL	ENDIF2
 ENDIF2:
+GLOBAL	SYSFORLOOPEND2
 SYSFORLOOPEND2:
+;*** Read the 8 stored bytes using SAFReadBlock ***
+;SAFReadBlock (0, MyBuffer, numbytes)
 	CLRF	_HEF_BLOCKNUM
 	MOVLW	LOW MYBUFFER
 	MOVWF	SYS_HEF_BUFFERHANDLER
@@ -357,11 +613,14 @@ SYSFORLOOPEND2:
 	MOVWF	_HEF_COUNT
 	CLRF	_HEF_COUNT_H
 	CALL	SAFREADBLOCK
+;Output the 8 bytes to a terminal
+;HSerPrintCRLF
 	MOVLW	1
 	MOVWF	HSERPRINTCRLFCOUNT
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINTCRLF
+;HSerPrint "Buffer being read back from SAF : "
 	MOVLW	LOW STRINGTABLE4
 	MOVWF	SYSPRINTDATAHANDLER
 	MOVLW	(HIGH STRINGTABLE4) | 128
@@ -369,9 +628,12 @@ SYSFORLOOPEND2:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;For index = 1 to numbytes
 	MOVLW	1
 	MOVWF	INDEX
+GLOBAL	SYSFORLOOP3
 SYSFORLOOP3:
+;Hserprint "0x"
 	MOVLW	LOW STRINGTABLE3
 	MOVWF	SYSPRINTDATAHANDLER
 	MOVLW	(HIGH STRINGTABLE3) | 128
@@ -379,6 +641,7 @@ SYSFORLOOP3:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;Hserprint hex(MyBuffer(index))
 	MOVLW	LOW(MYBUFFER)
 	ADDWF	INDEX,W
 	MOVWF	FSR0L
@@ -396,9 +659,12 @@ SYSFORLOOP3:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;Hsersend 32 'space
 	MOVLW	32
 	MOVWF	SERDATA
 	CALL	HSERSEND294
+;Next
+;POSITIVE VALUE STEP HANDLER IN FOR-NEXT STATEMENT :#4P 
 	MOVF	INDEX,W
 	SUBWF	NUMBYTES,W
 	MOVWF	SYSTEMP2
@@ -408,15 +674,24 @@ SYSFORLOOP3:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF3
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	INCF	INDEX,F
 	GOTO	SYSFORLOOP3
+;END IF
+GLOBAL	ENDIF3
 ENDIF3:
+GLOBAL	SYSFORLOOPEND3
 SYSFORLOOPEND3:
+;*** Read the stored bytes using SAFRead ***
+;The relative memory address or location is
+;offset by 1 relative to the buffer address
+;HserprintCRLF
 	MOVLW	1
 	MOVWF	HSERPRINTCRLFCOUNT
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINTCRLF
+;HSerPrint "Direct read to SAF address      : "
 	MOVLW	LOW STRINGTABLE5
 	MOVWF	SYSPRINTDATAHANDLER
 	MOVLW	(HIGH STRINGTABLE5) | 128
@@ -424,15 +699,20 @@ SYSFORLOOPEND3:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;For rel_address = 0 to 3
+;LEGACY METHOD
 	MOVLW	255
 	MOVWF	REL_ADDRESS
+GLOBAL	SYSFORLOOP4
 SYSFORLOOP4:
 	INCF	REL_ADDRESS,F
+;SAFRead (Rel_Address, Databyte)
 	MOVF	REL_ADDRESS,W
 	MOVWF	_HEF_REL_ADDR
 	CALL	SAFREAD394
 	MOVF	_HEF_DATABYTE,W
 	MOVWF	DATABYTE
+;Hserprint "0x"+hex(DataByte)
 	MOVWF	SYSVALTEMP
 	CALL	FN__HEXPICAS
 	MOVLW	LOW SYSSTRINGPARAM1
@@ -462,20 +742,26 @@ SYSFORLOOP4:
 	MOVWF	SYSPRINTDATAHANDLER_H
 	MOVLW	1
 	MOVWF	COMPORT
+;USED SYSDEFAULTCONCATSTRING CONSTANT TO CREATE SYSSTRINGPARAM1 STRING OF LENGTH 16 TO CATER FOR CONSTANT_STRING + CONSTANT_STRING CONCATENATION
 	CALL	HSERPRINT305
+;hsersend 32 'space
 	MOVLW	32
 	MOVWF	SERDATA
 	CALL	HSERSEND294
+;Next
 	MOVLW	3
 	SUBWF	REL_ADDRESS,W
 	BTFSS	STATUS,0
 	GOTO	SYSFORLOOP4
+GLOBAL	SYSFORLOOPEND4
 SYSFORLOOPEND4:
+;HserprintCRLF 2
 	MOVLW	2
 	MOVWF	HSERPRINTCRLFCOUNT
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINTCRLF
+;HSerPrint "SAF Dump "
 	MOVLW	LOW STRINGTABLE6
 	MOVWF	SYSPRINTDATAHANDLER
 	MOVLW	(HIGH STRINGTABLE6) | 128
@@ -483,28 +769,39 @@ SYSFORLOOPEND4:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;SAFM_Dump
 	CALL	SAFM_DUMP
+;=========================================================
+;'' Store 4 Words  of Data in SAF Memory using SAFWrite
+;''------------------------------------------------------
+;Dim Word1, Word2, Word3, Word4 as Word
+;Word1 = 0x5BAF
 	MOVLW	175
 	MOVWF	WORD1
 	MOVLW	91
 	MOVWF	WORD1_H
+;Word2 = 0x1F0
 	MOVLW	240
 	MOVWF	WORD2
 	MOVLW	1
 	MOVWF	WORD2_H
+;Word3 = 0xD271
 	MOVLW	113
 	MOVWF	WORD3
 	MOVLW	210
 	MOVWF	WORD3_H
+;Word4 = 0x4321
 	MOVLW	33
 	MOVWF	WORD4
 	MOVLW	67
 	MOVWF	WORD4_H
+;HserprintCRLF 2
 	MOVLW	2
 	MOVWF	HSERPRINTCRLFCOUNT
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINTCRLF
+;HSerPrint "Send word to address x08 - 0x0C - should be same"
 	MOVLW	LOW STRINGTABLE7
 	MOVWF	SYSPRINTDATAHANDLER
 	MOVLW	(HIGH STRINGTABLE7) | 128
@@ -512,11 +809,13 @@ SYSFORLOOPEND4:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;HserprintCRLF
 	MOVLW	1
 	MOVWF	HSERPRINTCRLFCOUNT
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINTCRLF
+;HSerprint "0x"+hex(Word1_h)
 	MOVF	WORD1_H,W
 	MOVWF	SYSVALTEMP
 	CALL	FN__HEXPICAS
@@ -547,7 +846,9 @@ SYSFORLOOPEND4:
 	MOVWF	SYSPRINTDATAHANDLER_H
 	MOVLW	1
 	MOVWF	COMPORT
+;USED SYSDEFAULTCONCATSTRING CONSTANT TO CREATE SYSSTRINGPARAM1 STRING OF LENGTH 16 TO CATER FOR CONSTANT_STRING + CONSTANT_STRING CONCATENATION
 	CALL	HSERPRINT305
+;HSerprint      hex(Word1)
 	MOVF	WORD1,W
 	MOVWF	SYSVALTEMP
 	CALL	FN__HEXPICAS
@@ -558,9 +859,11 @@ SYSFORLOOPEND4:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;HSerSend 32
 	MOVLW	32
 	MOVWF	SERDATA
 	CALL	HSERSEND294
+;HSerprint "0x"+hex(Word2_h)
 	MOVF	WORD2_H,W
 	MOVWF	SYSVALTEMP
 	CALL	FN__HEXPICAS
@@ -591,7 +894,9 @@ SYSFORLOOPEND4:
 	MOVWF	SYSPRINTDATAHANDLER_H
 	MOVLW	1
 	MOVWF	COMPORT
+;USED SYSDEFAULTCONCATSTRING CONSTANT TO CREATE SYSSTRINGPARAM1 STRING OF LENGTH 16 TO CATER FOR CONSTANT_STRING + CONSTANT_STRING CONCATENATION
 	CALL	HSERPRINT305
+;HSerprint      hex(Word2)
 	MOVF	WORD2,W
 	MOVWF	SYSVALTEMP
 	CALL	FN__HEXPICAS
@@ -602,9 +907,11 @@ SYSFORLOOPEND4:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;HSerSend 32
 	MOVLW	32
 	MOVWF	SERDATA
 	CALL	HSERSEND294
+;HSerprint "0x"+hex(Word3_h)
 	MOVF	WORD3_H,W
 	MOVWF	SYSVALTEMP
 	CALL	FN__HEXPICAS
@@ -635,7 +942,9 @@ SYSFORLOOPEND4:
 	MOVWF	SYSPRINTDATAHANDLER_H
 	MOVLW	1
 	MOVWF	COMPORT
+;USED SYSDEFAULTCONCATSTRING CONSTANT TO CREATE SYSSTRINGPARAM1 STRING OF LENGTH 16 TO CATER FOR CONSTANT_STRING + CONSTANT_STRING CONCATENATION
 	CALL	HSERPRINT305
+;HSerprint      hex(Word3)
 	MOVF	WORD3,W
 	MOVWF	SYSVALTEMP
 	CALL	FN__HEXPICAS
@@ -646,9 +955,11 @@ SYSFORLOOPEND4:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;HSerSend 32
 	MOVLW	32
 	MOVWF	SERDATA
 	CALL	HSERSEND294
+;HSerprint "0x"+hex(Word4_h)
 	MOVF	WORD4_H,W
 	MOVWF	SYSVALTEMP
 	CALL	FN__HEXPICAS
@@ -679,7 +990,9 @@ SYSFORLOOPEND4:
 	MOVWF	SYSPRINTDATAHANDLER_H
 	MOVLW	1
 	MOVWF	COMPORT
+;USED SYSDEFAULTCONCATSTRING CONSTANT TO CREATE SYSSTRINGPARAM1 STRING OF LENGTH 16 TO CATER FOR CONSTANT_STRING + CONSTANT_STRING CONCATENATION
 	CALL	HSERPRINT305
+;HSerprint      hex(Word4)
 	MOVF	WORD4,W
 	MOVWF	SYSVALTEMP
 	CALL	FN__HEXPICAS
@@ -690,9 +1003,13 @@ SYSFORLOOPEND4:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;HSerSend 32
 	MOVLW	32
 	MOVWF	SERDATA
 	CALL	HSERSEND294
+;Write the words staring at saf location 8
+;Which is the next address past the 8 bytes
+;SAFwriteWord (8, Word1)   ' use even numbered adresses
 	MOVLW	8
 	MOVWF	_HEF_REL_ADDR
 	MOVF	WORD1,W
@@ -700,6 +1017,7 @@ SYSFORLOOPEND4:
 	MOVF	WORD1_H,W
 	MOVWF	_HEF_DATAWORD_H
 	CALL	SAFWRITEWORD
+;SAFwriteWord (10, Word2)
 	MOVLW	10
 	MOVWF	_HEF_REL_ADDR
 	MOVF	WORD2,W
@@ -707,6 +1025,7 @@ SYSFORLOOPEND4:
 	MOVF	WORD2_H,W
 	MOVWF	_HEF_DATAWORD_H
 	CALL	SAFWRITEWORD
+;SAFwriteWord (12, Word3)
 	MOVLW	12
 	MOVWF	_HEF_REL_ADDR
 	MOVF	WORD3,W
@@ -714,6 +1033,7 @@ SYSFORLOOPEND4:
 	MOVF	WORD3_H,W
 	MOVWF	_HEF_DATAWORD_H
 	CALL	SAFWRITEWORD
+;SAFwriteWord (14, Word4)
 	MOVLW	14
 	MOVWF	_HEF_REL_ADDR
 	MOVF	WORD4,W
@@ -721,16 +1041,22 @@ SYSFORLOOPEND4:
 	MOVF	WORD4_H,W
 	MOVWF	_HEF_DATAWORD_H
 	CALL	SAFWRITEWORD
+;Read the Words using SAFReadWord & output to terminal
+;Rel_Address = 8
 	MOVLW	8
 	MOVWF	REL_ADDRESS
+;HserprintCRLF
 	MOVLW	1
 	MOVWF	HSERPRINTCRLFCOUNT
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINTCRLF
+;Repeat 4
 	MOVLW	4
 	MOVWF	SYSREPEATTEMP1
+GLOBAL	SYSREPEATLOOP1
 SYSREPEATLOOP1:
+;SAFReadWord(Rel_Address, DataWord)
 	MOVF	REL_ADDRESS,W
 	MOVWF	_HEF_REL_ADDR
 	CALL	SAFREADWORD396
@@ -738,6 +1064,7 @@ SYSREPEATLOOP1:
 	MOVWF	DATAWORD
 	MOVF	_HEF_DATAWORD_H,W
 	MOVWF	DATAWORD_H
+;HSerprint "0x"+hex(DataWord_h)
 	MOVWF	SYSVALTEMP
 	CALL	FN__HEXPICAS
 	MOVLW	LOW SYSSTRINGPARAM1
@@ -767,7 +1094,9 @@ SYSREPEATLOOP1:
 	MOVWF	SYSPRINTDATAHANDLER_H
 	MOVLW	1
 	MOVWF	COMPORT
+;USED SYSDEFAULTCONCATSTRING CONSTANT TO CREATE SYSSTRINGPARAM1 STRING OF LENGTH 16 TO CATER FOR CONSTANT_STRING + CONSTANT_STRING CONCATENATION
 	CALL	HSERPRINT305
+;HSerprint      hex(DataWord)
 	MOVF	DATAWORD,W
 	MOVWF	SYSVALTEMP
 	CALL	FN__HEXPICAS
@@ -778,35 +1107,51 @@ SYSREPEATLOOP1:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;Hsersend 32
 	MOVLW	32
 	MOVWF	SERDATA
 	CALL	HSERSEND294
+;Rel_Address +=2  'increment address by 2
 	MOVLW	2
 	ADDWF	REL_ADDRESS,F
+;End repeat
 	DECFSZ	SYSREPEATTEMP1,F
 	GOTO	SYSREPEATLOOP1
+GLOBAL	SYSREPEATLOOPEND1
 SYSREPEATLOOPEND1:
+;HSerprintCRLF 2
 	MOVLW	2
 	MOVWF	HSERPRINTCRLFCOUNT
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINTCRLF
+;SAFM_DUMP
 	CALL	SAFM_DUMP
+;=========================================================
+;end
 	GOTO	BASPROGRAMEND
+;
+;; This subroutine displays the SAF Flash Memory on a terminal
+;; Words in reverse byte order relative to address
+GLOBAL	BASPROGRAMEND
 BASPROGRAMEND:
 	SLEEP
 	GOTO	BASPROGRAMEND
 
 ;********************************************************************************
 
+GLOBAL	DELAY_MS
 DELAY_MS:
 	INCF	SYSWAITTEMPMS_H, F
+GLOBAL	DMS_START
 DMS_START:
 	MOVLW	14
 	MOVWF	DELAYTEMP2
+GLOBAL	DMS_OUTER
 DMS_OUTER:
 	MOVLW	189
 	MOVWF	DELAYTEMP
+GLOBAL	DMS_INNER
 DMS_INNER:
 	DECFSZ	DELAYTEMP, F
 	GOTO	DMS_INNER
@@ -820,19 +1165,27 @@ DMS_INNER:
 
 ;********************************************************************************
 
+;OVERLOADED SIGNATURE: STRING:BYTE:, SOURCE: USART.H (1526)
+GLOBAL	HSERPRINT305
 HSERPRINT305:
+;PrintLen = PrintData(0)
 	MOVF	SYSPRINTDATAHANDLER,W
 	MOVWF	FSR0L
 	MOVF	SYSPRINTDATAHANDLER_H,W
 	MOVWF	FSR0H
 	MOVF	INDF0,W
 	MOVWF	PRINTLEN
+;If PrintLen <> 0 then
 	MOVF	PRINTLEN,F
 	BTFSC	STATUS,2
 	GOTO	ENDIF13
+;Write Data
+;for SysPrintTemp = 1 to PrintLen
 	MOVLW	1
 	MOVWF	SYSPRINTTEMP
+GLOBAL	SYSFORLOOP6
 SYSFORLOOP6:
+;HSerSend(PrintData(SysPrintTemp),comport )
 	MOVF	SYSPRINTTEMP,W
 	ADDWF	SYSPRINTDATAHANDLER,W
 	MOVWF	FSR0L
@@ -842,6 +1195,8 @@ SYSFORLOOP6:
 	MOVF	INDF0,W
 	MOVWF	SERDATA
 	CALL	HSERSEND295
+;next
+;POSITIVE VALUE STEP HANDLER IN FOR-NEXT STATEMENT :#4P 
 	MOVF	SYSPRINTTEMP,W
 	SUBWF	PRINTLEN,W
 	MOVWF	SYSTEMP2
@@ -851,21 +1206,33 @@ SYSFORLOOP6:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF14
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	INCF	SYSPRINTTEMP,F
 	GOTO	SYSFORLOOP6
+;END IF
+GLOBAL	ENDIF14
 ENDIF14:
+GLOBAL	SYSFORLOOPEND6
 SYSFORLOOPEND6:
+;End If
+GLOBAL	ENDIF13
 ENDIF13:
+;CR
 	RETURN
 
 ;********************************************************************************
 
+;OVERLOADED SIGNATURE: BYTE:BYTE:, SOURCE: USART.H (1549)
+GLOBAL	HSERPRINT306
 HSERPRINT306:
+;OutValueTemp = 0
 	CLRF	OUTVALUETEMP
+;IF SerPrintVal >= 100 Then
 	MOVLW	100
 	SUBWF	SERPRINTVAL,W
 	BTFSS	STATUS,0
 	GOTO	ENDIF15
+;OutValueTemp = SerPrintVal / 100
 	MOVF	SERPRINTVAL,W
 	MOVWF	SYSBYTETEMPA
 	MOVLW	100
@@ -873,13 +1240,18 @@ HSERPRINT306:
 	CALL	SYSDIVSUB
 	MOVF	SYSBYTETEMPA,W
 	MOVWF	OUTVALUETEMP
+;SerPrintVal = SysCalcTempX
 	MOVF	SYSCALCTEMPX,W
 	MOVWF	SERPRINTVAL
+;HSerSend(OutValueTemp + 48 ,comport )
 	MOVLW	48
 	ADDWF	OUTVALUETEMP,W
 	MOVWF	SERDATA
 	CALL	HSERSEND295
+;End If
+GLOBAL	ENDIF15
 ENDIF15:
+;If OutValueTemp > 0 Or SerPrintVal >= 10 Then
 	MOVF	OUTVALUETEMP,W
 	MOVWF	SYSBYTETEMPB
 	CLRF	SYSBYTETEMPA
@@ -897,6 +1269,7 @@ ENDIF15:
 	MOVWF	SYSTEMP3
 	BTFSS	SYSTEMP3,0
 	GOTO	ENDIF16
+;OutValueTemp = SerPrintVal / 10
 	MOVF	SERPRINTVAL,W
 	MOVWF	SYSBYTETEMPA
 	MOVLW	10
@@ -904,52 +1277,80 @@ ENDIF15:
 	CALL	SYSDIVSUB
 	MOVF	SYSBYTETEMPA,W
 	MOVWF	OUTVALUETEMP
+;SerPrintVal = SysCalcTempX
 	MOVF	SYSCALCTEMPX,W
 	MOVWF	SERPRINTVAL
+;HSerSend(OutValueTemp + 48 ,comport )
 	MOVLW	48
 	ADDWF	OUTVALUETEMP,W
 	MOVWF	SERDATA
 	CALL	HSERSEND295
+;End If
+GLOBAL	ENDIF16
 ENDIF16:
+;HSerSend(SerPrintVal + 48 ,comport)
 	MOVLW	48
 	ADDWF	SERPRINTVAL,W
 	MOVWF	SERDATA
 	GOTO	HSERSEND295
+;CR
 
 ;********************************************************************************
 
+;SOURCE: USART.H (1683)
+GLOBAL	HSERPRINTCRLF
 HSERPRINTCRLF:
+;repeat HSerPrintCRLFCount
 	MOVF	HSERPRINTCRLFCOUNT,W
 	MOVWF	SYSREPEATTEMP3
 	BTFSC	STATUS,2
 	GOTO	SYSREPEATLOOPEND3
+GLOBAL	SYSREPEATLOOP3
 SYSREPEATLOOP3:
+;HSerSend(13,comport)
 	MOVLW	13
 	MOVWF	SERDATA
 	CALL	HSERSEND295
+;HSerSend(10,comport)
 	MOVLW	10
 	MOVWF	SERDATA
 	CALL	HSERSEND295
+;end Repeat
 	DECFSZ	SYSREPEATTEMP3,F
 	GOTO	SYSREPEATLOOP3
+GLOBAL	SYSREPEATLOOPEND3
 SYSREPEATLOOPEND3:
 	RETURN
 
 ;********************************************************************************
 
+;OVERLOADED SIGNATURE: BYTE:, SOURCE: USART.H (871)
+GLOBAL	HSERSEND294
 HSERSEND294:
+;Registers/Bits determined by #samevar at top of library
+;USART_TX_BLOCKING
+;Wait While TXIF = Off
+GLOBAL	SYSWAITLOOP1
 SYSWAITLOOP1:
 	BANKSEL	PIR3
 	BTFSS	PIR3,2
 	GOTO	SYSWAITLOOP1
+;ensure any previous operation has completed @1
+;Wait until TRMT = 1
+GLOBAL	SYSWAITLOOP2
 SYSWAITLOOP2:
 	BANKSEL	TX1STA
 	BTFSS	TX1STA,1
 	GOTO	SYSWAITLOOP2
+;Write the data byte to the USART.
+;Sets register to value of SerData - where register could be TXREG or TXREG1 or U1TXB set via the #samevar
+;TXREG = SerData
 	BANKSEL	SERDATA
 	MOVF	SERDATA,W
 	BANKSEL	TX1REG
 	MOVWF	TX1REG
+;Add USART_DELAY after the byte is sent by the USART module
+;Wait USART_DELAY
 	MOVLW	1
 	MOVWF	SYSWAITTEMPMS
 	CLRF	SYSWAITTEMPMS_H
@@ -958,33 +1359,54 @@ SYSWAITLOOP2:
 
 ;********************************************************************************
 
+;OVERLOADED SIGNATURE: BYTE:BYTE:, SOURCE: USART.H (974)
+GLOBAL	HSERSEND295
 HSERSEND295:
+;Registers/Bits determined by #samevar at top of library
+;if comport = 1 Then
 	DECF	COMPORT,W
 	BTFSS	STATUS,2
 	GOTO	ENDIF24
+;USART_TX_BLOCKING
+;Wait While TXIF = Off
+GLOBAL	SYSWAITLOOP3
 SYSWAITLOOP3:
 	BANKSEL	PIR3
 	BTFSS	PIR3,2
 	GOTO	SYSWAITLOOP3
+;ensure any previous operation has completed
+;Wait until TRMT = 1
+GLOBAL	SYSWAITLOOP4
 SYSWAITLOOP4:
 	BANKSEL	TX1STA
 	BTFSS	TX1STA,1
 	GOTO	SYSWAITLOOP4
+;Write the data byte to the USART.
+;Sets register to value of SerData - where register could be TXREG or TXREG1 or U1TXB set via the #samevar
+;TXREG = SerData
 	BANKSEL	SERDATA
 	MOVF	SERDATA,W
 	BANKSEL	TX1REG
 	MOVWF	TX1REG
+;Add USART_DELAY after the byte is sent by the USART module
+;Wait USART_DELAY
 	MOVLW	1
 	MOVWF	SYSWAITTEMPMS
 	CLRF	SYSWAITTEMPMS_H
 	BANKSEL	STATUS
 	CALL	DELAY_MS
+;end if
+GLOBAL	ENDIF24
 ENDIF24:
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: 280_SHOWING_SAF_DATA_TO_SERIAL_TERMINAL.GCB (71)
+GLOBAL	INITPPS
 INITPPS:
+;Module: EUSART
+;RC6PPS = 0x000E    'TX > RC6
 	MOVLW	14
 	BANKSEL	RC6PPS
 	MOVWF	RC6PPS
@@ -993,36 +1415,64 @@ INITPPS:
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (159)
+GLOBAL	INITSYS
 INITSYS:
 ;asm showdebug This code block sets the internal oscillator to ChipMHz
+;OSCCON2 = 0
 	BANKSEL	OSCCON2
 	CLRF	OSCCON2
+;OSCCON3 = 0
 	CLRF	OSCCON3
+;Set OSCFRQ values for MCUs with OSCSTAT... the 16F180xx MCU family 32 mhz
+;OSCFRQ = 0b00000101
 	MOVLW	5
 	MOVWF	OSCFRQ
 ;asm showdebug _Complete_the_chip_setup_of_BSR,ADCs,ANSEL_and_other_key_setup_registers_or_register_bits
+;Ensure all ports are set for digital I/O and, turn off A/D
+;SET ADFM OFF
 	BANKSEL	ADCON0
 	BCF	ADCON0,2
+;Switch off A/D Var(ADCON0)
+;SET ADCON0.ADON OFF
 	BCF	ADCON0,7
+;ANSELA = 0
 	BANKSEL	ANSELA
 	CLRF	ANSELA
+;ANSELB = 0
 	CLRF	ANSELB
+;ANSELC = 0
 	CLRF	ANSELC
+;ANSELD = 0
 	CLRF	ANSELD
+;ANSELE = 0
 	CLRF	ANSELE
+;Set comparator register bits for many MCUs with register CM2CON0
+;C1EN = 0
 	BANKSEL	CM1CON0
 	BCF	CM1CON0,7
+;
+;'Turn off all ports
+;PORTA = 0
 	BANKSEL	PORTA
 	CLRF	PORTA
+;PORTB = 0
 	CLRF	PORTB
+;PORTC = 0
 	CLRF	PORTC
+;PORTD = 0
 	CLRF	PORTD
+;PORTE = 0
 	CLRF	PORTE
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: USART.H (630)
+GLOBAL	INITUSART
 INITUSART:
+;Set the default value for comport
+;comport = 1
 	MOVLW	1
 	MOVWF	COMPORT
 ;asm showdebug Values_calculated_in_the_script
@@ -1030,25 +1480,49 @@ INITUSART:
 ;asm showdebug _SPBRGL_TEMP=_ SPBRGL_TEMP
 ;asm showdebug _BRG16_TEMP=_ BRG16_TEMP
 ;asm showdebug _BRGH_TEMP=_ BRGH_TEMP
+;Set baud rate for legacy chips
+;SPBRG = SPBRGL_TEMP
 	MOVLW	64
 	BANKSEL	SP1BRGL
 	MOVWF	SP1BRGL
+;Set baud rate for chips with BRG16 bit
+;SPBRGH = SPBRGH_TEMP
 	MOVLW	3
 	MOVWF	SP1BRGH
+;SPBRGL = SPBRGL_TEMP
 	MOVLW	64
 	MOVWF	SP1BRGL
+;BRG16: 16-bit Baud Rate Generator bit
+;1 = 16-bit Baud Rate Generator is used
+;0 = 8-bit Baud Rate Generator is used
+;BRG16 = BRG16_TEMP
 	BSF	BAUD1CON,3
+;Set High Baud Rate Select bit
+;BRGH = BRGH_TEMP
 	BSF	TX1STA,2
+;Enable async and TX mode for most non K42
+;Set SYNC Off
+;Set TXEN On
+;Changed to canskip to silently exit when no USART
+;[canskip]SYNC=0
 	BCF	TX1STA,4
+;[canskip]TXEN=1
 	BSF	TX1STA,5
+;SPEN=1
 	BSF	RC1STA,7
+;Enable TX and RX
+;CREN=1
 	BSF	RC1STA,4
 	BANKSEL	STATUS
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SAF.H (434)
+GLOBAL	SAFERASEBLOCK
 SAFERASEBLOCK:
+;Dim _HEF_ABS_ADDR Alias _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL as Long
+;_HEF_ABS_ADDR = HEF_START_ADDR + (HEF_ROWSIZE_BYTES * _HEF_BlockNum)
 	MOVF	_HEF_BLOCKNUM,W
 	MOVWF	SYSBYTETEMPA
 	MOVLW	32
@@ -1072,25 +1546,39 @@ SAFERASEBLOCK:
 	BTFSC	STATUS,0
 	INCF	_HEF_ABS_ADDR_U,F
 	CLRF	_HEF_ABS_ADDR_E
+;NVMCON1 = 0
 	BANKSEL	NVMCON1
 	CLRF	NVMCON1
+;NVMCON1.NVMREGS = 0
 	BCF	NVMCON1,6
+;NVMCON1.FREE = 1
 	BSF	NVMCON1,4
+;NVMCON1.WREN = 1
 	BSF	NVMCON1,2
+;_GIE_Save = INTCON.GIE   'Save interrupt setting
 	BANKSEL	_GIE_SAVE
 	CLRF	_GIE_SAVE
 	BTFSC	INTCON,7
 	INCF	_GIE_SAVE,F
+;INTCON.GIE = 0 'Disable Interrupts
 	BCF	INTCON,7
+;unlock Sequence
+;NVMCON2 = 0x55
 	MOVLW	85
 	BANKSEL	NVMCON2
 	MOVWF	NVMCON2
+;NVMCON2 = 0xAA
 	MOVLW	170
 	MOVWF	NVMCON2
+;NVMCON1.WR = 1            'Write takes place here
 	BSF	NVMCON1,1
+;NOP
 	NOP
+;NOP
 	NOP
+;NVMCON1.WREN = 0           'Disable Flash Memory write/erase
 	BCF	NVMCON1,2
+;INTCON.GIE = _GIE_SAVE    ' Restore saved interrupt setting
 	BANKSEL	_GIE_SAVE
 	BTFSC	_GIE_SAVE,0
 	BSF	INTCON,7
@@ -1100,17 +1588,25 @@ SAFERASEBLOCK:
 
 ;********************************************************************************
 
+;SOURCE: 280_SHOWING_SAF_DATA_TO_SERIAL_TERMINAL.GCB (254)
+GLOBAL	SAFM_DUMP
 SAFM_DUMP:
+;Dim Blocknum as Byte
+;NVM_Address  = SAF_START_ADDR
 	MOVLW	128
 	MOVWF	NVM_ADDRESS
 	MOVLW	31
 	MOVWF	NVM_ADDRESS_H
 	CLRF	NVM_ADDRESS_U
 	CLRF	NVM_ADDRESS_E
+;BlockNum = 0
 	CLRF	BLOCKNUM
+;Repeat 64
 	MOVLW	64
 	MOVWF	SYSREPEATTEMP2
+GLOBAL	SYSREPEATLOOP2
 SYSREPEATLOOP2:
+;If NVM_Address % SAF_ROWSIZE_BYTES = 0 then
 	MOVF	NVM_ADDRESS,W
 	MOVWF	SYSLONGTEMPA
 	MOVF	NVM_ADDRESS_H,W
@@ -1148,21 +1644,27 @@ SYSREPEATLOOP2:
 	CALL	SYSCOMPEQUAL32
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF5
+;If BlockNum > 0 then   HSERPRINTCRLF
 	MOVF	BLOCKNUM,W
 	SUBLW	0
 	BTFSC	STATUS,0
 	GOTO	ENDIF7
+;If BlockNum > 0 then   HSERPRINTCRLF
 	MOVLW	1
 	MOVWF	HSERPRINTCRLFCOUNT
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINTCRLF
+;If BlockNum > 0 then   HSERPRINTCRLF
+GLOBAL	ENDIF7
 ENDIF7:
+;HSerprintCRLF
 	MOVLW	1
 	MOVWF	HSERPRINTCRLFCOUNT
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINTCRLF
+;HserPrint "Block"
 	MOVLW	LOW STRINGTABLE8
 	MOVWF	SYSPRINTDATAHANDLER
 	MOVLW	(HIGH STRINGTABLE8) | 128
@@ -1170,11 +1672,13 @@ ENDIF7:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;HSerprint BlockNum
 	MOVF	BLOCKNUM,W
 	MOVWF	SERPRINTVAL
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT306
+;HSerprint "  1 0   3 2   5 4   7 6"
 	MOVLW	LOW STRINGTABLE9
 	MOVWF	SYSPRINTDATAHANDLER
 	MOVLW	(HIGH STRINGTABLE9) | 128
@@ -1182,8 +1686,12 @@ ENDIF7:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;BlockNum++
 	INCF	BLOCKNUM,F
+;End if
+GLOBAL	ENDIF5
 ENDIF5:
+;IF NVM_Address  % 8 = 0 then
 	MOVF	NVM_ADDRESS,W
 	MOVWF	SYSLONGTEMPA
 	MOVF	NVM_ADDRESS_H,W
@@ -1221,11 +1729,13 @@ ENDIF5:
 	CALL	SYSCOMPEQUAL32
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF6
+;HSerPrintCRLF
 	MOVLW	1
 	MOVWF	HSERPRINTCRLFCOUNT
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINTCRLF
+;hserprint hex(NVM_Address_H)
 	MOVF	NVM_ADDRESS_H,W
 	MOVWF	SYSVALTEMP
 	CALL	FN__HEXPICAS
@@ -1236,6 +1746,7 @@ ENDIF5:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;hserprint hex(NVM_Address)
 	MOVF	NVM_ADDRESS,W
 	MOVWF	SYSVALTEMP
 	CALL	FN__HEXPICAS
@@ -1246,6 +1757,7 @@ ENDIF5:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;hserprint "    "
 	MOVLW	LOW STRINGTABLE10
 	MOVWF	SYSPRINTDATAHANDLER
 	MOVLW	(HIGH STRINGTABLE10) | 128
@@ -1253,16 +1765,21 @@ ENDIF5:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;end if
+GLOBAL	ENDIF6
 ENDIF6:
+;Rel_Address = NVM_ADDRESS - SAF_START_ADDR
 	MOVLW	128
 	SUBWF	NVM_ADDRESS,W
 	MOVWF	REL_ADDRESS
+;SAFReadWord(Rel_Address,DataWord)
 	MOVWF	_HEF_REL_ADDR
 	CALL	SAFREADWORD396
 	MOVF	_HEF_DATAWORD,W
 	MOVWF	DATAWORD
 	MOVF	_HEF_DATAWORD_H,W
 	MOVWF	DATAWORD_H
+;hserprint hex(DataWord_H)
 	MOVWF	SYSVALTEMP
 	CALL	FN__HEXPICAS
 	MOVLW	LOW _HEXPICAS
@@ -1272,6 +1789,7 @@ ENDIF6:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;hserprint hex(DataWord)
 	MOVF	DATAWORD,W
 	MOVWF	SYSVALTEMP
 	CALL	FN__HEXPICAS
@@ -1282,6 +1800,7 @@ ENDIF6:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;hserprint "  "
 	MOVLW	LOW STRINGTABLE11
 	MOVWF	SYSPRINTDATAHANDLER
 	MOVLW	(HIGH STRINGTABLE11) | 128
@@ -1289,6 +1808,7 @@ ENDIF6:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT305
+;NVM_Address+=2 ' Next "WORD"
 	MOVLW	2
 	ADDWF	NVM_ADDRESS,F
 	MOVLW	0
@@ -1297,9 +1817,12 @@ ENDIF6:
 	ADDWFC	NVM_ADDRESS_U,F
 	MOVLW	0
 	ADDWFC	NVM_ADDRESS_E,F
+;End Repeat
 	DECFSZ	SYSREPEATTEMP2,F
 	GOTO	SYSREPEATLOOP2
+GLOBAL	SYSREPEATLOOPEND2
 SYSREPEATLOOPEND2:
+;HserPrintCRLF
 	MOVLW	1
 	MOVWF	HSERPRINTCRLFCOUNT
 	MOVLW	1
@@ -1308,7 +1831,16 @@ SYSREPEATLOOPEND2:
 
 ;********************************************************************************
 
+;OVERLOADED SIGNATURE: BYTE:BYTE:, SOURCE: SAF.H (190)
+GLOBAL	SAFREAD394
 SAFREAD394:
+;overloaded sub byte only
+;Returns in _HEF_HEF_DataOut the byte value stored in SAFM
+;at relative location [_HEF_Address] with 0 being the first HEFM location
+;_HEF_Address is generally be comprised between 0 and 127
+;The syntax is similar to the EPRead subroutine
+;Dim _HEF_ABS_ADDR Alias _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL as Long
+;_HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
 	MOVLW	128
 	ADDWF	_HEF_REL_ADDR,W
 	BANKSEL	NVMADRL
@@ -1325,11 +1857,16 @@ SAFREAD394:
 	BTFSC	STATUS,0
 	INCF	_HEF_ABS_ADDR_U,F
 	CLRF	_HEF_ABS_ADDR_E
+;NVMCON1.NVMREGS = 0    'Select the Flash address space
 	BANKSEL	NVMCON1
 	BCF	NVMCON1,6
+;NVMCON1.RD = 1         'Read control bit on
 	BSF	NVMCON1,0
+;NOP
 	NOP
+;NOP
 	NOP
+;_HEF_DataByte = NVMDATL
 	MOVF	NVMDATL,W
 	BANKSEL	_HEF_DATABYTE
 	MOVWF	_HEF_DATABYTE
@@ -1337,7 +1874,15 @@ SAFREAD394:
 
 ;********************************************************************************
 
+;SOURCE: SAF.H (343)
+GLOBAL	SAFREADBLOCK
 SAFREADBLOCK:
+;Dim _HEF_Count as Word
+;This subroutine returns in _HEF_Buffer array the [_HEF_Count] byte values
+;stored in SAF given its row/block #
+;Dim _HEF_ABS_ADDR Alias _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL as Long
+;Obtain absolute address of HEFlash row
+;_HEF_ABS_ADDR =  HEF_START_ADDR + (_HEF_BlockNum * HEF_ROWSIZE_BYTES)
 	MOVF	_HEF_BLOCKNUM,W
 	MOVWF	SYSBYTETEMPA
 	MOVLW	32
@@ -1361,17 +1906,24 @@ SAFREADBLOCK:
 	BTFSC	STATUS,0
 	INCF	_HEF_ABS_ADDR_U,F
 	CLRF	_HEF_ABS_ADDR_E
+;NVMCON1.NVMREGS  = 0       'Select the Flash address space
 	BANKSEL	NVMCON1
 	BCF	NVMCON1,6
+;for _HEF_Index  = 1 to _HEF_Count -1
 	MOVLW	1
 	BANKSEL	_HEF_INDEX
 	MOVWF	_HEF_INDEX
 	CLRF	_HEF_INDEX_H
+GLOBAL	SYSFORLOOP7
 SYSFORLOOP7:
+;NVMCON1.RD = 1         'Read control bit on
 	BANKSEL	NVMCON1
 	BSF	NVMCON1,0
+;NOP
 	NOP
+;NOP
 	NOP
+;_HEF_Buffer(_HEF_Index) = NVMDATL
 	BANKSEL	_HEF_INDEX
 	MOVF	_HEF_INDEX,W
 	ADDWF	SYS_HEF_BUFFERHANDLER,W
@@ -1382,6 +1934,7 @@ SYSFORLOOP7:
 	BANKSEL	NVMDATL
 	MOVF	NVMDATL,W
 	MOVWF	INDF0
+;_HEF_ABS_ADDR++
 	INCF	NVMADRL,F
 	BTFSC	STATUS,2
 	INCF	NVMADRH,F
@@ -1391,6 +1944,8 @@ SYSFORLOOP7:
 	BTFSC	STATUS,2
 	BANKSEL	_HEF_ABS_ADDR_E
 	INCF	_HEF_ABS_ADDR_E,F
+;next
+;POSITIVE VALUE STEP HANDLER IN FOR-NEXT STATEMENT :#4P 
 	MOVLW	1
 	BANKSEL	_HEF_COUNT
 	SUBWF	_HEF_COUNT,W
@@ -1414,16 +1969,25 @@ SYSFORLOOP7:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF17
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	INCF	_HEF_INDEX,F
 	BTFSC	STATUS,2
 	INCF	_HEF_INDEX_H,F
 	GOTO	SYSFORLOOP7
+;END IF
+GLOBAL	ENDIF17
 ENDIF17:
+GLOBAL	SYSFORLOOPEND7
 SYSFORLOOPEND7:
+;get last byte
+;NVMCON1.RD = 1         'Read control bit on
 	BANKSEL	NVMCON1
 	BSF	NVMCON1,0
+;NOP
 	NOP
+;NOP
 	NOP
+;_HEF_Buffer(_HEF_Index+1) = NVMDATL
 	MOVLW	1
 	BANKSEL	_HEF_INDEX
 	ADDWF	_HEF_INDEX,W
@@ -1445,7 +2009,11 @@ SYSFORLOOPEND7:
 
 ;********************************************************************************
 
+;OVERLOADED SIGNATURE: BYTE:WORD:, SOURCE: SAF.H (292)
+GLOBAL	SAFREADWORD396
 SAFREADWORD396:
+;Dim _HEF_ABS_ADDR Alias _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL as Long
+;_HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
 	MOVLW	128
 	ADDWF	_HEF_REL_ADDR,W
 	BANKSEL	NVMADRL
@@ -1462,15 +2030,21 @@ SAFREADWORD396:
 	BTFSC	STATUS,0
 	INCF	_HEF_ABS_ADDR_U,F
 	CLRF	_HEF_ABS_ADDR_E
+;NVMCON1.NVMREGS = 0
 	BANKSEL	NVMCON1
 	BCF	NVMCON1,6
+;NVMCON1.RD = 1
 	BSF	NVMCON1,0
+;NOP
 	NOP
+;NOP
 	NOP
+;_HEF_DataWord = NVMDATL
 	MOVF	NVMDATL,W
 	BANKSEL	_HEF_DATAWORD
 	MOVWF	_HEF_DATAWORD
 	CLRF	_HEF_DATAWORD_H
+;_HEF_ABS_ADDR++  'Next HEF Aaddress
 	BANKSEL	NVMADRL
 	INCF	NVMADRL,F
 	BTFSC	STATUS,2
@@ -1481,10 +2055,14 @@ SAFREADWORD396:
 	BTFSC	STATUS,2
 	BANKSEL	_HEF_ABS_ADDR_E
 	INCF	_HEF_ABS_ADDR_E,F
+;NVMCON1.RD = 1
 	BANKSEL	NVMCON1
 	BSF	NVMCON1,0
+;NOP
 	NOP
+;NOP
 	NOP
+;_HEF_DataWord_H = NVMDATL
 	MOVF	NVMDATL,W
 	BANKSEL	_HEF_DATAWORD_H
 	MOVWF	_HEF_DATAWORD_H
@@ -1492,7 +2070,16 @@ SAFREADWORD396:
 
 ;********************************************************************************
 
+;SOURCE: SAF.H (550)
+GLOBAL	SAFWRITEBLOCK
 SAFWRITEBLOCK:
+;This subroutine writes _HEF_Count from the _HEF_Buffer() array
+;at a given row # of the HEM
+;Dim _HEF_Count as Word
+;Calculate Base Address of NVM Erase Block for Chipfamily16
+;Dim _HEF_ABS_ADDR Alias _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL as Long
+;Calculate Base Address of NVM Erase Block
+;_HEF_ABS_ADDR =  HEF_Block0_Addr + (_HEF_BlockNum * HEF_ROWSIZE_BYTES)
 	MOVF	_HEF_BLOCKNUM,W
 	MOVWF	SYSBYTETEMPA
 	MOVLW	32
@@ -1516,27 +2103,42 @@ SAFWRITEBLOCK:
 	BTFSC	STATUS,0
 	INCF	_HEF_ABS_ADDR_U,F
 	CLRF	_HEF_ABS_ADDR_E
+;Erase the entire row
+;SAFEraseBlock (_HEF_BlockNum)
 	CALL	SAFERASEBLOCK
+;NVMCON1.CFGS = 0           'Select the Flash address space
 	BANKSEL	NVMCON1
 	BCF	NVMCON1,6
+;NVMCON1.FREE = 0           'Next operation will be a write
 	BCF	NVMCON1,4
+;NVMCON1.WREN = 1           'Enable Flash Memory write/erase
 	BSF	NVMCON1,2
+;NVMDATH = 0x3F  'Erase State Defaults
 	MOVLW	63
 	MOVWF	NVMDATH
+;NVMDATL = 0xFF
 	MOVLW	255
 	MOVWF	NVMDATL
+;_GIE_SAVE = INTCON.GIE    'Save initial GIE state
 	BANKSEL	_GIE_SAVE
 	CLRF	_GIE_SAVE
 	BTFSC	INTCON,7
 	INCF	_GIE_SAVE,F
+;INTCON.GIE = 0 'Disable INterrupts
 	BCF	INTCON,7
+;Fill the latches with data no write
+;NVMCON1.LWLO = 1          '1=latch 0=write row
 	BANKSEL	NVMCON1
 	BSF	NVMCON1,5
+;for _HEF_Index = 1 to _HEF_Count -1
 	MOVLW	1
 	BANKSEL	_HEF_INDEX
 	MOVWF	_HEF_INDEX
 	CLRF	_HEF_INDEX_H
+GLOBAL	SYSFORLOOP8
 SYSFORLOOP8:
+;Load data in latches without writing
+;NVMDATL = _HEF_Buffer(_HEF_Index)  'Only write Lower Byte!
 	MOVF	_HEF_INDEX,W
 	ADDWF	SYS_HEF_BUFFERHANDLER,W
 	MOVWF	FSR0L
@@ -1546,13 +2148,19 @@ SYSFORLOOP8:
 	MOVF	INDF0,W
 	BANKSEL	NVMDATL
 	MOVWF	NVMDATL
+;NVMCON2 = 0x55
 	MOVLW	85
 	MOVWF	NVMCON2
+;NVMCON2 = 0xAA
 	MOVLW	170
 	MOVWF	NVMCON2
+;NVMCON1.WR = 1
 	BSF	NVMCON1,1
+;NOP
 	NOP
+;NOP
 	NOP
+;_HEF_ABS_ADDR++
 	INCF	NVMADRL,F
 	BTFSC	STATUS,2
 	INCF	NVMADRH,F
@@ -1562,6 +2170,8 @@ SYSFORLOOP8:
 	BTFSC	STATUS,2
 	BANKSEL	_HEF_ABS_ADDR_E
 	INCF	_HEF_ABS_ADDR_E,F
+;Next
+;POSITIVE VALUE STEP HANDLER IN FOR-NEXT STATEMENT :#4P 
 	MOVLW	1
 	BANKSEL	_HEF_COUNT
 	SUBWF	_HEF_COUNT,W
@@ -1585,12 +2195,18 @@ SYSFORLOOP8:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF18
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	INCF	_HEF_INDEX,F
 	BTFSC	STATUS,2
 	INCF	_HEF_INDEX_H,F
 	GOTO	SYSFORLOOP8
+;END IF
+GLOBAL	ENDIF18
 ENDIF18:
+GLOBAL	SYSFORLOOPEND8
 SYSFORLOOPEND8:
+;last byte
+;NVMDATL =  _HEF_Buffer(_HEF_Index + 1)
 	MOVLW	1
 	ADDWF	_HEF_INDEX,W
 	MOVWF	SYSTEMP2
@@ -1606,15 +2222,24 @@ SYSFORLOOPEND8:
 	MOVF	INDF0,W
 	BANKSEL	NVMDATL
 	MOVWF	NVMDATL
+;NVMCON1.LWLO = 0  'write latches
 	BCF	NVMCON1,5
+;unlock
+;NVMCON2 = 0x55
 	MOVLW	85
 	MOVWF	NVMCON2
+;NVMCON2 = 0xAA
 	MOVLW	170
 	MOVWF	NVMCON2
+;NVMCON1.WR = 1 'Write !
 	BSF	NVMCON1,1
+;NOP
 	NOP
+;NOP
 	NOP
+;NVMCON1.WREN = 0           'Disable Flash Memory write/erase
 	BCF	NVMCON1,2
+;INTCON.GIE = _GIE_SAVE    ' Restore initial GIE state
 	BANKSEL	_GIE_SAVE
 	BTFSC	_GIE_SAVE,0
 	BSF	INTCON,7
@@ -1624,7 +2249,16 @@ SYSFORLOOPEND8:
 
 ;********************************************************************************
 
+;SOURCE: SAF.H (745)
+GLOBAL	SAFWRITEWORD
 SAFWRITEWORD:
+;Writes a single WORD to 18F SAF Memory
+;at relative locations [_HEF_REL_ADDR]
+;where each address is an even number.
+;
+;Existing data in the row of [_HEF_REL_ADDR] is preserved
+;Calculate block number
+;_HEF_BlockNum = _HEF_REL_ADDR / HEF_ROWSIZE_BYTES
 	MOVF	_HEF_REL_ADDR,W
 	MOVWF	SYSBYTETEMPA
 	MOVLW	32
@@ -1632,6 +2266,8 @@ SAFWRITEWORD:
 	CALL	SYSDIVSUB
 	MOVF	SYSBYTETEMPA,W
 	MOVWF	_HEF_BLOCKNUM
+;Calculate offset in block/row
+;_HEF_Offset = _HEF_REL_ADDR % HEF_ROWSIZE_BYTES
 	MOVF	_HEF_REL_ADDR,W
 	MOVWF	SYSWORDTEMPA
 	CLRF	SYSWORDTEMPA_H
@@ -1643,6 +2279,8 @@ SAFWRITEWORD:
 	MOVWF	_HEF_OFFSET
 	MOVF	SYSWORDTEMPX_H,W
 	MOVWF	_HEF_OFFSET_H
+;Save data previously stored in row#
+;SAFReadBlock(_HEF_BlockNum, _HEF_Buffer(), HEF_ROWSIZE_BYTES)
 	MOVLW	LOW _HEF_BUFFER
 	MOVWF	SYS_HEF_BUFFERHANDLER
 	MOVLW	HIGH _HEF_BUFFER
@@ -1651,6 +2289,8 @@ SAFWRITEWORD:
 	MOVWF	_HEF_COUNT
 	CLRF	_HEF_COUNT_H
 	CALL	SAFREADBLOCK
+;Update buffer with DataValue at offset
+;_HEF_Buffer(_HEF_Offset + 1) = _HEF_DataWord
 	MOVLW	1
 	ADDWF	_HEF_OFFSET,W
 	MOVWF	SYSTEMP2
@@ -1665,6 +2305,7 @@ SAFWRITEWORD:
 	MOVWF	FSR0H
 	MOVF	_HEF_DATAWORD,W
 	MOVWF	INDF0
+;_HEF_Buffer(_HEF_Offset + 2) = _HEF_DataWord_H
 	MOVLW	2
 	ADDWF	_HEF_OFFSET,W
 	MOVWF	SYSTEMP2
@@ -1679,6 +2320,8 @@ SAFWRITEWORD:
 	MOVWF	FSR0H
 	MOVF	_HEF_DATAWORD_H,W
 	MOVWF	INDF0
+;Write back the updated row buffer to  HEFM
+;SAFwriteBlock(_HEF_BlockNum, _HEF_Buffer(), HEF_ROWSIZE_BYTES)
 	MOVLW	LOW _HEF_BUFFER
 	MOVWF	SYS_HEF_BUFFERHANDLER
 	MOVLW	HIGH _HEF_BUFFER
@@ -1690,126 +2333,255 @@ SAFWRITEWORD:
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (3078)
+GLOBAL	SYSCOMPEQUAL
 SYSCOMPEQUAL:
+;Dim SysByteTempA, SysByteTempB, SysByteTempX as byte
+;clrf SysByteTempX
 	CLRF	SYSBYTETEMPX
+;movf SysByteTempA, W
 	MOVF	SYSBYTETEMPA, W
+;subwf SysByteTempB, W
 	SUBWF	SYSBYTETEMPB, W
+;btfsc STATUS, Z
 	BTFSC	STATUS,2
+;comf SysByteTempX,F
 	COMF	SYSBYTETEMPX,F
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (3104)
+GLOBAL	SYSCOMPEQUAL16
 SYSCOMPEQUAL16:
+;dim SysWordTempA as word
+;dim SysWordTempB as word
+;dim SysByteTempX as byte
+;clrf SysByteTempX
 	CLRF	SYSBYTETEMPX
+;Test low, exit if false
+;movf SysWordTempA, W
 	MOVF	SYSWORDTEMPA, W
+;subwf SysWordTempB, W
 	SUBWF	SYSWORDTEMPB, W
+;btfss STATUS, Z
 	BTFSS	STATUS,2
+;return
 	RETURN
+;Test high, exit if false
+;movf SysWordTempA_H, W
 	MOVF	SYSWORDTEMPA_H, W
+;subwf SysWordTempB_H, W
 	SUBWF	SYSWORDTEMPB_H, W
+;btfss STATUS, Z
 	BTFSS	STATUS,2
+;return
 	RETURN
+;comf SysByteTempX,F
 	COMF	SYSBYTETEMPX,F
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (3158)
+GLOBAL	SYSCOMPEQUAL32
 SYSCOMPEQUAL32:
+;dim SysLongTempA as long
+;dim SysLongTempB as long
+;dim SysByteTempX as byte
+;clrf SysByteTempX
 	CLRF	SYSBYTETEMPX
+;Test low, exit if false
+;movf SysLongTempA, W
 	MOVF	SYSLONGTEMPA, W
+;subwf SysLongTempB, W
 	SUBWF	SYSLONGTEMPB, W
+;btfss STATUS, Z
 	BTFSS	STATUS,2
+;return
 	RETURN
+;Test high, exit if false
+;movf SysLongTempA_H, W
 	MOVF	SYSLONGTEMPA_H, W
+;subwf SysLongTempB_H, W
 	SUBWF	SYSLONGTEMPB_H, W
+;btfss STATUS, Z
 	BTFSS	STATUS,2
+;return
 	RETURN
+;Test upper, exit if false
+;movf SysLongTempA_U, W
 	MOVF	SYSLONGTEMPA_U, W
+;subwf SysLongTempB_U, W
 	SUBWF	SYSLONGTEMPB_U, W
+;btfss STATUS, Z
 	BTFSS	STATUS,2
+;return
 	RETURN
+;Test exp, exit if false
+;movf SysLongTempA_E, W
 	MOVF	SYSLONGTEMPA_E, W
+;subwf SysLongTempB_E, W
 	SUBWF	SYSLONGTEMPB_E, W
+;btfss STATUS, Z
 	BTFSS	STATUS,2
+;return
 	RETURN
+;comf SysByteTempX,F
 	COMF	SYSBYTETEMPX,F
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (3383)
+GLOBAL	SYSCOMPLESSTHAN
 SYSCOMPLESSTHAN:
+;Dim SysByteTempA, SysByteTempB, SysByteTempX as byte
+;clrf SysByteTempX
 	CLRF	SYSBYTETEMPX
+;bsf STATUS, C
 	BSF	STATUS,0
+;movf SysByteTempB, W
 	MOVF	SYSBYTETEMPB, W
+;subwf SysByteTempA, W
 	SUBWF	SYSBYTETEMPA, W
+;btfss STATUS, C
 	BTFSS	STATUS,0
+;comf SysByteTempX,F
 	COMF	SYSBYTETEMPX,F
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (1374)
+GLOBAL	SYSCOPYSTRING
 SYSCOPYSTRING:
+;Dim SysCalcTempA As Byte
+;Dim SysStringLength As Byte
+;Get and copy length
+;movf INDF0, W
 	MOVF	INDF0, W
+;movwf SysCalcTempA
 	MOVWF	SYSCALCTEMPA
+;movwf INDF1
 	MOVWF	INDF1
+;goto SysCopyStringCheck
 	GOTO	SYSCOPYSTRINGCHECK
+;When appending, add length to counter
+GLOBAL	SYSCOPYSTRINGPART
 SYSCOPYSTRINGPART:
+;movf INDF0, W
 	MOVF	INDF0, W
+;movwf SysCalcTempA
 	MOVWF	SYSCALCTEMPA
+;addwf SysStringLength, F
 	ADDWF	SYSSTRINGLENGTH, F
+GLOBAL	SYSCOPYSTRINGCHECK
 SYSCOPYSTRINGCHECK:
+;Exit if length = 0
+;movf SysCalcTempA,F
 	MOVF	SYSCALCTEMPA,F
+;btfsc STATUS,Z
 	BTFSC	STATUS,2
+;return
 	RETURN
+GLOBAL	SYSSTRINGCOPY
 SYSSTRINGCOPY:
+;Increment pointers
+;addfsr 0, 1
 	ADDFSR	0, 1
+;addfsr 1, 1
 	ADDFSR	1, 1
+;Copy character
+;movf INDF0, W
 	MOVF	INDF0, W
+;movwf INDF1
 	MOVWF	INDF1
+;decfsz SysCalcTempA, F
 	DECFSZ	SYSCALCTEMPA, F
+;goto SysStringCopy
 	GOTO	SYSSTRINGCOPY
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (2793)
+GLOBAL	SYSDIVSUB
 SYSDIVSUB:
+;dim SysByteTempA as byte
+;dim SysByteTempB as byte
+;dim SysByteTempX as byte
+;Check for div/0
+;movf SysByteTempB, F
 	MOVF	SYSBYTETEMPB, F
+;btfsc STATUS, Z
 	BTFSC	STATUS,2
+;return
 	RETURN
+;Main calc routine
+;SysByteTempX = 0
 	CLRF	SYSBYTETEMPX
+;SysDivLoop = 8
 	MOVLW	8
 	MOVWF	SYSDIVLOOP
+GLOBAL	SYSDIV8START
 SYSDIV8START:
+;bcf STATUS, C
 	BCF	STATUS,0
+;rlf SysByteTempA, F
 	RLF	SYSBYTETEMPA, F
+;rlf SysByteTempX, F
 	RLF	SYSBYTETEMPX, F
+;movf SysByteTempB, W
 	MOVF	SYSBYTETEMPB, W
+;subwf SysByteTempX, F
 	SUBWF	SYSBYTETEMPX, F
+;bsf SysByteTempA, 0
 	BSF	SYSBYTETEMPA, 0
+;btfsc STATUS, C
 	BTFSC	STATUS,0
+;goto Div8NotNeg
 	GOTO	DIV8NOTNEG
+;bcf SysByteTempA, 0
 	BCF	SYSBYTETEMPA, 0
+;movf SysByteTempB, W
 	MOVF	SYSBYTETEMPB, W
+;addwf SysByteTempX, F
 	ADDWF	SYSBYTETEMPX, F
+GLOBAL	DIV8NOTNEG
 DIV8NOTNEG:
+;decfsz SysDivLoop, F
 	DECFSZ	SYSDIVLOOP, F
+;goto SysDiv8Start
 	GOTO	SYSDIV8START
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (2861)
+GLOBAL	SYSDIVSUB16
 SYSDIVSUB16:
+;dim SysWordTempA as word
+;dim SysWordTempB as word
+;dim SysWordTempX as word
+;dim SysDivMultA as word
+;dim SysDivMultB as word
+;dim SysDivMultX as word
+;SysDivMultA = SysWordTempA
 	MOVF	SYSWORDTEMPA,W
 	MOVWF	SYSDIVMULTA
 	MOVF	SYSWORDTEMPA_H,W
 	MOVWF	SYSDIVMULTA_H
+;SysDivMultB = SysWordTempB
 	MOVF	SYSWORDTEMPB,W
 	MOVWF	SYSDIVMULTB
 	MOVF	SYSWORDTEMPB_H,W
 	MOVWF	SYSDIVMULTB_H
+;SysDivMultX = 0
 	CLRF	SYSDIVMULTX
 	CLRF	SYSDIVMULTX_H
+;Avoid division by zero
+;if SysDivMultB = 0 then
 	MOVF	SYSDIVMULTB,W
 	MOVWF	SYSWORDTEMPA
 	MOVF	SYSDIVMULTB_H,W
@@ -1819,37 +2591,58 @@ SYSDIVSUB16:
 	CALL	SYSCOMPEQUAL16
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF22
+;SysWordTempA = 0
 	CLRF	SYSWORDTEMPA
 	CLRF	SYSWORDTEMPA_H
+;exit sub
 	RETURN
+;end if
+GLOBAL	ENDIF22
 ENDIF22:
+;Main calc routine
+;SysDivLoop = 16
 	MOVLW	16
 	MOVWF	SYSDIVLOOP
+GLOBAL	SYSDIV16START
 SYSDIV16START:
+;set C off
 	BCF	STATUS,0
+;Rotate SysDivMultA Left
 	RLF	SYSDIVMULTA,F
 	RLF	SYSDIVMULTA_H,F
+;Rotate SysDivMultX Left
 	RLF	SYSDIVMULTX,F
 	RLF	SYSDIVMULTX_H,F
+;SysDivMultX = SysDivMultX - SysDivMultB
 	MOVF	SYSDIVMULTB,W
 	SUBWF	SYSDIVMULTX,F
 	MOVF	SYSDIVMULTB_H,W
 	SUBWFB	SYSDIVMULTX_H,F
+;Set SysDivMultA.0 On
 	BSF	SYSDIVMULTA,0
+;If C Off Then
 	BTFSC	STATUS,0
 	GOTO	ENDIF23
+;Set SysDivMultA.0 Off
 	BCF	SYSDIVMULTA,0
+;SysDivMultX = SysDivMultX + SysDivMultB
 	MOVF	SYSDIVMULTB,W
 	ADDWF	SYSDIVMULTX,F
 	MOVF	SYSDIVMULTB_H,W
 	ADDWFC	SYSDIVMULTX_H,F
+;End If
+GLOBAL	ENDIF23
 ENDIF23:
+;decfsz SysDivLoop, F
 	DECFSZ	SYSDIVLOOP, F
+;goto SysDiv16Start
 	GOTO	SYSDIV16START
+;SysWordTempA = SysDivMultA
 	MOVF	SYSDIVMULTA,W
 	MOVWF	SYSWORDTEMPA
 	MOVF	SYSDIVMULTA_H,W
 	MOVWF	SYSWORDTEMPA_H
+;SysWordTempX = SysDivMultX
 	MOVF	SYSDIVMULTX,W
 	MOVWF	SYSWORDTEMPX
 	MOVF	SYSDIVMULTX_H,W
@@ -1858,7 +2651,18 @@ ENDIF23:
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (2937)
+GLOBAL	SYSDIVSUB32
 SYSDIVSUB32:
+;dim SysLongTempA as long
+;dim SysLongTempB as long
+;dim SysLongTempX as long
+;#ifdef PIC
+;dim SysLongDivMultA as long
+;dim SysLongDivMultB as long
+;dim SysLongDivMultX as long
+;#endif
+;SysLongDivMultA = SysLongTempA
 	MOVF	SYSLONGTEMPA,W
 	MOVWF	SYSLONGDIVMULTA
 	MOVF	SYSLONGTEMPA_H,W
@@ -1867,6 +2671,7 @@ SYSDIVSUB32:
 	MOVWF	SYSLONGDIVMULTA_U
 	MOVF	SYSLONGTEMPA_E,W
 	MOVWF	SYSLONGDIVMULTA_E
+;SysLongDivMultB = SysLongTempB
 	MOVF	SYSLONGTEMPB,W
 	MOVWF	SYSLONGDIVMULTB
 	MOVF	SYSLONGTEMPB_H,W
@@ -1875,10 +2680,13 @@ SYSDIVSUB32:
 	MOVWF	SYSLONGDIVMULTB_U
 	MOVF	SYSLONGTEMPB_E,W
 	MOVWF	SYSLONGDIVMULTB_E
+;SysLongDivMultX = 0
 	CLRF	SYSLONGDIVMULTX
 	CLRF	SYSLONGDIVMULTX_H
 	CLRF	SYSLONGDIVMULTX_U
 	CLRF	SYSLONGDIVMULTX_E
+;Avoid division by zero
+;if SysLongDivMultB = 0 then
 	MOVF	SYSLONGDIVMULTB,W
 	MOVWF	SYSLONGTEMPA
 	MOVF	SYSLONGDIVMULTB_H,W
@@ -1894,24 +2702,35 @@ SYSDIVSUB32:
 	CALL	SYSCOMPEQUAL32
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF11
+;SysLongTempA = 0
 	CLRF	SYSLONGTEMPA
 	CLRF	SYSLONGTEMPA_H
 	CLRF	SYSLONGTEMPA_U
 	CLRF	SYSLONGTEMPA_E
+;exit sub
 	RETURN
+;end if
+GLOBAL	ENDIF11
 ENDIF11:
+;Main calc routine
+;SysDivLoop = 32
 	MOVLW	32
 	MOVWF	SYSDIVLOOP
+GLOBAL	SYSDIV32START
 SYSDIV32START:
+;set C off
 	BCF	STATUS,0
+;Rotate SysLongDivMultA Left
 	RLF	SYSLONGDIVMULTA,F
 	RLF	SYSLONGDIVMULTA_H,F
 	RLF	SYSLONGDIVMULTA_U,F
 	RLF	SYSLONGDIVMULTA_E,F
+;Rotate SysLongDivMultX Left
 	RLF	SYSLONGDIVMULTX,F
 	RLF	SYSLONGDIVMULTX_H,F
 	RLF	SYSLONGDIVMULTX_U,F
 	RLF	SYSLONGDIVMULTX_E,F
+;SysLongDivMultX = SysLongDivMultX - SysLongDivMultB
 	MOVF	SYSLONGDIVMULTB,W
 	SUBWF	SYSLONGDIVMULTX,F
 	MOVF	SYSLONGDIVMULTB_H,W
@@ -1920,10 +2739,14 @@ SYSDIV32START:
 	SUBWFB	SYSLONGDIVMULTX_U,F
 	MOVF	SYSLONGDIVMULTB_E,W
 	SUBWFB	SYSLONGDIVMULTX_E,F
+;Set SysLongDivMultA.0 On
 	BSF	SYSLONGDIVMULTA,0
+;If C Off Then
 	BTFSC	STATUS,0
 	GOTO	ENDIF12
+;Set SysLongDivMultA.0 Off
 	BCF	SYSLONGDIVMULTA,0
+;SysLongDivMultX = SysLongDivMultX + SysLongDivMultB
 	MOVF	SYSLONGDIVMULTB,W
 	ADDWF	SYSLONGDIVMULTX,F
 	MOVF	SYSLONGDIVMULTB_H,W
@@ -1932,9 +2755,14 @@ SYSDIV32START:
 	ADDWFC	SYSLONGDIVMULTX_U,F
 	MOVF	SYSLONGDIVMULTB_E,W
 	ADDWFC	SYSLONGDIVMULTX_E,F
+;End If
+GLOBAL	ENDIF12
 ENDIF12:
+;decfsz SysDivLoop, F
 	DECFSZ	SYSDIVLOOP, F
+;goto SysDiv32Start
 	GOTO	SYSDIV32START
+;SysLongTempA = SysLongDivMultA
 	MOVF	SYSLONGDIVMULTA,W
 	MOVWF	SYSLONGTEMPA
 	MOVF	SYSLONGDIVMULTA_H,W
@@ -1943,6 +2771,7 @@ ENDIF12:
 	MOVWF	SYSLONGTEMPA_U
 	MOVF	SYSLONGDIVMULTA_E,W
 	MOVWF	SYSLONGTEMPA_E
+;SysLongTempX = SysLongDivMultX
 	MOVF	SYSLONGDIVMULTX,W
 	MOVWF	SYSLONGTEMPX
 	MOVF	SYSLONGDIVMULTX_H,W
@@ -1955,46 +2784,93 @@ ENDIF12:
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (2518)
+GLOBAL	SYSMULTSUB
 SYSMULTSUB:
+;dim SysByteTempA as byte
+;dim SysByteTempB as byte
+;dim SysByteTempX as byte
+;clrf SysByteTempX
 	CLRF	SYSBYTETEMPX
+GLOBAL	MUL8LOOP
 MUL8LOOP:
+;movf SysByteTempA, W
 	MOVF	SYSBYTETEMPA, W
+;btfsc SysByteTempB, 0
 	BTFSC	SYSBYTETEMPB, 0
+;addwf SysByteTempX, F
 	ADDWF	SYSBYTETEMPX, F
+;bcf STATUS, C
 	BCF	STATUS,0
+;rrf SysByteTempB, F
 	RRF	SYSBYTETEMPB, F
+;bcf STATUS, C
 	BCF	STATUS,0
+;rlf SysByteTempA, F
 	RLF	SYSBYTETEMPA, F
+;movf SysByteTempB, F
 	MOVF	SYSBYTETEMPB, F
+;btfss STATUS, Z
 	BTFSS	STATUS,2
+;goto MUL8LOOP
 	GOTO	MUL8LOOP
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (1571)
+GLOBAL	SYSREADSTRING
 SYSREADSTRING:
+;Dim SysCalcTempA As Byte
+;Dim SysStringLength As Byte
+;Get length
+;call SysStringTables
 	CALL	SYSSTRINGTABLES
+;movwf SysCalcTempA
 	MOVWF	SYSCALCTEMPA
+;movwf INDF1
 	MOVWF	INDF1
+;goto SysStringReadCheck
 	GOTO	SYSSTRINGREADCHECK
+GLOBAL	SYSREADSTRINGPART
 SYSREADSTRINGPART:
+;Get length
+;call SysStringTables
 	CALL	SYSSTRINGTABLES
+;movwf SysCalcTempA
 	MOVWF	SYSCALCTEMPA
+;addwf SysStringLength,F
 	ADDWF	SYSSTRINGLENGTH,F
+;Check length
+GLOBAL	SYSSTRINGREADCHECK
 SYSSTRINGREADCHECK:
+;If length is 0, exit
+;movf SysCalcTempA,F
 	MOVF	SYSCALCTEMPA,F
+;btfsc STATUS,Z
 	BTFSC	STATUS,2
+;return
 	RETURN
+;Copy
+GLOBAL	SYSSTRINGREAD
 SYSSTRINGREAD:
+;Get char
+;call SysStringTables
 	CALL	SYSSTRINGTABLES
+;Set char
+;addfsr 1,1
 	ADDFSR	1,1
+;movwf INDF1
 	MOVWF	INDF1
+;decfsz SysCalcTempA, F
 	DECFSZ	SYSCALCTEMPA, F
+;goto SysStringRead
 	GOTO	SYSSTRINGREAD
 	RETURN
 
 ;********************************************************************************
 
+GLOBAL	SYSSTRINGTABLES
 SYSSTRINGTABLES:
 	MOVF	SYSSTRINGA_H,W
 	MOVWF	PCLATH
@@ -2004,6 +2880,7 @@ SYSSTRINGTABLES:
 	INCF	SYSSTRINGA_H,F
 	MOVWF	PCL
 
+GLOBAL	STRINGTABLE1
 STRINGTABLE1:
 	RETLW	46
 	RETLW	66	;B
@@ -2054,6 +2931,7 @@ STRINGTABLE1:
 	RETLW	46	;.
 
 
+GLOBAL	STRINGTABLE2
 STRINGTABLE2:
 	RETLW	34
 	RETLW	66	;B
@@ -2092,12 +2970,14 @@ STRINGTABLE2:
 	RETLW	32	; 
 
 
+GLOBAL	STRINGTABLE3
 STRINGTABLE3:
 	RETLW	2
 	RETLW	48	;0
 	RETLW	120	;X
 
 
+GLOBAL	STRINGTABLE4
 STRINGTABLE4:
 	RETLW	34
 	RETLW	66	;B
@@ -2136,6 +3016,7 @@ STRINGTABLE4:
 	RETLW	32	; 
 
 
+GLOBAL	STRINGTABLE5
 STRINGTABLE5:
 	RETLW	34
 	RETLW	68	;D
@@ -2174,6 +3055,7 @@ STRINGTABLE5:
 	RETLW	32	; 
 
 
+GLOBAL	STRINGTABLE6
 STRINGTABLE6:
 	RETLW	9
 	RETLW	83	;S
@@ -2187,6 +3069,7 @@ STRINGTABLE6:
 	RETLW	32	; 
 
 
+GLOBAL	STRINGTABLE7
 STRINGTABLE7:
 	RETLW	48
 	RETLW	83	;S
@@ -2239,6 +3122,7 @@ STRINGTABLE7:
 	RETLW	101	;E
 
 
+GLOBAL	STRINGTABLE8
 STRINGTABLE8:
 	RETLW	5
 	RETLW	66	;B
@@ -2248,6 +3132,7 @@ STRINGTABLE8:
 	RETLW	107	;K
 
 
+GLOBAL	STRINGTABLE9
 STRINGTABLE9:
 	RETLW	23
 	RETLW	32	; 
@@ -2275,6 +3160,7 @@ STRINGTABLE9:
 	RETLW	54	;6
 
 
+GLOBAL	STRINGTABLE10
 STRINGTABLE10:
 	RETLW	4
 	RETLW	32	; 
@@ -2283,6 +3169,7 @@ STRINGTABLE10:
 	RETLW	32	; 
 
 
+GLOBAL	STRINGTABLE11
 STRINGTABLE11:
 	RETLW	2
 	RETLW	32	; 
@@ -2291,43 +3178,67 @@ STRINGTABLE11:
 
 ;********************************************************************************
 
+;SOURCE: PICAS.H (7)
+GLOBAL	FN__HEXPICAS
 FN__HEXPICAS:
+;_HexPICAS(0) = 2
 	MOVLW	2
 	BANKSEL	SYS_HEXPICAS_0
 	MOVWF	SYS_HEXPICAS_0
+;dim SysStringTemp as byte
+;Low nibble
+;SysStringTemp = SysValTemp And 0x0F
 	MOVLW	15
 	BANKSEL	SYSVALTEMP
 	ANDWF	SYSVALTEMP,W
 	MOVWF	SYSSTRINGTEMP
+;If SysStringTemp > 9 Then SysStringTemp = SysStringTemp + 7
 	SUBLW	9
 	BTFSC	STATUS,0
 	GOTO	ENDIF8
+;If SysStringTemp > 9 Then SysStringTemp = SysStringTemp + 7
 	MOVLW	7
 	ADDWF	SYSSTRINGTEMP,F
+;If SysStringTemp > 9 Then SysStringTemp = SysStringTemp + 7
+GLOBAL	ENDIF8
 ENDIF8:
+;_HexPICAS(2) = SysStringTemp + 48
 	MOVLW	48
 	ADDWF	SYSSTRINGTEMP,W
 	BANKSEL	SYS_HEXPICAS_2
 	MOVWF	SYS_HEXPICAS_2
+;Get high nibble
+;For SysStringTemp = 1 to 4
+;LEGACY METHOD
 	BANKSEL	SYSSTRINGTEMP
 	CLRF	SYSSTRINGTEMP
+GLOBAL	SYSFORLOOP5
 SYSFORLOOP5:
 	INCF	SYSSTRINGTEMP,F
+;Rotate SysValTemp Right
 	RRF	SYSVALTEMP,F
+;Next
 	MOVLW	4
 	SUBWF	SYSSTRINGTEMP,W
 	BTFSS	STATUS,0
 	GOTO	SYSFORLOOP5
+GLOBAL	SYSFORLOOPEND5
 SYSFORLOOPEND5:
+;SysStringTemp = SysValTemp And 0x0F
 	MOVLW	15
 	ANDWF	SYSVALTEMP,W
 	MOVWF	SYSSTRINGTEMP
+;If SysStringTemp > 9 Then SysStringTemp = SysStringTemp + 7
 	SUBLW	9
 	BTFSC	STATUS,0
 	GOTO	ENDIF10
+;If SysStringTemp > 9 Then SysStringTemp = SysStringTemp + 7
 	MOVLW	7
 	ADDWF	SYSSTRINGTEMP,F
+;If SysStringTemp > 9 Then SysStringTemp = SysStringTemp + 7
+GLOBAL	ENDIF10
 ENDIF10:
+;_HexPICAS(1) = SysStringTemp + 48
 	MOVLW	48
 	ADDWF	SYSSTRINGTEMP,W
 	BANKSEL	SYS_HEXPICAS_1

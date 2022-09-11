@@ -45,237 +45,465 @@
 ;********************************************************************************
 
 ;Set aside RAM memory locations for variables. All variables are global.
+GLOBAL	BYTENUMBER
  BYTENUMBER                       EQU 32          ; 0X20
+GLOBAL	CCOUNT
  CCOUNT                           EQU 33          ; 0X21
+GLOBAL	CHARCODE
  CHARCODE                         EQU 34          ; 0X22
+GLOBAL	CHARCOL
  CHARCOL                          EQU 35          ; 0X23
+GLOBAL	CHARCOLS
  CHARCOLS                         EQU 37          ; 0X25
+GLOBAL	CHARCOL_H
  CHARCOL_H                        EQU 36          ; 0X24
+GLOBAL	CHARLOCX
  CHARLOCX                         EQU 38          ; 0X26
+GLOBAL	CHARLOCX_H
  CHARLOCX_H                       EQU 39          ; 0X27
+GLOBAL	CHARLOCY
  CHARLOCY                         EQU 40          ; 0X28
+GLOBAL	CHARLOCY_H
  CHARLOCY_H                       EQU 41          ; 0X29
+GLOBAL	CHARROW
  CHARROW                          EQU 42          ; 0X2A
+GLOBAL	CHARROWS
  CHARROWS                         EQU 44          ; 0X2C
+GLOBAL	CHARROW_H
  CHARROW_H                        EQU 43          ; 0X2B
+GLOBAL	COL
  COL                              EQU 45          ; 0X2D
+GLOBAL	CURRCHARCOL
  CURRCHARCOL                      EQU 46          ; 0X2E
+GLOBAL	CURRCHARROW
  CURRCHARROW                      EQU 47          ; 0X2F
+GLOBAL	CURRCHARVAL
  CURRCHARVAL                      EQU 48          ; 0X30
+GLOBAL	DDF_X
  DDF_X                            EQU 49          ; 0X31
+GLOBAL	DDF_X_H
  DDF_X_H                          EQU 50          ; 0X32
+GLOBAL	DDF_Y
  DDF_Y                            EQU 51          ; 0X33
+GLOBAL	DDF_Y_H
  DDF_Y_H                          EQU 52          ; 0X34
+GLOBAL	DELAYTEMP
  DELAYTEMP                        EQU 112          ; 0X70
+GLOBAL	DELAYTEMP2
  DELAYTEMP2                       EQU 113          ; 0X71
+GLOBAL	DRAWLINE
  DRAWLINE                         EQU 53          ; 0X35
+GLOBAL	DRAWLINE_H
  DRAWLINE_H                       EQU 54          ; 0X36
+GLOBAL	FF
  FF                               EQU 55          ; 0X37
+GLOBAL	FF_H
  FF_H                             EQU 56          ; 0X38
+GLOBAL	FILLCIRCLEXX
  FILLCIRCLEXX                     EQU 57          ; 0X39
+GLOBAL	FILLCIRCLEYY
  FILLCIRCLEYY                     EQU 58          ; 0X3A
+GLOBAL	GLCDBACKGROUND
  GLCDBACKGROUND                   EQU 59          ; 0X3B
+GLOBAL	GLCDBACKGROUND_H
  GLCDBACKGROUND_H                 EQU 60          ; 0X3C
+GLOBAL	GLCDBITNO
  GLCDBITNO                        EQU 61          ; 0X3D
+GLOBAL	GLCDCHANGE
  GLCDCHANGE                       EQU 62          ; 0X3E
+GLOBAL	GLCDCOLOUR
  GLCDCOLOUR                       EQU 63          ; 0X3F
+GLOBAL	GLCDCOLOUR_H
  GLCDCOLOUR_H                     EQU 64          ; 0X40
+GLOBAL	GLCDDATATEMP
  GLCDDATATEMP                     EQU 65          ; 0X41
+GLOBAL	GLCDFNTDEFAULT
  GLCDFNTDEFAULT                   EQU 66          ; 0X42
+GLOBAL	GLCDFNTDEFAULTHEIGHT
  GLCDFNTDEFAULTHEIGHT             EQU 67          ; 0X43
+GLOBAL	GLCDFNTDEFAULTSIZE
  GLCDFNTDEFAULTSIZE               EQU 68          ; 0X44
+GLOBAL	GLCDFONTWIDTH
  GLCDFONTWIDTH                    EQU 69          ; 0X45
+GLOBAL	GLCDFOREGROUND
  GLCDFOREGROUND                   EQU 70          ; 0X46
+GLOBAL	GLCDFOREGROUND_H
  GLCDFOREGROUND_H                 EQU 71          ; 0X47
+GLOBAL	GLCDPRINTLEN
  GLCDPRINTLEN                     EQU 72          ; 0X48
+GLOBAL	GLCDPRINTLOC
  GLCDPRINTLOC                     EQU 73          ; 0X49
+GLOBAL	GLCDPRINTLOC_H
  GLCDPRINTLOC_H                   EQU 74          ; 0X4A
+GLOBAL	GLCDPRINT_STRING_COUNTER
  GLCDPRINT_STRING_COUNTER         EQU 75          ; 0X4B
+GLOBAL	GLCDTEMP
  GLCDTEMP                         EQU 76          ; 0X4C
+GLOBAL	GLCDTEMP_H
  GLCDTEMP_H                       EQU 77          ; 0X4D
+GLOBAL	GLCDX
  GLCDX                            EQU 78          ; 0X4E
+GLOBAL	GLCDY
  GLCDY                            EQU 79          ; 0X4F
+GLOBAL	GLCDY_TEMP
  GLCDY_TEMP                       EQU 80          ; 0X50
+GLOBAL	GLCD_YORDINATE
  GLCD_YORDINATE                   EQU 81          ; 0X51
+GLOBAL	GLCD_YORDINATE_H
  GLCD_YORDINATE_H                 EQU 82          ; 0X52
+GLOBAL	HI2CACKPOLLSTATE
  HI2CACKPOLLSTATE                 EQU 83          ; 0X53
+GLOBAL	HI2CCURRENTMODE
  HI2CCURRENTMODE                  EQU 84          ; 0X54
+GLOBAL	HI2CWAITMSSPTIMEOUT
  HI2CWAITMSSPTIMEOUT              EQU 85          ; 0X55
+GLOBAL	I2CBYTE
  I2CBYTE                          EQU 86          ; 0X56
+GLOBAL	INXRADIUS
  INXRADIUS                        EQU 87          ; 0X57
+GLOBAL	INXRADIUS_H
  INXRADIUS_H                      EQU 88          ; 0X58
+GLOBAL	LCDVALUE
  LCDVALUE                         EQU 89          ; 0X59
+GLOBAL	LCDVALUE_E
  LCDVALUE_E                       EQU 92          ; 0X5C
+GLOBAL	LCDVALUE_H
  LCDVALUE_H                       EQU 90          ; 0X5A
+GLOBAL	LCDVALUE_U
  LCDVALUE_U                       EQU 91          ; 0X5B
+GLOBAL	LINECOLOUR
  LINECOLOUR                       EQU 93          ; 0X5D
+GLOBAL	LINECOLOUR_H
  LINECOLOUR_H                     EQU 94          ; 0X5E
+GLOBAL	LINEDIFFX
  LINEDIFFX                        EQU 95          ; 0X5F
+GLOBAL	LINEDIFFX_H
  LINEDIFFX_H                      EQU 96          ; 0X60
+GLOBAL	LINEDIFFX_X2
  LINEDIFFX_X2                     EQU 97          ; 0X61
+GLOBAL	LINEDIFFX_X2_H
  LINEDIFFX_X2_H                   EQU 98          ; 0X62
+GLOBAL	LINEDIFFY
  LINEDIFFY                        EQU 99          ; 0X63
+GLOBAL	LINEDIFFY_H
  LINEDIFFY_H                      EQU 100          ; 0X64
+GLOBAL	LINEDIFFY_X2
  LINEDIFFY_X2                     EQU 101          ; 0X65
+GLOBAL	LINEDIFFY_X2_H
  LINEDIFFY_X2_H                   EQU 102          ; 0X66
+GLOBAL	LINEERR
  LINEERR                          EQU 103          ; 0X67
+GLOBAL	LINEERR_H
  LINEERR_H                        EQU 104          ; 0X68
+GLOBAL	LINESTEPX
  LINESTEPX                        EQU 105          ; 0X69
+GLOBAL	LINESTEPX_H
  LINESTEPX_H                      EQU 106          ; 0X6A
+GLOBAL	LINESTEPY
  LINESTEPY                        EQU 107          ; 0X6B
+GLOBAL	LINESTEPY_H
  LINESTEPY_H                      EQU 108          ; 0X6C
+GLOBAL	LINEX1
  LINEX1                           EQU 109          ; 0X6D
+GLOBAL	LINEX1_H
  LINEX1_H                         EQU 110          ; 0X6E
+GLOBAL	LINEX2
  LINEX2                           EQU 160          ; 0XA0
+GLOBAL	LINEX2_H
  LINEX2_H                         EQU 161          ; 0XA1
+GLOBAL	LINEY1
  LINEY1                           EQU 162          ; 0XA2
+GLOBAL	LINEY1_H
  LINEY1_H                         EQU 163          ; 0XA3
+GLOBAL	LINEY2
  LINEY2                           EQU 164          ; 0XA4
+GLOBAL	LINEY2_H
  LINEY2_H                         EQU 165          ; 0XA5
+GLOBAL	LOCX
  LOCX                             EQU 111          ; 0X6F
+GLOBAL	LOCY
  LOCY                             EQU 166          ; 0XA6
+GLOBAL	LONGNUMBER
  LONGNUMBER                       EQU 167          ; 0XA7
+GLOBAL	LONGNUMBER_E
  LONGNUMBER_E                     EQU 170          ; 0XAA
+GLOBAL	LONGNUMBER_H
  LONGNUMBER_H                     EQU 168          ; 0XA8
+GLOBAL	LONGNUMBER_U
  LONGNUMBER_U                     EQU 169          ; 0XA9
+GLOBAL	OUTSTRING
  OUTSTRING                        EQU 9030          ; 0X2346
+GLOBAL	PAD
  PAD                              EQU 8989          ; 0X231D
+GLOBAL	POSCHARX
  POSCHARX                         EQU 171          ; 0XAB
+GLOBAL	POSCHARX_H
  POSCHARX_H                       EQU 172          ; 0XAC
+GLOBAL	POSCHARY
  POSCHARY                         EQU 173          ; 0XAD
+GLOBAL	PRINTLOCX
  PRINTLOCX                        EQU 174          ; 0XAE
+GLOBAL	PRINTLOCX_H
  PRINTLOCX_H                      EQU 175          ; 0XAF
+GLOBAL	PRINTLOCY
  PRINTLOCY                        EQU 176          ; 0XB0
+GLOBAL	PRINTLOCY_H
  PRINTLOCY_H                      EQU 177          ; 0XB1
+GLOBAL	RADIUSERR
  RADIUSERR                        EQU 178          ; 0XB2
+GLOBAL	RADIUSERR_H
  RADIUSERR_H                      EQU 179          ; 0XB3
+GLOBAL	ROW
  ROW                              EQU 180          ; 0XB4
+GLOBAL	SSD1306SENDBYTE
  SSD1306SENDBYTE                  EQU 181          ; 0XB5
+GLOBAL	SSD1306_BUFFERALIAS
  SSD1306_BUFFERALIAS              EQU 9071          ; 0X236F
+GLOBAL	SSD1306_BUFFERLOCATIONCALC
  SSD1306_BUFFERLOCATIONCALC       EQU 182          ; 0XB6
+GLOBAL	SSD1306_BUFFERLOCATIONCALC_H
  SSD1306_BUFFERLOCATIONCALC_H     EQU 183          ; 0XB7
+GLOBAL	STR
  STR                              EQU 8972          ; 0X230C
+GLOBAL	STRINGLOCX
  STRINGLOCX                       EQU 184          ; 0XB8
+GLOBAL	STRINGPOINTER
  STRINGPOINTER                    EQU 185          ; 0XB9
+GLOBAL	SYSARRAYTEMP1
  SYSARRAYTEMP1                    EQU 186          ; 0XBA
+GLOBAL	SYSARRAYTEMP2
  SYSARRAYTEMP2                    EQU 187          ; 0XBB
+GLOBAL	SYSBYTETEMPA
  SYSBYTETEMPA                     EQU 117          ; 0X75
+GLOBAL	SYSBYTETEMPB
  SYSBYTETEMPB                     EQU 121          ; 0X79
+GLOBAL	SYSBYTETEMPX
  SYSBYTETEMPX                     EQU 112          ; 0X70
+GLOBAL	SYSCALCTEMPA
  SYSCALCTEMPA                     EQU 117          ; 0X75
+GLOBAL	SYSCALCTEMPA_E
  SYSCALCTEMPA_E                   EQU 120          ; 0X78
+GLOBAL	SYSCALCTEMPA_H
  SYSCALCTEMPA_H                   EQU 118          ; 0X76
+GLOBAL	SYSCALCTEMPA_U
  SYSCALCTEMPA_U                   EQU 119          ; 0X77
+GLOBAL	SYSCALCTEMPX
  SYSCALCTEMPX                     EQU 112          ; 0X70
+GLOBAL	SYSCALCTEMPX_H
  SYSCALCTEMPX_H                   EQU 113          ; 0X71
+GLOBAL	SYSCHARCOUNT
  SYSCHARCOUNT                     EQU 188          ; 0XBC
+GLOBAL	SYSCHARSHANDLER
  SYSCHARSHANDLER                  EQU 189          ; 0XBD
+GLOBAL	SYSCHARSHANDLER_H
  SYSCHARSHANDLER_H                EQU 190          ; 0XBE
+GLOBAL	SYSDIVLOOP
  SYSDIVLOOP                       EQU 116          ; 0X74
+GLOBAL	SYSDIVMULTA
  SYSDIVMULTA                      EQU 119          ; 0X77
+GLOBAL	SYSDIVMULTA_H
  SYSDIVMULTA_H                    EQU 120          ; 0X78
+GLOBAL	SYSDIVMULTB
  SYSDIVMULTB                      EQU 123          ; 0X7B
+GLOBAL	SYSDIVMULTB_H
  SYSDIVMULTB_H                    EQU 124          ; 0X7C
+GLOBAL	SYSDIVMULTX
  SYSDIVMULTX                      EQU 114          ; 0X72
+GLOBAL	SYSDIVMULTX_H
  SYSDIVMULTX_H                    EQU 115          ; 0X73
+GLOBAL	SYSFORLOOPABSVALUE12
  SYSFORLOOPABSVALUE12             EQU 191          ; 0XBF
+GLOBAL	SYSFORLOOPABSVALUE12_H
  SYSFORLOOPABSVALUE12_H           EQU 192          ; 0XC0
+GLOBAL	SYSFORLOOPSTEP11
  SYSFORLOOPSTEP11                 EQU 193          ; 0XC1
+GLOBAL	SYSFORLOOPSTEP11_H
  SYSFORLOOPSTEP11_H               EQU 194          ; 0XC2
+GLOBAL	SYSFORLOOPSTEP6
  SYSFORLOOPSTEP6                  EQU 195          ; 0XC3
+GLOBAL	SYSFORLOOPSTEP6_H
  SYSFORLOOPSTEP6_H                EQU 196          ; 0XC4
+GLOBAL	SYSINTEGERTEMPA
  SYSINTEGERTEMPA                  EQU 117          ; 0X75
+GLOBAL	SYSINTEGERTEMPA_H
  SYSINTEGERTEMPA_H                EQU 118          ; 0X76
+GLOBAL	SYSINTEGERTEMPB
  SYSINTEGERTEMPB                  EQU 121          ; 0X79
+GLOBAL	SYSINTEGERTEMPB_H
  SYSINTEGERTEMPB_H                EQU 122          ; 0X7A
+GLOBAL	SYSINTEGERTEMPX
  SYSINTEGERTEMPX                  EQU 112          ; 0X70
+GLOBAL	SYSINTEGERTEMPX_H
  SYSINTEGERTEMPX_H                EQU 113          ; 0X71
+GLOBAL	SYSLCDPRINTDATAHANDLER
  SYSLCDPRINTDATAHANDLER           EQU 197          ; 0XC5
+GLOBAL	SYSLCDPRINTDATAHANDLER_H
  SYSLCDPRINTDATAHANDLER_H         EQU 198          ; 0XC6
+GLOBAL	SYSLONGDIVMULTA
  SYSLONGDIVMULTA                  EQU 199          ; 0XC7
+GLOBAL	SYSLONGDIVMULTA_E
  SYSLONGDIVMULTA_E                EQU 202          ; 0XCA
+GLOBAL	SYSLONGDIVMULTA_H
  SYSLONGDIVMULTA_H                EQU 200          ; 0XC8
+GLOBAL	SYSLONGDIVMULTA_U
  SYSLONGDIVMULTA_U                EQU 201          ; 0XC9
+GLOBAL	SYSLONGDIVMULTB
  SYSLONGDIVMULTB                  EQU 203          ; 0XCB
+GLOBAL	SYSLONGDIVMULTB_E
  SYSLONGDIVMULTB_E                EQU 206          ; 0XCE
+GLOBAL	SYSLONGDIVMULTB_H
  SYSLONGDIVMULTB_H                EQU 204          ; 0XCC
+GLOBAL	SYSLONGDIVMULTB_U
  SYSLONGDIVMULTB_U                EQU 205          ; 0XCD
+GLOBAL	SYSLONGDIVMULTX
  SYSLONGDIVMULTX                  EQU 207          ; 0XCF
+GLOBAL	SYSLONGDIVMULTX_E
  SYSLONGDIVMULTX_E                EQU 210          ; 0XD2
+GLOBAL	SYSLONGDIVMULTX_H
  SYSLONGDIVMULTX_H                EQU 208          ; 0XD0
+GLOBAL	SYSLONGDIVMULTX_U
  SYSLONGDIVMULTX_U                EQU 209          ; 0XD1
+GLOBAL	SYSLONGTEMPA
  SYSLONGTEMPA                     EQU 117          ; 0X75
+GLOBAL	SYSLONGTEMPA_E
  SYSLONGTEMPA_E                   EQU 120          ; 0X78
+GLOBAL	SYSLONGTEMPA_H
  SYSLONGTEMPA_H                   EQU 118          ; 0X76
+GLOBAL	SYSLONGTEMPA_U
  SYSLONGTEMPA_U                   EQU 119          ; 0X77
+GLOBAL	SYSLONGTEMPB
  SYSLONGTEMPB                     EQU 121          ; 0X79
+GLOBAL	SYSLONGTEMPB_E
  SYSLONGTEMPB_E                   EQU 124          ; 0X7C
+GLOBAL	SYSLONGTEMPB_H
  SYSLONGTEMPB_H                   EQU 122          ; 0X7A
+GLOBAL	SYSLONGTEMPB_U
  SYSLONGTEMPB_U                   EQU 123          ; 0X7B
+GLOBAL	SYSLONGTEMPX
  SYSLONGTEMPX                     EQU 112          ; 0X70
+GLOBAL	SYSLONGTEMPX_E
  SYSLONGTEMPX_E                   EQU 115          ; 0X73
+GLOBAL	SYSLONGTEMPX_H
  SYSLONGTEMPX_H                   EQU 113          ; 0X71
+GLOBAL	SYSLONGTEMPX_U
  SYSLONGTEMPX_U                   EQU 114          ; 0X72
+GLOBAL	SYSPRINTBUFFER
  SYSPRINTBUFFER                   EQU 8978          ; 0X2312
+GLOBAL	SYSPRINTBUFFLEN
  SYSPRINTBUFFLEN                  EQU 211          ; 0XD3
+GLOBAL	SYSREPEATTEMP1
  SYSREPEATTEMP1                   EQU 212          ; 0XD4
+GLOBAL	SYSREPEATTEMP2
  SYSREPEATTEMP2                   EQU 213          ; 0XD5
+GLOBAL	SYSREPEATTEMP4
  SYSREPEATTEMP4                   EQU 214          ; 0XD6
+GLOBAL	SYSSIGNBYTE
  SYSSIGNBYTE                      EQU 125          ; 0X7D
+GLOBAL	SYSSTRDATA
  SYSSTRDATA                       EQU 215          ; 0XD7
+GLOBAL	SYSSTRINGA
  SYSSTRINGA                       EQU 119          ; 0X77
+GLOBAL	SYSSTRINGA_H
  SYSSTRINGA_H                     EQU 120          ; 0X78
+GLOBAL	SYSSTRINGLENGTH
  SYSSTRINGLENGTH                  EQU 118          ; 0X76
+GLOBAL	SYSSTRINGTEMP
  SYSSTRINGTEMP                    EQU 216          ; 0XD8
+GLOBAL	SYSSTRLEN
  SYSSTRLEN                        EQU 217          ; 0XD9
+GLOBAL	SYSSYSINSTRING3HANDLER
  SYSSYSINSTRING3HANDLER           EQU 218          ; 0XDA
+GLOBAL	SYSSYSINSTRING3HANDLER_H
  SYSSYSINSTRING3HANDLER_H         EQU 219          ; 0XDB
+GLOBAL	SYSSYSINSTRINGHANDLER
  SYSSYSINSTRINGHANDLER            EQU 220          ; 0XDC
+GLOBAL	SYSSYSINSTRINGHANDLER_H
  SYSSYSINSTRINGHANDLER_H          EQU 221          ; 0XDD
+GLOBAL	SYSTEMP1
  SYSTEMP1                         EQU 222          ; 0XDE
+GLOBAL	SYSTEMP1_E
  SYSTEMP1_E                       EQU 225          ; 0XE1
+GLOBAL	SYSTEMP1_H
  SYSTEMP1_H                       EQU 223          ; 0XDF
+GLOBAL	SYSTEMP1_U
  SYSTEMP1_U                       EQU 224          ; 0XE0
+GLOBAL	SYSTEMP2
  SYSTEMP2                         EQU 226          ; 0XE2
+GLOBAL	SYSTEMP3
  SYSTEMP3                         EQU 227          ; 0XE3
+GLOBAL	SYSTEMP3_H
  SYSTEMP3_H                       EQU 228          ; 0XE4
+GLOBAL	SYSVALTEMP
  SYSVALTEMP                       EQU 229          ; 0XE5
+GLOBAL	SYSVALTEMP_H
  SYSVALTEMP_H                     EQU 230          ; 0XE6
+GLOBAL	SYSWAITTEMPMS
  SYSWAITTEMPMS                    EQU 114          ; 0X72
+GLOBAL	SYSWAITTEMPMS_H
  SYSWAITTEMPMS_H                  EQU 115          ; 0X73
+GLOBAL	SYSWAITTEMPS
  SYSWAITTEMPS                     EQU 116          ; 0X74
+GLOBAL	SYSWORDTEMPA
  SYSWORDTEMPA                     EQU 117          ; 0X75
+GLOBAL	SYSWORDTEMPA_H
  SYSWORDTEMPA_H                   EQU 118          ; 0X76
+GLOBAL	SYSWORDTEMPB
  SYSWORDTEMPB                     EQU 121          ; 0X79
+GLOBAL	SYSWORDTEMPB_H
  SYSWORDTEMPB_H                   EQU 122          ; 0X7A
+GLOBAL	SYSWORDTEMPX
  SYSWORDTEMPX                     EQU 112          ; 0X70
+GLOBAL	SYSWORDTEMPX_H
  SYSWORDTEMPX_H                   EQU 113          ; 0X71
+GLOBAL	WORDNUMBER
  WORDNUMBER                       EQU 231          ; 0XE7
+GLOBAL	WORDNUMBER_H
  WORDNUMBER_H                     EQU 232          ; 0XE8
+GLOBAL	XCHAR
  XCHAR                            EQU 233          ; 0XE9
+GLOBAL	XOFFSET
  XOFFSET                          EQU 234          ; 0XEA
+GLOBAL	XOFFSET_H
  XOFFSET_H                        EQU 235          ; 0XEB
+GLOBAL	XRADIUS
  XRADIUS                          EQU 236          ; 0XEC
+GLOBAL	XRADIUS_H
  XRADIUS_H                        EQU 237          ; 0XED
+GLOBAL	YCALC1
  YCALC1                           EQU 238          ; 0XEE
+GLOBAL	YCALC1_H
  YCALC1_H                         EQU 239          ; 0XEF
+GLOBAL	YCALC2
  YCALC2                           EQU 288          ; 0X120
+GLOBAL	YCALC2_H
  YCALC2_H                         EQU 289          ; 0X121
+GLOBAL	YOFFSET
  YOFFSET                          EQU 290          ; 0X122
+GLOBAL	YOFFSET_H
  YOFFSET_H                        EQU 291          ; 0X123
+GLOBAL	YORDINATE
  YORDINATE                        EQU 292          ; 0X124
+GLOBAL	_GLCDPAGE
  _GLCDPAGE                        EQU 293          ; 0X125
+GLOBAL	_HEXPICAS
  _HEXPICAS                        EQU 8968          ; 0X2308
 
 ;********************************************************************************
 
 ;ALIAS VARIABLES
+GLOBAL	AFSR0
  AFSR0                            EQU 4
+GLOBAL	AFSR0_H
  AFSR0_H                          EQU 5
+GLOBAL	SYSPAD_0
  SYSPAD_0                         EQU 1261
+GLOBAL	SYSSTR_0
  SYSSTR_0                         EQU 1244
+GLOBAL	SYS_HEXPICAS_0
  SYS_HEXPICAS_0                   EQU 1240
+GLOBAL	SYS_HEXPICAS_1
  SYS_HEXPICAS_1                   EQU 1241
+GLOBAL	SYS_HEXPICAS_2
  SYS_HEXPICAS_2                   EQU 1242
 
 ;********************************************************************************
@@ -293,6 +521,7 @@
 
 ;START OF PROGRAM MEMORY PAGE 0
 	ORG	5
+GLOBAL	BASPROGRAMSTART
 BASPROGRAMSTART:
 ;CALL INITIALISATION ROUTINES
 	CALL	INITSYS
@@ -301,15 +530,85 @@ BASPROGRAMSTART:
 	CALL	INITGLCD_SSD1306
 
 ;START OF THE MAIN PROGRAM
+;''
+;''This demonstration program is a simple GLCD demonstration of the SSD1306 GLCD capabilities.
+;''
+;''This program is a simple GLCD demonstration of the SSD1306 GLCD capabilities.
+;''This program draws lines, boxes, circles and prints strings and numbers.
+;''The SSD1306 controller a small graphical OLED, suitable for a lot of various projects.
+;''The display is 38*35 mm, with an active display surface of 0.96inches, and a 128*64 pixel resolution.
+;''The display is easy to interface, using an I2C type of communication.
+;''The GLCD is connected to the microprocessor as shown in the hardware section of this code.
+;''
+;''This version is compatible will all version of Great Cow BASIC as this demonstration uses Full Memory GLCD mode only.  This can be adapted to Low Memory GLCD mode.
+;''
+;''************************************************************************
+;''@author  EvanV
+;''@licence GPL
+;''@version 1.01
+;''@date    15/09/2022
+;----- Configuration
+;Chip Settings.
+;Generated by PIC PPS Tool for Great Cow Basic
+;PPS Tool version: 0.0.6.2
+;PinManager data: Not available (3)
+;Generated for 16F18075
+;
+;Template comment at the start of the config file
+;
+;Template comment at the end of the config file
+;' -------------------PORTA----------------
+;' Bit#:  -7---6---5---4---3---2---1---0---
+;' IO:    ---------------------------------
+;'-----------------------------------------
+;'
+;' -------------------PORTB----------------
+;' Bit#:  -7---6---5---4---3---2---1---0---
+;' IO:    --------IN-LED--LED-LED LED -----
+;'-----------------------------------------
+;'
+;' ------------------PORTC-----------------
+;' Bit#:  -7---6---5---4---3---2---1---0---
+;' IO:    ----TX------SDA-SCL--------------
+;'-----------------------------------------
+;'
+;' ------------------PORTE-----------------
+;' Bit#:  -7---6---5---4---3---2---1---0---
+;' IO:    ----------------RST--------------
+;'-----------------------------------------
+;'
+;Define constants to make things easier. We can reuse these at any time.
+;Dir     LEDD1         Out
 	BCF	TRISB,1
+;Dir     LEDD2         Out
 	BCF	TRISB,2
+;Dir     LEDD3         Out
 	BCF	TRISB,3
+;Dir     LEDD4         Out
 	BCF	TRISB,4
+;Dir     POTENTIOMETER In
 	BSF	TRISA,0
+;Dir     SWITCHIN      In
 	BSF	TRISB,5
+;Setup Serial port
+;Define I2C settings
+;Initialise I2C - note for the I2C module the ports need to be set to correct direction
+;Dir HI2C_DATA In
 	BSF	TRISC,4
+;Dir HI2C_CLOCK In
 	BSF	TRISC,3
+;Port specific controls may be required - see the datasheet
+;----- Define variables
+;These constants allow you to change the GLCD memory usage.
+;These constants allow you to change the GLCD memory usage.
+;We have set this demonstration to use only 128bytes of RAM for GLCD operations.
+;----- Define variables
+;Dim BYTENUMBER, CCOUNT As Byte
+;CCount = 0
 	CLRF	CCOUNT
+;Dim longNumber As Long
+;max value = 4294967290
+;longNumber = 123456
 	MOVLW	64
 	BANKSEL	LONGNUMBER
 	MOVWF	LONGNUMBER
@@ -318,15 +617,28 @@ BASPROGRAMSTART:
 	MOVLW	1
 	MOVWF	LONGNUMBER_U
 	CLRF	LONGNUMBER_E
+;Dim wordNumber As Word
+;Dim outstring As String
+;wordNumber = 0
 	CLRF	WORDNUMBER
 	CLRF	WORDNUMBER_H
+;byteNumber = 0
 	BANKSEL	BYTENUMBER
 	CLRF	BYTENUMBER
+;----- Main program
+;GLCD_Open_PageTransaction 0,7
+;Macro Source: glcd_ssd1306.h (1180)
+;dim _GLCDPage as byte
+;Clear buffer
+;for _GLCDPage = _GLCDPagesL to _GLCDPagesH    '_GLCDPage is a global variable - DO NOT CHANGE!!!
+;LEGACY METHOD
 	MOVLW	255
 	BANKSEL	_GLCDPAGE
 	MOVWF	_GLCDPAGE
+GLOBAL	SYSFORLOOP1
 SYSFORLOOP1:
 	INCF	_GLCDPAGE,F
+;GLCDPrint 0, 0,   "Great Cow BASIC"
 	BANKSEL	PRINTLOCX
 	CLRF	PRINTLOCX
 	CLRF	PRINTLOCX_H
@@ -338,6 +650,7 @@ SYSFORLOOP1:
 	MOVWF	SYSLCDPRINTDATAHANDLER_H
 	BANKSEL	STATUS
 	FCALL	GLCDPRINT4
+;GLCDPrint (0, 16, "Anobium 2022")
 	BANKSEL	PRINTLOCX
 	CLRF	PRINTLOCX
 	CLRF	PRINTLOCX_H
@@ -350,6 +663,7 @@ SYSFORLOOP1:
 	MOVWF	SYSLCDPRINTDATAHANDLER_H
 	BANKSEL	STATUS
 	FCALL	GLCDPRINT4
+;GLCDPrint (0, 32, "Portability Demo")
 	BANKSEL	PRINTLOCX
 	CLRF	PRINTLOCX
 	CLRF	PRINTLOCX_H
@@ -362,6 +676,7 @@ SYSFORLOOP1:
 	MOVWF	SYSLCDPRINTDATAHANDLER_H
 	BANKSEL	STATUS
 	FCALL	GLCDPRINT4
+;GLCDPrint (0, 48, ChipNameStr )
 	BANKSEL	PRINTLOCX
 	CLRF	PRINTLOCX
 	CLRF	PRINTLOCX_H
@@ -374,6 +689,10 @@ SYSFORLOOP1:
 	MOVWF	SYSLCDPRINTDATAHANDLER_H
 	BANKSEL	STATUS
 	FCALL	GLCDPRINT4
+;GLCD_Close_PageTransaction
+;Macro Source: glcd_ssd1306.h (1192)
+;Set cursor position
+;Cursor_Position_SSD1306 ( 0, 8 * _GLCDPage )
 	CLRF	LOCX
 	BANKSEL	_GLCDPAGE
 	MOVF	_GLCDPAGE,W
@@ -387,21 +706,34 @@ SYSFORLOOP1:
 	MOVWF	LOCY
 	BANKSEL	STATUS
 	FCALL	CURSOR_POSITION_SSD1306
+;Send the buffer to the device using transaction
+;Open_Transaction_SSD1306
+;Macro Source: glcd_ssd1306.h (1218)
+;4wire not supported, see Write_Transaction_Data_SSD1306
+;HI2CStart
 	FCALL	HI2CSTART
+;HI2CSend GLCD_I2C_Address
 	MOVLW	120
 	MOVWF	I2CBYTE
 	FCALL	HI2CSEND
+;HI2CSend 0x40
 	MOVLW	64
 	MOVWF	I2CBYTE
 	FCALL	HI2CSEND
+;for SSD1306_BufferLocationCalc = 1 to 128
+;LEGACY METHOD
 	BANKSEL	SSD1306_BUFFERLOCATIONCALC
 	CLRF	SSD1306_BUFFERLOCATIONCALC
 	CLRF	SSD1306_BUFFERLOCATIONCALC_H
+GLOBAL	SYSFORLOOP2
 SYSFORLOOP2:
 	BANKSEL	SSD1306_BUFFERLOCATIONCALC
 	INCF	SSD1306_BUFFERLOCATIONCALC,F
 	BTFSC	STATUS,2
 	INCF	SSD1306_BUFFERLOCATIONCALC_H,F
+;Write_Transaction_Data_SSD1306 SSD1306_BufferAlias(SSD1306_BufferLocationCalc)
+;Macro Source: glcd_ssd1306.h (1249)
+;HI2CSend SSD1306SendByte
 	MOVLW	LOW(SSD1306_BUFFERALIAS)
 	ADDWF	SSD1306_BUFFERLOCATIONCALC,W
 	MOVWF	FSR0L
@@ -412,6 +744,8 @@ SYSFORLOOP2:
 	BANKSEL	I2CBYTE
 	MOVWF	I2CBYTE
 	FCALL	HI2CSEND
+;Clear the buffer byte. We need it to be empty for the next page operation
+;SSD1306_BufferAlias(SSD1306_BufferLocationCalc) = 0
 	MOVLW	LOW(SSD1306_BUFFERALIAS)
 	BANKSEL	SSD1306_BUFFERLOCATIONCALC
 	ADDWF	SSD1306_BUFFERLOCATIONCALC,W
@@ -420,6 +754,7 @@ SYSFORLOOP2:
 	ADDWFC	SSD1306_BUFFERLOCATIONCALC_H,W
 	MOVWF	FSR0H
 	CLRF	INDF0
+;next
 	MOVF	SSD1306_BUFFERLOCATIONCALC,W
 	MOVWF	SYSWORDTEMPA
 	MOVF	SSD1306_BUFFERLOCATIONCALC_H,W
@@ -431,29 +766,53 @@ SYSFORLOOP2:
 	FCALL	SYSCOMPLESSTHAN16
 	BTFSC	SYSBYTETEMPX,0
 	GOTO	SYSFORLOOP2
+GLOBAL	SYSFORLOOPEND2
 SYSFORLOOPEND2:
+;Close_Transaction_SSD1306
+;Macro Source: glcd_ssd1306.h (1282)
+;4wire not supported, see Write_Transaction_Data_SSD1306
+;HI2CStop
 	FCALL	HI2CSTOP
+;next
 	MOVLW	7
 	BANKSEL	_GLCDPAGE
 	SUBWF	_GLCDPAGE,W
 	BTFSS	STATUS,0
 	GOTO	SYSFORLOOP1
+GLOBAL	SYSFORLOOPEND1
 SYSFORLOOPEND1:
+;Wait 3 s
 	MOVLW	3
 	MOVWF	SYSWAITTEMPS
 	BANKSEL	STATUS
 	FCALL	DELAY_S
+;GLCDCLS
 	FCALL	GLCDCLS_SSD1306
+;Do Forever
+GLOBAL	SYSDOLOOP_S1
 SYSDOLOOP_S1:
+;For CCount = 31 To 127
+;LEGACY METHOD
 	MOVLW	30
 	MOVWF	CCOUNT
+GLOBAL	SYSFORLOOP3
 SYSFORLOOP3:
 	INCF	CCOUNT,F
+;GLCD_Open_PageTransaction 0,7
+;Macro Source: glcd_ssd1306.h (1180)
+;dim _GLCDPage as byte
+;Clear buffer
+;for _GLCDPage = _GLCDPagesL to _GLCDPagesH    '_GLCDPage is a global variable - DO NOT CHANGE!!!
+;LEGACY METHOD
 	MOVLW	255
 	BANKSEL	_GLCDPAGE
 	MOVWF	_GLCDPAGE
+GLOBAL	SYSFORLOOP4
 SYSFORLOOP4:
 	INCF	_GLCDPAGE,F
+;Prepare the static components of the screen
+;Print some text
+;GLCDPrint ( 0,   0, "PrintStr")
 	BANKSEL	PRINTLOCX
 	CLRF	PRINTLOCX
 	CLRF	PRINTLOCX_H
@@ -465,6 +824,8 @@ SYSFORLOOP4:
 	MOVWF	SYSLCDPRINTDATAHANDLER_H
 	BANKSEL	STATUS
 	FCALL	GLCDPRINT4
+;Print some more text
+;GLCDPrint ( 64,  0, "@")
 	MOVLW	64
 	BANKSEL	PRINTLOCX
 	MOVWF	PRINTLOCX
@@ -477,6 +838,8 @@ SYSFORLOOP4:
 	MOVWF	SYSLCDPRINTDATAHANDLER_H
 	BANKSEL	STATUS
 	FCALL	GLCDPRINT4
+;Print chip speed
+;GLCDPrint ( 72,  0, ChipMHz)
 	MOVLW	72
 	BANKSEL	PRINTLOCX
 	MOVWF	PRINTLOCX
@@ -490,6 +853,8 @@ SYSFORLOOP4:
 	CLRF	LCDVALUE_U
 	CLRF	LCDVALUE_E
 	FCALL	GLCDPRINT7
+;Print some text
+;GLCDPrint ( 86, 0, "Mhz")
 	MOVLW	86
 	BANKSEL	PRINTLOCX
 	MOVWF	PRINTLOCX
@@ -502,6 +867,8 @@ SYSFORLOOP4:
 	MOVWF	SYSLCDPRINTDATAHANDLER_H
 	BANKSEL	STATUS
 	FCALL	GLCDPRINT4
+;Draw some text
+;GLCDDrawString( 0,8,"DrawStr")
 	BANKSEL	STRINGLOCX
 	CLRF	STRINGLOCX
 	MOVLW	8
@@ -518,6 +885,8 @@ SYSFORLOOP4:
 	MOVF	GLCDFOREGROUND_H,W
 	MOVWF	LINECOLOUR_H
 	FCALL	GLCDDRAWSTRING
+;Draw a box
+;Box 0,0,GLCD_WIDTH-1, GLCD_HEIGHT-1
 	CLRF	LINEX1
 	CLRF	LINEX1_H
 	BANKSEL	LINEY1
@@ -535,6 +904,8 @@ SYSFORLOOP4:
 	MOVF	GLCDFOREGROUND_H,W
 	MOVWF	LINECOLOUR_H
 	FCALL	BOX
+;Draw a box
+;Box GLCD_WIDTH-5, GLCD_HEIGHT-5,GLCD_WIDTH-1, GLCD_HEIGHT-1
 	MOVLW	123
 	MOVWF	LINEX1
 	CLRF	LINEX1_H
@@ -554,6 +925,8 @@ SYSFORLOOP4:
 	MOVF	GLCDFOREGROUND_H,W
 	MOVWF	LINECOLOUR_H
 	FCALL	BOX
+;Draw a circle
+;Circle (44,41,15)
 	MOVLW	44
 	BANKSEL	XOFFSET
 	MOVWF	XOFFSET
@@ -575,6 +948,8 @@ SYSFORLOOP4:
 	MOVWF	YORDINATE
 	BANKSEL	STATUS
 	FCALL	CIRCLE
+;Draw a line
+;Line 64,31,0,31
 	MOVLW	64
 	MOVWF	LINEX1
 	CLRF	LINEX1_H
@@ -593,6 +968,8 @@ SYSFORLOOP4:
 	MOVF	GLCDFOREGROUND_H,W
 	MOVWF	LINECOLOUR_H
 	CALL	_LINE
+;Print a HEX string
+;GLCDPrint ( 64 ,  36,  Hex(longNumber_E ) )
 	MOVLW	64
 	BANKSEL	PRINTLOCX
 	MOVWF	PRINTLOCX
@@ -611,6 +988,8 @@ SYSFORLOOP4:
 	MOVWF	SYSLCDPRINTDATAHANDLER_H
 	BANKSEL	STATUS
 	FCALL	GLCDPRINT4
+;Print a HEX string
+;GLCDPrint ( 76 ,  36,  Hex(longNumber_U ) )
 	MOVLW	76
 	BANKSEL	PRINTLOCX
 	MOVWF	PRINTLOCX
@@ -629,6 +1008,8 @@ SYSFORLOOP4:
 	MOVWF	SYSLCDPRINTDATAHANDLER_H
 	BANKSEL	STATUS
 	FCALL	GLCDPRINT4
+;Print a HEX string
+;GLCDPrint ( 88 ,  36,  Hex(longNumber_H ) )
 	MOVLW	88
 	BANKSEL	PRINTLOCX
 	MOVWF	PRINTLOCX
@@ -647,6 +1028,8 @@ SYSFORLOOP4:
 	MOVWF	SYSLCDPRINTDATAHANDLER_H
 	BANKSEL	STATUS
 	FCALL	GLCDPRINT4
+;Print a HEX string
+;GLCDPrint ( 100 ,  36, Hex(longNumber   ) )
 	MOVLW	100
 	BANKSEL	PRINTLOCX
 	MOVWF	PRINTLOCX
@@ -665,6 +1048,8 @@ SYSFORLOOP4:
 	MOVWF	SYSLCDPRINTDATAHANDLER_H
 	BANKSEL	STATUS
 	FCALL	GLCDPRINT4
+;Print a HEX string
+;GLCDPrint ( 112 ,  36, "h" )
 	MOVLW	112
 	BANKSEL	PRINTLOCX
 	MOVWF	PRINTLOCX
@@ -678,6 +1063,8 @@ SYSFORLOOP4:
 	MOVWF	SYSLCDPRINTDATAHANDLER_H
 	BANKSEL	STATUS
 	FCALL	GLCDPRINT4
+;Print a padded string
+;GLCDPrint ( 64 ,  44, Pad(Str(wordNumber), 5 ) )
 	MOVLW	64
 	BANKSEL	PRINTLOCX
 	MOVWF	PRINTLOCX
@@ -711,6 +1098,8 @@ SYSFORLOOP4:
 	MOVWF	SYSLCDPRINTDATAHANDLER_H
 	BANKSEL	STATUS
 	FCALL	GLCDPRINT4
+;Print a padded string
+;GLCDPrint ( 64 ,  52, Pad(Str(byteNumber), 3 ) )
 	MOVLW	64
 	BANKSEL	PRINTLOCX
 	MOVWF	PRINTLOCX
@@ -745,6 +1134,8 @@ SYSFORLOOP4:
 	MOVWF	SYSLCDPRINTDATAHANDLER_H
 	BANKSEL	STATUS
 	FCALL	GLCDPRINT4
+;Draw a Box
+;Box (46,9,56,19)
 	MOVLW	46
 	MOVWF	LINEX1
 	CLRF	LINEX1_H
@@ -764,6 +1155,8 @@ SYSFORLOOP4:
 	MOVF	GLCDFOREGROUND_H,W
 	MOVWF	LINECOLOUR_H
 	FCALL	BOX
+;Draw a character
+;GLCDDrawChar(48, 10, CCount )
 	MOVLW	48
 	MOVWF	CHARLOCX
 	CLRF	CHARLOCX_H
@@ -777,6 +1170,8 @@ SYSFORLOOP4:
 	MOVF	GLCDFOREGROUND_H,W
 	MOVWF	LINECOLOUR_H
 	CALL	GLCDDRAWCHAR_SSD1306
+;Prepare a string
+;outString = Str( CCount )
 	MOVF	CCOUNT,W
 	BANKSEL	SYSVALTEMP
 	MOVWF	SYSVALTEMP
@@ -792,6 +1187,8 @@ SYSFORLOOP4:
 	MOVLW	HIGH STR
 	MOVWF	FSR0H
 	FCALL	SYSCOPYSTRING
+;Draw a string
+;GLCDDrawString(64, 9, Pad(outString,3) )
 	MOVLW	64
 	BANKSEL	STRINGLOCX
 	MOVWF	STRINGLOCX
@@ -822,6 +1219,8 @@ SYSFORLOOP4:
 	MOVF	GLCDFOREGROUND_H,W
 	MOVWF	LINECOLOUR_H
 	FCALL	GLCDDRAWSTRING
+;Draw a filled box
+;FilledBox 3,43,11,51, wordNumber
 	MOVLW	3
 	MOVWF	LINEX1
 	MOVLW	43
@@ -839,6 +1238,8 @@ SYSFORLOOP4:
 	BANKSEL	LINECOLOUR_H
 	MOVWF	LINECOLOUR_H
 	FCALL	FILLEDBOX_SSD1306
+;Draw a filled box
+;FilledCircle( 44,41,9, longNumber XOR 1)
 	MOVLW	44
 	BANKSEL	XOFFSET
 	MOVWF	XOFFSET
@@ -860,6 +1261,8 @@ SYSFORLOOP4:
 	BANKSEL	LINECOLOUR_H
 	MOVWF	LINECOLOUR_H
 	CALL	FILLEDCIRCLE
+;Draw a line
+;Line 0,63,64,31
 	CLRF	LINEX1
 	CLRF	LINEX1_H
 	MOVLW	63
@@ -878,6 +1281,10 @@ SYSFORLOOP4:
 	MOVF	GLCDFOREGROUND_H,W
 	MOVWF	LINECOLOUR_H
 	CALL	_LINE
+;GLCD_Close_PageTransaction
+;Macro Source: glcd_ssd1306.h (1192)
+;Set cursor position
+;Cursor_Position_SSD1306 ( 0, 8 * _GLCDPage )
 	CLRF	LOCX
 	BANKSEL	_GLCDPAGE
 	MOVF	_GLCDPAGE,W
@@ -891,21 +1298,34 @@ SYSFORLOOP4:
 	MOVWF	LOCY
 	BANKSEL	STATUS
 	FCALL	CURSOR_POSITION_SSD1306
+;Send the buffer to the device using transaction
+;Open_Transaction_SSD1306
+;Macro Source: glcd_ssd1306.h (1218)
+;4wire not supported, see Write_Transaction_Data_SSD1306
+;HI2CStart
 	FCALL	HI2CSTART
+;HI2CSend GLCD_I2C_Address
 	MOVLW	120
 	MOVWF	I2CBYTE
 	FCALL	HI2CSEND
+;HI2CSend 0x40
 	MOVLW	64
 	MOVWF	I2CBYTE
 	FCALL	HI2CSEND
+;for SSD1306_BufferLocationCalc = 1 to 128
+;LEGACY METHOD
 	BANKSEL	SSD1306_BUFFERLOCATIONCALC
 	CLRF	SSD1306_BUFFERLOCATIONCALC
 	CLRF	SSD1306_BUFFERLOCATIONCALC_H
+GLOBAL	SYSFORLOOP5
 SYSFORLOOP5:
 	BANKSEL	SSD1306_BUFFERLOCATIONCALC
 	INCF	SSD1306_BUFFERLOCATIONCALC,F
 	BTFSC	STATUS,2
 	INCF	SSD1306_BUFFERLOCATIONCALC_H,F
+;Write_Transaction_Data_SSD1306 SSD1306_BufferAlias(SSD1306_BufferLocationCalc)
+;Macro Source: glcd_ssd1306.h (1249)
+;HI2CSend SSD1306SendByte
 	MOVLW	LOW(SSD1306_BUFFERALIAS)
 	ADDWF	SSD1306_BUFFERLOCATIONCALC,W
 	MOVWF	FSR0L
@@ -916,6 +1336,8 @@ SYSFORLOOP5:
 	BANKSEL	I2CBYTE
 	MOVWF	I2CBYTE
 	FCALL	HI2CSEND
+;Clear the buffer byte. We need it to be empty for the next page operation
+;SSD1306_BufferAlias(SSD1306_BufferLocationCalc) = 0
 	MOVLW	LOW(SSD1306_BUFFERALIAS)
 	BANKSEL	SSD1306_BUFFERLOCATIONCALC
 	ADDWF	SSD1306_BUFFERLOCATIONCALC,W
@@ -924,6 +1346,7 @@ SYSFORLOOP5:
 	ADDWFC	SSD1306_BUFFERLOCATIONCALC_H,W
 	MOVWF	FSR0H
 	CLRF	INDF0
+;next
 	MOVF	SSD1306_BUFFERLOCATIONCALC,W
 	MOVWF	SYSWORDTEMPA
 	MOVF	SSD1306_BUFFERLOCATIONCALC_H,W
@@ -935,14 +1358,23 @@ SYSFORLOOP5:
 	FCALL	SYSCOMPLESSTHAN16
 	BTFSC	SYSBYTETEMPX,0
 	GOTO	SYSFORLOOP5
+GLOBAL	SYSFORLOOPEND5
 SYSFORLOOPEND5:
+;Close_Transaction_SSD1306
+;Macro Source: glcd_ssd1306.h (1282)
+;4wire not supported, see Write_Transaction_Data_SSD1306
+;HI2CStop
 	FCALL	HI2CSTOP
+;next
 	MOVLW	7
 	BANKSEL	_GLCDPAGE
 	SUBWF	_GLCDPAGE,W
 	BTFSS	STATUS,0
 	GOTO	SYSFORLOOP4
+GLOBAL	SYSFORLOOPEND4
 SYSFORLOOPEND4:
+;Do some simple maths
+;longNumber = longNumber + 7 : wordNumber = wordNumber + 3 : byteNumber++
 	MOVLW	7
 	BANKSEL	LONGNUMBER
 	ADDWF	LONGNUMBER,F
@@ -952,28 +1384,45 @@ SYSFORLOOPEND4:
 	ADDWFC	LONGNUMBER_U,F
 	MOVLW	0
 	ADDWFC	LONGNUMBER_E,F
+;longNumber = longNumber + 7 : wordNumber = wordNumber + 3 : byteNumber++
 	MOVLW	3
 	ADDWF	WORDNUMBER,F
 	MOVLW	0
 	ADDWFC	WORDNUMBER_H,F
+;longNumber = longNumber + 7 : wordNumber = wordNumber + 3 : byteNumber++
 	BANKSEL	BYTENUMBER
 	INCF	BYTENUMBER,F
+;Next
 	MOVLW	127
 	SUBWF	CCOUNT,W
 	BTFSS	STATUS,0
 	GOTO	SYSFORLOOP3
+GLOBAL	SYSFORLOOPEND3
 SYSFORLOOPEND3:
+;Loop
 	GOTO	SYSDOLOOP_S1
+GLOBAL	SYSDOLOOP_E1
 SYSDOLOOP_E1:
+;End
 	GOTO	BASPROGRAMEND
 ;asm showdebug  GLCD SSD1306 buffer is 128bytes
+GLOBAL	BASPROGRAMEND
 BASPROGRAMEND:
 	SLEEP
 	GOTO	BASPROGRAMEND
 
 ;********************************************************************************
 
+;SOURCE: GLCD.H (1569)
+GLOBAL	FILLEDCIRCLE
 FILLEDCIRCLE:
+;Circle fill Code is merely a modification of the midpoint
+;circle algorithem which is an adaption of Bresenham's line algorithm
+;http://en.wikipedia.org/wiki/Midpoint_circle_algorithm
+;http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+;dim ff, ddF_x, ddF_y as integer
+;dim YCalc2, YCalc1 as word
+;ff = 1 - xradius
 	BANKSEL	XRADIUS
 	MOVF	XRADIUS,W
 	SUBLW	1
@@ -986,9 +1435,11 @@ FILLEDCIRCLE:
 	SUBWFB	SYSTEMP2,W
 	BANKSEL	FF_H
 	MOVWF	FF_H
+;ddF_x = 1
 	MOVLW	1
 	MOVWF	DDF_X
 	CLRF	DDF_X_H
+;ddF_y = -2 * xradius
 	BANKSEL	XRADIUS
 	MOVF	XRADIUS,W
 	MOVWF	SYSINTEGERTEMPA
@@ -1004,11 +1455,15 @@ FILLEDCIRCLE:
 	MOVWF	DDF_Y
 	MOVF	SYSINTEGERTEMPX_H,W
 	MOVWF	DDF_Y_H
+;FillCircleXX = 0
 	CLRF	FILLCIRCLEXX
+;FillCircleYY = xradius
 	BANKSEL	XRADIUS
 	MOVF	XRADIUS,W
 	BANKSEL	FILLCIRCLEYY
 	MOVWF	FILLCIRCLEYY
+;Fill in the center between the two halves
+;YCalc2 = yoffset+xradius
 	BANKSEL	XRADIUS
 	MOVF	XRADIUS,W
 	BANKSEL	YOFFSET
@@ -1019,6 +1474,7 @@ FILLEDCIRCLE:
 	BANKSEL	YOFFSET_H
 	ADDWFC	YOFFSET_H,W
 	MOVWF	YCALC2_H
+;YCalc1 = yoffset-xradius
 	BANKSEL	XRADIUS
 	MOVF	XRADIUS,W
 	BANKSEL	YOFFSET
@@ -1030,6 +1486,7 @@ FILLEDCIRCLE:
 	SUBWFB	YOFFSET_H,W
 	BANKSEL	YCALC1_H
 	MOVWF	YCALC1_H
+;Line( xoffset, YCalc1 , xoffset, YCalc2, LineColour)
 	MOVF	XOFFSET,W
 	BANKSEL	LINEX1
 	MOVWF	LINEX1
@@ -1056,11 +1513,14 @@ FILLEDCIRCLE:
 	MOVWF	LINEY2_H
 	BANKSEL	STATUS
 	CALL	_LINE
+;do while (FillCircleXX < FillCircleYY)
+GLOBAL	SYSDOLOOP_S4
 SYSDOLOOP_S4:
 	MOVF	FILLCIRCLEYY,W
 	SUBWF	FILLCIRCLEXX,W
 	BTFSC	STATUS,0
 	GOTO	SYSDOLOOP_E4
+;if ff >= 0 then
 	MOVF	FF,W
 	MOVWF	SYSINTEGERTEMPA
 	MOVF	FF_H,W
@@ -1071,25 +1531,37 @@ SYSDOLOOP_S4:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF17
+;FillCircleYY--
 	DECF	FILLCIRCLEYY,F
+;ddF_y += 2
 	MOVLW	2
 	ADDWF	DDF_Y,F
 	MOVLW	0
 	ADDWFC	DDF_Y_H,F
+;ff += ddF_y
 	MOVF	DDF_Y,W
 	ADDWF	FF,F
 	MOVF	DDF_Y_H,W
 	ADDWFC	FF_H,F
+;end if
+GLOBAL	ENDIF17
 ENDIF17:
+;FillCircleXX++
 	INCF	FILLCIRCLEXX,F
+;ddF_x += 2
 	MOVLW	2
 	ADDWF	DDF_X,F
 	MOVLW	0
 	ADDWFC	DDF_X_H,F
+;ff += ddF_x
 	MOVF	DDF_X,W
 	ADDWF	FF,F
 	MOVF	DDF_X_H,W
 	ADDWFC	FF_H,F
+;Now draw vertical lines between the points on the circle rather than
+;draw the points of the circle. This draws lines between the
+;perimeter points on the upper and lower quadrants of the 2 halves of the circle.
+;Line(xoffset+FillCircleXX, yoffset+FillCircleYY, xoffset+FillCircleXX, yoffset-FillCircleYY, LineColour);
 	MOVF	FILLCIRCLEXX,W
 	BANKSEL	XOFFSET
 	ADDWF	XOFFSET,W
@@ -1131,6 +1603,7 @@ ENDIF17:
 	MOVWF	LINEY2_H
 	BANKSEL	STATUS
 	CALL	_LINE
+;Line(xoffset-FillCircleXX, yoffset+FillCircleYY, xoffset-FillCircleXX, yoffset-FillCircleYY, LineColour);
 	MOVF	FILLCIRCLEXX,W
 	BANKSEL	XOFFSET
 	SUBWF	XOFFSET,W
@@ -1172,6 +1645,7 @@ ENDIF17:
 	MOVWF	LINEY2_H
 	BANKSEL	STATUS
 	CALL	_LINE
+;Line(xoffset+FillCircleYY, yoffset+FillCircleXX, FillCircleYY+xoffset, yoffset-FillCircleXX, LineColour);
 	MOVF	FILLCIRCLEYY,W
 	BANKSEL	XOFFSET
 	ADDWF	XOFFSET,W
@@ -1214,6 +1688,7 @@ ENDIF17:
 	MOVWF	LINEY2_H
 	BANKSEL	STATUS
 	CALL	_LINE
+;Line(xoffset-FillCircleYY, yoffset+FillCircleXX, xoffset-FillCircleYY, yoffset-FillCircleXX, LineColour);
 	MOVF	FILLCIRCLEYY,W
 	BANKSEL	XOFFSET
 	SUBWF	XOFFSET,W
@@ -1255,45 +1730,76 @@ ENDIF17:
 	MOVWF	LINEY2_H
 	BANKSEL	STATUS
 	CALL	_LINE
+;loop
 	GOTO	SYSDOLOOP_S4
+GLOBAL	SYSDOLOOP_E4
 SYSDOLOOP_E4:
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: GLCD_SSD1306.H (475)
+GLOBAL	GLCDDRAWCHAR_SSD1306
 GLCDDRAWCHAR_SSD1306:
+;This is now in four parts
+;1. Handler for GLCD LM mode
+;2. Preamble
+;3. GCB Font set handler
+;4. OLED Font set handler
+;***** Handler for GLCD LM mode
+;if GLCDfntDefaultSize = 1 then
 	DECF	GLCDFNTDEFAULTSIZE,W
 	BTFSS	STATUS,2
 	GOTO	ENDIF23
+;test if character lies within current page
+;GLCDY_Temp = CharLocY + 7
 	MOVLW	7
 	ADDWF	CHARLOCY,W
 	MOVWF	GLCDY_TEMP
+;Repeat 3
 	MOVLW	3
 	BANKSEL	SYSREPEATTEMP1
 	MOVWF	SYSREPEATTEMP1
+GLOBAL	SYSREPEATLOOP1
 SYSREPEATLOOP1:
+;Set C Off
 	BCF	STATUS,0
+;Rotate GLCDY_Temp Right
 	BANKSEL	GLCDY_TEMP
 	RRF	GLCDY_TEMP,F
+;End Repeat
 	BANKSEL	SYSREPEATTEMP1
 	DECFSZ	SYSREPEATTEMP1,F
 	GOTO	SYSREPEATLOOP1
+GLOBAL	SYSREPEATLOOPEND1
 SYSREPEATLOOPEND1:
+;IF GLCDY_Temp <> _GLCDPage THEN
 	BANKSEL	_GLCDPAGE
 	MOVF	_GLCDPAGE,W
 	BANKSEL	GLCDY_TEMP
 	SUBWF	GLCDY_TEMP,W
 	BTFSC	STATUS,2
 	GOTO	ENDIF32
+;GLCDY_Temp = GLCDY_Temp - 1
 	DECF	GLCDY_TEMP,F
+;IF GLCDY_Temp <> _GLCDPage THEN
 	BANKSEL	_GLCDPAGE
 	MOVF	_GLCDPAGE,W
 	BANKSEL	GLCDY_TEMP
 	SUBWF	GLCDY_TEMP,W
 	BTFSS	STATUS,2
+;EXIT SUB
 	RETURN
+;END IF
+;END IF
+GLOBAL	ENDIF32
 ENDIF32:
+;end if
+GLOBAL	ENDIF23
 ENDIF23:
+;****** Preamble
+;invert colors if required
+;if LineColour <> GLCDForeground  then
 	MOVF	LINECOLOUR,W
 	MOVWF	SYSWORDTEMPA
 	MOVF	LINECOLOUR_H,W
@@ -1306,16 +1812,25 @@ ENDIF23:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF24
+;Inverted Colours
+;GLCDBackground = 1
 	MOVLW	1
 	MOVWF	GLCDBACKGROUND
 	CLRF	GLCDBACKGROUND_H
+;GLCDForeground = 0
 	CLRF	GLCDFOREGROUND
 	CLRF	GLCDFOREGROUND_H
+;end if
+GLOBAL	ENDIF24
 ENDIF24:
+;dim CharCol, CharRow as word
+;CharCode -= 15
 	MOVLW	15
 	SUBWF	CHARCODE,F
+;CharCol=0
 	CLRF	CHARCOL
 	CLRF	CHARCOL_H
+;Cursor_Position_SSD1306 ( CharLocX , CharLocY )
 	MOVF	CHARLOCX,W
 	MOVWF	LOCX
 	MOVF	CHARLOCY,W
@@ -1323,13 +1838,22 @@ ENDIF24:
 	MOVWF	LOCY
 	BANKSEL	STATUS
 	FCALL	CURSOR_POSITION_SSD1306
+;1.14 Added transaction
+;Open_Transaction_SSD1306
+;Macro Source: glcd_ssd1306.h (1218)
+;4wire not supported, see Write_Transaction_Data_SSD1306
+;HI2CStart
 	FCALL	HI2CSTART
+;HI2CSend GLCD_I2C_Address
 	MOVLW	120
 	MOVWF	I2CBYTE
 	FCALL	HI2CSEND
+;HI2CSend 0x40
 	MOVLW	64
 	MOVWF	I2CBYTE
 	FCALL	HI2CSEND
+;****** GCB Font set handler
+;if CharCode>=178 and CharCode<=202 then
 	MOVF	CHARCODE,W
 	MOVWF	SYSBYTETEMPA
 	MOVLW	178
@@ -1352,79 +1876,116 @@ ENDIF24:
 	MOVWF	SYSTEMP1
 	BTFSS	SYSTEMP1,0
 	GOTO	ENDIF25
+;CharLocY=CharLocY-1
 	MOVLW	1
 	BANKSEL	CHARLOCY
 	SUBWF	CHARLOCY,F
 	MOVLW	0
 	SUBWFB	CHARLOCY_H,F
+;end if
+GLOBAL	ENDIF25
 ENDIF25:
+;For CurrCharCol = 1 to 5
+;LEGACY METHOD
 	BANKSEL	CURRCHARCOL
 	CLRF	CURRCHARCOL
+GLOBAL	SYSFORLOOP14
 SYSFORLOOP14:
 	INCF	CURRCHARCOL,F
+;Select Case CurrCharCol
+;Case 1: ReadTable GLCDCharCol3, CharCode, CurrCharVal
+GLOBAL	SYSSELECT1CASE1
 SYSSELECT1CASE1:
 	DECF	CURRCHARCOL,W
 	BTFSS	STATUS,2
 	GOTO	SYSSELECT1CASE2
+;Case 1: ReadTable GLCDCharCol3, CharCode, CurrCharVal
 	MOVF	CHARCODE,W
 	MOVWF	SYSSTRINGA
 	FCALL	GLCDCHARCOL3
 	MOVWF	CURRCHARVAL
+;Case 2: ReadTable GLCDCharCol4, CharCode, CurrCharVal
 	GOTO	SYSSELECTEND1
+GLOBAL	SYSSELECT1CASE2
 SYSSELECT1CASE2:
 	MOVLW	2
 	SUBWF	CURRCHARCOL,W
 	BTFSS	STATUS,2
 	GOTO	SYSSELECT1CASE3
+;Case 2: ReadTable GLCDCharCol4, CharCode, CurrCharVal
 	MOVF	CHARCODE,W
 	MOVWF	SYSSTRINGA
 	FCALL	GLCDCHARCOL4
 	MOVWF	CURRCHARVAL
+;Case 3: ReadTable GLCDCharCol5, CharCode, CurrCharVal
 	GOTO	SYSSELECTEND1
+GLOBAL	SYSSELECT1CASE3
 SYSSELECT1CASE3:
 	MOVLW	3
 	SUBWF	CURRCHARCOL,W
 	BTFSS	STATUS,2
 	GOTO	SYSSELECT1CASE4
+;Case 3: ReadTable GLCDCharCol5, CharCode, CurrCharVal
 	MOVF	CHARCODE,W
 	MOVWF	SYSSTRINGA
 	FCALL	GLCDCHARCOL5
 	MOVWF	CURRCHARVAL
+;Case 4: ReadTable GLCDCharCol6, CharCode, CurrCharVal
 	GOTO	SYSSELECTEND1
+GLOBAL	SYSSELECT1CASE4
 SYSSELECT1CASE4:
 	MOVLW	4
 	SUBWF	CURRCHARCOL,W
 	BTFSS	STATUS,2
 	GOTO	SYSSELECT1CASE5
+;Case 4: ReadTable GLCDCharCol6, CharCode, CurrCharVal
 	MOVF	CHARCODE,W
 	MOVWF	SYSSTRINGA
 	FCALL	GLCDCHARCOL6
 	MOVWF	CURRCHARVAL
+;Case 5: ReadTable GLCDCharCol7, CharCode, CurrCharVal
 	GOTO	SYSSELECTEND1
+GLOBAL	SYSSELECT1CASE5
 SYSSELECT1CASE5:
 	MOVLW	5
 	SUBWF	CURRCHARCOL,W
 	BTFSS	STATUS,2
 	GOTO	SYSSELECTEND1
+;Case 5: ReadTable GLCDCharCol7, CharCode, CurrCharVal
 	MOVF	CHARCODE,W
 	MOVWF	SYSSTRINGA
 	FCALL	GLCDCHARCOL7
 	MOVWF	CURRCHARVAL
+;End Select
+GLOBAL	SYSSELECTEND1
 SYSSELECTEND1:
+;Full Memory GLCD mode
+;1.14 Low Memory GLCD mode
+;CharRow=0
 	CLRF	CHARROW
 	CLRF	CHARROW_H
+;For CurrCharRow = 1 to 8
+;LEGACY METHOD
 	CLRF	CURRCHARROW
+GLOBAL	SYSFORLOOP15
 SYSFORLOOP15:
 	INCF	CURRCHARROW,F
+;CharColS=0
 	CLRF	CHARCOLS
+;For Col=1 to GLCDfntDefaultsize
 	MOVLW	1
 	MOVWF	COL
+GLOBAL	SYSFORLOOP16
 SYSFORLOOP16:
+;CharRowS=0
 	CLRF	CHARROWS
+;For Row=1 to GLCDfntDefaultsize
 	MOVLW	1
 	BANKSEL	ROW
 	MOVWF	ROW
+GLOBAL	SYSFORLOOP17
 SYSFORLOOP17:
+;GLCDY = [word]CharLocY + CharRow + CharRowS
 	BANKSEL	CHARROW
 	MOVF	CHARROW,W
 	ADDWF	CHARLOCY,W
@@ -1436,8 +1997,10 @@ SYSFORLOOP17:
 	ADDWF	SYSTEMP2,W
 	BANKSEL	GLCDY
 	MOVWF	GLCDY
+;if CurrCharVal.0=1 then
 	BTFSS	CURRCHARVAL,0
 	GOTO	ELSE26_1
+;PSet [word]CharLocX + CharCol + CharColS, GLCDY, LineColour
 	MOVF	CHARCOL,W
 	ADDWF	CHARLOCX,W
 	BANKSEL	SYSTEMP2
@@ -1453,8 +2016,11 @@ SYSFORLOOP17:
 	MOVF	LINECOLOUR_H,W
 	MOVWF	GLCDCOLOUR_H
 	FCALL	PSET_SSD1306
+;Else
 	GOTO	ENDIF26
+GLOBAL	ELSE26_1
 ELSE26_1:
+;PSet [word]CharLocX + CharCol + CharColS, GLCDY, GLCDBackground
 	MOVF	CHARCOL,W
 	ADDWF	CHARLOCX,W
 	BANKSEL	SYSTEMP2
@@ -1470,8 +2036,14 @@ ELSE26_1:
 	MOVF	GLCDBACKGROUND_H,W
 	MOVWF	GLCDCOLOUR_H
 	FCALL	PSET_SSD1306
+;End if
+GLOBAL	ENDIF26
 ENDIF26:
+;End if
+;CharRowS +=1
 	INCF	CHARROWS,F
+;Put out a white intercharacter pixel/space
+;if ( CharCol + CharColS ) = ( GLCDFontWidth * GLCDfntDefaultsize) - GLCDfntDefaultsize - 1 then
 	MOVF	CHARCOLS,W
 	ADDWF	CHARCOL,W
 	BANKSEL	SYSTEMP1
@@ -1508,6 +2080,7 @@ ENDIF26:
 	FCALL	SYSCOMPEQUAL16
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF27
+;PSet [word]CharLocX + CharCol + CharColS + 1, [word]CharLocY + CharRow+CharRowS -1, GLCDBackground
 	MOVF	CHARCOL,W
 	ADDWF	CHARLOCX,W
 	BANKSEL	SYSTEMP2
@@ -1537,7 +2110,11 @@ ENDIF26:
 	MOVF	GLCDBACKGROUND_H,W
 	MOVWF	GLCDCOLOUR_H
 	FCALL	PSET_SSD1306
+;end if
+GLOBAL	ENDIF27
 ENDIF27:
+;Next Row
+;POSITIVE VALUE STEP HANDLER IN FOR-NEXT STATEMENT :#4P 
 	BANKSEL	ROW
 	MOVF	ROW,W
 	BANKSEL	GLCDFNTDEFAULTSIZE
@@ -1551,12 +2128,19 @@ ENDIF27:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF28
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	BANKSEL	ROW
 	INCF	ROW,F
 	GOTO	SYSFORLOOP17
+;END IF
+GLOBAL	ENDIF28
 ENDIF28:
+GLOBAL	SYSFORLOOPEND17
 SYSFORLOOPEND17:
+;CharColS +=1
 	INCF	CHARCOLS,F
+;Next Col
+;POSITIVE VALUE STEP HANDLER IN FOR-NEXT STATEMENT :#4P 
 	MOVF	COL,W
 	SUBWF	GLCDFNTDEFAULTSIZE,W
 	BANKSEL	SYSTEMP2
@@ -1568,32 +2152,55 @@ SYSFORLOOPEND17:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF29
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	INCF	COL,F
 	GOTO	SYSFORLOOP16
+;END IF
+GLOBAL	ENDIF29
 ENDIF29:
+GLOBAL	SYSFORLOOPEND16
 SYSFORLOOPEND16:
+;Rotate CurrCharVal Right
 	RRF	CURRCHARVAL,F
+;CharRow +=GLCDfntDefaultsize
 	MOVF	GLCDFNTDEFAULTSIZE,W
 	ADDWF	CHARROW,F
 	MOVLW	0
 	ADDWFC	CHARROW_H,F
+;Next
 	MOVLW	8
 	SUBWF	CURRCHARROW,W
 	BTFSS	STATUS,0
 	GOTO	SYSFORLOOP15
+GLOBAL	SYSFORLOOPEND15
 SYSFORLOOPEND15:
+;CharCol +=GLCDfntDefaultsize
 	MOVF	GLCDFNTDEFAULTSIZE,W
 	ADDWF	CHARCOL,F
 	MOVLW	0
 	ADDWFC	CHARCOL_H,F
+;1.12 Character GLCD mode
+;Handles specific draw sequence. This caters for write only of a bit value. No read operation.
+;Ensure this is not called with in Low memory mode
+;Next
 	MOVLW	5
 	SUBWF	CURRCHARCOL,W
 	BTFSS	STATUS,0
 	GOTO	SYSFORLOOP14
+GLOBAL	SYSFORLOOPEND14
 SYSFORLOOPEND14:
+;****** OLED Font set handler
+;1.14 Added transaction
+;Close_Transaction_SSD1306
+;Macro Source: glcd_ssd1306.h (1282)
+;4wire not supported, see Write_Transaction_Data_SSD1306
+;HI2CStop
 	FCALL	HI2CSTOP
+;Restore
+;GLCDBackground = 0
 	CLRF	GLCDBACKGROUND
 	CLRF	GLCDBACKGROUND_H
+;GLCDForeground = 1
 	MOVLW	1
 	MOVWF	GLCDFOREGROUND
 	CLRF	GLCDFOREGROUND_H
@@ -1601,162 +2208,216 @@ SYSFORLOOPEND14:
 
 ;********************************************************************************
 
+;SOURCE: HWI2C.H (709)
+GLOBAL	HI2CINIT
 HI2CINIT:
 ;asm showdebug  This method sets the variable `HI2CCurrentMode`, and, if required calls the method `SI2CInit` to set up new MSSP modules - aka K42s family chips
+;HI2CCurrentMode = 0
 	CLRF	HI2CCURRENTMODE
+;Initialise the I2C module
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: GLCD_SSD1306.H (317)
+GLOBAL	INITGLCD_SSD1306
 INITGLCD_SSD1306:
+;Colours //Set these first
+;GLCDBackground = 0
 	CLRF	GLCDBACKGROUND
 	CLRF	GLCDBACKGROUND_H
+;GLCDForeground = 1
 	MOVLW	1
 	MOVWF	GLCDFOREGROUND
 	CLRF	GLCDFOREGROUND_H
+;GLCDFontWidth = 5
 	MOVLW	5
 	MOVWF	GLCDFONTWIDTH
+;GLCDfntDefaultHeight = 7  'used by GLCDPrintString and GLCDPrintStringLn
 	MOVLW	7
 	MOVWF	GLCDFNTDEFAULTHEIGHT
+;dim PrintLocX, PrintLocY as word
+;GLCDfntDefault = 0
 	CLRF	GLCDFNTDEFAULT
+;GLCDfntDefaultsize = 1
 	MOVLW	1
 	MOVWF	GLCDFNTDEFAULTSIZE
+;wait 255 ms             'added to ensure the charge pump and power is operational.
 	MOVLW	255
 	MOVWF	SYSWAITTEMPMS
 	CLRF	SYSWAITTEMPMS_H
 	FCALL	DELAY_MS
+;HI2CMode Master
 	MOVLW	12
 	MOVWF	HI2CCURRENTMODE
 	FCALL	HI2CMODE
+;Wait 15 ms  'wait for power-up and reset
 	MOVLW	15
 	MOVWF	SYSWAITTEMPMS
 	CLRF	SYSWAITTEMPMS_H
 	FCALL	DELAY_MS
+;Setup code for SSD1306 controllers
+;Init sequence for 128x64 OLED module
+;Write_Command_SSD1306(SSD1306_DISPLAYOFF)                    ' 0xAE
 	MOVLW	174
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;Write_Command_SSD1306(SSD1306_DEACTIVATE_SCROLL)
 	MOVLW	46
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;Write_Command_SSD1306(SSD1306_SETDISPLAYCLOCKDIV)            ' 0xD5
 	MOVLW	213
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;Write_Command_SSD1306(0x80)                                  ' the suggested ratio 0x80
 	MOVLW	128
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;Write_Command_SSD1306(SSD1306_SETMULTIPLEX)                  ' 0xA8
 	MOVLW	168
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;Write_Command_SSD1306(0x3f)                                 '64 pixels
 	MOVLW	63
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;Write_Command_SSD1306(SSD1306_SETDISPLAYOFFSET)              ' 0xD3
 	MOVLW	211
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;Write_Command_SSD1306(0x00)                                   ' no offset
 	BANKSEL	SSD1306SENDBYTE
 	CLRF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;Write_Command_SSD1306(SSD1306_SETSTARTLINE | 0x00)            ' line #0
 	MOVLW	64
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;Write_Command_SSD1306(SSD1306_CHARGEPUMP)                    ' 0x8D
 	MOVLW	141
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;if (SSD1306_vccstate = SSD1306_EXTERNALVCC) then
+;Write_Command_SSD1306(0x14)
 	MOVLW	20
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;end if
+;Write_Command_SSD1306(SSD1306_MEMORYMODE)                    ' 0x20
 	MOVLW	32
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;Write_Command_SSD1306(0x00)                                  ' 0x00 act like ks0108 - DO NOT SELECT!!
+;Write_Command_SSD1306(0x10)                                  ' 0x01 act like PCD8544
 	MOVLW	16
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;Write_Command_SSD1306(SSD1306_SEGREMAP | 0x1)
 	MOVLW	161
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;Write_Command_SSD1306(SSD1306_COMSCANDEC)
 	MOVLW	200
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;Write_Command_SSD1306(SSD1306_SETCOMPINS)                    ' 0xDA
 	MOVLW	218
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;Write_Command_SSD1306(0x12)                                 '64 pixels
 	MOVLW	18
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;Write_Command_SSD1306(SSD1306_SETCONTRAST)                   ' 0x81
 	MOVLW	129
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;if SSD1306_vccstate = SSD1306_EXTERNALVCC then
+;Write_Command_SSD1306(0xCF)
 	MOVLW	207
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;end if
+;Write_Command_SSD1306(SSD1306_SETPRECHARGE)                  ' 0xd9
 	MOVLW	217
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;if SSD1306_vccstate = SSD1306_EXTERNALVCC then
+;Write_Command_SSD1306(0xF1)
 	MOVLW	241
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;end if
+;Write_Command_SSD1306(SSD1306_SETVCOMDETECT)                 ' 0xDB
 	MOVLW	219
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;Write_Command_SSD1306(0x40)
 	MOVLW	64
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;Write_Command_SSD1306(SSD1306_DISPLAYALLON_RESUME)           ' 0xA4
 	MOVLW	164
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;Write_Command_SSD1306(SSD1306_NORMALDISPLAY)                 ' 0xA6
 	MOVLW	166
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	FCALL	WRITE_COMMAND_SSD1306
+;Clear screen Here
+;GLCDCLS_SSD1306
 	FCALL	GLCDCLS_SSD1306
+;Write_Command_SSD1306(SSD1306_DISPLAYON)                     '--turn on oled panel
 	MOVLW	175
 	BANKSEL	SSD1306SENDBYTE
 	MOVWF	SSD1306SENDBYTE
@@ -1765,19 +2426,28 @@ INITGLCD_SSD1306:
 
 ;********************************************************************************
 
+;SOURCE: 220_I2C_GLCD_USING_SSD1306_128_64_GRAPHICS.GCB (35)
+GLOBAL	INITPPS
 INITPPS:
+;Module: EUSART
+;RC6PPS = 0x000E    'TX > RC6
 	MOVLW	14
 	BANKSEL	RC6PPS
 	MOVWF	RC6PPS
+;Module: MSSP1
+;SSP1CLKPPS = 0x13;  //RC3->MSSP1:SCL1;
 	MOVLW	19
 	BANKSEL	SSP1CLKPPS
 	MOVWF	SSP1CLKPPS
+;RC3PPS = 0x15;  //RC3->MSSP1:SCL1;
 	MOVLW	21
 	BANKSEL	RC3PPS
 	MOVWF	RC3PPS
+;SSP1DATPPS = 0x14;  //RC4->MSSP1:SDA1;
 	MOVLW	20
 	BANKSEL	SSP1DATPPS
 	MOVWF	SSP1DATPPS
+;RC4PPS = 0x16;  //RC4->MSSP1:SDA1;
 	MOVLW	22
 	BANKSEL	RC4PPS
 	MOVWF	RC4PPS
@@ -1786,57 +2456,103 @@ INITPPS:
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (159)
+GLOBAL	INITSYS
 INITSYS:
 ;asm showdebug This code block sets the internal oscillator to ChipMHz
+;OSCCON2 = 0
 	BANKSEL	OSCCON2
 	CLRF	OSCCON2
+;OSCCON3 = 0
 	CLRF	OSCCON3
+;Set OSCFRQ values for MCUs with OSCSTAT... the 16F180xx MCU family 32 mhz
+;OSCFRQ = 0b00000101
 	MOVLW	5
 	MOVWF	OSCFRQ
 ;asm showdebug _Complete_the_chip_setup_of_BSR,ADCs,ANSEL_and_other_key_setup_registers_or_register_bits
+;Ensure all ports are set for digital I/O and, turn off A/D
+;SET ADFM OFF
 	BANKSEL	ADCON0
 	BCF	ADCON0,2
+;Switch off A/D Var(ADCON0)
+;SET ADCON0.ADON OFF
 	BCF	ADCON0,7
+;ANSELA = 0
 	BANKSEL	ANSELA
 	CLRF	ANSELA
+;ANSELB = 0
 	CLRF	ANSELB
+;ANSELC = 0
 	CLRF	ANSELC
+;ANSELD = 0
 	CLRF	ANSELD
+;ANSELE = 0
 	CLRF	ANSELE
+;Set comparator register bits for many MCUs with register CM2CON0
+;C1EN = 0
 	BANKSEL	CM1CON0
 	BCF	CM1CON0,7
+;
+;'Turn off all ports
+;PORTA = 0
 	BANKSEL	PORTA
 	CLRF	PORTA
+;PORTB = 0
 	CLRF	PORTB
+;PORTC = 0
 	CLRF	PORTC
+;PORTD = 0
 	CLRF	PORTD
+;PORTE = 0
 	CLRF	PORTE
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (3383)
+GLOBAL	SYSCOMPLESSTHAN
 SYSCOMPLESSTHAN:
+;Dim SysByteTempA, SysByteTempB, SysByteTempX as byte
+;clrf SysByteTempX
 	CLRF	SYSBYTETEMPX
+;bsf STATUS, C
 	BSF	STATUS,0
+;movf SysByteTempB, W
 	MOVF	SYSBYTETEMPB, W
+;subwf SysByteTempA, W
 	SUBWF	SYSBYTETEMPA, W
+;btfss STATUS, C
 	BTFSS	STATUS,0
+;comf SysByteTempX,F
 	COMF	SYSBYTETEMPX,F
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (2861)
+GLOBAL	SYSDIVSUB16
 SYSDIVSUB16:
+;dim SysWordTempA as word
+;dim SysWordTempB as word
+;dim SysWordTempX as word
+;dim SysDivMultA as word
+;dim SysDivMultB as word
+;dim SysDivMultX as word
+;SysDivMultA = SysWordTempA
 	MOVF	SYSWORDTEMPA,W
 	MOVWF	SYSDIVMULTA
 	MOVF	SYSWORDTEMPA_H,W
 	MOVWF	SYSDIVMULTA_H
+;SysDivMultB = SysWordTempB
 	MOVF	SYSWORDTEMPB,W
 	MOVWF	SYSDIVMULTB
 	MOVF	SYSWORDTEMPB_H,W
 	MOVWF	SYSDIVMULTB_H
+;SysDivMultX = 0
 	CLRF	SYSDIVMULTX
 	CLRF	SYSDIVMULTX_H
+;Avoid division by zero
+;if SysDivMultB = 0 then
 	MOVF	SYSDIVMULTB,W
 	MOVWF	SYSWORDTEMPA
 	MOVF	SYSDIVMULTB_H,W
@@ -1846,37 +2562,58 @@ SYSDIVSUB16:
 	FCALL	SYSCOMPEQUAL16
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF84
+;SysWordTempA = 0
 	CLRF	SYSWORDTEMPA
 	CLRF	SYSWORDTEMPA_H
+;exit sub
 	RETURN
+;end if
+GLOBAL	ENDIF84
 ENDIF84:
+;Main calc routine
+;SysDivLoop = 16
 	MOVLW	16
 	MOVWF	SYSDIVLOOP
+GLOBAL	SYSDIV16START
 SYSDIV16START:
+;set C off
 	BCF	STATUS,0
+;Rotate SysDivMultA Left
 	RLF	SYSDIVMULTA,F
 	RLF	SYSDIVMULTA_H,F
+;Rotate SysDivMultX Left
 	RLF	SYSDIVMULTX,F
 	RLF	SYSDIVMULTX_H,F
+;SysDivMultX = SysDivMultX - SysDivMultB
 	MOVF	SYSDIVMULTB,W
 	SUBWF	SYSDIVMULTX,F
 	MOVF	SYSDIVMULTB_H,W
 	SUBWFB	SYSDIVMULTX_H,F
+;Set SysDivMultA.0 On
 	BSF	SYSDIVMULTA,0
+;If C Off Then
 	BTFSC	STATUS,0
 	GOTO	ENDIF85
+;Set SysDivMultA.0 Off
 	BCF	SYSDIVMULTA,0
+;SysDivMultX = SysDivMultX + SysDivMultB
 	MOVF	SYSDIVMULTB,W
 	ADDWF	SYSDIVMULTX,F
 	MOVF	SYSDIVMULTB_H,W
 	ADDWFC	SYSDIVMULTX_H,F
+;End If
+GLOBAL	ENDIF85
 ENDIF85:
+;decfsz SysDivLoop, F
 	DECFSZ	SYSDIVLOOP, F
+;goto SysDiv16Start
 	GOTO	SYSDIV16START
+;SysWordTempA = SysDivMultA
 	MOVF	SYSDIVMULTA,W
 	MOVWF	SYSWORDTEMPA
 	MOVF	SYSDIVMULTA_H,W
 	MOVWF	SYSWORDTEMPA_H
+;SysWordTempX = SysDivMultX
 	MOVF	SYSDIVMULTX,W
 	MOVWF	SYSWORDTEMPX
 	MOVF	SYSDIVMULTX_H,W
@@ -1885,21 +2622,36 @@ ENDIF85:
 
 ;********************************************************************************
 
+;SOURCE: PICAS.H (26)
+GLOBAL	_LINE
 _LINE:
+;dim LineStepX as integer
+;dim LineStepY as integer
+;dim LineDiffX, LineDiffY as integer
+;dim LineDiffX_x2, LineDiffY_x2 as integer
+;dim LineErr as integer
+;LineDiffX = 0
 	CLRF	LINEDIFFX
 	CLRF	LINEDIFFX_H
+;LineDiffY = 0
 	CLRF	LINEDIFFY
 	CLRF	LINEDIFFY_H
+;LineStepX = 0
 	CLRF	LINESTEPX
 	CLRF	LINESTEPX_H
+;LineStepY = 0
 	CLRF	LINESTEPY
 	CLRF	LINESTEPY_H
+;LineDiffX_x2 = 0
 	CLRF	LINEDIFFX_X2
 	CLRF	LINEDIFFX_X2_H
+;LineDiffY_x2 = 0
 	CLRF	LINEDIFFY_X2
 	CLRF	LINEDIFFY_X2_H
+;LineErr = 0
 	CLRF	LINEERR
 	CLRF	LINEERR_H
+;LineDiffX =  LineX2 -   LineX1
 	MOVF	LINEX1,W
 	BANKSEL	LINEX2
 	SUBWF	LINEX2,W
@@ -1910,6 +2662,7 @@ _LINE:
 	SUBWFB	LINEX2_H,W
 	BANKSEL	LINEDIFFX_H
 	MOVWF	LINEDIFFX_H
+;LineDiffY =  LineY2 -   LineY1
 	BANKSEL	LINEY1
 	MOVF	LINEY1,W
 	SUBWF	LINEY2,W
@@ -1920,6 +2673,7 @@ _LINE:
 	SUBWFB	LINEY2_H,W
 	BANKSEL	LINEDIFFY_H
 	MOVWF	LINEDIFFY_H
+;if (LineDiffX > 0) then
 	MOVF	LINEDIFFX,W
 	MOVWF	SYSINTEGERTEMPB
 	MOVF	LINEDIFFX_H,W
@@ -1929,15 +2683,22 @@ _LINE:
 	FCALL	SYSCOMPLESSTHANINT
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ELSE47_1
+;LineStepX = 1
 	MOVLW	1
 	MOVWF	LINESTEPX
 	CLRF	LINESTEPX_H
+;else
 	GOTO	ENDIF47
+GLOBAL	ELSE47_1
 ELSE47_1:
+;LineStepX = -1
 	MOVLW	255
 	MOVWF	LINESTEPX
 	MOVWF	LINESTEPX_H
+;end if
+GLOBAL	ENDIF47
 ENDIF47:
+;if (LineDiffY > 0) then
 	MOVF	LINEDIFFY,W
 	MOVWF	SYSINTEGERTEMPB
 	MOVF	LINEDIFFY_H,W
@@ -1947,15 +2708,22 @@ ENDIF47:
 	FCALL	SYSCOMPLESSTHANINT
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ELSE48_1
+;LineStepY = 1
 	MOVLW	1
 	MOVWF	LINESTEPY
 	CLRF	LINESTEPY_H
+;else
 	GOTO	ENDIF48
+GLOBAL	ELSE48_1
 ELSE48_1:
+;LineStepY = -1
 	MOVLW	255
 	MOVWF	LINESTEPY
 	MOVWF	LINESTEPY_H
+;end if
+GLOBAL	ENDIF48
 ENDIF48:
+;LineDiffX = LineStepX * LineDiffX
 	MOVF	LINESTEPX,W
 	MOVWF	SYSINTEGERTEMPA
 	MOVF	LINESTEPX_H,W
@@ -1969,6 +2737,7 @@ ENDIF48:
 	MOVWF	LINEDIFFX
 	MOVF	SYSINTEGERTEMPX_H,W
 	MOVWF	LINEDIFFX_H
+;LineDiffY = LineStepY * LineDiffY
 	MOVF	LINESTEPY,W
 	MOVWF	SYSINTEGERTEMPA
 	MOVF	LINESTEPY_H,W
@@ -1982,6 +2751,7 @@ ENDIF48:
 	MOVWF	LINEDIFFY
 	MOVF	SYSINTEGERTEMPX_H,W
 	MOVWF	LINEDIFFY_H
+;LineDiffX_x2 = LineDiffX*2
 	MOVF	LINEDIFFX,W
 	MOVWF	SYSINTEGERTEMPA
 	MOVF	LINEDIFFX_H,W
@@ -1994,6 +2764,7 @@ ENDIF48:
 	MOVWF	LINEDIFFX_X2
 	MOVF	SYSINTEGERTEMPX_H,W
 	MOVWF	LINEDIFFX_X2_H
+;LineDiffY_x2 = LineDiffY*2
 	MOVF	LINEDIFFY,W
 	MOVWF	SYSINTEGERTEMPA
 	MOVF	LINEDIFFY_H,W
@@ -2006,6 +2777,7 @@ ENDIF48:
 	MOVWF	LINEDIFFY_X2
 	MOVF	SYSINTEGERTEMPX_H,W
 	MOVWF	LINEDIFFY_X2_H
+;if ( LineDiffX >= LineDiffY) then
 	MOVF	LINEDIFFX,W
 	MOVWF	SYSINTEGERTEMPA
 	MOVF	LINEDIFFX_H,W
@@ -2018,12 +2790,15 @@ ENDIF48:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ELSE49_1
+;LineErr = LineDiffY_x2 - LineDiffX
 	MOVF	LINEDIFFX,W
 	SUBWF	LINEDIFFY_X2,W
 	MOVWF	LINEERR
 	MOVF	LINEDIFFX_H,W
 	SUBWFB	LINEDIFFY_X2_H,W
 	MOVWF	LINEERR_H
+;do while (   LineX1 <>  LineX2 )
+GLOBAL	SYSDOLOOP_S5
 SYSDOLOOP_S5:
 	BANKSEL	LINEX1
 	MOVF	LINEX1,W
@@ -2040,6 +2815,7 @@ SYSDOLOOP_S5:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	SYSDOLOOP_E5
+;PSet (   LineX1,   LineY1, LineColour )
 	MOVF	LINEX1,W
 	MOVWF	GLCDX
 	BANKSEL	LINEY1
@@ -2051,10 +2827,12 @@ SYSDOLOOP_S5:
 	MOVF	LINECOLOUR_H,W
 	MOVWF	GLCDCOLOUR_H
 	FCALL	PSET_SSD1306
+;LineX1 += LineStepX
 	MOVF	LINESTEPX,W
 	ADDWF	LINEX1,F
 	MOVF	LINESTEPX_H,W
 	ADDWFC	LINEX1_H,F
+;if ( LineErr < 0) then
 	MOVF	LINEERR,W
 	MOVWF	SYSINTEGERTEMPA
 	MOVF	LINEERR_H,W
@@ -2064,12 +2842,16 @@ SYSDOLOOP_S5:
 	FCALL	SYSCOMPLESSTHANINT
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ELSE50_1
+;LineErr += LineDiffY_x2
 	MOVF	LINEDIFFY_X2,W
 	ADDWF	LINEERR,F
 	MOVF	LINEDIFFY_X2_H,W
 	ADDWFC	LINEERR_H,F
+;else
 	GOTO	ENDIF50
+GLOBAL	ELSE50_1
 ELSE50_1:
+;LineErr += ( LineDiffY_x2 - LineDiffX_x2 )
 	MOVF	LINEDIFFX_X2,W
 	SUBWF	LINEDIFFY_X2,W
 	BANKSEL	SYSTEMP3
@@ -2086,6 +2868,7 @@ ELSE50_1:
 	MOVF	SYSTEMP3_H,W
 	BANKSEL	LINEERR_H
 	ADDWFC	LINEERR_H,F
+;LineY1 += LineStepY
 	MOVF	LINESTEPY,W
 	BANKSEL	LINEY1
 	ADDWF	LINEY1,F
@@ -2093,9 +2876,14 @@ ELSE50_1:
 	MOVF	LINESTEPY_H,W
 	BANKSEL	LINEY1_H
 	ADDWFC	LINEY1_H,F
+;end if
+GLOBAL	ENDIF50
 ENDIF50:
+;loop
 	GOTO	SYSDOLOOP_S5
+GLOBAL	SYSDOLOOP_E5
 SYSDOLOOP_E5:
+;PSet (   LineX1,   LineY1, LineColour )
 	MOVF	LINEX1,W
 	MOVWF	GLCDX
 	BANKSEL	LINEY1
@@ -2107,14 +2895,19 @@ SYSDOLOOP_E5:
 	MOVF	LINECOLOUR_H,W
 	MOVWF	GLCDCOLOUR_H
 	FCALL	PSET_SSD1306
+;else
 	GOTO	ENDIF49
+GLOBAL	ELSE49_1
 ELSE49_1:
+;LineErr = LineDiffX_x2 - LineDiffY
 	MOVF	LINEDIFFY,W
 	SUBWF	LINEDIFFX_X2,W
 	MOVWF	LINEERR
 	MOVF	LINEDIFFY_H,W
 	SUBWFB	LINEDIFFX_X2_H,W
 	MOVWF	LINEERR_H
+;do while (   LineY1 <>  LineY2)
+GLOBAL	SYSDOLOOP_S6
 SYSDOLOOP_S6:
 	BANKSEL	LINEY1
 	MOVF	LINEY1,W
@@ -2130,6 +2923,7 @@ SYSDOLOOP_S6:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	SYSDOLOOP_E6
+;PSet (   LineX1,   LineY1, LineColour )
 	MOVF	LINEX1,W
 	MOVWF	GLCDX
 	BANKSEL	LINEY1
@@ -2141,6 +2935,7 @@ SYSDOLOOP_S6:
 	MOVF	LINECOLOUR_H,W
 	MOVWF	GLCDCOLOUR_H
 	FCALL	PSET_SSD1306
+;LineY1 += LineStepY
 	MOVF	LINESTEPY,W
 	BANKSEL	LINEY1
 	ADDWF	LINEY1,F
@@ -2148,6 +2943,7 @@ SYSDOLOOP_S6:
 	MOVF	LINESTEPY_H,W
 	BANKSEL	LINEY1_H
 	ADDWFC	LINEY1_H,F
+;if ( LineErr < 0) then
 	BANKSEL	LINEERR
 	MOVF	LINEERR,W
 	MOVWF	SYSINTEGERTEMPA
@@ -2158,12 +2954,16 @@ SYSDOLOOP_S6:
 	FCALL	SYSCOMPLESSTHANINT
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ELSE51_1
+;LineErr += LineDiffX_x2
 	MOVF	LINEDIFFX_X2,W
 	ADDWF	LINEERR,F
 	MOVF	LINEDIFFX_X2_H,W
 	ADDWFC	LINEERR_H,F
+;else
 	GOTO	ENDIF51
+GLOBAL	ELSE51_1
 ELSE51_1:
+;LineErr += ( LineDiffX_x2 - LineDiffY_x2 )
 	MOVF	LINEDIFFY_X2,W
 	SUBWF	LINEDIFFX_X2,W
 	BANKSEL	SYSTEMP3
@@ -2180,13 +2980,19 @@ ELSE51_1:
 	MOVF	SYSTEMP3_H,W
 	BANKSEL	LINEERR_H
 	ADDWFC	LINEERR_H,F
+;LineX1 += LineStepX
 	MOVF	LINESTEPX,W
 	ADDWF	LINEX1,F
 	MOVF	LINESTEPX_H,W
 	ADDWFC	LINEX1_H,F
+;end if
+GLOBAL	ENDIF51
 ENDIF51:
+;loop
 	GOTO	SYSDOLOOP_S6
+GLOBAL	SYSDOLOOP_E6
 SYSDOLOOP_E6:
+;PSet (   LineX1,   LineY1, LineColour )
 	MOVF	LINEX1,W
 	MOVWF	GLCDX
 	BANKSEL	LINEY1
@@ -2198,6 +3004,8 @@ SYSDOLOOP_E6:
 	MOVF	LINECOLOUR_H,W
 	MOVWF	GLCDCOLOUR_H
 	FCALL	PSET_SSD1306
+;end if
+GLOBAL	ENDIF49
 ENDIF49:
 	RETURN
 
@@ -2206,7 +3014,12 @@ ENDIF49:
 ;START OF PROGRAM MEMORY PAGE 1
 	PSECT	PROGMEM1,CLASS=CODE,SPACE=SPACE_CODE,DELTA=2, ABS, OVRLD 
 	ORG	2048
+;SOURCE: GLCD.H (1489)
+GLOBAL	BOX
 BOX:
+;dim GLCDTemp as word
+;Make sure that starting point (1) is always less than end point (2)
+;If LineX1 > LineX2 Then
 	MOVF	LINEX1,W
 	MOVWF	SYSWORDTEMPB
 	MOVF	LINEX1_H,W
@@ -2220,10 +3033,12 @@ BOX:
 	FCALL	SYSCOMPLESSTHAN16
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF12
+;GLCDTemp = LineX1
 	MOVF	LINEX1,W
 	MOVWF	GLCDTEMP
 	MOVF	LINEX1_H,W
 	MOVWF	GLCDTEMP_H
+;LineX1 = LineX2
 	BANKSEL	LINEX2
 	MOVF	LINEX2,W
 	BANKSEL	LINEX1
@@ -2232,6 +3047,7 @@ BOX:
 	MOVF	LINEX2_H,W
 	BANKSEL	LINEX1_H
 	MOVWF	LINEX1_H
+;LineX2 = GLCDTemp
 	MOVF	GLCDTEMP,W
 	BANKSEL	LINEX2
 	MOVWF	LINEX2
@@ -2239,7 +3055,10 @@ BOX:
 	MOVF	GLCDTEMP_H,W
 	BANKSEL	LINEX2_H
 	MOVWF	LINEX2_H
+;End If
+GLOBAL	ENDIF12
 ENDIF12:
+;If LineY1 > LineY2 Then
 	BANKSEL	LINEY1
 	MOVF	LINEY1,W
 	MOVWF	SYSWORDTEMPB
@@ -2253,6 +3072,7 @@ ENDIF12:
 	FCALL	SYSCOMPLESSTHAN16
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF13
+;GLCDTemp = LineY1
 	BANKSEL	LINEY1
 	MOVF	LINEY1,W
 	BANKSEL	GLCDTEMP
@@ -2261,11 +3081,13 @@ ENDIF12:
 	MOVF	LINEY1_H,W
 	BANKSEL	GLCDTEMP_H
 	MOVWF	GLCDTEMP_H
+;LineY1 = LineY2
 	BANKSEL	LINEY2
 	MOVF	LINEY2,W
 	MOVWF	LINEY1
 	MOVF	LINEY2_H,W
 	MOVWF	LINEY1_H
+;LineY2 = GLCDTemp
 	BANKSEL	GLCDTEMP
 	MOVF	GLCDTEMP,W
 	BANKSEL	LINEY2
@@ -2274,13 +3096,20 @@ ENDIF12:
 	MOVF	GLCDTEMP_H,W
 	BANKSEL	LINEY2_H
 	MOVWF	LINEY2_H
+;End If
+GLOBAL	ENDIF13
 ENDIF13:
+;dim DrawLine as word
+;Draw lines going across
+;For DrawLine = LineX1 To LineX2
 	BANKSEL	LINEX1
 	MOVF	LINEX1,W
 	MOVWF	DRAWLINE
 	MOVF	LINEX1_H,W
 	MOVWF	DRAWLINE_H
+GLOBAL	SYSFORLOOP9
 SYSFORLOOP9:
+;PSet DrawLine, LineY1, LineColour
 	MOVF	DRAWLINE,W
 	MOVWF	GLCDX
 	BANKSEL	LINEY1
@@ -2292,6 +3121,7 @@ SYSFORLOOP9:
 	MOVF	LINECOLOUR_H,W
 	MOVWF	GLCDCOLOUR_H
 	CALL	PSET_SSD1306
+;PSet DrawLine, LineY2, LineColour
 	MOVF	DRAWLINE,W
 	MOVWF	GLCDX
 	BANKSEL	LINEY2
@@ -2303,6 +3133,8 @@ SYSFORLOOP9:
 	MOVF	LINECOLOUR_H,W
 	MOVWF	GLCDCOLOUR_H
 	CALL	PSET_SSD1306
+;Next
+;POSITIVE VALUE STEP HANDLER IN FOR-NEXT STATEMENT :#4P 
 	MOVF	DRAWLINE,W
 	BANKSEL	LINEX2
 	SUBWF	LINEX2,W
@@ -2323,12 +3155,18 @@ SYSFORLOOP9:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF14
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	INCF	DRAWLINE,F
 	BTFSC	STATUS,2
 	INCF	DRAWLINE_H,F
 	GOTO	SYSFORLOOP9
+;END IF
+GLOBAL	ENDIF14
 ENDIF14:
+GLOBAL	SYSFORLOOPEND9
 SYSFORLOOPEND9:
+;Draw lines going down
+;For DrawLine = LineY1 To LineY2
 	BANKSEL	LINEY1
 	MOVF	LINEY1,W
 	BANKSEL	DRAWLINE
@@ -2337,7 +3175,9 @@ SYSFORLOOPEND9:
 	MOVF	LINEY1_H,W
 	BANKSEL	DRAWLINE_H
 	MOVWF	DRAWLINE_H
+GLOBAL	SYSFORLOOP10
 SYSFORLOOP10:
+;PSet LineX1, DrawLine, LineColour
 	MOVF	LINEX1,W
 	MOVWF	GLCDX
 	MOVF	DRAWLINE,W
@@ -2347,6 +3187,7 @@ SYSFORLOOP10:
 	MOVF	LINECOLOUR_H,W
 	MOVWF	GLCDCOLOUR_H
 	CALL	PSET_SSD1306
+;PSet LineX2, DrawLine, LineColour
 	BANKSEL	LINEX2
 	MOVF	LINEX2,W
 	BANKSEL	GLCDX
@@ -2358,6 +3199,8 @@ SYSFORLOOP10:
 	MOVF	LINECOLOUR_H,W
 	MOVWF	GLCDCOLOUR_H
 	CALL	PSET_SSD1306
+;Next
+;POSITIVE VALUE STEP HANDLER IN FOR-NEXT STATEMENT :#4P 
 	MOVF	DRAWLINE,W
 	BANKSEL	LINEY2
 	SUBWF	LINEY2,W
@@ -2378,17 +3221,25 @@ SYSFORLOOP10:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF15
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	INCF	DRAWLINE,F
 	BTFSC	STATUS,2
 	INCF	DRAWLINE_H,F
 	GOTO	SYSFORLOOP10
+;END IF
+GLOBAL	ENDIF15
 ENDIF15:
+GLOBAL	SYSFORLOOPEND10
 SYSFORLOOPEND10:
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: GLCD.H (1536)
+GLOBAL	CIRCLE
 CIRCLE:
+;dim  radiusErr, xradius as Integer
+;xradius = Inxradius
 	MOVF	INXRADIUS,W
 	BANKSEL	XRADIUS
 	MOVWF	XRADIUS
@@ -2396,6 +3247,7 @@ CIRCLE:
 	MOVF	INXRADIUS_H,W
 	BANKSEL	XRADIUS_H
 	MOVWF	XRADIUS_H
+;radiusErr = -(xradius/2)
 	MOVF	XRADIUS,W
 	MOVWF	SYSINTEGERTEMPA
 	MOVF	XRADIUS_H,W
@@ -2417,6 +3269,8 @@ CIRCLE:
 	INCF	RADIUSERR,F
 	BTFSC	STATUS,2
 	INCF	RADIUSERR_H,F
+;Do While xradius >=  yordinate
+GLOBAL	SYSDOLOOP_S3
 SYSDOLOOP_S3:
 	MOVF	XRADIUS,W
 	MOVWF	SYSINTEGERTEMPA
@@ -2431,6 +3285,7 @@ SYSDOLOOP_S3:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	SYSDOLOOP_E3
+;Pset ((xoffset + xradius), (yoffset + yordinate), LineColour)
 	BANKSEL	XRADIUS
 	MOVF	XRADIUS,W
 	ADDWF	XOFFSET,W
@@ -2446,6 +3301,7 @@ SYSDOLOOP_S3:
 	MOVF	LINECOLOUR_H,W
 	MOVWF	GLCDCOLOUR_H
 	FCALL	PSET_SSD1306
+;Pset ((xoffset + yordinate), (yoffset + xradius), LineColour)
 	BANKSEL	YORDINATE
 	MOVF	YORDINATE,W
 	BANKSEL	XOFFSET
@@ -2463,6 +3319,7 @@ SYSDOLOOP_S3:
 	MOVF	LINECOLOUR_H,W
 	MOVWF	GLCDCOLOUR_H
 	FCALL	PSET_SSD1306
+;Pset ((xoffset - xradius), (yoffset + yordinate), LineColour)
 	BANKSEL	XRADIUS
 	MOVF	XRADIUS,W
 	SUBWF	XOFFSET,W
@@ -2478,6 +3335,7 @@ SYSDOLOOP_S3:
 	MOVF	LINECOLOUR_H,W
 	MOVWF	GLCDCOLOUR_H
 	FCALL	PSET_SSD1306
+;Pset ((xoffset - yordinate), (yoffset + xradius), LineColour)
 	BANKSEL	YORDINATE
 	MOVF	YORDINATE,W
 	BANKSEL	XOFFSET
@@ -2495,6 +3353,7 @@ SYSDOLOOP_S3:
 	MOVF	LINECOLOUR_H,W
 	MOVWF	GLCDCOLOUR_H
 	FCALL	PSET_SSD1306
+;Pset ((xoffset - xradius), (yoffset - yordinate), LineColour)
 	BANKSEL	XRADIUS
 	MOVF	XRADIUS,W
 	SUBWF	XOFFSET,W
@@ -2510,6 +3369,7 @@ SYSDOLOOP_S3:
 	MOVF	LINECOLOUR_H,W
 	MOVWF	GLCDCOLOUR_H
 	FCALL	PSET_SSD1306
+;Pset ((xoffset - yordinate), (yoffset - xradius), LineColour)
 	BANKSEL	YORDINATE
 	MOVF	YORDINATE,W
 	BANKSEL	XOFFSET
@@ -2527,6 +3387,7 @@ SYSDOLOOP_S3:
 	MOVF	LINECOLOUR_H,W
 	MOVWF	GLCDCOLOUR_H
 	FCALL	PSET_SSD1306
+;Pset ((xoffset + xradius), (yoffset - yordinate), LineColour)
 	BANKSEL	XRADIUS
 	MOVF	XRADIUS,W
 	ADDWF	XOFFSET,W
@@ -2542,6 +3403,7 @@ SYSDOLOOP_S3:
 	MOVF	LINECOLOUR_H,W
 	MOVWF	GLCDCOLOUR_H
 	FCALL	PSET_SSD1306
+;Pset ((xoffset + yordinate), (yoffset - xradius), LineColour)
 	BANKSEL	YORDINATE
 	MOVF	YORDINATE,W
 	BANKSEL	XOFFSET
@@ -2559,8 +3421,10 @@ SYSDOLOOP_S3:
 	MOVF	LINECOLOUR_H,W
 	MOVWF	GLCDCOLOUR_H
 	FCALL	PSET_SSD1306
+;yordinate ++
 	BANKSEL	YORDINATE
 	INCF	YORDINATE,F
+;If radiusErr < 0 Then
 	BANKSEL	RADIUSERR
 	MOVF	RADIUSERR,W
 	MOVWF	SYSINTEGERTEMPA
@@ -2572,6 +3436,7 @@ SYSDOLOOP_S3:
 	FCALL	SYSCOMPLESSTHANINT
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ELSE16_1
+;radiusErr = radiusErr + 2 * yordinate + 1
 	BCF	STATUS,0
 	BANKSEL	YORDINATE
 	RLF	YORDINATE,W
@@ -2588,13 +3453,17 @@ SYSDOLOOP_S3:
 	MOVLW	0
 	ADDWFC	SYSTEMP1_H,W
 	MOVWF	RADIUSERR_H
+;else
 	GOTO	ENDIF16
+GLOBAL	ELSE16_1
 ELSE16_1:
+;xradius --
 	MOVLW	1
 	BANKSEL	XRADIUS
 	SUBWF	XRADIUS,F
 	MOVLW	0
 	SUBWFB	XRADIUS_H,F
+;radiusErr = radiusErr + 2 * (yordinate - xradius + 1)
 	MOVF	XRADIUS,W
 	BANKSEL	YORDINATE
 	SUBWF	YORDINATE,W
@@ -2624,13 +3493,18 @@ ELSE16_1:
 	ADDWF	RADIUSERR,F
 	MOVF	SYSINTEGERTEMPX_H,W
 	ADDWFC	RADIUSERR_H,F
+;end if
+GLOBAL	ENDIF16
 ENDIF16:
+;Loop
 	GOTO	SYSDOLOOP_S3
+GLOBAL	SYSDOLOOP_E3
 SYSDOLOOP_E3:
 	RETURN
 
 ;********************************************************************************
 
+GLOBAL	GLCDCHARCOL3
 GLCDCHARCOL3:
 	MOVLW	113
 	SUBWF	SYSSTRINGA, W
@@ -2645,6 +3519,7 @@ GLCDCHARCOL3:
 	MOVWF	PCLATH
 	MOVF	SYSSTRINGA, W
 	MOVWF	PCL
+GLOBAL	TABLEGLCDCHARCOL3
 TABLEGLCDCHARCOL3:
 	RETLW	112
 	RETLW	0
@@ -2762,6 +3637,7 @@ TABLEGLCDCHARCOL3:
 
 ;********************************************************************************
 
+GLOBAL	GLCDCHARCOL4
 GLCDCHARCOL4:
 	MOVLW	113
 	SUBWF	SYSSTRINGA, W
@@ -2776,6 +3652,7 @@ GLCDCHARCOL4:
 	MOVWF	PCLATH
 	MOVF	SYSSTRINGA, W
 	MOVWF	PCL
+GLOBAL	TABLEGLCDCHARCOL4
 TABLEGLCDCHARCOL4:
 	RETLW	112
 	RETLW	254
@@ -2893,6 +3770,7 @@ TABLEGLCDCHARCOL4:
 
 ;********************************************************************************
 
+GLOBAL	GLCDCHARCOL5
 GLCDCHARCOL5:
 	MOVLW	113
 	SUBWF	SYSSTRINGA, W
@@ -2907,6 +3785,7 @@ GLCDCHARCOL5:
 	MOVWF	PCLATH
 	MOVF	SYSSTRINGA, W
 	MOVWF	PCL
+GLOBAL	TABLEGLCDCHARCOL5
 TABLEGLCDCHARCOL5:
 	RETLW	112
 	RETLW	124
@@ -3024,6 +3903,7 @@ TABLEGLCDCHARCOL5:
 
 ;********************************************************************************
 
+GLOBAL	GLCDCHARCOL6
 GLCDCHARCOL6:
 	MOVLW	113
 	SUBWF	SYSSTRINGA, W
@@ -3038,6 +3918,7 @@ GLCDCHARCOL6:
 	MOVWF	PCLATH
 	MOVF	SYSSTRINGA, W
 	MOVWF	PCL
+GLOBAL	TABLEGLCDCHARCOL6
 TABLEGLCDCHARCOL6:
 	RETLW	112
 	RETLW	56
@@ -3155,6 +4036,7 @@ TABLEGLCDCHARCOL6:
 
 ;********************************************************************************
 
+GLOBAL	GLCDCHARCOL7
 GLCDCHARCOL7:
 	MOVLW	113
 	SUBWF	SYSSTRINGA, W
@@ -3169,6 +4051,7 @@ GLCDCHARCOL7:
 	MOVWF	PCLATH
 	MOVF	SYSSTRINGA, W
 	MOVWF	PCL
+GLOBAL	TABLEGLCDCHARCOL7
 TABLEGLCDCHARCOL7:
 	RETLW	112
 	RETLW	16
@@ -3286,18 +4169,26 @@ TABLEGLCDCHARCOL7:
 
 ;********************************************************************************
 
+;SOURCE: GLCD_SSD1306.H (427)
+GLOBAL	GLCDCLS_SSD1306
 GLCDCLS_SSD1306:
+;initialise global variable. Required variable for Circle in all DEVICE DRIVERS- DO NOT DELETE
+;GLCD_yordinate = 0
 	CLRF	GLCD_YORDINATE
 	CLRF	GLCD_YORDINATE_H
+;For SSD1306_BufferLocationCalc = 0 to 128
+;LEGACY METHOD
 	MOVLW	255
 	BANKSEL	SSD1306_BUFFERLOCATIONCALC
 	MOVWF	SSD1306_BUFFERLOCATIONCALC
 	MOVWF	SSD1306_BUFFERLOCATIONCALC_H
+GLOBAL	SYSFORLOOP11
 SYSFORLOOP11:
 	BANKSEL	SSD1306_BUFFERLOCATIONCALC
 	INCF	SSD1306_BUFFERLOCATIONCALC,F
 	BTFSC	STATUS,2
 	INCF	SSD1306_BUFFERLOCATIONCALC_H,F
+;SSD1306_BufferAlias(SSD1306_BufferLocationCalc) = 0
 	MOVLW	LOW(SSD1306_BUFFERALIAS)
 	ADDWF	SSD1306_BUFFERLOCATIONCALC,W
 	MOVWF	FSR0L
@@ -3305,6 +4196,7 @@ SYSFORLOOP11:
 	ADDWFC	SSD1306_BUFFERLOCATIONCALC_H,W
 	MOVWF	FSR0H
 	CLRF	INDF0
+;Next
 	MOVF	SSD1306_BUFFERLOCATIONCALC,W
 	MOVWF	SYSWORDTEMPA
 	MOVF	SSD1306_BUFFERLOCATIONCALC_H,W
@@ -3316,15 +4208,20 @@ SYSFORLOOP11:
 	FCALL	SYSCOMPLESSTHAN16
 	BTFSC	SYSBYTETEMPX,0
 	GOTO	SYSFORLOOP11
+GLOBAL	SYSFORLOOPEND11
 SYSFORLOOPEND11:
+;1.14 changed to transaction
+;For SSD1306_BufferLocationCalc = 0 to GLCD_HEIGHT-1 step 8
 	BANKSEL	SSD1306_BUFFERLOCATIONCALC
 	CLRF	SSD1306_BUFFERLOCATIONCALC
 	CLRF	SSD1306_BUFFERLOCATIONCALC_H
+GLOBAL	SYSFORLOOP12
 SYSFORLOOP12:
 ;INIT SYSFORLOOPSTEP11 :#0
 	MOVLW	8
 	MOVWF	SYSFORLOOPSTEP11
 	CLRF	SYSFORLOOPSTEP11_H
+;Cursor_Position_SSD1306 ( 0 , SSD1306_BufferLocationCalc )
 	BANKSEL	LOCX
 	CLRF	LOCX
 	BANKSEL	SSD1306_BUFFERLOCATIONCALC
@@ -3332,29 +4229,50 @@ SYSFORLOOP12:
 	MOVWF	LOCY
 	BANKSEL	STATUS
 	FCALL	CURSOR_POSITION_SSD1306
+;Open_Transaction_SSD1306
+;Macro Source: glcd_ssd1306.h (1218)
+;4wire not supported, see Write_Transaction_Data_SSD1306
+;HI2CStart
 	FCALL	HI2CSTART
+;HI2CSend GLCD_I2C_Address
 	MOVLW	120
 	MOVWF	I2CBYTE
 	FCALL	HI2CSEND
+;HI2CSend 0x40
 	MOVLW	64
 	MOVWF	I2CBYTE
 	FCALL	HI2CSEND
+;For GLCDTemp = 0 to 127
+;LEGACY METHOD
 	MOVLW	255
 	MOVWF	GLCDTEMP
+GLOBAL	SYSFORLOOP13
 SYSFORLOOP13:
 	INCF	GLCDTEMP,F
+;Write_Transaction_Data_SSD1306(GLCDBackground)
+;Macro Source: glcd_ssd1306.h (1249)
+;HI2CSend SSD1306SendByte
 	MOVF	GLCDBACKGROUND,W
 	MOVWF	I2CBYTE
 	FCALL	HI2CSEND
+;Next
 	MOVLW	127
 	SUBWF	GLCDTEMP,W
 	BTFSS	STATUS,0
 	GOTO	SYSFORLOOP13
+GLOBAL	SYSFORLOOPEND13
 SYSFORLOOPEND13:
+;Close_Transaction_SSD1306
+;Macro Source: glcd_ssd1306.h (1282)
+;4wire not supported, see Write_Transaction_Data_SSD1306
+;HI2CStop
 	FCALL	HI2CSTOP
+;Next
+;INTEGER NEGATIVE STEP HANDLER IN FOR-NEXT STATEMENT
 	BANKSEL	SYSFORLOOPSTEP11_H
 	BTFSS	SYSFORLOOPSTEP11_H,7
 	GOTO	ELSE20_1
+;SET SYSFORLOOPABSVALUE TO -STEPVALUE :#1 
 	COMF	SYSFORLOOPSTEP11,W
 	MOVWF	SYSFORLOOPABSVALUE12
 	COMF	SYSFORLOOPSTEP11_H,W
@@ -3362,6 +4280,7 @@ SYSFORLOOPEND13:
 	INCF	SYSFORLOOPABSVALUE12,F
 	BTFSC	STATUS,2
 	INCF	SYSFORLOOPABSVALUE12_H,F
+;IF ( SSD1306_BUFFERLOCATIONCALC - 64-1) } [WORD]SYSFORLOOPABSVALUE12 THEN  :#1N 
 	MOVLW	64
 	SUBWF	SSD1306_BUFFERLOCATIONCALC,W
 	MOVWF	SYSTEMP1
@@ -3387,15 +4306,21 @@ SYSFORLOOPEND13:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF21
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A NEGATIVE VALUE
 	BANKSEL	SYSFORLOOPSTEP11
 	MOVF	SYSFORLOOPSTEP11,W
 	ADDWF	SSD1306_BUFFERLOCATIONCALC,F
 	MOVF	SYSFORLOOPSTEP11_H,W
 	ADDWFC	SSD1306_BUFFERLOCATIONCALC_H,F
 	GOTO	SYSFORLOOP12
+;END IF
+GLOBAL	ENDIF21
 ENDIF21:
 	GOTO	ENDIF20
+GLOBAL	ELSE20_1
 ELSE20_1:
+;INTEGER POSITIVE STEP HANDLER IN FOR-NEXT STATEMENT
+;IF ([WORD]64-1 - [WORD]SSD1306_BUFFERLOCATIONCALC) } [WORD]SYSFORLOOPSTEP11 THEN :#1P 
 	MOVF	SSD1306_BUFFERLOCATIONCALC,W
 	SUBLW	63
 	MOVWF	SYSTEMP1
@@ -3416,29 +4341,51 @@ ELSE20_1:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF22
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	BANKSEL	SYSFORLOOPSTEP11
 	MOVF	SYSFORLOOPSTEP11,W
 	ADDWF	SSD1306_BUFFERLOCATIONCALC,F
 	MOVF	SYSFORLOOPSTEP11_H,W
 	ADDWFC	SSD1306_BUFFERLOCATIONCALC_H,F
 	GOTO	SYSFORLOOP12
+;END IF
+GLOBAL	ENDIF22
 ENDIF22:
+;END IF
+GLOBAL	ENDIF20
 ENDIF20:
+GLOBAL	SYSFORLOOPEND12
 SYSFORLOOPEND12:
+;Removed at 1.14. Retained for documentation only
+;Cursor_Position_SSD1306 ( 0 , 0 )
+;for SSD1306_BufferLocationCalc = 0 to GLCD_HEIGHT-1 step 8
+;for GLCDTemp = 0 to 127
+;Write_Data_SSD1306(GLCDBackground)
+;Next
+;next
+;Cursor_Position_SSD1306 ( 0 , 0 )
 	CLRF	LOCX
 	BANKSEL	LOCY
 	CLRF	LOCY
 	BANKSEL	STATUS
 	FCALL	CURSOR_POSITION_SSD1306
+;PrintLocX =0
 	BANKSEL	PRINTLOCX
 	CLRF	PRINTLOCX
+;PrintLocY =0
 	CLRF	PRINTLOCY
 	BANKSEL	STATUS
 	RETURN
 
 ;********************************************************************************
 
+;OVERLOADED SIGNATURE: WORD:WORD:STRING:, SOURCE: GLCD.H (981)
+GLOBAL	GLCDPRINT4
 GLCDPRINT4:
+;GLCD.h Sub GLCDPrint
+;Dim GLCDPrintLoc  as word
+;Dim GLCDPrint_String_Counter, GLCDPrintLen as byte
+;GLCDPrintLen = LCDPrintData(0)
 	BANKSEL	SYSLCDPRINTDATAHANDLER
 	MOVF	SYSLCDPRINTDATAHANDLER,W
 	MOVWF	FSR0L
@@ -3447,9 +4394,13 @@ GLCDPRINT4:
 	MOVF	INDF0,W
 	BANKSEL	GLCDPRINTLEN
 	MOVWF	GLCDPRINTLEN
+;If GLCDPrintLen = 0 Then Exit Sub
 	MOVF	GLCDPRINTLEN,F
 	BTFSC	STATUS,2
+;If GLCDPrintLen = 0 Then Exit Sub
 	RETURN
+;If GLCDPrintLen = 0 Then Exit Sub
+;GLCDPrintLoc = PrintLocX
 	BANKSEL	PRINTLOCX
 	MOVF	PRINTLOCX,W
 	BANKSEL	GLCDPRINTLOC
@@ -3458,9 +4409,13 @@ GLCDPRINT4:
 	MOVF	PRINTLOCX_H,W
 	BANKSEL	GLCDPRINTLOC_H
 	MOVWF	GLCDPRINTLOC_H
+;Write Data
+;For GLCDPrint_String_Counter = 1 To GLCDPrintLen
 	MOVLW	1
 	MOVWF	GLCDPRINT_STRING_COUNTER
+GLOBAL	SYSFORLOOP6
 SYSFORLOOP6:
+;GLCDDrawChar  GLCDPrintLoc, PrintLocY, LCDPrintData(GLCDPrint_String_Counter)
 	MOVF	GLCDPRINTLOC,W
 	MOVWF	CHARLOCX
 	MOVF	GLCDPRINTLOC_H,W
@@ -3488,6 +4443,9 @@ SYSFORLOOP6:
 	MOVF	GLCDFOREGROUND_H,W
 	MOVWF	LINECOLOUR_H
 	FCALL	GLCDDRAWCHAR_SSD1306
+;GLCDPrintIncrementPixelPositionMacro
+;Macro Source: glcd.h (1219)
+;GLCDPrintLoc = GLCDPrintLoc + ( GLCDFontWidth * GLCDfntDefaultsize )+1
 	MOVF	GLCDFONTWIDTH,W
 	MOVWF	SYSBYTETEMPA
 	MOVF	GLCDFNTDEFAULTSIZE,W
@@ -3514,6 +4472,8 @@ SYSFORLOOP6:
 	ADDWFC	SYSTEMP1_H,W
 	BANKSEL	GLCDPRINTLOC_H
 	MOVWF	GLCDPRINTLOC_H
+;Next
+;POSITIVE VALUE STEP HANDLER IN FOR-NEXT STATEMENT :#4P 
 	MOVF	GLCDPRINT_STRING_COUNTER,W
 	SUBWF	GLCDPRINTLEN,W
 	BANKSEL	SYSTEMP1
@@ -3525,10 +4485,16 @@ SYSFORLOOP6:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF7
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	INCF	GLCDPRINT_STRING_COUNTER,F
 	GOTO	SYSFORLOOP6
+;END IF
+GLOBAL	ENDIF7
 ENDIF7:
+GLOBAL	SYSFORLOOPEND6
 SYSFORLOOPEND6:
+;Update the current X position for GLCDPrintString
+;PrintLocX = GLCDPrintLoc
 	MOVF	GLCDPRINTLOC,W
 	BANKSEL	PRINTLOCX
 	MOVWF	PRINTLOCX
@@ -3541,12 +4507,23 @@ SYSFORLOOPEND6:
 
 ;********************************************************************************
 
+;OVERLOADED SIGNATURE: WORD:WORD:LONG:, SOURCE: GLCD.H (1094)
+GLOBAL	GLCDPRINT7
 GLCDPRINT7:
+;Dim SysCalcTempA As Long
+;Dim GLCDPrintLoc as word
+;Dim SysPrintBuffer(10)
+;SysPrintBuffLen = 0
 	BANKSEL	SYSPRINTBUFFLEN
 	CLRF	SYSPRINTBUFFLEN
+;Do
+GLOBAL	SYSDOLOOP_S2
 SYSDOLOOP_S2:
+;Divide number by 10, remainder into buffer
+;SysPrintBuffLen += 1
 	BANKSEL	SYSPRINTBUFFLEN
 	INCF	SYSPRINTBUFFLEN,F
+;SysPrintBuffer(SysPrintBuffLen) = LCDValue % 10
 	MOVLW	LOW(SYSPRINTBUFFER)
 	ADDWF	SYSPRINTBUFFLEN,W
 	MOVWF	FSR0L
@@ -3571,6 +4548,7 @@ SYSDOLOOP_S2:
 	FCALL	SYSDIVSUB32
 	MOVF	SYSLONGTEMPX,W
 	MOVWF	INDF0
+;LCDValue = SysCalcTempA
 	MOVF	SYSCALCTEMPA,W
 	MOVWF	LCDVALUE
 	MOVF	SYSCALCTEMPA_H,W
@@ -3579,6 +4557,7 @@ SYSDOLOOP_S2:
 	MOVWF	LCDVALUE_U
 	MOVF	SYSCALCTEMPA_E,W
 	MOVWF	LCDVALUE_E
+;Loop While LCDValue <> 0
 	MOVF	LCDVALUE,W
 	MOVWF	SYSLONGTEMPA
 	MOVF	LCDVALUE_H,W
@@ -3595,7 +4574,10 @@ SYSDOLOOP_S2:
 	COMF	SYSBYTETEMPX,F
 	BTFSC	SYSBYTETEMPX,0
 	GOTO	SYSDOLOOP_S2
+GLOBAL	SYSDOLOOP_E2
 SYSDOLOOP_E2:
+;Display
+;GLCDPrintLoc = PrintLocX
 	BANKSEL	PRINTLOCX
 	MOVF	PRINTLOCX,W
 	BANKSEL	GLCDPRINTLOC
@@ -3604,16 +4586,19 @@ SYSDOLOOP_E2:
 	MOVF	PRINTLOCX_H,W
 	BANKSEL	GLCDPRINTLOC_H
 	MOVWF	GLCDPRINTLOC_H
+;For GLCDPrint_String_Counter = SysPrintBuffLen To 1 Step -1
 	BANKSEL	SYSPRINTBUFFLEN
 	MOVF	SYSPRINTBUFFLEN,W
 	BANKSEL	GLCDPRINT_STRING_COUNTER
 	MOVWF	GLCDPRINT_STRING_COUNTER
+GLOBAL	SYSFORLOOP7
 SYSFORLOOP7:
 ;INIT SYSFORLOOPSTEP6 :#0
 	MOVLW	255
 	BANKSEL	SYSFORLOOPSTEP6
 	MOVWF	SYSFORLOOPSTEP6
 	MOVWF	SYSFORLOOPSTEP6_H
+;GLCDDrawChar GLCDPrintLoc, PrintLocY, SysPrintBuffer(GLCDPrint_String_Counter) + 48
 	BANKSEL	GLCDPRINTLOC
 	MOVF	GLCDPRINTLOC,W
 	MOVWF	CHARLOCX
@@ -3645,6 +4630,9 @@ SYSFORLOOP7:
 	MOVF	GLCDFOREGROUND_H,W
 	MOVWF	LINECOLOUR_H
 	FCALL	GLCDDRAWCHAR_SSD1306
+;GLCDPrintIncrementPixelPositionMacro
+;Macro Source: glcd.h (1219)
+;GLCDPrintLoc = GLCDPrintLoc + ( GLCDFontWidth * GLCDfntDefaultsize )+1
 	MOVF	GLCDFONTWIDTH,W
 	MOVWF	SYSBYTETEMPA
 	MOVF	GLCDFNTDEFAULTSIZE,W
@@ -3671,10 +4659,13 @@ SYSFORLOOP7:
 	ADDWFC	SYSTEMP1_H,W
 	BANKSEL	GLCDPRINTLOC_H
 	MOVWF	GLCDPRINTLOC_H
+;Next
+;INTEGER NEGATIVE STEP HANDLER IN FOR-NEXT STATEMENT
 	BANKSEL	SYSFORLOOPSTEP6_H
 	BTFSS	SYSFORLOOPSTEP6_H,7
 	GOTO	ELSE8_1
 	BANKSEL	GLCDPRINT_STRING_COUNTER
+;IF ( GLCDPRINT_STRING_COUNTER - 1) } -SYSFORLOOPSTEP6 THEN :#3N
 	DECF	GLCDPRINT_STRING_COUNTER,W
 	BANKSEL	SYSTEMP2
 	MOVWF	SYSTEMP2
@@ -3697,15 +4688,21 @@ SYSFORLOOP7:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF9
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A NEGATIVE VALUE
 	BANKSEL	SYSFORLOOPSTEP6
 	MOVF	SYSFORLOOPSTEP6,W
 	BANKSEL	GLCDPRINT_STRING_COUNTER
 	ADDWF	GLCDPRINT_STRING_COUNTER,F
 	GOTO	SYSFORLOOP7
+;END IF
+GLOBAL	ENDIF9
 ENDIF9:
 	GOTO	ENDIF8
+GLOBAL	ELSE8_1
 ELSE8_1:
+;INTEGER POSITIVE STEP HANDLER IN FOR-NEXT STATEMENT
 	BANKSEL	GLCDPRINT_STRING_COUNTER
+;IF (1 - GLCDPRINT_STRING_COUNTER) } SYSFORLOOPSTEP6 THEN :#3P
 	MOVF	GLCDPRINT_STRING_COUNTER,W
 	SUBLW	1
 	BANKSEL	SYSTEMP2
@@ -3721,14 +4718,22 @@ ELSE8_1:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF10
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	BANKSEL	SYSFORLOOPSTEP6
 	MOVF	SYSFORLOOPSTEP6,W
 	BANKSEL	GLCDPRINT_STRING_COUNTER
 	ADDWF	GLCDPRINT_STRING_COUNTER,F
 	GOTO	SYSFORLOOP7
+;END IF
+GLOBAL	ENDIF10
 ENDIF10:
+;END IF
+GLOBAL	ENDIF8
 ENDIF8:
+GLOBAL	SYSFORLOOPEND7
 SYSFORLOOPEND7:
+;Update the current X position for GLCDPrintString
+;PrintLocX = GLCDPrintLoc
 	MOVF	GLCDPRINTLOC,W
 	BANKSEL	PRINTLOCX
 	MOVWF	PRINTLOCX
@@ -3741,7 +4746,13 @@ SYSFORLOOPEND7:
 
 ;********************************************************************************
 
+;SOURCE: STRING.H (646)
+GLOBAL	FN_PAD
 FN_PAD:
+;Check length of SysInString
+;If SysInString(0) = longer or equal SysStrLen then
+;give back SysInString and exit function
+;If SysInString(0) < SysStrLen Then
 	BANKSEL	SYSSYSINSTRINGHANDLER
 	MOVF	SYSSYSINSTRINGHANDLER,W
 	MOVWF	FSR0L
@@ -3751,12 +4762,15 @@ FN_PAD:
 	SUBWF	INDF0,W
 	BTFSC	STATUS,0
 	GOTO	ELSE67_1
+;SysCharCount = SysInString(0)
 	MOVF	SYSSYSINSTRINGHANDLER,W
 	MOVWF	FSR0L
 	MOVF	SYSSYSINSTRINGHANDLER_H,W
 	MOVWF	FSR0H
 	MOVF	INDF0,W
 	MOVWF	SYSCHARCOUNT
+;clear output string
+;Pad=""
 	MOVLW	LOW PAD
 	MOVWF	FSR1L
 	MOVLW	HIGH PAD
@@ -3767,10 +4781,14 @@ FN_PAD:
 	MOVWF	SYSSTRINGA_H
 	BANKSEL	STATUS
 	FCALL	SYSREADSTRING
+;Copy leftmost characters
+;For SysStringTemp = 1 To SysCharCount
 	MOVLW	1
 	BANKSEL	SYSSTRINGTEMP
 	MOVWF	SYSSTRINGTEMP
+GLOBAL	SYSFORLOOP21
 SYSFORLOOP21:
+;Pad(SysStringTemp) = SysInString(SysStringTemp)
 	MOVF	SYSSTRINGTEMP,W
 	ADDWF	SYSSYSINSTRINGHANDLER,W
 	MOVWF	FSR0L
@@ -3789,6 +4807,8 @@ SYSFORLOOP21:
 	MOVWF	FSR0H
 	MOVF	SYSARRAYTEMP2,W
 	MOVWF	INDF0
+;Next
+;POSITIVE VALUE STEP HANDLER IN FOR-NEXT STATEMENT :#4P 
 	MOVF	SYSSTRINGTEMP,W
 	SUBWF	SYSCHARCOUNT,W
 	MOVWF	SYSTEMP2
@@ -3799,15 +4819,22 @@ SYSFORLOOP21:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF68
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	BANKSEL	SYSSTRINGTEMP
 	INCF	SYSSTRINGTEMP,F
 	GOTO	SYSFORLOOP21
+;END IF
+GLOBAL	ENDIF68
 ENDIF68:
+GLOBAL	SYSFORLOOPEND21
 SYSFORLOOPEND21:
+;For SysStringTemp = SysCharCount+1 to SysStrLen
 	BANKSEL	SYSCHARCOUNT
 	INCF	SYSCHARCOUNT,W
 	MOVWF	SYSSTRINGTEMP
+GLOBAL	SYSFORLOOP22
 SYSFORLOOP22:
+;Pad(SysStringTemp) = SysInString3(1)
 	MOVLW	1
 	ADDWF	SYSSYSINSTRING3HANDLER,W
 	MOVWF	FSR0L
@@ -3826,6 +4853,8 @@ SYSFORLOOP22:
 	MOVWF	FSR0H
 	MOVF	SYSARRAYTEMP1,W
 	MOVWF	INDF0
+;Next
+;POSITIVE VALUE STEP HANDLER IN FOR-NEXT STATEMENT :#4P 
 	MOVF	SYSSTRINGTEMP,W
 	SUBWF	SYSSTRLEN,W
 	MOVWF	SYSTEMP2
@@ -3836,20 +4865,33 @@ SYSFORLOOP22:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF69
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	BANKSEL	SYSSTRINGTEMP
 	INCF	SYSSTRINGTEMP,F
 	GOTO	SYSFORLOOP22
+;END IF
+GLOBAL	ENDIF69
 ENDIF69:
+GLOBAL	SYSFORLOOPEND22
 SYSFORLOOPEND22:
+;set new length to PAD
+;Pad(0) = SysStrLen
 	BANKSEL	SYSSTRLEN
 	MOVF	SYSSTRLEN,W
 	BANKSEL	SYSPAD_0
 	MOVWF	SYSPAD_0
+;else
 	GOTO	ENDIF67
+GLOBAL	ELSE67_1
 ELSE67_1:
+;SysInString is equal or longer than SysStrLen
+;give back old string; copy SysInString to Pad
+;For SysStringTemp = 1 To SysInString(0)
 	MOVLW	1
 	MOVWF	SYSSTRINGTEMP
+GLOBAL	SYSFORLOOP23
 SYSFORLOOP23:
+;Pad(SysStringTemp) = SysInString(SysStringTemp)
 	MOVF	SYSSTRINGTEMP,W
 	ADDWF	SYSSYSINSTRINGHANDLER,W
 	MOVWF	FSR0L
@@ -3868,6 +4910,8 @@ SYSFORLOOP23:
 	MOVWF	FSR0H
 	MOVF	SYSARRAYTEMP2,W
 	MOVWF	INDF0
+;Next
+;POSITIVE VALUE STEP HANDLER IN FOR-NEXT STATEMENT :#4P 
 	MOVF	SYSSYSINSTRINGHANDLER,W
 	MOVWF	FSR0L
 	MOVF	SYSSYSINSTRINGHANDLER_H,W
@@ -3882,11 +4926,16 @@ SYSFORLOOP23:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF70
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	BANKSEL	SYSSTRINGTEMP
 	INCF	SYSSTRINGTEMP,F
 	GOTO	SYSFORLOOP23
+;END IF
+GLOBAL	ENDIF70
 ENDIF70:
+GLOBAL	SYSFORLOOPEND23
 SYSFORLOOPEND23:
+;PAD(0) = SysInString(0)
 	BANKSEL	SYSSYSINSTRINGHANDLER
 	MOVF	SYSSYSINSTRINGHANDLER,W
 	MOVWF	FSR0L
@@ -3896,13 +4945,23 @@ SYSFORLOOPEND23:
 	MOVWF	SYSARRAYTEMP1
 	BANKSEL	SYSPAD_0
 	MOVWF	SYSPAD_0
+;End If
+GLOBAL	ENDIF67
 ENDIF67:
 	BANKSEL	STATUS
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: GLCD_SSD1306.H (883)
+GLOBAL	PSET_SSD1306
 PSET_SSD1306:
+;Set pixel at X, Y on LCD to State
+;X is 0 to 127
+;Y is 0 to 63
+;Origin in top left
+;anything off screen with be rejected
+;if GLCDX => GLCD_WIDTH OR GLCDY => GLCD_HEIGHT Then
 	MOVF	GLCDX,W
 	MOVWF	SYSBYTETEMPA
 	MOVLW	128
@@ -3925,29 +4984,52 @@ PSET_SSD1306:
 	MOVWF	SYSTEMP1
 	BTFSS	SYSTEMP1,0
 	GOTO	ENDIF38
+;exit sub
 	BANKSEL	STATUS
 	RETURN
+;end if
+GLOBAL	ENDIF38
 ENDIF38:
+;1.14 Addresses correct device horizonal page
+;Is YPOS addressing the page we need?
+;SSD1306_BufferLocationCalc = GLCDY
+;Repeat 3
+;Set C Off
+;Rotate SSD1306_BufferLocationCalc Right
+;End Repeat
+;if SSD1306_BufferLocationCalc = _GLCDPage then
+;GLCDY_Temp = ( GLCDY / 8 )* GLCD_WIDTH
+;faster than /8
+;GLCDY_Temp = GLCDY
 	BANKSEL	GLCDY
 	MOVF	GLCDY,W
 	MOVWF	GLCDY_TEMP
+;Repeat 3
 	MOVLW	3
 	BANKSEL	SYSREPEATTEMP2
 	MOVWF	SYSREPEATTEMP2
+GLOBAL	SYSREPEATLOOP2
 SYSREPEATLOOP2:
+;Set C Off
 	BCF	STATUS,0
+;Rotate GLCDY_Temp Right
 	BANKSEL	GLCDY_TEMP
 	RRF	GLCDY_TEMP,F
+;End Repeat
 	BANKSEL	SYSREPEATTEMP2
 	DECFSZ	SYSREPEATTEMP2,F
 	GOTO	SYSREPEATLOOP2
+GLOBAL	SYSREPEATLOOPEND2
 SYSREPEATLOOPEND2:
+;if GLCDY_Temp = _GLCDPage then
 	BANKSEL	_GLCDPAGE
 	MOVF	_GLCDPAGE,W
 	BANKSEL	GLCDY_TEMP
 	SUBWF	GLCDY_TEMP,W
 	BTFSS	STATUS,2
 	GOTO	ELSE39_1
+;Mod the YPOS to get the correct pixel with the page
+;GLCDY = GLCDY mod 8
 	MOVF	GLCDY,W
 	MOVWF	SYSBYTETEMPA
 	MOVLW	8
@@ -3955,10 +5037,18 @@ SYSREPEATLOOPEND2:
 	FCALL	SYSDIVSUB
 	MOVF	SYSBYTETEMPX,W
 	MOVWF	GLCDY
+;Else
 	GOTO	ENDIF39
+GLOBAL	ELSE39_1
 ELSE39_1:
+;Exit if not the page we are looking for
+;exit sub
 	RETURN
+;end if
+GLOBAL	ENDIF39
 ENDIF39:
+;buffer location in LOWMEMORY_GLCD_MODE always equals GLCDX + 1
+;SSD1306_BufferLocationCalc = GLCDX + 1
 	MOVLW	1
 	ADDWF	GLCDX,W
 	BANKSEL	SSD1306_BUFFERLOCATIONCALC
@@ -3966,6 +5056,10 @@ ENDIF39:
 	CLRF	SSD1306_BUFFERLOCATIONCALC_H
 	BTFSC	STATUS,0
 	INCF	SSD1306_BUFFERLOCATIONCALC_H,F
+;don't need to do these calculations for in LOWMEMORY_GLCD_MODE
+;anything beyond buffer boundary?
+;why? X = 127 and Y = 64 (Y is over 63!) will have passed first check....
+;if SSD1306_BufferLocationCalc > GLCD_HEIGHT * GLCD_WIDTH Then
 	MOVF	SSD1306_BUFFERLOCATIONCALC,W
 	MOVWF	SYSWORDTEMPB
 	MOVF	SSD1306_BUFFERLOCATIONCALC_H,W
@@ -3976,7 +5070,10 @@ ENDIF39:
 	BANKSEL	STATUS
 	FCALL	SYSCOMPLESSTHAN16
 	BTFSC	SYSBYTETEMPX,0
+;exit sub
 	RETURN
+;end if
+;GLCDDataTemp = SSD1306_BufferAlias(SSD1306_BufferLocationCalc)
 	MOVLW	LOW(SSD1306_BUFFERALIAS)
 	BANKSEL	SSD1306_BUFFERLOCATIONCALC
 	ADDWF	SSD1306_BUFFERLOCATIONCALC,W
@@ -3987,44 +5084,70 @@ ENDIF39:
 	MOVF	INDF0,W
 	BANKSEL	GLCDDATATEMP
 	MOVWF	GLCDDATATEMP
+;Change data to set/clear pixel
+;GLCDBitNo = GLCDY And 7
 	MOVLW	7
 	ANDWF	GLCDY,W
 	MOVWF	GLCDBITNO
+;If GLCDColour.0 = 0 Then
 	BTFSC	GLCDCOLOUR,0
 	GOTO	ELSE41_1
+;GLCDChange = 254
 	MOVLW	254
 	MOVWF	GLCDCHANGE
+;Set C On
 	BSF	STATUS,0
+;Else
 	GOTO	ENDIF41
+GLOBAL	ELSE41_1
 ELSE41_1:
+;GLCDChange = 1
 	MOVLW	1
 	MOVWF	GLCDCHANGE
+;Set C Off
 	BCF	STATUS,0
+;End If
+GLOBAL	ENDIF41
 ENDIF41:
+;Repeat GLCDBitNo
 	MOVF	GLCDBITNO,W
 	BANKSEL	SYSREPEATTEMP2
 	MOVWF	SYSREPEATTEMP2
 	BTFSC	STATUS,2
 	GOTO	SYSREPEATLOOPEND3
+GLOBAL	SYSREPEATLOOP3
 SYSREPEATLOOP3:
+;Rotate GLCDChange Left
 	BANKSEL	GLCDCHANGE
 	RLF	GLCDCHANGE,F
+;End Repeat
 	BANKSEL	SYSREPEATTEMP2
 	DECFSZ	SYSREPEATTEMP2,F
 	GOTO	SYSREPEATLOOP3
+GLOBAL	SYSREPEATLOOPEND3
 SYSREPEATLOOPEND3:
+;If GLCDColour.0 = 0 Then
 	BANKSEL	GLCDCOLOUR
 	BTFSC	GLCDCOLOUR,0
 	GOTO	ELSE42_1
+;GLCDDataTemp = GLCDDataTemp And GLCDChange
 	MOVF	GLCDDATATEMP,W
 	ANDWF	GLCDCHANGE,W
 	MOVWF	GLCDDATATEMP
+;Else
 	GOTO	ENDIF42
+GLOBAL	ELSE42_1
 ELSE42_1:
+;GLCDDataTemp = GLCDDataTemp Or GLCDChange
 	MOVF	GLCDDATATEMP,W
 	IORWF	GLCDCHANGE,W
 	MOVWF	GLCDDATATEMP
+;End If
+GLOBAL	ENDIF42
 ENDIF42:
+;added 1.14 to isolate from full glcd mode
+;restore address the correct page by adjustng the Y
+;GLCDY = GLCDY + ( 8 * _GLCDPage )
 	BANKSEL	_GLCDPAGE
 	MOVF	_GLCDPAGE,W
 	MOVWF	SYSBYTETEMPA
@@ -4037,6 +5160,7 @@ ENDIF42:
 	MOVWF	SYSTEMP2
 	BANKSEL	GLCDY
 	ADDWF	GLCDY,F
+;if SSD1306_BufferAlias(SSD1306_BufferLocationCalc) <> GLCDDataTemp then
 	MOVLW	LOW(SSD1306_BUFFERALIAS)
 	BANKSEL	SSD1306_BUFFERLOCATIONCALC
 	ADDWF	SSD1306_BUFFERLOCATIONCALC,W
@@ -4049,6 +5173,7 @@ ENDIF42:
 	SUBWF	INDF0,W
 	BTFSC	STATUS,2
 	GOTO	ENDIF43
+;SSD1306_BufferAlias(SSD1306_BufferLocationCalc) = GLCDDataTemp
 	MOVLW	LOW(SSD1306_BUFFERALIAS)
 	BANKSEL	SSD1306_BUFFERLOCATIONCALC
 	ADDWF	SSD1306_BUFFERLOCATIONCALC,W
@@ -4059,14 +5184,23 @@ ENDIF42:
 	BANKSEL	GLCDDATATEMP
 	MOVF	GLCDDATATEMP,W
 	MOVWF	INDF0
+;end if
+GLOBAL	ENDIF43
 ENDIF43:
+;revised 1.14 to isolate from low memory mode
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: STRING.H (76)
+GLOBAL	FN_STR
 FN_STR:
+;SysCharCount = 0
 	BANKSEL	SYSCHARCOUNT
 	CLRF	SYSCHARCOUNT
+;Dim SysCalcTempX As Word
+;Ten Thousands
+;IF SysValTemp >= 10000 then
 	MOVF	SYSVALTEMP,W
 	MOVWF	SYSWORDTEMPA
 	MOVF	SYSVALTEMP_H,W
@@ -4080,6 +5214,7 @@ FN_STR:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF63
+;SysStrData = SysValTemp / 10000
 	BANKSEL	SYSVALTEMP
 	MOVF	SYSVALTEMP,W
 	MOVWF	SYSWORDTEMPA
@@ -4094,11 +5229,14 @@ FN_STR:
 	MOVF	SYSWORDTEMPA,W
 	BANKSEL	SYSSTRDATA
 	MOVWF	SYSSTRDATA
+;SysValTemp = SysCalcTempX
 	MOVF	SYSCALCTEMPX,W
 	MOVWF	SYSVALTEMP
 	MOVF	SYSCALCTEMPX_H,W
 	MOVWF	SYSVALTEMP_H
+;SysCharCount += 1
 	INCF	SYSCHARCOUNT,F
+;Str(SysCharCount) = SysStrData + 48
 	MOVLW	LOW(STR)
 	ADDWF	SYSCHARCOUNT,W
 	MOVWF	FSR0L
@@ -4109,8 +5247,13 @@ FN_STR:
 	MOVLW	48
 	ADDWF	SYSSTRDATA,W
 	MOVWF	INDF0
+;Goto SysValThousands
 	GOTO	SYSVALTHOUSANDS
+;End If
+GLOBAL	ENDIF63
 ENDIF63:
+;Thousands
+;IF SysValTemp >= 1000 then
 	BANKSEL	SYSVALTEMP
 	MOVF	SYSVALTEMP,W
 	MOVWF	SYSWORDTEMPA
@@ -4125,7 +5268,9 @@ ENDIF63:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF64
+GLOBAL	SYSVALTHOUSANDS
 SYSVALTHOUSANDS:
+;SysStrData = SysValTemp / 1000
 	BANKSEL	SYSVALTEMP
 	MOVF	SYSVALTEMP,W
 	MOVWF	SYSWORDTEMPA
@@ -4140,11 +5285,14 @@ SYSVALTHOUSANDS:
 	MOVF	SYSWORDTEMPA,W
 	BANKSEL	SYSSTRDATA
 	MOVWF	SYSSTRDATA
+;SysValTemp = SysCalcTempX
 	MOVF	SYSCALCTEMPX,W
 	MOVWF	SYSVALTEMP
 	MOVF	SYSCALCTEMPX_H,W
 	MOVWF	SYSVALTEMP_H
+;SysCharCount += 1
 	INCF	SYSCHARCOUNT,F
+;Str(SysCharCount) = SysStrData + 48
 	MOVLW	LOW(STR)
 	ADDWF	SYSCHARCOUNT,W
 	MOVWF	FSR0L
@@ -4155,8 +5303,13 @@ SYSVALTHOUSANDS:
 	MOVLW	48
 	ADDWF	SYSSTRDATA,W
 	MOVWF	INDF0
+;Goto SysValHundreds
 	GOTO	SYSVALHUNDREDS
+;End If
+GLOBAL	ENDIF64
 ENDIF64:
+;Hundreds
+;IF SysValTemp >= 100 then
 	BANKSEL	SYSVALTEMP
 	MOVF	SYSVALTEMP,W
 	MOVWF	SYSWORDTEMPA
@@ -4170,7 +5323,9 @@ ENDIF64:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF65
+GLOBAL	SYSVALHUNDREDS
 SYSVALHUNDREDS:
+;SysStrData = SysValTemp / 100
 	BANKSEL	SYSVALTEMP
 	MOVF	SYSVALTEMP,W
 	MOVWF	SYSWORDTEMPA
@@ -4184,11 +5339,14 @@ SYSVALHUNDREDS:
 	MOVF	SYSWORDTEMPA,W
 	BANKSEL	SYSSTRDATA
 	MOVWF	SYSSTRDATA
+;SysValTemp = SysCalcTempX
 	MOVF	SYSCALCTEMPX,W
 	MOVWF	SYSVALTEMP
 	MOVF	SYSCALCTEMPX_H,W
 	MOVWF	SYSVALTEMP_H
+;SysCharCount += 1
 	INCF	SYSCHARCOUNT,F
+;Str(SysCharCount) = SysStrData + 48
 	MOVLW	LOW(STR)
 	ADDWF	SYSCHARCOUNT,W
 	MOVWF	FSR0L
@@ -4199,8 +5357,13 @@ SYSVALHUNDREDS:
 	MOVLW	48
 	ADDWF	SYSSTRDATA,W
 	MOVWF	INDF0
+;Goto SysValTens
 	GOTO	SYSVALTENS
+;End If
+GLOBAL	ENDIF65
 ENDIF65:
+;Tens
+;IF SysValTemp >= 10 Then
 	BANKSEL	SYSVALTEMP
 	MOVF	SYSVALTEMP,W
 	MOVWF	SYSWORDTEMPA
@@ -4214,7 +5377,9 @@ ENDIF65:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF66
+GLOBAL	SYSVALTENS
 SYSVALTENS:
+;SysStrData = SysValTemp / 10
 	BANKSEL	SYSVALTEMP
 	MOVF	SYSVALTEMP,W
 	MOVWF	SYSWORDTEMPA
@@ -4228,11 +5393,14 @@ SYSVALTENS:
 	MOVF	SYSWORDTEMPA,W
 	BANKSEL	SYSSTRDATA
 	MOVWF	SYSSTRDATA
+;SysValTemp = SysCalcTempX
 	MOVF	SYSCALCTEMPX,W
 	MOVWF	SYSVALTEMP
 	MOVF	SYSCALCTEMPX_H,W
 	MOVWF	SYSVALTEMP_H
+;SysCharCount += 1
 	INCF	SYSCHARCOUNT,F
+;Str(SysCharCount) = SysStrData + 48
 	MOVLW	LOW(STR)
 	ADDWF	SYSCHARCOUNT,W
 	MOVWF	FSR0L
@@ -4243,9 +5411,14 @@ SYSVALTENS:
 	MOVLW	48
 	ADDWF	SYSSTRDATA,W
 	MOVWF	INDF0
+;End If
+GLOBAL	ENDIF66
 ENDIF66:
+;Ones
+;SysCharCount += 1
 	BANKSEL	SYSCHARCOUNT
 	INCF	SYSCHARCOUNT,F
+;Str(SysCharCount) = SysValTemp + 48
 	MOVLW	LOW(STR)
 	ADDWF	SYSCHARCOUNT,W
 	MOVWF	FSR0L
@@ -4256,10 +5429,12 @@ ENDIF66:
 	MOVLW	48
 	ADDWF	SYSVALTEMP,W
 	MOVWF	INDF0
+;SysValTemp = SysCalcTempX
 	MOVF	SYSCALCTEMPX,W
 	MOVWF	SYSVALTEMP
 	MOVF	SYSCALCTEMPX_H,W
 	MOVWF	SYSVALTEMP_H
+;Str(0) = SysCharCount
 	MOVF	SYSCHARCOUNT,W
 	BANKSEL	SYSSTR_0
 	MOVWF	SYSSTR_0
@@ -4271,45 +5446,68 @@ ENDIF66:
 ;START OF PROGRAM MEMORY PAGE 2
 	PSECT	PROGMEM2,CLASS=CODE,SPACE=SPACE_CODE,DELTA=2, ABS, OVRLD 
 	ORG	4096
+;SOURCE: GLCD_SSD1306.H (1040)
+GLOBAL	CURSOR_POSITION_SSD1306
 CURSOR_POSITION_SSD1306:
+;dim  PosCharX, PosCharX as Word
+;PosCharY = LocY / 8
+;faster than /8
+;PosCharY = LocY
 	BANKSEL	LOCY
 	MOVF	LOCY,W
 	MOVWF	POSCHARY
+;Repeat 3
 	MOVLW	3
 	MOVWF	SYSREPEATTEMP4
+GLOBAL	SYSREPEATLOOP4
 SYSREPEATLOOP4:
+;Set C Off
 	BCF	STATUS,0
+;Rotate PosCharY Right
 	RRF	POSCHARY,F
+;End Repeat
 	DECFSZ	SYSREPEATTEMP4,F
 	GOTO	SYSREPEATLOOP4
+GLOBAL	SYSREPEATLOOPEND4
 SYSREPEATLOOPEND4:
+;Write_Command_SSD1306( 0xB0 + PosCharY )   ' set page address
 	MOVLW	176
 	ADDWF	POSCHARY,W
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	CALL	WRITE_COMMAND_SSD1306
+;PosCharX = ( LocX  & 0x0f )  ' lower nibble
 	MOVLW	15
 	ANDWF	LOCX,W
 	BANKSEL	POSCHARX
 	MOVWF	POSCHARX
 	CLRF	POSCHARX_H
+;Write_Command_SSD1306( PosCharX )
 	MOVF	POSCHARX,W
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
 	CALL	WRITE_COMMAND_SSD1306
+;PosCharX = LocX
 	MOVF	LOCX,W
 	BANKSEL	POSCHARX
 	MOVWF	POSCHARX
 	CLRF	POSCHARX_H
+;Repeat 4
 	MOVLW	4
 	MOVWF	SYSREPEATTEMP4
+GLOBAL	SYSREPEATLOOP5
 SYSREPEATLOOP5:
+;Set C off
 	BCF	STATUS,0
+;Rotate PosCharX Right
 	RRF	POSCHARX_H,F
 	RRF	POSCHARX,F
+;End Repeat
 	DECFSZ	SYSREPEATTEMP4,F
 	GOTO	SYSREPEATLOOP5
+GLOBAL	SYSREPEATLOOPEND5
 SYSREPEATLOOPEND5:
+;PosCharX = ( PosCharX & 0x0F ) + 0x10
 	MOVLW	15
 	ANDWF	POSCHARX,W
 	MOVWF	SYSTEMP1
@@ -4320,6 +5518,7 @@ SYSREPEATLOOPEND5:
 	MOVLW	0
 	ADDWFC	SYSTEMP1_H,W
 	MOVWF	POSCHARX_H
+;Write_Command_SSD1306 ( PosCharX )
 	MOVF	POSCHARX,W
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
@@ -4327,14 +5526,18 @@ SYSREPEATLOOPEND5:
 
 ;********************************************************************************
 
+GLOBAL	DELAY_MS
 DELAY_MS:
 	INCF	SYSWAITTEMPMS_H, F
+GLOBAL	DMS_START
 DMS_START:
 	MOVLW	14
 	MOVWF	DELAYTEMP2
+GLOBAL	DMS_OUTER
 DMS_OUTER:
 	MOVLW	189
 	MOVWF	DELAYTEMP
+GLOBAL	DMS_INNER
 DMS_INNER:
 	DECFSZ	DELAYTEMP, F
 	GOTO	DMS_INNER
@@ -4348,7 +5551,9 @@ DMS_INNER:
 
 ;********************************************************************************
 
+GLOBAL	DELAY_S
 DELAY_S:
+GLOBAL	DS_START
 DS_START:
 	MOVLW	232
 	MOVWF	SYSWAITTEMPMS
@@ -4361,47 +5566,68 @@ DS_START:
 
 ;********************************************************************************
 
+;SOURCE: GLCD_SSD1306.H (854)
+GLOBAL	FILLEDBOX_SSD1306
 FILLEDBOX_SSD1306:
+;Make sure that starting point (1) is always less than end point (2)
+;If LineX1 > LineX2 Then
 	MOVF	LINEX1,W
 	BANKSEL	LINEX2
 	SUBWF	LINEX2,W
 	BTFSC	STATUS,0
 	GOTO	ENDIF34
+;GLCDTemp = LineX1
 	BANKSEL	LINEX1
 	MOVF	LINEX1,W
 	MOVWF	GLCDTEMP
+;LineX1 = LineX2
 	BANKSEL	LINEX2
 	MOVF	LINEX2,W
 	BANKSEL	LINEX1
 	MOVWF	LINEX1
+;LineX2 = GLCDTemp
 	MOVF	GLCDTEMP,W
 	BANKSEL	LINEX2
 	MOVWF	LINEX2
+;End If
+GLOBAL	ENDIF34
 ENDIF34:
+;If LineY1 > LineY2 Then
 	MOVF	LINEY1,W
 	SUBWF	LINEY2,W
 	BTFSC	STATUS,0
 	GOTO	ENDIF35
+;GLCDTemp = LineY1
 	MOVF	LINEY1,W
 	BANKSEL	GLCDTEMP
 	MOVWF	GLCDTEMP
+;LineY1 = LineY2
 	BANKSEL	LINEY2
 	MOVF	LINEY2,W
 	MOVWF	LINEY1
+;LineY2 = GLCDTemp
 	BANKSEL	GLCDTEMP
 	MOVF	GLCDTEMP,W
 	BANKSEL	LINEY2
 	MOVWF	LINEY2
+;End If
+GLOBAL	ENDIF35
 ENDIF35:
+;Draw lines going across
+;For DrawLine = LineX1 To LineX2
 	BANKSEL	LINEX1
 	MOVF	LINEX1,W
 	MOVWF	DRAWLINE
+GLOBAL	SYSFORLOOP18
 SYSFORLOOP18:
+;For GLCDTemp = LineY1 To LineY2
 	BANKSEL	LINEY1
 	MOVF	LINEY1,W
 	BANKSEL	GLCDTEMP
 	MOVWF	GLCDTEMP
+GLOBAL	SYSFORLOOP19
 SYSFORLOOP19:
+;PSet DrawLine, GLCDTemp, LineColour
 	MOVF	DRAWLINE,W
 	MOVWF	GLCDX
 	MOVF	GLCDTEMP,W
@@ -4411,6 +5637,8 @@ SYSFORLOOP19:
 	MOVF	LINECOLOUR_H,W
 	MOVWF	GLCDCOLOUR_H
 	FCALL	PSET_SSD1306
+;Next
+;POSITIVE VALUE STEP HANDLER IN FOR-NEXT STATEMENT :#4P 
 	MOVF	GLCDTEMP,W
 	BANKSEL	LINEY2
 	SUBWF	LINEY2,W
@@ -4422,10 +5650,16 @@ SYSFORLOOP19:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF36
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	INCF	GLCDTEMP,F
 	GOTO	SYSFORLOOP19
+;END IF
+GLOBAL	ENDIF36
 ENDIF36:
+GLOBAL	SYSFORLOOPEND19
 SYSFORLOOPEND19:
+;Next
+;POSITIVE VALUE STEP HANDLER IN FOR-NEXT STATEMENT :#4P 
 	MOVF	DRAWLINE,W
 	BANKSEL	LINEX2
 	SUBWF	LINEX2,W
@@ -4437,24 +5671,35 @@ SYSFORLOOPEND19:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF37
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	INCF	DRAWLINE,F
 	GOTO	SYSFORLOOP18
+;END IF
+GLOBAL	ENDIF37
 ENDIF37:
+GLOBAL	SYSFORLOOPEND18
 SYSFORLOOPEND18:
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: GLCD.H (1285)
+GLOBAL	GLCDDRAWSTRING
 GLCDDRAWSTRING:
+;dim GLCDPrintLoc as word
+;GLCDPrintLoc = StringLocX
 	BANKSEL	STRINGLOCX
 	MOVF	STRINGLOCX,W
 	BANKSEL	GLCDPRINTLOC
 	MOVWF	GLCDPRINTLOC
 	CLRF	GLCDPRINTLOC_H
+;for xchar = 1 to Chars(0)
 	MOVLW	1
 	BANKSEL	XCHAR
 	MOVWF	XCHAR
+GLOBAL	SYSFORLOOP8
 SYSFORLOOP8:
+;GLCDDrawChar GLCDPrintLoc , CharLocY , Chars(xchar), LineColour
 	BANKSEL	GLCDPRINTLOC
 	MOVF	GLCDPRINTLOC,W
 	MOVWF	CHARLOCX
@@ -4471,6 +5716,9 @@ SYSFORLOOP8:
 	BANKSEL	CHARCODE
 	MOVWF	CHARCODE
 	FCALL	GLCDDRAWCHAR_SSD1306
+;GLCDPrintIncrementPixelPositionMacro
+;Macro Source: glcd.h (1219)
+;GLCDPrintLoc = GLCDPrintLoc + ( GLCDFontWidth * GLCDfntDefaultsize )+1
 	MOVF	GLCDFONTWIDTH,W
 	MOVWF	SYSBYTETEMPA
 	MOVF	GLCDFNTDEFAULTSIZE,W
@@ -4497,6 +5745,8 @@ SYSFORLOOP8:
 	ADDWFC	SYSTEMP1_H,W
 	BANKSEL	GLCDPRINTLOC_H
 	MOVWF	GLCDPRINTLOC_H
+;next
+;POSITIVE VALUE STEP HANDLER IN FOR-NEXT STATEMENT :#4P 
 	BANKSEL	SYSCHARSHANDLER
 	MOVF	SYSCHARSHANDLER,W
 	MOVWF	FSR0L
@@ -4512,55 +5762,90 @@ SYSFORLOOP8:
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF11
+;SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
 	BANKSEL	XCHAR
 	INCF	XCHAR,F
 	GOTO	SYSFORLOOP8
+;END IF
+GLOBAL	ENDIF11
 ENDIF11:
+GLOBAL	SYSFORLOOPEND8
 SYSFORLOOPEND8:
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: HWI2C.H (257)
+GLOBAL	HI2CMODE
 HI2CMODE:
 ;asm showdebug  This method sets the variable `HI2CCurrentMode`, and, if required, sets the SSPCON1.bits
+;#ifdef var(SSPCON1) added to separate from newer i2C module which does not have an SSPCON1
+;set SSPSTAT.SMP on
 	BANKSEL	SSP1STAT
 	BSF	SSP1STAT,7
+;set SSPCON1.CKP on
 	BSF	SSP1CON1,4
+;set SSPCON1.WCOL Off
 	BCF	SSP1CON1,7
+;Select mode and clock
+;If HI2CCurrentMode = Master Then
 	MOVLW	12
 	BANKSEL	HI2CCURRENTMODE
 	SUBWF	HI2CCURRENTMODE,W
 	BTFSS	STATUS,2
 	GOTO	ENDIF86
+;set SSPCON1.SSPM3 on
 	BANKSEL	SSP1CON1
 	BSF	SSP1CON1,3
+;set SSPCON1.SSPM2 off
 	BCF	SSP1CON1,2
+;set SSPCON1.SSPM1 off
 	BCF	SSP1CON1,1
+;set SSPCON1.SSPM0 off
 	BCF	SSP1CON1,0
+;SSPADD = HI2C_BAUD_TEMP and 127
 	MOVLW	79
 	MOVWF	SSP1ADD
+;end if
+GLOBAL	ENDIF86
 ENDIF86:
+;if HI2CCurrentMode = Slave then
 	BANKSEL	HI2CCURRENTMODE
 	MOVF	HI2CCURRENTMODE,F
 	BTFSS	STATUS,2
 	GOTO	ENDIF87
+;set SSPCON1.SSPM3 off
 	BANKSEL	SSP1CON1
 	BCF	SSP1CON1,3
+;set SSPCON1.SSPM2 on
 	BSF	SSP1CON1,2
+;set SSPCON1.SSPM1 on
 	BSF	SSP1CON1,1
+;set SSPCON1.SSPM0 off
 	BCF	SSP1CON1,0
+;end if
+GLOBAL	ENDIF87
 ENDIF87:
+;if HI2CCurrentMode = Slave10 then
 	MOVLW	3
 	BANKSEL	HI2CCURRENTMODE
 	SUBWF	HI2CCURRENTMODE,W
 	BTFSS	STATUS,2
 	GOTO	ENDIF88
+;set SSPCON1.SSPM3 off
 	BANKSEL	SSP1CON1
 	BCF	SSP1CON1,3
+;set SSPCON1.SSPM2 on
 	BSF	SSP1CON1,2
+;set SSPCON1.SSPM1 on
 	BSF	SSP1CON1,1
+;set SSPCON1.SSPM0 on
 	BSF	SSP1CON1,0
+;end if
+GLOBAL	ENDIF88
 ENDIF88:
+;Enable I2C
+;set SSPCON1.SSPEN on
 	BANKSEL	SSP1CON1
 	BSF	SSP1CON1,5
 	BANKSEL	STATUS
@@ -4568,193 +5853,354 @@ ENDIF88:
 
 ;********************************************************************************
 
+;SOURCE: HWI2C.H (428)
+GLOBAL	HI2CSEND
 HI2CSEND:
 ;asm showdebug  This method sets the registers and register bits to send I2C data
+GLOBAL	RETRYHI2CSEND
 RETRYHI2CSEND:
+;Clear WCOL
+;SET SSPCON1.WCOL OFF
 	BANKSEL	SSP1CON1
 	BCF	SSP1CON1,7
+;Load data to send
+;SSPBUF = I2CByte
 	BANKSEL	I2CBYTE
 	MOVF	I2CBYTE,W
 	BANKSEL	SSP1BUF
 	MOVWF	SSP1BUF
+;HI2CWaitMSSP
 	BANKSEL	STATUS
 	CALL	HI2CWAITMSSP
+;if ACKSTAT =  1 then
 	BANKSEL	SSP1CON2
 	BTFSS	SSP1CON2,6
 	GOTO	ELSE73_1
+;HI2CAckPollState = true
 	MOVLW	255
 	BANKSEL	HI2CACKPOLLSTATE
 	MOVWF	HI2CACKPOLLSTATE
+;else
 	GOTO	ENDIF73
+GLOBAL	ELSE73_1
 ELSE73_1:
+;HI2CAckPollState = false
 	BANKSEL	HI2CACKPOLLSTATE
 	CLRF	HI2CACKPOLLSTATE
+;end if
+GLOBAL	ENDIF73
 ENDIF73:
+;If SSPCON1.WCOL = On Then
 	BANKSEL	SSP1CON1
 	BTFSS	SSP1CON1,7
 	GOTO	ENDIF74
+;If HI2CCurrentMode <= 10 Then Goto RetryHI2CSend
 	BANKSEL	HI2CCURRENTMODE
 	MOVF	HI2CCURRENTMODE,W
 	SUBLW	10
 	BTFSC	STATUS,0
+;If HI2CCurrentMode <= 10 Then Goto RetryHI2CSend
 	GOTO	RETRYHI2CSEND
+;If HI2CCurrentMode <= 10 Then Goto RetryHI2CSend
+;End If
+GLOBAL	ENDIF74
 ENDIF74:
+;Release clock (only needed by slave)
+;If HI2CCurrentMode <= 10 Then Set SSPCON1.CKP On
 	BANKSEL	HI2CCURRENTMODE
 	MOVF	HI2CCURRENTMODE,W
 	SUBLW	10
 	BTFSS	STATUS,0
 	GOTO	ENDIF75
+;If HI2CCurrentMode <= 10 Then Set SSPCON1.CKP On
 	BANKSEL	SSP1CON1
 	BSF	SSP1CON1,4
+;If HI2CCurrentMode <= 10 Then Set SSPCON1.CKP On
+GLOBAL	ENDIF75
 ENDIF75:
 	BANKSEL	STATUS
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: HWI2C.H (312)
+GLOBAL	HI2CSTART
 HI2CSTART:
 ;asm showdebug  This method sets the registers and register bits to generate the I2C  START signal
+;If HI2CCurrentMode > 10 Then
 	MOVF	HI2CCURRENTMODE,W
 	SUBLW	10
 	BTFSC	STATUS,0
 	GOTO	ELSE71_1
+;Master_mode operational
+;Set SSP1CON2_SEN On
 	BANKSEL	SSP1CON2
 	BSF	SSP1CON2,0
+;HI2CWaitMSSP
 	BANKSEL	STATUS
 	CALL	HI2CWAITMSSP
+;Else
 	GOTO	ENDIF71
+GLOBAL	ELSE71_1
 ELSE71_1:
+;Slave mode operational
+;Wait Until SSPSTAT.S = On
+GLOBAL	SYSWAITLOOP1
 SYSWAITLOOP1:
 	BANKSEL	SSP1STAT
 	BTFSS	SSP1STAT,3
 	GOTO	SYSWAITLOOP1
+;End If
+GLOBAL	ENDIF71
 ENDIF71:
 	BANKSEL	STATUS
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: HWI2C.H (362)
+GLOBAL	HI2CSTOP
 HI2CSTOP:
+;Master_mode
+;If HI2CCurrentMode > 10 Then
 	MOVF	HI2CCURRENTMODE,W
 	SUBLW	10
 	BTFSC	STATUS,0
 	GOTO	ELSE72_1
+;set SSPIE OFF; disable SSP interrupt, tested by Anobium but not implemented.
+;wait while R_NOT_W = 1   'wait for completion of activities
+GLOBAL	SYSWAITLOOP2
 SYSWAITLOOP2:
 	BANKSEL	SSP1STAT
 	BTFSC	SSP1STAT,2
 	GOTO	SYSWAITLOOP2
+;Set SSPCON2.PEN On
 	BSF	SSP1CON2,2
+;Set SSPCON2.PEN On
 	BSF	SSP1CON2,2
+;HI2CWaitMSSP
 	BANKSEL	STATUS
 	CALL	HI2CWAITMSSP
+;Slave mode
+;Else
 	GOTO	ENDIF72
+GLOBAL	ELSE72_1
 ELSE72_1:
+;Wait Until SSPSTAT.P = On
+GLOBAL	SYSWAITLOOP3
 SYSWAITLOOP3:
 	BANKSEL	SSP1STAT
 	BTFSS	SSP1STAT,4
 	GOTO	SYSWAITLOOP3
+;End If
+GLOBAL	ENDIF72
 ENDIF72:
 	BANKSEL	STATUS
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: HWI2C.H (515)
+GLOBAL	HI2CWAITMSSP
 HI2CWAITMSSP:
+;HI2CWaitMSSPTimeout = 0
 	CLRF	HI2CWAITMSSPTIMEOUT
+GLOBAL	HI2CWAITMSSPWAIT
 HI2CWAITMSSPWAIT:
+;HI2CWaitMSSPTimeout++
 	BANKSEL	HI2CWAITMSSPTIMEOUT
 	INCF	HI2CWAITMSSPTIMEOUT,F
+;if HI2CWaitMSSPTimeout < 255 then
 	MOVLW	255
 	SUBWF	HI2CWAITMSSPTIMEOUT,W
 	BTFSC	STATUS,0
 	GOTO	ENDIF77
+;'Support for SSP1IF
+;if SSP1IF = 0 then goto HI2CWaitMSSPWait
 	BANKSEL	PIR3
 	BTFSS	PIR3,6
+;if SSP1IF = 0 then goto HI2CWaitMSSPWait
 	GOTO	HI2CWAITMSSPWAIT
+;if SSP1IF = 0 then goto HI2CWaitMSSPWait
+;SSP1IF = 0
 	BCF	PIR3,6
+;end if
+GLOBAL	ENDIF77
 ENDIF77:
 	BANKSEL	STATUS
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (3078)
+GLOBAL	SYSCOMPEQUAL
 SYSCOMPEQUAL:
+;Dim SysByteTempA, SysByteTempB, SysByteTempX as byte
+;clrf SysByteTempX
 	CLRF	SYSBYTETEMPX
+;movf SysByteTempA, W
 	MOVF	SYSBYTETEMPA, W
+;subwf SysByteTempB, W
 	SUBWF	SYSBYTETEMPB, W
+;btfsc STATUS, Z
 	BTFSC	STATUS,2
+;comf SysByteTempX,F
 	COMF	SYSBYTETEMPX,F
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (3104)
+GLOBAL	SYSCOMPEQUAL16
 SYSCOMPEQUAL16:
+;dim SysWordTempA as word
+;dim SysWordTempB as word
+;dim SysByteTempX as byte
+;clrf SysByteTempX
 	CLRF	SYSBYTETEMPX
+;Test low, exit if false
+;movf SysWordTempA, W
 	MOVF	SYSWORDTEMPA, W
+;subwf SysWordTempB, W
 	SUBWF	SYSWORDTEMPB, W
+;btfss STATUS, Z
 	BTFSS	STATUS,2
+;return
 	RETURN
+;Test high, exit if false
+;movf SysWordTempA_H, W
 	MOVF	SYSWORDTEMPA_H, W
+;subwf SysWordTempB_H, W
 	SUBWF	SYSWORDTEMPB_H, W
+;btfss STATUS, Z
 	BTFSS	STATUS,2
+;return
 	RETURN
+;comf SysByteTempX,F
 	COMF	SYSBYTETEMPX,F
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (3158)
+GLOBAL	SYSCOMPEQUAL32
 SYSCOMPEQUAL32:
+;dim SysLongTempA as long
+;dim SysLongTempB as long
+;dim SysByteTempX as byte
+;clrf SysByteTempX
 	CLRF	SYSBYTETEMPX
+;Test low, exit if false
+;movf SysLongTempA, W
 	MOVF	SYSLONGTEMPA, W
+;subwf SysLongTempB, W
 	SUBWF	SYSLONGTEMPB, W
+;btfss STATUS, Z
 	BTFSS	STATUS,2
+;return
 	RETURN
+;Test high, exit if false
+;movf SysLongTempA_H, W
 	MOVF	SYSLONGTEMPA_H, W
+;subwf SysLongTempB_H, W
 	SUBWF	SYSLONGTEMPB_H, W
+;btfss STATUS, Z
 	BTFSS	STATUS,2
+;return
 	RETURN
+;Test upper, exit if false
+;movf SysLongTempA_U, W
 	MOVF	SYSLONGTEMPA_U, W
+;subwf SysLongTempB_U, W
 	SUBWF	SYSLONGTEMPB_U, W
+;btfss STATUS, Z
 	BTFSS	STATUS,2
+;return
 	RETURN
+;Test exp, exit if false
+;movf SysLongTempA_E, W
 	MOVF	SYSLONGTEMPA_E, W
+;subwf SysLongTempB_E, W
 	SUBWF	SYSLONGTEMPB_E, W
+;btfss STATUS, Z
 	BTFSS	STATUS,2
+;return
 	RETURN
+;comf SysByteTempX,F
 	COMF	SYSBYTETEMPX,F
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (3413)
+GLOBAL	SYSCOMPLESSTHAN16
 SYSCOMPLESSTHAN16:
+;dim SysWordTempA as word
+;dim SysWordTempB as word
+;dim SysByteTempX as byte
+;clrf SysByteTempX
 	CLRF	SYSBYTETEMPX
+;Test High, exit if more
+;movf SysWordTempA_H,W
 	MOVF	SYSWORDTEMPA_H,W
+;subwf SysWordTempB_H,W
 	SUBWF	SYSWORDTEMPB_H,W
+;btfss STATUS,C
 	BTFSS	STATUS,0
+;return
 	RETURN
+;Test high, exit true if less
+;movf SysWordTempB_H,W
 	MOVF	SYSWORDTEMPB_H,W
+;subwf SysWordTempA_H,W
 	SUBWF	SYSWORDTEMPA_H,W
+;btfss STATUS,C
 	BTFSS	STATUS,0
+;goto SCLT16True
 	GOTO	SCLT16TRUE
+;Test Low, exit if more or equal
+;movf SysWordTempB,W
 	MOVF	SYSWORDTEMPB,W
+;subwf SysWordTempA,W
 	SUBWF	SYSWORDTEMPA,W
+;btfsc STATUS,C
 	BTFSC	STATUS,0
+;return
 	RETURN
+GLOBAL	SCLT16TRUE
 SCLT16TRUE:
+;comf SysByteTempX,F
 	COMF	SYSBYTETEMPX,F
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (3714)
+GLOBAL	SYSCOMPLESSTHANINT
 SYSCOMPLESSTHANINT:
+;Dim SysIntegerTempA, SysIntegerTempB, SysDivMultA as Integer
+;Clear result
+;SysByteTempX = 0
 	CLRF	SYSBYTETEMPX
+;Compare sign bits
+;-A
+;If SysIntegerTempA.15 = On Then
 	BTFSS	SYSINTEGERTEMPA_H,7
 	GOTO	ELSE60_1
+;-A, +B, return true
+;If SysIntegerTempB.15 = Off Then
 	BTFSC	SYSINTEGERTEMPB_H,7
 	GOTO	ENDIF61
+;Set SysByteTempX to 255
+;SysByteTempX = Not SysByteTempX
 	COMF	SYSBYTETEMPX,F
+;Exit Sub
 	RETURN
+;End If
+GLOBAL	ENDIF61
 ENDIF61:
+;-A, -B, negate both and swap
+;SysDivMultA = -SysIntegerTempA
 	COMF	SYSINTEGERTEMPA,W
 	MOVWF	SYSDIVMULTA
 	COMF	SYSINTEGERTEMPA_H,W
@@ -4762,6 +6208,7 @@ ENDIF61:
 	INCF	SYSDIVMULTA,F
 	BTFSC	STATUS,2
 	INCF	SYSDIVMULTA_H,F
+;SysIntegerTempA = -SysIntegerTempB
 	COMF	SYSINTEGERTEMPB,W
 	MOVWF	SYSINTEGERTEMPA
 	COMF	SYSINTEGERTEMPB_H,W
@@ -4769,84 +6216,177 @@ ENDIF61:
 	INCF	SYSINTEGERTEMPA,F
 	BTFSC	STATUS,2
 	INCF	SYSINTEGERTEMPA_H,F
+;SysIntegerTempB = SysDivMultA
 	MOVF	SYSDIVMULTA,W
 	MOVWF	SYSINTEGERTEMPB
 	MOVF	SYSDIVMULTA_H,W
 	MOVWF	SYSINTEGERTEMPB_H
+;+A
+;Else
 	GOTO	ENDIF60
+GLOBAL	ELSE60_1
 ELSE60_1:
+;+A, -B, return false
+;If SysIntegerTempB.15 = On Then
 	BTFSC	SYSINTEGERTEMPB_H,7
+;Exit Sub
 	RETURN
+;End If
+;End If
+GLOBAL	ENDIF60
 ENDIF60:
+;Test High, exit if more
+;movf SysIntegerTempA_H,W
 	MOVF	SYSINTEGERTEMPA_H,W
+;subwf SysIntegerTempB_H,W
 	SUBWF	SYSINTEGERTEMPB_H,W
+;btfss STATUS,C
 	BTFSS	STATUS,0
+;return
 	RETURN
+;Test high, exit true if less
+;movf SysIntegerTempB_H,W
 	MOVF	SYSINTEGERTEMPB_H,W
+;subwf SysIntegerTempA_H,W
 	SUBWF	SYSINTEGERTEMPA_H,W
+;btfss STATUS,C
 	BTFSS	STATUS,0
+;goto SCLTIntTrue
 	GOTO	SCLTINTTRUE
+;Test Low, exit if more or equal
+;movf SysIntegerTempB,W
 	MOVF	SYSINTEGERTEMPB,W
+;subwf SysIntegerTempA,W
 	SUBWF	SYSINTEGERTEMPA,W
+;btfsc STATUS,C
 	BTFSC	STATUS,0
+;return
 	RETURN
+GLOBAL	SCLTINTTRUE
 SCLTINTTRUE:
+;comf SysByteTempX,F
 	COMF	SYSBYTETEMPX,F
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (1374)
+GLOBAL	SYSCOPYSTRING
 SYSCOPYSTRING:
+;Dim SysCalcTempA As Byte
+;Dim SysStringLength As Byte
+;Get and copy length
+;movf INDF0, W
 	MOVF	INDF0, W
+;movwf SysCalcTempA
 	MOVWF	SYSCALCTEMPA
+;movwf INDF1
 	MOVWF	INDF1
+;goto SysCopyStringCheck
 	GOTO	SYSCOPYSTRINGCHECK
+;When appending, add length to counter
+GLOBAL	SYSCOPYSTRINGPART
 SYSCOPYSTRINGPART:
+;movf INDF0, W
 	MOVF	INDF0, W
+;movwf SysCalcTempA
 	MOVWF	SYSCALCTEMPA
+;addwf SysStringLength, F
 	ADDWF	SYSSTRINGLENGTH, F
+GLOBAL	SYSCOPYSTRINGCHECK
 SYSCOPYSTRINGCHECK:
+;Exit if length = 0
+;movf SysCalcTempA,F
 	MOVF	SYSCALCTEMPA,F
+;btfsc STATUS,Z
 	BTFSC	STATUS,2
+;return
 	RETURN
+GLOBAL	SYSSTRINGCOPY
 SYSSTRINGCOPY:
+;Increment pointers
+;addfsr 0, 1
 	ADDFSR	0, 1
+;addfsr 1, 1
 	ADDFSR	1, 1
+;Copy character
+;movf INDF0, W
 	MOVF	INDF0, W
+;movwf INDF1
 	MOVWF	INDF1
+;decfsz SysCalcTempA, F
 	DECFSZ	SYSCALCTEMPA, F
+;goto SysStringCopy
 	GOTO	SYSSTRINGCOPY
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (2793)
+GLOBAL	SYSDIVSUB
 SYSDIVSUB:
+;dim SysByteTempA as byte
+;dim SysByteTempB as byte
+;dim SysByteTempX as byte
+;Check for div/0
+;movf SysByteTempB, F
 	MOVF	SYSBYTETEMPB, F
+;btfsc STATUS, Z
 	BTFSC	STATUS,2
+;return
 	RETURN
+;Main calc routine
+;SysByteTempX = 0
 	CLRF	SYSBYTETEMPX
+;SysDivLoop = 8
 	MOVLW	8
 	MOVWF	SYSDIVLOOP
+GLOBAL	SYSDIV8START
 SYSDIV8START:
+;bcf STATUS, C
 	BCF	STATUS,0
+;rlf SysByteTempA, F
 	RLF	SYSBYTETEMPA, F
+;rlf SysByteTempX, F
 	RLF	SYSBYTETEMPX, F
+;movf SysByteTempB, W
 	MOVF	SYSBYTETEMPB, W
+;subwf SysByteTempX, F
 	SUBWF	SYSBYTETEMPX, F
+;bsf SysByteTempA, 0
 	BSF	SYSBYTETEMPA, 0
+;btfsc STATUS, C
 	BTFSC	STATUS,0
+;goto Div8NotNeg
 	GOTO	DIV8NOTNEG
+;bcf SysByteTempA, 0
 	BCF	SYSBYTETEMPA, 0
+;movf SysByteTempB, W
 	MOVF	SYSBYTETEMPB, W
+;addwf SysByteTempX, F
 	ADDWF	SYSBYTETEMPX, F
+GLOBAL	DIV8NOTNEG
 DIV8NOTNEG:
+;decfsz SysDivLoop, F
 	DECFSZ	SYSDIVLOOP, F
+;goto SysDiv8Start
 	GOTO	SYSDIV8START
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (2937)
+GLOBAL	SYSDIVSUB32
 SYSDIVSUB32:
+;dim SysLongTempA as long
+;dim SysLongTempB as long
+;dim SysLongTempX as long
+;#ifdef PIC
+;dim SysLongDivMultA as long
+;dim SysLongDivMultB as long
+;dim SysLongDivMultX as long
+;#endif
+;SysLongDivMultA = SysLongTempA
 	MOVF	SYSLONGTEMPA,W
 	BANKSEL	SYSLONGDIVMULTA
 	MOVWF	SYSLONGDIVMULTA
@@ -4856,6 +6396,7 @@ SYSDIVSUB32:
 	MOVWF	SYSLONGDIVMULTA_U
 	MOVF	SYSLONGTEMPA_E,W
 	MOVWF	SYSLONGDIVMULTA_E
+;SysLongDivMultB = SysLongTempB
 	MOVF	SYSLONGTEMPB,W
 	MOVWF	SYSLONGDIVMULTB
 	MOVF	SYSLONGTEMPB_H,W
@@ -4864,10 +6405,13 @@ SYSDIVSUB32:
 	MOVWF	SYSLONGDIVMULTB_U
 	MOVF	SYSLONGTEMPB_E,W
 	MOVWF	SYSLONGDIVMULTB_E
+;SysLongDivMultX = 0
 	CLRF	SYSLONGDIVMULTX
 	CLRF	SYSLONGDIVMULTX_H
 	CLRF	SYSLONGDIVMULTX_U
 	CLRF	SYSLONGDIVMULTX_E
+;Avoid division by zero
+;if SysLongDivMultB = 0 then
 	MOVF	SYSLONGDIVMULTB,W
 	MOVWF	SYSLONGTEMPA
 	MOVF	SYSLONGDIVMULTB_H,W
@@ -4884,25 +6428,36 @@ SYSDIVSUB32:
 	FCALL	SYSCOMPEQUAL32
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF58
+;SysLongTempA = 0
 	CLRF	SYSLONGTEMPA
 	CLRF	SYSLONGTEMPA_H
 	CLRF	SYSLONGTEMPA_U
 	CLRF	SYSLONGTEMPA_E
+;exit sub
 	RETURN
+;end if
+GLOBAL	ENDIF58
 ENDIF58:
+;Main calc routine
+;SysDivLoop = 32
 	MOVLW	32
 	MOVWF	SYSDIVLOOP
+GLOBAL	SYSDIV32START
 SYSDIV32START:
+;set C off
 	BCF	STATUS,0
+;Rotate SysLongDivMultA Left
 	BANKSEL	SYSLONGDIVMULTA
 	RLF	SYSLONGDIVMULTA,F
 	RLF	SYSLONGDIVMULTA_H,F
 	RLF	SYSLONGDIVMULTA_U,F
 	RLF	SYSLONGDIVMULTA_E,F
+;Rotate SysLongDivMultX Left
 	RLF	SYSLONGDIVMULTX,F
 	RLF	SYSLONGDIVMULTX_H,F
 	RLF	SYSLONGDIVMULTX_U,F
 	RLF	SYSLONGDIVMULTX_E,F
+;SysLongDivMultX = SysLongDivMultX - SysLongDivMultB
 	MOVF	SYSLONGDIVMULTB,W
 	SUBWF	SYSLONGDIVMULTX,F
 	MOVF	SYSLONGDIVMULTB_H,W
@@ -4911,10 +6466,14 @@ SYSDIV32START:
 	SUBWFB	SYSLONGDIVMULTX_U,F
 	MOVF	SYSLONGDIVMULTB_E,W
 	SUBWFB	SYSLONGDIVMULTX_E,F
+;Set SysLongDivMultA.0 On
 	BSF	SYSLONGDIVMULTA,0
+;If C Off Then
 	BTFSC	STATUS,0
 	GOTO	ENDIF59
+;Set SysLongDivMultA.0 Off
 	BCF	SYSLONGDIVMULTA,0
+;SysLongDivMultX = SysLongDivMultX + SysLongDivMultB
 	MOVF	SYSLONGDIVMULTB,W
 	ADDWF	SYSLONGDIVMULTX,F
 	MOVF	SYSLONGDIVMULTB_H,W
@@ -4923,9 +6482,14 @@ SYSDIV32START:
 	ADDWFC	SYSLONGDIVMULTX_U,F
 	MOVF	SYSLONGDIVMULTB_E,W
 	ADDWFC	SYSLONGDIVMULTX_E,F
+;End If
+GLOBAL	ENDIF59
 ENDIF59:
+;decfsz SysDivLoop, F
 	DECFSZ	SYSDIVLOOP, F
+;goto SysDiv32Start
 	GOTO	SYSDIV32START
+;SysLongTempA = SysLongDivMultA
 	MOVF	SYSLONGDIVMULTA,W
 	MOVWF	SYSLONGTEMPA
 	MOVF	SYSLONGDIVMULTA_H,W
@@ -4934,6 +6498,7 @@ ENDIF59:
 	MOVWF	SYSLONGTEMPA_U
 	MOVF	SYSLONGDIVMULTA_E,W
 	MOVWF	SYSLONGTEMPA_E
+;SysLongTempX = SysLongDivMultX
 	MOVF	SYSLONGDIVMULTX,W
 	MOVWF	SYSLONGTEMPX
 	MOVF	SYSLONGDIVMULTX_H,W
@@ -4947,86 +6512,146 @@ ENDIF59:
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (2915)
+GLOBAL	SYSDIVSUBINT
 SYSDIVSUBINT:
+;Dim SysIntegerTempA, SysIntegerTempB, SysIntegerTempX As Integer
+;Dim SysSignByte As Byte
+;Make both inputs positive, decide output type
+;SysSignByte = SysIntegerTempA_H xor SysIntegerTempB_H
 	MOVF	SYSINTEGERTEMPA_H,W
 	XORWF	SYSINTEGERTEMPB_H,W
 	MOVWF	SYSSIGNBYTE
+;If SysIntegerTempA.15 Then SysIntegerTempA = -SysIntegerTempA
 	BTFSS	SYSINTEGERTEMPA_H,7
 	GOTO	ENDIF55
+;If SysIntegerTempA.15 Then SysIntegerTempA = -SysIntegerTempA
 	COMF	SYSINTEGERTEMPA,F
 	COMF	SYSINTEGERTEMPA_H,F
 	INCF	SYSINTEGERTEMPA,F
 	BTFSC	STATUS,2
 	INCF	SYSINTEGERTEMPA_H,F
+;If SysIntegerTempA.15 Then SysIntegerTempA = -SysIntegerTempA
+GLOBAL	ENDIF55
 ENDIF55:
+;If SysIntegerTempB.15 Then SysIntegerTempB = -SysIntegerTempB
 	BTFSS	SYSINTEGERTEMPB_H,7
 	GOTO	ENDIF56
+;If SysIntegerTempB.15 Then SysIntegerTempB = -SysIntegerTempB
 	COMF	SYSINTEGERTEMPB,F
 	COMF	SYSINTEGERTEMPB_H,F
 	INCF	SYSINTEGERTEMPB,F
 	BTFSC	STATUS,2
 	INCF	SYSINTEGERTEMPB_H,F
+;If SysIntegerTempB.15 Then SysIntegerTempB = -SysIntegerTempB
+GLOBAL	ENDIF56
 ENDIF56:
+;Call word divide routine
+;SysDivSub16
 	FCALL	SYSDIVSUB16
+;Negate result if necessary
+;If SysSignByte.7 Then
 	BTFSS	SYSSIGNBYTE,7
 	GOTO	ENDIF57
+;SysIntegerTempA = -SysIntegerTempA
 	COMF	SYSINTEGERTEMPA,F
 	COMF	SYSINTEGERTEMPA_H,F
 	INCF	SYSINTEGERTEMPA,F
 	BTFSC	STATUS,2
 	INCF	SYSINTEGERTEMPA_H,F
+;SysIntegerTempX = -SysIntegerTempX
 	COMF	SYSINTEGERTEMPX,F
 	COMF	SYSINTEGERTEMPX_H,F
 	INCF	SYSINTEGERTEMPX,F
 	BTFSC	STATUS,2
 	INCF	SYSINTEGERTEMPX_H,F
+;End If
+GLOBAL	ENDIF57
 ENDIF57:
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (2518)
+GLOBAL	SYSMULTSUB
 SYSMULTSUB:
+;dim SysByteTempA as byte
+;dim SysByteTempB as byte
+;dim SysByteTempX as byte
+;clrf SysByteTempX
 	CLRF	SYSBYTETEMPX
+GLOBAL	MUL8LOOP
 MUL8LOOP:
+;movf SysByteTempA, W
 	MOVF	SYSBYTETEMPA, W
+;btfsc SysByteTempB, 0
 	BTFSC	SYSBYTETEMPB, 0
+;addwf SysByteTempX, F
 	ADDWF	SYSBYTETEMPX, F
+;bcf STATUS, C
 	BCF	STATUS,0
+;rrf SysByteTempB, F
 	RRF	SYSBYTETEMPB, F
+;bcf STATUS, C
 	BCF	STATUS,0
+;rlf SysByteTempA, F
 	RLF	SYSBYTETEMPA, F
+;movf SysByteTempB, F
 	MOVF	SYSBYTETEMPB, F
+;btfss STATUS, Z
 	BTFSS	STATUS,2
+;goto MUL8LOOP
 	GOTO	MUL8LOOP
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (2565)
+GLOBAL	SYSMULTSUB16
 SYSMULTSUB16:
+;dim SysWordTempA as word
+;dim SysWordTempB as word
+;dim SysWordTempX as word
+;dim SysDivMultA as word
+;dim SysDivMultB as word
+;dim SysDivMultX as word
+;SysDivMultA = SysWordTempA
 	MOVF	SYSWORDTEMPA,W
 	MOVWF	SYSDIVMULTA
 	MOVF	SYSWORDTEMPA_H,W
 	MOVWF	SYSDIVMULTA_H
+;SysDivMultB = SysWordTempB
 	MOVF	SYSWORDTEMPB,W
 	MOVWF	SYSDIVMULTB
 	MOVF	SYSWORDTEMPB_H,W
 	MOVWF	SYSDIVMULTB_H
+;SysDivMultX = 0
 	CLRF	SYSDIVMULTX
 	CLRF	SYSDIVMULTX_H
+GLOBAL	MUL16LOOP
 MUL16LOOP:
+;IF SysDivMultB.0 ON then SysDivMultX += SysDivMultA
 	BTFSS	SYSDIVMULTB,0
 	GOTO	ENDIF82
+;IF SysDivMultB.0 ON then SysDivMultX += SysDivMultA
 	MOVF	SYSDIVMULTA,W
 	ADDWF	SYSDIVMULTX,F
 	MOVF	SYSDIVMULTA_H,W
 	ADDWFC	SYSDIVMULTX_H,F
+;IF SysDivMultB.0 ON then SysDivMultX += SysDivMultA
+GLOBAL	ENDIF82
 ENDIF82:
+;set STATUS.C OFF
 	BCF	STATUS,0
+;rotate SysDivMultB right
 	RRF	SYSDIVMULTB_H,F
 	RRF	SYSDIVMULTB,F
+;set STATUS.C off
 	BCF	STATUS,0
+;rotate SysDivMultA left
 	RLF	SYSDIVMULTA,F
 	RLF	SYSDIVMULTA_H,F
+;if SysDivMultB > 0 then goto MUL16LOOP
 	MOVF	SYSDIVMULTB,W
 	MOVWF	SYSWORDTEMPB
 	MOVF	SYSDIVMULTB_H,W
@@ -5035,7 +6660,10 @@ ENDIF82:
 	CLRF	SYSWORDTEMPA_H
 	CALL	SYSCOMPLESSTHAN16
 	BTFSC	SYSBYTETEMPX,0
+;if SysDivMultB > 0 then goto MUL16LOOP
 	GOTO	MUL16LOOP
+;if SysDivMultB > 0 then goto MUL16LOOP
+;SysWordTempX = SysDivMultX
 	MOVF	SYSDIVMULTX,W
 	MOVWF	SYSWORDTEMPX
 	MOVF	SYSDIVMULTX_H,W
@@ -5044,62 +6672,113 @@ ENDIF82:
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (2663)
+GLOBAL	SYSMULTSUBINT
 SYSMULTSUBINT:
+;Dim SysIntegerTempA, SysIntegerTempB, SysIntegerTempX As Integer
+;Dim SysSignByte As Byte
+;Make both inputs positive, decide output type
+;SysSignByte = SysIntegerTempA_H xor SysIntegerTempB_H
 	MOVF	SYSINTEGERTEMPA_H,W
 	XORWF	SYSINTEGERTEMPB_H,W
 	MOVWF	SYSSIGNBYTE
+;if SysIntegerTempA.15 then SysIntegerTempA = -SysIntegerTempA
 	BTFSS	SYSINTEGERTEMPA_H,7
 	GOTO	ENDIF52
+;if SysIntegerTempA.15 then SysIntegerTempA = -SysIntegerTempA
 	COMF	SYSINTEGERTEMPA,F
 	COMF	SYSINTEGERTEMPA_H,F
 	INCF	SYSINTEGERTEMPA,F
 	BTFSC	STATUS,2
 	INCF	SYSINTEGERTEMPA_H,F
+;if SysIntegerTempA.15 then SysIntegerTempA = -SysIntegerTempA
+GLOBAL	ENDIF52
 ENDIF52:
+;if SysIntegerTempB.15 then SysIntegerTempB = -SysIntegerTempB
 	BTFSS	SYSINTEGERTEMPB_H,7
 	GOTO	ENDIF53
+;if SysIntegerTempB.15 then SysIntegerTempB = -SysIntegerTempB
 	COMF	SYSINTEGERTEMPB,F
 	COMF	SYSINTEGERTEMPB_H,F
 	INCF	SYSINTEGERTEMPB,F
 	BTFSC	STATUS,2
 	INCF	SYSINTEGERTEMPB_H,F
+;if SysIntegerTempB.15 then SysIntegerTempB = -SysIntegerTempB
+GLOBAL	ENDIF53
 ENDIF53:
+;Call word multiply routine
+;SysMultSub16
 	CALL	SYSMULTSUB16
+;Negate result if necessary
+;if SysSignByte.7 then SysIntegerTempX = -SysIntegerTempX
 	BTFSS	SYSSIGNBYTE,7
 	GOTO	ENDIF54
+;if SysSignByte.7 then SysIntegerTempX = -SysIntegerTempX
 	COMF	SYSINTEGERTEMPX,F
 	COMF	SYSINTEGERTEMPX_H,F
 	INCF	SYSINTEGERTEMPX,F
 	BTFSC	STATUS,2
 	INCF	SYSINTEGERTEMPX_H,F
+;if SysSignByte.7 then SysIntegerTempX = -SysIntegerTempX
+GLOBAL	ENDIF54
 ENDIF54:
 	RETURN
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (1571)
+GLOBAL	SYSREADSTRING
 SYSREADSTRING:
+;Dim SysCalcTempA As Byte
+;Dim SysStringLength As Byte
+;Get length
+;call SysStringTables
 	FCALL	SYSSTRINGTABLES
+;movwf SysCalcTempA
 	MOVWF	SYSCALCTEMPA
+;movwf INDF1
 	MOVWF	INDF1
+;goto SysStringReadCheck
 	GOTO	SYSSTRINGREADCHECK
+GLOBAL	SYSREADSTRINGPART
 SYSREADSTRINGPART:
+;Get length
+;call SysStringTables
 	FCALL	SYSSTRINGTABLES
+;movwf SysCalcTempA
 	MOVWF	SYSCALCTEMPA
+;addwf SysStringLength,F
 	ADDWF	SYSSTRINGLENGTH,F
+;Check length
+GLOBAL	SYSSTRINGREADCHECK
 SYSSTRINGREADCHECK:
+;If length is 0, exit
+;movf SysCalcTempA,F
 	MOVF	SYSCALCTEMPA,F
+;btfsc STATUS,Z
 	BTFSC	STATUS,2
+;return
 	RETURN
+;Copy
+GLOBAL	SYSSTRINGREAD
 SYSSTRINGREAD:
+;Get char
+;call SysStringTables
 	FCALL	SYSSTRINGTABLES
+;Set char
+;addfsr 1,1
 	ADDFSR	1,1
+;movwf INDF1
 	MOVWF	INDF1
+;decfsz SysCalcTempA, F
 	DECFSZ	SYSCALCTEMPA, F
+;goto SysStringRead
 	GOTO	SYSSTRINGREAD
 	RETURN
 
 ;********************************************************************************
 
+GLOBAL	SYSSTRINGTABLES
 SYSSTRINGTABLES:
 	MOVF	SYSSTRINGA_H,W
 	MOVWF	PCLATH
@@ -5109,6 +6788,7 @@ SYSSTRINGTABLES:
 	INCF	SYSSTRINGA_H,F
 	MOVWF	PCL
 
+GLOBAL	STRINGTABLE1
 STRINGTABLE1:
 	RETLW	15
 	RETLW	71	;G
@@ -5128,6 +6808,7 @@ STRINGTABLE1:
 	RETLW	67	;C
 
 
+GLOBAL	STRINGTABLE2
 STRINGTABLE2:
 	RETLW	12
 	RETLW	65	;A
@@ -5144,6 +6825,7 @@ STRINGTABLE2:
 	RETLW	50	;2
 
 
+GLOBAL	STRINGTABLE3
 STRINGTABLE3:
 	RETLW	16
 	RETLW	80	;P
@@ -5164,6 +6846,7 @@ STRINGTABLE3:
 	RETLW	111	;O
 
 
+GLOBAL	STRINGTABLE4
 STRINGTABLE4:
 	RETLW	8
 	RETLW	80	;P
@@ -5176,11 +6859,13 @@ STRINGTABLE4:
 	RETLW	114	;R
 
 
+GLOBAL	STRINGTABLE5
 STRINGTABLE5:
 	RETLW	1
 	RETLW	64	;
 
 
+GLOBAL	STRINGTABLE6
 STRINGTABLE6:
 	RETLW	3
 	RETLW	77	;M
@@ -5188,6 +6873,7 @@ STRINGTABLE6:
 	RETLW	122	;Z
 
 
+GLOBAL	STRINGTABLE7
 STRINGTABLE7:
 	RETLW	7
 	RETLW	68	;D
@@ -5199,20 +6885,24 @@ STRINGTABLE7:
 	RETLW	114	;R
 
 
+GLOBAL	STRINGTABLE8
 STRINGTABLE8:
 	RETLW	1
 	RETLW	104	;H
 
 
+GLOBAL	STRINGTABLE56
 STRINGTABLE56:
 	RETLW	1
 	RETLW	32	; 
 
 
+GLOBAL	STRINGTABLE90
 STRINGTABLE90:
 	RETLW	0
 
 
+GLOBAL	STRINGTABLE124
 STRINGTABLE124:
 	RETLW	8
 	RETLW	49	;1
@@ -5227,59 +6917,90 @@ STRINGTABLE124:
 
 ;********************************************************************************
 
+;SOURCE: GLCD_SSD1306.H (224)
+GLOBAL	WRITE_COMMAND_SSD1306
 WRITE_COMMAND_SSD1306:
+;HI2CStart
 	CALL	HI2CSTART
+;HI2CSend GLCD_I2C_Address
 	MOVLW	120
 	MOVWF	I2CBYTE
 	CALL	HI2CSEND
+;HI2CSend 0x00
 	CLRF	I2CBYTE
 	CALL	HI2CSEND
+;HI2CSend SSD1306SendByte
 	BANKSEL	SSD1306SENDBYTE
 	MOVF	SSD1306SENDBYTE,W
 	BANKSEL	I2CBYTE
 	MOVWF	I2CBYTE
 	CALL	HI2CSEND
+;HI2CStop
 	GOTO	HI2CSTOP
 
 ;********************************************************************************
 
+;SOURCE: PICAS.H (7)
+GLOBAL	FN__HEXPICAS
 FN__HEXPICAS:
+;_HexPICAS(0) = 2
 	MOVLW	2
 	BANKSEL	SYS_HEXPICAS_0
 	MOVWF	SYS_HEXPICAS_0
+;dim SysStringTemp as byte
+;Low nibble
+;SysStringTemp = SysValTemp And 0x0F
 	MOVLW	15
 	BANKSEL	SYSVALTEMP
 	ANDWF	SYSVALTEMP,W
 	MOVWF	SYSSTRINGTEMP
+;If SysStringTemp > 9 Then SysStringTemp = SysStringTemp + 7
 	SUBLW	9
 	BTFSC	STATUS,0
 	GOTO	ENDIF44
+;If SysStringTemp > 9 Then SysStringTemp = SysStringTemp + 7
 	MOVLW	7
 	ADDWF	SYSSTRINGTEMP,F
+;If SysStringTemp > 9 Then SysStringTemp = SysStringTemp + 7
+GLOBAL	ENDIF44
 ENDIF44:
+;_HexPICAS(2) = SysStringTemp + 48
 	MOVLW	48
 	ADDWF	SYSSTRINGTEMP,W
 	BANKSEL	SYS_HEXPICAS_2
 	MOVWF	SYS_HEXPICAS_2
+;Get high nibble
+;For SysStringTemp = 1 to 4
+;LEGACY METHOD
 	BANKSEL	SYSSTRINGTEMP
 	CLRF	SYSSTRINGTEMP
+GLOBAL	SYSFORLOOP20
 SYSFORLOOP20:
 	INCF	SYSSTRINGTEMP,F
+;Rotate SysValTemp Right
 	RRF	SYSVALTEMP,F
+;Next
 	MOVLW	4
 	SUBWF	SYSSTRINGTEMP,W
 	BTFSS	STATUS,0
 	GOTO	SYSFORLOOP20
+GLOBAL	SYSFORLOOPEND20
 SYSFORLOOPEND20:
+;SysStringTemp = SysValTemp And 0x0F
 	MOVLW	15
 	ANDWF	SYSVALTEMP,W
 	MOVWF	SYSSTRINGTEMP
+;If SysStringTemp > 9 Then SysStringTemp = SysStringTemp + 7
 	SUBLW	9
 	BTFSC	STATUS,0
 	GOTO	ENDIF46
+;If SysStringTemp > 9 Then SysStringTemp = SysStringTemp + 7
 	MOVLW	7
 	ADDWF	SYSSTRINGTEMP,F
+;If SysStringTemp > 9 Then SysStringTemp = SysStringTemp + 7
+GLOBAL	ENDIF46
 ENDIF46:
+;_HexPICAS(1) = SysStringTemp + 48
 	MOVLW	48
 	ADDWF	SYSSTRINGTEMP,W
 	BANKSEL	SYS_HEXPICAS_1

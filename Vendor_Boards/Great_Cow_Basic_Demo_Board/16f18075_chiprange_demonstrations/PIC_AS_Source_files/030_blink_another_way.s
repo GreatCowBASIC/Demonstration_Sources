@@ -45,10 +45,15 @@
 ;********************************************************************************
 
 ;Set aside RAM memory locations for variables. All variables are global.
+GLOBAL	DELAYTEMP
  DELAYTEMP                        EQU 112          ; 0X70
+GLOBAL	DELAYTEMP2
  DELAYTEMP2                       EQU 113          ; 0X71
+GLOBAL	SYSTEMP1
  SYSTEMP1                         EQU 32          ; 0X20
+GLOBAL	SYSWAITTEMPMS
  SYSWAITTEMPMS                    EQU 114          ; 0X72
+GLOBAL	SYSWAITTEMPMS_H
  SYSWAITTEMPMS_H                  EQU 115          ; 0X73
 
 ;********************************************************************************
@@ -66,18 +71,63 @@
 
 ;START OF PROGRAM MEMORY PAGE 0
 	ORG	5
+GLOBAL	BASPROGRAMSTART
 BASPROGRAMSTART:
 ;CALL INITIALISATION ROUTINES
 	CALL	INITSYS
 
 ;START OF THE MAIN PROGRAM
+;''
+;''  One way to create a delay is to spend time decrementing to a value, but Great Cow BASIC  has timer calculations built in.
+;''  The demonstration will also use a Great Cow BASIC method to toggle the LED using CONSTANTS rather than the port address.
+;''
+;''  LED blinks at a rate of approximately 1.0 seconds, we use CONSTANTS to refer to the LED port.
+;''
+;''  The LED is attached to portb shown below via a suitable resistor to 0v.
+;''
+;''  We set one of the LEDs, you can try setting the another LED..  do not forget those appropiate resistors
+;''
+;''************************************************************************
+;''@author  EvanV
+;''@licence GPL
+;''@version 1.01
+;''@date    15/09/2022
+;----- Configuration
+;Chip Settings.
+;This Configuration may need changing to enable programming in Low Voltage Programming Mode
+;' -------------------PORTA----------------
+;' Bit#:  -7---6---5---4---3---2---1---0---
+;' IO:    ---------------------------------
+;'-----------------------------------------
+;'
+;' -------------------PORTB----------------
+;' Bit#:  -7---6---5---4---3---2---1---0---
+;' IO:    ------------------------LED------
+;'-----------------------------------------
+;'
+;' ------------------PORTC-----------------
+;' Bit#:  -7---6---5---4---3---2---1---0---
+;' IO:    ---------------------------------
+;'-----------------------------------------
+;'
+;Define constants to make things easier. We can reuse these at any time.
+;*****************************************************************************************************
+;Main program commences here.. everything before this is setup for the board.
+;Use a constant
+;Dir LEDD1 Out
 	BCF	TRISB,1
+;Do
+GLOBAL	SYSDOLOOP_S1
 SYSDOLOOP_S1:
+;wait for 1 second which is 1000 ms
+;Wait 1000 ms
 	MOVLW	232
 	MOVWF	SYSWAITTEMPMS
 	MOVLW	3
 	MOVWF	SYSWAITTEMPMS_H
 	CALL	DELAY_MS
+;Set the port bit to NOT value from previous state but using the ! as an alternative to NOT
+;LEDD1 = !LEDD1
 	CLRF	SYSTEMP1
 	BTFSC	PORTB,1
 	INCF	SYSTEMP1,F
@@ -85,22 +135,29 @@ SYSDOLOOP_S1:
 	BCF	LATB,1
 	BTFSC	SYSTEMP1,0
 	BSF	LATB,1
+;Loop
 	GOTO	SYSDOLOOP_S1
+GLOBAL	SYSDOLOOP_E1
 SYSDOLOOP_E1:
+GLOBAL	BASPROGRAMEND
 BASPROGRAMEND:
 	SLEEP
 	GOTO	BASPROGRAMEND
 
 ;********************************************************************************
 
+GLOBAL	DELAY_MS
 DELAY_MS:
 	INCF	SYSWAITTEMPMS_H, F
+GLOBAL	DMS_START
 DMS_START:
 	MOVLW	14
 	MOVWF	DELAYTEMP2
+GLOBAL	DMS_OUTER
 DMS_OUTER:
 	MOVLW	189
 	MOVWF	DELAYTEMP
+GLOBAL	DMS_INNER
 DMS_INNER:
 	DECFSZ	DELAYTEMP, F
 	GOTO	DMS_INNER
@@ -114,30 +171,54 @@ DMS_INNER:
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (159)
+GLOBAL	INITSYS
 INITSYS:
 ;asm showdebug This code block sets the internal oscillator to ChipMHz
+;OSCCON2 = 0
 	BANKSEL	OSCCON2
 	CLRF	OSCCON2
+;OSCCON3 = 0
 	CLRF	OSCCON3
+;Set OSCFRQ values for MCUs with OSCSTAT... the 16F180xx MCU family 32 mhz
+;OSCFRQ = 0b00000101
 	MOVLW	5
 	MOVWF	OSCFRQ
 ;asm showdebug _Complete_the_chip_setup_of_BSR,ADCs,ANSEL_and_other_key_setup_registers_or_register_bits
+;Ensure all ports are set for digital I/O and, turn off A/D
+;SET ADFM OFF
 	BANKSEL	ADCON0
 	BCF	ADCON0,2
+;Switch off A/D Var(ADCON0)
+;SET ADCON0.ADON OFF
 	BCF	ADCON0,7
+;ANSELA = 0
 	BANKSEL	ANSELA
 	CLRF	ANSELA
+;ANSELB = 0
 	CLRF	ANSELB
+;ANSELC = 0
 	CLRF	ANSELC
+;ANSELD = 0
 	CLRF	ANSELD
+;ANSELE = 0
 	CLRF	ANSELE
+;Set comparator register bits for many MCUs with register CM2CON0
+;C1EN = 0
 	BANKSEL	CM1CON0
 	BCF	CM1CON0,7
+;
+;'Turn off all ports
+;PORTA = 0
 	BANKSEL	PORTA
 	CLRF	PORTA
+;PORTB = 0
 	CLRF	PORTB
+;PORTC = 0
 	CLRF	PORTC
+;PORTD = 0
 	CLRF	PORTD
+;PORTE = 0
 	CLRF	PORTE
 	RETURN
 

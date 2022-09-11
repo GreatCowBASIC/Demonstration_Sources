@@ -45,22 +45,35 @@
 ;********************************************************************************
 
 ;Set aside RAM memory locations for variables. All variables are global.
+GLOBAL	ADCVAL
  ADCVAL                           EQU 32          ; 0X20
+GLOBAL	ADCVAL_H
  ADCVAL_H                         EQU 33          ; 0X21
+GLOBAL	ADREADPORT
  ADREADPORT                       EQU 34          ; 0X22
+GLOBAL	DELAYTEMP
  DELAYTEMP                        EQU 112          ; 0X70
+GLOBAL	DELAYTEMP2
  DELAYTEMP2                       EQU 113          ; 0X71
+GLOBAL	READAD10
  READAD10                         EQU 35          ; 0X23
+GLOBAL	READAD10_H
  READAD10_H                       EQU 36          ; 0X24
+GLOBAL	SYSWAITTEMP10US
  SYSWAITTEMP10US                  EQU 117          ; 0X75
+GLOBAL	SYSWAITTEMPMS
  SYSWAITTEMPMS                    EQU 114          ; 0X72
+GLOBAL	SYSWAITTEMPMS_H
  SYSWAITTEMPMS_H                  EQU 115          ; 0X73
+GLOBAL	SYSWAITTEMPS
  SYSWAITTEMPS                     EQU 116          ; 0X74
 
 ;********************************************************************************
 
 ;ALIAS VARIABLES
+GLOBAL	SYSREADAD10WORD
  SYSREADAD10WORD                  EQU 35
+GLOBAL	SYSREADAD10WORD_H
  SYSREADAD10WORD_H                EQU 36
 
 ;********************************************************************************
@@ -78,58 +91,136 @@
 
 ;START OF PROGRAM MEMORY PAGE 0
 	ORG	5
+GLOBAL	BASPROGRAMSTART
 BASPROGRAMSTART:
 ;CALL INITIALISATION ROUTINES
 	CALL	INITSYS
 
 ;START OF THE MAIN PROGRAM
+;''
+;'' This shows how to read the ADC converter and display the
+;'' a proportional delay value by changing/inverting the LEDs state.
+;'' The pot on the board varies the voltage coming in from the ADC.
+;''
+;'' The ADC is referenced to the same Vdd as the device, which
+;'' is nominally is 5V.  The ADC returns the ratio of the voltage
+;'' on Pin RA0 to 5V.  The ADC has a resolution of 12 bits, with 4095
+;'' representing 5V and 0 representing 0V.
+;''
+;'' Rotate the potentiometer to change the LEDs displayed.
+;''
+;''************************************************************************
+;''@author  EvanV
+;''@licence GPL
+;''@version 1.01
+;''@date    15/09/2022
+;----- Configuration
+;Chip Settings.
+;This Configuration change is needed to enable programming in Low Voltage Programming Mode
+;' -------------------PORTA----------------
+;' Bit#:  -7---6---5---4---3---2---1---0---
+;' IO:    ----------------------------ADC--
+;'-----------------------------------------
+;'
+;' -------------------PORTB----------------
+;' Bit#:  -7---6---5---4---3---2---1---0---
+;' IO:    -----------LED--LED-LED LED -----
+;'-----------------------------------------
+;'
+;' ------------------PORTC-----------------
+;' Bit#:  -7---6---5---4---3---2---1---0---
+;' IO:    ---------------------------------
+;'-----------------------------------------
+;'
+;Define constants to make things easier. We can reuse these at any time.
+;Dir     LEDD1         Out
 	BCF	TRISB,1
+;Dir     LEDD2         Out
 	BCF	TRISB,2
+;Dir     LEDD3         Out
 	BCF	TRISB,3
+;Dir     LEDD4         Out
 	BCF	TRISB,4
+;Dir     POTENTIOMETER In
 	BSF	TRISA,0
+;*****************************************************************************************************
+;Main program commences here.. everything before this is setup for the board.
+;Set the initial LED states - change to suit your configuration
+;You may need change to the LEDMASK to suit your port/configuration.  We use a macro as re reuse this statement more that once.
+;LEDSTATEMACRO
 	BCF	LATB,1
 	BCF	LATB,2
 	BCF	LATB,3
 	BSF	LATB,4
+;Wait 1 s
 	MOVLW	1
 	MOVWF	SYSWAITTEMPS
 	CALL	DELAY_S
+;we have change to a larger variable to hold the range of 0 to 1023
+;Dim ADCVal As Word
+;Do
+GLOBAL	SYSDOLOOP_S1
 SYSDOLOOP_S1:
+;ADCVal = ReadAD10 ( AN0  )
 	CLRF	ADREADPORT
 	CALL	FN_READAD106
 	MOVF	SYSREADAD10WORD,W
 	MOVWF	ADCVAL
 	MOVF	SYSREADAD10WORD_H,W
 	MOVWF	ADCVAL_H
+;Wait for the number of milliseconds
+;Wait ADCVal ms
 	MOVF	ADCVAL,W
 	MOVWF	SYSWAITTEMPMS
 	MOVF	ADCVAL_H,W
 	MOVWF	SYSWAITTEMPMS_H
 	CALL	DELAY_MS
+;ROTATE THE LEDS.  WE ARE ONLY INTERESTED IN THE FOUR LEDS SO WE MASK THE OTHER .
+;Set C Off
 	BCF	STATUS,0
+;and shift the contents of LEDState
+;Rotate LEDPORT Right
 	RRF	LATB,F
+;If the LEDState.0is equal to 1 then the sequence has completed, then set the initial state again, the same operation as the starting LED.
+;If LEDPORT.0 = 1 Then
 	BTFSS	LATB,0
 	GOTO	ENDIF1
+;Set the initial LED states
+;LEDSTATEMACRO
 	BCF	LATB,1
 	BCF	LATB,2
 	BCF	LATB,3
 	BSF	LATB,4
+;Mask off the other bits
+;LEDPORT = LEDPORT AND LEDMASK
 	MOVLW	30
 	ANDWF	LATB,F
+;End If
+GLOBAL	ENDIF1
 ENDIF1:
+;Loop
 	GOTO	SYSDOLOOP_S1
+GLOBAL	SYSDOLOOP_E1
 SYSDOLOOP_E1:
+;'' GCB Optimisation file
+;Optmise PWM.h
+;Optimise A-d.h
+;Standard family chips
+;Family of chips based on 16f1688x with ADCON3 register
+GLOBAL	BASPROGRAMEND
 BASPROGRAMEND:
 	SLEEP
 	GOTO	BASPROGRAMEND
 
 ;********************************************************************************
 
+GLOBAL	DELAY_10US
 DELAY_10US:
+GLOBAL	D10US_START
 D10US_START:
 	MOVLW	25
 	MOVWF	DELAYTEMP
+GLOBAL	DELAYUS0
 DELAYUS0:
 	DECFSZ	DELAYTEMP,F
 	GOTO	DELAYUS0
@@ -140,14 +231,18 @@ DELAYUS0:
 
 ;********************************************************************************
 
+GLOBAL	DELAY_MS
 DELAY_MS:
 	INCF	SYSWAITTEMPMS_H, F
+GLOBAL	DMS_START
 DMS_START:
 	MOVLW	14
 	MOVWF	DELAYTEMP2
+GLOBAL	DMS_OUTER
 DMS_OUTER:
 	MOVLW	189
 	MOVWF	DELAYTEMP
+GLOBAL	DMS_INNER
 DMS_INNER:
 	DECFSZ	DELAYTEMP, F
 	GOTO	DMS_INNER
@@ -161,7 +256,9 @@ DMS_INNER:
 
 ;********************************************************************************
 
+GLOBAL	DELAY_S
 DELAY_S:
+GLOBAL	DS_START
 DS_START:
 	MOVLW	232
 	MOVWF	SYSWAITTEMPMS
@@ -174,82 +271,157 @@ DS_START:
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (159)
+GLOBAL	INITSYS
 INITSYS:
 ;asm showdebug This code block sets the internal oscillator to ChipMHz
+;OSCCON2 = 0
 	BANKSEL	OSCCON2
 	CLRF	OSCCON2
+;OSCCON3 = 0
 	CLRF	OSCCON3
+;Set OSCFRQ values for MCUs with OSCSTAT... the 16F180xx MCU family 32 mhz
+;OSCFRQ = 0b00000101
 	MOVLW	5
 	MOVWF	OSCFRQ
 ;asm showdebug _Complete_the_chip_setup_of_BSR,ADCs,ANSEL_and_other_key_setup_registers_or_register_bits
+;Ensure all ports are set for digital I/O and, turn off A/D
+;SET ADFM OFF
 	BANKSEL	ADCON0
 	BCF	ADCON0,2
+;Switch off A/D Var(ADCON0)
+;SET ADCON0.ADON OFF
 	BCF	ADCON0,7
+;ANSELA = 0
 	BANKSEL	ANSELA
 	CLRF	ANSELA
+;ANSELB = 0
 	CLRF	ANSELB
+;ANSELC = 0
 	CLRF	ANSELC
+;ANSELD = 0
 	CLRF	ANSELD
+;ANSELE = 0
 	CLRF	ANSELE
+;Set comparator register bits for many MCUs with register CM2CON0
+;C1EN = 0
 	BANKSEL	CM1CON0
 	BCF	CM1CON0,7
+;
+;'Turn off all ports
+;PORTA = 0
 	BANKSEL	PORTA
 	CLRF	PORTA
+;PORTB = 0
 	CLRF	PORTB
+;PORTC = 0
 	CLRF	PORTC
+;PORTD = 0
 	CLRF	PORTD
+;PORTE = 0
 	CLRF	PORTE
 	RETURN
 
 ;********************************************************************************
 
+;OVERLOADED SIGNATURE: BYTE:, SOURCE: A-D.H (2270)
+GLOBAL	FN_READAD106
 FN_READAD106:
+;Always RIGHT justified
+;SET ADFM ON
 	BANKSEL	ADCON0
 	BSF	ADCON0,2
+;ADPCH = ADReadPort
 	BANKSEL	ADREADPORT
 	MOVF	ADREADPORT,W
 	BANKSEL	ADPCH
 	MOVWF	ADPCH
+;Do conversion
+;LLReadAD 0
+;Macro Source: a-d.h (564)
+;For chips with ADCON3 ***
+;Configure ANSELA/B/C/D @DebugADC_H
+;Select Case ADReadPort
+;End Select  '*** ANSEL Bits should now be set ***
+GLOBAL	SYSSELECTEND1
 SYSSELECTEND1:
+;*** ANSEL Bits are now set ***
+;Set voltage reference
+;ADREF = 0  'Default = 0 /Vref+ = Vdd/ Vref-  = Vss
+;Configure AD clock defaults
+;Set ADCS off 'Clock source = FOSC/ADCLK
 	BCF	ADCON0,4
+;ADCLK = 1 ' default to FOSC/2
 	MOVLW	1
 	MOVWF	ADCLK
+;Conversion Clock Speed
+;SET ADCS OFF  'ADCON0.4
 	BCF	ADCON0,4
+;ADCLK = 15    'FOSC/16
 	MOVLW	15
 	MOVWF	ADCLK
+;Result formatting
+;if ADLeftadjust = 0 then  '10-bit
+;Set ADCON0.2 ON
+;Set ADFM ON
 	BSF	ADCON0,2
+;Set ADFM0 ON
 	BSF	ADCON0,2
+;Else
+;Select Channel
+;ADPCH = ADReadPort  'Configure AD read Channel
 	BANKSEL	ADREADPORT
 	MOVF	ADREADPORT,W
 	BANKSEL	ADPCH
 	MOVWF	ADPCH
+;Enable A/D
+;SET ADON ON
 	BSF	ADCON0,7
+;Acquisition Delay
+;Wait AD_Delay
 	MOVLW	2
 	MOVWF	SYSWAITTEMP10US
 	BANKSEL	STATUS
 	CALL	DELAY_10US
+;Read A/D @1
+;SET GO_NOT_DONE ON
 	BANKSEL	ADCON0
 	BSF	ADCON0,0
+;nop
 	NOP
+;Wait While GO_NOT_DONE ON
+GLOBAL	SYSWAITLOOP1
 SYSWAITLOOP1:
 	BTFSC	ADCON0,0
 	GOTO	SYSWAITLOOP1
+;Switch off A/D
+;SET ADCON0.ADON OFF
 	BCF	ADCON0,7
+;ANSELA = 0
 	BANKSEL	ANSELA
 	CLRF	ANSELA
+;ANSELB = 0
 	CLRF	ANSELB
+;ANSELC = 0
 	CLRF	ANSELC
+;ANSELD = 0
 	CLRF	ANSELD
+;ANSELE = 0
 	CLRF	ANSELE
+;Write output
+;ReadAD10 = ADRESL
 	BANKSEL	ADRESL
 	MOVF	ADRESL,W
 	BANKSEL	READAD10
 	MOVWF	READAD10
 	CLRF	READAD10_H
+;ReadAD10_H = ADRESH
 	BANKSEL	ADRESH
 	MOVF	ADRESH,W
 	BANKSEL	READAD10_H
 	MOVWF	READAD10_H
+;Put A/D format back to normal
+;SET ADFM OFF
 	BANKSEL	ADCON0
 	BCF	ADCON0,2
 	BANKSEL	STATUS
