@@ -13,7 +13,7 @@
   #chip mega328p, 16
 
 ; ----- Define Hardware settings
- dir  PORTB out
+ dir  PORTB.5 out
 
 
 ; ----- Variables
@@ -23,7 +23,7 @@
   Do Forever
 
      ' toggle the first bit - this equates to PORTB.5
-     Toggle @PORTB, 32
+     PORTB.5 = !PORTB.5
      'Then wait after the pin toggles
      Wait 1 s
 
