@@ -32,8 +32,4 @@
 
 ; ----- Support methods.  Subroutines and Functions
 
-' You can toggle any number of pins by addressing the bits using this method
-' Toggle PORT, BIT
-Sub Toggle ( In DestPort As word, In DestBit )
-     Poke DestPort, Peek(DestPort) xor DestBit
-End sub
+;None
