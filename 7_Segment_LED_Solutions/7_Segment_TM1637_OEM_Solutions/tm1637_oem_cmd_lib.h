@@ -15,8 +15,8 @@
 
 ''********************************************************************
 ' Required files "TM1637_OEM_Message.h" & "TM1637_HW_Driver.h"
-
-'   Rev 0.9.10
+'    2022/09/15   Add Script to check/set Constants, change TM_6dReMap to Constant.
+'   Rev 0.9.20
 ''********************************************************************
 'Commands:    [See TM_1637_OEM Demo files for example] & TM1637 OEM CmdLib Ref.pdf
 '  tmSndDec    Value -> Display as Dec
@@ -41,7 +41,7 @@
 
 ' Varaibles:  Note some Vars are shared use between .h includes
 ' Read - InVal, DigPos, NumDigs, TM_DispLen, TM_Disp, TM_Bright, TM_Blank0, TMscroll
-'      -  TM_ScrollRate, TM_FlashRate, TM_6dReMap, TM_dpPos, TM_KeyChk
+'      -  TM_ScrollRate, TM_FlashRate, TM_dpPos, TM_KeyChk
 ' Modified - TM_DispBuf, Dbuf, DigCNT, NumExtr, Nibl, StrPos, StrChr, ChrTblIndx
 '          - BufPos, DigCNT, Chr_ok, DPf, TMcnt1, (TmpArrVal used for array bit set).
 '          - BG_Dig, BG_Seg, TM_BGlen, BG_Lp1, BG_Tmp, Seg_tmp
@@ -52,7 +52,7 @@
 
 ' TooDoo:
 '
-'#Include "TM1637_OEM_Message.h"
+//#Include "TM1637_OEM_Message.h"
 #Include <TM1637_OEM_Message.h>
 
 ' Variables for use in Main program
@@ -60,7 +60,7 @@
 Dim TM_Bright as Byte            ' 0 - 7 (LED duty% 6.25 - 87.5)
 Dim TM_dpPos as Byte             ' Position of DP (0 = no DP)
 Dim TM_Blank0 as Bit             ' 1 = enable zero Blanking
-Dim TM_6dReMap as Bit            ' enable/disable digit remap(for swap com pins)
+'Dim TM_6dReMap as Bit            ' enable/disable digit remap(for swap com pins)
 Dim TM_Disp as Bit               ' 1 = on, 0 = off
 Dim TM_Scroll as Bit             ' On/Off Enable text/array scrolling
 Dim TM_ScrollRate as Byte         ' Scroll speed ms
@@ -78,7 +78,7 @@ Dim Tmp_1 as Byte    ' Temp, eg. var->array bitset, not var bitset
 Dim TM_ButnVal as Byte
 'Other Vars Declared in Subs.
 
-' Default Constants            (#Define in Main will override)
+' Default Constants:            (will be set here if not #Define in Main)
 #script
   IF NODEF(TM_DispLen) Then
     TM_DispLen=6    ' 7seg display No. of digits
@@ -89,8 +89,15 @@ Dim TM_ButnVal as Byte
   IF NODEF(KeyMap) Then
     KeyMap=ButnMap1 ' Sensible button map (TM_ButnVal lookup table)
   END IF
+  6dReMap
+  IF NODEF(TM_6dReMap) Then
+    TM_6dReMap=Off ' Sensible button map (TM_ButnVal lookup table)
+  END IF
+  IF NODEF(TMDly) Then
+    TMdly=10       ' clk <-> DIO delay us (Close to this value)
+  END IF
+  ' Snd_SEQ is optionally defined only in main
 #endscript
-
 
 #startup tmInit
 
@@ -103,12 +110,12 @@ Sub tmInit
      Dir TM1637_CLK Out
    #endif
 
-    TMctrl = TMcmd0
+    TMctrl = TMcmd80h
     TM_KeyVal = 0
     TM_ButnVal = 0
     TM_Bright = 0
     TM_dpPos = 0
-    TM_6dReMap = Off
+'    TM_6dReMap = Off
     TM_Disp = On
     TM_Blank0 = On
     TM_Scroll = Off
@@ -330,7 +337,7 @@ End Sub
 '   Setup control byte  ~0   (called by tmCtrlSnd)
 Sub tmCtrlSet
     If TM_Bright > 7 then TM_Bright = 7
-     TMctrl = TMcmd0 + TM_Bright
+     TMctrl = TMcmd80h + TM_Bright
      TMctrl.3 = TM_Disp   ' on/off
 End Sub
 

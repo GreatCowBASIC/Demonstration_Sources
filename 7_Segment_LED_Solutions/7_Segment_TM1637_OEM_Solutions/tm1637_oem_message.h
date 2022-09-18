@@ -18,7 +18,8 @@
 '    2022/06/20   Add tmScrolBuf, TM_ChkKey
 '    2022/06/20   Fix a few missing lines  (TM_lp2 = TMlp2, Dig_RM = Dig_n)
                 'Remove #Option Explicit, Change include to <>
-'   Rev 0.9.10
+'    2022/09/15   Improve TMcmd constants, restructure  condition to #IFDEF Snd_SEQ #Else
+'   Rev 0.9.20
 ' This include builds TM1637 serial messages for TM1637_HW_Driver.h
 ''********************************************************************
 
@@ -26,51 +27,50 @@
 ' Read - Dig_pos, Num_Digs, Dig_RM, TMdigVal, Dig_n, TM_DispLen, Dbuf()
 ' Modified - TM_KeyVal, TM_ButnVal, TMlp2, TM_lp2
 
-'#Include "TM1637_HW_Driver.h"
+//#Include "TM1637_HW_Driver.h"
 #Include <TM1637_HW_Driver.h>
 
 ' TM1637 Constants
-#Define TMdly 10      ' clk <-> DIO delay us
-#Define TMcmd0 0x80     ' Ctrl value
-#Define TMcmd1 0x40     ' Sequential address mode  (Digit registers)
-#Define TMcmd2 0x44     ' Fixed address mode (1 Digit per cmd)
-#Define TMcmd3 0x42     ' Read key press
+' DELETE #Define TMdly 10      ' clk <-> DIO delay us
+#Define TMcmd80h 0x80     ' Ctrl value
+#Define TMcmd40h 0x40     ' Sequential address mode  (Digit registers)
+#Define TMcmd44h 0x44     ' Fixed address mode (1 Digit per cmd)
+#Define TMcmd42h 0x42     ' Read key press
 #Define TMaddr 0xC0     ' First disp. register address (digit 1)
 Dim TMlp2 as byte      ' Loop var
 
 Sub tmSndBuf (Optional In Dig_pos = TM_DispLen, Optional In Num_Digs = TM_DispLen, Optional In Dbuf() = TM_DispBuf)
 Dim TM_lp2 as Byte'< re-mapped value
-  #Ifdef SndMode_SEQ
+  #Ifdef Snd_SEQ    ' <  compile Sequential mode code
         Nack_Rst
       TM1637_Start
-        TM1637_WrVal (TMcmd1) : TM1637_Ack ' Sequential address mode 40h
+        TM1637_WrVal (TMcmd40h) : TM1637_Ack ' Sequential address mode 40h
       TM1637_Stop
       TM1637_Start
         TM1637_WrVal (TMaddr + (Dig_pos - Num_Digs)) : TM1637_Ack  ' Start addr
      For TMlp2 = Dig_pos - (Num_Digs - 1) to Dig_pos
          TM_lp2 = TMlp2                  '< without remap
-         If TM_6dReMap = 1 then ReadTable Digit_ReMap, TMlp2, TM_lp2
+         If TM_6dReMap = On then ReadTable Digit_ReMap, TMlp2, TM_lp2
          TM1637_WrVal (DBuf(TM_lp2)) : TM1637_Ack                  ' data
      Next
       TM1637_Stop
         tmCtrlSnd
-  #endif
 
-  #Ifndef SndMode_SEQ
+  #Else       ' <  compile Fixd address mode code.
         Nack_Rst
       TM1637_Start
-        TM1637_WrVal (TMcmd2) : TM1637_Ack ' Fixed address mode 44h
+        TM1637_WrVal (TMcmd44h) : TM1637_Ack ' Fixed address mode 44h
        TM1637_Stop
      For TMlp2 = Dig_pos - (Num_Digs - 1)  to  Dig_pos
           TM_lp2 = TMlp2  '< If not remap
-        If TM_6dReMap = 1 then ReadTable Digit_ReMap, TMlp2, TM_lp2 'reMap_Addr
+        If TM_6dReMap = On then ReadTable Digit_ReMap, TMlp2, TM_lp2 'reMap_Addr
         TM1637_Start
           TM1637_WrVal (TMaddr + (TM_lp2 -1)) : TM1637_Ack  ' Digit addr
           TM1637_WrVal (DBuf(TMlp2)) : TM1637_Ack          ' Digit data
         TM1637_Stop
      Next
         tmCtrlSnd
-  #endif
+  #Endif
 End Sub
 
 ' For 6d modules with incorrect(swap) wired digits
@@ -84,9 +84,9 @@ Sub tmSndDig (In TMdigVal, In Dig_n)
       Dim Dig_RM as Byte
        Dig_RM = Dig_n
        Nack_Rst
-       If TM_6dReMap = 1 then ReadTable Digit_ReMap, Dig_n, Dig_RM 'reMap_Addr
+       If TM_6dReMap = On then ReadTable Digit_ReMap, Dig_n, Dig_RM 'reMap_Addr
      TM1637_Start
-       TM1637_WrVal (TMcmd2) : TM1637_Ack ' Fixed address mode 44h
+       TM1637_WrVal (TMcmd44h) : TM1637_Ack ' Fixed address mode 44h
      TM1637_Stop
      TM1637_Start
        TM1637_WrVal (TMaddr + Dig_RM-1): TM1637_Ack   ' address
@@ -110,7 +110,7 @@ Dim TM_KeyVal, TM_ButnVal as byte
        Nack_Rst
      ' get raw key value
      TM1637_Start
-       TM1637_WrVal(TMcmd3) : TM1637_Ack
+       TM1637_WrVal(TMcmd42h) : TM1637_Ack
        TM1637_RdVal : TM1637_Ack
      TM1637_Stop
      ' Set button number
@@ -120,6 +120,7 @@ Dim TM_KeyVal, TM_ButnVal as byte
       TM_ButnVal = 0
     End If
 End Sub
+
 '  Button Map tables     1 of 2 maps are selected by #Define KeyMap
  Table ButnMap1 ' [linear map]
   '232  -->                                           247 '< TM_KeyVal
@@ -133,7 +134,8 @@ End Sub
  End Table
 '----------------------------
 
-' Notes: 1.  tmCtrlSnd is not really needed after each message,
-'            it however ensures convenient control update.
-'        2. TM1637 keypress register, how long does TM hold register value?
-'            until next disp scan, so need to GetKey while pressed.
+' Notes: 1.  tmCtrlSnd is not needed after each message,
+'            it however ensures convenient control update(Bright, Disp. on/off).
+'        2. TM1637 will hold keypress value in register
+'            only until next disp. scan.
+'            A very short press may be missed

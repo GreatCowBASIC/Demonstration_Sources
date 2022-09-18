@@ -7,13 +7,14 @@
 '    2022/05/10   Fix issue with ACK - DIO not HiZ at 8th CLK H->L.
 '    2022/05/17   Add Ack recovery - DIO would stay HiZ (input) if no ACK.
 '    2022/09/03   Change loops to Repeat
-'    Rev 1.10
+'    2022/09/15   Add #IfDEF NoAck, restructure #Ifdef NackCount #Else
+'    Rev 1.20
 ''*******************************************************
 'TooDoo:  option to ignore ACK check
 
 ' Call Nack_Rst at each message start
 
-' Varaibles:
+' Variables:
 ' Read - TMValue
 ' Modified - TM_keyVal, TMlp3, AckBit
 
@@ -32,6 +33,7 @@ Sub TM1637_RdVal
        Rotate TM_keyVal Right
        TM_keyVal.7 = TM1637_DIO
     End Repeat
+       Dir TM1637_DIO Out
 End Sub
 
 '   Write 8 bits to TM1637
@@ -81,17 +83,17 @@ Sub TM1637_Ack
      Wait TMdly us
     Set TM1637_CLK 1
      Wait TMdly us
+#IfDEF NoAck
+    Dir TM1637_DIO Out '< Just ignore the ACK/NACK (comment previous line)
+#Else
     If TM1637_DIO = 0 then  AckBit = 0 : Dir TM1637_DIO Out '< if ack ok
+#EndIF
     Set TM1637_CLK 0  '< TM release DIO here
      Wait TMdly us
 End Sub
 
 '   Recover from NACK
 Sub Nack_Rst
-#Ifndef NackCount
-    If AckBit = 1 then Dir TM1637_DIO Out : AckBit = 0
-#ENDIF
-
 '  For Testing/Log bad ack events
 #Ifdef NackCount
  Dim NackCnt as Word
@@ -99,6 +101,8 @@ Sub Nack_Rst
     Dir TM1637_DIO Out : AckBit = 0
     NackCnt++
    End If
+#ELSE
+    If AckBit = 1 then Dir TM1637_DIO Out : AckBit = 0
 #ENDIF
 End Sub
 '----------------------------

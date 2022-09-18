@@ -2,7 +2,7 @@
 
 'Set below configuration first for #chip, pins, display etc...
 '*******************************************************
-'#Include "TM1637_OEM_Cmd_Lib.h"
+//#Include "TM1637_OEM_Cmd_Lib.h"
 #Include <TM1637_OEM_Cmd_Lib.h>
 
 #OPTION explicit
@@ -13,35 +13,35 @@
 Dim Value as Long   ' number to display
 Dim lp1 as Byte       ' Loops etc
 Dim lp2 as Byte
-
+'Dim tmp1 as byte     ' Temp var
+'Dim tmp2 as Byte
 Dim cnt1 as Byte     ' count
 Dim cnt2 as Word     ' count
-Dim Mybuf1(TM_DispLen+1+TM_LEDs) as Byte  ' user buffer
+Dim Mybuf1(TM_DispLen+1+TM_LEDs) as Byte  ' user buffer if needed.
 
 #define TM1637_CLK PortB.4
 #define TM1637_DIO PortB.5
-
 '      (Port Dir is set in include file)
-''#Define TM1637_CLK GPIO.0 '#Define TM1637_CLK = PORTB.2
-''#Define TM1637_DIO GPIO.1 '#Define TM1637_DIO = PORTB.1
 
-#Define TM_DispLen 6     ' Number of digits on display
-TM_6dReMap = On          ' Remap digits for 6d module with swapped com pins
+'  Configuration constants: (If not set will be default value)
+'-------------------------------------------------------------
+'#Define TM_DispLen 6      ' Number of digits on display (default 6)
+#Define TM_6dReMap On    ' Remap digits for 6d module with swapped com pins (default Off)
+'#Define Snd_SEQ           ' Enable sequential register addressing mode-see pdf help (default Fixed)
+'#Define KeyMap ButnMap2   ' Only used for weird datasheet map. (default ButnMap1)
+'#Define TM_LEDs 2         ' Use when TM_DispLen=4, TM_DispBuf(5 & 6) for other LED's  (default 0)
+'#Define TMdly 5          ' Modify clk <-> DIO delay us -eg. if need a shorter write message.  (default 10)
+'---------------------------
+'#Define NackCount         ' Enable NACK counts (for testing comm issues)  (default no count)
+'NackCnt = 0               ' need to ensure clear if counting NACK's
+'#Define NoAck             ' Ignore ACK state.  (default ack test enabled)
+'-------------------------------------------------------------
 
-'Optional Constants
-  '#Define NackCount         ' Enable NACK counts (for testing comm issues)
-  'NackCnt = 0               '
-  '#Define SndMode_SEQ       ' Enable sequential register addressing mode
-  '#Define KeyMap ButnMap2   ' Only used for weird datasheet map
-  '#Define TM_LEDs 2         ' Use when TM_DispLen=4, TM_DispBuf(5 & 6) for other LED's
-  '#Define TMdly 25          ' Modify clk <-> DIO delay us  - Use with care !
-
-'*******************************************************
 Value = 314159
 
 '-------------------
-' Most of the subs will work with 4d or 6d module (just set TM_DispLen & TM_6dReMap appropriately)
-'                                               & some other values
+' Most of the demo subs will work with 4d or 6d module (just set TM_DispLen & TM_6dReMap appropriately)
+' & some other values where needed.    Refer PDF Help document for detailed information.
 ' Using Commands... see Sub CmdDemo1.
 
 wait 1 ms
@@ -61,8 +61,8 @@ Main:
   FlashDigs ': Buffers_2
 
  'NackCounter
-  BarGraph1
-' BarGraph2
+  BarGraph1 ' using 7-seg display
+' BarGraph2 ' using linear LED bargraph
   Count_2
   Bright_Test2 : Bright_Test1
   tmCLRdisp : tmCLRbuf
@@ -80,7 +80,7 @@ End
 'Set all segments
 Sub TestAll_1
     For Cnt1 = 1 to TM_DispLen
-      tmSndDig (255,Cnt1)   '    "888888"
+      tmSndDig (255,Cnt1)   '    "888888" & all dp's
     Next
      Wait 1 s
 End Sub
@@ -187,9 +187,9 @@ End Sub
 
 
 'Set segments on LED linear Bargraph tmSegBar(Digit,Segment,Length,[Fill])
-Sub BarGraph2'           (on 7 seg display will just see segments)
+Sub BarGraph2'           (on 7 seg display will just see segments set)
     tmCLRbuf : tmSndBuf
- '   TM_DispBuf(6) = 240 ' discrete LED's set (segs 5 - 8)
+ '   TM_DispBuf(6) = 240 ' set discrete LED's (segs 5 - 8)
     tmSndBuf
     Wait 600 ms
     TM_BGlen = 12     ' BarGraph length
@@ -213,8 +213,6 @@ Sub BarGraph2'           (on 7 seg display will just see segments)
       Wait 500 ms
       tmSegBar(5,0)
 
-
-
     Wait 1 s : tmCLRbuf(6,1) : tmSndBuf (6,1) ' clear digit 6
 
 For Lp1 = 0 to 12
@@ -223,7 +221,6 @@ For Lp1 = 0 to 12
     Wait 500 ms
   Next
     Wait 1 s
-
 
 For Lp1 = 0 to 24
     Lp2 = Lp1 : If Lp1 > 12 then Lp2 = (24) - Lp1
@@ -392,10 +389,6 @@ Dim Rev as Bit
   Loop while TM_Bright <> 0
 End Sub
 
-
-
-'=========================================================
-
 ' Set Segments pattern
 Sub SetSeg2
 Dim Digit, Segment as byte
@@ -426,8 +419,6 @@ Dim Digit, Segment as byte
     wait 2 s
     tmCLRbuf : tmCLRdisp
 End sub
-
-'=========================================================
 
 ' fill digits with random decimal value
 Sub RndFill_1
@@ -462,7 +453,6 @@ Sub RndFill_1
    wait 2 s
 End Sub
 
-
 ' Fill segments random
 Sub RndFill_3
     tmCLRbuf : tmCLRdisp
@@ -479,7 +469,6 @@ Sub RndFill_3
    wait 1 s
 End Sub
 
-
 Sub Scroll_1
     TM_Scroll = On : TM_ScrollRate = 50
     tmClrbuf
@@ -493,7 +482,7 @@ Sub Scroll_1
      Wait 1 s
 
     tmClrbuf ': tmClrDisp
-     tmSndStr "Error.3 no_Fan  CASE =75ï¿½C"
+     tmSndStr "Error.3 no_Fan  CASE =75°C"
      tmSndBuf
      Wait 1 s
 
@@ -503,7 +492,7 @@ Sub Scroll_1
      Wait 1 s
 
     tmClrbuf ': tmClrDisp
-     tmSndStr "Special chrs . . .    "" = _ ~ | ) ( ï¿½ ' - ?"
+     tmSndStr "Special chrs . . .    "" = _ ~ | ) ( ° ' - ?"
      tmSndBuf
      Wait 1 s
     TM_Scroll = Off
@@ -524,7 +513,7 @@ Dim Array1 (11) as byte
     TM_scroll = Off
 End Sub
 
-' Scrolling characters 3bit_scope
+' Scrolling characters - 3bit_scope
 Sub Wave1
     TM_scroll = On
     tmClrbuf
@@ -562,6 +551,7 @@ Dim UpDn as Bit
      cnt1--
   Loop
 End Sub
+'---------------------------------------------------------
 
 
 '   Using Commands
@@ -649,7 +639,7 @@ Sub CmdDemo1
     tmSndBuf                ' Result "3.14159"
     Wait 1 s
 
-'User Buffer
+'User Buffer                  ' See near start of this demo file to "dim the buffer array"
     tmDecBuf(25,2,2,Mybuf1)
     tmDecBuf(40,4,2,Mybuf1)
     tmSndBuf(Mybuf1)
