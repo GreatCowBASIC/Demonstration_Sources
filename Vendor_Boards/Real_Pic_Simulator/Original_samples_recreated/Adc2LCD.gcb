@@ -29,7 +29,7 @@
 
 Print "Great Cow BASIC"
 Locate 1,0
-Print "@2018 v1.0"
+Print "@2022 v1.0"
 Wait 4 s
 
 CLS
