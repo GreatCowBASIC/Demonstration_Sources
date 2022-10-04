@@ -14,7 +14,7 @@
 '''  IDE: GCB@SYN
 '''
 '''  Board: SmartPIC 18 Board
-'''  Date: 29.8.17
+'''  Date: 04.10.22
 '''
 ' ----- Configuration
 'Chip Settings.
@@ -93,9 +93,14 @@ Dim CCOUNT, SIGNBIT, WHOLE, FRACT, DIG As Byte
 
 ccount = 0
 CLS
-Print "GCBASIC 2019"
+Print "GCBASIC"
 Locate 1,0
-Print "DS18B20 Demo"
+Print " 2022"
+Wait 2 s
+CLS
+Print "DS18B20"
+Locate 1,0
+Print " Demo"
 Wait 2 s
 CLS
 

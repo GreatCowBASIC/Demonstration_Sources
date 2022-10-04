@@ -21,7 +21,7 @@
 '''  IDE: GCB@SYN
 '''
 '''  Board: SmartPIC 18 Board
-'''  Date: 29.8.17
+'''  Date: 04.10.22
 '''
 ' ----- Configuration
 'Chip Settings.
@@ -107,7 +107,7 @@ byteNumber = 0
 ' ----- Main program
 
 GLCDPrint 0, 0,   "Great Cow BASIC"
-GLCDPrint (0, 16, "Anobium 2019")
+GLCDPrint (0, 16, "Anobium 2022")
 GLCDPrint (0, 32, "Portability Demo")
 GLCDPrint (0, 48, ChipNameStr )
 

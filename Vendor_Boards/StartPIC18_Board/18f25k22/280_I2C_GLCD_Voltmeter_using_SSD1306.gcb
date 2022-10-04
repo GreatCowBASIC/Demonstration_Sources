@@ -12,14 +12,14 @@
 '''@author  StanC and EvanV
 '''@licence GPL
 '''@version 1.01a
-'''@date    31.08.2017
+'''@date    31.08.2022
 '''********************************************************************************
 '''  PIC: 18f25k22
 '''  Compiler: GCB
 '''  IDE: GCB@SYN
 '''
 '''  Board: SmartPIC 18 Board
-'''  Date: 29.8.17
+'''  Date: 04.10.22
 '''
 ' ----- Configuration
 'Chip Settings.

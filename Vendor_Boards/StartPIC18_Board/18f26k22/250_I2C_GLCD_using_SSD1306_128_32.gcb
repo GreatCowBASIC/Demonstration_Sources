@@ -20,7 +20,7 @@
 '''  IDE: GCB@SYN
 '''
 '''  Board: SmartPIC 18 Board
-'''  Date: 29.8.17
+'''  Date: 04.10.22
 '''
 ' ----- Configuration
 'Chip Settings.
@@ -114,7 +114,7 @@ Dir PORTB.0 In
 #ENDIF
 
 GLCDPrint 0, 0,   "Great Cow BASIC"
-GLCDPrint (0, 16, "Anobium 2019")
+GLCDPrint (0, 16, "Anobium 2022")
 GLCDPrint (76, 16, GLCD_WIDTH )
 GLCDPrint (96, 16, "*" )
 GLCDPrint (104, 16, GLCD_HEIGHT )

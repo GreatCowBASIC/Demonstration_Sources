@@ -12,7 +12,7 @@
 '''  IDE: GCB@SYN
 '''
 '''  Board: SmartPIC 18 Board
-'''  Date: 29.8.17
+'''  Date: 04.10.22
 '''
 ' ----- Configuration
 'Chip Settings.
@@ -86,7 +86,7 @@ Wait 1 s
 Locate 0, 0
 Print "BASIC"
 Locate 1, 0
-Print "2017  "
+Print "2022  "
 Wait 2 s
 CLS
 
