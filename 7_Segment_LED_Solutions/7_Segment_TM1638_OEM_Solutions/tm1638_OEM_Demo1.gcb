@@ -7,27 +7,25 @@
 
 'Set below configuration first for #chip, pins, display etc...
 '*******************************************************
-
-#Include <TM1638_OEM_Lib.h>
+#Include "TM1638_OEM_Lib.h"
+'#Include <TM1638_OEM_Lib.h>
 
 #OPTION explicit
-''#chip 12F683, 8
-'' #Chip 16F1829,8
-#chip mega2560, 16
 
+'---Mega2560---
+#Chip mega2560,16
+#Define TM1638_DIO PortD.0
+#Define TM1638_CLK PortD.1
+#Define TM1638_STB1 PortD.2
+'*/
 
-Dim Value as Long   ' number to display
-Dim lp1, lp2, cnt1, cnt2 as Byte       ' Loops etc
-Dim Mybuf1(TM_DispLen +1 +TM_LEDs) as Byte  ' additional display buffer
-
-'UNO Setup
-#Define TM1638_CLK  PortB.5
-#Define TM1638_DIO  PortB.4
-#Define TM1638_STB1 PortB.3
-
+ '---16F1829---
+'#Chip 16F1829,8
+'#Config Osc = Int
 '#Define TM1638_CLK PortB.4
 '#Define TM1638_DIO PortB.5
 '#Define TM1638_STB1 PortB.6
+'*/
 
 '#Define TM1638_STB2 PortB.1  ' Enable to use multiple boards, use 'TM_STB = n' to set
 '#Define TM1638_STB3 PortB.2
@@ -38,15 +36,17 @@ Dim Mybuf1(TM_DispLen +1 +TM_LEDs) as Byte  ' additional display buffer
 '  Configuration constants: enable relavent #Define
 '-------------------------------------------------------------
 #Define TM_DispLen 8      ' Number of digits on display
-' #Define Com_Cathode       ' CC Display up to 8x 7-seg digits (This is default if not set)
-
+#Define Com_Cathode       ' CC Display up to 8x 7-seg digits (This is default if not set)
 '#Define Com_Anode         ' CA Display up to 10x 7-seg digits
 '#Define RevDig            ' Reverse display digits (need for rev wired display boards)
 #Define Butn_Map1         ' Remap ButnValue as per Table Butn_Map1 (if not set create your own)
 '#Define Butn_Map2         ' Remap ButnValue as per Table Butn_Map2
-' #Define TM_LEDs 2         ' Use when eg. TM_DispLen=8, TM_DispBuf(9 & 10) for other LED's
+#Define TM_LEDs 2         ' Use when eg. TM_DispLen=8, TM_DispBuf(9 & 10) for other LED's
 '#Define TMdly 2           ' Modify clk <-> DIO delay us (if need a shorter write message)
 
+Dim Value as Long   ' number to display
+Dim lp1, lp2, cnt1, cnt2 as Byte       ' Loops etc
+Dim Mybuf1(TM_DispLen +1 +TM_LEDs) as Byte  ' additional display buffer
 
 ' Notes
 '-------------------------------------------------------------
@@ -65,7 +65,6 @@ Dim Mybuf1(TM_DispLen +1 +TM_LEDs) as Byte  ' additional display buffer
   TM_Disp = On    ' Default is On
 '-----------------------
 
-'-----------------------
   TestAll_1    ' all 8 segments on all digits
   tmCLRbuf : tmCLRdisp
   Wait 1 s
@@ -81,23 +80,22 @@ Main:
 
     SetLED   'set LEDs demo (also set in ShowButtons_1)
     wait 400 ms
+    Count_2
     Scroll_1 : ScrollArray : RndFill_3 : RndFill_1 : Wave1 : RedEye1
-    Set TM1638_DIO 1
     tmSndStr("FlASH ")
     Flash_Disp ': Buffers_2
     Flash_Digs
     BarGraph1
-'   BarGraph2  ' This is for linear LED bargraph (but can see which 7-seg's used)
+//   BarGraph2  ' This is for linear LED bargraph (can see which 7-seg's used)
     Count_2
     Bright_Test1 ' : Bright_Test2
     tmCLRdisp : tmCLRbuf
 
     OverRange : tmCLRbuf : tmCLRdisp : wait 500 ms
-    'Button press demo's - 2 buttons same time enabled (no exit from sub)
-'    ShowButtons_2   ' Display Raw Key values - hex
     BarGraph2
     tmCLRbuf : tmCLRdisp : wait 500 ms
-    ShowButtons_1
+    ShowButtons_1  '<- [disable to run ShowButtons_2]
+    ShowButtons_2   ' Display Raw Key values - hex
 '    TMdisp_n ' Use multiple TM1638 displays (#define STBn first)
 
 Goto Main
@@ -122,11 +120,12 @@ Sub  ShowButtons_1
 Dim LED_n1, LED_n2 as byte
      tmSndStr "press"
      wait 1 s
-     tmSndStr "buttons"
+     tmSndStr "button.."
      Wait 2 s
      tmCLRbuf
      For Cnt1 = 1 to 8 : tmSetLED (Cnt1, Off) : Next ' clear  LED's
-rpt1:
+'rpt1:
+   Do
      tmGetKey
 
      ' clear  LED's
@@ -144,13 +143,15 @@ rpt1:
         tmDecBuf(TM_ButnVal2,TM_DispLen,2)
         tmSndBuf
      wait 100 ms
-     Goto rpt1
+   Loop
+'  Goto rpt1
 End Sub
 
 '    Display the raw keyval (hex)
 Sub  ShowButtons_2
       TM_Blank0 = Off
-rpt2:
+'rpt2:
+   Do
       tmGetKey
       tmHexBuf(TM_KeyVal(1),2,2)
       tmHexBuf(TM_KeyVal(2),4,2)
@@ -162,14 +163,16 @@ rpt2:
       TM_DispBuf(6).7 = On
       tmSndBuf
       wait 100 ms
-      Goto rpt2
+   Loop
+'    Goto rpt2
 End Sub
 
 '    Indicates the button(s) pressed
 Sub  ShowButtons_3
       tmSndStr "PressBtn"
       Wait 2 s
-rpt3:
+'rpt3:
+   Do
      tmGetKey
      tmCLRbuf
      For Cnt1 = 1 to 8 : tmSetLED (Cnt1, Off) : Next ' clear  LED's
@@ -179,7 +182,9 @@ rpt3:
      TM_DispBuf(TM_ButnVal2) = 8
      tmSndBuf
      wait 50 ms
-     Goto rpt3
+     If TM_ButnVal1 = 4 and  TM_ButnVal2 = 8 Then Exit Do
+   Loop
+'     Goto rpt3
 End Sub
 
 ' How to use multiple TM1638 displays
@@ -262,40 +267,49 @@ Sub OverRange
      Wait 1 s
 End Sub
 
-' Count bad ACK's (Use for testing)
-   ' Not applicable to TM1638
+
 
 
 ' Display 2 count up numbers
 Sub Count_2
+
 tmCLRbuf : tmCLRdisp
 Dim UpCnt1, UpCnt2, Count2 as Byte
 Dim Count1, Count0 as Word
-        TM_dpPos = TM_DispLen /2
-        UpCnt1 = 0 : UpCnt2 = 0 : Count1 = 0 : Count2 = 0 : Count0 = 0
+
+        UpCnt1 = 0
+        UpCnt2 = 0
+        Count0 = 0   '<< Comment this line to run ok
+        Count1 = 0
+        Count2 = 0
+
+TM_dpPos = TM_DispLen / 2
   Do while Count0 < 301
          UpCnt1++
          UpCnt2++
 
-        If UpCnt1 > 20 Then       ' every xx ms
+       If UpCnt1 > 20 Then       ' every xx ms
           Count1++
           UpCnt1 = 0 : Count0++
           tmDecBuf(Count1,TM_DispLen,3)    ' Set digits 456
-          tmSndBuf(TM_DispLen,3 )
+          tmSndBuf(TM_DispLen,3)
        End If
+
           TM_Blank0 = Off        ' just for hex
-        If UpCnt2 > 200 Then     ' every xx ms
+       If UpCnt2 > 200 Then     ' every xx ms
           Count2++
           UpCnt2 = 0
           tmHexBuf(Count2,2,2)   ' Set digits 12
           tmSndBuf(2,2 )
        End If
           TM_Blank0 = On
+
          If Count1 > 999 then Count1 = 0
          If Count2 > 200 then Count2 = 0
          wait 500 us
   Loop
         TM_dpPos = 0
+
 End Sub
 
 
@@ -508,7 +522,7 @@ Sub Msg1'  called from Sub TestFlashKey
 End Sub
 '---------------------------------------------------------
 
-' Using tmctrlSnd
+' Using dataSnd
 Sub Bright_Test1
   tmCLRbuf : tmCLRdisp
 Dim Rev as Bit
@@ -516,13 +530,14 @@ Dim Rev as Bit
     tmSndStr("bright")
       Wait 1 s
   Do
-'    tmctrlSnd
+   ' tmctrlSnd
     tmSndDec(TM_Bright,TM_DispLen,1)
+    If TM_Bright = 7 then wait 300 ms
     If Rev = 0 then TM_Bright++
     If Rev = 1 then TM_Bright--
-    If TM_Bright > 6 and Rev = 0 then Rev = 1
-    If TM_Bright = 7 then wait 300 ms
-    wait 300 ms
+   // If TM_Bright > 6 And Rev = 0 then Rev = 1 '< Compile issue W-ATMEL 2022.10.04
+    If TM_Bright > 6 And Not Rev then Rev = 1
+    wait 250 ms
   Loop while TM_Bright <> 0
 End Sub
 
@@ -538,7 +553,8 @@ Dim Rev as Bit
     tmctrlSnd
     If Rev = 0 then TM_Bright++
     If Rev = 1 then TM_Bright--
-    If TM_Bright > 6 and Rev = 0 then Rev = 1
+//    If TM_Bright > 6 and Rev = 0 then Rev = 1 '< Compile issue W-ATMEL 2022.10.04
+    If TM_Bright > 6 And Not Rev then Rev = 1
     wait 200 ms
   Loop while TM_Bright <> 0
 End Sub
@@ -631,7 +647,7 @@ End Sub
 
 
 Sub Scroll_1
-    TM_Scroll = On : TM_ScrollRate = 35   ' 120ms  (30*4ms)
+    TM_Scroll = On : TM_ScrollRate = 35   ' 140ms  (35*4ms)
     tmClrbuf
      tmSndStr "Great CoLJ basic 7seg_Display"
      tmSndBuf
@@ -654,11 +670,12 @@ Sub Scroll_1
      tmSndBuf
      Wait 1 s
 
+     TM_ScrollRate = 32
     tmClrbuf ': tmClrDisp
      tmSndStr "Scrolling A long ""string""    can-be good_fun to read"
      tmSndBuf
      Wait 1 s
-
+     TM_ScrollRate = 35
     tmClrbuf ': tmClrDisp
      tmSndStr "Special chr . . .    "" = _ ~ | ) ( � ' - ?"
      tmSndBuf

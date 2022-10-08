@@ -59,6 +59,7 @@ Dim TM_lp2 as Byte'< re-mapped value
 '' Common Cathode displays, up to 8 digits - no segment transpose (Reg C0 bits 0-7 is digit 1)
   #Ifdef Com_Cathode   ' Com_Cathode
       setTM1638_STB 0
+          Wait TMdly us
           TM1638_WrVal (TMcmd_44h) ' Fixed address mode
       setTM1638_STB 1
           Wait TMdly us
@@ -106,6 +107,7 @@ Dim TM_lp2 as Byte'< re-mapped value
 
 '     Send the Reg buffer
       setTM1638_STB 0
+          Wait TMdly us
         TM1638_WrVal (TMcmd_40h) ' Seq. address mode
       setTM1638_STB 1
         Wait TMdly us
@@ -188,16 +190,6 @@ Sub tmSetLED (In LEDn, In LEDon) ' LEDn 1 - 16
      setTM1638_STB 1
        Wait TMdly us
        tmCtrlSnd
-End Sub
-
-
-' Send TM1638 control byte
-Sub tmCtrlSnd
-      tmCtrlSet
-    setTM1638_STB 0
-      TM1638_WrVal (TMctrl)
-    setTM1638_STB 1
-      Wait TMdly us
 End Sub
 
 'TM1638 read Key press (Set array TM_KeyVal & var TM_ButnVal1,TM_ButnVal2 )
@@ -284,7 +276,6 @@ End Sub
 
 ' set STBn for the selected display (1~4)
  Sub setTM1638_STB (In STB as bit)
-
     Select Case TM_STB    '< This is the STB to set
       Case 1
         #IFDEF TM1638_STB1
@@ -309,8 +300,36 @@ End Sub
     End Select
 End Sub
 
+' clear all TM1638 registers
+'Sub tmCLRdisp(Optional In TM_WrVal = 0)
+Sub tmCLRdisp(Optional In TM_WrVal = 0)
+      setTM1638_STB 0
+        TM1638_WrVal (TMcmd_40h) 'seq. addr mode
+      setTM1638_STB 1
+        Wait TMdly us
+      setTM1638_STB 0
+        TM1638_WrVal (TMaddr)
+'    For TMlp1 = 1 to 16
+    Repeat 16
+      TM1638_WrVal (0)
+'      TM1638_WrVal (TM_WrVal)
+    End Repeat
+'    Next
+      setTM1638_STB 1
+        tmCtrlSnd
+End Sub
+
+' Send TM1638 control byte
+Sub tmCtrlSnd
+      tmCtrlSet
+    setTM1638_STB 0
+      TM1638_WrVal (TMctrl)
+    setTM1638_STB 1
+      Wait TMdly us
+End Sub
+
 '----------------------------
-' Notes: 1. tmCtrlSnd is not needed after every message, need if bright or on/off changed.
+' Notes: 1. tmCtrlSnd is not really needed after every message, need if bright or on/off changed.
 '        2. TM1638 will hold keypress value in register until next disp. scan.
 '                   a very short press may be missed
 

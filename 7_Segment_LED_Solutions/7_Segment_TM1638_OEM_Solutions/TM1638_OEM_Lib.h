@@ -48,7 +48,7 @@
 
 ' "TM_DispBuf()" is the main Display buffer(array) name.
 
-' Varaibles:  Note some Vars are shared use between .h includes
+' Variables:  Note some Vars are shared use between .h includes
 ' Read - InVal, DigPos, NumDigs, TM_DispLen, TM_Disp, TM_Bright, TM_Blank0, TMscroll
 '      -  TM_ScrollRate, TM_FlashRate, TM_dpPos, TM_KeyChk, TM_STB
 ' Modified - TM_DispBuf, Dbuf, DigCNT, NumExtr, Nibl, StrPos, StrChr, ChrTblIndx
@@ -76,7 +76,7 @@ Dim TM_Blank0 as Bit             ' 1 = enable zero Blanking
 Dim TM_Disp as Bit               ' 1 = on, 0 = off
 Dim TM_Scroll as Bit             ' On/Off Enable text/array scrolling
 Dim TM_ScrollRate as Byte        ' Scroll speed *4ms
-Dim TM_FlashRate  as Byte        ' Flash rate *4ms
+Dim TM_FlashRate  as Word        ' Flash rate *4ms
 Dim TM_KeyChk as Bit             ' Test for keypress during flash
 Dim TM_STB as Byte               ' 1 of 4 boards to read/write to (TM_STB = 1~4)
 Dim TM_DispBuf(TM_DispLen +1 +TM_LEDs) as Byte  ' digit values display buffer
@@ -246,7 +246,8 @@ End Sub
 '   Send single chr to TM         (uses buffer array element 0)
 Sub tmSndChr (In StrChr, In DigN)
     GetChrTblIndx
-    If Chr_ok = 1 and DPf = 0 then    ' DP not sent
+//    If Chr_ok = 1 and DPf = 0 then 'Note 3.
+    If Chr_ok and Not DPf then    ' DP not sent
       ReadTable Seg7Alpha, ChrTblIndx, TM_DispBuf(0)
       tmSndDig(TM_DispBuf(0), DigN)                   ' Uses buffer digit(0)
     End If
@@ -255,7 +256,8 @@ End Sub
 '   Load single chr to buffer
 Sub tmChrBuf (In StrChr, In DigN, Optional In Dbuf() = TM_DispBuf)
     GetChrTblIndx
-    If Chr_ok = 1 and DPf = 0 then
+//    If Chr_ok = 1 and DPf = 0 then 'Note 3.
+    If Chr_ok and Not DPf then    ' DP not sent
       ReadTable Seg7Alpha, ChrTblIndx, Dbuf(DigN)
     Else
       Dbuf(DigN).7 = 1
@@ -263,16 +265,17 @@ Sub tmChrBuf (In StrChr, In DigN, Optional In Dbuf() = TM_DispBuf)
 End Sub
 
 '   String -> 7Seg Val -> Buffer & send     (read str as array)
-Sub tmSndStr (In TMchrVal(), Optional In Dbuf() = TM_DispBuf, Optional in DSnd as Bit = On)
+'Sub tmSndStr (In TMchrVal(), Optional In Dbuf() = TM_DispBuf, Optional in DSnd as Bit = On)
+Sub tmSndStr (In TMchrVal as String, Optional In Dbuf() = TM_DispBuf, Optional in DSnd as Bit = On)
 Dim StrPos, StrChr, ChrTblIndx, BufPos, BufShft as Byte
-'Dim Chr_ok, DPf as Bit        '< display chr, DP found
-      If TMchrVal(0) = 0 then Exit Sub   ' empty string
+
+      If len(TMchrVal) = 0 then Exit Sub   ' empty string
       BufPos = 0
    For StrPos = 1 to TMchrVal(0)
        StrChr = TMchrVal(StrPos)
-'       Chr_ok = 0 : DPf = 0
        GetChrTblIndx
-      If Chr_ok = 1 and DPf = 0 then       ' only for valid character and not for DP
+//     If Chr_ok = 1 And DPf = 0 then 'Note 3.
+     If Chr_ok And Not DPf then
          If TM_Scroll = 1  then  '
             For BufShft = 1 to TM_DispLen - 1   ' ShftLft array
                Dbuf(BufShft) = Dbuf(BufShft+1)   '         into buffer.
@@ -285,7 +288,7 @@ Dim StrPos, StrChr, ChrTblIndx, BufPos, BufShft as Byte
              BufPos++ : If BufPos > TM_DispLen then Exit Sub ' string longer than disp
              ReadTable Seg7Alpha, ChrTblIndx, Dbuf(BufPos) ' chr -> buffer Array
          End If
-      End If
+     End If
             If DPf = 1 then Dbuf(BufPos).7 = 1            ' set DP
    Next
             If Dsnd = On then tmSndBuf    ' option to send buffer
@@ -318,7 +321,7 @@ Sub GetChrTblIndx
           If StrChr =  61 then ChrTblIndx = 5  : Chr_ok = 1    ' =
           If StrChr =  63 then ChrTblIndx = 6  : Chr_ok = 1    ' ?
           If StrChr =  95 then ChrTblIndx = 7  : Chr_ok = 1    ' _ Uscore
-          If StrChr = 176 then ChrTblIndx = 8  : Chr_ok = 1    ' ° deg
+          If StrChr = 176 then ChrTblIndx = 8  : Chr_ok = 1    ' ï¿½ deg
           If StrChr = 126 then ChrTblIndx = 9  : Chr_ok = 1    ' ~ Oscore
           If StrChr =  34 then ChrTblIndx = 10 : Chr_ok = 1    ' " Dquote
           If StrChr = 124 then ChrTblIndx = 11 : Chr_ok = 1    ' | left 1
@@ -348,7 +351,7 @@ Table Seg7Alpha  'chr maps
 '  0   1   2  3   4    5    6   7   8   9       Number
    63, 6, 91, 79, 102, 109, 125, 7, 127, 111            '< TblPtr2
 
-'  spc  [   ]  -   =   ?   _   deg° "   '   |   Special Characters
+'  spc  [   ]  -   =   ?   _   degï¿½ "   '   |   Special Characters
 '  32, 40, 41,  45, 61, 63, 95, 176 126 34  124  [ASCII]
     0, 57, 15, 64, 72, 83,  8, 99,  1, 34, 48           '< TblPtr3
 End Table
@@ -356,22 +359,6 @@ End Table
 
 '   Misc Subs
 '========================================================
-' clear all TM1638 registers
-Sub tmCLRdisp
-      setTM1638_STB 0
-        TM1638_WrVal (TMcmd_40h) 'seq. addr mode
-      setTM1638_STB 1
-        Wait TMdly us
-      setTM1638_STB 0
-        TM1638_WrVal (TMaddr)
-'    For TMlp1 = 1 to 16
-    Repeat 16
-      TM1638_WrVal (0)
-    End Repeat
-'    Next
-      setTM1638_STB 1
-End Sub
-
 '   clear display buffer  ~0
 Sub tmCLRbuf (Optional In DigPos = TM_DispLen, Optional In NumDigs = TM_DispLen, Optional In Dbuf() = TM_DispBuf)
     For TMlp1 = DigPos - (NumDigs -1) to DigPos
@@ -481,5 +468,6 @@ Dim BG_Seg, TM_BGlen, BG_Lp1 as Byte
    Next
 End Sub
 ' Notes: Linear BarGraph
-' Up to 16 segments bargraph start Digit 9, or 2x 8 segments bargraph Dig 9 & 10
-' To avoid clear of these LED's" in CA mode use #Define TM_LEDs = 2" & #Define TM_DispLen = 8)
+' 1. Up to 16 segments bargraph start Digit 9, or 2x 8 segments bargraph Dig 9 & 10
+' 2. To avoid clear of these LED's" in CA mode use #Define TM_LEDs = 2" & #Define TM_DispLen = 8)
+' 3. Compile issue "And bit = 0" W-ATMEL 2022.10.04
