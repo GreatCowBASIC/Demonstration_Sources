@@ -1,0 +1,91 @@
+#chip mega328p, 16
+#option Explicit
+
+// #DEFINE SHOWERROR
+// #DEFINE DISABLE1173
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
+Dim bitVar1,  bitVar2 as Bit
+Dim calcVar as Byte
+
+bitVar1 = 1
+bitVar2 = 0
+
+// wait 3 s
+
+HserPrintCRLF
+
+IF bitVar1 = bitVar2 Then
+
+End If
+
+#IF DEF(SHOWERROR)
+    //! YIELDS FALSE
+    If bitVar1 = 1 and bitVar2 = 0 Then
+        HSerPrintStringCRLF "TRUE: bitVar1 = 1 and bitVar2 = 0"
+    else
+        HSerPrintStringCRLF "FALSE: bitVar1 = 1 and bitVar2 = 0"
+    End if
+
+    //! YIELDS FALSE
+    If bitVar1 = 1 and NOT bitVar2 Then
+        HSerPrintStringCRLF "TRUE: bitVar1 = 1 and NOT bitVar2 "
+    else
+        HSerPrintStringCRLF "FALSE: bitVar1 = 1 and NOT bitVar2 "
+    End if
+
+    //! YIELDS FALSE
+    If bitVar1 and bitVar2 = 0 Then
+        HSerPrintStringCRLF "TRUE:  bitVar1 and bitVar2 = 0 "
+    else
+        HSerPrintStringCRLF "FALSE: bitVar1 and bitVar2 = 0 "
+    End if
+#ENDIF
+
+// YIELDS TRUE
+If bitVar1 = 1   Then
+    HSerPrintStringCRLF "TRUE:  bitVar1 = 1"
+else
+    HSerPrintStringCRLF "FALSE: bitVar1 = 1"
+End if
+
+// // YIELDS TRUE
+If bitVar2 = 0 Then
+    HSerPrintStringCRLF "TRUE:  bitVar2 = 0"
+else
+    HSerPrintStringCRLF "FALSE: bitVar2 = 0"
+End if
+
+// // YIELDS TRUE
+If bitVar1 and NOT bitVar2 Then
+    HSerPrintStringCRLF "TRUE:  bitVar1 and NOT bitVar2 "
+else
+    HSerPrintStringCRLF "FALSE: bitVar1 and NOT bitVar2 "
+End if
+
+calcVar =  bitVar2
+    HSerPrint "Assign calcVar"+str(calcVar)
+    HSerPrint "  "
+    HSerPrint bitVar2
+    HserPrintCRLF
+
+// // erv
+// ASM BREAK
+
+
+If BitVar1 AND NOT BitVar2 Then
+    HSerPrint "TRUE:  Compare" calcVar"+str(calcVar)"
+    HSerPrint "  "
+    HSerPrint bitVar2
+    HserPrintCRLF
+
+else
+    HSerPrint "FALSE: Compare"
+    HSerPrint "  "
+    HSerPrint bitVar2
+    HserPrintCRLF
+
+End if
