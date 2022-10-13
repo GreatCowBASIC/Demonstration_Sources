@@ -1,0 +1,297 @@
+    /*
+    Get a few USB/TLL and a terminal application.
+    Define the USART settings for USART 1..5 - the Baud Rate (BPS) are set in the script below
+        USART1 9600
+        USART2 19200
+        USART3 38400
+        USART4 57600
+        USART5 115200
+
+        These baud rates are used to test that each USART is set to specific speed and the setup of each USART is different.
+    Set up PPS as needed for the chip.
+    Attached the TX, RX and Ground for each USART and TTL/USE combination
+    Select the OUTSART and the INUSART below - this will set the output USART in the uC and the input in the uC
+        The input will use an interrupt to fill a buffer. 
+        The buffer is sent to the output USART.
+        Using the interrupt tests the interrupt handler
+    
+    When you compile you will be shown the information to validate the configuration you have selected.
+        You cannot set the OUTUSART or the INUSART to a USART that does not exist - an error will be generated
+        You will be shown the number of USARTs for the selected uC
+        You will be shown the BPS per USART
+
+    Program the uC.
+
+    Enter data into the terminal attached logically to the INUSART - data will appear on the OUTUSART, enjoy
+
+
+    -----------------------------
+
+    Tested on the following key uC 18FxxQ43, 18F26K22, 18F27K40, 16F886
+
+    */
+
+
+
+
+#chip  18f26k22
+#option Explicit
+
+    #DEFINE OUTUSART 1
+    #DEFINE INUSART  1
+
+    //Optionally, turn of messages, uncomment the constant STOPMESSAGES
+    
+    // #DEFINE STOPMESSAGES
+
+
+    // ADD PPS HERE FOR THE SPECIFIC uC, IF REQUIRED
+
+
+
+
+    // DO NOT CHANGE BELOW HERE
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_BLOCKING
+    #DEFINE USART_DELAY OFF
+
+    #DEFINE USART2_TX_BLOCKING
+    #DEFINE USART2_BLOCKING
+    #DEFINE USART2_DELAY OFF
+
+    #DEFINE USART3_TX_BLOCKING
+    #DEFINE USART3_BLOCKING
+    #DEFINE USART3_DELAY OFF
+
+    #DEFINE USART4_TX_BLOCKING
+    #DEFINE USART4_BLOCKING
+    #DEFINE USART4_DELAY OFF
+
+    #DEFINE USART5_TX_BLOCKING
+    #DEFINE USART5_BLOCKING
+    #DEFINE USART5_DELAY OFF
+
+
+    #script
+
+        If NODEF(STOPMESSAGES) Then
+            Warning "Max USARTs = " CHIPUSART
+        End If
+        If OUTUSART > CHIPUSART OR INUSART > CHIPUSART Then 
+            Warning "USART IN/OUT parameters are incorrect"
+        END IF
+
+        
+
+        IF CHIPUSART > 0 Then
+            USART_BAUD_RATE=9600
+        END IF
+        IF CHIPUSART > 1 Then
+            USART2_BAUD_RATE=19200
+        END IF
+        IF CHIPUSART > 2 Then
+            USART3_BAUD_RATE=38400
+        END IF
+        IF CHIPUSART > 3 Then
+            USART4_BAUD_RATE=57600
+        END IF
+        IF CHIPUSART > 4 Then
+            USART5_BAUD_RATE=115200
+        END IF
+
+        If NODEF(STOPMESSAGES) Then
+            IF OUTUSART = 1 Then
+                Warning "Output USART " OUTUSART  USART_BAUD_RATE "BPS"
+            END IF
+            IF OUTUSART = 2 Then
+                Warning  "Output USART " OUTUSART USART2_BAUD_RATE "BPS"
+            END IF
+            IF OUTUSART = 3 Then
+                Warning  "Output USART " OUTUSART USART3_BAUD_RATE "BPS"
+            END IF
+            IF OUTUSART = 4 Then
+                Warning  "Output USART " OUTUSART USART4_BAUD_RATE "BPS"
+            END IF
+            IF OUTUSART = 5 Then
+                Warning  "Output USART " OUTUSART USART5_BAUD_RATE "BPS"
+            END IF
+
+            IF INUSART = 1 Then
+                Warning "Input  USART " INUSART  USART_BAUD_RATE "BPS"
+            END IF
+            IF INUSART = 2 Then
+                Warning "Input  USART " INUSART  USART2_BAUD_RATE "BPS"
+            END IF
+            IF INUSART = 3 Then
+                Warning "Input  USART " INUSART  USART3_BAUD_RATE "BPS"
+            END IF
+            IF INUSART = 4 Then
+                Warning "Input  USART " INUSART  USART4_BAUD_RATE "BPS"
+            END IF
+            IF INUSART = 5 Then
+                Warning "Input  USART " INUSART  USART5_BAUD_RATE "BPS"
+            END IF
+        END IF
+    #endscript
+
+    'This assumes you are using an ANSI compatible terminal.  Use PUTTY.EXE it is very easy to use.
+
+    '   Main program
+
+    'Wait for terminal to settle
+    wait 1 s
+
+    'Create the supporting variables
+    Dim next_in As Byte
+    Dim next_out As Byte
+    Dim syncbyte As Byte
+    Dim temppnt As Byte
+
+    ' Constants etc required for Buffer Ring
+    #DEFINE BUFFER_SIZE 8
+    #DEFINE bkbhit (next_in <> next_out)
+
+    'Define the Buffer
+    Dim buffer( BUFFER_SIZE - 1 ) 'we will use element 0 in the array as part of out buffer
+
+    'Call init the buffer
+    InitBufferRing
+
+    HSerSend 10, OUTUSART
+    HSerSend 13, OUTUSART
+    HSerSend 10, OUTUSART
+    HSerSend 13, OUTUSART
+    HSerPrint "Started: Serial between two devices", OUTUSART
+    HSerSend 10, OUTUSART
+    HSerSend 13, OUTUSART
+
+
+    'Get character(s) and send back
+    Do
+
+        ' Do we have data in the buffer?
+        if bkbhit then
+
+            'Send the next character in the buffer, exposed via the function `bgetc` back the terminal
+            HSerSend bgetc, OUTUSART
+
+        end if
+
+
+    Loop
+
+    'Supporting subroutines
+
+    Sub readUSART
+
+        buffer(next_in) = HSerReceiveFrom( INUSART )
+        temppnt = next_in
+        next_in = ( next_in + 1 ) % BUFFER_SIZE
+        If ( next_in = next_out ) Then  ' buffer is full!!
+            next_in = temppnt
+        End If
+
+    End Sub
+
+    Function bgetc
+        Dim local_next_out as Byte    'maintain a local copy of the next_out variable to ensure it does not change when an Interrupt happens
+        local_next_out = next_out
+        bgetc = buffer(local_next_out)
+        local_next_out=(local_next_out+1) % BUFFER_SIZE
+        INTOFF
+        next_out = local_next_out
+        INTON
+    End Function
+
+
+
+
+    Sub InitBufferRing
+
+        'Set the buffer to the first address
+        next_in = 0
+        next_out = 0
+        'Interrupt Handler - some have RCIE and some have U1RXIE, so handle
+        #IF INUSART=1
+            #IFDEF BIT( RCIE )
+                HandlerRCIE:
+                On Interrupt UsartRX1Ready Call readUSART
+            #ENDIF
+            #IFDEF BIT( RC1IE )
+                HandlerRC1IE:
+                On Interrupt UsartRX1Ready Call readUSART
+            #ENDIF      
+            #IFDEF BIT( U1RXIE )
+                HandlerU1RXIE:
+                On Interrupt UART1ReceiveInterrupt Call readUSART
+            #ENDIF
+            #IFDEF AVR
+                HandlerAVR:
+                On Interrupt UsartRX1Ready Call readUSART
+            #ENDIF
+        #ENDIF
+
+        #IF INUSART=2
+            #IFDEF BIT( RC2IE )
+                HandlerRC2IE:
+                On Interrupt UsartRX2Ready Call readUSART
+            #ENDIF
+            #IFDEF BIT( U2RXIE )
+                HandlerU2RXIE:
+                On Interrupt UART2ReceiveInterrupt Call readUSART
+            #ENDIF
+            #IFDEF AVR
+                HandlerAVR:
+                On Interrupt UsartRX2Ready Call readUSART
+            #ENDIF
+        #ENDIF
+
+        #IF INUSART=3
+            #IFDEF BIT( RC3IE )
+                HandlerRC3IE:
+                On Interrupt UsartRX3Ready Call readUSART
+            #ENDIF
+            #IFDEF BIT( U3RXIE )
+                HandlerU3RXIE:
+                On Interrupt UART3ReceiveInterrupt Call readUSART
+            #ENDIF
+            #IFDEF AVR
+                HandlerAVR:
+                On Interrupt UsartRX3Ready Call readUSART
+            #ENDIF
+        #ENDIF
+
+        #IF INUSART=4
+            #IFDEF BIT( RC4IE )
+                HandlerRC4IE:
+                On Interrupt UsartRX4Ready Call readUSART
+            #ENDIF
+            #IFDEF BIT( U4RXIE )
+                HandlerU4RXIE:
+                On Interrupt UART4ReceiveInterrupt Call readUSART
+            #ENDIF
+            #IFDEF AVR
+                HandlerAVR:
+                On Interrupt UsartRX4Ready Call readUSART
+            #ENDIF
+        #ENDIF
+
+        #IF INUSART=5
+            #IFDEF BIT( RC5IE )
+                HandlerRC5IE:
+                On Interrupt UsartRX5Ready Call readUSART
+            #ENDIF
+            #IFDEF BIT( U5RXIE )
+                HandlerU5RXIE:
+                On Interrupt UART5ReceiveInterrupt Call readUSART
+            #ENDIF
+            #IFDEF AVR
+                HandlerAVR:
+                On Interrupt UsartRX5Ready Call readUSART
+            #ENDIF
+        #ENDIF
+
+
+    End Sub
+
+
