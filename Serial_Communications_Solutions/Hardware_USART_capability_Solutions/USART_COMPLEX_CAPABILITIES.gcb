@@ -27,30 +27,43 @@
 
     -----------------------------
 
-    Tested on the following key uC 18FxxQ43, 18F26K22, 18F27K40, 16F886
+    Tested on the following key uC 18FxxQ43, 18F26K22, 18F27K40, 16F886 m- these represent the full range of uCs.
 
     */
 
 
 
 
-#chip  18f26k22
+#chip  18f27K40
 #option Explicit
 
-    #DEFINE OUTUSART 1
+    #DEFINE OUTUSART 2
     #DEFINE INUSART  1
-
-    //Optionally, turn of messages, uncomment the constant STOPMESSAGES
-    
-    // #DEFINE STOPMESSAGES
-
 
     // ADD PPS HERE FOR THE SPECIFIC uC, IF REQUIRED
 
+//PPS
+
+    // END OF PPPS SECTION  
+
+    // To optionally show baud rate information
+    // #DEFINE CHECK_USART_BAUD_RATE                       'Show baud rate errors above 2%   
+    // #DEFINE ISSUE_CHECK_USART_BAUD_RATE_WARNING      'Show actual baud rate
+
+    // To optionally, turn of messages from this demonstration program; uncomment the constant STOPMESSAGES
+    // #DEFINE STOPMESSAGES
+    //
+    // Example messages are:
+    //
+    //  Information messages have been generated:
+    //    
+    //     Information message: Max USARTs =  2
+    //     Information message: Output USART  2 19200 BPS
+    //     Information message: Input  USART  1 9600 BPS
 
 
 
-    // DO NOT CHANGE BELOW HERE
+    // DO NOT CHANGE BELOW HERE *************************************************************************************
     #DEFINE USART_TX_BLOCKING
     #DEFINE USART_BLOCKING
     #DEFINE USART_DELAY OFF
@@ -81,8 +94,7 @@
             Warning "USART IN/OUT parameters are incorrect"
         END IF
 
-        
-
+        // Set the baud rates
         IF CHIPUSART > 0 Then
             USART_BAUD_RATE=9600
         END IF
