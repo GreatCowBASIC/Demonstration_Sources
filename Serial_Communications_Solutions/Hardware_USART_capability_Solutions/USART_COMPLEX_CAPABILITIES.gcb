@@ -1,6 +1,6 @@
     /*
     Get a few USB/TLL and a terminal application.
-    Define the USART settings for USART 1..5 - the Baud Rate (BPS) are set in the script below
+    Define the USART settings in your terminal application for USART 1..5 - the Baud Rate (BPS) are set in the script below
         USART1 9600
         USART2 19200
         USART3 38400
