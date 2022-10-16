@@ -1,16 +1,22 @@
 
-' TM1638 7-Segment OEM display library Demonstration for Great Cow Basic
+' TM1638 7-Segment OEM display library Demonstration - For Great Cow Basic
 ' This is a collection of demo subroutines, each demo is run from Main.
 ' for chip with less Prog. memory/RAM, enable just a few demo's.
 ' Using Commands... see Sub CmdDemo1.
-' Ask on the forum for help or feedback any comments.
+' Ask on the forum for help or feedback any comments/issues.
+' Note: As this demo is quite "busy" exercising the library functions, there may be
+'       some anomalies experienced with the compiler & or specific chip.
+'       Due to the modular structure it is easy to disable specific demo's in Main:
 
 'Set below configuration first for #chip, pins, display etc...
 '*******************************************************
-#Include "TM1638_OEM_Lib.h"
-'#Include <TM1638_OEM_Lib.h>
+//#Include "TM1638_OEM_Lib.h"
+#Include <TM1638_OEM_Lib.h>
 
 #OPTION explicit
+
+'---Mega328p---
+'#chip mega328p, 16
 
 '---Mega2560---
 #Chip mega2560,16
@@ -19,7 +25,7 @@
 #Define TM1638_STB1 PortD.2
 '*/
 
- '---16F1829---
+ '---PIC16F1829---
 '#Chip 16F1829,8
 '#Config Osc = Int
 '#Define TM1638_CLK PortB.4
@@ -33,7 +39,7 @@
 '(Port pin Dir is set in lib file)
 
 
-'  Configuration constants: enable relavent #Define
+'  Configuration constants: enable relavent #Define for your board
 '-------------------------------------------------------------
 #Define TM_DispLen 8      ' Number of digits on display
 #Define Com_Cathode       ' CC Display up to 8x 7-seg digits (This is default if not set)
@@ -58,7 +64,7 @@ Dim Mybuf1(TM_DispLen +1 +TM_LEDs) as Byte  ' additional display buffer
 
 ' Set some global values
 '-----------------------
-  Value = 314159
+  Value = 31415926
   cnt1 = 0 : cnt2 = 0
   TM_STB = 1  '< use TM Display 1,  1 is default (so don't need to set)
   TM_FlashRate = 75
@@ -71,6 +77,7 @@ Dim Mybuf1(TM_DispLen +1 +TM_LEDs) as Byte  ' additional display buffer
 
 
 '   comment/un-comment lines in main to run/hide demos
+'===========================================================
 Main:
 ' Demo
     tmCLRbuf : tmCLRdisp : Wait 200 ms
@@ -80,7 +87,9 @@ Main:
 
     SetLED   'set LEDs demo (also set in ShowButtons_1)
     wait 400 ms
-    Count_2
+
+    Count_2   '<- Here just for testing
+
     Scroll_1 : ScrollArray : RndFill_3 : RndFill_1 : Wave1 : RedEye1
     tmSndStr("FlASH ")
     Flash_Disp ': Buffers_2
@@ -100,7 +109,7 @@ Main:
 
 Goto Main
 End
-'-------------------------------
+'===========================================================
 
 Sub SetLED
      tmCLRdisp
@@ -182,7 +191,6 @@ Sub  ShowButtons_3
      TM_DispBuf(TM_ButnVal2) = 8
      tmSndBuf
      wait 50 ms
-     If TM_ButnVal1 = 4 and  TM_ButnVal2 = 8 Then Exit Do
    Loop
 '     Goto rpt3
 End Sub
@@ -272,59 +280,53 @@ End Sub
 
 ' Display 2 count up numbers
 Sub Count_2
-
-tmCLRbuf : tmCLRdisp
 Dim UpCnt1, UpCnt2, Count2 as Byte
 Dim Count1, Count0 as Word
+        tmCLRbuf : tmCLRdisp
+        UpCnt1 = 0 : UpCnt2 = 0 : Count0 = 0 : Count1 = 0 : Count2 = 0 :
+        TM_dpPos = TM_DispLen / 2
 
-        UpCnt1 = 0
-        UpCnt2 = 0
-        Count0 = 0   '<< Comment this line to run ok
-        Count1 = 0
-        Count2 = 0
-
-TM_dpPos = TM_DispLen / 2
   Do while Count0 < 301
-         UpCnt1++
-         UpCnt2++
+        UpCnt1++
+        UpCnt2++
 
-       If UpCnt1 > 20 Then       ' every xx ms
-          Count1++
-          UpCnt1 = 0 : Count0++
-          tmDecBuf(Count1,TM_DispLen,3)    ' Set digits 456
-          tmSndBuf(TM_DispLen,3)
-       End If
+     If UpCnt1 > 20 Then       ' every xx ms
+        Count1++
+        UpCnt1 = 0 : Count0++
+        tmDecBuf(Count1,TM_DispLen,3)    ' Set digits 456
+        tmSndBuf(TM_DispLen,3)
+     End If
 
-          TM_Blank0 = Off        ' just for hex
-       If UpCnt2 > 200 Then     ' every xx ms
-          Count2++
-          UpCnt2 = 0
-          tmHexBuf(Count2,2,2)   ' Set digits 12
-          tmSndBuf(2,2 )
-       End If
-          TM_Blank0 = On
+        TM_Blank0 = Off        ' just for hex
+     If UpCnt2 > 200 Then     ' every xx ms
+        Count2++
+        UpCnt2 = 0
+        tmHexBuf(Count2,2,2)   ' Set digits 12
+        tmSndBuf(2,2 )
+     End If
+        TM_Blank0 = On
 
-         If Count1 > 999 then Count1 = 0
-         If Count2 > 200 then Count2 = 0
-         wait 500 us
+       If Count1 > 999 then Count1 = 0
+       If Count2 > 200 then Count2 = 0
+       wait 500 us
   Loop
-        TM_dpPos = 0
+      TM_dpPos = 0
 
 End Sub
 
 
-' Horzontal Bargraph 2 ch on 7-Seg disp.
+' Horzontal Bargraph 2 channel on 7-Seg disp.
 Sub BarGraph1
 Dim Seg1_2, Fillseg as Bit
 Dim Inval1, Inval2, DigitNum, BGdigit as Byte
-  tmCLRbuf
-  FillSeg = On
+      tmCLRbuf
+      FillSeg = On
 
- For Cnt1 = 0 to TM_DispLen *4' 24  '< set some values for BG
-  Inval1 = Cnt1
-  Inval2 = Cnt1 / 2
+  For Cnt1 = 0 to TM_DispLen *4' 24  '< set some values for BG
+      Inval1 = Cnt1
+      Inval2 = Cnt1 / 2
 '  If Inval1 > TM_DispLen *2 then Inval1 = TM_DispLen *2
-  If Inval1 > TM_DispLen *2 then Inval1 = (TM_DispLen *4)-Inval1
+    If Inval1 > TM_DispLen *2 then Inval1 = (TM_DispLen *4)-Inval1
 
 ' Upper bargraph (7-seg)
       DigitNum = 1
@@ -363,7 +365,7 @@ Dim Inval1, Inval2, DigitNum, BGdigit as Byte
       Wait 1 s
 End Sub
 
- ' This is not Tested yet with TM1638 - Likely will need work (port from TM1637_OEM_lib)
+ ' This is not Fully Tested yet with TM1638 - Likely will need work (ported from TM1637_OEM_lib)
 'Set segments on LED linear Bargraph tmSegBar(Digit,Segment,[Fill])
 Sub BarGraph2'           (on 7 seg display will just see the segments)
 Dim BG1, rpt, Rnd1, Rndp as Byte
@@ -391,8 +393,8 @@ Dim BG1, rpt, Rnd1, Rndp as Byte
     Next
         tmSegBar(Cnt1,0) ' Clear bargraph
         Wait 500 ms
-/*  ' Usable code...
 
+/*  ' Usable code...
   For Lp1 = 0 to 8 '16  ' < digit values
     tmSegBar(BG1,Lp1,Off)   ' no fill
     Wait 50 ms
@@ -651,35 +653,41 @@ Sub Scroll_1
     tmClrbuf
      tmSndStr "Great CoLJ basic 7seg_Display"
      tmSndBuf
-     Wait 1 s
+      Wait 1 s
 
     tmClrbuf ': tmClrDisp
 '     tmSndStr "Error.5 no_input  CHECK CABlE"
      tmSndStr "Error.5 "
      tmSndBuf
-     wait 600 ms
-     tmSndStr "   no_input  CHECK CABlE"
+      wait 300 ms
+     tmSndStr "   no_input"
      tmSndBuf
-     Wait 1 s
+      wait 700 ms
+     tmSndStr "  CHECK CABlE"
+     tmSndBuf
+      Wait 1 s
 
     tmClrbuf ': tmClrDisp
      tmSndStr "Error.3 "
      tmSndBuf
-     wait 600 ms
-     tmSndStr"   no_Fan  CASE =85�C"
+      wait 300 ms
+     tmSndStr"   no_Fan"
      tmSndBuf
-     Wait 1 s
+      wait 700 ms
+     tmSndStr"  CASE =85�C"
+     tmSndBuf
+      Wait 1 s
 
      TM_ScrollRate = 32
     tmClrbuf ': tmClrDisp
      tmSndStr "Scrolling A long ""string""    can-be good_fun to read"
      tmSndBuf
-     Wait 1 s
+      Wait 1 s
      TM_ScrollRate = 35
     tmClrbuf ': tmClrDisp
      tmSndStr "Special chr . . .    "" = _ ~ | ) ( � ' - ?"
      tmSndBuf
-     Wait 1 s
+      Wait 1 s
     TM_Scroll = Off
 End Sub
 
@@ -695,7 +703,9 @@ Dim Array1 (11) as byte
     tmScrlBuf(Array1)
      Array1 =   1, 1, 1,56,14,1,1,68,8,8
     tmScrlBuf(Array1)
-     Array1 =   8,8,0,0,0,0,0,0,0,0
+     Array1 =   8,8,8,8,8,8,8,8,8,8
+    tmScrlBuf(Array1)
+     Array1 =   8,0,0,0,0,0,0,0,0
     tmScrlBuf(Array1)
     TM_scroll = Off
     wait 600 ms

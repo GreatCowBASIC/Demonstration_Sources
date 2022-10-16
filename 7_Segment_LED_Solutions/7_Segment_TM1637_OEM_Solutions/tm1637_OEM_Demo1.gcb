@@ -1,14 +1,36 @@
-' TM1637 7-Segment OEM display library Demonstration
+' TM1637 7-Segment OEM display library Demonstration - For Great Cow Basic
+' This is a collection of demo subroutines, each demo is run from Main.
+' For a chip with less Prog. memory/RAM, enable just a few demo's.
+' Using Commands... see Sub CmdDemo1.
+' Ask on the forum for help or feedback any comments/issues.
+
+' Note: As this demo is quite "busy" exercising the library functions, there may be
+'       some anomalies experienced with the compiler & or specific chip.
+'       Due to the modular structure it is easy to disable specific demo's in Main:
 
 'Set below configuration first for #chip, pins, display etc...
 '*******************************************************
-//#Include "TM1637_OEM_Cmd_Lib.h"
-#Include <TM1637_OEM_Cmd_Lib.h>
+//#Include "tm1637_oem_lib.h"
+#Include <tm1637_oem_lib.h>
 
 #OPTION explicit
-''#chip 12F683, 8
+'---PIC12F683---
+'#chip 12F683, 8
+'#Define TM1637_CLK GPIO.0
+'#Define TM1637_DIO GPIO.1
+
+'---Mega2560---
+'#Chip mega2560,16
+'#Define TM1638_DIO PortD.0
+'#Define TM1638_CLK PortD.1
+
+'---PIC16F1829---
 #chip 16F1829,8
 #config Osc = Int
+#define TM1637_CLK PortB.4
+#define TM1637_DIO PortB.5
+'(Port Dir is set in include file)
+
 
 Dim Value as Long   ' number to display
 Dim lp1 as Byte       ' Loops etc
@@ -19,22 +41,20 @@ Dim cnt1 as Byte     ' count
 Dim cnt2 as Word     ' count
 Dim Mybuf1(TM_DispLen+1+TM_LEDs) as Byte  ' user buffer if needed.
 
-#define TM1637_CLK PortB.4
-#define TM1637_DIO PortB.5
-'      (Port Dir is set in include file)
+
 
 '  Configuration constants: (If not set will be default value)
 '-------------------------------------------------------------
-'#Define TM_DispLen 6      ' Number of digits on display (default 6)
+#Define TM_DispLen 6      ' Number of digits on display (default 6)
 #Define TM_6dReMap On    ' Remap digits for 6d module with swapped com pins (default Off)
 '#Define Snd_SEQ           ' Enable sequential register addressing mode-see pdf help (default Fixed)
 '#Define KeyMap ButnMap2   ' Only used for weird datasheet map. (default ButnMap1)
 '#Define TM_LEDs 2         ' Use when TM_DispLen=4, TM_DispBuf(5 & 6) for other LED's  (default 0)
-'#Define TMdly 5          ' Modify clk <-> DIO delay us -eg. if need a shorter write message.  (default 10)
+'#Define TMdly 5          ' Modify clk <-> DIO delay us -eg. if need a shorter write message. (default 10)
 '---------------------------
 '#Define NackCount         ' Enable NACK counts (for testing comm issues)  (default no count)
-'NackCnt = 0               ' need to ensure clear if counting NACK's
 '#Define NoAck             ' Ignore ACK state.  (default ack test enabled)
+'NackCnt = 0               ' need to ensure clear if counting NACK's
 '-------------------------------------------------------------
 
 Value = 314159
@@ -49,33 +69,33 @@ wait 1 ms
   tmCLRdisp : tmCLRbuf
 
 '   comment/un-comment lines in main to run/hide demos
+'===========================================================
 Main:
 
   tmCLRdisp : tmCLRbuf  : Wait 500 ms
   OverRange : Wait 500 ms
 
  '---Using Commands---
-'  CmdDemo1       ' <-- Uncomment to run
+'  CmdDemo1       ' <-- Uncomment to run this demo
 
+'  FlashDigs  '< TESTING....
   RndFill_3 : RndFill_1 : Scroll_1 : ScrollArray : Wave1 : RedEye1
-  FlashDigs ': Buffers_2
-
- 'NackCounter
+  FlashDigs
   BarGraph1 ' using 7-seg display
-' BarGraph2 ' using linear LED bargraph
+' BarGraph2 ' using linear LED bargraph (not the 7-seg display)
   Count_2
-  Bright_Test2 : Bright_Test1
+  Bright_Test1 ': Bright_Test2
   tmCLRdisp : tmCLRbuf
-
+'   Buffers_2 'additional display buffer
 '   TestFlashKey
 '   Disp_KeyVal_6d : Disp_KeyVal_6d : Disp_KeyVal_6d : Disp_KeyVal_6d
 '---Demo2---
 '  disp2Val4d : Disp_KeyVal_4d    ' 4 digit test
 '  disp2Val6d : Disp_KeyVal_6d   ' 6 digit test
-
+'  NackCounter
 Goto Main
 End
-'-------------------------------
+'===========================================================
 
 'Set all segments
 Sub TestAll_1
@@ -242,7 +262,8 @@ Sub FlashDigs   ' (The loop just simulates your main program loop)
 ' Flash_Display
 tmCLRbuf : tmCLRdisp
 TM_scroll = off
-    tmSndStr("FlASH ")
+    tmSndStr("FlASH ")   '< This should be ok on 4 digit disp.?
+'    tmSndStr("FlSH")    '< 4 digit disp.
     cnt1 = 5
     Wait 500 ms
     Do while cnt1 > 0
@@ -277,6 +298,7 @@ TM_scroll = off
 
 End Sub
 
+' Using additional display buffer
 Sub Buffers_2
 tmSndStr "Error ",Mybuf1,Off
 '    For LP1 = 1 to TM_DispLen+1 : Mybuf1(LP1) = TM_DispBuf(LP1) : Next
@@ -300,7 +322,7 @@ Sub TestFlashKey
     cnt1 = 10
     Do while Cnt1 > 0       '< simulates main program loop
      tmFlashDig(TM_DispLen)
-     If TM_ButnVal <> 0 then Msg1 ' stop flashing if button pressed
+     If TM_ButnVal1 <> 0 then Msg1 ' stop flashing if button pressed
      cnt1-- ': if cnt1 > 100 then cnt1 = 0
     Loop
 
@@ -309,8 +331,8 @@ End Sub
 Sub Msg1'  called from Sub TestFlashKey
     tmCLRbuf
     tmSndStr "Btn"
-    tmSndDec(TM_ButnVal,TM_DispLen,2)
-    TM_ButnVal = 0 : cnt1 = 1
+    tmSndDec(TM_ButnVal1,TM_DispLen,2)
+    TM_ButnVal1 = 0 : cnt1 = 1
     Wait 2 s
 End Sub
 '---------------------------------------------------------
@@ -341,7 +363,7 @@ End Sub
 Sub Disp_KeyVal_4d
     tmGetKey                '< Scan for keypress
     tmSndStr "bn"
-    tmDecBuf (TM_ButnVal)
+    tmDecBuf (TM_ButnVal1)
     tmSndBuf                 ' eg "bn09"
     Wait 200 ms
 End Sub
@@ -350,7 +372,7 @@ Sub Disp_KeyVal_6d
 
     tmGetKey                '< Scan for keypress
     tmDecBuf (TM_KeyVal,3,3)
-    tmDecBuf (TM_ButnVal,6,2)
+    tmDecBuf (TM_ButnVal1,6,2)
     tmSndBuf                 ' eg "239 09"
     Wait 200 ms
 End Sub
@@ -367,7 +389,9 @@ Dim Rev as Bit
     tmSndDec(TM_Bright,TM_DispLen,1)
     If Rev = 0 then TM_Bright++
     If Rev = 1 then TM_Bright--
-    If TM_Bright > 6 and Rev = 0 then Rev = 1
+ // If TM_Bright > 6 And Rev = 0 then Rev = 1 '< Compile issue W-ATMEL 2022.10.04
+    If TM_Bright > 6 And Not Rev then Rev = 1
+
     wait 300 ms
   Loop while TM_Bright <> 0
 End Sub
@@ -384,7 +408,8 @@ Dim Rev as Bit
     tmctrlSnd
     If Rev = 0 then TM_Bright++
     If Rev = 1 then TM_Bright--
-    If TM_Bright > 6 and Rev = 0 then Rev = 1
+//  If TM_Bright > 6 and Rev = 0 then Rev = 1
+    If TM_Bright > 6 And Not Rev then Rev = 1
     wait 200 ms
   Loop while TM_Bright <> 0
 End Sub
@@ -466,9 +491,10 @@ Sub RndFill_3
     cnt2--
     Wait 200 ms
  Loop
-   wait 1 s
+   wait 500 ms
 End Sub
 
+'Scroll text on display
 Sub Scroll_1
     TM_Scroll = On : TM_ScrollRate = 50
     tmClrbuf
@@ -492,7 +518,7 @@ Sub Scroll_1
      Wait 1 s
 
     tmClrbuf ': tmClrDisp
-     tmSndStr "Special chrs . . .    "" = _ ~ | ) ( ° ' - ?"
+     tmSndStr "Special chr . . .    "" = _ ~ | ) ( ° ' - ?"
      tmSndBuf
      Wait 1 s
     TM_Scroll = Off

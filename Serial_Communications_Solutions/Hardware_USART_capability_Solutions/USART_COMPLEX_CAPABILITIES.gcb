@@ -34,7 +34,7 @@
 
 
 
-#chip  18f27K40
+#chip  18f26k22
 #option Explicit
 
     #DEFINE OUTUSART 2

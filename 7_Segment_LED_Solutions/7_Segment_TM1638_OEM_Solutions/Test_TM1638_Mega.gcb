@@ -1,0 +1,140 @@
+
+' TM1638 7-Segment OEM display library Demonstration for Great Cow Basic
+' This is a collection of demo subroutines, each demo is run from Main.
+' for chip with less Prog. memory/RAM, enable just a few demo's.
+' Using Commands... see Sub CmdDemo1.
+' Ask on the forum for help or feedback any comments.
+
+'Set below configuration first for #chip, pins, display etc...
+'*******************************************************
+#Include "TM1638_OEM_Lib.h"
+'#Include <TM1638_OEM_Lib.h>
+
+#OPTION explicit
+
+'---Mega2560---
+#Chip mega2560,16          ' not sure if osc freq. & Osc = Int is working correctly
+'#Config Osc = Int         '   wait ms is not consistemt with different freq.
+#Define TM1638_DIO PortD.0
+#Define TM1638_CLK PortD.1
+#Define TM1638_STB1 PortD.2
+'*/
+
+' Note: if use commented 'start comment block' (SlashStar) block is not commented completely
+
+ '---16F1829---
+'#Chip 16F1829,8
+'#Config Osc = Int
+'#Define TM1638_CLK PortB.4
+'#Define TM1638_DIO PortB.5
+'#Define TM1638_STB1 PortB.6
+'*/
+
+'#Define TM1638_STB2 PortB.1  ' Enable to use multiple boards, use 'TM_STB = n' to set
+'#Define TM1638_STB3 PortB.2
+'#Define TM1638_STB4 PortB.3
+'(Port pin Dir is set in lib file)
+
+
+'  Configuration constants: enable relavent #Define
+'-------------------------------------------------------------
+#Define TM_DispLen 8      ' Number of digits on display
+#Define Com_Cathode       ' CC Display up to 8x 7-seg digits (This is default if not set)
+'#Define Com_Anode         ' CA Display up to 10x 7-seg digits
+'#Define RevDig            ' Reverse display digits (need for rev wired display boards)
+#Define Butn_Map1         ' Remap ButnValue as per Table Butn_Map1 (if not set create your own)
+'#Define Butn_Map2         ' Remap ButnValue as per Table Butn_Map2
+#Define TM_LEDs 2         ' Use when eg. TM_DispLen=8, TM_DispBuf(9 & 10) for other LED's
+'#Define TMdly 2           ' Modify clk <-> DIO delay us (if need a shorter write message)
+
+Dim Value as Long   ' number to display
+Dim lp1, lp2, cnt1, cnt2 as Byte       ' Loops etc
+Dim  dly1 as Word
+Dim Mybuf1(TM_DispLen +1 +TM_LEDs) as Byte  ' additional display buffer
+
+' Notes
+'-------------------------------------------------------------
+' Com_Anode & RevDig needed for "QYF-TM1638" board.
+' Butn_Map1 is needed for "LED&KEY" board. (Com_Cathode is default)
+' Other boards you will need to test(please feedback detail).
+' Sequential/Fixed adress mode cannot be user selected due to even/odd registers structure
+'-------------------------------------------------------------
+
+' Set some global values
+'-----------------------
+  Value = 31415926
+  cnt1 = 0 : cnt2 = 0
+  TM_STB = 1  '< use TM Display 1,  1 is default (so don't need to set)
+  TM_FlashRate = 75
+  TM_Disp = On    ' Default is On
+  dly1 = 1000
+'-----------------------
+
+  TestAll_1    ' all 8 segments on all digits
+  tmCLRbuf : tmCLRdisp
+  Wait dly1 ms
+
+
+'   comment/un-comment lines in main to run/hide demos
+Main:
+' Demo
+
+
+    tmDecBuf(Value)    ' Set digits 456
+    tmSndBuf
+    Wait dly1 ms
+
+    tmSndStr"ABCDEFGH"
+'    tmSndBuf
+    Wait dly1 ms
+
+    Bright_Test1 ' : Bright_Test2
+    Wait 1 s
+
+Goto Main
+End
+
+' Using DataSnd
+Sub Bright_Test1
+  tmCLRbuf : tmCLRdisp
+Dim Rev as Bit
+    TM_Bright = 0 : Rev = 0
+    tmSndStr("bright")
+      Wait dly1 ms
+  Do
+'    tmctrlSnd
+    tmSndDec(TM_Bright,TM_DispLen,1)
+    If TM_Bright = 7 then wait 250 ms
+    If Rev = 0 then TM_Bright++
+    If Rev = 1 then TM_Bright--
+''    If TM_Bright > 6 and Rev = 0 then Rev = 1
+    If TM_Bright > 6 then
+      If Rev = 0 then Rev = 1
+    End If
+    wait 250 ms
+  Loop while TM_Bright <> 0
+End Sub
+
+'Set all digits FF (all segments on)
+Sub TestAll_1
+    For Cnt1 = 1 to TM_DispLen
+      tmSndDig (255,Cnt1)   '    "88888888"
+    Next
+     Wait dly1 ms
+End Sub
+
+'Set all digits FF (all segments on)
+Sub TestAll_2
+    For Cnt1 = 1 to 16
+      tmCLRdisp(255)   '    "88888888"
+    Next
+     Wait dly1 ms
+End Sub
+
+Sub OverRange
+    For Cnt1 = 1 to TM_DispLen
+      tmSegBuf(Cnt1,7,On)   '    "------"
+    Next
+     tmSndBuf
+    Wait dly1 ms
+End Sub

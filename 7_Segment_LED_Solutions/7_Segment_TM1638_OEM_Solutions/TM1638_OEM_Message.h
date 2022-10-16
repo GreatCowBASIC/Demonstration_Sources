@@ -1,7 +1,3 @@
-//-------------------------------
-//*****Preliminary*******
-//-------------------------------
-
 
 '   TM1638 Message Processor - TM1638_OEM_Message.h   GreatCowBasic
 '   Copyright (C) 2022 -  ToniG
@@ -22,26 +18,25 @@
 '    2022/09/19   Add key(button) read, including 2 keypress.
 '    2022/09/22   Add multiple board use.
 '
-'   Rev 0.9.00
+'   Rev 0.9.10
 ' This include builds TM1638 serial messages for the TM1638 HW_Driver
 ''********************************************************************
 
-' "ComAnode" remaps digit data for TM1638 registers  for Common Anode displays.
-' CA mode is slower to process.
-
+' "ComAnode" remaps digit data for TM1638 registers for Common Anode displays.
+' CA mode is slower to process, but need for some displays.
+'   digit 9 & 10 always ComAnode.
 
 'TooDoo
-'
+'       Com_Anode - Disable revdig for 9&10 ? if TM_LEDs <> 0
 
 ' Variables:
 ' Read - Dig_pos, Num_Digs, Dig_RM, TMdigVal, Dig_n, TM_DispLen, Dbuf(1-10),TM_DispBuf()
 ' Modified - TM_KeyVal(1-4), TM_ButnVal1 , TM_ButnVal2, BufIndx, TM_lp2, KeyLP, Tmp_1, Tmp_2
 '          - LedReg,
 
-#OPTION explicit  '< while in dev...
-'#Include "TM1638_HW_Driver.h"
+'#OPTION explicit  '< while in dev...
+
 ' TM1638 message Constants
-//DELETE #Define TMdly 10        ' clk <-> DIO delay us
 #Define TMcmd_80h 0x80     ' Ctrl value
 #Define TMcmd_40h 0x40     ' Sequential address mode  (Digit registers)
 #Define TMcmd_44h 0x44     ' Fixed address mode (1 Digit per cmd)
@@ -53,7 +48,7 @@ Dim TM_RdVal, TM_ButnVal1 , TM_ButnVal2, KeyLP as byte
 
 ' Send the display buffer to TM1638 (whole buffer is sent in ComAnode mode)
 Sub tmSndBuf (Optional In Dig_pos = TM_DispLen, Optional In Num_Digs = TM_DispLen, Optional In Dbuf() = TM_DispBuf)
-Dim TM_lp2 as Byte'< re-mapped value
+Dim TM_lp2, Tmp_2 as Byte
 
 
 '' Common Cathode displays, up to 8 digits - no segment transpose (Reg C0 bits 0-7 is digit 1)
@@ -73,7 +68,7 @@ Dim TM_lp2 as Byte'< re-mapped value
         tmCtrlSnd
   #endif
 
-'ToDoo: Disable revdig for 9&10 if TM_LEDs <> 0
+
 ' Common Anode display, up to 10 digits, seg_dig transpose active.
 ' Regs C0,C2,C4,C6,C8,CA,CC,CE bit 0 is digit 1.  Need to send whole buffer
 '                  we are reading/setting array bits so need temp vars
@@ -151,13 +146,12 @@ Sub tmSndDig (In TMdigVal, In Dig_n)
 End Sub
 
 
-' Set LED on Grid 9 & 10 (bit 0, 1 odd address registers) always ComANODE
+' Set LED on Grid 9 & 10 (bit 0, 1 odd address registers) always ComAnode
 Sub tmSetLED (In LEDn, In LEDon) ' LEDn 1 - 16
     Dim LedReg as Byte
     If LEDn = 0 then Exit Sub
     Tmp_1 = LEDn -1
     If LEDn < 9 then
-      ''If LEDon = 1 then LedReg.0 = 1 Else LedReg.0 = 0 ' LED's 1-8 - Grid 9
          Tmp_1 = LEDn -1
        If LEDon = 1 then  ' this is for ComAnode SndBuf (it clears odd regs)
          LedReg.0 = 1
@@ -168,7 +162,6 @@ Sub tmSetLED (In LEDn, In LEDon) ' LEDn 1 - 16
       End If
 
     Else
-      ''If LEDon = 1 then LedReg.1 = 1 Else LedReg.1 = 0  ' LED's 9-16 - Grid 10
          Tmp_1 = LEDn -9  '(-1-8)
        If LEDon = 1 then
          LedReg.0 = 1
@@ -194,9 +187,6 @@ End Sub
 
 'TM1638 read Key press (Set array TM_KeyVal & var TM_ButnVal1,TM_ButnVal2 )
 Sub tmGetKey
-'Dim TM_RdVal, TM_ButnVal1 , TM_ButnVal2, KeyLP as byte
-'Dim TM_KeyVal(5) as byte
-
        TM_ButnVal1  = 0 : TM_ButnVal2 = 0
 
      ' ' get each key byte -> array
@@ -247,20 +237,19 @@ Sub tmGetKey
 '          The above could be expanded to include more then 2 sametime buttons
 '           DataSheet states only same Kn buttons can be sametime pressed
 
-'   Modify the TM_ButnVal1, TM_ButnVal2 as per Table (if required)
-    #Ifdef Butn_Map1 ' for the "LED&KEY" module board
+'          Modify the TM_ButnVal1, TM_ButnVal2 as per Table (if required)
+    #Ifdef Butn_Map1 '< for the "LED&KEY" module board
           If TM_ButnVal1 < 25 then ReadTable ButnMap1, TM_ButnVal1-16, TM_ButnVal1
           If TM_ButnVal2 < 25 then ReadTable ButnMap1, TM_ButnVal2-16, TM_ButnVal2
     #Endif
 
-    #Ifdef Butn_Map2 ' for the "Unknown" module board (modify below line[-16] to suit)
+    #Ifdef Butn_Map2 '< for the "Unknown" module board (modify below line[-16] to suit)
           If TM_ButnVal1 < 25 then ReadTable ButnMap2, TM_ButnVal1-16, TM_ButnVal1
           If TM_ButnVal2 < 25 then ReadTable ButnMap2, TM_ButnVal2-16, TM_ButnVal2
     #Endif
           If TM_ButnVal1 <> 0 And  TM_ButnVal2 <> 0 then
              If TM_ButnVal1 > TM_ButnVal2 then Swap(TM_ButnVal1,TM_ButnVal2)
           End If
-
 End Sub
 
 '  Button Map tables     1 of 2 maps or none are selected by //// #Define KeyMap
@@ -275,27 +264,27 @@ End Sub
  End Table
 
 ' set STBn for the selected display (1~4)
- Sub setTM1638_STB (In STB as bit)
+ Sub setTM1638_STB (In tmSTB as bit)
     Select Case TM_STB    '< This is the STB to set
       Case 1
         #IFDEF TM1638_STB1
-          'Set TM1638_STB1 STB ' < Cannot use bit variable with Set (silent fail)
-          If STB = True then Set TM1638_STB1 1 Else Set TM1638_STB1 0
+          'Set TM1638_STB1 tmSTB ' < Cannot use bit variable with Set (silent fail)
+          If tmSTB = True then Set TM1638_STB1 1 Else Set TM1638_STB1 0
         #ENDIF
       Case 2
         #IFDEF TM1638_STB2
-          'Set TM1638_STB2 STB
-          If STB = True then Set TM1638_STB2 1 Else Set TM1638_STB2 0
+          'Set TM1638_STB2 tmSTB
+          If tmSTB = True then Set TM1638_STB2 1 Else Set TM1638_STB2 0
         #ENDIF
       Case 3
         #IFDEF TM1638_STB3
-          'Set TM1638_STB3 STB
-          If STB = True then Set TM1638_STB3 1 Else Set TM1638_STB3 0
+          'Set TM1638_STB3 tmSTB
+          If tmSTB = True then Set TM1638_STB3 1 Else Set TM1638_STB3 0
         #ENDIF
       Case 4
         #IFDEF TM1638_STB4
-          'Set TM1638_STB4 STB
-          If STB = True then Set TM1638_STB4 1 Else Set TM1638_STB4 0
+          'Set TM1638_STB4 tmSTB
+          If tmSTB = True then Set TM1638_STB4 1 Else Set TM1638_STB4 0
         #ENDIF
     End Select
 End Sub
@@ -309,12 +298,9 @@ Sub tmCLRdisp(Optional In TM_WrVal = 0)
         Wait TMdly us
       setTM1638_STB 0
         TM1638_WrVal (TMaddr)
-'    For TMlp1 = 1 to 16
     Repeat 16
       TM1638_WrVal (0)
-'      TM1638_WrVal (TM_WrVal)
     End Repeat
-'    Next
       setTM1638_STB 1
         tmCtrlSnd
 End Sub

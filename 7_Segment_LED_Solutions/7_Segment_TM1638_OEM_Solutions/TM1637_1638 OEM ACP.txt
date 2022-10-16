@@ -14,7 +14,7 @@
 -> tmCLRbuf  ([Optional position{Disp_Len}], [Optional number of digits{Disp_Len}], [Optional buffer name{DispBuf}]) | - TM1637/1638 OEM Lib: Clear display buffer
 -> tmCLRdisp  Clear all display | TM1637/1638 OEM Lib - Clear all display digits
 -> tmCtrlSnd Send Control Byte | TM1637/1638 OEM Lib - Send TM1637/1638 Control Byte *
--> tmGetKey  Read Button/Key press | TM1637/1638 OEM Lib - Get Key pressed,  Button Number set in 'BtnVal' Var *
+-> tmGetKey  Read Button/Key press | TM1637/1638 OEM Lib - Get Key pressed,  Button Number set in 'TM_ButnVal1' Var *
 -> tmScrlBuf (Array name, [Optional Buffer name{DispBuf}]) | - TM1637/1638 OEM Lib: Scroll Buffer
 -> tmSetLED (LED Num, On/Off) | - TM16338 OEM Lib: Set LED 1~16 ON or Off
 
@@ -28,8 +28,8 @@
 -> TM_FlashRate - (byte var) TM1637/1638 Set Flash Rate | TM_FlashRate = Value (1 - 255) {default = 100} val*4ms eg. 100 = 400ms
 -> TM_Scroll - (bit var) TM1637/1638 Scroll long strings |  TM_Scroll = On/Off {default = Off}
 -> TM_ScrollRate - (byte var) TM1637/1638 Set scroll speed |  ScrollSpd = Value (1 - 255){default = 75} val*4ms eg. 100 = 400ms
--> TM_ButnVal - (byte var) TM1637 Button pressed value | Set by tmGetKey (1 - 16/24)
+-> TM_ButnVal1 - (byte var) TM1637/1638 Button pressed value | Set by tmGetKey (1 - 16/24) & TM_ButnVal2 for TM1638
 -> TM_KeyChk - (bit var) TM1637/1638 Enable check keypress in TM_FlashRate |  TM_KeyChk = On/Off {default = Off}
 -> TM_LEDs - (byte constant) TM1637/1638 buffer use for discrete LED's |
--> TM_STB - (byte var) TM1638 strobe pin select | Select Display to use (STB1 ~ STB4)
+-> TM_STB - (byte var) TM1638 strobe pin select | Select Display to use, TM_STB = Value (1 - 4)
 -> TM_DispBuf - (byte array) TM1637/1638 Display Buffer |  7seg digit values (0 - 255)
