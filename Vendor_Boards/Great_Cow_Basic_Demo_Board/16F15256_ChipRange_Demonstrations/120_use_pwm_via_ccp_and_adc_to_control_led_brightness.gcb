@@ -97,7 +97,7 @@ Dim ADCVal, MaxVal as byte
 Do
 
 
-    ADCVal = ReadAD( AN0 )
+    ADCVal = ReadAD( ANA0 )
 
     ADCVal = Scale ( ADCVal, 0 , 255 , 0, 255 )
 

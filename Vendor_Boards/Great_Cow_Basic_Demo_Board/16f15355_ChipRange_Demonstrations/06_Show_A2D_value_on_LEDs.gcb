@@ -53,6 +53,6 @@
     do
 
         Wait 100 ms
-        PORTC =  ReadAD10 ( AN0 ) / 64
+        PORTC =  ReadAD10 ( ANA0 ) / 64
 
     loop

@@ -83,7 +83,7 @@ leds = 0b10000
 Do
 
     'Get a value for the ADC port
-    mydelay = ReadAD( AN0 )
+    mydelay = ReadAD( ANA0 )
 
     mydelay = scale( mydelay, 0, 255, 1, 200 )
 

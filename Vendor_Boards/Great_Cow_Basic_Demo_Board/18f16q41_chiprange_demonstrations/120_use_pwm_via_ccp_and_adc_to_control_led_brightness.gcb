@@ -95,7 +95,7 @@ Dim ADCVal, MaxVal as byte
 Do
 
     'HPWM CCPchannel, frequency, duty cycle
-    ADCVal = ReadAD( AN0 )
+    ADCVal = ReadAD( ANA0 )
 
     ADCVal = Scale ( ADCVal, 0 , 210, 0, 255 )
 

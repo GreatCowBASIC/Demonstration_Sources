@@ -107,7 +107,7 @@ Dir     SWITCHIN      In
 Do
 
     'HPWM CCPchannel, frequency, duty cycle
-    HPWM 3, 40, ReadAD( AN0 )
+    HPWM 3, 40, ReadAD( ANA0 )
     Wait 10 ms
 
 Loop

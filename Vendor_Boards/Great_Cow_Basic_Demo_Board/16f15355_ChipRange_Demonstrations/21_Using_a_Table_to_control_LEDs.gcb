@@ -85,6 +85,6 @@
     do
         wait 5 ms
         'Read the table value and set the port to the table value.
-        readtable gray_code, ( ReadAD ( AN0 )  / 16 ), LEDBANK
+        readtable gray_code, ( ReadAD ( ANA0 )  / 16 ), LEDBANK
 
     loop

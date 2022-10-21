@@ -180,7 +180,7 @@ Do Forever
 
         ' Prepare a string
         outString = Str( CCount )
-        adcval = ReadAD ( AN0 )
+        adcval = ReadAD ( ANA0 )
 
         ' Prepare the static components of the screen
         #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE

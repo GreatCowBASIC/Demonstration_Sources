@@ -31,7 +31,7 @@
     ; ----- Main body of program commences here.
         do
           '100 cycles is a purely arbitrary value
-            PWMOut 1, ReadAD(AN0), 100
+            PWMOut 1, ReadAD(ANA0), 100
             wait 5 s
 
         loop

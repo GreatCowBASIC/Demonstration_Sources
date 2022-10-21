@@ -98,7 +98,7 @@
 
     do
 
-      mydelay = ReadAD10 ( AN0 ) / 4
+      mydelay = ReadAD10 ( ANA0 ) / 4
 
       HSerPrint "P: "
       hserprint mydelay

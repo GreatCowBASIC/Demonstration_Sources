@@ -67,7 +67,7 @@ Dir SWITCH In
 
 Do
 
-    mydelay = ReadAD10( AN0 ) / 4
+    mydelay = ReadAD10( ANA0 ) / 4
 
     ' Factor the ADC reading to delay steps
     mydelay = mydelay / 16

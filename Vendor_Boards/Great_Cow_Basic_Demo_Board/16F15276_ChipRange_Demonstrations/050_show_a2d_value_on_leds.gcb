@@ -62,7 +62,7 @@ Dir     POTENTIOMETER In
 
   Do
 
-      adcVal = ReadAD ( AN0 )
+      adcVal = ReadAD ( ANA0 )
 
       Select Case adcVal
 

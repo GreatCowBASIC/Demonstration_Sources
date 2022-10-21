@@ -72,7 +72,7 @@ Dim ADCVal As Word
 
 Do
 
-    ADCVal = ReadAD12 ( AN0 )
+    ADCVal = ReadAD12 ( ANA0 )
 
     'Wait for the number of milliseconds
     Wait ADCVal ms

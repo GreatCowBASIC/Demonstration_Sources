@@ -71,7 +71,7 @@ Dir     POTENTIOMETER In
 #DEFINE SWITCHIN      PORTB.5
 Dir     SWITCHIN      In
 'analogue port selection
-#DEFINE ADCChannelSelected AN0
+#DEFINE ADCChannelSelected ANA0
 #DEFINE ADSpeed LowSpeed
 
 

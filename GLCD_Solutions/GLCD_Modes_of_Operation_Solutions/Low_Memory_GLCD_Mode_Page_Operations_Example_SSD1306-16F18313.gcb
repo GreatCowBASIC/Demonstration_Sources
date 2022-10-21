@@ -66,7 +66,7 @@
     dim test, test_disp as byte
 
     do
-        test=ReadAD(AN5)
+        test=ReadAD(ANA5)
         if test<>test_disp then
           'Display only pages 2 thru 5. Faster as this does not update page1, page 6 and page 7.
           GLCD_Open_PageTransaction 2,5

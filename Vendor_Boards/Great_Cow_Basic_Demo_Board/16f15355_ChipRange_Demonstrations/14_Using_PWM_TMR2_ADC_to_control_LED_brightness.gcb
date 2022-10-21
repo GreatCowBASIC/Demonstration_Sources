@@ -75,7 +75,7 @@
     Do Forever
 
       'Set the variable(this maps to the registers) to the value of the ADC moved the left by 6 shifts.
-      Bright = FnLSL( ReadAD10( AN0 ), 6 )
+      Bright = FnLSL( ReadAD10( ANA0 ), 6 )
 
     Loop
 

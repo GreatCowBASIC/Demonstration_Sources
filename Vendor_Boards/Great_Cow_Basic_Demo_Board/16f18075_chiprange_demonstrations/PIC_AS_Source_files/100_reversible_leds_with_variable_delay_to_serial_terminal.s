@@ -370,7 +370,7 @@ SYSDOLOOP_S1:
 ;LEDD2 = 0
 	BCF	LATB,2
 ;Get a value for the ADC port
-;mydelay = ReadAD( AN0 )
+;mydelay = ReadAD( ANA0 )
 	CLRF	ADREADPORT
 	CALL	FN_READAD6
 	MOVF	SYSREADADBYTE,W

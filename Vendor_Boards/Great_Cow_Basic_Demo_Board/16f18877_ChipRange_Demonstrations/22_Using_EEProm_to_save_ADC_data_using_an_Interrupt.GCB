@@ -136,7 +136,7 @@ Sub InterruptHandler
         HSerPrint "SW Pressed"
         HSerPrintCRLF
         'Read the ADC
-        adc_value = ReadAD ( AN0 )
+        adc_value = ReadAD ( ANA0 )
 
         'Write the value to register Zero in the EEPROM
         EPWrite ( 0, adc_value )

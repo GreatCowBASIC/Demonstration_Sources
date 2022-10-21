@@ -57,7 +57,7 @@ Do Forever
 
     Repeat 4
 
-        Wait  ( ReadAD10 ( AN0 ) + 32 / 32 ) ms
+        Wait  ( ReadAD10 ( ANA0 ) + 32 / 32 ) ms
         Wait 5 ms
         Rotate PORTD Left
 

@@ -51,6 +51,6 @@ Dir      Potentiometer In
 Do
 
     Wait 100 ms
-    portc =  ReadAD10 ( AN0 ) / 64
+    portc =  ReadAD10 ( ANA0 ) / 64
 
 Loop

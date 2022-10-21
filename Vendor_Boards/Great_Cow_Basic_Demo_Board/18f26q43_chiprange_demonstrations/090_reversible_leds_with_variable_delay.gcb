@@ -86,7 +86,7 @@ Do
     LEDD2 = 0
 
     'Get a value for the debounce period (the time)
-    mydelay = ReadAD( AN0 )
+    mydelay = ReadAD( ANA0 )
 
     'Set the LEDs
     If  direction = LED_RIGHT  Then

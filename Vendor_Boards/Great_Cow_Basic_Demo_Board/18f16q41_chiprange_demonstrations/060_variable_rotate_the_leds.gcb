@@ -68,7 +68,7 @@ Dim ADCVal As Word
 
   Do
 
-      ADCVal = ReadAD12 ( AN0 )
+      ADCVal = ReadAD12 ( ANA0 )
 
       ADCVal = Scale ( ADCVal, 0, 4095, 2, 100 )
 

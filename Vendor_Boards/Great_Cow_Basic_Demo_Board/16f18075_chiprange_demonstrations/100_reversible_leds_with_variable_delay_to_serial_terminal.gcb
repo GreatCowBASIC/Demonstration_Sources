@@ -116,7 +116,7 @@ Do
     LEDD2 = 0
 
     'Get a value for the ADC port
-    mydelay = ReadAD( AN0 )
+    mydelay = ReadAD( ANA0 )
 
     'Show state
     If direction = LED_RIGHT Then

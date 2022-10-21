@@ -77,7 +77,7 @@
             ' This will set the whole port
             LEDBANK = ( average_reading ( queue() ) * 10 / 138 )         ' a little calculation to ensure max value is 15, equates to all 4 LEDS on
             ' Set the next array point with the next reading
-            queue( xloop ) = ReadAD ( AN0 )
+            queue( xloop ) = ReadAD ( ANA0 )
         next
     loop
 

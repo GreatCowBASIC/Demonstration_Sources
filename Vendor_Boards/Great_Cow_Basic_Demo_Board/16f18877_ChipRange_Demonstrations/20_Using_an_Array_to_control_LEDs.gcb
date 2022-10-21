@@ -77,7 +77,7 @@ Do
         ' a little calculation to ensure max value is 15, equates to all 4 LEDS on
         LEDBANK = ( average_reading ( queue() ) * 10 / 138 )
         ' Set the next array point with the next reading
-        queue( xloop ) = ReadAD ( AN0 )
+        queue( xloop ) = ReadAD ( ANA0 )
     Next
 Loop
 
