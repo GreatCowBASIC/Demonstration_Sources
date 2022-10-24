@@ -1,0 +1,77 @@
+// #DEFINE DebugADC_H
+
+#STARTUP PSS 
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
+
+
+Sub PSS
+
+    /**
+    PPS registers
+    */
+    RX1PPS = 0x15; //RC5->EUSART1:RX1;
+    RC4PPS = 0x13;  //RC4->EUSART1:TX1;
+
+End Sub
+
+
+// #DEFINE ADREADPREREADCOMMAND   SetUPADC   // set the ADCC to the options selected in the User Interface
+
+
+Macro SetUPADC
+    // //ADLTHL 0; 
+    // ADLTHL = 0x0;
+    // //ADLTHH 0; 
+    // ADLTHH = 0x0;
+    // //ADUTHL 0; 
+    // ADUTHL = 0x0;
+    // //ADUTHH 0; 
+    // ADUTHH = 0x0;
+    // //ADSTPTL 0; 
+    // ADSTPTL = 0x0;
+    // //ADSTPTH 0; 
+    // ADSTPTH = 0x0;
+    // //ADACCU 0x0; 
+    // ADACCU = 0x0;
+    // //ADRPT 0; 
+    // ADRPT = 0x0;
+    // //ADCHS ANA0; 
+    // ADPCH = 0x0;
+    // //ADCHS ANA0; 
+    // ADNCH = 0x0;
+    // //ADACQL 0; 
+    // ADACQL = 0x0;
+    // //ADACQH 0; 
+    // ADACQH = 0x0;
+    // //ADCAP Additional uC disabled; 
+    // ADCAP = 0x0;
+    // //ADPREL 0; 
+    // ADPREL = 0x0;
+    // //ADPREH 0; 
+    // ADPREH = 0x0;
+    // //CGA0 disabled; CGA1 disabled; CGA2 disabled; CGA4 disabled; CGA5 disabled; 
+    // ADCG1A = 0x0;
+    // //CGC0 disabled; CGC1 disabled; CGC2 disabled; CGC3 disabled; CGC4 disabled; CGC5 disabled; 
+    // ADCG1C = 0x0;
+    // //ADDSEN disabled; ADPCSC internal sampling capacitor and ext i/o pin; ADGPOL digital_low; ADIPEN disabled; ADPPOL Vss; 
+    // ADCON1 = 0x0;
+    // //ADMD Basic_mode; ADACLR disabled; ADCRS 1; ADPSIS RES; 
+    // ADCON2 = 0x10;
+    // //ADTMD disabled; ADSOI ADGO not cleared; ADCALC First derivative of Single measurement; 
+    // ADCON3 = 0x0;
+    // //ADMATH registers not updated; 
+    // ADSTAT = 0x0;
+    // //ADPREF VDD; 
+    // ADREF = 0x0;
+    //ADACT disabled; 
+    // ADACT = 0x0;
+    // //ADCCS FOSC/4; 
+    // ADCLK = 0x1;
+    //GO_nDONE undefined; ADIC single-ended mode; ADFM left justified; ADCS FOSC; ADCONT disabled; ADON enabled; 
+    // ADCON0 = 0x80;
+
+End Macro
