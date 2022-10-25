@@ -13,11 +13,12 @@
 'Chip Settings.
 #CHIP 16F17126
 #OPTION Explicit
+#CONFIG LVP=ON,MCLRE_EXTMCLR
 
     Sub InitPPS
 
             'Module: UART pin directions
-            Dir PORTC.6 Out    ' Make TX1 pin an output
+            Dir PORTC.4 Out    ' Make TX1 pin an output
             'Module: UART1
             RC6PPS = 0x0010    'TX1 > RC6
 
