@@ -76,7 +76,7 @@ Do
     'Get a value for the ADC port
     mydelay = ReadAD( ANA0 )
 
-    mydelay = scale( mydelay, 0, 220, 1, 200 )
+    mydelay = scale( mydelay, 0, 255, 1, 200 )
 
     'Set the LEDs
     If  direction = LED_RIGHT  Then

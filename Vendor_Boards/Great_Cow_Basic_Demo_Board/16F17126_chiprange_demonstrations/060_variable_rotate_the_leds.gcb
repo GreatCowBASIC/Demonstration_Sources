@@ -19,7 +19,7 @@
 ' ----- Configuration
 
 'Chip Settings.
-#CHIP 16F17126, 8
+#CHIP 16F17126
 #OPTION Explicit
 
 '' -------------------PORTA----------------
