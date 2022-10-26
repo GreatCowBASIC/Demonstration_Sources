@@ -12,45 +12,43 @@ The baseline set of demonstrations was created at version 1.00.xx of the Great C
 Enjoy
 
 
-# Overall Demo Layout
+# Layout of Demo programs
 
 This is the standard program. This is included in every Great Cow BASIC installation.  See IDE/Snippets.
 
 ----
     '''A program  for GCGB and GCB the demonsations......
     '''--------------------------------------------------------------------------------------------------------------------------------
-    '''This program [todo] a decription of the demonstration
+    '''This program a decription of the demonstration
     '''
-    '''@author     [todo]
+    '''@author     [a name]
     '''@licence    GPL
-    '''@version    [todo]
-    '''@date       [todo]
+    '''@version    [a version]
+    '''@date       [a date]
     '''********************************************************************************
 
     ; ----- Configuration
-     #chip [todo]
-     #config [todo]
-     #include [todo]
+     #chip 16F17126
+     #config [if required, not normally required]
+     #include [required when using specific libraries]
 
      #option explicit
 
     ; ----- Constants
-      ' No Constants specified in this example.
-      ' [todo]
+       ' [lots of these]
 
     ; ----- Define Hardware settings
-      ' [todo]
+      ' [some times lots of this]
 
     ; ----- Variables
       ' No Variables specified in this example. All byte variables are defined upon use.
-      ' [todo]
-
-    ; ----- Quick Command Reference:
-      [todo]
+      ' [some times lots of these]
 
     ; ----- Main body of program commences here.
 
-    end
+    [some times lots of this!]
+
+    [end]
     ; ----- Support methods.  Subroutines and Functions
 ----
 
