@@ -76,38 +76,3 @@ Dir     SWITCHIN      In
 'Single instrunction enables the fixed mode PWM on CCP/PWM - this shows all four LEDs as PPS is set to all four LEDs
 PWMON
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    'This program will enable a 1 Khz PWM signal, with a duty cycle
-    'of 90%.
-    #define PWM_Freq 1    'Set frequency in KHz
-    #define PWM_Duty 50   'Set duty cycle to 50 %
-
-    'Default to CCP/PWM1
-    PWMOn
-
-    Do
-    Loop
-
-    End
