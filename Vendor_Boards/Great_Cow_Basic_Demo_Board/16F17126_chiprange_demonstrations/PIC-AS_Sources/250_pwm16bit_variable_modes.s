@@ -122,7 +122,7 @@ BASPROGRAMSTART:
 ;Template comment at the end of the config file
 ;' -------------------PORTA----------------
 ;' Bit#:  -7---6---5---4---3---2---1---0---
-;' IO:   ---------------------SW------ADC--
+;' IO:   -------------SDA-SW------SCL-ADC--
 ;'-----------------------------------------
 ;'
 ;' -------------------PORTB----------------
@@ -146,7 +146,7 @@ BASPROGRAMSTART:
 ;Dir     POTENTIOMETER In
 	BSF	TRISA,0
 ;Dir     SWITCHIN      In
-	BSF	TRISA,2
+	BSF	TRISA,3
 ;analogue port selection
 ;------ Start of main Program to provide 2kHz frequency at 100% for 16Khz chip frequency, it cycles from 0% to 100% Duty
 ;PWMERS External Reset Disabled;

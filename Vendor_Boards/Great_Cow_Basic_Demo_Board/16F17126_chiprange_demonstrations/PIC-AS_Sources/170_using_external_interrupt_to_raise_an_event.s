@@ -154,7 +154,7 @@ BASPROGRAMSTART:
 ;START OF THE MAIN PROGRAM
 ;''
 ;'' This demonstration will provide code for raising an event when a port changes.
-;'' The port that is being set then inspected in PORTA.2. Why? Because we have the switch on that port.
+;'' The port that is being set then inspected in PORTA.3. Why? Because we have the switch on that port.
 ;''
 ;'' When the event happens the LED is toggled.  The LED will toggle when the Signal value is 0.
 ;''
@@ -170,7 +170,7 @@ BASPROGRAMSTART:
 ;Chip Settings.
 ;' -------------------PORTA----------------
 ;' Bit#:  -7---6---5---4---3---2---1---0---
-;' IO:   ---------------------SW------ADC--
+;' IO:   -----------------SW----------ADC--
 ;'-----------------------------------------
 ;'
 ;' -------------------PORTB----------------
@@ -194,14 +194,14 @@ BASPROGRAMSTART:
 ;Dir     POTENTIOMETER In
 	BSF	TRISA,0
 ;Dir     SWITCHIN      In
-	BSF	TRISA,2
+	BSF	TRISA,3
 ;*****************************************************************************************************
 ;Main program commences here.. everything before this is setup for the board.
 ;Dim SWState as BIT
 ;Setup an Interrupt event when switch goes negative.
-;IOCAN2 = 1
+;IOCAN3 = 1
 	BANKSEL	IOCAN
-	BSF	IOCAN,2
+	BSF	IOCAN,3
 ;On Interrupt PORTChange  Call InterruptHandler
 	BANKSEL	PIE0
 	BSF	PIE0,4
@@ -284,9 +284,9 @@ INTERRUPTHANDLER:
 	GOTO	ENDIF1
 ;Is this our event?
 ;We must clear the flag in software
-;IOCAF2  = 0
+;IOCAF3  = 0
 	BANKSEL	IOCAF
-	BCF	IOCAF,2
+	BCF	IOCAF,3
 ;Save the state
 ;SWState = RC2
 	BANKSEL	SYSBITVAR0
@@ -325,7 +325,7 @@ DELAYUS2:
 GLOBAL	SYSWAITLOOP1
 SYSWAITLOOP1:
 	CLRW
-	BTFSC	PORTA,2
+	BTFSC	PORTA,3
 	XORLW	255
 	BTFSC	SYSBITVAR0,0
 	XORLW	255

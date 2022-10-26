@@ -120,7 +120,7 @@ BASPROGRAMSTART:
 ;Dir     POTENTIOMETER In
 	BSF	TRISA,0
 ;Dir     SWITCHIN      In
-	BSF	TRISA,2
+	BSF	TRISA,3
 ;*******************************************************************************
 ;Main code start here....
 ;Do
@@ -140,8 +140,8 @@ BASPROGRAMEND:
 ;SOURCE: 300_USING_CLC.GCB (8)
 GLOBAL	INITPPS
 INITPPS:
-;CLCIN0PPS = 0x2; //RA2->CLC1:CLCIN0;
-	MOVLW	2
+;CLCIN0PPS = 0x3; //RA3->CLC1:CLCIN0;
+	MOVLW	3
 	BANKSEL	CLCIN0PPS
 	MOVWF	CLCIN0PPS
 ;RC0PPS = 0x01;  //RC0->CLC1:CLC1OUT;

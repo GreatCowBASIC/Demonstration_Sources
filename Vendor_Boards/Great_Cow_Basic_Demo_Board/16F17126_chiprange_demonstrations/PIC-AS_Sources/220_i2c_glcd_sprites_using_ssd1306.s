@@ -334,7 +334,7 @@ BASPROGRAMSTART:
 ;Template comment at the end of the config file
 ;' -------------------PORTA----------------
 ;' Bit#:  -7---6---5---4---3---2---1---0---
-;' IO:   -------------SDA-----SW--SCL-ADC--
+;' IO:   -------------SDA-SW------SCL-ADC--
 ;'-----------------------------------------
 ;'
 ;' -------------------PORTB----------------
@@ -358,8 +358,7 @@ BASPROGRAMSTART:
 ;Dir     POTENTIOMETER In
 	BSF	TRISA,0
 ;Dir     SWITCHIN      In
-	BSF	TRISA,2
-;Setup Serial port
+	BSF	TRISA,3
 ;Define I2C settings
 ;Initialise I2C - note for the I2C module the ports need to be set to IN
 ;Dir HI2C_DATA In
@@ -1612,7 +1611,7 @@ SYSFORLOOPEND10:
 
 ;********************************************************************************
 
-;SOURCE: 220_I2C_GLCD_SPRITES_USING_SSD1306.GCB (194)
+;SOURCE: 220_I2C_GLCD_SPRITES_USING_SSD1306.GCB (190)
 GLOBAL	GLCDDRAWSPRITE_SSD1306
 GLCDDRAWSPRITE_SSD1306:
 ;Dim CurrCharVal, CurrCharCol, SSD1306_Page, GLCDHiChange, GLCDLoChange, GLCDRotateBits, GLCDTemp As Byte
@@ -1692,7 +1691,7 @@ SYSREPEATLOOPEND2:
 	GOTO	ELSE9_1
 ;uses GLDX and SS1306_Page variables
 ;Cursor_Position_SSD1306_Fast
-;Macro Source: 220_i2c_glcd_sprites_using_ssd1306.gcb (423)
+;Macro Source: 220_i2c_glcd_sprites_using_ssd1306.gcb (419)
 ;Dim I2CByte As Byte
 ;HI2CStart
 	FCALL	HI2CSTART
@@ -1938,7 +1937,7 @@ ELSE9_1:
 ;handle TOP portion of the sprite as we are NOT at 0 pixel of a ROW
 ;send the TOP pixels
 ;Cursor_Position_SSD1306_Fast
-;Macro Source: 220_i2c_glcd_sprites_using_ssd1306.gcb (423)
+;Macro Source: 220_i2c_glcd_sprites_using_ssd1306.gcb (419)
 ;Dim I2CByte As Byte
 ;HI2CStart
 	FCALL	HI2CSTART
@@ -2200,7 +2199,7 @@ SYSFORLOOPEND2:
 ;SSD1306_Page++
 	INCF	SSD1306_PAGE,F
 ;Cursor_Position_SSD1306_Fast
-;Macro Source: 220_i2c_glcd_sprites_using_ssd1306.gcb (423)
+;Macro Source: 220_i2c_glcd_sprites_using_ssd1306.gcb (419)
 ;Dim I2CByte As Byte
 ;HI2CStart
 	FCALL	HI2CSTART
@@ -2669,9 +2668,9 @@ GLOBAL	INITRANDOM
 INITRANDOM:
 ;Dim RandomSeed As Word
 ;RandomSeed = RandStart
-	MOVLW	255
+	MOVLW	117
 	MOVWF	RANDOMSEED
-	MOVLW	248
+	MOVLW	146
 	MOVWF	RANDOMSEED_H
 	RETURN
 

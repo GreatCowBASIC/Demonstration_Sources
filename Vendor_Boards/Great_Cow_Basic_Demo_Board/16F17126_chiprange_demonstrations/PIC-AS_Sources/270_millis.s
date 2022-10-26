@@ -185,7 +185,7 @@ BASPROGRAMSTART:
 ;Chip Settings
 ;' -------------------PORTA----------------
 ;' Bit#:  -7---6---5---4---3---2---1---0---
-;' IO:   ---------------------SW------ADC--
+;' IO:   -------------SDA-SW------SCL-ADC--
 ;'-----------------------------------------
 ;'
 ;' -------------------PORTB----------------
@@ -209,7 +209,7 @@ BASPROGRAMSTART:
 ;Dir     POTENTIOMETER In
 	BSF	TRISA,0
 ;Dir     SWITCHIN      In
-	BSF	TRISA,2
+	BSF	TRISA,3
 ;*****************************************************************************************************
 ;Main program commences here.. everything before this is setup for the board.
 ;Dim CurMs, LstMs as word  ' declare working variables

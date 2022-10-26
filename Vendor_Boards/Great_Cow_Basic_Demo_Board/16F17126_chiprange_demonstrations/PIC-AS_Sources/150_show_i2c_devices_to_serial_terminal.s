@@ -150,7 +150,7 @@ BASPROGRAMSTART:
 ;''
 ;''  I2C device required a data bus and a clock bus, devices also required an input voltage and 0v.
 ;''   I2C data bus is connected to PortA.4
-;''   I2C clock bus is connected to PortA.2
+;''   I2C clock bus is connected to PortA.1
 ;''   Serial output is connected, as previously, to PortC.4
 ;''
 ;''  Connect your IC2 devices and see the results on the serial terminal.
@@ -167,7 +167,7 @@ BASPROGRAMSTART:
 ;Template comment at the end of the config file
 ;' -------------------PORTA----------------
 ;' Bit#:  -7---6---5---4---3---2---1---0---
-;' IO:   -------------SDA-----SW--SCL-ADC--
+;' IO:   -------------SDA--SW------SCL-ADC--
 ;'-----------------------------------------
 ;'
 ;' -------------------PORTB----------------
@@ -191,7 +191,7 @@ BASPROGRAMSTART:
 ;Dir     POTENTIOMETER In
 	BSF	TRISA,0
 ;Dir     SWITCHIN      In
-	BSF	TRISA,2
+	BSF	TRISA,3
 ;Setup Serial port
 ;Define I2C settings
 ;Initialise I2C - note for the I2C module the ports need to be set to IN
@@ -435,7 +435,7 @@ SYSFORLOOPEND2:
 ;Wait While SwitchIn = Off
 GLOBAL	SYSWAITLOOP1
 SYSWAITLOOP1:
-	BTFSS	PORTA,2
+	BTFSS	PORTA,3
 	GOTO	SYSWAITLOOP1
 ;Loop
 	GOTO	SYSDOLOOP_S1

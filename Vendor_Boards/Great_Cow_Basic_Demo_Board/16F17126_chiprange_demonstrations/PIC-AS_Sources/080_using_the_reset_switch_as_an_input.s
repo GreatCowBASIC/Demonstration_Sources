@@ -27,7 +27,7 @@
  CONFIG CLKOUTEN=OFF                             ;C1 Reverselookup CLKOUTEN = OFF
  CONFIG RSTOSC=HFINTOSC_32MHz                    ;C1 Reverselookup RSTOSC = HFINTOSC_32MHZ
  CONFIG FEXTOSC=OFF                              ;C1 Reverselookup FEXTOSC = OFF
- CONFIG MCLRE=EXTMCLR                            ;C1 Reverselookup MCLRE = EXTMCLR
+ CONFIG MCLRE=INTMCLR                            ;C1 Reverselookup MCLRE = INTMCLR
  CONFIG WDTE=OFF                                 ;C1 Reverselookup WDTE = OFF
  CONFIG LVP=OFF                                  ;C1 Reverselookup LVP = OFF
  CONFIG WRTSAF=OFF                               ;C1 Reverselookup WRTSAF = OFF
@@ -100,7 +100,7 @@ BASPROGRAMSTART:
 ;EXTMCLR is MCLR Enable bit->If LVP = 0, MCLR pin is MCLR; If LVP = 1, RA3 pin function is MCLR
 ;' -------------------PORTA----------------
 ;' Bit#:  -7---6---5---4---3---2---1---0---
-;' IO:   -----------------MCLE-SW-----ADC--
+;' IO:   -----------------MCLE--------ADC--
 ;'-----------------------------------------
 ;'
 ;' -------------------PORTB----------------

@@ -549,7 +549,7 @@ BASPROGRAMSTART:
 ;Template comment at the end of the config file
 ;' -------------------PORTA----------------
 ;' Bit#:  -7---6---5---4---3---2---1---0---
-;' IO:   -------------SDA-----SW--SCL-ADC--
+;' IO:   -------------SDA-SW------SCL-ADC--
 ;'-----------------------------------------
 ;'
 ;' -------------------PORTB----------------
@@ -573,7 +573,7 @@ BASPROGRAMSTART:
 ;Dir     POTENTIOMETER In
 	BSF	TRISA,0
 ;Dir     SWITCHIN      In
-	BSF	TRISA,2
+	BSF	TRISA,3
 ;Setup Serial port
 ;Define I2C settings
 ;Initialise I2C - note for the I2C module the ports need to be set to IN

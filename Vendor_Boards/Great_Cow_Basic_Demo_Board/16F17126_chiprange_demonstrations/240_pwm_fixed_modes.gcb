@@ -35,7 +35,7 @@
 
 '' -------------------PORTA----------------
 '' Bit#:  -7---6---5---4---3---2---1---0---
-'' IO:   ---------------------SW------ADC--
+'' IO:   -------------SDA-SW------SCL-ADC--
 ''-----------------------------------------
 ''
 
@@ -63,16 +63,22 @@ Dir     RC3         Out
 
 #DEFINE POTENTIOMETER PORTA.0
 Dir     POTENTIOMETER In
-#DEFINE SWITCHIN      PORTA.2
+#DEFINE SWITCHIN      PORTA.3
 Dir     SWITCHIN      In
-
-'analogue port selection
-#DEFINE ADCChannelSelected ANA0
-#DEFINE ADSpeed LowSpeed
-
 
 ' ------ Start of main Program to provide
 
 'Single instrunction enables the fixed mode PWM on CCP/PWM - this shows all four LEDs as PPS is set to all four LEDs
-PWMON
 
+    'This program will enable a 1 Khz PWM signal, with a duty cycle
+    'of 90%.
+    #define PWM_Freq 1    'Set frequency in KHz
+    #define PWM_Duty 50   'Set duty cycle to 50 %
+
+    'Default to CCP/PWM1
+    PWMOn
+
+    Do
+    Loop
+
+    End

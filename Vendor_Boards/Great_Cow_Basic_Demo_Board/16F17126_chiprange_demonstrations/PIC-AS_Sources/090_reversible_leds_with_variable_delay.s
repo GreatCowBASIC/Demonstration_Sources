@@ -251,7 +251,7 @@ BASPROGRAMSTART:
 ;Dir     POTENTIOMETER In
 	BSF	TRISA,0
 ;Dir     SWITCHIN      In
-	BSF	TRISA,2
+	BSF	TRISA,3
 ;*****************************************************************************************************
 ;Main program commences here.. everything before this is setup for the board.
 ;Dim direction As Byte
@@ -382,7 +382,7 @@ GLOBAL	FN_CHECK_SWITCH
 FN_CHECK_SWITCH:
 ;switch is normally open to 5V ...when pressed, RA3 is connected to GND
 ;If (SwitchIn = SWITCH_DOWN) Then
-	BTFSC	PORTA,2
+	BTFSC	PORTA,3
 	GOTO	ELSE5_1
 ;debounce by delaying and checking if switch is still pressed
 ;Wait 1 ms
@@ -397,7 +397,7 @@ FN_CHECK_SWITCH:
 	MOVF	SYSBYTETEMPX,W
 	MOVWF	SYSTEMP1
 	CLRF	SYSBYTETEMPX
-	BTFSS	PORTA,2
+	BTFSS	PORTA,3
 	COMF	SYSBYTETEMPX,F
 	MOVF	SYSBYTETEMPX,W
 	MOVWF	SYSTEMP2
@@ -417,7 +417,7 @@ GLOBAL	ELSE6_1
 ELSE6_1:
 ;check if still down
 ;If (SwitchIn = SWITCH_DOWN) Then
-	BTFSC	PORTA,2
+	BTFSC	PORTA,3
 	GOTO	ELSE7_1
 ;previous_state = SWITCH_DOWN
 	BCF	SYSBITVAR0,0

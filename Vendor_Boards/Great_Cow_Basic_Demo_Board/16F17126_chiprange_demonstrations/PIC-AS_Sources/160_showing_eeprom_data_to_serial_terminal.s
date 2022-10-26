@@ -240,7 +240,7 @@ BASPROGRAMSTART:
 ;Dir     POTENTIOMETER In
 	BSF	TRISA,0
 ;Dir     SWITCHIN      In
-	BSF	TRISA,2
+	BSF	TRISA,3
 ;Setup Serial port
 ;*****************************************************************************************************
 ;Main program commences here.. everything before this is setup for the board.
@@ -502,7 +502,7 @@ SYSFORLOOPEND2:
 ;Wait While SwitchIn <> DOWN
 GLOBAL	SYSWAITLOOP1
 SYSWAITLOOP1:
-	BTFSS	PORTA,2
+	BTFSC	PORTA,3
 	GOTO	SYSWAITLOOP1
 ;Loop
 	GOTO	SYSDOLOOP_S1

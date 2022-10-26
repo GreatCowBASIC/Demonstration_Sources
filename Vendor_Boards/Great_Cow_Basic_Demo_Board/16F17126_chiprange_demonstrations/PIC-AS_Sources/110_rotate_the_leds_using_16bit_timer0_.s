@@ -134,7 +134,7 @@ BASPROGRAMSTART:
 ;Dir     POTENTIOMETER In
 	BSF	TRISA,0
 ;Dir     SWITCHIN      In
-	BSF	TRISA,2
+	BSF	TRISA,3
 ;*****************************************************************************************************
 ;Main program commences here.. everything before this is setup for the board.
 ;Initialise the timer.

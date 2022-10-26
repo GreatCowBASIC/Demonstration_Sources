@@ -20,13 +20,13 @@
 #OPTION Explicit
 
 'The will enable the reset switch to be an input.  This will NOT reset the chip now but the reset becomes a switch input but ONLY when LVP=off
-#CONFIG MCLRE=EXTMCLR    'Options are INTMCLR and EXTMCLR
+#CONFIG MCLRE=INTMCLR    'Options are INTMCLR and EXTMCLR
                          'EXTMCLR is MCLR Enable bit->If LVP = 0, MCLR pin is MCLR; If LVP = 1, RA3 pin function is MCLR
 
 
 '' -------------------PORTA----------------
 '' Bit#:  -7---6---5---4---3---2---1---0---
-'' IO:   -----------------MCLE-SW-----ADC--
+'' IO:   -----------------MCLE--------ADC--
 ''-----------------------------------------
 ''
 

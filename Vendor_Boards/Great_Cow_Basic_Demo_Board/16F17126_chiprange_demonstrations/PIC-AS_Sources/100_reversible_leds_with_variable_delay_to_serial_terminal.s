@@ -271,7 +271,7 @@ BASPROGRAMSTART:
 ;Template comment at the end of the config file
 ;' -------------------PORTA----------------
 ;' Bit#:  -7---6---5---4---3---2---1---0---
-;' IO:   ---------------------SW------ADC--
+;' IO:   -----------------SW----------ADC--
 ;'-----------------------------------------
 ;'
 ;' -------------------PORTB----------------
@@ -295,7 +295,7 @@ BASPROGRAMSTART:
 ;Dir     POTENTIOMETER In
 	BSF	TRISA,0
 ;Dir     SWITCHIN      In
-	BSF	TRISA,2
+	BSF	TRISA,3
 ;USART settings - setup the serial port - connects to PortC.4 via PPS
 ;*****************************************************************************************************
 ;Main program commences here.. everything before this is setup for the board.
@@ -537,7 +537,7 @@ GLOBAL	FN_CHECK_SWITCH
 FN_CHECK_SWITCH:
 ;switch is normally open to 5V ...when pressed, RA3 is connected to GND
 ;If (SwitchIn = SWITCH_DOWN) Then
-	BTFSC	PORTA,2
+	BTFSC	PORTA,3
 	GOTO	ELSE7_1
 ;debounce by delaying and checking if switch is still pressed
 ;Wait 1 ms
@@ -552,7 +552,7 @@ FN_CHECK_SWITCH:
 	MOVF	SYSBYTETEMPX,W
 	MOVWF	SYSTEMP1
 	CLRF	SYSBYTETEMPX
-	BTFSS	PORTA,2
+	BTFSS	PORTA,3
 	COMF	SYSBYTETEMPX,F
 	MOVF	SYSBYTETEMPX,W
 	MOVWF	SYSTEMP2
@@ -572,7 +572,7 @@ GLOBAL	ELSE8_1
 ELSE8_1:
 ;check if still down
 ;If (SwitchIn = SWITCH_DOWN) Then
-	BTFSC	PORTA,2
+	BTFSC	PORTA,3
 	GOTO	ELSE9_1
 ;previous_state = SWITCH_DOWN
 	BCF	SYSBITVAR0,0

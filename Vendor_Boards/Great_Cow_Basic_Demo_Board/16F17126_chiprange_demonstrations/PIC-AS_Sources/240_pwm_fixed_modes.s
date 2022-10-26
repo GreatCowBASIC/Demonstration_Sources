@@ -88,7 +88,7 @@ BASPROGRAMSTART:
 ;Template comment at the end of the config file
 ;' -------------------PORTA----------------
 ;' Bit#:  -7---6---5---4---3---2---1---0---
-;' IO:   ---------------------SW------ADC--
+;' IO:   -------------SDA-SW------SCL-ADC--
 ;'-----------------------------------------
 ;'
 ;' -------------------PORTB----------------
@@ -112,12 +112,23 @@ BASPROGRAMSTART:
 ;Dir     POTENTIOMETER In
 	BSF	TRISA,0
 ;Dir     SWITCHIN      In
-	BSF	TRISA,2
-;analogue port selection
+	BSF	TRISA,3
 ;------ Start of main Program to provide
 ;Single instrunction enables the fixed mode PWM on CCP/PWM - this shows all four LEDs as PPS is set to all four LEDs
-;PWMON
+;This program will enable a 1 Khz PWM signal, with a duty cycle
+;of 90%.
+;Default to CCP/PWM1
+;PWMOn
 	CALL	PWMON18
+;Do
+GLOBAL	SYSDOLOOP_S1
+SYSDOLOOP_S1:
+;Loop
+	GOTO	SYSDOLOOP_S1
+GLOBAL	SYSDOLOOP_E1
+SYSDOLOOP_E1:
+;End
+	GOTO	BASPROGRAMEND
 GLOBAL	BASPROGRAMEND
 BASPROGRAMEND:
 	SLEEP
@@ -187,25 +198,26 @@ LEGACY_STARTOFFIXEDCCPPWMMODECODE:
 	CLRF	CCPCONCACHE
 ;Set PWM Period
 ;PR2 = PR2_CPP_PWM_Temp
-	MOVLW	105
+	MOVLW	250
 	BANKSEL	T2PR
 	MOVWF	T2PR
 ;SET T2CON.T2CKPS0 OFF
 	BCF	T2CON,4
 ;SET T2CON.T2CKPS1 OFF
 	BCF	T2CON,5
-;SET T2CON.T2CKPS2 OFF
-	BCF	T2CON,6
+;SET T2CON.T2CKPS2 ON
+	BSF	T2CON,6
 ;Set Duty cycle
 ;CCPCONCache.CCP1FMT = 1
 	BANKSEL	CCPCONCACHE
 	BSF	CCPCONCACHE,4
 ;CCPR1H = DutyCycleH
-	MOVLW	53
+	MOVLW	125
 	BANKSEL	CCPR1H
 	MOVWF	CCPR1H
 ;CCPR1L = DutyCycleL*64
-	CLRF	CCPR1L
+	MOVLW	128
+	MOVWF	CCPR1L
 ;[canskip]T2CLKCON = 1
 	MOVLW	1
 	BANKSEL	T2CLKCON

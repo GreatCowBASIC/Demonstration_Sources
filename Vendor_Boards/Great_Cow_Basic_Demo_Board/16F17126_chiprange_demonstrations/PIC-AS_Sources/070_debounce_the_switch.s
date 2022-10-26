@@ -102,7 +102,7 @@ BASPROGRAMSTART:
 ;Chip Settings.
 ;' -------------------PORTA----------------
 ;' Bit#:  -7---6---5---4---3---2---1---0---
-;' IO:   ---------------------SW------ADC--
+;' IO:   ------------------SW---------ADC--
 ;'-----------------------------------------
 ;'
 ;' -------------------PORTB----------------
@@ -127,7 +127,7 @@ BASPROGRAMSTART:
 ;Dir     POTENTIOMETER In
 	BSF	TRISA,0
 ;Dir     SWITCHIN      In
-	BSF	TRISA,2
+	BSF	TRISA,3
 ;*****************************************************************************************************
 ;Main program commences here.. everything before this is setup for the board.
 ;Debouncing a switch
@@ -228,7 +228,7 @@ FN_FUNCKEYPRESSED:
 	CLRF	SYSWAITTEMPMS_H
 	CALL	DELAY_MS
 ;If ( SWITCHIN = DOWN ) Then
-	BTFSS	PORTA,2
+	BTFSS	PORTA,3
 	GOTO	ELSE10_1
 ;CurrentSwitchState = TRUE
 	MOVLW	255

@@ -27,9 +27,9 @@
  CONFIG CLKOUTEN=OFF                             ;C1 Reverselookup CLKOUTEN = OFF
  CONFIG RSTOSC=HFINTOSC_32MHz                    ;C1 Reverselookup RSTOSC = HFINTOSC_32MHZ
  CONFIG FEXTOSC=OFF                              ;C1 Reverselookup FEXTOSC = OFF
- CONFIG MCLRE=EXTMCLR                            ;C1 Reverselookup MCLRE = EXTMCLR
+ CONFIG MCLRE=INTMCLR                            ;C1 Reverselookup MCLRE = INTMCLR
  CONFIG WDTE=OFF                                 ;C1 Reverselookup WDTE = OFF
- CONFIG LVP=ON                                   ;C1 Reverselookup LVP = ON
+ CONFIG LVP=OFF                                  ;C1 Reverselookup LVP = OFF
  CONFIG WRTSAF=OFF                               ;C1 Reverselookup WRTSAF = OFF
  CONFIG WRTD=OFF                                 ;C1 Reverselookup WRTD = OFF
  CONFIG WRTB=OFF                                 ;C1 Reverselookup WRTB = OFF
@@ -113,7 +113,7 @@ BASPROGRAMSTART:
 ;Template comment at the end of the config file
 ;' -------------------PORTA----------------
 ;' Bit#:  -7---6---5---4---3---2---1---0---
-;' IO:   ---------------------SW------ADC--
+;' IO:   -----------------SW----------ADC--
 ;'-----------------------------------------
 ;'
 ;' -------------------PORTB----------------
@@ -137,7 +137,7 @@ BASPROGRAMSTART:
 ;Dir     POTENTIOMETER In
 	BSF	TRISA,0
 ;Dir     SWITCHIN      In
-	BSF	TRISA,2
+	BSF	TRISA,3
 ;*****************************************************************************************************
 ;Main program commences here.. everything before this is setup for the board.
 ;Dim DisplayNewLine, Outdata, Indata  As Byte

@@ -7,7 +7,7 @@
 
     Sub InitPPS
 
-        CLCIN0PPS = 0x2; //RA2->CLC1:CLCIN0;
+        CLCIN0PPS = 0x3; //RA3->CLC1:CLCIN0;
         RC0PPS = 0x01;  //RC0->CLC1:CLC1OUT;
         RC1PPS = 0x01;  //RC1->CLC1:CLC1OUT;
         RC2PPS = 0x01;  //RC2->CLC1:CLC1OUT;
@@ -56,7 +56,7 @@
 
     #DEFINE POTENTIOMETER PORTA.0
     Dir     POTENTIOMETER In
-    #DEFINE SWITCHIN      PORTA.2
+    #DEFINE SWITCHIN      PORTA.3
     Dir     SWITCHIN      In
 
 ' *******************************************************************************

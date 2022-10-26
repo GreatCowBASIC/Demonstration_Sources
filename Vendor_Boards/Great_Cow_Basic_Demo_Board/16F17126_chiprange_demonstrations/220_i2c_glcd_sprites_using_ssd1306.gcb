@@ -38,7 +38,7 @@
 
 '' -------------------PORTA----------------
 '' Bit#:  -7---6---5---4---3---2---1---0---
-'' IO:   -------------SDA-----SW--SCL-ADC--
+'' IO:   -------------SDA-SW------SCL-ADC--
 ''-----------------------------------------
 ''
 
@@ -66,12 +66,8 @@ Dir     RC3         Out
 
 #DEFINE POTENTIOMETER PORTA.0
 Dir     POTENTIOMETER In
-#DEFINE SWITCHIN      PORTA.2
+#DEFINE SWITCHIN      PORTA.3
 Dir     SWITCHIN      In
-
-'Setup Serial port
-#DEFINE USART_BAUD_RATE 9600
-#DEFINE USART_TX_BLOCKING
 
 
 ' Define I2C settings

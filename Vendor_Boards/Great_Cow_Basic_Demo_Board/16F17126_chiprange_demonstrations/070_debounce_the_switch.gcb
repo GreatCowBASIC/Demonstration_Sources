@@ -21,7 +21,7 @@
 
 '' -------------------PORTA----------------
 '' Bit#:  -7---6---5---4---3---2---1---0---
-'' IO:   ---------------------SW------ADC--
+'' IO:   ------------------SW---------ADC--
 ''-----------------------------------------
 ''
 
@@ -52,7 +52,7 @@ Dir     RC3         Out
 Dir     POTENTIOMETER In
 
 
-#DEFINE SWITCHIN      PORTA.2
+#DEFINE SWITCHIN      PORTA.3
 Dir     SWITCHIN      In
 #DEFINE DOWN          1
 
