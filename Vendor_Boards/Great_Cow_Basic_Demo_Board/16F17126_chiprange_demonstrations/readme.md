@@ -67,7 +67,7 @@ Porting to another microcontroller is easier as the user can locate the PPS meth
 We used the PICKit2 Low Pin Count Demo board.  But, you can make your own like this - thank you Chris Roper.
 
 
-![Broadboard PK2 LPC Board](image.png)
+![Breadboard PK2 LPC Board](image.png)
 
 
 
