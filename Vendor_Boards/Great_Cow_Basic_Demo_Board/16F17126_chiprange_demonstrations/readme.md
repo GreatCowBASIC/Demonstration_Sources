@@ -53,7 +53,7 @@ This is the standard program. This is included in every Great Cow BASIC installa
 ----
 
 
-# Method Support for Peripheral Programming Support (PPS)
+# Support for Peripheral Programming Support (PPS)
 
 The PPS method needs to go at the top of the program.
 
