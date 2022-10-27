@@ -24,8 +24,8 @@
     Dir PORTC.0 Out
 
     'Set one bit of the port on.
-    ' You can try set portc.1 - the other LED, remember you will need a resistor!
+    ' You can try set portc.1 - another LED, remember you will need a resistor!
       PORTC.0 = 1
 
     'End
-    End
+    
