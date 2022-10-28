@@ -7,8 +7,6 @@
 Dim Display, Delay1, Delay2 as byte
 
 
-Start:
-
   CLRF TRISC
   MOVLW 0x08
   MOVWF Display
