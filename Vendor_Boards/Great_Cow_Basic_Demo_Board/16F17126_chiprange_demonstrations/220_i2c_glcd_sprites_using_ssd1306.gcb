@@ -50,7 +50,7 @@
 
 '' ------------------PORTC-----------------
 '' Bit#:  -7---6---5---4---3---2---1---0---
-'' IO:    ----TX---------LED--LED-LED LED--
+'' IO:    ------------TX-LED--LED-LED LED--
 ''-----------------------------------------
 
 
@@ -89,9 +89,9 @@ Dir HI2C_CLOCK In
 
 '*******************************************************************************************
 'Select the sprite and the user delay
-#DEFINE spritechoice 2
-'3ms is limit of user visual perception
-#DEFINE spritedelay 2 ms
+#DEFINE SPRITECHOICE 2
+'2ms is the lower limit of user visual perception
+#DEFINE SPRITEDELAY 2 ms
 
 '*******************************************************************************************
 'Draw initial screen
@@ -178,7 +178,7 @@ Do
     RC1 = !RC1
     'user delay
     'so you can see it!
-    Wait spritedelay
+    Wait SPRITEDELAY
 
 Loop
 

@@ -13,7 +13,7 @@
 ' ----- Configuration
 
 'Chip Settings.
-#CHIP 16F17126
+#CHIP 16F753
 #OPTION Explicit
 
 
@@ -58,7 +58,8 @@ Dir     SWITCHIN      In
 #DEFINE UP          1
 
 Dim direction As Byte
-Dim mydelay, leds  As Byte
+Dim mydelay As Byte
+Dim leds As Byte
 
 #DEFINE LED_RIGHT 0
 #DEFINE LED_LEFT  1
@@ -101,7 +102,6 @@ Do
             leds = 1
         End If
         LEDPORT = ( LEDPORT and LEDMASK ) or leds
-
 
     End If
 
