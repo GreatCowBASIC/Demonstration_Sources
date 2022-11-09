@@ -91,7 +91,7 @@ Dir HI2C_CLOCK In
 'Select the sprite and the user delay
 #DEFINE SPRITECHOICE 2
 '2ms is the lower limit of user visual perception
-#DEFINE SPRITEDELAY 2 ms
+#DEFINE SPRITEDELAY 10 ms
 
 '*******************************************************************************************
 'Draw initial screen

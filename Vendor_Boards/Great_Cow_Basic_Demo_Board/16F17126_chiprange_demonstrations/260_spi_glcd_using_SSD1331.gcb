@@ -16,12 +16,11 @@
 
 'Chip Settings
 #CHIP 16F17126
-
 #OPTION Explicit
 
 '' -------------------PORTA----------------
 '' Bit#:  -7---6---5---4---3---2---1---0---
-'' IO:   -------------SD0-SW------SCk-ADC--
+'' IO:   -------------SDO-SW------SCK-ADC--
 ''-----------------------------------------
 ''
 
@@ -42,16 +41,16 @@
     #define PPSToolPart 16F17126
 
     Sub InitPPS
-        #ifdef SSD1331_HardwareSPI
+        #IFDEF SSD1331_HardwareSPI
             'Module: SPI1
             RA4PPS = 0x1C;      //RA4->MSSP1:SDO1;
             SSP1CLKPPS = 0x1;   //RA1->MSSP1:SCK1;
             RA1PPS = 0x1B;      //RA1->MSSP1:SCK1;
-        #else
+        #ELSE
             RA4PPS = 0x00
             SSP1CLKPPS = 0x00
             RA1PPS = 0x00
-        #endif
+        #ENDIF
     End Sub
     'Template comment at the end of the config file
 
@@ -159,9 +158,8 @@
   ' Prepare the static components of the screen
   GLCDPrint ( 2,   2, "SSD1331 Library")                         ; Print some text
   GLCDPrint ( 2,   9, "PrintStr")                                ; Print some text
-  GLCDPrint ( 64,  2, "@")                                       ; Print some more text
-  GLCDPrint ( 72,  2, ChipMhz)                                   ; Print chip speed
-  GLCDPrint ( 80,  2, "Mhz")                                     ; Print some text
+  GLCDPrint ( 64,  2, ChipMhz)                                   ; Print chip speed
+  GLCDPrint ( 74,  2, "Mhz")                                     ; Print some text
   GLCDDrawString( 2,18,"DrawStr")                                ; Draw some text
   box 0,0,GLCD_WIDTH-1, GLCD_HEIGHT-1                            ; Draw a box
   box GLCD_WIDTH-5, GLCD_HEIGHT-5,GLCD_WIDTH-1, GLCD_HEIGHT-1    ; Draw a box
@@ -177,14 +175,14 @@
           outstring = outstring+"h"
 
           GLCDPrint ( 46 ,  36,  Outstring  )                        ; Print a HEX string
-          GLCDPrint ( 46 ,  44, pad(str(wordNumber), 6 ) )           ; Print a padded string
-          GLCDPrint ( 46 ,  52, pad(str(byteNumber), 4 ) )           ; Print a padded string
+          GLCDPrint ( 46 ,  44, pad(str(wordNumber), 30 ) )          ; Print a padded string
+          GLCDPrint ( 46 ,  52, pad(str(byteNumber), 30 ) )          ; Print a padded string
 
-
-          box (46,19,56,28)                                           ; Draw a Box
-          GLCDDrawChar(49, 20, CCount )                               ; Draw a character
+          box (46,19,56,28)                                          ; Draw a Box  
+          filledbox (47,20,55,27,SSD1331_BLUE)                       ; Draw a Box
+          GLCDDrawChar(49, 20, CCount )                              ; Draw a character
           outString = str( CCount )                                  ; Prepare a string
-          GLCDDrawString(64, 19, pad(outString,5) )                   ; Draw a string
+          GLCDDrawString(64, 19, pad(outString,5) )                  ; Draw a string
 
           filledbox 3,43,11,51, wordNumber                           ; Draw a filled box
 
@@ -193,6 +191,8 @@
 
                                                                      ; Do some simple maths
           longNumber = longNumber + 7 : wordNumber = wordNumber + 3 : byteNumber++
+
+          wait 25 ms
 
       NEXT
 
