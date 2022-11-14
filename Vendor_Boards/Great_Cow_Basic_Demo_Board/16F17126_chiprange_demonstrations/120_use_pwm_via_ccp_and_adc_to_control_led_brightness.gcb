@@ -50,7 +50,6 @@
             RC3PPS = 0x0009    'CCP1 > RC3
             CCP1PPS = 0x0013    'RC3 > CCP1 (bi-directional)
         
-      
     End Sub
     // Template comment at the end of the config file
 
@@ -102,7 +101,7 @@ Do
 
     Wait 10 ms
 
-    HPWM ( 1, 5, ADCVal )
+    HPWM ( 1, 1, ADCVal )
 
 Loop
 

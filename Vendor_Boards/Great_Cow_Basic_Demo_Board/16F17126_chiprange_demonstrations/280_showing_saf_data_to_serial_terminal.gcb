@@ -140,7 +140,9 @@
     Next
     HSerPrintCRLF
 
+// SAF operation
     SAFWriteBlock (0, MyBuffer, numbytes)
+
     HserPrint "                                  : Write Completed"
 
     'Clear the buffer
@@ -148,7 +150,8 @@
       MyBuffer(IndexWord) = 0xFF
     Next
 
-    '*** Read the 8 stored bytes using SAFReadBlock ***
+// SAF operation
+    //*** Read the 8 stored bytes using SAFReadBlock ***
     SAFReadBlock (0, MyBuffer, numbytes)
 
    'Output the 8 bytes to a terminal
@@ -169,7 +172,10 @@
     HserprintCRLF
     HSerPrint "Direct byte reads from SAF address: "
     For rel_address = 0 to 7
+
+// SAF operation    
         SAFRead (Rel_Address, Databyte)
+
         Hserprint "0x"+hex(DataByte)
         hsersend 32 'space
     Next
@@ -210,6 +216,8 @@
 
   'Write the words staring at saf location 8
   'Which is the next address past the 8 bytes
+
+// SAF operations 
   SAFwriteWord (8, Word1)   ' use even numbered adresses
   SAFwriteWord (10, Word2)
   SAFwriteWord (12, Word3)
@@ -270,6 +278,8 @@ sub SAFM_Dump
         end if
 
         Rel_Address = NVM_ADDRESS - SAF_START_ADDR
+        
+// SAF operation        
         SAFReadWord(Rel_Address,DataWord)
 
         hserprint hex(DataWord_H)

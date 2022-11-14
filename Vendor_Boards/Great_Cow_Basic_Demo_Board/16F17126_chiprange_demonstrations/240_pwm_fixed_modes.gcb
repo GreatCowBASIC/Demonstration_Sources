@@ -35,7 +35,7 @@
 
 '' -------------------PORTA----------------
 '' Bit#:  -7---6---5---4---3---2---1---0---
-'' IO:   -------------SDA-SW------SCL-ADC--
+'' IO:   -----------------SW----------ADC--
 ''-----------------------------------------
 ''
 
@@ -73,7 +73,7 @@ Dir     SWITCHIN      In
     'This program will enable a 1 Khz PWM signal, with a duty cycle
     'of 90%.
     #define PWM_Freq 1    'Set frequency in KHz
-    #define PWM_Duty 50   'Set duty cycle to 50 %
+    #define PWM_Duty 25   'Set duty cycle to 50 %
 
     'Default to CCP/PWM1
     PWMOn
