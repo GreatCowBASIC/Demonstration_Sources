@@ -11,7 +11,7 @@
 ;PROCESSOR   16F17126
  PAGEWIDTH   180
  RADIX       DEC
- TITLE       "d:\GreatCowBASICGits\Demonstration_Sources.git\trunk\Vendor_Boards\Great_Cow_Basic_Demo_Board\16F17126_chiprange_demonstrations\300_using_CLC.s"
+ TITLE       "d:\GreatCowBASICGits\Demonstration_Sources.git\trunk\Vendor_Boards\Great_Cow_Basic_Demo_Board\16F17126_chiprange_demonstrations\310_using_MPLABX.s"
  SUBTITLE    "11-14-2022"
 
 ; Reverse lookup file(s)
@@ -43,6 +43,21 @@
 
  #include <xc.inc>
 
+;********************************************************************************
+
+;Set aside RAM memory locations for variables. All variables are global.
+GLOBAL	DELAYTEMP
+ DELAYTEMP                        EQU 112          ; 0X70
+GLOBAL	DELAYTEMP2
+ DELAYTEMP2                       EQU 113          ; 0X71
+GLOBAL	SYSTEMP1
+ SYSTEMP1                         EQU 32          ; 0X20
+GLOBAL	SYSWAITTEMPMS
+ SYSWAITTEMPMS                    EQU 114          ; 0X72
+GLOBAL	SYSWAITTEMPMS_H
+ SYSWAITTEMPMS_H                  EQU 115          ; 0X73
+GLOBAL	SYSWAITTEMPS
+ SYSWAITTEMPS                     EQU 116          ; 0X74
 
 ;********************************************************************************
 
@@ -63,70 +78,36 @@ GLOBAL	BASPROGRAMSTART
 BASPROGRAMSTART:
 ;CALL INITIALISATION ROUTINES
 	CALL	INITSYS
-	CALL	INITPPS
 
 ;START OF THE MAIN PROGRAM
-;Template comment at the end of the config file
-;Set the CLC1
-;SLCT 0x0;
-;CLCSELECT = 0x0;
-	BANKSEL	CLCSELECT
-	CLRF	CLCSELECT
-;LCG1POL not_inverted; LCG2POL not_inverted; LCG3POL not_inverted; LCG4POL not_inverted; LCPOL not_inverted;
-;CLCnPOL = 0x0;
-	CLRF	CLCnPOL
-;LCD1S CLCIN0 (CLCIN0PPS);
-;CLCnSEL0 = 0x0;
-	CLRF	CLCnSEL0
-;LCD2S CLCIN0 (CLCIN0PPS);
-;CLCnSEL1 = 0x0;
-	CLRF	CLCnSEL1
-;LCD3S CLCIN0 (CLCIN0PPS);
-;CLCnSEL2 = 0x0;
-	CLRF	CLCnSEL2
-;LCD4S CLCIN0 (CLCIN0PPS);
-;CLCnSEL3 = 0x0;
-	CLRF	CLCnSEL3
-;LCG1D1N enabled; LCG1D1T disabled; LCG1D2N disabled; LCG1D2T disabled; LCG1D3N disabled; LCG1D3T disabled; LCG1D4N disabled; LCG1D4T disabled;
-;CLCnGLS0 = 0x1;
-	MOVLW	1
-	MOVWF	CLCnGLS0
-;LCG2D1N disabled; LCG2D1T disabled; LCG2D2N disabled; LCG2D2T disabled; LCG2D3N disabled; LCG2D3T disabled; LCG2D4N disabled; LCG2D4T disabled;
-;CLCnGLS1 = 0x0;
-	CLRF	CLCnGLS1
-;LCG3D1N disabled; LCG3D1T disabled; LCG3D2N disabled; LCG3D2T disabled; LCG3D3N disabled; LCG3D3T disabled; LCG3D4N disabled; LCG3D4T disabled;
-;CLCnGLS2 = 0x0;
-	CLRF	CLCnGLS2
-;LCG4D1N disabled; LCG4D1T disabled; LCG4D2N disabled; LCG4D2T disabled; LCG4D3N disabled; LCG4D3T disabled; LCG4D4N disabled; LCG4D4T disabled;
-;CLCnGLS3 = 0x0;
-	CLRF	CLCnGLS3
-;LCOUT 0x00;
-;CLCDATA = 0x0;
-	CLRF	CLCDATA
-;LCMODE OR-XOR; LCINTN disabled; LCINTP disabled; LCEN enabled;
-;CLCnCON = 0x81;
-	MOVLW	129
-	MOVWF	CLCnCON
-;Define constants to make things easier. We can reuse these at any time.
-;Dir     RC0         Out
-	BANKSEL	TRISC
-	BCF	TRISC,0
-;Dir     RC1         Out
+;''A demonstration program for GCGB and GCB.
+;''--------------------------------------------------------------------------------
+;''This program shows integration
+;''
+;''
+;''@author    EvanV
+;''@license   GPL
+;''@version   1.00
+;''@date      2022-11-13
+;''********************************************************************************
+;DIR LED1 OUT
 	BCF	TRISC,1
-;Dir     RC2         Out
-	BCF	TRISC,2
-;Dir     RC3         Out
-	BCF	TRISC,3
-;Dir     POTENTIOMETER In
-	BSF	TRISA,0
-;Dir     SWITCHIN      In
-	BSF	TRISA,3
-;*******************************************************************************
-;Main code start here....
-;Do
+;do
 GLOBAL	SYSDOLOOP_S1
 SYSDOLOOP_S1:
-;Loop
+;LED1 = !LED1
+	CLRF	SYSTEMP1
+	BTFSC	PORTC,1
+	INCF	SYSTEMP1,F
+	COMF	SYSTEMP1,F
+	BCF	LATC,1
+	BTFSC	SYSTEMP1,0
+	BSF	LATC,1
+;Wait 1 s
+	MOVLW	1
+	MOVWF	SYSWAITTEMPS
+	CALL	DELAY_S
+;loop
 	GOTO	SYSDOLOOP_S1
 GLOBAL	SYSDOLOOP_E1
 SYSDOLOOP_E1:
@@ -137,30 +118,42 @@ BASPROGRAMEND:
 
 ;********************************************************************************
 
-;SOURCE: 300_USING_CLC.GCB (8)
-GLOBAL	INITPPS
-INITPPS:
-;*
-;PPS registers
-;
-;CLCIN0PPS = 0x3; //RA3->CLC1:CLCIN0;
+GLOBAL	DELAY_MS
+DELAY_MS:
+	INCF	SYSWAITTEMPMS_H, F
+GLOBAL	DMS_START
+DMS_START:
+	MOVLW	14
+	MOVWF	DELAYTEMP2
+GLOBAL	DMS_OUTER
+DMS_OUTER:
+	MOVLW	189
+	MOVWF	DELAYTEMP
+GLOBAL	DMS_INNER
+DMS_INNER:
+	DECFSZ	DELAYTEMP, F
+	GOTO	DMS_INNER
+	DECFSZ	DELAYTEMP2, F
+	GOTO	DMS_OUTER
+	DECFSZ	SYSWAITTEMPMS, F
+	GOTO	DMS_START
+	DECFSZ	SYSWAITTEMPMS_H, F
+	GOTO	DMS_START
+	RETURN
+
+;********************************************************************************
+
+GLOBAL	DELAY_S
+DELAY_S:
+GLOBAL	DS_START
+DS_START:
+	MOVLW	232
+	MOVWF	SYSWAITTEMPMS
 	MOVLW	3
-	BANKSEL	CLCIN0PPS
-	MOVWF	CLCIN0PPS
-;RC0PPS = 0x01;  //RC0->CLC1:CLC1OUT;
-	MOVLW	1
-	BANKSEL	RC0PPS
-	MOVWF	RC0PPS
-;RC1PPS = 0x01;  //RC1->CLC1:CLC1OUT;
-	MOVLW	1
-	MOVWF	RC1PPS
-;RC2PPS = 0x01;  //RC2->CLC1:CLC1OUT;
-	MOVLW	1
-	MOVWF	RC2PPS
-;RC3PPS = 0x01;  //RC3->CLC1:CLC1OUT;
-	MOVLW	1
-	MOVWF	RC3PPS
-	BANKSEL	STATUS
+	MOVWF	SYSWAITTEMPMS_H
+	CALL	DELAY_MS
+	DECFSZ	SYSWAITTEMPS, F
+	GOTO	DS_START
 	RETURN
 
 ;********************************************************************************

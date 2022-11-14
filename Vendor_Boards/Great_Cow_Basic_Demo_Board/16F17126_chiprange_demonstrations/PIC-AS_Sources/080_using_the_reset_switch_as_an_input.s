@@ -1,4 +1,4 @@
-;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-10-19 (Windows 64 bit) : Build 1181) for Microchip PIC-AS
+;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-11-06 (Windows 64 bit) : Build 1189) for Microchip PIC-AS
 ;  See the GCBASIC forums at http://sourceforge.net/projects/gcbasic/forums,
 ;  Check the documentation and Help at http://gcbasic.sourceforge.net/help/,
 ;or, email:
@@ -12,7 +12,7 @@
  PAGEWIDTH   180
  RADIX       DEC
  TITLE       "d:\GreatCowBASICGits\Demonstration_Sources.git\trunk\Vendor_Boards\Great_Cow_Basic_Demo_Board\16F17126_chiprange_demonstrations\080_using_the_reset_switch_as_an_input.s"
- SUBTITLE    "10-26-2022"
+ SUBTITLE    "11-14-2022"
 
 ; Reverse lookup file(s)
 ; C:\Program Files\Microchip\xc8\v2.40\pic\include\proc\pic16f17126.inc
@@ -27,7 +27,7 @@
  CONFIG CLKOUTEN=OFF                             ;C1 Reverselookup CLKOUTEN = OFF
  CONFIG RSTOSC=HFINTOSC_32MHz                    ;C1 Reverselookup RSTOSC = HFINTOSC_32MHZ
  CONFIG FEXTOSC=OFF                              ;C1 Reverselookup FEXTOSC = OFF
- CONFIG MCLRE=INTMCLR                            ;C1 Reverselookup MCLRE = INTMCLR
+ CONFIG MCLRE=EXTMCLR                            ;C1 Reverselookup MCLRE = EXTMCLR
  CONFIG WDTE=OFF                                 ;C1 Reverselookup WDTE = OFF
  CONFIG LVP=OFF                                  ;C1 Reverselookup LVP = OFF
  CONFIG WRTSAF=OFF                               ;C1 Reverselookup WRTSAF = OFF

@@ -1,4 +1,4 @@
-;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-10-19 (Windows 64 bit) : Build 1181) for Microchip PIC-AS
+;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-11-06 (Windows 64 bit) : Build 1189) for Microchip PIC-AS
 ;  See the GCBASIC forums at http://sourceforge.net/projects/gcbasic/forums,
 ;  Check the documentation and Help at http://gcbasic.sourceforge.net/help/,
 ;or, email:
@@ -12,7 +12,7 @@
  PAGEWIDTH   180
  RADIX       DEC
  TITLE       "d:\GreatCowBASICGits\Demonstration_Sources.git\trunk\Vendor_Boards\Great_Cow_Basic_Demo_Board\16F17126_chiprange_demonstrations\250_pwm16bit_variable_modes.s"
- SUBTITLE    "10-26-2022"
+ SUBTITLE    "11-14-2022"
 
 ; Reverse lookup file(s)
 ; C:\Program Files\Microchip\xc8\v2.40\pic\include\proc\pic16f17126.inc
@@ -72,6 +72,8 @@ GLOBAL	SYSWAITTEMPMS
  SYSWAITTEMPMS                    EQU 114          ; 0X72
 GLOBAL	SYSWAITTEMPMS_H
  SYSWAITTEMPMS_H                  EQU 115          ; 0X73
+GLOBAL	SYSWAITTEMPS
+ SYSWAITTEMPS                     EQU 116          ; 0X74
 GLOBAL	SYSWORDTEMPA
  SYSWORDTEMPA                     EQU 117          ; 0X75
 GLOBAL	SYSWORDTEMPA_H
@@ -84,10 +86,10 @@ GLOBAL	SYSWORDTEMPB_H
 ;********************************************************************************
 
 ;ALIAS VARIABLES
-GLOBAL	ADCVAL
- ADCVAL                           EQU 1175
-GLOBAL	ADCVAL_H
- ADCVAL_H                         EQU 1176
+GLOBAL	PWMVAL
+ PWMVAL                           EQU 1175
+GLOBAL	PWMVAL_H
+ PWMVAL_H                         EQU 1176
 
 ;********************************************************************************
 
@@ -122,7 +124,7 @@ BASPROGRAMSTART:
 ;Template comment at the end of the config file
 ;' -------------------PORTA----------------
 ;' Bit#:  -7---6---5---4---3---2---1---0---
-;' IO:   -------------SDA-SW------SCL-ADC--
+;' IO:   -----------------SW---------------
 ;'-----------------------------------------
 ;'
 ;' -------------------PORTB----------------
@@ -149,89 +151,89 @@ BASPROGRAMSTART:
 	BSF	TRISA,3
 ;analogue port selection
 ;------ Start of main Program to provide 2kHz frequency at 100% for 16Khz chip frequency, it cycles from 0% to 100% Duty
-;PWMERS External Reset Disabled;
-;PWM1ERS = 0x0;
+;PWMERS External Reset Disabled
+;PWM1ERS = 0x00
 	BANKSEL	PWM1ERS
 	CLRF	PWM1ERS
-;PWMCLK HFINTOSC;
-;PWM1CLK = 0x3;
+;PWMCLK HFINTOSC
+;PWM1CLK = 0x03
 	MOVLW	3
 	MOVWF	PWM1CLK
-;PWMLDS Autoload disabled;
-;PWM1LDS = 0x0;
+;PWMLDS Autoload disabled
+;PWM1LDS = 0x00
 	CLRF	PWM1LDS
-;PWMPRL 231;
-;PWM1PRL = 0xE7;
+;PWMPRL 231
+;PWM1PRL = 0xE7
 	MOVLW	231
 	MOVWF	PWM1PRL
-;PWMPRH 3;
-;PWM1PRH = 0x3;
+;PWMPRH 3
+;PWM1PRH = 0x03
 	MOVLW	3
 	MOVWF	PWM1PRH
-;PWMCPRE Prescale by 32;
-;PWM1CPRE = 0x1F;
+;PWMCPRE Prescale by 32
+;PWM1CPRE = 0x1F
 	MOVLW	31
 	MOVWF	PWM1CPRE
-;PWMPIPOS No postscale;
-;PWM1PIPOS = 0x0;
+;PWMPIPOS No postscale
+;PWM1PIPOS = 0x00
 	CLRF	PWM1PIPOS
-;PWMS1P1IF PWM1 output match did not occur; PWMS1P2IF PWM2 output match did not occur;
-;PWM1GIR = 0x0;
+;PWMS1P1IF PWM1 output match did not occur; PWMS1P2IF PWM2 output match did not occur
+;PWM1GIR = 0x00
 	CLRF	PWM1GIR
-;PWMS1P1IE disabled; PWMS1P2IE disabled;
-;PWM1GIE = 0x0;
+;PWMS1P1IE disabled; PWMS1P2IE disabled
+;PWM1GIE = 0x00
 	CLRF	PWM1GIE
-;PWMPOL1 disabled; PWMPOL2 disabled; PWMPPEN disabled; PWMMODE Left aligned mode;
-;PWM1S1CFG = 0x0;
+;PWMPOL1 disabled; PWMPOL2 disabled; PWMPPEN disabled; PWMMODE Left aligned mode
+;PWM1S1CFG = 0x00
 	CLRF	PWM1S1CFG
-;PWMS1P1L 232;
-;PWM1S1P1L = 0xE8;
+;PWMS1P1L 232
+;PWM1S1P1L = 0xE8
 	MOVLW	232
 	MOVWF	PWM1S1P1L
-;PWMS1P1H 3;
-;PWM1S1P1H = 0x3;
+;PWMS1P1H 3
+;PWM1S1P1H = 0x03
 	MOVLW	3
 	MOVWF	PWM1S1P1H
-;PWMS1P2L 244;
-;PWM1S1P2L = 0xF4;
+;PWMS1P2L 244
+;PWM1S1P2L = 0xF4
 	MOVLW	244
 	MOVWF	PWM1S1P2L
-;PWMS1P2H 1;
-;PWM1S1P2H = 0x1;
+;PWMS1P2H 1
+;PWM1S1P2H = 0x01
 	MOVLW	1
 	MOVWF	PWM1S1P2H
 ;Clear PWM1_16BIT period interrupt flag
-;PIR3.PWM1PIF = 0;
+;PWM1PIF = 0
 	BANKSEL	PIR3
 	BCF	PIR3,0
 ;Clear PWM1_16BIT interrupt flag
-;PIR3.PWM1IF = 0;
+;PWM1IF = 0
 	BCF	PIR3,1
 ;Clear PWM1_16BIT slice 1, output 1 interrupt flag
-;PWM1GIR.S1P1IF = 0;
+;S1P1IF = 0
 	BANKSEL	PWM1GIR
 	BCF	PWM1GIR,0
 ;Clear PWM1_16BIT slice 1, output 2 interrupt flag
-;PWM1GIR.S1P2IF = 0;
+;S1P2IF = 0
 	BCF	PWM1GIR,1
 ;PWM1_16BIT interrupt enable bit
-;PIE3.PWM1IE = 0;
+;PWM1IE = 0
 	BANKSEL	PIE3
 	BCF	PIE3,1
 ;PWM1_16BIT period interrupt enable bit
-;PIE3.PWM1PIE = 0;
+;PWM1PIE = 0
 	BCF	PIE3,0
-;PWMEN enabled; PWMLD disabled; PWMERSPOL disabled; PWMERSNOW disabled;
-;PWM1CON = 0x80;
+;PWMEN enabled; PWMLD disabled; PWMERSPOL disabled; PWMERSNOW disabled
+;PWM1CON = 0x80
 	MOVLW	128
 	BANKSEL	PWM1CON
 	MOVWF	PWM1CON
 ;Create an alias to the PWM1 duty register
-;Dim ADCval as word alias PWM1S1P1H, PWM1S1P1L
+;Dim PWMval as word alias PWM1S1P1H, PWM1S1P1L
 ;Do
 GLOBAL	SYSDOLOOP_S1
 SYSDOLOOP_S1:
-;for ADCVal = 0x00 to 0x3E8
+;for PWMval = 0x00 to 0x3E8
 ;LEGACY METHOD
 	MOVLW	255
 	BANKSEL	PWM1S1P1L
@@ -270,8 +272,12 @@ SYSFORLOOP1:
 	GOTO	SYSFORLOOP1
 GLOBAL	SYSFORLOOPEND1
 SYSFORLOOPEND1:
-;for ADCVal = 0x3E7 to 0x01 Step -1
-	MOVLW	231
+;wait 2  s
+	MOVLW	2
+	MOVWF	SYSWAITTEMPS
+	CALL	DELAY_S
+;for PWMval = 0x3E8 to 0x00 Step -1
+	MOVLW	232
 	BANKSEL	PWM1S1P1L
 	MOVWF	PWM1S1P1L
 	MOVLW	3
@@ -308,8 +314,8 @@ SYSFORLOOP2:
 	BTFSC	STATUS,2
 	INCF	SYSFORLOOPABSVALUE2_H,F
 	BANKSEL	PWM1S1P1L
-;IF ( ADCVAL - 1) } [WORD]SYSFORLOOPABSVALUE2 THEN  :#1N 
-	MOVLW	1
+;IF ( PWMVAL - 0) } [WORD]SYSFORLOOPABSVALUE2 THEN  :#1N 
+	MOVLW	0
 	SUBWF	PWM1S1P1L,W
 	BANKSEL	SYSTEMP1
 	MOVWF	SYSTEMP1
@@ -347,9 +353,9 @@ GLOBAL	ELSE2_1
 ELSE2_1:
 ;INTEGER POSITIVE STEP HANDLER IN FOR-NEXT STATEMENT
 	BANKSEL	PWM1S1P1L
-;IF ([WORD]1 - [WORD]ADCVAL) } [WORD]SYSFORLOOPSTEP1 THEN :#1P 
+;IF ([WORD]0 - [WORD]PWMVAL) } [WORD]SYSFORLOOPSTEP1 THEN :#1P 
 	MOVF	PWM1S1P1L,W
-	SUBLW	1
+	SUBLW	0
 	BANKSEL	SYSTEMP1
 	MOVWF	SYSTEMP1
 	CLRF	SYSTEMP2
@@ -387,6 +393,10 @@ GLOBAL	ENDIF2
 ENDIF2:
 GLOBAL	SYSFORLOOPEND2
 SYSFORLOOPEND2:
+;wait 2 s
+	MOVLW	2
+	MOVWF	SYSWAITTEMPS
+	CALL	DELAY_S
 ;Loop
 	GOTO	SYSDOLOOP_S1
 GLOBAL	SYSDOLOOP_E1
@@ -425,20 +435,35 @@ DMS_INNER:
 
 ;********************************************************************************
 
+GLOBAL	DELAY_S
+DELAY_S:
+GLOBAL	DS_START
+DS_START:
+	MOVLW	232
+	MOVWF	SYSWAITTEMPMS
+	MOVLW	3
+	MOVWF	SYSWAITTEMPMS_H
+	CALL	DELAY_MS
+	DECFSZ	SYSWAITTEMPS, F
+	GOTO	DS_START
+	RETURN
+
+;********************************************************************************
+
 ;SOURCE: 250_PWM16BIT_VARIABLE_MODES.GCB (16)
 GLOBAL	INITPPS
 INITPPS:
-;RC0PPS = 0x0B;  //RC0->PWM1_16BIT:PWM11;
+;RC0PPS = 0x0B;  //RC0->PWM1_16BIT:PWM11
 	MOVLW	11
 	BANKSEL	RC0PPS
 	MOVWF	RC0PPS
-;RC1PPS = 0x0B;  //RC1->PWM1_16BIT:PWM11;
+;RC1PPS = 0x0B;  //RC1->PWM1_16BIT:PWM11
 	MOVLW	11
 	MOVWF	RC1PPS
-;RC2PPS = 0x0B;  //RC2->PWM1_16BIT:PWM11;
+;RC2PPS = 0x0B;  //RC2->PWM1_16BIT:PWM11
 	MOVLW	11
 	MOVWF	RC2PPS
-;RC3PPS = 0x0B;  //RC3->PWM1_16BIT:PWM11;
+;RC3PPS = 0x0B;  //RC3->PWM1_16BIT:PWM11
 	MOVLW	11
 	MOVWF	RC3PPS
 	BANKSEL	STATUS

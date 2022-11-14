@@ -1,4 +1,4 @@
-;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-10-19 (Windows 64 bit) : Build 1181) for Microchip PIC-AS
+;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-11-06 (Windows 64 bit) : Build 1189) for Microchip PIC-AS
 ;  See the GCBASIC forums at http://sourceforge.net/projects/gcbasic/forums,
 ;  Check the documentation and Help at http://gcbasic.sourceforge.net/help/,
 ;or, email:
@@ -12,7 +12,7 @@
  PAGEWIDTH   180
  RADIX       DEC
  TITLE       "d:\GreatCowBASICGits\Demonstration_Sources.git\trunk\Vendor_Boards\Great_Cow_Basic_Demo_Board\16F17126_chiprange_demonstrations\280_showing_saf_data_to_serial_terminal.s"
- SUBTITLE    "10-26-2022"
+ SUBTITLE    "11-14-2022"
 
 ; Reverse lookup file(s)
 ; C:\Program Files\Microchip\xc8\v2.40\pic\include\proc\pic16f17126.inc
@@ -547,6 +547,7 @@ SYSFORLOOPEND1:
 	MOVLW	1
 	MOVWF	COMPORT
 	FCALL	HSERPRINTCRLF
+;SAF operation
 ;SAFWriteBlock (0, MyBuffer, numbytes)
 	CLRF	_HEF_BLOCKNUM
 	MOVLW	LOW MYBUFFER
@@ -609,6 +610,7 @@ GLOBAL	ENDIF2
 ENDIF2:
 GLOBAL	SYSFORLOOPEND2
 SYSFORLOOPEND2:
+;SAF operation
 ;*** Read the 8 stored bytes using SAFReadBlock ***
 ;SAFReadBlock (0, MyBuffer, numbytes)
 	CLRF	_HEF_BLOCKNUM
@@ -713,6 +715,7 @@ SYSFORLOOPEND3:
 GLOBAL	SYSFORLOOP4
 SYSFORLOOP4:
 	INCF	REL_ADDRESS,F
+;SAF operation
 ;SAFRead (Rel_Address, Databyte)
 	MOVF	REL_ADDRESS,W
 	MOVWF	_HEF_REL_ADDR
@@ -778,6 +781,7 @@ SYSFORLOOPEND4:
 	FCALL	HSERPRINT305
 ;SAFM_Dump
 	CALL	SAFM_DUMP
+	PAGESEL	$
 ;=========================================================
 ;'' Store 4 Words  of Data in SAF Memory using SAFWrite
 ;''------------------------------------------------------
@@ -1016,6 +1020,7 @@ SYSFORLOOPEND4:
 	FCALL	HSERSEND294
 ;Write the words staring at saf location 8
 ;Which is the next address past the 8 bytes
+;SAF operations
 ;SAFwriteWord (8, Word1)   ' use even numbered adresses
 	MOVLW	8
 	MOVWF	_HEF_REL_ADDR
@@ -1156,7 +1161,10 @@ SYSREPEATLOOPEND1:
 	FCALL	HSERPRINT305
 ;SAFM_DUMP
 	CALL	SAFM_DUMP
+	PAGESEL	$
 ;=========================================================
+;END
+	GOTO	BASPROGRAMEND
 ;
 ;; This subroutine displays the SAF Flash Memory on a terminal
 ;; Words in reverse byte order relative to address
@@ -1351,7 +1359,7 @@ INITUSART:
 
 ;********************************************************************************
 
-;SOURCE: 280_SHOWING_SAF_DATA_TO_SERIAL_TERMINAL.GCB (246)
+;SOURCE: 280_SHOWING_SAF_DATA_TO_SERIAL_TERMINAL.GCB (254)
 GLOBAL	SAFM_DUMP
 SAFM_DUMP:
 ;Dim Blocknum as Byte
@@ -1407,18 +1415,18 @@ SYSREPEATLOOP2:
 	FCALL	SYSCOMPEQUAL32
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF5
-;If BlockNum > 0 then   HSERPRINTCRLF
+;If BlockNum > 0 then
 	MOVF	BLOCKNUM,W
 	SUBLW	0
 	BTFSC	STATUS,0
 	GOTO	ENDIF7
-;If BlockNum > 0 then   HSERPRINTCRLF
+;HSerprintCRLF
 	MOVLW	1
 	MOVWF	HSERPRINTCRLFCOUNT
 	MOVLW	1
 	MOVWF	COMPORT
 	FCALL	HSERPRINTCRLF
-;If BlockNum > 0 then   HSERPRINTCRLF
+;End if
 GLOBAL	ENDIF7
 ENDIF7:
 ;HSerprintCRLF
@@ -1441,6 +1449,7 @@ ENDIF7:
 	MOVLW	1
 	MOVWF	COMPORT
 	CALL	HSERPRINT307
+	PAGESEL	$
 ;HSerprint "  1 0   3 2   5 4   7 6"
 	MOVLW	LOW STRINGTABLE13
 	MOVWF	SYSPRINTDATAHANDLER
@@ -1535,6 +1544,7 @@ ENDIF6:
 	MOVLW	128
 	SUBWF	NVM_ADDRESS,W
 	MOVWF	REL_ADDRESS
+;SAF operation
 ;SAFReadWord(Rel_Address,DataWord)
 	MOVWF	_HEF_REL_ADDR
 	FCALL	SAFREADWORD397
@@ -1989,26 +1999,6 @@ SAFWRITEWORD:
 	MOVWF	_HEF_COUNT
 	CLRF	_HEF_COUNT_H
 	GOTO	SAFWRITEBLOCK
-
-;********************************************************************************
-
-;SOURCE: SYSTEM.H (3383)
-GLOBAL	SYSCOMPLESSTHAN
-SYSCOMPLESSTHAN:
-;Dim SysByteTempA, SysByteTempB, SysByteTempX as byte
-;clrf SysByteTempX
-	CLRF	SYSBYTETEMPX
-;bsf STATUS, C
-	BSF	STATUS,0
-;movf SysByteTempB, W
-	MOVF	SYSBYTETEMPB, W
-;subwf SysByteTempA, W
-	SUBWF	SYSBYTETEMPA, W
-;btfss STATUS, C
-	BTFSS	STATUS,0
-;comf SysByteTempX,F
-	COMF	SYSBYTETEMPX,F
-	RETURN
 
 ;********************************************************************************
 
@@ -3208,6 +3198,26 @@ SYSCOMPEQUAL32:
 	BTFSS	STATUS,2
 ;return
 	RETURN
+;comf SysByteTempX,F
+	COMF	SYSBYTETEMPX,F
+	RETURN
+
+;********************************************************************************
+
+;SOURCE: SYSTEM.H (3383)
+GLOBAL	SYSCOMPLESSTHAN
+SYSCOMPLESSTHAN:
+;Dim SysByteTempA, SysByteTempB, SysByteTempX as byte
+;clrf SysByteTempX
+	CLRF	SYSBYTETEMPX
+;bsf STATUS, C
+	BSF	STATUS,0
+;movf SysByteTempB, W
+	MOVF	SYSBYTETEMPB, W
+;subwf SysByteTempA, W
+	SUBWF	SYSBYTETEMPA, W
+;btfss STATUS, C
+	BTFSS	STATUS,0
 ;comf SysByteTempX,F
 	COMF	SYSBYTETEMPX,F
 	RETURN

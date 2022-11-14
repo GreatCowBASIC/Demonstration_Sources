@@ -1,4 +1,4 @@
-;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-10-19 (Windows 64 bit) : Build 1181) for Microchip PIC-AS
+;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-11-06 (Windows 64 bit) : Build 1189) for Microchip PIC-AS
 ;  See the GCBASIC forums at http://sourceforge.net/projects/gcbasic/forums,
 ;  Check the documentation and Help at http://gcbasic.sourceforge.net/help/,
 ;or, email:
@@ -12,7 +12,7 @@
  PAGEWIDTH   180
  RADIX       DEC
  TITLE       "d:\GreatCowBASICGits\Demonstration_Sources.git\trunk\Vendor_Boards\Great_Cow_Basic_Demo_Board\16F17126_chiprange_demonstrations\240_pwm_fixed_modes.s"
- SUBTITLE    "10-26-2022"
+ SUBTITLE    "11-14-2022"
 
 ; Reverse lookup file(s)
 ; C:\Program Files\Microchip\xc8\v2.40\pic\include\proc\pic16f17126.inc
@@ -88,7 +88,7 @@ BASPROGRAMSTART:
 ;Template comment at the end of the config file
 ;' -------------------PORTA----------------
 ;' Bit#:  -7---6---5---4---3---2---1---0---
-;' IO:   -------------SDA-SW------SCL-ADC--
+;' IO:   -----------------SW----------ADC--
 ;'-----------------------------------------
 ;'
 ;' -------------------PORTB----------------
@@ -212,11 +212,11 @@ LEGACY_STARTOFFIXEDCCPPWMMODECODE:
 	BANKSEL	CCPCONCACHE
 	BSF	CCPCONCACHE,4
 ;CCPR1H = DutyCycleH
-	MOVLW	125
+	MOVLW	62
 	BANKSEL	CCPR1H
 	MOVWF	CCPR1H
 ;CCPR1L = DutyCycleL*64
-	MOVLW	128
+	MOVLW	192
 	MOVWF	CCPR1L
 ;[canskip]T2CLKCON = 1
 	MOVLW	1

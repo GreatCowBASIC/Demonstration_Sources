@@ -1,4 +1,4 @@
-;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-10-19 (Windows 64 bit) : Build 1181) for Microchip PIC-AS
+;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-11-06 (Windows 64 bit) : Build 1189) for Microchip PIC-AS
 ;  See the GCBASIC forums at http://sourceforge.net/projects/gcbasic/forums,
 ;  Check the documentation and Help at http://gcbasic.sourceforge.net/help/,
 ;or, email:
@@ -12,7 +12,7 @@
  PAGEWIDTH   180
  RADIX       DEC
  TITLE       "d:\GreatCowBASICGits\Demonstration_Sources.git\trunk\Vendor_Boards\Great_Cow_Basic_Demo_Board\16F17126_chiprange_demonstrations\200_i2c_glcd_using_ssd1306_128_32.s"
- SUBTITLE    "10-26-2022"
+ SUBTITLE    "11-14-2022"
 
 ; Reverse lookup file(s)
 ; C:\Program Files\Microchip\xc8\v2.40\pic\include\proc\pic16f17126.inc
@@ -609,6 +609,7 @@ BASPROGRAMSTART:
 	CALL	INITPPS
 	CALL	HI2CINIT
 	CALL	INITGLCD_SSD1306
+	PAGESEL	$
 
 ;START OF THE MAIN PROGRAM
 ;''
@@ -1628,40 +1629,6 @@ GLOBAL	BASPROGRAMEND
 BASPROGRAMEND:
 	SLEEP
 	GOTO	BASPROGRAMEND
-
-;********************************************************************************
-
-;SOURCE: STRING.H (537)
-GLOBAL	FN_CHR
-FN_CHR:
-;Empty input?
-;If SysChar < 0 Then
-	MOVLW	0
-	BANKSEL	SYSCHAR
-	SUBWF	SYSCHAR,W
-	BTFSC	STATUS,0
-	GOTO	ENDIF75
-;Chr(0) = 0
-	BANKSEL	SYSCHR_0
-	CLRF	SYSCHR_0
-;Exit Function
-	BANKSEL	STATUS
-	RETURN
-;End If
-GLOBAL	ENDIF75
-ENDIF75:
-;Chr(0) = 1
-	MOVLW	1
-	BANKSEL	SYSCHR_0
-	MOVWF	SYSCHR_0
-;Copy characters
-;Chr(1) = SysChar
-	BANKSEL	SYSCHAR
-	MOVF	SYSCHAR,W
-	BANKSEL	SYSCHR_1
-	MOVWF	SYSCHR_1
-	BANKSEL	STATUS
-	RETURN
 
 ;********************************************************************************
 
@@ -2939,6 +2906,58 @@ INITSYS:
 
 ;********************************************************************************
 
+;SOURCE: SYSTEM.H (1374)
+GLOBAL	SYSCOPYSTRING
+SYSCOPYSTRING:
+;Dim SysCalcTempA As Byte
+;Dim SysStringLength As Byte
+;Get and copy length
+;movf INDF0, W
+	MOVF	INDF0, W
+;movwf SysCalcTempA
+	MOVWF	SYSCALCTEMPA
+;movwf INDF1
+	MOVWF	INDF1
+;goto SysCopyStringCheck
+	GOTO	SYSCOPYSTRINGCHECK
+;When appending, add length to counter
+GLOBAL	SYSCOPYSTRINGPART
+SYSCOPYSTRINGPART:
+;movf INDF0, W
+	MOVF	INDF0, W
+;movwf SysCalcTempA
+	MOVWF	SYSCALCTEMPA
+;addwf SysStringLength, F
+	ADDWF	SYSSTRINGLENGTH, F
+GLOBAL	SYSCOPYSTRINGCHECK
+SYSCOPYSTRINGCHECK:
+;Exit if length = 0
+;movf SysCalcTempA,F
+	MOVF	SYSCALCTEMPA,F
+;btfsc STATUS,Z
+	BTFSC	STATUS,2
+;return
+	RETURN
+GLOBAL	SYSSTRINGCOPY
+SYSSTRINGCOPY:
+;Increment pointers
+;addfsr 0, 1
+	ADDFSR	0, 1
+;addfsr 1, 1
+	ADDFSR	1, 1
+;Copy character
+;movf INDF0, W
+	MOVF	INDF0, W
+;movwf INDF1
+	MOVWF	INDF1
+;decfsz SysCalcTempA, F
+	DECFSZ	SYSCALCTEMPA, F
+;goto SysStringCopy
+	GOTO	SYSSTRINGCOPY
+	RETURN
+
+;********************************************************************************
+
 ;START OF PROGRAM MEMORY PAGE 1
 	PSECT	PROGMEM1,CLASS=CODE,SPACE=SPACE_CODE,DELTA=2, ABS, OVRLD 
 	ORG	2048
@@ -3187,21 +3206,6 @@ ENDIF18:
 GLOBAL	SYSFORLOOPEND12
 SYSFORLOOPEND12:
 	RETURN
-
-;********************************************************************************
-
-;SOURCE: GLCD.H (3610)
-GLOBAL	FILLEDELLIPSE
-FILLEDELLIPSE:
-;Version 1.00 (08/20/2017) by Joseph Realmuto
-;draws a filled ellipse at location (xoffset, yoffset)
-;Inxradius is x radius of ellipse
-;Inyradius is y radius of ellipse
-;filled_ellipse = 1
-	MOVLW	1
-	MOVWF	FILLED_ELLIPSE
-;DrawEllipseRoutine( xoffset, yoffset, Inxradius, Inyradius, LineColour )
-	LJMP	DRAWELLIPSEROUTINE
 
 ;********************************************************************************
 
@@ -4518,7 +4522,7 @@ ENDIF76:
 
 ;********************************************************************************
 
-;OVERLOADED SIGNATURE: BYTE:, SOURCE: A-D.H (2008)
+;OVERLOADED SIGNATURE: BYTE:, SOURCE: A-D.H (2091)
 GLOBAL	FN_READAD456
 FN_READAD456:
 ;ADFM should configured to ensure LEFT justified
@@ -4532,16 +4536,16 @@ FN_READAD456:
 	BANKSEL	ADPCH
 	MOVWF	ADPCH
 ;SetNegativeChannelSelectbits
-;Macro Source: a-d.h (2789)
+;Macro Source: a-d.h (2867)
 ;ADCON0.ADIC = 0
 	BCF	ADCON0,1
-;ADNCH = 0x3A
-	MOVLW	58
-	MOVWF	ADNCH
+;ADNCH = 0x00
+	CLRF	ADNCH
 ;***************************************
 ;Perform conversion
 ;LLReadAD 1
-;Macro Source: a-d.h (565)
+;Macro Source: a-d.h (567)
+;Configure ANSELA/B/C/D @DebugADC_H
 ;Select Case ADReadPort
 ;Case 0: Set ANSELA.0 On
 GLOBAL	SYSSELECT2CASE1
@@ -4797,9 +4801,12 @@ SYSSELECT2CASE24:
 ;Case 23: Set ANSELC.7 On
 	BANKSEL	ANSELC
 	BSF	ANSELC,7
-;End Select
+;End Select  '*** ANSEL Bits should now be set ***
 GLOBAL	SYSSELECTEND2
 SYSSELECTEND2:
+;*** ANSEL Bits are now set ***
+;Set voltage reference
+;ADREF = 0  'Default = 0 /Vref+ = Vdd/ Vref-  = Vss
 ;Configure AD clock defaults
 ;Set ADCS off 'Clock source = FOSC/ADCLK
 	BANKSEL	ADCON0
@@ -4821,8 +4828,8 @@ SYSSELECTEND2:
 ;Set ADFM0 OFF
 	BCF	ADCON0,2
 ;End if
-;Configure AD read Channel
-;ADPCH = ADReadPort
+;Select Channel
+;ADPCH = ADReadPort  'Configure AD read Channel
 	BANKSEL	ADREADPORT
 	MOVF	ADREADPORT,W
 	BANKSEL	ADPCH
@@ -5131,6 +5138,24 @@ ENDIF74:
 	BANKSEL	SYSSTR_0
 	MOVWF	SYSSTR_0
 	BANKSEL	STATUS
+	RETURN
+
+;********************************************************************************
+
+;SOURCE: SYSTEM.H (3078)
+GLOBAL	SYSCOMPEQUAL
+SYSCOMPEQUAL:
+;Dim SysByteTempA, SysByteTempB, SysByteTempX as byte
+;clrf SysByteTempX
+	CLRF	SYSBYTETEMPX
+;movf SysByteTempA, W
+	MOVF	SYSBYTETEMPA, W
+;subwf SysByteTempB, W
+	SUBWF	SYSBYTETEMPB, W
+;btfsc STATUS, Z
+	BTFSC	STATUS,2
+;comf SysByteTempX,F
+	COMF	SYSBYTETEMPX,F
 	RETURN
 
 ;********************************************************************************
@@ -5559,6 +5584,40 @@ ENDIF52:
 ;START OF PROGRAM MEMORY PAGE 2
 	PSECT	PROGMEM2,CLASS=CODE,SPACE=SPACE_CODE,DELTA=2, ABS, OVRLD 
 	ORG	4096
+;SOURCE: STRING.H (537)
+GLOBAL	FN_CHR
+FN_CHR:
+;Empty input?
+;If SysChar < 0 Then
+	MOVLW	0
+	BANKSEL	SYSCHAR
+	SUBWF	SYSCHAR,W
+	BTFSC	STATUS,0
+	GOTO	ENDIF75
+;Chr(0) = 0
+	BANKSEL	SYSCHR_0
+	CLRF	SYSCHR_0
+;Exit Function
+	BANKSEL	STATUS
+	RETURN
+;End If
+GLOBAL	ENDIF75
+ENDIF75:
+;Chr(0) = 1
+	MOVLW	1
+	BANKSEL	SYSCHR_0
+	MOVWF	SYSCHR_0
+;Copy characters
+;Chr(1) = SysChar
+	BANKSEL	SYSCHAR
+	MOVF	SYSCHAR,W
+	BANKSEL	SYSCHR_1
+	MOVWF	SYSCHR_1
+	BANKSEL	STATUS
+	RETURN
+
+;********************************************************************************
+
 ;SOURCE: GLCD_SSD1306.H (1040)
 GLOBAL	CURSOR_POSITION_SSD1306
 CURSOR_POSITION_SSD1306:
@@ -5592,7 +5651,7 @@ SYSREPEATLOOPEND4:
 	ADDWF	POSCHARY,W
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
-	FCALL	WRITE_COMMAND_SSD1306
+	CALL	WRITE_COMMAND_SSD1306
 ;PosCharX = ( LocX  & 0x0f )  ' lower nibble
 	MOVLW	15
 	BANKSEL	LOCX
@@ -5603,7 +5662,7 @@ SYSREPEATLOOPEND4:
 	MOVF	POSCHARX,W
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
-	FCALL	WRITE_COMMAND_SSD1306
+	CALL	WRITE_COMMAND_SSD1306
 ;PosCharX = LocX
 	BANKSEL	LOCX
 	MOVF	LOCX,W
@@ -5647,7 +5706,7 @@ SYSREPEATLOOPEND5:
 	MOVF	POSCHARX,W
 	MOVWF	SSD1306SENDBYTE
 	BANKSEL	STATUS
-	LJMP	WRITE_COMMAND_SSD1306
+	GOTO	WRITE_COMMAND_SSD1306
 
 ;********************************************************************************
 
@@ -5815,7 +5874,7 @@ SYSFORLOOP13:
 	MOVWF	SYSBYTETEMPA
 	CLRF	SYSBYTETEMPB
 	BANKSEL	STATUS
-	CALL	SYSCOMPEQUAL
+	FCALL	SYSCOMPEQUAL
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF27
@@ -5898,6 +5957,21 @@ ELLIPSE:
 ;Inyradius is y radius of ellipse
 ;filled_ellipse = 0
 	CLRF	FILLED_ELLIPSE
+;DrawEllipseRoutine( xoffset, yoffset, Inxradius, Inyradius, LineColour )
+	LJMP	DRAWELLIPSEROUTINE
+
+;********************************************************************************
+
+;SOURCE: GLCD.H (3610)
+GLOBAL	FILLEDELLIPSE
+FILLEDELLIPSE:
+;Version 1.00 (08/20/2017) by Joseph Realmuto
+;draws a filled ellipse at location (xoffset, yoffset)
+;Inxradius is x radius of ellipse
+;Inyradius is y radius of ellipse
+;filled_ellipse = 1
+	MOVLW	1
+	MOVWF	FILLED_ELLIPSE
 ;DrawEllipseRoutine( xoffset, yoffset, Inxradius, Inyradius, LineColour )
 	LJMP	DRAWELLIPSEROUTINE
 
@@ -6512,7 +6586,7 @@ SYSFORLOOP10:
 	MOVWF	SYSBYTETEMPA
 	CLRF	SYSBYTETEMPB
 	BANKSEL	STATUS
-	CALL	SYSCOMPEQUAL
+	FCALL	SYSCOMPEQUAL
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF14
@@ -6635,7 +6709,7 @@ SYSFORLOOP8:
 	MOVWF	SYSBYTETEMPA
 	CLRF	SYSBYTETEMPB
 	BANKSEL	STATUS
-	CALL	SYSCOMPEQUAL
+	FCALL	SYSCOMPEQUAL
 	COMF	SYSBYTETEMPX,F
 	BTFSS	SYSBYTETEMPX,0
 	GOTO	ENDIF10
@@ -7157,24 +7231,6 @@ ENDIF49:
 
 ;********************************************************************************
 
-;SOURCE: SYSTEM.H (3078)
-GLOBAL	SYSCOMPEQUAL
-SYSCOMPEQUAL:
-;Dim SysByteTempA, SysByteTempB, SysByteTempX as byte
-;clrf SysByteTempX
-	CLRF	SYSBYTETEMPX
-;movf SysByteTempA, W
-	MOVF	SYSBYTETEMPA, W
-;subwf SysByteTempB, W
-	SUBWF	SYSBYTETEMPB, W
-;btfsc STATUS, Z
-	BTFSC	STATUS,2
-;comf SysByteTempX,F
-	COMF	SYSBYTETEMPX,F
-	RETURN
-
-;********************************************************************************
-
 ;SOURCE: SYSTEM.H (3104)
 GLOBAL	SYSCOMPEQUAL16
 SYSCOMPEQUAL16:
@@ -7478,58 +7534,6 @@ GLOBAL	SCLTINTTRUE
 SCLTINTTRUE:
 ;comf SysByteTempX,F
 	COMF	SYSBYTETEMPX,F
-	RETURN
-
-;********************************************************************************
-
-;SOURCE: SYSTEM.H (1374)
-GLOBAL	SYSCOPYSTRING
-SYSCOPYSTRING:
-;Dim SysCalcTempA As Byte
-;Dim SysStringLength As Byte
-;Get and copy length
-;movf INDF0, W
-	MOVF	INDF0, W
-;movwf SysCalcTempA
-	MOVWF	SYSCALCTEMPA
-;movwf INDF1
-	MOVWF	INDF1
-;goto SysCopyStringCheck
-	GOTO	SYSCOPYSTRINGCHECK
-;When appending, add length to counter
-GLOBAL	SYSCOPYSTRINGPART
-SYSCOPYSTRINGPART:
-;movf INDF0, W
-	MOVF	INDF0, W
-;movwf SysCalcTempA
-	MOVWF	SYSCALCTEMPA
-;addwf SysStringLength, F
-	ADDWF	SYSSTRINGLENGTH, F
-GLOBAL	SYSCOPYSTRINGCHECK
-SYSCOPYSTRINGCHECK:
-;Exit if length = 0
-;movf SysCalcTempA,F
-	MOVF	SYSCALCTEMPA,F
-;btfsc STATUS,Z
-	BTFSC	STATUS,2
-;return
-	RETURN
-GLOBAL	SYSSTRINGCOPY
-SYSSTRINGCOPY:
-;Increment pointers
-;addfsr 0, 1
-	ADDFSR	0, 1
-;addfsr 1, 1
-	ADDFSR	1, 1
-;Copy character
-;movf INDF0, W
-	MOVF	INDF0, W
-;movwf INDF1
-	MOVWF	INDF1
-;decfsz SysCalcTempA, F
-	DECFSZ	SYSCALCTEMPA, F
-;goto SysStringCopy
-	GOTO	SYSSTRINGCOPY
 	RETURN
 
 ;********************************************************************************
@@ -8345,26 +8349,26 @@ STRINGTABLE92:
 GLOBAL	WRITE_COMMAND_SSD1306
 WRITE_COMMAND_SSD1306:
 ;HI2CStart
-	FCALL	HI2CSTART
+	CALL	HI2CSTART
 ;HI2CSend GLCD_I2C_Address
 	MOVLW	120
 	BANKSEL	I2CBYTE
 	MOVWF	I2CBYTE
 	BANKSEL	STATUS
-	FCALL	HI2CSEND
+	CALL	HI2CSEND
 ;HI2CSend 0x00
 	BANKSEL	I2CBYTE
 	CLRF	I2CBYTE
 	BANKSEL	STATUS
-	FCALL	HI2CSEND
+	CALL	HI2CSEND
 ;HI2CSend SSD1306SendByte
 	BANKSEL	SSD1306SENDBYTE
 	MOVF	SSD1306SENDBYTE,W
 	MOVWF	I2CBYTE
 	BANKSEL	STATUS
-	FCALL	HI2CSEND
+	CALL	HI2CSEND
 ;HI2CStop
-	LJMP	HI2CSTOP
+	GOTO	HI2CSTOP
 
 ;********************************************************************************
 

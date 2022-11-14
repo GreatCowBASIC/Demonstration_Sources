@@ -1,4 +1,4 @@
-;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-10-19 (Windows 64 bit) : Build 1181) for Microchip PIC-AS
+;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-11-06 (Windows 64 bit) : Build 1189) for Microchip PIC-AS
 ;  See the GCBASIC forums at http://sourceforge.net/projects/gcbasic/forums,
 ;  Check the documentation and Help at http://gcbasic.sourceforge.net/help/,
 ;or, email:
@@ -12,7 +12,7 @@
  PAGEWIDTH   180
  RADIX       DEC
  TITLE       "d:\GreatCowBASICGits\Demonstration_Sources.git\trunk\Vendor_Boards\Great_Cow_Basic_Demo_Board\16F17126_chiprange_demonstrations\010_hello_world.s"
- SUBTITLE    "10-26-2022"
+ SUBTITLE    "11-14-2022"
 
 ; Reverse lookup file(s)
 ; C:\Program Files\Microchip\xc8\v2.40\pic\include\proc\pic16f17126.inc
@@ -68,7 +68,7 @@ BASPROGRAMSTART:
 ;''
 ;'' The  most simple sample for GCGB and GCB.
 ;''
-;'' This simply set an LEDs on.  The LED is attached to portc.1 via a suitable resistor to 0v.
+;'' This simply set a LED on.  The LED is attached to portc.0 via a suitable resistor to 0v.
 ;''
 ;''
 ;''************************************************************************
@@ -86,12 +86,10 @@ BASPROGRAMSTART:
 ;Dir PORTC.0 Out
 	BCF	TRISC,0
 ;Set one bit of the port on.
-;You can try set portc.1 - the other LED, remember you will need a resistor!
+;You can try set portc.1 - another LED, remember you will need a resistor!
 ;PORTC.0 = 1
 	BSF	LATC,0
 ;End
-;End
-	GOTO	BASPROGRAMEND
 GLOBAL	BASPROGRAMEND
 BASPROGRAMEND:
 	SLEEP
@@ -121,8 +119,8 @@ INITSYS:
 ;asm showdebug The MCU is a chip family ChipFamily
 ;asm showdebug OSCCON type is 102
 ;Set OSCFRQ values for MCUs with OSCSTAT... the 16F171xx MCU family
-;OSCFRQ = 0b00000100
-	MOVLW	4
+;OSCFRQ = 0b00000101
+	MOVLW	5
 	MOVWF	OSCFRQ
 ;asm showdebug _Complete_the_chip_setup_of_BSR,ADCs,ANSEL_and_other_key_setup_registers_or_register_bits
 ;Ensure all ports are set for digital I/O and, turn off A/D

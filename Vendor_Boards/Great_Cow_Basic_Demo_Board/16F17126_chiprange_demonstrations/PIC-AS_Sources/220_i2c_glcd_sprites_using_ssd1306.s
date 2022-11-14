@@ -1,4 +1,4 @@
-;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-10-19 (Windows 64 bit) : Build 1181) for Microchip PIC-AS
+;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-11-06 (Windows 64 bit) : Build 1189) for Microchip PIC-AS
 ;  See the GCBASIC forums at http://sourceforge.net/projects/gcbasic/forums,
 ;  Check the documentation and Help at http://gcbasic.sourceforge.net/help/,
 ;or, email:
@@ -12,7 +12,7 @@
  PAGEWIDTH   180
  RADIX       DEC
  TITLE       "d:\GreatCowBASICGits\Demonstration_Sources.git\trunk\Vendor_Boards\Great_Cow_Basic_Demo_Board\16F17126_chiprange_demonstrations\220_i2c_glcd_sprites_using_ssd1306.s"
- SUBTITLE    "10-26-2022"
+ SUBTITLE    "11-14-2022"
 
 ; Reverse lookup file(s)
 ; C:\Program Files\Microchip\xc8\v2.40\pic\include\proc\pic16f17126.inc
@@ -309,6 +309,7 @@ BASPROGRAMSTART:
 	CALL	INITPPS
 	CALL	HI2CINIT
 	CALL	INITGLCD_SSD1306
+	PAGESEL	$
 	CALL	INITRANDOM
 
 ;START OF THE MAIN PROGRAM
@@ -344,7 +345,7 @@ BASPROGRAMSTART:
 ;'
 ;' ------------------PORTC-----------------
 ;' Bit#:  -7---6---5---4---3---2---1---0---
-;' IO:    ----TX---------LED--LED-LED LED--
+;' IO:    ------------TX-LED--LED-LED LED--
 ;'-----------------------------------------
 ;Define constants to make things easier. We can reuse these at any time.
 ;Dir     RC0         Out
@@ -370,7 +371,7 @@ BASPROGRAMSTART:
 ;These constants allow you to change the GLCD memory usage.
 ;*******************************************************************************************
 ;Select the sprite and the user delay
-;3ms is limit of user visual perception
+;2ms is the lower limit of user visual perception
 ;*******************************************************************************************
 ;Draw initial screen
 ;Box 0,0,127,63
@@ -682,8 +683,8 @@ GLOBAL	ENDIF8
 ENDIF8:
 ;user delay
 ;so you can see it!
-;Wait spritedelay
-	MOVLW	2
+;Wait SPRITEDELAY
+	MOVLW	10
 	MOVWF	SYSWAITTEMPMS
 	CLRF	SYSWAITTEMPMS_H
 	BANKSEL	STATUS
@@ -2668,9 +2669,9 @@ GLOBAL	INITRANDOM
 INITRANDOM:
 ;Dim RandomSeed As Word
 ;RandomSeed = RandStart
-	MOVLW	117
+	MOVLW	175
 	MOVWF	RANDOMSEED
-	MOVLW	146
+	MOVLW	137
 	MOVWF	RANDOMSEED_H
 	RETURN
 
@@ -3098,7 +3099,7 @@ DS_START:
 	MOVWF	SYSWAITTEMPMS
 	MOVLW	3
 	MOVWF	SYSWAITTEMPMS_H
-	FCALL	DELAY_MS
+	CALL	DELAY_MS
 	DECFSZ	SYSWAITTEMPS, F
 	GOTO	DS_START
 	RETURN

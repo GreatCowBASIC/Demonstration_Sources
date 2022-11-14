@@ -1,4 +1,4 @@
-;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-10-19 (Windows 64 bit) : Build 1181) for Microchip PIC-AS
+;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-11-06 (Windows 64 bit) : Build 1189) for Microchip PIC-AS
 ;  See the GCBASIC forums at http://sourceforge.net/projects/gcbasic/forums,
 ;  Check the documentation and Help at http://gcbasic.sourceforge.net/help/,
 ;or, email:
@@ -12,7 +12,7 @@
  PAGEWIDTH   180
  RADIX       DEC
  TITLE       "d:\GreatCowBASICGits\Demonstration_Sources.git\trunk\Vendor_Boards\Great_Cow_Basic_Demo_Board\16F17126_chiprange_demonstrations\070_debounce_the_switch.s"
- SUBTITLE    "10-26-2022"
+ SUBTITLE    "11-14-2022"
 
 ; Reverse lookup file(s)
 ; C:\Program Files\Microchip\xc8\v2.40\pic\include\proc\pic16f17126.inc
@@ -46,18 +46,14 @@
 ;********************************************************************************
 
 ;Set aside RAM memory locations for variables. All variables are global.
-GLOBAL	CURRENTSWITCHSTATE
- CURRENTSWITCHSTATE               EQU 32          ; 0X20
 GLOBAL	DELAYTEMP
  DELAYTEMP                        EQU 112          ; 0X70
 GLOBAL	DELAYTEMP2
  DELAYTEMP2                       EQU 113          ; 0X71
-GLOBAL	FUNCKEYPRESSED
- FUNCKEYPRESSED                   EQU 33          ; 0X21
-GLOBAL	LASTSWITCHSTATE
- LASTSWITCHSTATE                  EQU 34          ; 0X22
+GLOBAL	SYSBITVAR0
+ SYSBITVAR0                       EQU 32          ; 0X20
 GLOBAL	SYSTEMP1
- SYSTEMP1                         EQU 35          ; 0X23
+ SYSTEMP1                         EQU 33          ; 0X21
 GLOBAL	SYSWAITTEMPMS
  SYSWAITTEMPMS                    EQU 114          ; 0X72
 GLOBAL	SYSWAITTEMPMS_H
@@ -84,37 +80,37 @@ BASPROGRAMSTART:
 	CALL	INITSYS
 
 ;START OF THE MAIN PROGRAM
-;''
-;'' This demonstration uses a simple software routine to avoid the initial noise on the switch
-;'' pin. The code will inspect the switch status, but should overcome most of the noise from a switch.
-;''
-;'' Some switches are worse than others.
-;''
-;'' When the switch is held down and released, one LED will toggle.
-;''
-;''
-;''************************************************************************
-;''@author  EvanV
-;''@licence GPL
-;''@version 1.00
-;''@date    31.10.2022
+;
+;This demonstration uses a simple software routine to avoid the initial noise on the switch
+;pin. The code will inspect the switch status, but should overcome most of the noise from a switch.
+;
+;Some switches are worse than others.
+;
+;When the switch is held down and released, one LED will toggle.
+;
+;
+;************************************************************************
+;@author  EvanV
+;@licence GPL
+;@version 1.00
+;@date    31.10.2022
+;
 ;----- Configuration
 ;Chip Settings.
-;' -------------------PORTA----------------
-;' Bit#:  -7---6---5---4---3---2---1---0---
-;' IO:   ------------------SW---------ADC--
-;'-----------------------------------------
-;'
-;' -------------------PORTB----------------
-;' Bit#:  -7---6---5---4---3---2---1---0---
-;' IO:    ---------------------------------
-;'-----------------------------------------
-;'
-;' ------------------PORTC-----------------
-;' Bit#:  -7---6---5---4---3---2---1---0---
-;' IO:    ---------------LED--LED-LED LED--
-;'-----------------------------------------
-;'
+;-------------------PORTA----------------
+;Bit#:  -7---6---5---4---3---2---1---0---
+;IO:   ------------------SW---------ADC--
+;-----------------------------------------
+;-------------------PORTB----------------
+;Bit#:  -7---6---5---4---3---2---1---0---
+;IO:    ---------------------------------
+;-----------------------------------------
+;
+;------------------PORTC-----------------
+;Bit#:  -7---6---5---4---3---2---1---0---
+;IO:    ---------------LED--LED-LED LED--
+;-----------------------------------------
+;
 ;Define constants to make things easier. We can reuse these at any time.
 ;Dir     RC0         Out
 	BCF	TRISC,0
@@ -142,8 +138,7 @@ SYSDOLOOP_S1:
 ;keyPressed is a Function that returns the state
 ;If  funcKeyPressed() = TRUE Then
 	CALL	FN_FUNCKEYPRESSED
-	INCF	FUNCKEYPRESSED,W
-	BTFSS	STATUS,2
+	BTFSS	SYSBITVAR0,0
 	GOTO	ENDIF1
 ;push button pressed
 ;RC0 = !RC0
@@ -217,11 +212,11 @@ DMS_INNER:
 
 ;********************************************************************************
 
-;SOURCE: 070_DEBOUNCE_THE_SWITCH.GCB (83)
+;SOURCE: 070_DEBOUNCE_THE_SWITCH.GCB (81)
 GLOBAL	FN_FUNCKEYPRESSED
 FN_FUNCKEYPRESSED:
-;Dim CurrentSwitchState As Byte
-;Dim LastSwitchState As Byte
+;Dim CurrentSwitchState As Bit
+;Dim LastSwitchState As Bit
 ;wait 1 ms
 	MOVLW	1
 	MOVWF	SYSWAITTEMPMS
@@ -231,34 +226,41 @@ FN_FUNCKEYPRESSED:
 	BTFSS	PORTA,3
 	GOTO	ELSE10_1
 ;CurrentSwitchState = TRUE
-	MOVLW	255
-	MOVWF	CURRENTSWITCHSTATE
+	BSF	SYSBITVAR0,1
 ;Else
 	GOTO	ENDIF10
 GLOBAL	ELSE10_1
 ELSE10_1:
 ;CurrentSwitchState = FALSE
-	CLRF	CURRENTSWITCHSTATE
+	BCF	SYSBITVAR0,1
 ;End If
 GLOBAL	ENDIF10
 ENDIF10:
+;This condition ensures the state of the switch has changed
 ;If (CurrentSwitchState <> LastSwitchState) Then
-	MOVF	LASTSWITCHSTATE,W
-	SUBWF	CURRENTSWITCHSTATE,W
+	CLRW
+	BTFSC	SYSBITVAR0,1
+	XORLW	255
+	BTFSC	SYSBITVAR0,2
+	XORLW	255
 	BTFSC	STATUS,2
 	GOTO	ELSE11_1
+;Set the last state
 ;LastSwitchState = CurrentSwitchState
-	MOVF	CURRENTSWITCHSTATE,W
-	MOVWF	LASTSWITCHSTATE
+	BCF	SYSBITVAR0,2
+	BTFSC	SYSBITVAR0,1
+	BSF	SYSBITVAR0,2
+;Return the state value - returns either TRUE or FALSE
 ;funcKeyPressed =  CurrentSwitchState
-	MOVF	CURRENTSWITCHSTATE,W
-	MOVWF	FUNCKEYPRESSED
+	BCF	SYSBITVAR0,0
+	BTFSC	SYSBITVAR0,1
+	BSF	SYSBITVAR0,0
 ;Else
 	GOTO	ENDIF11
 GLOBAL	ELSE11_1
 ELSE11_1:
 ;funcKeyPressed = FALSE
-	CLRF	FUNCKEYPRESSED
+	BCF	SYSBITVAR0,0
 ;End If
 GLOBAL	ENDIF11
 ENDIF11:

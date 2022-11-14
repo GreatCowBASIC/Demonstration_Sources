@@ -1,4 +1,4 @@
-;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-10-19 (Windows 64 bit) : Build 1181) for Microchip PIC-AS
+;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-11-06 (Windows 64 bit) : Build 1189) for Microchip PIC-AS
 ;  See the GCBASIC forums at http://sourceforge.net/projects/gcbasic/forums,
 ;  Check the documentation and Help at http://gcbasic.sourceforge.net/help/,
 ;or, email:
@@ -12,7 +12,7 @@
  PAGEWIDTH   180
  RADIX       DEC
  TITLE       "d:\GreatCowBASICGits\Demonstration_Sources.git\trunk\Vendor_Boards\Great_Cow_Basic_Demo_Board\16F17126_chiprange_demonstrations\230_i2c_glcd_voltmeter_using_ssd1306.s"
- SUBTITLE    "10-26-2022"
+ SUBTITLE    "11-14-2022"
 
 ; Reverse lookup file(s)
 ; C:\Program Files\Microchip\xc8\v2.40\pic\include\proc\pic16f17126.inc
@@ -543,6 +543,7 @@ BASPROGRAMSTART:
 	CALL	INITPPS
 	CALL	HI2CINIT
 	CALL	INITGLCD_SSD1306
+	PAGESEL	$
 
 ;START OF THE MAIN PROGRAM
 ;''
@@ -2095,7 +2096,7 @@ SYSFORLOOPEND14:
 
 ;********************************************************************************
 
-;OVERLOADED SIGNATURE: BYTE:, SOURCE: A-D.H (2008)
+;OVERLOADED SIGNATURE: BYTE:, SOURCE: A-D.H (2091)
 GLOBAL	FN_READAD463
 FN_READAD463:
 ;ADFM should configured to ensure LEFT justified
@@ -2109,16 +2110,16 @@ FN_READAD463:
 	BANKSEL	ADPCH
 	MOVWF	ADPCH
 ;SetNegativeChannelSelectbits
-;Macro Source: a-d.h (2789)
+;Macro Source: a-d.h (2867)
 ;ADCON0.ADIC = 0
 	BCF	ADCON0,1
-;ADNCH = 0x3A
-	MOVLW	58
-	MOVWF	ADNCH
+;ADNCH = 0x00
+	CLRF	ADNCH
 ;***************************************
 ;Perform conversion
 ;LLReadAD 1
-;Macro Source: a-d.h (565)
+;Macro Source: a-d.h (567)
+;Configure ANSELA/B/C/D @DebugADC_H
 ;Select Case ADReadPort
 ;Case 0: Set ANSELA.0 On
 GLOBAL	SYSSELECT2CASE1
@@ -2374,9 +2375,12 @@ SYSSELECT2CASE24:
 ;Case 23: Set ANSELC.7 On
 	BANKSEL	ANSELC
 	BSF	ANSELC,7
-;End Select
+;End Select  '*** ANSEL Bits should now be set ***
 GLOBAL	SYSSELECTEND2
 SYSSELECTEND2:
+;*** ANSEL Bits are now set ***
+;Set voltage reference
+;ADREF = 0  'Default = 0 /Vref+ = Vdd/ Vref-  = Vss
 ;Configure AD clock defaults
 ;Set ADCS off 'Clock source = FOSC/ADCLK
 	BANKSEL	ADCON0
@@ -2398,8 +2402,8 @@ SYSSELECTEND2:
 ;Set ADFM0 OFF
 	BCF	ADCON0,2
 ;End if
-;Configure AD read Channel
-;ADPCH = ADReadPort
+;Select Channel
+;ADPCH = ADReadPort  'Configure AD read Channel
 	BANKSEL	ADREADPORT
 	MOVF	ADREADPORT,W
 	BANKSEL	ADPCH

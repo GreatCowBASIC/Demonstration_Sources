@@ -1,4 +1,4 @@
-;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-10-19 (Windows 64 bit) : Build 1181) for Microchip PIC-AS
+;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-11-06 (Windows 64 bit) : Build 1189) for Microchip PIC-AS
 ;  See the GCBASIC forums at http://sourceforge.net/projects/gcbasic/forums,
 ;  Check the documentation and Help at http://gcbasic.sourceforge.net/help/,
 ;or, email:
@@ -12,7 +12,7 @@
  PAGEWIDTH   180
  RADIX       DEC
  TITLE       "d:\GreatCowBASICGits\Demonstration_Sources.git\trunk\Vendor_Boards\Great_Cow_Basic_Demo_Board\16F17126_chiprange_demonstrations\040_rotate_the_leds.s"
- SUBTITLE    "10-26-2022"
+ SUBTITLE    "11-14-2022"
 
 ; Reverse lookup file(s)
 ; C:\Program Files\Microchip\xc8\v2.40\pic\include\proc\pic16f17126.inc
@@ -116,20 +116,13 @@ BASPROGRAMSTART:
 ;Dir     RC3         Out
 	BCF	TRISC,3
 ;Set the initial LED states - change to suit your configuration
-;You may need change to the LEDMASK to suit your port/configuration.  We use a macro as re reuse this statement more that once.
-;LEDSTATEMACRO
-	BCF	LATC,0
-	BCF	LATC,1
-	BCF	LATC,2
-	BSF	LATC,3
-;Wait 1 s
-	MOVLW	1
-	MOVWF	SYSWAITTEMPS
-	CALL	DELAY_S
+;LEDPORT = 8    //! 0b00001000
+	MOVLW	8
+	MOVWF	LATC
 ;Do
 GLOBAL	SYSDOLOOP_S1
 SYSDOLOOP_S1:
-;Wait for milliseconds
+;Wait for one second
 ;Wait 1 s
 	MOVLW	1
 	MOVWF	SYSWAITTEMPS
@@ -140,20 +133,14 @@ SYSDOLOOP_S1:
 ;and shift the contents of LEDState
 ;Rotate LEDPORT Right
 	RRF	LATC,F
-;If the C ( the Caryy Flag) = 1 then the sequence has completed, then set the initial state again, the same operation as the starting LED.
+;If the C ( the Carry Flag) = 1 then the sequence has completed, then set the initial state again, the same operation as the starting LED.
 ;If C = 1 Then
 	BTFSS	STATUS,0
 	GOTO	ENDIF1
-;Set the initial LED states
-;LEDSTATEMACRO
-	BCF	LATC,0
-	BCF	LATC,1
-	BCF	LATC,2
-	BSF	LATC,3
-;Mask off the other bits
-;LEDPORT = LEDPORT AND LEDMASK
-	MOVLW	15
-	ANDWF	LATC,F
+;Reset the initial LED states
+;LEDPORT = 8
+	MOVLW	8
+	MOVWF	LATC
 ;End If
 GLOBAL	ENDIF1
 ENDIF1:
