@@ -1,21 +1,10 @@
-'''A most simple sample for GCGB and GCB.
+'''For GCGB and GCB.
 '''------------------------------------------------------------------------
-'''This program blinks the onboard LED of a microcontroller - simple - the demonstration should work across many microcontrollers.
+'''This program shows how to integate Great Cow BASIC to Microchip's Data Visualizer.
 '''
-'''This sample file can be adapted to any of the supported microcontrollers by simply changing the #chip definition - do this by changing to your chip. Other common chips are shown.
+'''You can send data ( see DataVisualizer_sendFrame() ) and then the Microchip's Data Visualizer can display the data.
 '''
-'''To make your programmer or your bootloader work, simply do the following.
-'''
-'''From within this IDE, press function_key F4, then select  'Edit Programmer Preferences'.   This will show you the 'Programmer Preferences', select the 'Programmer' tab.
-'''
-'''For PIC:  Typically, if you are using a PICKIT2 then select 'Microchip PICKit 2 CLI - Default' will work for you - select and drag this to the top of the dialog area.
-'''
-'''For AVR:  Typically, for an UNO the programmer 'Arduino UNO/328p@115200' will work, select the option from the list of programmers, then, select 'Edit', 
-'''   please edit the communication 'Port', select 'OK', and, then select this option again and drag this to the top of the dialog area.
-'''
-'''
-'''For further adventures with Great Cow BASIC .... Select F4 and then "view Demos" for 1000's of sample programs.
-'''
+'''This example sends an ADC read then the state of the switch and the LEDs.
 '''
 '''Enjoy.
 '''
@@ -46,6 +35,24 @@
     End Sub
     // Template comment at the end of the config file
 
+
+'' -------------------PORTA----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:   -----------------SW----------ADC--
+''-----------------------------------------
+''
+
+'' -------------------PORTB----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---------------------------------
+''-----------------------------------------
+''
+
+'' ------------------PORTC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    -----------TX1-LED--LED-LED LED--
+''-----------------------------------------
+
     #DEFINE USART_BAUD_RATE 9600
     #DEFINE USART_TX_BLOCKING
     #DEFINE USART_DELAY OFF
@@ -54,6 +61,8 @@
     Dir     POTENTIOMETER In
     #DEFINE SWITCHIN      PORTA.3
     Dir     SWITCHIN      In
+
+    
 ' ----- Main body of program commences here.
 
 // Set this the constant to your desired USART command, HERSEND, Ser1Send, Ser2Send or Ser3Send
@@ -80,7 +89,7 @@ Do Forever
 
     // Send the data to the DataVisualizer application
     DataVisualizer_sendFrame ( ReadAD12( ANA0) )
-    // DataVisualizer_sendFrame ( 0x55 )
+
     wait 100 ms
 
     Set C Off
