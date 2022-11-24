@@ -1,0 +1,23 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------
+'''This program shows integration
+'''
+'''
+'''@author    EvanV   
+'''@license   GPL
+'''@version   1.00   
+'''@date      2022-11-13
+'''********************************************************************************
+
+#CHIP 16f18126
+#OPTION EXPLICIT
+
+
+#DEFINE LED1 PORTC.1
+DIR LED1 OUT
+
+do
+    LED1 = !LED1
+    Wait 1 s
+loop
+
