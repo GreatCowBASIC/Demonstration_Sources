@@ -1,6 +1,6 @@
 # 16f18126 Demos for Great-Cow-BASIC
 
-![A 16f18126](/medium-PIC16F18126-TSSOP-14.png)
+![A 16f18126](medium-PIC16F18126-TSSOP-14.png)
 
 
 # Great-Cow-BASIC
