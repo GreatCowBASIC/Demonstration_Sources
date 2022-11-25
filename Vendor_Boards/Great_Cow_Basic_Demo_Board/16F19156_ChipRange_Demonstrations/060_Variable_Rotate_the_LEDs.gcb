@@ -63,7 +63,7 @@
 
     do
 
-        'Read the ADC for the cuttent value
+        'Read the ADC for the current value
         ADCVal =  ReadAD10 ( ANB4, TRUE )
         'Wait for the number of milliseconds
         Wait ADCVal ms

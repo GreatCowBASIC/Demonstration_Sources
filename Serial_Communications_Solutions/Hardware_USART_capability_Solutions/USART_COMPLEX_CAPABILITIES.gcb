@@ -51,7 +51,7 @@
     // #DEFINE ISSUE_CHECK_USART_BAUD_RATE_WARNING      'Show actual baud rate
 
     // To optionally, turn of messages from this demonstration program; uncomment the constant STOPMESSAGES
-    // #DEFINE STOPMESSAGES
+    #DEFINE STOPMESSAGES
     //
     // Example messages are:
     //

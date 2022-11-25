@@ -92,7 +92,7 @@ MaxADCVal = 0
 
 Do
 
-    'Read the ADC for the cuttent value
+    'Read the ADC for the current value
     ADCVal =  ReadAD10 ( ANA1, TRUE )
 
     'Ensure the ADC value supports the widest range.
