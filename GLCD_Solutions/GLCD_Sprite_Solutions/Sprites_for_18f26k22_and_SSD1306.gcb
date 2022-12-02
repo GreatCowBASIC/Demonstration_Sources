@@ -1,6 +1,6 @@
 '''A program  for GCGB and GCB.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program shows how to draw sprites on an SSD1306 I2C device.  Only support I2C and Full GLCD Mode - supported from v0.98 onwards
+'''This program shows how to draw sprites on an SSD1306 I2C device.  Only support I2C and Full GLCD Mode - supported from v1.xx onwards
 '''
 '''The #define 'spritechoice' defines the sprite to be managed. You can define your own in the sprite tables. Each table is 8 pixles vertical - col1 to col8 in each table.
 '''

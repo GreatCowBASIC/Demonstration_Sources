@@ -160,7 +160,7 @@ sub ShowCase1
         GLCDRotate ( Portrait )
 
         GLCDDrawString (2, 1, "GCB", ILI9341_WHITE )
-        GLCDDrawString (56,1,"v0.98.05", ILI9341_YELLOW )
+        GLCDDrawString (56,1,"v1.xx.05", ILI9341_YELLOW )
         GLCDDrawString (2, 16, "DrawStr", ILI9341_WHITE )
 
         GLCDDrawString ( 60, 31, "Long Number" )
@@ -222,7 +222,7 @@ sub ShowCase2
         GLCDRotate ( Landscape_rev )
 
         GLCDDrawString (2, 1, "GCB",ILI9341_WHITE)
-        GLCDDrawString (56,1,"v0.98.05",ILI9341_YELLOW)
+        GLCDDrawString (56,1,"v1.xx.05",ILI9341_YELLOW)
         GLCDDrawString (2, 18, "DrawStr",ILI9341_WHITE)
 
         GLCDDrawString ( 2, 52, "Long:" )

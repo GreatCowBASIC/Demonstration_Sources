@@ -120,7 +120,7 @@
          GLCDPrint(0, 0,"Great")
          GLCDPrint(36, 17,"Cow")
          GLCDPrint( 54 , 33,"BASIC")
-         GLCDPrint( 0 , 49,"V0.98 @ 2017")
+         GLCDPrint( 0 , 49,"v1.xx @ 2017")
          wait 4 S
 
     do
@@ -130,7 +130,7 @@
          GLCDPrint(0, 0,"Great")
          GLCDPrint(36, 17,"Cow")
          GLCDPrint( 54 , 33,"BASIC")
-         GLCDPrint( 0 , 49,"V0.98 @ 2017")
+         GLCDPrint( 0 , 49,"v1.xx @ 2017")
          wait 1 S
 
          GLCDCLS
