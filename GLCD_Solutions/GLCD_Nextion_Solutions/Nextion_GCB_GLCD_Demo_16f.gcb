@@ -128,7 +128,7 @@
     GLCDPrintDefaultFont_Nextion ( NextionFont0 )
     GLCDPrintString_Nextion ( "Great Cow BASIC " )
     GLCDLocateString_Nextion 130,1
-    GLCDPrintStringLn_Nextion ( "v0.98.02" )
+    GLCDPrintStringLn_Nextion ( "v1.00.xx" )
 
     GLCDPrint_Nextion ( 60, GLCD_HEIGHT - 40 , "Great Cow BASIC" , TFT_WHITE, NextionFont2 )
 

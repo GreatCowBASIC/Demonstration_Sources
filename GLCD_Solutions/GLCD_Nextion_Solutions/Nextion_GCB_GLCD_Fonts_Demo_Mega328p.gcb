@@ -87,7 +87,7 @@
     GLCDLocateString 1,1
     GLCDPrintString ( "Great Cow BASIC " )
     GLCDLocateString 130,1
-    GLCDPrintStringLn ( "v0.98.02" )
+    GLCDPrintStringLn ( "v1.00.xx" )
 
     GLCDPrint ( 60, GLCD_HEIGHT - 40 , "Great Cow BASIC"  )
 

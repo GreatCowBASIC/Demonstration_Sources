@@ -153,7 +153,7 @@ sub ShowCase1
         GLCDRotate ( Portrait_Rev )
 
         GLCDDrawString (2, 1, "GCB", TFT_WHITE )
-        GLCDDrawString (26,1,"v0.99", TFT_YELLOW )
+        GLCDDrawString (26,1,"v1.xx", TFT_YELLOW )
         GLCDDrawString (2, 20, "DrawStr", TFT_WHITE )
 
         GLCDDrawString ( 2, 31, "Long#" )
@@ -222,7 +222,7 @@ sub ShowCase2
 
         GLCDRotate ( Landscape_rev )
         GLCDDrawString (2, 1, "GCB", TFT_WHITE )
-        GLCDDrawString (26,1,"v0.99", TFT_YELLOW )
+        GLCDDrawString (26,1,"v1.xx", TFT_YELLOW )
         GLCDDrawString (2, 10, "DrawStr", TFT_WHITE )
 
         GLCDDrawString ( 64, 10, "Asc:" )

@@ -7,7 +7,7 @@
 '''The display is easy to interface, using an I2C type of communication.
 '''The GLCD is connected to the microprocessor as shown in the hardware section of this code.
 '''
-'''This version is compatible will all version of Great Cow BASIC but only version greater than v0.98.00 support low memory GLCD modes.
+'''This version is compatible will all version of Great Cow BASIC but only version greater than v1.00.xx support low memory GLCD modes.
 '''
 '''************************************************************************
 '''@author  EvanV
@@ -141,7 +141,7 @@ GLCDCLS
     GLCD_Open_PageTransaction 0, 3
 #ENDIF
 
-GLCDPrint 0, 0,   "Version 0.98.01"
+GLCDPrint 0, 0,   "Version 1.00.xx"
 
 
 #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE

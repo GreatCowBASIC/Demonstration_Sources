@@ -72,7 +72,7 @@
     CLS
     PRINT "Great Cow Basic"
     Locate 1,0
-    Print "@v.0.95.010"
+    Print "@v1.00.xx"
     WAIT 3 s
 
     Do Forever

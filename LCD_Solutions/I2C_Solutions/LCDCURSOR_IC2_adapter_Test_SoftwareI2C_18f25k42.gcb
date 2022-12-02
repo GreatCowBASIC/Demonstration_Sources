@@ -38,7 +38,7 @@
 
     Print "Great Cow BASIC"
     Locate 1,0
-    Print "Ver 0.98.01"
+    Print "Ver 1.00.xx"
     WAIT 3 s
 
     Do Forever

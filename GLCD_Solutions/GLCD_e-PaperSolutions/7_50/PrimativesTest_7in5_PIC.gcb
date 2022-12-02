@@ -100,7 +100,7 @@
       GLCD_Open_PageTransaction
 
         GLCDDrawString (2, 1, "GCB",TFT_BLACK)
-        GLCDDrawString (56,1,"v.9700",TFT_BLACK)
+        GLCDDrawString (56,1,"v1.00.xx",TFT_BLACK)
         GLCDDrawString (2, 18, "DrawStr",TFT_BLACK)
 
         GLCDDrawString ( 2, 52, "Long:" )

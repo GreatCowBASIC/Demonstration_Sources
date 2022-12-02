@@ -20,7 +20,7 @@
 ' Call: Display_Memo to call the display function with Memo containing the text
 '
 
-' Compiler Version: 0.98.01 2019-10-27   Program Memory: 970/2048 words (47.36%)   RAM: 42/128 bytes (32.81%)   Chip: 16F1503
+' Compiler Version: 1.00.xx 2019-10-27   Program Memory: 970/2048 words (47.36%)   RAM: 42/128 bytes (32.81%)   Chip: 16F1503
 
 '******************************************
 '#include "setup_16f1503.h"

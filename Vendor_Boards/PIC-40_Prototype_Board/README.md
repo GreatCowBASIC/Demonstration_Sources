@@ -2,7 +2,7 @@
 
 This GIT contains the latest user contributed demonstrations. 
 
-The baseline set of demonstrations was created at version 0.98.01 of the Great Cow BASIC distrubution.
+The baseline set of demonstrations was created at version 1.00.xx of the Great Cow BASIC distrubution.
 
 
 

@@ -83,7 +83,7 @@ sub ShowCase1
 				GLCDRotate ( Portrait )
 
  				GLCDDrawString (2, 1, "GCB", SSD1289_WHITE )
-        GLCDDrawString (56,1,"v.95", SSD1289_YELLOW )
+        GLCDDrawString (56,1,"v1.00.xx", SSD1289_YELLOW )
         GLCDDrawString (2, 16, "DrawStr", SSD1289_WHITE )
 
         GLCDDrawString ( 60, 31, "Long Number" )
@@ -143,7 +143,7 @@ sub ShowCase2
 				GLCDRotate ( Landscape_rev )
 
         GLCDDrawString (2, 1, "GCB",SSD1289_WHITE)
-        GLCDDrawString (56,1,"v.95",SSD1289_YELLOW)
+        GLCDDrawString (56,1,"v1.00.xx",SSD1289_YELLOW)
         GLCDDrawString (2, 18, "DrawStr",SSD1289_WHITE)
 
         GLCDDrawString ( 2, 52, "Long:" )

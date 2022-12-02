@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB for version the compiler less than v0.95
+'''A demonstration program for GCGB and GCB for version the compiler less than v01.00.xx
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program shows how to sleep on the following microprocessors.
 '''See 'Understanding Reset Events On The PIC10F20X' document TB082-DS91082A from Microchip Technology Inc. for more details on the reset events.
@@ -8,7 +8,7 @@
 ''':
 '''This example has an LED attached to GPIO.1 and a switch to GPIO.3 (which is pulled high).  GPIO.3 is NOT used as the master reset.
 ''':
-'''This shown in this demonstration is required for versions of the compiler prior to v0.95
+'''This shown in this demonstration is required for versions of the compiler prior to v01.00.xx
 ''':
 '''@author  EvanV
 '''@licence GPL
