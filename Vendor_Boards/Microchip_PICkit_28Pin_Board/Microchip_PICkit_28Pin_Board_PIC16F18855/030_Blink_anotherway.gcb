@@ -1,0 +1,75 @@
+'''
+'''******************************************************************
+'''
+'''  One way to create a delay is to spend time decrementing a value. In Great Cow BASIC the timing
+'''  can be accurately programmed since the user has control on how the
+'''  time delays are executed.
+'''
+'''  This demonstration blinks LED D1 at a rate of approximately 1.0 seconds.
+'''
+'''  PIC: 16F18855
+'''  Compiler: GCB
+'''  IDE: GC Studio
+'''
+'''  Board: PICKit 28-Pin Demo Board
+'''  Date: 1.12.2022
+'''
+' ----- Configuration
+'Chip Settings.
+#CHIP 16f18855
+#OPTION Explicit
+
+#OPTION EXPLICIT
+ 
+'' -------------------PORTA----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:   -----------------------------ADC--
+''-----------------------------------------
+''
+
+'' -------------------PORTB----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ----------------LED-LED-LED LED--
+''-----------------------------------------
+''
+
+'' ------------------PORTC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---------------------------------
+''-----------------------------------------
+''
+
+'' ------------------PORTE-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ----------------SW---------------
+''-----------------------------------------
+''
+
+
+
+'Define constants to make things easier. We can reuse these at any time.
+#DEFINE LEDPORT LATB
+
+Dir     RB0         Out
+Dir     RB1         Out
+Dir     RB2         Out
+Dir     RB3         Out
+
+#DEFINE POTENTIOMETER RA0
+Dir     POTENTIOMETER In
+
+#DEFINE SWITCHIN      RE3
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+
+
+Dim CURRENTSTATE As Byte
+
+Dir RB0 Out
+
+Do
+    Wait 1000 ms
+    'Set Current state by toggling the existing state
+    RB0 = !RB0
+Loop

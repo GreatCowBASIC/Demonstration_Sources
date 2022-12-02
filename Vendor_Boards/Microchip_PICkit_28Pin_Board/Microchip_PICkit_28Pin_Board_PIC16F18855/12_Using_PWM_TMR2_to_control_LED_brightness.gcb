@@ -1,0 +1,80 @@
+'''
+'''******************************************************************
+'''
+''' Pulse-Width Modulation (PWM) is a scheme that provides power to a load by switching
+''' quickly between fully on and fully off states. The PWM signal resembles a square wave
+''' where the high portion of the signal is considered the on state and the low portion of
+''' the signal is considered the off state. The high portion, also known as the pulse width,
+''' can vary in time and is defined in steps. A longer, high on time will illuminate the LED
+''' brighter. The frequency or period of the PWM does not change. A larger number of
+''' steps applied, which lengthens the pulse width, also supplies more power to the load.
+''' Lowering the number of steps applied, which shortens the pulse width, supplies less
+''' power. The PWM period is defined as the duration of one complete cycle or the total
+''' amount of on and off time combined.
+'''
+''' This demonstation shows a how the changing PWM values across the LEDs using the PWM module.
+'''
+'''  PIC: 16F18855
+'''  Compiler: GCB
+'''  IDE: GC Studio
+'''
+'''  Board: PICKit 28-Pin Demo Board
+'''  Date: 1.12.2022
+'''
+
+
+
+#CHIP 16f18855,32
+#OPTION Explicit
+
+'Set the PPS of the PWM and the RS232 ports.
+'Set the PPS for this solution.
+#STARTUP InitPPS, 85
+
+Sub InitPPS
+    UNLOCKPPS
+    'RC0->EUSART:TX;
+    RC0PPS = 0x0010
+    'RC1->EUSART:RX;
+    RXPPS  = 0x0011
+
+    '   'RC5->TMR4:T4IN;
+    T4AINPPS = 0x0015
+    '   'RB4->ADCC:ADCACT;
+    ADCACTPPS = 0x000C
+    '   'RA3->PWM6:PWM6OUT;
+    RA3PPS = 0x000E
+    '   'RA1->PWM6:PWM6OUT;
+    RA1PPS = 0x000E
+    '   'RA2->PWM6:PWM6OUT;
+    RA2PPS = 0x000E
+    '   'RA0->PWM6:PWM6OUT;
+    RA0PPS = 0x000E
+    LOCKPPS
+End Sub
+
+#DEFINE USART_BAUD_RATE 19200
+#DEFINE USART_TX_BLOCKING
+
+#DEFINE USE_HPWM6 TRUE
+#DEFINE USE_HPWM7 FALSE
+'' -------------------LATC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' LED:   ---------------|DS4|DS3|DS2|DS1|-
+''-----------------------------------------
+''
+
+Dir porta.0 Out
+Dir porta.1 Out
+Dir porta.2 Out
+Dir porta.3 Out
+
+Dim bright As Byte
+
+    Do Forever
+          for bright = 0 to 255
+              wait 10 ms
+              HPWM ( 6, 1000, bright , 2  )
+        next
+        wait 10 ms
+    Loop

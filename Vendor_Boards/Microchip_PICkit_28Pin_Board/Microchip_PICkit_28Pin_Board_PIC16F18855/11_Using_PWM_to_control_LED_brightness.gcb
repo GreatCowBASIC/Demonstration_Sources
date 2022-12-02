@@ -1,0 +1,98 @@
+'''
+'''******************************************************************
+'''
+''' Pulse-Width Modulation (PWM) is a scheme that provides power to a load by switching
+''' quickly between fully on and fully off states. The PWM signal resembles a square wave
+''' where the high portion of the signal is considered the on state and the low portion of
+''' the signal is considered the off state. The high portion, also known as the pulse width,
+''' can vary in time and is defined in steps. A longer, high on time will illuminate the LED
+''' brighter. The frequency or period of the PWM does not change. A larger number of
+''' steps applied, which lengthens the pulse width, also supplies more power to the load.
+''' Lowering the number of steps applied, which shortens the pulse width, supplies less
+''' power. The PWM period is defined as the duration of one complete cycle or the total
+''' amount of on and off time combined.
+'''
+''' The demo vary the PWM to all the LEDS. This is achieved by redirected PMW6 to the LEDS.
+'''
+'''
+'''  PIC: 16F18855
+'''  Compiler: GCB
+'''  IDE: GC Studio
+'''
+'''  Board: PICKit 28-Pin Demo Board
+'''  Date: 06.11.2017
+'''
+
+#CHIP 16f18855,32
+
+'Set the PPS of the PWM and the RS232 ports.
+'Set the PPS for this solution.
+#STARTUP InitPPS, 85
+
+Sub InitPPS
+    UNLOCKPPS
+    '   'RA3->PWM6:PWM6OUT;
+    RA3PPS = 0x000E
+    '   'RA1->PWM6:PWM6OUT;
+    RA1PPS = 0x000E
+    '   'RA2->PWM6:PWM6OUT;
+    RA2PPS = 0x000E
+    '   'RA0->PWM6:PWM6OUT;
+    RA0PPS = 0x000E
+    LOCKPPS
+End Sub
+
+'' -------------------LATA-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' LED:   ---------------|D5 |D4 |D3 |D1 |-
+''-----------------------------------------
+''
+#DEFINE LEDD2 PORTA.0
+#DEFINE LEDD3 PORTA.1
+#DEFINE LEDD4 PORTA.2
+#DEFINE LEDD5 PORTA.3
+
+
+Dir     LEDD2 Out
+Dir     LEDD3 Out
+Dir     LEDD4 Out
+Dir     LEDD5 Out
+
+
+'Optimise commands  for PWM modules to reduce the size of the code produced.
+' not used Optimise
+#DEFINE USE_HPWMCCP1 FALSE
+' not used Optimise
+#DEFINE USE_HPWMCCP2 FALSE
+' not used Optimise
+#DEFINE USE_HPWMCCP3 FALSE
+' not used Optimise
+#DEFINE USE_HPWMCCP4 FALSE
+
+' used so compile
+#DEFINE USE_HPWM6 TRUE
+' not used Optimise
+#DEFINE USE_HPWM7 FALSE
+
+' used so compile
+#DEFINE USE_HPWM_TIMER2 TRUE
+' not used Optimise
+#DEFINE USE_HPWM_TIMER4 FALSE
+' not used Optimise
+#DEFINE USE_HPWM_TIMER6 FALSE
+
+#DEFINE myFrequency 60
+#DEFINE myTimerSelected 2
+Dim myDuty As Byte
+'start at 50%
+myDuty = 50
+
+HPWM ( HPWM6, myFrequency, myDuty , myTimerSelected  )
+
+Do Forever
+    For myDuty = 0 To 255
+        Wait 10 ms
+        HPWM ( HPWM6, myFrequency, myDuty, myTimerSelected  )
+    Next
+    Wait 10 ms
+Loop

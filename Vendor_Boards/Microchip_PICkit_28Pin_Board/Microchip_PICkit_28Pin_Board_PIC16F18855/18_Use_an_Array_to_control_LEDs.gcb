@@ -1,0 +1,74 @@
+'''
+'''******************************************************************
+'''
+''' This demonstration covers a very important topic of Arrays. The code uses indirect
+''' addressing to implement a moving average filter. This demonstration adds a moving average
+''' filter to the Analog-to-Digital code in previous demonstration. The moving average keeps a list of the
+''' last ADC values (n) and averages them together. The filter needs two parts: A circular
+''' queue and a function to calculate the average.
+'''
+''' Twisting the potentiometer changes the value read by the Analog-to-Digital converter.
+''' The filtered value is then sent to the LED display.
+'''
+''' The user rotates the POT to see the LEDs rotate. The four LSbs of the ADC value are reflected onto the LEDs.
+'''
+'''
+'''  PIC: 16F18855
+'''  Compiler: GCB
+'''  IDE: GC Studio
+'''
+'''  Board: PICKit 28-Pin Demo Board
+'''  Date: 1.12.2022
+'''
+
+
+
+#CHIP 16f18855,32
+
+'' -------------------LATA-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' LED:   ---------------|D5 |D4 |D3 |D1 |-
+''-----------------------------------------
+''
+#DEFINE LEDD2 PORTA.0
+#DEFINE LEDD3 PORTA.1
+#DEFINE LEDD4 PORTA.2
+#DEFINE LEDD5 PORTA.3
+#DEFINE Potentiometer   PORTA.4
+
+Dir     LEDD2 Out
+Dir     LEDD3 Out
+Dir     LEDD4 Out
+Dir     LEDD5 Out
+Dir     Potentiometer In
+
+
+#DEFINE NUM_READINGS 8
+
+'Set up the variables
+Dim _sum As Long
+Dim yloop, xloop As Byte
+_sum = 0
+
+'Define the table
+Dim queue(8)
+queue = 0, 0, 0, 0, 0, 0, 0, 0
+
+Do
+    For xloop = 1 To NUM_READINGS
+        porta = average_reading ( queue() )
+        queue( xloop ) = ReadAD ( AN4 )
+    Next
+Loop
+
+
+Function average_reading ( In analyze_queue() ) As Word
+
+    _sum = 0
+    For yloop = 1 To  NUM_READINGS
+        _sum = [Long]queue ( yloop ) + _sum
+    Next
+
+    average_reading = _sum / NUM_READINGS
+
+End Function

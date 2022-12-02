@@ -1,0 +1,64 @@
+'''
+'''******************************************************************
+'''
+''' This shows using a table lookup function to implement a
+''' binary to gray code conversion.  The POT is read by the A2D,
+''' The high order 4 bits then are converted to Gray Code and
+''' displayed on the LEDs.
+
+''' The ADC value is used as the offset into reading the gray code equivalent inside of
+''' a constant data array.
+'''
+''' Gray coded binary will be reflected on the LEDs in accordance with the POT reading
+'''
+'''
+'''
+'''  PIC: 16F18855
+'''  Compiler: GCB
+'''  IDE: GC Studio
+'''
+'''  Board: PICKit 28-Pin Demo Board
+'''  Date: 1.12.2022
+'''
+
+
+'Chip Settings.
+#CHIP 16f18855,32
+
+'' -------------------LATA-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' LED:   ---------------|D5 |D4 |D3 |D1 |-
+''-----------------------------------------
+''
+
+Table gray_code
+    0
+    0
+    0
+    1
+    1
+    1
+    3
+    3
+    3
+    3
+    7
+    7
+    7
+    15
+    15
+    15
+End Table
+
+Dir porta Out
+
+
+'Potentitor is connected to RA4...set as input
+Dir porta.4 In
+
+Do
+    Wait 5 ms
+    'Read the table value and set the port to the table value.
+    ReadTable gray_code, ( ReadAD ( AN4 )  / 16 ), porta
+
+Loop

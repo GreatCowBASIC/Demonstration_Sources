@@ -1,0 +1,125 @@
+'''
+'''******************************************************************
+'''
+'''  Timer0 is a counter implemented in the processor. It may be used to count instruction
+'''  cycles or external events, that occur at or below the instruction cycle rate.
+'''  In thE pic, Timer0 can be used as either an 8-bit or 16-bit counter, or timer. The
+'''  enhanced mid-range core implements only an 8-bit counter.
+'''  This lesson configures Timer0 to count instruction cycles and to set a flag when it rolls
+'''  over. This frees up the processor to do meaningful work rather than wasting instruction
+'''  cycles in a timing loop.
+'''  Using a counter provides a convenient method of measuring time or delay loops as it
+'''  allows the processor to work on other tasks rather than counting instruction cycles.
+'''
+'''
+'''  LEDs rotate from right to left, similar to Lesson 3, at a rate of ~.5 seconds.
+'''
+'''
+'''  PIC: 16F18855
+'''  Compiler: GCB
+'''  IDE: GC Studio
+'''
+'''  Board: PICKit 28-Pin Demo Board
+'''  Date: 1.12.2022
+'''
+
+
+'Chip Settings.
+#CHIP 16f18855, 32
+#OPTION Explicit
+
+
+'Set the PPS of the PWM
+'Set the PPS for this solution.
+#STARTUP InitPPS, 85
+
+Sub InitPPS
+    UNLOCKPPS
+
+    'Set the PPS of the RS232 ports.
+    'RC0->EUSART:TX;
+    RC0PPS = 0x0010
+    'RC1->EUSART:RX;
+    RXPPS  = 0x0011
+
+    '   //RB0->TMR0:TMR0;
+    RB0PPS = 0x18
+    LOCKPPS
+End Sub
+
+'-------------------LATA-----------------
+'Bit#:  -7---6---5---4---3---2---1---0---
+'LED:   ---------------|D5 |D4 |D3 |D2 |-
+''-----------------------------------------
+''
+
+Dim TIMEOUT As Byte
+
+' ----- Constants
+#DEFINE USART_BAUD_RATE 115200
+#DEFINE USART_TX_BLOCKING
+'
+
+
+#DEFINE LEDD2 PORTA.0
+#DEFINE LEDD3 PORTA.1
+#DEFINE LEDD4 PORTA.2
+#DEFINE LEDD5 PORTA.3
+Dir     LEDD2 Out
+Dir     LEDD3 Out
+Dir     LEDD4 Out
+Dir     LEDD5 Out
+
+'   Set portb.0 as out
+Dir portb.0 Out
+'   Set the port as an ouput
+Dir porta Out
+'   Set the first LED on
+Set LEDD5 On
+
+
+'   Initialise the timer.
+'   Firstly tell the compiler to use a 16bit timer for this demonstration
+#DEFINE TMR0_16BIT
+
+'     For this timer we need the following:
+'       Prescaler
+'           1:256
+'            HF int Osc, and
+'            NOT to sync Timer
+'       Post scaler
+'           1:2
+'Event will be raised every 1.04s
+InitTimer0 Osc, PRE0_256 + TMR0_HFINTOSC ,  POST0_2
+'   Set the type of event
+On Interrupt Timer0Overflow Call blink
+SetTimer ( 0, 0x0bdc )
+'     Start the Timer - you need to start this Timer0!
+StartTimer 0
+
+Do Forever
+
+    If TimeOut = 1 Then
+
+        ' Rotate our LEDs
+        Set C Off
+        Rotate porta Right
+        If C = 1 Then porta.3 = 1
+
+        TimeOut= 0
+        ' Set timer to 1 second`
+        SetTimer ( 0, 0x0bdc )
+
+    End If
+
+
+
+
+Loop
+
+
+Sub blink
+    TimeOut = 1
+    'Clear the Timer0 overflow event
+    TMR0IF = 0
+End Sub

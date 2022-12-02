@@ -1,0 +1,113 @@
+'''
+'''  This demonstration produces a variable speed rotating LED display that is proportional to the ADC value.
+'''  The ADC value and LED rotate speed are inversely proportional to each other.
+'''
+'''  Rotate the POT counterclockwise to see the LEDs shift faster, press the switch to reverse the direction of the LEDs.
+'''  The switch event is detected using an Interrupt.
+'''
+'''  The four LSbs of the ADC are mirrored onto the LEDs. Rotate the potentiometer
+'''  to change the display.
+'''
+'''
+'''  PIC: 16F18855
+'''  Compiler: GCB
+'''  IDE: GC Studio
+'''
+'''  Board: PICKit 28-Pin Demo Board
+'''  Date: 1.7.2016
+'''
+
+' ----- Configuration
+#CHIP 16f18855
+#OPTION Explicit
+
+'Required to ensure 16F18855 device is fully supported
+#SCRIPT
+    If NoVar(PortABCChange) Then
+        PortABCChange = PortBChange
+    End If
+#ENDSCRIPT
+
+#DEFINE SWITCH_DOWN         0
+#DEFINE SWITCH_UP           1
+
+#DEFINE LED_RIGHT           TRUE
+#DEFINE LED_LEFT            FALSE
+
+#DEFINE SWITCH      PORTA.5
+
+Dim DIRECTION As Byte
+Dim mydelay, leds  As Byte
+
+'start from the right to left
+direction = LED_RIGHT
+
+Dir porta Out
+leds = 8
+
+'Potentitor is connected to RA4...set as input
+Dir porta.4 In
+
+'setup switch (SW1)
+Dir SWITCH In
+
+porta  = 15
+Repeat 8
+    porta  = !porta AND 15
+    Wait 125 ms
+End Repeat
+
+' Set up the Interrupt. Use on
+IOCAN5 = 1
+On Interrupt PortChange Call HandleISR
+
+Do
+
+    mydelay = ReadAD10 ( AN4 ) / 4
+
+    ' Factor the ADC reading to delay steps
+    mydelay = mydelay / 16
+
+    ' decrement the 8 MSbs of the ADC and delay 20ms for each
+    Do While ( mydelay <> 0 )
+        mydelay--
+        Wait 20 ms
+    Loop
+
+    porta = leds
+
+    If  direction = LED_RIGHT  Then
+
+        'shift to the right by 1
+        Rotate leds Right Simple
+
+        ' when the ROTATE moves the bit to bit 7, restart the pattern
+        If leds = 128 Then
+            leds = 8
+        End If
+
+    Else
+
+        'Set C off to ensure the carry bit does not impact
+        Set C Off
+        Rotate leds Left
+
+        'when the last LED is lit, restart the pattern
+        If  leds = 16 Then
+            leds = 1
+        End If
+    End If
+Loop
+
+
+Sub HandleISR
+    'Did the correct Interrupt occur?
+    'We are looking for an enabled change was detected on the associated pin.
+    'Set when IOCAPx = 1 and a rising edge was detected on RAx, or when IOCANx = 1 and a falling
+    'edge was detected on RAx.
+    If IOCAF5 = 1 Then
+        'Clear the Interrupt
+        IOCAF5 = 0
+        direction = !direction
+    End If
+End Sub
