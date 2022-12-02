@@ -10,8 +10,8 @@
 
 'Set below configuration first for #chip, pins, display etc...
 '*******************************************************
-//#Include "tm1637_oem_lib.h"
-#Include <tm1637_oem_lib.h>
+#Include "tm1637_oem_lib.h"
+// #Include <tm1637_oem_lib.h>
 
 #OPTION explicit
 '---PIC12F683---
@@ -508,7 +508,7 @@ Sub Scroll_1
      Wait 1 s
 
     tmClrbuf ': tmClrDisp
-     tmSndStr "Error.3 no_Fan  CASE =75°C"
+     tmSndStr "Error.3 no_Fan  CASE =75ï¿½C"
      tmSndBuf
      Wait 1 s
 
@@ -518,7 +518,7 @@ Sub Scroll_1
      Wait 1 s
 
     tmClrbuf ': tmClrDisp
-     tmSndStr "Special chr . . .    "" = _ ~ | ) ( ° ' - ?"
+     tmSndStr "Special chr . . .    "" = _ ~ | ) ( ï¿½ ' - ?"
      tmSndBuf
      Wait 1 s
     TM_Scroll = Off
