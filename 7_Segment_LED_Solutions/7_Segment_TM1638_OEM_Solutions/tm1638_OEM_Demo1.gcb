@@ -10,7 +10,7 @@
 
 'Set below configuration first for #chip, pins, display etc...
 '*******************************************************
-//#Include "TM1638_OEM_Lib.h"
+
 #Include <TM1638_OEM_Lib.h>
 
 #OPTION explicit
@@ -674,7 +674,7 @@ Sub Scroll_1
      tmSndStr"   no_Fan"
      tmSndBuf
       wait 700 ms
-     tmSndStr"  CASE =85°C"
+     tmSndStr"  CASE =85ï¿½C"
      tmSndBuf
       Wait 1 s
 
@@ -685,7 +685,7 @@ Sub Scroll_1
       Wait 1 s
      TM_ScrollRate = 35
     tmClrbuf ': tmClrDisp
-     tmSndStr "Special chr . . .    "" = _ ~ | ) ( ° ' - ?"
+     tmSndStr "Special chr . . .    "" = _ ~ | ) ( ï¿½ ' - ?"
      tmSndBuf
       Wait 1 s
     TM_Scroll = Off
