@@ -1,0 +1,2633 @@
+#Chip 18F15Q40, 64
+
+#Option Explicit
+#Config CP=On
+'Read protected
+
+'LCD connection settings
+#Define LCD_IO 4
+#Define LCD_SPEED FAST
+#Define LCD_NO_RW
+
+'Port assignments
+#Define LCD_RS        PortA.0
+#Define LCD_Enable    PortA.1
+
+#Define LCD_DB4       PortA.2
+#Define LCD_DB5       PortC.0
+#Define LCD_DB6       PortC.1
+#Define LCD_DB7       PortC.2
+
+#Define C5            PortC.5
+#Define A4            PortA.4
+#Define C4            PortC.4
+
+#Define A5            PortA.5
+
+#Define UpSw          PortB.7
+#Define DnSw          PortC.7
+#Define LSw           PortC.6
+#Define RSw           PortC.3
+#Define OKSw          PortA.3
+
+'#Define Serial0       PortB.6
+#Define SerialRcv     PortB.5
+#Define B4            PortB.4
+
+
+'Switch constants
+#Define SwNil         0
+#Define SwUp          1
+#Define SwDn          2
+#Define SwL           3
+#Define SwR           4
+#Define SwOK          5
+#Define SwUpDn        6
+#Define SwLR          7
+
+'Correct level for a switch press
+'switch inputs normally held high by Weak pullups
+#Define SwPress       0
+
+Dim Ep_Val As Byte
+Dim Wrt    As Byte
+Dim WrtVal As Byte
+
+Dim T_250  As Word 'Store 250          'These MUST be word variables.
+Dim T_500  As Word 'Store 251-500      'otherwise they don't add up
+Dim T_750  As Word 'Store 501-750      'they are stored in Eeprom bytes
+Dim T_999  As Word 'Store 751-999      'and only hold a value of 251 maximum
+Dim T_Word As Word                    'but still must be WORDS
+
+Dim Temp   As Byte
+Dim TempR  As Byte
+
+
+'           Pic     LCD
+
+'           20      VSS Gnd
+'                   VDD +5V
+'                   V0  Contrast
+'PortA.0    19      RS
+'                   RW  Gnd
+'PortA.1    18      EN
+'PortA.2    17      D4
+'PortC.0    16      D5
+'PortC.1    15      D6
+'PortC.2    14      D7
+'PortB.4    13                                             B4 input
+'PortB.5    12                                             B5  input
+'PortB.6    11                                             B6   output
+
+'PortB.7    10                                             UpSw
+'PortC.7     9                                             DnSw
+'PortC.6     8                                             LSw
+'PortC.3     7                                             RSw
+'PortC.4     6                                             DLat  LED display
+'PortC.5     5                                             DClk  LED display
+'PortA.3     4                               'In Only      OkSw
+'PortA.4     3                                             DData LED display
+'PortA.5     2                                             A5  output
+'            1          +5V
+'                    A  +5V
+'                    K  Gnd
+
+
+'Port directions
+Dir UpSw                In
+Dir DnSw                In
+Dir LSw                 In
+Dir RSw                 In
+Dir OKSw                In
+Dir C5                  Out
+Dir A4                  Out
+Dir C4                  Out
+'Dir B6                  Out
+'Dir B5                  Out
+Dir B4                  In
+Dir A5                  Out
+
+Initialise_Serial:
+
+#Include <SoftSerial.h>
+
+#Define SER1_BAUD 9600
+'#Define SER1_BAUD 9600     ' baudrate must be defined
+'#Define SER1_DATABITS 7   ' databits optional (default = 8)
+'#Define SER1_STOPBITS 2   ' stopbits optional (default = 1)
+'#Define SER1_INVERT Off   ' inverted polarity optional (default = Off)
+#Define SER1_TXPORT PORTB  ' I/O Port (without .bit) must be defined
+#Define SER1_TXPIN 6       ' Port Bit must be defined
+#Define SER1_RXPORT PORTB
+#Define SER1_RXPIN 5
+
+'Dir     SerialO   Out
+Dir     SerialRcv   In
+
+'Variables used
+
+Dim SwitchValue         As Byte
+
+#IFDEF VAR(OPTION_REG)
+    Set Not_WPUEN = 0 'Enable pullups in general.
+    'but not for the chips which do not have this register.
+#ENDIF
+
+Set WPUA0     = 0
+Set WPUA1     = 0
+Set WPUA2     = 0
+Set WPUA3     = 1
+Set WPUA4     = 1
+Set WPUA5     = 1
+
+Set WPUb4     = 1
+Set WPUb5     = 1
+Set WPUb6     = 0
+Set WPUb7     = 1
+
+Set WPUc0     = 0
+Set WPUc1     = 0
+Set WPUc2     = 0
+Set WPUc3     = 1
+Set WPUc4     = 1
+Set WPUc5     = 1
+Set WPUc6     = 1
+Set WPUc7     = 1
+
+Dim RecvData(255)   As Byte
+Dim DisplayData(50) As Byte
+Dim DataOut(25)     As Byte'25 x 8 = 200 channels - no more than that surely?
+
+Dim DataCount     As Byte
+Dim DataIndx      As Byte
+Dim Chk           As Byte
+Dim ChkCnt        As Byte
+Dim DataAvailable As Bit
+Dim CntDown       As Byte
+Dim SendDat       As Byte
+Dim RecvCount     As Byte
+
+Dim SendDataCount As Byte
+Dim EndCount      As Byte
+
+Dim StoreDat_Len  As Byte
+Dim MsgTot_Len    As Byte
+
+Dim ComError      As Bit
+
+Dim EventsCount   As Byte
+Dim Last_Event    As Byte
+Dim Events(11)    As Byte
+Events = 0,0,0,0,0,0,0,0,0,0,0
+Dim CoinValue(6)  As Byte
+Dim CashIn        As Word 'Values greater than 200 possible ?
+Dim NewestCoin    As Word
+Dim PrintLast     As Byte
+
+Dim PayError      As Bit
+Dim ProgressIdx   As Byte
+
+Dim CoinsPaidOut  As Word
+Dim CoinsToPayout As Word
+
+Dim CoinsToDate As Long
+
+'^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+'^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+'^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+'^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#Define PayValue  2
+'^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+'^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+'^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+'^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#Define CAddr     2
+'#Define HAddr     3
+
+#Define FirstHopper  3
+#Define SecondHopper 4
+
+#Define Attract1     1
+#Define Attract2     2
+#Define Attract3     3
+#Define Attract4     4
+#Define PayStartDis  5
+#Define Paying1      6
+#Define Paid1        7
+#Define Error1       8
+
+'Error defines added 22/11/2022
+#Define NoError          0
+#Define DestinationError 1
+#Define ChkSumError      2
+#Define NoAckError       3
+#Define SourceError      4
+
+
+Dim HAddr1        As Byte
+Dim HAddr2        As Byte
+Dim SearchAddr    As Byte
+Dim UseHopper     As Byte
+Let HAddr1        = 0
+Let HAddr2        = 0
+Let UseHopper     = 0
+Let SearchAddr    = FirstHopper
+
+Dim PrintOn As Byte
+Let PrintOn = 0
+
+Dim HopperType As Byte
+#Define SCH       Asc("S")
+#Define Asahi     Asc("A")
+#Define Universe  Asc("U")
+#Define Unknown   Asc("!")
+
+Dim Encrypted As Byte
+Let Encrypted = 0
+
+
+Dim Offset     As Byte
+Dim MessageLen As Byte
+Dim TableData  As Byte
+Dim LastOffset As Byte
+Let LastOffset = 1
+
+Dim UpdateDisplay As Byte
+Let UpdateDisplay = 1
+Dim AttractLine  As Byte
+Let AttractLine   = 1
+
+Dim Hopper1Ready As Bit
+Dim Hopper2Ready As Bit
+Let Hopper1Ready = 1
+Let Hopper2Ready = 1
+'Start off with the assumption that two hoppers are fitted.
+'For a version with only one hopper, setting Hopper2Ready to
+'zero will prevent the second hopper search.
+
+'#Define DebugOn
+
+Dim CIn1  As Byte
+Dim CIn2  As Byte
+Dim CIn3  As Byte
+Dim CIn4  As Byte
+Dim COut1 As Byte
+Dim COut2 As Byte
+Dim COut3 As Byte
+Dim COut4 As Byte
+
+Let CIn1  = 0
+Let CIn2  = 0
+Let CIn3  = 0
+Let CIn4  = 0
+Let COut1 = 0
+Let COut2 = 0
+Let COut3 = 0
+Let COut4 = 0
+
+#Define Ep_CTD        1 'Word value - next available = 5
+#Define Ep_NewestCoin 5
+
+Dim StallCount As Word
+Dim PaidSoFar  As Byte
+Dim LastPaid   As Byte
+Dim DisplayRefresh As Bit
+
+Dim CoinsHopper1 As Byte
+Dim CoinsHopper2 As Byte
+Let CoinsHopper1 = 0
+Let CoinsHopper2 = 0
+Dim Ready2Pay    As Bit
+Let Ready2Pay    = 0
+
+Dim CheckHopper As Bit
+Dim H1Events1   As Byte
+Dim H1Events2   As Byte
+Dim H1Events3   As Byte
+Dim H2Events1   As Byte
+Dim H2Events2   As Byte
+Dim H2Events3   As Byte
+Dim PayingCoinAmout As Byte
+
+#Define StallError 120 '120 * 250 mS = 30 Seconds
+
+StartSub
+
+FillDisplay(AttractLine)
+PrintToDisplay
+
+Sub A_Top_Loop
+    'Dummy Sub
+End Sub
+
+Do
+    CheckForCoins
+    If CashIn >= PayValue Then
+        MasterInhibit(CAddr)
+        Let CoinsToPayOut = CashIn / PayValue
+
+        If Hopper1Ready=1 + Hopper2Ready = 2 Then '2 Hoppers = 2Pay time!
+            Let CoinsHopper1 = CoinsToPayout / 2
+            Let CoinsHopper2 = CoinsToPayout - CoinsHopper1
+            Let Ready2Pay = 1
+        Else
+            Let Ready2Pay = 0
+            If Hopper1Ready = 1 Then
+                Let UseHopper = HAddr1
+            End If
+            If Hopper2Ready = 1 Then
+                Let UseHopper = HAddr2
+            End If
+            If Hopper1Ready + Hopper2Ready = 0 Then
+                Locate 0, 0
+                '      0123456789012345
+                Print "No hoppers ready"
+                GoTo PayoutFailure
+            End If
+        End If
+
+StartPayout:
+
+        If Ready2Pay = 1 Then
+            PayTwoHopper(CoinsHopper1, CoinsHopper2, HAddr1, HAddr2)
+        Else
+            PayHopper(CoinsToPayOut, UseHopper)
+        End If
+        If PayError = 0 Then
+            Let CoinsPaidOut = Events(2) * PayValue
+            Let CashIn = CashIn - CoinsPaidOut
+            MasterEnable(CAddr)
+        Else
+            If UseHopper = HAddr1 Then
+                Let Hopper1Ready = 0 'Don't use hopper 1 again
+                If Hopper2Ready Then
+                    Let UseHopper = HAddr2
+                    Let CoinsToPayOut = Events(3)
+                    Let CashIn = Events(3) * PayValue
+                    Goto StartPayout
+                End If
+            End If
+            If UseHopper = HAddr2 Then
+                Let Hopper2Ready = 0 'Don't use hopper 2 again
+                If Hopper1Ready Then
+                    Let UseHopper = HAddr1
+                    Let CoinsToPayOut = Events(3)
+                    Let CashIn = Events(3) * PayValue
+                    Goto StartPayout
+                End If
+            End If
+
+PayoutFailure:
+
+            FillDisplay(Error1)
+            Do
+                CheckSwitches
+                PrintToDisplay
+                Wait 250 mS
+            Loop Until SwitchValue = SwOK
+            Do
+                CheckSwitches
+                PrintToDisplay
+                Wait 250 mS
+            Loop Until SwitchValue = SwNil
+            If Hopper1Ready = 0 Then
+                If Hopper2Ready = 0 Then
+                    Locate 0, 0
+                    '      0123456789012345
+                    Print " Customer  owed "
+                    Locate 1, 0
+                    Print "      coins     "
+                    Repeat 30
+                        Locate 1, 2
+                        Print Events(3)
+                        PrintToDisplay
+                        Wait 500 mS
+                        Locate 1, 2
+                        Print "    "
+                        Wait 500 mS
+                    End Repeat
+                    Let CashIn    = 0
+                    Let Events(1) = 0
+                    Let Events(2) = 0
+                    Let Events(3) = 0
+                    asm Reset
+                End If
+            End If
+            Let CoinsPaidOut = Events(2) * PayValue
+            Let CashIn = CashIn - CoinsPaidOut
+        End If
+    Else 'Added this delay 28/11/2022
+         'Trying to reduce the number of
+         'consecutive calls on the ccTalk bus...
+        Wait 250 mS
+    End If
+Loop
+
+
+Sub CheckForCoins
+
+    If PollForCEvents <> 0 Then
+        FetchCEvents 'Fetch events before ANYTHING else or events wiped by next command!
+        ProcessCEvents
+    Else
+        If ComError = NoError Then
+
+            'Print to the internal LCD display
+            PrintScroll
+
+            'Refresh the external ccTalk display
+            If UpdateDisplay = 5 Then
+                FillDisplay(AttractLine)
+                Let AttractLine = AttractLine + 1
+                If AttractLine > Attract4 Then
+                    Let AttractLine = Attract1
+                End If
+            End If
+
+            'Print to the external ccTalk display
+            If UpdateDisplay > 5 Then
+                PrintToDisplay
+                Let UpdateDisplay = 0
+            End If
+
+            Let UpdateDisplay = UpdateDisplay + 1
+
+            'Show the CoinsToDate counter if "OK" pressed.
+            'In the final machine, "OK" may be replaced...
+            CheckSwitches
+            If SwitchValue = SwOK Then
+                Locate 1, 0
+                      '0123456789012345
+                Print "CTD:            "
+                Locate 1, 4
+                Print CoinsToDate
+            Else
+                If CashIn <> 0 Then
+                    Locate 1, 0
+                          '0123456789012345
+                    Print "Coins in : "
+                                     '99.99
+                    PrintValuesSub(CashIn,0,0,0)
+                Else
+                    Locate 1, 0
+                          '0123456789012345
+                    Print "Last coin: "
+                                     '99.99
+                    PrintValuesSub(NewestCoin,0,0,0)
+                    EpWrite(Ep_NewestCoin, NewestCoin)
+                End If
+                Print " "                '-
+            End If
+
+            'Reduced to 50 mS 3/11/2022
+            'Removed 28/11/2022 as there is now a 250 mS delay in main Do...Loop
+            'Wait 100 mS 'Added delay here to assist in re-connecting to removed coin mech.
+        Else
+            'At this point we actually get an invalid response!
+            '"Processing the coin value" looks better though...
+            Locate 0, 0
+                  '0123456789012345
+            Print " Coin mech busy "
+            Locate 1, 0
+            Print "  or unplugged  "
+            'Reduced to 50 mS 3/11/2022
+            Wait 250 mS 'Added delay here to assist in re-connecting to removed coin mech.
+            Let PrintLast = 0
+        End If
+    End If
+End Sub
+
+Sub ProcessCEvents
+Dim ValidCoin  As Bit
+
+    'Reset counter if it has wrapped from 255 to 1
+    If Events(1) < Last_Event Then
+        Let Last_Event = 0
+    End If
+
+    Let EventsCount = Events(1) - Last_Event
+    Let Last_Event  = Events(1)
+
+    'Wait 1000 mS 'This delay MUST be removed!
+    MasterInhibit(CAddr)
+    Let EndCount = 2
+    Repeat EventsCount
+        If Events(EndCount) <> 0 Then
+'This test added 24/11/2022
+'Channels limited to prevent attempting to look for coin channels that don't exist.
+'Maximum channels catered for is 16. This is OK for SP and hopefully others...
+            If Events(EndCount) > 16 Then
+                Let ValidCoin = 0
+            Else
+                Let RecvData = 0 'Should prevent processing of 'non' events?
+                RequestCoinID(Events(EndCount))
+                If CoinValue(1) = "G" or CoinValue(1) = "E" Then
+                    If CoinValue(2) = "B" or CoinValue(2) = "U" Then
+                        Let CoinValue(3) = CoinValue(3) - 48 'Get numeric value from Ascii
+                        Let CoinValue(4) = CoinValue(4) - 48
+                        Let CoinValue(5) = CoinValue(5) - 48
+                        Let CoinValue(3) = CoinValue(3) * 100
+                        Let CoinValue(4) = CoinValue(4) * 10
+                        Let NewestCoin   = CoinValue(3) + CoinValue(4) + CoinValue(5)
+
+                        'Print NewCoin
+
+                        Let ValidCoin = 0        'Added 24/11/2022
+
+                        If NewestCoin = 5 Then   'Added 24/11/2022
+                            Let ValidCoin = 1
+                        End If
+
+                        If NewestCoin = 10 Then  'Added 24/11/2022
+                            Let ValidCoin = 1
+                        End If
+
+                        If NewestCoin = 20 Then  'Added 24/11/2022
+                            Let ValidCoin = 1
+                        End If
+
+                        'No 25p or 25c coin in Europe?
+                        'If NewestCoin = 25 Then  'Added 24/11/2022
+                        '    Let ValidCoin = 1
+                        'End If
+
+                        If NewestCoin = 50 Then  'Added 24/11/2022
+                            Let ValidCoin = 1
+                        End If
+
+                        If NewestCoin = 100 Then 'Added 24/11/2022
+                            Let ValidCoin = 1
+                        End If
+
+                        If NewestCoin = 200 Then 'Added 24/11/2022
+                            Let ValidCoin = 1
+                        End If
+
+                    Else
+                        Let ValidCoin = 0        'Added 24/11/2022
+                    End If
+                Else
+                    Let ValidCoin = 0            'Added 24/11/2022
+                End If
+            End If
+
+            If ValidCoin = 0 Then
+              '0123456789012345
+                Print "  Invalid Coin  "
+                Wait 750 mS
+                Let NewestCoin = 0
+            Else
+                Let CashIn = CashIn + NewestCoin
+            End If
+            'Wait 100 mS
+            Let EndCount = EndCount + 2
+        End If
+    End Repeat
+    MasterEnable(CAddr)
+End Sub
+
+Sub RequestCoinID(In ID_Channel As Byte)
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+    SerialSendMsgSimple(CAddr,1,1,184,5,ID_Channel) 'Request Coin ID
+    SerialRecvData     (1,Caddr,0)                  'Destination Master, source coin mech. Data Type binary
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+
+    'Added ComError check 3/11/2022
+    If ComError = NoError Then
+        Let CoinValue(1) = RecvData(5)
+        Let CoinValue(2) = RecvData(6)
+        Let CoinValue(3) = RecvData(7)
+        Let CoinValue(4) = RecvData(8)
+        Let CoinValue(5) = RecvData(9)
+        Let CoinValue(6) = RecvData(10)
+    End If
+End Sub
+
+Function PollForCEvents
+    Let PollForCEvents = 0
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+    SerialSendData(CAddr,0,1,229) 'Poll Events
+    SerialRecvData(1,CAddr,0)     'Destination Master, source coin mech. Data Type binary
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+
+    'Added ComError check 3/11/2022
+    If ComError = NoError Then
+        If RecvData(5) <> Last_Event Then
+            Let PollForCEvents = 1
+        End If
+    End If
+
+End Function
+
+Sub FetchCEvents
+    Let DataIndx = 5 'Event counter at 5, event "values" at 6, 8, 10, 12, 14
+    Let EndCount = 1 'Event errors or sorter paths at 7, 9, 11, 13, 15
+    Repeat 11
+        Let Events(EndCount) = RecvData(DataIndx)
+        Let EndCount = EndCount + 1
+        Let DataIndx = DataIndx + 1
+    End Repeat
+End Sub
+
+Sub CheckSwitches           'Checks the state of the switches
+    Let SwitchValue = SwNil 'and sets SwitchValue to a constant
+'                           'indicating the switch(es) pressed
+
+      If UpSw = SwPress And DnSw = SwPress Then
+         Wait 10 mS
+         If UpSw = SwPress And DnSw = SwPress Then
+            If SwitchValue = 0 Then
+               Let SwitchValue = SwUpDn
+               Exit Sub
+            End If
+         End If
+      End If
+
+      If LSw = SwPress And RSw = SwPress Then
+         Wait 10 mS
+         If LSw = SwPress And RSw = SwPress Then
+            If SwitchValue = 0 Then
+               Let SwitchValue = SwLR
+               Exit Sub
+            End If
+         End If
+      End If
+
+      If OKSw = SwPress Then
+         Wait 10 mS
+         If OKSw = SwPress Then
+            If SwitchValue = 0 Then
+               Let SwitchValue = SwOK
+            End If
+         End If
+      End If
+
+      If UpSw = SwPress Then
+         Wait 10 mS
+         If UpSw = SwPress Then
+            If SwitchValue = 0 Then
+               Let SwitchValue = SwUp
+            End If
+         End If
+      End If
+
+      If DnSw = SwPress Then
+         Wait 10 mS
+         If DnSw = SwPress Then
+            If SwitchValue = 0 Then
+               Let SwitchValue = SwDn
+            End If
+         End If
+      End If
+
+      If LSw = SwPress Then
+         Wait 10 mS
+         If LSw = SwPress Then
+            If SwitchValue = 0 Then
+               Let SwitchValue = SwL
+            End If
+         End If
+      End If
+
+      If RSw = SwPress Then
+         Wait 10 mS
+         If RSw = SwPress Then
+            If SwitchValue = 0 Then
+               Let SwitchValue = SwR
+            End If
+         End If
+      End If
+
+End Sub
+
+Sub SerialSendData(In MessageDestination As Byte, In MessageDataLength As Byte, In MessageSource As Byte, In MessageToSend As Byte)
+
+    Let RecvData(1) = MessageDestination
+    Let RecvData(2) = MessageDataLength
+    Let RecvData(3) = MessageSource
+    Let RecvData(4) = MessageToSend
+
+    SerialTransmit(4)
+
+End Sub
+
+'SerialSendMsgData (2,StoreDataLen,1,231,MsgTotLen) 'Set Enable
+Sub SerialSendMsgData(In dMessage_Destination As Byte, In dMessage_DataLength As Byte, In dMessage_Source As Byte, In dMessage_ToSend As Byte, In dMessage_Length As Byte)
+
+    Let RecvData(1)  = dMessage_Destination
+    Let RecvData(2)  = dMessage_DataLength
+    Let RecvData(3)  = dMessage_Source
+    Let RecvData(4)  = dMessage_ToSend
+    Let DataIndx   = 5
+    Let EndCount = 1
+
+    Repeat dMessage_DataLength
+        Let RecvData(DataIndx) = DataOut(EndCount)
+        Let DataIndx = DataIndx     + 1
+        Let EndCount = EndCount + 1
+    End Repeat
+
+    SerialTransmit(dMessage_Length)
+
+End Sub
+
+'@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+'@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+'@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+'@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+'
+'Message length =     1  2 3  4     5   6   Message length = 6
+'SerialSendMessage(CAddr,2,1,231,6,255,255)
+'                     ^  ^ ^  ^  ^  ^   ^
+'Sequence:            ^  ^ ^  ^  ^  ^   ^
+'Destination - - - - -^  ^ ^  ^  ^  ^   ^
+'Data length - - - - - - ^ ^  ^  ^  ^   ^
+'Source      - - - - - - - ^  ^  ^  ^   ^
+'Message     - - - - - - - - -^  ^  ^   ^
+'-Message length-  1     2 3  4  ^  5   6  This is the length of all bytes to transmit, not including any checksum or the message length value
+'Data byte 1 - - - - - - - - - - - -^   ^
+'                                       ^
+'** optional **                         ^
+'Data byte 2 - - - - - - - - - - - - - -^
+'Data byte 3
+'Data byte 5
+'Data byte 6
+'Data byte 7
+'Data byte 8
+'Data byte 9
+'Data byte 10
+
+'@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+'@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+'@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+'@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+'SerialSendMessage(2,1,1,228,5,0)
+Sub SerialSendMsgSimple(In sMessage_Destination As Byte, In sMessage_DataLength As Byte, In sMessage_Source As Byte, In sMessage_ToSend As Byte, In sMessage_TotLength As Byte, In sMsg1 As Byte, Optional In sMsg2 As Byte = 0, Optional In sMsg3 As Byte = 0, Optional In sMsg4 As Byte = 0, Optional In sMsg5 As Byte = 0, Optional In sMsg6 As Byte = 0, Optional In sMsg7 As Byte = 0, Optional In sMsg8 As Byte = 0, Optional In sMsg9 As Byte = 0, Optional In sMsg10 As Byte = 0)
+
+    Let RecvData(1)   = sMessage_Destination
+    Let RecvData(2)   = sMessage_DataLength
+    Let RecvData(3)   = sMessage_Source
+    Let RecvData(4)   = sMessage_ToSend
+    Let RecvData(5)   = sMsg1
+    Let RecvData(6)   = sMsg2
+    Let RecvData(7)   = sMsg3
+    Let RecvData(8)   = sMsg4
+    Let RecvData(9)   = sMsg5
+    Let RecvData(10)  = sMsg6
+    Let RecvData(11)  = sMsg7
+    Let RecvData(12)  = sMsg8
+    Let RecvData(13)  = sMsg9
+    Let RecvData(14)  = sMsg10
+    SerialTransmit(sMessage_TotLength)
+
+End Sub
+
+Function Ser_TimeOut(_RxTimeOut As Word) As Byte  ' time out in mS
+#Define SerT_Out ChipMHZ * 400 / 5     ' (8Mhz)640 = 1mS circa
+
+    Repeat _RxTimeOut
+       Repeat SerT_Out  'Large inner loop to get delays of some seconds
+          If SER1_RXPORT.SER1_RXPIN = 0 Then
+            Let Ser_TimeOut = Ser1Receive   '... get byte
+            Exit Function
+          End If
+       End Repeat
+    End Repeat
+
+End Function
+
+Sub SerialTransmit(In ByteLength As Byte)
+
+Dim CTS As Byte
+Let CTS = 0
+
+    'PrintSent(1, Bytelength)
+    Let Chk = CalcChkSum(ByteLength)
+    Let DataIndx = 1
+
+    'Wait until Clear To Send?
+    'Added 22/11/2022
+    Repeat 50
+        If SerialRcv = 1 Then
+            Wait 100 uS
+            Let CTS = CTS + 1
+            If CTS > 19 Then
+                Exit Repeat
+            End If
+        Else
+            Wait 1 mS
+            Let CTS = 0
+        End If
+    End Repeat
+
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+    Repeat ByteLength
+        Let SendDat = RecvData(DataIndx)
+        Ser1Send(SendDat)
+        Let DataIndx = DataIndx + 1
+    End Repeat
+
+    Ser1Send(Chk)
+
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+
+End Sub
+
+Sub SerialRecvData(In RecvDestination As Byte, In RecvSource As Byte, In RecvType As Byte)
+
+Let DataIndx  = 0
+Let RecvCount = 5
+Let ComError  = NoError
+
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+
+    Let RecvData(1) = Ser_TimeOut(500)
+    If  RecvData(1) = RecvDestination Then 'Do no more if wrong destination
+
+        Let RecvData(2) = Ser_TimeOut(1)
+
+        'RecvData(1) and RecvData(2) are the first two bytes of data.
+        'Follow these with at least three further bytes, plus
+        'the number of bytes specified in the value of RecvData(2)
+
+        Let RecvCount = RecvCount + RecvData(2)
+        Let DataIndx = 3
+        Repeat RecvCount - 2
+            Let RecvData(DataIndx) = Ser_TimeOut(1)
+            Let DataIndx = DataIndx + 1
+        End Repeat
+    'Added this Exit option 22/11/2022
+    Else
+        Let ComError = DestinationError            'Destination value error
+        Exit Sub
+    End If
+
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+
+'Data is validated here.
+
+'The destination - RecvData(1) - must match, this should be '1' for Master
+'The source      - RecvData(3) - must match, this should be '2' for a coin mech, 40 for a note acceptor
+'The checksum should always be '0'
+
+    If RecvData(1) = RecvDestination Then
+        If RecvData(3) = RecvSource  Then
+            If RecvData(4) = 0 Then
+                If CheckChkSum(RecvCount) = 0 Then
+If PrintOn = 1 Then
+                    PrintRecv(1, RecvType)
+                    Wait 100 mS
+End If
+                    Let ComError = NoError         'No Errors
+                    Wait 10 mS                     'Short delay required?
+                Else
+                    Let ComError = ChkSumError     'CheckSum Error
+                    Exit Sub
+                End If
+            Else
+            'Added the Acknowledge Error test 22/11/2022
+                Let ComError = NoAckError          'Acknowledge Error
+            End If
+        Else
+            Let ComError = SourceError             'Source Error
+            Exit Sub
+        End If
+    Else
+        Let ComError = DestinationError            'Destination Error
+        Exit Sub
+    End If
+
+
+End Sub
+
+'This calculate the checksum to send to the host.
+Function CalcChkSum(In CheckValue As Byte)
+    Let CalcChkSum = 255
+    If RecvData(1) <> 0 Then
+        Let CalcChkSum = 0
+        Let DataIndx = 1
+        Repeat CheckValue
+            Let CalcChkSum = CalcChkSum - RecvData(DataIndx)
+            Let DataIndx = DataIndx + 1
+        End Repeat
+    End If
+End Function
+
+Function CalcChkSumDisplay(In CheckValue As Byte)
+    Let CalcChkSumDisplay = 255
+    If DisplayData(1) <> 0 Then
+        Let CalcChkSumDisplay = 0
+        Let DataIndx = 1
+        Repeat CheckValue
+            Let CalcChkSumDisplay = CalcChkSumDisplay - DisplayData(DataIndx)
+            Let DataIndx = DataIndx + 1
+        End Repeat
+    End If
+End Function
+
+'This calculates the checksum "As received" by the host.
+'Useful for ensuring that it adds up to zero'
+Function CheckChkSum(In CheckBytes As Byte)
+    Let CheckChkSum = 255
+    Let RecvData(CheckBytes + 1) = CalcChkSum(CheckBytes)
+    If RecvData(1) <> 0 Then
+        Let CheckChkSum = 0
+        Let DataIndx = 1
+        Repeat CheckBytes + 1
+            Let CheckChkSum = CheckChkSum - RecvData(DataIndx)
+            Let DataIndx = DataIndx + 1
+        End Repeat
+    End If
+End Function
+
+Sub MasterInhibit(In InhibitChannel As Byte)
+    'Sequence:
+    'Destination
+    'Data length
+    'Source
+    'Message
+    '--Total message length--
+    'Data byte 1
+
+    '**Optional**
+    'Data byte 2
+    'Data byte 3
+    '...........
+    'Data byte 9
+    'Data byte 10
+
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+
+    SerialSendMsgSimple(InhibitChannel,1,1,228,5,0) 'Master Inhibit
+    SerialRecvData     (1,InhibitChannel,0)         'Destination Master, source coin mech. Data Type binary
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+End Sub
+
+Sub MasterEnable(In EnableChannel As Byte)
+    'Sequence:
+    'Destination
+    'Data length
+    'Source
+    'Message
+    '--Total message length--
+    'Data byte 1
+
+    '**Optional**
+    'Data byte 2
+    'Data byte 3
+    '...........
+    'Data byte 9
+    'Data byte 10
+
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+
+    SerialSendData(EnableChannel,0,1,232)     'Perform self check (result ignored!)
+    SerialRecvData     (1,EnableChannel,0)         'Destination Master, source coin mech. Data Type binary
+    Wait 100 mS
+
+    SerialSendMsgSimple(EnableChannel,2,1,231,6,255,255) 'Enable all coin channels
+    SerialRecvData     (1,EnableChannel,0)         'Destination Master, source coin mech. Data Type binary
+    Wait 100 mS
+
+    SerialSendMsgSimple(EnableChannel,1,1,228,5,1) 'Master Enable
+    SerialRecvData     (1,EnableChannel,0)         'Destination Master, source coin mech. Data Type binary
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+End Sub
+
+Sub PrintSent(In LinePrint As Byte, In ByteCount As Byte)
+
+    If LinePrint = 1 Then
+        Locate 0, 0
+    Else
+        Locate 1, 0
+    End If
+
+    Let DataIndx = 1
+    Repeat ByteCount - 1
+        Print RecvData(DataIndx)
+        Print ","
+        Let DataIndx = DataIndx + 1
+    End Repeat
+    Print RecvData(ByteCount)
+    Print ";"
+    Print ByteCount 'Bytes Sent
+    Print ":"
+    'This shows the checksum "As received" by the host.
+    'Useful for ensuring that it adds up to zero'
+    Print CheckChkSum(ByteCount)
+If PrintOn = 1 Then
+    Wait 500 mS
+End If
+
+End Sub
+
+Sub PrintRecv(In LinePrint As Byte, In RecvDataType As Byte)
+
+    If LinePrint = 1 Then
+        Locate 0, 0
+    Else
+        Locate 1, 0
+    End If
+
+    If RecvData(2) > 0 Then
+        Let DataAvailable = 1
+    Else
+        Let DataAvailable = 0
+    End If
+
+    Print RecvData(1)
+    Print ","
+    Print RecvData(2)
+    Print ","
+    Print RecvData(3)
+    Print ","
+    Print RecvData(4)
+    Print ","
+
+    If DataAvailable Then
+        Print "D"
+        Print ","
+        Let DataIndx = 5 + RecvData(2)
+        Print RecvData(DataIndx)
+    Else
+        Print RecvData(5)
+        Let DataIndx = 5
+    End If
+
+
+    Print ";"
+    Print DataIndx 'Bytes received
+    Print ":"
+    Print CalcChkSum(DataIndx)
+
+    If DataAvailable > 0 Then
+        PrintTheData(2,RecvDataType) 'Print data as Ascii or values
+    End If
+
+If PrintOn = 1 Then
+    Wait 500 mS
+End If
+
+End Sub
+
+
+Sub PrintTheData(In LinePrint As Byte, In ConvertToAscii as Byte)
+
+    If LinePrint = 1 Then
+        Locate 0, 0
+    Else
+        Locate 1, 0
+    End If
+
+    If ConvertToAscii = 0 Then
+        Print "D:"
+    Else
+        Print "A:"
+    End If
+
+    Let DataIndx = 5
+    Let EndCount = 1
+    Repeat RecvData(2) 'Data byte count
+        If ConvertToAscii = 0 Then
+            Print RecvData(DataIndx)
+            If EndCount < RecvData(2) Then
+                Print ":"
+            End If
+        Else
+            Print Chr(RecvData(DataIndx))
+        End If
+        Let DataIndx   = DataIndx   + 1
+        Let EndCount = EndCount + 1
+    End Repeat
+
+    Print ";"
+    Print RecvData(2) 'Data only bytes received
+
+End Sub
+
+Sub ShowSplashScreen
+    Locate 0, 0
+    PrintName
+
+    Locate 1, 0
+          '0123456789012345
+    Print "  V.1.01  2Pay  " 'show the version number
+
+    Repeat 100
+        Wait 10 mS
+        'This allows a delay that can test an input and then exit the splash screen
+    End Repeat
+
+    Locate 0, 0
+    Print "  (c) Instance  "
+    Locate 1, 0
+    Print "   Automatics   "
+
+    Repeat 100
+        Wait 10 mS
+    End Repeat
+
+    Locate 1, 0
+    '      0123456789012345
+    Print "28-11-2022 15Q40" 'show the compile date
+
+    Repeat 100
+        Wait 10 mS
+    End Repeat
+
+    Locate 1, 0
+          '0123456789012345
+    Print "Change value "
+    Print PayValue
+    Print "p  "
+
+    Repeat 100
+        Wait 10 mS
+    End Repeat
+
+End Sub
+
+Sub PrintValuesSub(In D_Value As Word, In CoinInValue As Byte, In CoinOutValue As Byte, In No_Print As Byte)
+
+    Dim Dt, D1, D2, D3, D4 As Word
+
+    Let Dt = D_Value
+
+    If Dt > 999 Then '1000s
+       Let D1 = Dt / 1000
+       Let Dt = Dt - (1000*D1)
+    Else
+       Let D1 = 0    'Space
+    End If
+    If CoinInValue  = 1 Then
+        Let CIn1  = D1
+    End If
+    If CoinOutValue = 1 Then
+        Let COut1 = D1
+    End If
+
+    If Dt > 99 Then  '100s
+       Let D2 = Dt / 100
+       Let Dt = Dt - (100*D2)
+    Else
+       Let D2 = 0
+    End If
+    If CoinInValue  = 1 Then
+        Let CIn2  = D2
+    End If
+    If CoinOutValue = 1 Then
+        Let COut2 = D2
+    End If
+
+    If Dt > 9 Then  '10s
+       Let D3 = Dt / 10
+       Let Dt = Dt - (10*D3)
+    Else
+       Let D3 = 0
+    End If
+    If CoinInValue  = 1 Then
+        Let CIn3  = D3
+    End If
+    If CoinOutValue = 1 Then
+        Let COut3 = D3
+    End If
+
+    Let D4 = Dt '1s
+    If CoinInValue  = 1 Then
+        Let CIn4  = D4
+    End If
+    If CoinOutValue = 1 Then
+        Let COut4 = D4
+    End If
+
+    If No_Print = 0 Then
+        If D1 <> 0 Then
+            Print D1
+        End If
+        Print D2
+        Print "."
+        Print D3
+        Print D4
+    End If
+
+End Sub
+
+Sub StartSub
+
+#IfDef DebugOn
+    'Do
+#EndIf
+    SearchCoinMech
+    CLS
+    SearchHopper(FirstHopper)
+    If Hopper2Ready = 1 Then 'Gives an option of setting Hopper2Ready to zero for single hopper version
+        SearchHopper(SecondHopper)
+    End If
+#IfDef DebugOn
+    'Loop
+#EndIf
+
+    ShowSplashScreen
+    Let PayError   = 0
+    Let CashIn     = 0
+    Let NewestCoin = 0
+    Let Last_Event = 0
+
+    GetLEeprom(Ep_CTD, CoinsToDate)
+    If CoinsToDate > 4000000000 Then
+        Let CoinsToDate = 0
+        PutLEeprom(EP_CTD, CoinsToDate)
+    End If
+
+    EpRead(Ep_NewestCoin, NewestCoin)
+    If NewestCoin > 250 Then
+        Let NewestCoin = 0
+        EpWrite(Ep_NewestCoin, NewestCoin)
+    End If
+
+    MasterEnable(CAddr)
+End Sub
+
+Sub SearchCoinMech
+    Locate 0, 0
+          '0123456789012345
+    Print "Waiting for coin"
+    Locate 1, 0
+    Print "mech."
+
+    Let ProgressIdx = 5
+    'Let Last_Event  = 0
+
+    Do
+        GetPool(CAddr)
+        Locate 1, ProgressIdx
+        Print "."
+        Let ProgressIdx = ProgressIdx + 1
+        If ProgressIdx > 16 Then
+            Let ProgressIdx = 5
+            Locate 1, ProgressIdx
+            Print "           "
+        End If
+        Wait 100 mS
+    Loop Until ComError = NoError
+
+    Let ProgressIdx = 0
+
+    'CLS
+    ResetMech(CAddr)
+    'PrintStart
+    MasterInhibit(CAddr)
+    'Print "1"
+    GetManID(CAddr) 'Coin mech
+    'Print "2"
+    GetCatID(CAddr)
+    'Print "3"
+    GetPCode(CAddr)
+    'Print "4"
+
+    Locate 1,0
+          '0123456789012345
+    Print "Coin mech. found"
+    Wait 1000 mS
+End Sub
+
+Sub SearchHopper(In HSearch As Byte)
+
+    Let SearchAddr = HSearch
+
+    If HSearch = SecondHopper Then
+        If HSearch =< HAddr1 Then
+            Locate 0, 0
+            '      0123456789012345
+            Print "  First Hopper  "
+            Locate 1, 0
+            Print " at 2nd address "
+            Wait 1000 mS
+            Locate 1, 0
+            Print "hopp.           "
+            Let SearchAddr = HAddr1 + 1
+        End If
+    End If
+
+
+#IfnDef DebugOn
+    Locate 0, 0
+          '0123456789012345
+    Print "Waiting for coin"
+    Locate 1, 0
+    Print "hopp."
+#EndIf
+    Let ProgressIdx = 5
+    'Let Last_Event  = 0
+
+    Do
+        Repeat 12
+            If PrintOn = 1 Then
+                CLS
+            End If
+            GetPool(SearchAddr)
+#IfnDef DebugOn
+            Locate 1, ProgressIdx
+            Print "."
+            Let ProgressIdx = ProgressIdx + 1
+            If ProgressIdx > 16 Then
+                Let ProgressIdx = 5
+                Locate 1, ProgressIdx
+                Print "           "
+            End If
+#EndIf
+            If ComError = NoError Then
+                Exit Repeat
+            End If
+            'Wait 100 mS
+        End Repeat
+        If ComError <> 0 Then
+            Let SearchAddr = SearchAddr + 1
+            Let ProgressIdx = 16
+            If SearchAddr > 10 Then
+                If HSearch = FirstHopper Then
+                    Let SearchAddr = HSearch
+                Else
+                    Locate 0, 0
+                    '      0123456789012345
+                    Print "No Second Hopper"
+                    Locate 1, 0
+                    Print "    Detected    "
+                    Wait 1000 mS
+                    Let HAddr2 = 0
+                    Let Hopper2Ready = 0
+                    Exit Sub
+                End If
+            End If
+
+            Locate 1, 0
+            '      0123456789012345
+            Print "Try address:"
+            Print SearchAddr
+            Print "    "
+            Wait 750 mS
+            Locate 0, 0
+                  '0123456789012345
+            Print "Waiting for coin"
+            Locate 1, 0
+            Print "hopp.           "
+        End If
+    Loop Until ComError = NoError
+
+    Let ProgressIdx = 0
+
+    'CLS
+
+    Let HopperType = Unknown
+
+#IfnDef DebugOn
+    'PrintStart
+#Endif
+
+
+    GetManID(SearchAddr) 'Hopper
+
+    If RecvData(5) = "A" Then
+        If RecvData(6) = "s" Then
+            If RecvData(7) = "a" Then
+                If RecvData(8) = "h" Then
+                    If RecvData(9) = "i" Then
+                        Let HopperType = Asahi
+                        Let Encrypted = 0
+                    End If
+                End If
+            End If
+        End If
+    End If
+
+#IfnDef DebugOn
+    'Print "1"
+#Endif
+    GetCatID(SearchAddr)
+#IfnDef DebugOn
+    'Print "2"
+#Endif
+
+
+'CLS
+'Let PrintOn = 1
+    GetPCode(SearchAddr)
+'Let PrintOn = 0
+'Wait 5000 mS
+
+    If RecvData(5) = "S" Then
+        If RecvData(6) = "U" Then
+            If RecvData(7) = "H" Then
+                Let HopperType = Universe
+                Let Encrypted = 1
+            End If
+        End If
+    End If
+
+    If RecvData(5) = "S" Then
+        If RecvData(6) = "C" Then
+            If RecvData(7) = "H" Then
+                If RecvData(10) = "N" Then
+                    If RecvData(11) = "O" Then
+                        Let HopperType = SCH
+                        Let Encrypted = 0
+                    End If
+                Else
+                    Let HopperType = SCH
+                    Let Encrypted = 1
+                End If
+            End If
+        End If
+    End If
+
+    If RecvData(5) = "S" Then
+        If RecvData(6) = "U" Then
+            If RecvData(7) = "H" Then
+                If RecvData(8) = "1" Then
+                    If RecvData(9) = "-" Then
+                        If RecvData(10) = "N" Then
+                            If RecvData(11) = "O" Then
+                                Let HopperType = Universe
+                                Let Encrypted = 0
+                            End If
+                        End If
+                    End If
+                End If
+            End If
+        End If
+    End If
+
+    If HopperType = Unknown Then
+        Locate 1, 0
+            '0123456789012345
+        Print " Invalid Hopper "
+        Do
+            Wait 1 mS
+            CheckSwitches
+            If SwitchValue = SwOK Then
+                asm Reset
+            End If
+        Loop
+    End If
+
+    If Encrypted = 1 Then
+        Locate 1, 0
+              '0123456789012345
+        Print " Encrypt Hopper "
+        Do
+            Wait 1 mS
+            CheckSwitches
+            If SwitchValue = SwOK Then
+                asm Reset
+            End If
+        Loop
+    End If
+
+#IfnDef DebugOn
+    'Print "3"
+#Endif
+    EnableHopper(HSearch)
+#IfnDef DebugOn
+    'Print "4"
+#Endif
+
+    Locate 1,0
+          '0123456789012345
+    Print "Hopp.   found   "
+
+    Locate 1,6
+    If HSearch = FirstHopper Then
+        Print 1
+    Else
+        Print 2
+    End If
+
+    Locate 1,15
+    Print Chr(HopperType)
+
+    Wait 1000 mS
+
+    If HSearch = FirstHopper Then
+        Let HAddr1 = SearchAddr
+    Else
+        Let HAddr2 = SearchAddr
+    End If
+
+End Sub
+
+Sub PayHopper(In PayCoinAmount As Byte, In PaymentAddress As Byte)
+
+    PrintValuesSub(PayCoinAmount * PayValue,1,0,1) 'Don't print to LCD
+    PrintValuesSub(0,0,1,1)                        '0.00
+
+    FillDisplay(PayStartDis)
+    PrintToDisplay
+    Let UpdateDisplay = 240 'Short delay before countdown shown?
+
+
+    CLS
+    Locate 0, 0
+          '0123456789012345
+    Print "Pay: "
+    Print PayCoinAmount
+    '           999
+    Print         " coins    "
+
+    Let UpdateDisplay = 1
+
+    If HopperType = SCH Then
+        'There must be no more than a few mS
+        'after sending the data to receiving it
+        SerialSendData(PaymentAddress,0,1,160) 'Request cipher key - even non-encrypted hoppers require this
+        SerialRecvData(1,PaymentAddress,0)     'Destination Master, source hopper Data Type binary
+        'There must be no more than a few mS
+        'after sending the data to receiving it
+
+        'There must be no more than a few mS
+        'after sending the data to receiving it
+        SerialSendMsgSimple(PaymentAddress,9,1,167,13,0,0,0,0,0,0,0,0,PayCoinAmount) 'Pay coins
+        SerialRecvData     (1,PaymentAddress,0)           'Destination Master, source hopper Data Type binary
+    End If
+
+    If HopperType = Asahi Then
+        GetPool(PaymentAddress)
+        Wait 5 mS
+        EnableHopper(PaymentAddress)
+        Wait 5 mS
+        SerialSendData(PaymentAddress,0,1,242)
+        'Request Serial Number - serial number for Asahi returned in RecvData(5),(6) and (7)
+        SerialRecvData     (1,PaymentAddress,0)           'Destination Master, source hopper Data Type binary
+
+        SerialSendMsgSimple(PaymentAddress,4,1,167,8,RecvData(5),RecvData(6),RecvData(7),PayCoinAmount)
+        'Pay coins using serial number sent in RecvData(5),(6) and (7)
+        SerialRecvData     (1,PaymentAddress,0)           'Destination Master, source hopper Data Type binary
+
+    End If
+
+    If HopperType = Universe Then
+        GetPool(PaymentAddress)
+        Wait 5 mS
+        EnableHopper(PaymentAddress)
+        Wait 5 mS
+
+        SerialSendData(PaymentAddress,0,1,160) 'Request cipher key - even non-encrypted hoppers require this
+        SerialRecvData(1,PaymentAddress,0)     'Destination Master, source hopper Data Type binary
+
+
+        SerialSendMsgSimple(PaymentAddress,9,1,167,13,RecvData(5),RecvData(6),RecvData(7),RecvData(8),RecvData(9),RecvData(10),RecvData(11),RecvData(12),PayCoinAmount)
+        'Pay coins using encryption number sent in RecvData(5),(6), (7), (8), (9), (10), (11) and (12)
+        SerialRecvData     (1,PaymentAddress,0)           'Destination Master, source hopper Data Type binary
+    End If
+
+    Let ProgressIdx = 0
+
+    Let StallCount = 0
+    Let PaidSoFar  = 0
+    Let LastPaid   = 0
+    Let DisplayRefresh = 0
+
+#Define StallError 120 '120 * 250 mS = 30 Seconds
+
+    Do
+    'Allow time for maximum payment
+    'As the PrintToDisplay routine takes
+    'a long time, printing to the ccTalk
+    'display more or less often will dramatically
+    'alter the loop count timing.
+
+'22/11/2022
+
+        PollForHEvvents(PaymentAddress)
+
+        FetchHEvents
+
+        Locate 1, 7
+        If Events(1) < PayCoinAmount Then
+            Let PaidSoFar = PayCoinAmount - Events(1)
+            Let PaidSoFar = PaidSoFar * PayValue
+            PrintValuesSub(PaidSoFar,0,1,0)
+        Else
+            PrintValuesSub(PayCoinAmount * PayValue,0,0,0) 'Show full value if Events(1) not yet calculated
+        End If
+        Print "   "
+
+        'If the the paid coins amount has changed, reset the Stall count.
+        If Events(1) <> LastPaid Then
+            LastPaid=Events(1) //! 1
+            Let StallCount = 0
+        Else
+            Let StallCount = StallCount + 1
+        End If
+
+        Let StallCount = StallCount + 1
+        'If UpdateDisplay > 20 Then
+        'Changed 28/11/2022
+        'A 250 mS delay is now included, this is to try and
+        'reduce the load on the ccTalk bus...
+        If DisplayRefresh = 0 Then
+            FillDisplay(Paying1)
+            Let DisplayRefresh = Not DisplayRefresh
+        Else
+            PrintToDisplay
+            Let DisplayRefresh = Not DisplayRefresh
+        End If
+
+        If Events(1) = 0 Then 'Events(1) holds the pending payment amount
+            Let StallCount = StallError + 1
+        Else
+            'Locate 0, 0
+            'Let QuickCount = QuickCount + 1
+            'Print QuickCount
+            Wait 250 mS '22/11/2022
+        End If
+
+    Loop Until StallCount > StallError
+
+    PollForHEvvents(PaymentAddress)
+    FetchHEvents
+
+    If Events(3) = 0 Then
+        PrintCoinsPaid(PayCoinAmount, Events(3))
+        Let PayError = 0
+        Let Temp = Events(2) * PayValue
+        Let CoinsToDate = CoinsToDate + Temp
+        PutLEeprom(Ep_CTD, CoinsToDate)
+    Else
+        PrintCoinsPaid(Events(2), Events(3))
+        Let PayError = 1
+        Let Temp = Events(2) * PayValue
+        Let CoinsToDate = CoinsToDate + Temp
+        PutLEeprom(Ep_CTD, CoinsToDate)
+        If PaymentAddress = HAddr1 Then
+            Let Hopper1Ready = 0
+        Else
+            Let Hopper2Ready = 0
+        End If
+        Exit Sub
+    End If
+
+    FillDisplay(Paid1)
+    Repeat 10
+        PrintToDisplay
+        Wait 100 mS
+    End Repeat
+    'Wait 1000 mS
+
+End Sub
+
+Sub PayTwoHopper(In PayCoin1Amount As Byte, In PayCoin2Amount As Byte, In Payment1Address As Byte, In Payment2Address As Byte)
+
+    Let PayingCoinAmount = PayCoin1Amount + PayCoin2Amount
+    PrintValuesSub(PayingCoinAmount * PayValue,1,0,1) 'Don't print to LCD
+    PrintValuesSub(0,0,1,1)                        '0.00
+
+    FillDisplay(PayStartDis)
+    PrintToDisplay
+    Let UpdateDisplay = 240 'Short delay before countdown shown?
+
+
+    CLS
+    Locate 0, 0
+          '0123456789012345
+    Print "Pay: "
+    Print PayingCoinAmount
+    '           999
+    Print         " coins    "
+
+    Let UpdateDisplay = 1
+
+    If HopperType = SCH Then
+        'There must be no more than a few mS
+        'after sending the data to receiving it
+        SerialSendData(Payment1Address,0,1,160) 'Request cipher key - even non-encrypted hoppers require this
+        SerialRecvData(1,Payment1Address,0)     'Destination Master, source hopper Data Type binary
+        'There must be no more than a few mS
+        'after sending the data to receiving it
+
+        'There must be no more than a few mS
+        'after sending the data to receiving it
+        SerialSendMsgSimple(Payment1Address,9,1,167,13,0,0,0,0,0,0,0,0,PayCoin1Amount) 'Pay coins
+        SerialRecvData     (1,Payment1Address,0)           'Destination Master, source hopper Data Type binary
+        Wait 50 mS
+        'There must be no more than a few mS
+        'after sending the data to receiving it
+        SerialSendData(Payment2Address,0,1,160) 'Request cipher key - even non-encrypted hoppers require this
+        SerialRecvData(1,Payment2Address,0)     'Destination Master, source hopper Data Type binary
+        'There must be no more than a few mS
+        'after sending the data to receiving it
+
+        'There must be no more than a few mS
+        'after sending the data to receiving it
+        SerialSendMsgSimple(Payment2Address,9,1,167,13,0,0,0,0,0,0,0,0,PayCoin1Amount) 'Pay coins
+        SerialRecvData     (1,Payment2Address,0)           'Destination Master, source hopper Data Type binary
+    End If
+
+    If HopperType = Asahi Then
+        GetPool(Payment1Address)
+        Wait 5 mS
+        EnableHopper(Payment1Address)
+        Wait 5 mS
+        SerialSendData(Payment1Address,0,1,242)
+        'Request Serial Number - serial number for Asahi returned in RecvData(5),(6) and (7)
+        SerialRecvData     (1,Payment1Address,0)           'Destination Master, source hopper Data Type binary
+
+        SerialSendMsgSimple(Payment1Address,4,1,167,8,RecvData(5),RecvData(6),RecvData(7),PayCoin1Amount)
+        'Pay coins using serial number sent in RecvData(5),(6) and (7)
+        SerialRecvData     (1,Payment1Address,0)           'Destination Master, source hopper Data Type binary
+        Wait 50 mS
+        GetPool(Payment2Address)
+        Wait 5 mS
+        EnableHopper(Payment2Address)
+        Wait 5 mS
+        SerialSendData(Payment2Address,0,1,242)
+        'Request Serial Number - serial number for Asahi returned in RecvData(5),(6) and (7)
+        SerialRecvData     (1,Payment2Address,0)           'Destination Master, source hopper Data Type binary
+
+        SerialSendMsgSimple(Payment2Address,4,1,167,8,RecvData(5),RecvData(6),RecvData(7),PayCoin2Amount)
+        'Pay coins using serial number sent in RecvData(5),(6) and (7)
+        SerialRecvData     (1,Payment2Address,0)           'Destination Master, source hopper Data Type binary
+    End If
+
+    If HopperType = Universe Then
+        GetPool(Payment1Address)
+        Wait 5 mS
+        EnableHopper(Payment1Address)
+        Wait 5 mS
+
+        SerialSendData(Payment1Address,0,1,160) 'Request cipher key - even non-encrypted hoppers require this
+        SerialRecvData(1,Payment1Address,0)     'Destination Master, source hopper Data Type binary
+
+
+        SerialSendMsgSimple(Payment1Address,9,1,167,13,RecvData(5),RecvData(6),RecvData(7),RecvData(8),RecvData(9),RecvData(10),RecvData(11),RecvData(12),PayCoin1Amount)
+        'Pay coins using encryption number sent in RecvData(5),(6), (7), (8), (9), (10), (11) and (12)
+        SerialRecvData     (1,Payment1Address,0)           'Destination Master, source hopper Data Type binary
+        Wait 50 mS
+        GetPool(Payment2Address)
+        Wait 5 mS
+        EnableHopper(Payment2Address)
+        Wait 5 mS
+
+        SerialSendData(Payment2Address,0,1,160) 'Request cipher key - even non-encrypted hoppers require this
+        SerialRecvData(1,Payment2Address,0)     'Destination Master, source hopper Data Type binary
+
+
+        SerialSendMsgSimple(Payment2Address,9,1,167,13,RecvData(5),RecvData(6),RecvData(7),RecvData(8),RecvData(9),RecvData(10),RecvData(11),RecvData(12),PayCoin2Amount)
+        'Pay coins using encryption number sent in RecvData(5),(6), (7), (8), (9), (10), (11) and (12)
+        SerialRecvData     (1,Payment2Address,0)           'Destination Master, source hopper Data Type binary
+    End If
+
+
+    Let ProgressIdx = 0
+
+    Let StallCount = 0
+    Let PaidSoFar  = 0
+    Let LastPaid   = 0
+    Let DisplayRefresh = 0
+
+    Do
+    'Allow time for maximum payment
+    'As the PrintToDisplay routine takes
+    'a long time, printing to the ccTalk
+    'display more or less often will dramatically
+    'alter the loop count timing.
+
+'22/11/2022
+
+        If CheckHopper = 1 Then
+            PollForHEvvents(Payment1Address)
+            FetchHEvents
+            Let CheckHopper = 0
+            Let H1Events1 = Events(1)
+        Else
+            PollForHEvvents(Payment2Address)
+            FetchHEvents
+            Let CheckHopper = 1
+            Let H2Events1 = Events(1)
+        End If
+
+        Let Events(1) = H1Events1 + H2Events1
+
+        Locate 1, 7
+        Dim PayingCoinAmount
+        If Events(1) < PayingCoinAmount Then
+            Let PaidSoFar = PayingCoinAmount - Events(1)
+            Let PaidSoFar = PaidSoFar * PayValue
+            PrintValuesSub(PaidSoFar,0,1,0)
+        Else
+            PrintValuesSub(PayingCoinAmount * PayValue,0,0,0) 'Show full value if Events(1) not yet calculated
+        End If
+        Print "   "
+
+        'If the the paid coins amount has changed, reset the Stall count.
+        If Events(1) <> LastPaid Then
+            LastPaid=Events(1) //! 2
+        Else
+            Let StallCount = StallCount + 1
+        End If
+
+        Let StallCount = StallCount + 1
+        'If UpdateDisplay > 20 Then
+        'Changed 28/11/2022
+        'A 250 mS delay is now included, this is to try and
+        'reduce the load on the ccTalk bus...
+        If DisplayRefresh = 0 Then
+            FillDisplay(Paying1)
+            Let DisplayRefresh = Not DisplayRefresh
+        Else
+            PrintToDisplay
+            Let DisplayRefresh = Not DisplayRefresh
+        End If
+
+        If Events(1) = 0 Then 'Events(1) holds the pending payment amount
+            Let StallCount = StallError + 1
+        Else
+            'Locate 0, 0
+            'Let QuickCount = QuickCount + 1
+            'Print QuickCount
+            Wait 250 mS '22/11/2022
+        End If
+
+    Loop Until StallCount > StallError
+
+    PollForHEvvents(Payment2Address)
+    FetchHEvents
+    Let H1Events1 = Events(1)
+    Let H1Events2 = Events(2)
+    Let H1Events3 = Events(3)
+    Wait 50 mS
+    PollForHEvvents(Payment2Address)
+    FetchHEvents
+    Let H2Events1 = Events(1)
+    Let H2Events2 = Events(2)
+    Let H2Events3 = Events(3)
+
+    Let Events(1) = H1Events1 + H2Events1
+    Let Events(2) = H1Events2 + H2Events2
+    Let Events(3) = H1Events3 + H2Events3
+
+    If Events(3) = 0 Then
+        PrintCoinsPaid(PayingCoinAmount, Events(3))
+        Let PayError = 0
+        Let Temp = Events(2) * PayValue
+        Let CoinsToDate = CoinsToDate + Temp
+        PutLEeprom(Ep_CTD, CoinsToDate)
+    Else
+        PrintCoinsPaid(Events(2), Events(3))
+        Let PayError = 1
+        Let Temp = Events(2) * PayValue
+        Let CoinsToDate = CoinsToDate + Temp
+        PutLEeprom(Ep_CTD, CoinsToDate)
+        If Payment1Address = HAddr1 Then
+            Let Hopper1Ready = 0
+        Else
+            Let Hopper2Ready = 0
+        End If
+        Exit Sub
+    End If
+
+    FillDisplay(Paid1)
+    Repeat 10
+        PrintToDisplay
+        Wait 100 mS
+    End Repeat
+    'Wait 1000 mS
+
+End Sub
+
+Sub FetchHEvents
+'Event counter at 5, event "values" at 6, 7, 8
+    Let Events(1) = RecvData(6) 'Remaining coins
+    Let Events(2) = RecvData(7) 'Paid   coins
+    Let Events(3) = RecvData(8) 'Unpaid coins
+End Sub
+
+Sub PollForHEvvents(In PollAddress As Byte)
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+    SerialSendData(PollAddress,0,1,166) 'Poll Events
+    SerialRecvData(1,PollAddress,0)     'Destination Master, source coin mech. Data Type binary
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+End Sub
+
+Sub PrintStart
+    Locate 0, 0
+          '0123456789012345
+    PrintName
+    Locate 1, 0
+    Print "Start"
+End Sub
+
+Sub GetManID(In IDChannel As Byte)
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+If PrintOn = 1 Then
+    Let RecvData(1) = IDChannel
+    Let RecvData(2) = 0
+    Let RecvData(3) = 1
+    Let RecvData(4) = 246
+    PrintSent(1,4)
+End If
+    SerialSendData(IDChannel,0,1,246) 'Manufacturer ID
+    SerialRecvData(1,IDChannel,1)     'Destination Master, source Data Type Ascii
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+End Sub
+
+Sub GetCatID(In CatChannel As Byte)
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+If PrintOn = 1 Then
+    Let RecvData(1) = CatChannel
+    Let RecvData(2) = 0
+    Let RecvData(3) = 1
+    Let RecvData(4) = 245
+    PrintSent(1,4)
+End If
+    SerialSendData(CatChannel,0,1,245) 'Category ID
+    SerialRecvData(1,CatChannel,1)     'Destination Master, source Data Type Ascii
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+End Sub
+
+Sub GetPCode(In CodeChannel As Byte)
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+If PrintOn = 1 Then
+    Let RecvData(1) = CodeChannel
+    Let RecvData(2) = 0
+    Let RecvData(3) = 1
+    Let RecvData(4) = 244
+    PrintSent(1,4)
+End If
+    SerialSendData(CodeChannel,0,1,244) 'Product code
+    SerialRecvData(1,CodeChannel,1)     'Destination Master, source Data Type Ascii
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+End Sub
+
+Sub GetPool(In PoolChannel As Byte)
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+If PrintOn = 1 Then
+    Let RecvData(1) = PoolChannel
+    Let RecvData(2) = 0
+    Let RecvData(3) = 1
+    Let RecvData(4) = 254
+    PrintSent(1,4)
+End If
+    SerialSendData(PoolChannel,0,1,254) 'Pool
+    SerialRecvData(1,PoolChannel,0)     'Destination Master, source Data Type binary
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+End Sub
+
+Sub ResetMech(In PoolChannel As Byte)
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+If PrintOn = 1 Then
+    Let RecvData(1) = PoolChannel
+    Let RecvData(2) = 0
+    Let RecvData(3) = 1
+    Let RecvData(4) = 1
+    PrintSent(1,4)
+End If
+    SerialSendData(PoolChannel,0,1,1) 'Reset
+    SerialRecvData(1,PoolChannel,0)     'Destination Master, source Data Type binary
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+End Sub
+
+Sub EnableHopper(In EnableAddr As Byte)
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+If PrintOn = 1 Then
+    Let RecvData(1) = EnableAddr
+    Let RecvData(2) = 1
+    Let RecvData(3) = 1
+    Let RecvData(4) = 164
+    Let RecvData(5) = 165
+    PrintSent(1,5)
+End If
+    SerialSendMsgSimple(EnableAddr,1,1,164,5,165) 'Enable Hopper
+    SerialRecvData     (1,EnableAddr,0)           'Destination Master, source hopper Data Type binary
+    'There must be no more than a few mS
+    'after sending the data to receiving it
+End Sub
+
+Sub PrintName
+    Print " ccTalk changer "
+End Sub
+
+Sub PrintCoinsPaid(In CoinsPaidOut As Word, In CoinsUnPaid As Word)
+    Locate 0, 0
+         '0123456789012345
+    Print CoinsPaidOut
+    '     999
+    Print " Coins paid    "
+    Locate 1, 0
+    Print CoinsUnPaid
+    Print " Coins unpaid  "
+End Sub
+
+Sub PrintScroll
+
+    If LastOffset < 1 Then
+        Let LastOffset = 1
+    End If
+
+    Let Offset = LastOffset
+
+    ReadTable Message, 0, MessageLen
+    If Offset > MessageLen Then
+        Let Offset = 1
+    End If
+
+    Locate 0,0
+    Repeat 15 'Align with end of last coin value
+        ReadTable Message, Offset, TableData
+        If TableData = 33 Then
+            Let TableData = HopperType
+        End If
+        Print Chr(TableData)
+        Let Offset = Offset + 1
+        If Offset > MessageLen Then
+            Let Offset = 1
+        End If
+    End Repeat
+    Print " " 'Print the final space
+
+    Let LastOffset = LastOffset + 1
+    If LastOffset > MessageLen Then
+        Let LastOffset = 1
+    End If
+
+End Sub
+
+Sub PrintToDisplay
+
+    Let DataIndx = 1
+    Repeat 48
+        Let SendDat = DisplayData(DataIndx)
+        Ser1Send(SendDat)
+        Let DataIndx = DataIndx + 1
+    End Repeat
+
+    Wait 50 mS
+
+End Sub
+
+Sub ClearDisplay
+
+    Let DisplayData(1) = 33  'Destination
+    Let DisplayData(2) = 43  'Data length
+    Let DisplayData(3) = 128 'Source
+    Let DisplayData(4) = 165 'Message
+    Let DisplayData(5) = 128 '
+
+    Let DataIndx = 6
+    Repeat 20
+        Let DisplayData(DataIndx) = 32
+        Let DataIndx = DataIndx + 1
+    End Repeat
+
+    Let DisplayData(DataIndx) = 192
+    Let DataIndx = DataIndx + 1
+
+    Repeat 20
+        Let DisplayData(DataIndx) = 32
+        Let DataIndx = DataIndx + 1
+    End Repeat
+
+    Let DisplayData(DataIndx) = 229
+
+    Let Chk = CalcChkSumDisplay(DataIndx)
+    Let DataIndx = DataIndx + 1
+
+    Let DisplayData(DataIndx) = Chk
+
+End Sub
+
+Sub FillDisplay(MessageToDisplay)
+    Dim DisplayOffset As Byte
+
+    Let DisplayData(1) = 33  'Destination
+    Let DisplayData(2) = 43  'Data length
+    Let DisplayData(3) = 128 'Source
+    Let DisplayData(4) = 165 'Message
+    Let DisplayData(5) = 128 '
+
+    Let DataIndx = 6
+    Let DisplayOffset = 1
+    Repeat 20
+        If MessageToDisplay = Attract1 Then
+            ReadTable AttractLine1, DisplayOffset, DisplayData(DataIndx)
+        End If
+        If MessageToDisplay = Attract2 Then
+            ReadTable AttractLine2, DisplayOffset, DisplayData(DataIndx)
+        End If
+        If MessageToDisplay = Attract3 Then
+            ReadTable AttractLine3, DisplayOffset, DisplayData(DataIndx)
+        End If
+        If MessageToDisplay = Attract4 Then
+            ReadTable AttractLine4, DisplayOffset, DisplayData(DataIndx)
+            If DisplayOffset = 18 Then
+                Let DisplayData(DataIndx) = "2"
+            End If
+            If DisplayOffset = 19 Then
+                Let DisplayData(DataIndx) = "p"
+            End If
+        End If
+        If MessageToDisplay = Error1 Then
+            ReadTable ErrorLine1, DisplayOffset, DisplayData(DataIndx)
+        End If
+        If MessageToDisplay = Paying1 Then
+            ReadTable PayingLine1, DisplayOffset, DisplayData(DataIndx)
+            If DisplayOffset = 6 Then
+                If CIn1 <> 0 Then
+                    Let DisplayData(DataIndx) = CIn1 + 48
+                Else
+                    Let DisplayData(DataIndx) = " "
+                End If
+            End If
+            If DisplayOffset = 7 Then
+                If CIn1 <> 0 Then
+                    Let DisplayData(DataIndx) = CIn2 + 48
+                Else
+                    If CIn2 <> 0 Then
+                        Let DisplayData(DataIndx) = CIn2 + 48
+                    Else
+                        Let DisplayData(DataIndx) = " "
+                    End If
+                End If
+            End If
+
+            If DisplayOffset = 9 Then
+                Let DisplayData(DataIndx) = CIn3 + 48
+            End If
+
+            If DisplayOffset = 10 Then
+                Let DisplayData(DataIndx) = CIn4 + 48
+            End If
+
+            If DisplayOffset = 12 Then
+                If COut1 <> 0 Then
+                    Let DisplayData(DataIndx) = COut1 + 48
+                Else
+                    Let DisplayData(DataIndx) = " "
+                End If
+            End If
+            If DisplayOffset = 13 Then
+                If CIn1 <> 0 Then
+                    Let DisplayData(DataIndx) = COut2 + 48
+                Else
+                    If COut2 <> 0 Then
+                        Let DisplayData(DataIndx) = COut2 + 48
+                    Else
+                        Let DisplayData(DataIndx) = " "
+                    End If
+                End If
+            End If
+            If DisplayOffset = 15 Then
+                Let DisplayData(DataIndx) = COut3 + 48
+            End If
+            If DisplayOffset = 16 Then
+                Let DisplayData(DataIndx) = COut4 + 48
+            End If
+        End If
+        If MessageToDisplay = PayStartDis Then
+            ReadTable PayStartDisp, DisplayOffset, DisplayData(DataIndx)
+        End If
+        If MessageToDisplay = Paid1 Then
+            ReadTable PaidLine1, DisplayOffset, DisplayData(DataIndx)
+        End If
+        Let DataIndx = DataIndx + 1
+        Let DisplayOffset = DisplayOffset + 1
+    End Repeat
+
+    Let DisplayData(DataIndx) = 192
+    Let DataIndx = DataIndx + 1
+
+    If MessageToDisplay = PayStartDis Then
+        Let MessageToDisplay = Paying1
+    End If
+
+    Let DisplayOffset = 1
+    Repeat 20
+        If MessageToDisplay = Attract1 Then
+            ReadTable AttractLine2, DisplayOffset, DisplayData(DataIndx)
+        End If
+        If MessageToDisplay = Attract2 Then
+            ReadTable AttractLine3, DisplayOffset, DisplayData(DataIndx)
+        End If
+        If MessageToDisplay = Attract3 Then
+            ReadTable AttractLine4, DisplayOffset, DisplayData(DataIndx)
+            If DisplayOffset = 18 Then
+                Let DisplayData(DataIndx) = "2"
+            End If
+            If DisplayOffset = 19 Then
+                Let DisplayData(DataIndx) = "p"
+            End If
+        End If
+        If MessageToDisplay = Attract4 Then
+            ReadTable AttractLine1, DisplayOffset, DisplayData(DataIndx)
+        End If
+        If MessageToDisplay = Error1 Then
+            ReadTable ErrorLine2, DisplayOffset, DisplayData(DataIndx)
+        End If
+        If MessageToDisplay = Paying1 Then
+            ReadTable PayingLine2, DisplayOffset, DisplayData(DataIndx)
+        End If
+        If MessageToDisplay = Paid1 Then
+            ReadTable PaidLine2, DisplayOffset, DisplayData(DataIndx)
+        End If
+        Let DataIndx = DataIndx + 1
+        Let DisplayOffset = DisplayOffset + 1
+    End Repeat
+
+    Let DisplayData(DataIndx) = 229
+
+    Let Chk = CalcChkSumDisplay(DataIndx)
+    Let DataIndx = DataIndx + 1
+
+    Let DisplayData(DataIndx) = Chk
+
+End Sub
+
+Table Message As Byte
+32 'Space
+73 'I
+110 'n
+115 's
+101 'e
+114 'r
+116 't
+32 'Space
+99 'c
+111 'o
+105 'i
+110 'n
+115 's
+32 'Space
+45 '-
+33 '!
+45 '-
+32 'Space
+99 'c
+99 'c
+84 'T
+97 'a
+108 'l
+107 'k
+32 'Space
+67 'C
+104 'h
+97 'a
+110 'n
+103 'g
+101 'e
+114 'r
+32 'Space
+45 '-
+33 '!
+45 '-
+32 'Space
+73 'I
+110 'n
+115 's
+116 't
+97 'a
+110 'n
+99 'c
+101 'e
+32 'Space
+65 'A
+117 'u
+116 't
+111 'o
+109 'm
+97 'a
+116 't
+105 'i
+99 'c
+115 's
+32 'Space
+45 '-
+33 '!
+45 '-
+End Table
+
+Table AttractLine1
+73 'I
+110 'n
+115 's
+116 't
+97 'a
+110 'n
+99 'c
+101 'e
+32 'Spc
+32 'Spc
+65 'A
+117 'u
+116 't
+111 'o
+109 'm
+97 'a
+116 't
+105 'i
+99 'c
+115 's
+End Table
+
+Table AttractLine2
+71 'G
+101 'e
+116 't
+32 'Spc
+121 'y
+111 'o
+117 'u
+114 'r
+32 'Spc
+99 'c
+104 'h
+97 'a
+110 'n
+103 'g
+101 'e
+32 'Spc
+104 'h
+101 'e
+114 'r
+101 'e
+End Table
+
+Table AttractLine3
+32 'Spc
+32 'Spc
+32 'Spc
+99 'c
+99 'c
+84 'T
+97 'a
+108 'l
+107 'k
+32 'Spc
+67 'C
+104 'h
+97 'a
+110 'n
+103 'g
+101 'e
+114 'r
+32 'Spc
+32 'Spc
+32 'Spc
+End Table
+
+Table AttractLine4
+'This must reamain as line 4 the change value is inserted
+'here, and is only valid for line 4.
+67 'C
+104 'h
+97 'a
+110 'n
+103 'g
+101 'e
+32 'Spc
+99 'c
+111 'o
+105 'i
+110 'n
+115 's
+32 'Spc
+102 'f
+111 'o
+114 'r
+32 'Spc
+32 'Spc
+32 'Spc
+32 'Spc
+End Table
+
+Table PayStartDisp
+32 'Spc
+80 'P
+97 'a
+121 'y
+105 'i
+110 'n
+103 'g
+32 'Spc
+121 'y
+111 'o
+117 'u
+114 'r
+32 'Spc
+99 'c
+104 'h
+97 'a
+110 'n
+103 'g
+101 'e
+32 'Spc
+End Table
+
+Table PayingLine1
+67 'C
+111 'o
+105 'i
+110 'n
+32 'Spc
+32 'Spc
+48 '0
+46 '.
+48 '0
+48 '0
+32 'Spc
+32 'Spc
+48 '0
+46 '.
+48 '0
+48 '0
+32 'Spc
+79 'O
+117 'u
+116 't
+End Table
+
+Table PayingLine2
+32 'Spc
+111 'o
+110 'n
+101 'e
+32 'Spc
+109 'm
+111 'o
+109 'm
+101 'e
+110 'n
+116 't
+32 'Spc
+112 'p
+108 'l
+101 'e
+97 'a
+115 's
+101 'e
+46 '.
+32 'Spc
+End Table
+
+Table PaidLine1
+89 'Y
+111 'o
+117 'u
+114 'r
+32 'Spc
+99 'c
+104 'h
+97 'a
+110 'n
+103 'g
+101 'e
+32 'Spc
+104 'h
+97 'a
+115 's
+32 'Spc
+98 'b
+101 'e
+101 'e
+110 'n
+End Table
+
+Table PaidLine2
+32 'Spc
+32 'Spc
+32 'Spc
+32 'Spc
+32 'Spc
+32 'Spc
+32 'Spc
+32 'Spc
+112 'p
+97 'a
+105 'i
+100 'd
+46 '.
+32 'Spc
+32 'Spc
+32 'Spc
+32 'Spc
+32 'Spc
+32 'Spc
+32 'Spc
+End Table
+
+Table ErrorLine1
+32 'Spc
+85 'U
+110 'n
+97 'a
+98 'b
+108 'l
+101 'e
+32 'Spc
+116 't
+111 'o
+32 'Spc
+112 'p
+97 'a
+121 'y
+32 'Spc
+97 'a
+108 'l
+108 'l
+32 'Spc
+32 'Spc
+End Table
+
+Table ErrorLine2
+99 'c
+111 'o
+105 'i
+110 'n
+115 's
+46 '.
+71 'G
+111 'o
+32 'Spc
+116 't
+111 'o
+32 'Spc
+67 'C
+97 'a
+115 's
+104 'h
+32 'Spc
+98 'b
+111 'o
+120 'x
+End Table
+
+Sub GetLEeprom (In HiAddr As Byte, Out EepromVal As Long)
+                                            'Takes the address of the High Byte and returns
+                                            'a Long made from the HiAddr and the adjacent
+                                            'bytes in Eeprom
+
+   'The sequence of this 'Rebuild' appears important.
+   'The order of Low byte - High must be maintained.
+   EpRead HiAddr+3, EepromVal
+   EpRead HiAddr+2, EepromVal_H
+   EpRead HiAddr+1, EepromVal_U
+   EpRead HiAddr,   EepromVal_E
+
+End Sub
+
+Sub PutLEeprom (In HiAddr As Byte, In Save_Long As Long)
+'Places a Long into four bytes of
+'Eeprom, HiAddr is the first Byte
+'location in Eeprom, the lower Bytes
+'are placed into the adjacent bytes
+
+   Let Temp = Save_Long_E
+   EpRead HiAddr,TempR
+   If Temp <> TempR Then
+       EpWrite (HiAddr  , Temp)    'The High byte
+   End If
+
+   Let Temp = Save_Long_U
+   EpRead HiAddr+1,TempR
+   If Temp <> TempR Then
+       EpWrite (HiAddr+1, Temp)    'The UMid  byte
+   End If
+
+   Let Temp = Save_Long_H
+   EpRead HiAddr+2,TempR
+   If Temp <> TempR Then
+       EpWrite (HiAddr+2, Temp)    'The LMid  byte
+   End If
+
+   Let Temp = Save_Long
+   EpRead HiAddr+3,TempR
+   If Temp <> TempR Then
+       EpWrite (HiAddr+3, Temp)    'The Low  byte
+   End If
+
+End Sub
