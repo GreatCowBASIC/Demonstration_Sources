@@ -66,7 +66,7 @@ BASPROGRAMSTART:
 
 ;START OF THE MAIN PROGRAM
 ;''
-;'' The  most simple sample for GCGB and GCB.
+;'' An example program for GCGB and GCB.
 ;''
 ;'' This simply set a LED on.  The LED is attached to portc.0 via a suitable resistor to 0v.
 ;''

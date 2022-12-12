@@ -1,4 +1,4 @@
-'''A most simple sample for GCGB and GCB.
+'''An example program for GCGB and GCB.
 '''------------------------------------------------------------------------
 '''  This program shows the basics of SPI operation.  This shows the configuration of the ports and how hardware and software SPI is implemented.
 '''

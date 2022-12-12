@@ -1,4 +1,4 @@
-'''A most simple sample for GCGB and GCB.
+'''An example program for GCGB and GCB.
 '''------------------------------------------------------------------------
 '''This program blinks the onboard LED of a microcontroller - simple - the demonstration should work across many microcontrollers.
 '''

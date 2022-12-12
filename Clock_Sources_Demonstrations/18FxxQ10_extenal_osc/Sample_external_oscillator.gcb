@@ -1,4 +1,4 @@
-'''A most simple sample for GCGB and GCB.
+'''An example program for GCGB and GCB.
 '''------------------------------------------------------------------------
 '''This program blinks the onboard LED of a microcontroller using a 16 MHz external oscillator using the 4x PLL to give 16mhz
 '''

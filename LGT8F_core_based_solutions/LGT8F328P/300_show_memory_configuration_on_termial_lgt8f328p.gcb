@@ -1,4 +1,4 @@
-'''A most simple sample for GCGB and GCB.
+'''An example program for GCGB and GCB.
 '''------------------------------------------------------------------------
 '''This program shows the name of the programmer chip passed to AVRDUDE, other key chip specific information.
 '''

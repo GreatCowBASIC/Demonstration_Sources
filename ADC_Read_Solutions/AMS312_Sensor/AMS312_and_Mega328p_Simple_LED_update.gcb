@@ -1,4 +1,4 @@
-''' A most simple sample for GCGB and GCB.
+''' An example program for GCGB and GCB.
 ''' ------------------------------------------------------------------------
 ''' This program turn the onboard LED of a microcontroller when the AMS312 detects movement.
 '''
