@@ -33,14 +33,16 @@ HI2CMODE MASTER
 
 /*
 
+
   There is the GLCD_OLED_FONT constants in this demo - therefore no BASELINE fonts, no OLED character extension or use of extended fonts.
   This is mutually exclusive to the GLCD_STANDARD fonts.
 
   Range of characters is 32 to 127
-  GLCDfntDefaultSize = 1 or 2 only with multiple the character size to make a larger character
-  Characters are a variable width font
-  
-  GLCDFontWidth = 5 is the default value - how the character does control the width.  A ! is one pixel, and " is two pixels etc.
+  GLCDfntDefaultSize = 1 or 2 only with different fonts being used to show the characters
+    GLCDfntDefaultSize = 1: Are variable width characters by 8 pixels high characters.  ! is one pixel width , and " is two pixels etc.
+    GLCDfntDefaultSize = 2: Are 10 width by 16 pixels high characters. Therefore, a fixed font.
+
+  GLCDFontWidth = 5 is the default value.
 
   You can use the method GLCDPrintLargeFont as in with the values of 1 or 2
     GLCDPrintLargeFont 0,0, "HELLO"
@@ -133,12 +135,10 @@ Do Forever
   Wait 3 s
 
   GLCDCLS
-  //! Standard size with no multiplier on the character size
   GLCDfntDefaultSize = 1
   Gosub showGLCD
 
   GLCDCLS
-  //! Standard size with *2 multiplier on the character size
   GLCDfntDefaultSize = 2
   Gosub showGLCD
 

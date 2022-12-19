@@ -1,0 +1,76 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------
+'''This program demonstrates GCLD methods and operations
+'''
+'''
+'''@author    Hareon   
+'''@license   GPL
+'''@version   1.00   
+'''@date      2022-12-19
+'''********************************************************************************
+
+
+#CHIP MEGA328P, 16
+#OPTION EXPLICIT
+#INCLUDE <GLCD.H>
+
+; ----- Define GLCD Hardware settings
+#DEFINE GLCD_TYPE GLCD_TYPE_SSD1306
+#DEFINE GLCD_I2C_ADDRESS 0X78
+#DEFINE GLCD_PROTECTOVERRUN
+
+; ----- Define Hardware settings
+#DEFINE HI2C_BAUD_RATE 400
+#DEFINE HI2C_DATA
+HI2CMODE MASTER
+
+GLCDfntDefaultSize = 2
+GLCDFontWidth = 5
+
+'Variables
+Dim Teller as Integer
+
+'MAIN
+Do Forever
+  GLCDCLS
+  Gosub Standard
+  Wait 3 s
+  Gosub Extended
+  Wait 3 s
+  Gosub OLED
+  Wait 7 s
+Loop
+
+Sub Standard
+  #define GLCD_OLED_FONT
+  For Teller=34 To 129
+    GLCDPrint (0, 16, Teller)
+    GLCDPrint (45, 16, chr(Teller))
+    GLCDdrawCHAR (60, 16, Teller)
+    GLCDPrint (107, 16, "S")
+    Pause 500
+  Next
+  GLCDCLS
+End Sub
+
+Sub Extended
+  #DEFINE GLCD_EXTENDEDFONTSET1
+  For Teller=32 To 255
+      GLCDPrint (0, 16, Teller)
+      GLCDPrint (35, 16, chr(Teller))
+      GLCDdrawCHAR (50, 16, Teller)
+      GLCDPrint (107, 16, "E")
+      Pause 500
+  Next
+End Sub
+
+Sub OLED
+  #DEFINE OLEDFont2 OLEDExtendedFont2
+  For Teller=32 To 255
+      GLCDPrint (0, 16, Teller)
+      GLCDPrint (35, 16, chr(Teller))
+      GLCDdrawCHAR (50, 16, Teller)
+      GLCDPrint (107, 16, "O")
+      Pause 500
+  Next
+End Sub
