@@ -1,0 +1,75 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------
+'''This program demonstrates GCLD methods and BASELINE operations
+'''
+'''
+'''@author    Hareon   
+'''@license   GPL
+'''@version   1.00   
+'''@date      2022-12-19
+'''********************************************************************************
+
+
+#CHIP MEGA328P, 16
+#OPTION EXPLICIT
+#INCLUDE <GLCD.H>
+
+; ----- Define GLCD Hardware settings
+#DEFINE GLCD_TYPE GLCD_TYPE_SSD1306
+#DEFINE GLCD_I2C_ADDRESS 0X78
+#DEFINE GLCD_PROTECTOVERRUN
+
+; ----- Define Hardware settings
+#DEFINE HI2C_BAUD_RATE 400
+#DEFINE HI2C_DATA
+HI2CMODE MASTER
+
+
+// character range constants
+#DEFINE LOWESTCHAR  15
+#DEFINE HIGHESTCHAR 129
+
+
+/*
+
+  Range of characters is 15 t0 129
+  GLCDfntDefaultSize = 1 to n with multiple the character size to make a larger character
+  Characters are a basic mono sized font
+  This is the original font set of Great Cow BASIC
+
+  GLCDFontWidth = 5 is the default value - this DOES control the intercharacter spacing.
+
+
+*/
+
+// Variables
+Dim Teller as Integer
+
+// MAIN
+Do Forever
+  GLCDCLS
+  //! Standard size with no multiplier on the character size
+  GLCDfntDefaultSize = 1
+  Gosub baseline
+
+  //! Standard size with *2 multiplier on the character size
+  GLCDfntDefaultSize = 2
+  Gosub baseline
+
+  //! Standard size with *3 multiplier on the character size
+  GLCDfntDefaultSize = 3
+  Gosub baseline
+
+Loop
+
+Sub baseline
+  For Teller=LOWESTCHAR To HIGHESTCHAR
+    GLCDPrint (0, 16, Teller)
+    GLCDPrint (45, 16, chr(Teller))
+    GLCDdrawCHAR (60, 16, Teller)
+    GLCDPrint (107, 16, "S")
+    GLCDPrint (1,1, "GCBASIC")
+    Pause 500
+  Next
+  GLCDCLS
+End Sub
