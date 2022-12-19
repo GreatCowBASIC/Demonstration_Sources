@@ -126,9 +126,10 @@ Dim Teller as Integer
 // MAIN
 Do Forever
  
+  GLCDCLS
   GLCDPrintWithSize 0,0, "H",2
-  GLCDPrintWithSize 20,0, "ello",1
-  end
+  GLCDPrintLoc 12,8, "ello",1
+  Wait 3 s
 
   GLCDCLS
   //! Standard size with no multiplier on the character size
