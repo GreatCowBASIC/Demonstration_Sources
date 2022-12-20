@@ -34,7 +34,7 @@ HI2CMODE MASTER
 /*
 
 
-  There is the GLCD_OLED_FONT constants in this demo - therefore no BASELINE fonts, no OLED character extension or use of extended fonts. 
+  This is a GLCD_OLED_FONT demo with no FONT SET 2 - therefore no BASELINE fonts, no OLED character extension or use of extended fonts. 
   But, most importantly not OLED_FONT2 - by using the constant GLCD_DISABLE_OLED_FONT2.  This save memory.
   OLED fonts are mutually exclusive to the GLCD_STANDARD fonts.
 
