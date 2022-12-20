@@ -1,0 +1,158 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------
+'''This program demonstrates GCLD methods and basic OLED operations
+'''
+'''
+'''@author    Hareon   
+'''@license   GPL
+'''@version   1.00   
+'''@date      202229
+'''********************************************************************************
+
+
+#CHIP MEGA328P, 16
+#OPTION EXPLICIT
+#INCLUDE <GLCD.H>
+
+; ----- Define GLCD Hardware settings
+#DEFINE GLCD_TYPE GLCD_TYPE_SSD1306
+#DEFINE GLCD_I2C_ADDRESS 0X78
+#DEFINE GLCD_PROTECTOVERRUN
+
+; ----- Define Hardware settings
+#DEFINE HI2C_BAUD_RATE 400
+#DEFINE HI2C_DATA
+HI2CMODE MASTER
+
+
+// character range constants
+#DEFINE LOWESTCHAR  32
+#DEFINE HIGHESTCHAR 255
+
+#DEFINE GLCD_OLED_FONT
+#DEFINE OLEDFONT2 OLEDEXTENDEDFONT2
+
+/*
+
+  There is the GLCD_OLED_FONT and OLEDFONT2 ( which redirects to OLEDEXTENDEDFONT2 ) constants in this demo - therefore no BASELINE fonts 
+  OLED fonts are mutually exclusive to the GLCD_STANDARD fonts.
+
+  This is essentially changes the character lookup from one table of data to another table of data - the table OLEDEXTENDEDFONT2 has all the characters in the range of 32 to 255
+
+  Range of characters is 32 to 255
+  OLEDEXTENDEDFONT2 fonts are ONLY GLCDfntDefaultSize = 2
+  GLCDfntDefaultSize = 2: Are 10 width by 16 pixels high characters. Therefore, a fixed font.
+  
+  GLCDFontWidth = 5 is the default value - how the character does control the width.  A ! is one pixel, and " is two pixels etc.
+
+  You can use the method GLCDPrintLargeFont as in with the values of 1 or 2
+    GLCDPrintLargeFont 0,0, "HELLO"
+
+  Also, GLCDPrintWithSize operated as expected
+    GLCDPrintWithSize 0,0, "H",2
+    GLCDPrintWithSize 20,0, "ello",1
+
+  Constants available are:
+
+    GLCD_TYPE                               	GLCD_TYPE_SSD1306
+    GLCD_OLED_FONT
+    OLEDFONT2                               	OLEDEXTENDEDFONT2               	                	
+    GLCD_PROTECTOVERRUN                     	                                	
+    LANDSCAPE                               	1                               	
+    PORTRAIT_REV                            	2                               	
+    LANDSCAPE_REV                           	3                               	
+    PORTRAIT                                	4                               	
+    GLCDINIT                                	INITGLCD                        	
+    GLCDBOX                                 	BOX                             	
+    GCLDFILLEDBOX                           	FILLEDBOX                       	
+    GCLDCIRCLE                              	CIRCLE                          	
+    GLCDFILLEDCIRCLE                        	FILLEDCIRCLE                    	
+    GLCDLINE                                	LINE                            	
+    SSD1306_VCCSTATE                        	0                               	
+    SSD1306_SETCONTRAST                     	129                             	
+    SSD1306_DISPLAYALLON_RESUME             	164                             	
+    SSD1306_DISPLAYALLON                    	165                             	
+    SSD1306_NORMALDISPLAY                   	166                             	
+    SSD1306_INVERTDISPLAY                   	167                             	
+    SSD1306_DISPLAYOFF                      	174                             	
+    SSD1306_DISPLAYON                       	175                             	
+    SSD1306_SETDISPLAYOFFSET                	211                             	
+    SSD1306_SETCOMPINS                      	218                             	
+    SSD1306_SETVCOMDETECT                   	219                             	
+    SSD1306_SETDISPLAYCLOCKDIV              	213                             	
+    SSD1306_SETPRECHARGE                    	217                             	
+    SSD1306_SETMULTIPLEX                    	168                             	
+    SSD1306_SETLOWCOLUMN                    	0                               	
+    SSD1306_SETHIGHCOLUMN                   	16                              	
+    SSD1306_SETSTARTLINE                    	64                              	
+    SSD1306_MEMORYMODE                      	32                              	
+    SSD1306_COLUMNADDR                      	33                              	
+    SSD1306_PAGEADDR                        	34                              	
+    SSD1306_COMSCANINC                      	192                             	
+    SSD1306_COMSCANDEC                      	200                             	
+    SSD1306_SEGREMAP                        	160                             	
+    SSD1306_CHARGEPUMP                      	141                             	
+    SSD1306_EXTERNALVCC                     	1                               	
+    SSD1306_SWITCHCAPVCC                    	2                               	
+    SSD1306_ACTIVATE_SCROLL                 	47                              	
+    SSD1306_DEACTIVATE_SCROLL               	46                              	
+    SSD1306_SET_VERTICAL_SCROLL_AREA        	163                             	
+    SSD1306_RIGHT_HORIZONTAL_SCROLL         	38                              	
+    SSD1306_LEFT_HORIZONTAL_SCROLL          	39                              	
+    SSD1306_VERTICAL_AND_RIGHT_HORIZONTAL_SC	41                              	
+    SSD1306_VERTICAL_AND_LEFT_HORIZONTAL_SCR	42                              	
+    GLCDLINEWIDTH                                     1                                         
+    GLCD_WIDTH                                        128                                       
+    GLCD_HEIGHT                                       64                                        
+    GLCDVERSION                                       8                                         
+    INITGLCD                                          INITGLCD_SSD1306                          
+    GLCDCLS                                           GLCDCLS_SSD1306                           
+    GLCDDRAWCHAR                                      GLCDDRAWCHAR_SSD1306                      
+    FILLEDBOX                                         FILLEDBOX_SSD1306                         
+    PSET                                              PSET_SSD1306                              
+    GLCD_OPEN_PAGETRANSACTION                         GLCD_OPEN_PAGETRANSACTION_SSD1306         
+    GLCD_CLOSE_PAGETRANSACTION                        GLCD_CLOSE_PAGETRANSACTION_SSD1306        
+    GLCDSETCONTRAST                                   SETCONTRAST_SSD1306                       
+    GLCD_TYPE_STRING                                  SSD1306                                   
+    GLCD_WIDTH                                        128                                       
+    GLCD_HEIGHT                                       64                                        
+    SSD1306_GLCD_HEIGHT                               GLCDDEVICEHEIGHT                          
+    SSD1306_GLCD_WIDTH                                GLCDDEVICEWIDTH                           
+    IGNORE_SPECIFIED_GLCD_TYPE_SSD1306_CHARACTER_MODE_ONLY          0                           
+    GLCD_TYPE_SSD1306_CHARACTER_MODE_ONLY = TRUE|FALSE
+    GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE = TRUE|FALSE
+
+
+*/
+
+// Variables
+Dim Teller as Integer
+
+// MAIN
+Do Forever
+ 
+  GLCDCLS
+  GLCDPrintWithSize 0,0, "H",2
+  //The OLED GLCDfntDefaultSize =1 is still available.
+  GLCDPrintWithSize 9,6, "ello",1  //! Note the positional change
+  Wait 3 s
+
+  GLCDCLS
+  GLCDfntDefaultSize = 2
+  Gosub showGLCD
+
+
+Loop
+
+Sub showGLCD
+  For Teller=LOWESTCHAR To HIGHESTCHAR
+    GLCDPrint (0, 16, Teller)
+    GLCDPrint (45, 16, chr(Teller))
+    GLCDdrawCHAR (60, 16, Teller)
+    GLCDPrint (107, 16, "S")
+    GLCDPrint (1,1, "GCBASIC")
+    Pause 500
+  Next
+  GLCDCLS
+End Sub
+
