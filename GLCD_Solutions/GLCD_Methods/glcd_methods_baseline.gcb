@@ -3,10 +3,10 @@
 '''This program demonstrates GCLD methods and BASELINE operations
 '''
 '''
-'''@author    Hareon   
+'''@author    Haroen   
 '''@license   GPL
-'''@version   1.00   
-'''@date      202229
+'''@version   1.01   
+'''@date      21-12-2022
 '''********************************************************************************
 
 
@@ -31,7 +31,8 @@ HI2CMODE MASTER
 
 
 /*
-
+  For use on a SSD1306 128x32 display please change above declaration to #DEFINE GLCD_TYPE GLCD_TYPE_SSD1306_32 and code lines to GLCDPrint (0, 16, ...)
+  
   There are NO control constants in this demo - therefore no OLED, no OLED character extension or use of extended fonts.
   This is mutually exclusive to the GLCD_OLED fonts.
 
@@ -148,11 +149,10 @@ Loop
 
 Sub showGLCD
   For Teller=LOWESTCHAR To HIGHESTCHAR
-    GLCDPrint (0, 16, Teller)
-    GLCDPrint (45, 16, chr(Teller))
-    GLCDdrawCHAR (60, 16, Teller)
-    GLCDPrint (107, 16, "B")
-    GLCDPrint (1,1, "GCBASIC")
+    GLCDPrint (0, 40, Teller)
+    GLCDPrint (45, 40, chr(Teller))
+    GLCDdrawCHAR (70, 40, Teller)
+    GLCDPrint (1,1, "Standard set")
     Pause 500
   Next
   GLCDCLS
