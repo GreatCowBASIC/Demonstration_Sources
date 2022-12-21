@@ -149,7 +149,7 @@ Sub showGLCD
     GLCDPrint (0, 16, Teller)
     GLCDPrint (45, 16, chr(Teller))
     GLCDdrawCHAR (60, 16, Teller)
-    GLCDPrint (107, 16, "S")
+    GLCDPrint (107, 16, "OE")
     GLCDPrint (1,1, "GCBASIC")
     Pause 500
   Next
