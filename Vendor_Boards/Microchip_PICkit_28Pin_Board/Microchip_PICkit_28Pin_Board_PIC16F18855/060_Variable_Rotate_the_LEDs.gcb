@@ -64,7 +64,7 @@ Dir     POTENTIOMETER In
 '*****************************************************************************************************
 'Main program commences here.. everything before this is setup for the board.
 
-Dim ADCVal as Byte
+Dim ADCVal as Word
 
 Do Forever
 

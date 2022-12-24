@@ -21,7 +21,7 @@
    ; ----- Define Hardware settings
 '  ' Define I2C settings - CHANGE PORTS
    #define HI2C_BAUD_RATE 100
-   #define HI2C_DATA PORTB.4
+   #define HI2C_DATA  PORTB.4
    #define HI2C_CLOCK PORTB.6
 
    Dir HI2C_DATA in

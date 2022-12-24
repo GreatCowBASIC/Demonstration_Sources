@@ -72,6 +72,7 @@ Do
 
     Wait 100 ms
     ADCVal =  ReadAD ( AN0 )
+    ' Set the LEDs to value of 0 to 15
     LATB = Scale ( ADCVal, 0, 255, 0, 15 )
 
 Loop

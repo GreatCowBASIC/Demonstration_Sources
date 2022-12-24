@@ -69,7 +69,9 @@ Dim CURRENTSTATE As Byte
 Dir RB0 Out
 
 Do
-    Wait 1000 ms
+
+    Wait 1 s
     'Set Current state by toggling the existing state
     RB0 = !RB0
+
 Loop
