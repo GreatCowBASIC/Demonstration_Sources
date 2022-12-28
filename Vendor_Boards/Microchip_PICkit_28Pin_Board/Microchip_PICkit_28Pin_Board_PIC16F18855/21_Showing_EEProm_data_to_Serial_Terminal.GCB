@@ -39,12 +39,12 @@
 #STARTUP InitPPS, 85
 
 Sub InitPPS
-    UNLOCKPPS
+    
     'RC0->EUSART:TX;
     RC0PPS = 0x0010
     'RC1->EUSART:RX;
     RXPPS  = 0x0011
-    LOCKPPS
+    
 End Sub
 
 Dim DISPLAYNEWLINE, OUTDATA, INDATA As Byte

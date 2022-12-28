@@ -5,7 +5,7 @@
 '''  can be accurately programmed since the user has control on how the
 '''  time delays are executed.
 '''
-'''  This demonstration blinks LED D1 at a rate of approximately 1.0 seconds.
+'''  This demonstration blinks LED DS1 at a rate of approximately 1.0 seconds.
 '''
 '''  PIC: 16F18855
 '''  Compiler: GCB

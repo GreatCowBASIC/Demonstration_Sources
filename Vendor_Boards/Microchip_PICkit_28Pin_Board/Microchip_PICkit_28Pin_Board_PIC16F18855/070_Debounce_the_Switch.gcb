@@ -4,7 +4,7 @@
 ''' required delay amount differs with the switch being used. Some switches are worse
 ''' than others.
 '''
-''' When the switch is held down, D1 will be lit. When the switch is not held down, all
+''' When the switch is held down, DS1 will be lit. When the switch is not held down, all
 ''' LEDs are OFF.
 '''
 '''
@@ -62,12 +62,13 @@ Dir     POTENTIOMETER In
 '*****************************************************************************************************
 'Main program commences here.. everything before this is setup for the board.
 
-#DEFINE DOWN 0
+'A constant that represents the state value of when the button is pressed down. 
+#DEFINE SWITCH_DOWN 0
 
 Do
-    If ( SWITCHIN = DOWN ) Then
-        Wait 10 ms
-        If ( SWITCHIN = DOWN ) Then
+    If ( SWITCHIN = SWITCH_DOWN ) Then
+        Wait 5 ms
+        If ( SWITCHIN = SWITCH_DOWN ) Then
             Set RB0 On
         End If
     Else

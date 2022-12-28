@@ -6,9 +6,6 @@
 '''
 '''  Press the SWITCHIN to reverse the direction of the LEDs.
 '''
-'''  The four LSbs of the ADC are mirrored onto the LEDs. Rotate the potentiometer
-'''  to change the display.
-'''
 '''
 '''  PIC: 16F18855
 '''  Compiler: GCB
@@ -21,7 +18,30 @@
 #CHIP 16f18855
 #OPTION EXPLICIT
 
+ 
+'' -------------------PORTA----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:   -----------------------------ADC--
+''-----------------------------------------
+''
 
+'' -------------------PORTB----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---------------LED--LED-LED LED--
+''-----------------------------------------
+''
+
+'' ------------------PORTC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---------------------------------
+''-----------------------------------------
+''
+
+'' ------------------PORTE-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ----------------SW---------------
+''-----------------------------------------
+''
 
 #DEFINE SWITCH_DOWN         0
 #DEFINE SWITCH_UP           1
@@ -48,25 +68,33 @@ Do
 
     mydelay = ReadAD10( AN0 )
 
-    ' Factor the ADC reading to delay steps
+    ' Factor the ADC reading to delay value
     mydelay = Scale ( mydelay, 0, 1023, 100, 1000 )
 
     Wait mydelay ms
+
+    ' Is the switch pressed? 
     If check_SWITCH = TRUE Then
         ' toggle the direction
         direction = !direction
     End If
 
+    ' Set the state of the led port using the variable `leds`
     PORTB = leds
 
-
+    ' handle the rotation of the variable `leds`
     If  direction = LED_RIGHT  Then
         'shift to the right by 1
 
-        Rotate leds Right Simple
+        Rotate leds Right
 
-        ' when the ROTATE moves the bit to bit 7, restart the pattern
-        If leds = 128 Then
+        ' when the ROTATE moves the bit to bit, when equals zero, restart the pattern
+        ' 8     1000
+        ' 4     0100
+        ' 2     0010
+        ' 1     0001
+        ' 0     0000 so, reset back to 8
+        If leds = 0 Then
             leds = 8
         End If
 
@@ -84,7 +112,7 @@ Do
 Loop
 
 
-
+'a function that returns the state of the switch
 'global variable - if button is held down, we don't want to keep on switching directions
 Dim previous_state As BIT
 previous_state = SWITCH_UP

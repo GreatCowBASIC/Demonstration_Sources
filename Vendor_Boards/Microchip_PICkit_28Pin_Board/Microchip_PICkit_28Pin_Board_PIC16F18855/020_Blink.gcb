@@ -61,9 +61,9 @@ Dir     POTENTIOMETER In
 
 Do
 
-    // Wait 100 ms
+    Wait 100 ms
     RB0 = 0
-    // Wait 25 ms
+    Wait 100 ms
     RB0 = 1
     
 Loop

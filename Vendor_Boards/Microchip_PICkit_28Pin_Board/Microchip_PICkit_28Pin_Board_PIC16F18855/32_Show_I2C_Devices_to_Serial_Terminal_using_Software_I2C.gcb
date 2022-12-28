@@ -25,7 +25,7 @@
 #STARTUP InitPPS, 85
 
 Sub InitPPS
-    UNLOCKPPS
+    
 
     'Module: EUSART
     'TX > RC0
@@ -33,7 +33,7 @@ Sub InitPPS
     'RC0 > TX (bi-directional)
     TXPPS = 0x0008
 
-    LOCKPPS
+    
 End Sub
 'Template comment at the end of the config file
 

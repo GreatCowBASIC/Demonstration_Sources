@@ -26,7 +26,7 @@
 #STARTUP InitPPS, 85
 
 Sub InitPPS
-    UNLOCKPPS
+    
     'RC0->EUSART:TX;
     RC0PPS = 0x0010
     'RC1->EUSART:RX;
@@ -42,7 +42,7 @@ Sub InitPPS
     SSP2CLKPPS = 0x0014
     'RC4->MSSP2:SCL2;
     RC4PPS = 0x0016
-    LOCKPPS
+    
 End Sub
 
 #DEFINE SWITCH_DOWN         0

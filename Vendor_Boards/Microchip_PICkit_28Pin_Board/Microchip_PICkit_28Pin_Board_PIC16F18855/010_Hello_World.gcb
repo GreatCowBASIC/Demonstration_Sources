@@ -44,7 +44,7 @@
 
 
 'Set the whole port as an output, we will use only one BIT
-Dir PORTB Out)
+Dir PORTB Out
 
 'Ensure the whole port is set off by setting to 0
 PORTB = 0

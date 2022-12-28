@@ -12,7 +12,7 @@
 '''  allows the processor to work on other tasks rather than counting instruction cycles.
 '''
 '''
-'''  LEDs rotate from right to left, similar to Lesson 3, at a rate of ~.5 seconds.
+'''  LEDs rotate from right to left, similar to previous demonstrations, at a rate of 1 seconds.
 '''
 '''
 '''  PIC: 16F18855
@@ -22,60 +22,57 @@
 '''  Board: PICKit 28-Pin Demo Board
 '''  Date: 1.12.2022
 '''
-
-
-'Chip Settings.
-#CHIP 16f18855, 32
+' ----- Configuration
+#CHIP 16f18855
 #OPTION Explicit
-
-
-'Set the PPS of the PWM
-'Set the PPS for this solution.
-#STARTUP InitPPS, 85
-
-Sub InitPPS
-    UNLOCKPPS
-
-    'Set the PPS of the RS232 ports.
-    'RC0->EUSART:TX;
-    RC0PPS = 0x0010
-    'RC1->EUSART:RX;
-    RXPPS  = 0x0011
-
-    '   //RB0->TMR0:TMR0;
-    RB0PPS = 0x18
-    LOCKPPS
-End Sub
-
-'-------------------LATA-----------------
-'Bit#:  -7---6---5---4---3---2---1---0---
-'LED:   ---------------|D5 |D4 |D3 |D2 |-
+ 
+'' -------------------PORTA----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:   -----------------------------ADC--
 ''-----------------------------------------
 ''
 
+'' -------------------PORTB----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---------------LED--LED-LED LED--
+''-----------------------------------------
+''
+
+'' ------------------PORTC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---------------------------------
+''-----------------------------------------
+''
+
+'' ------------------PORTE-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ----------------SW---------------
+''-----------------------------------------
+''
+
+
+
+'Define constants to make things easier. We can reuse these at any time.
+#DEFINE LEDPORT LATB
+
+Dir     RB0         Out
+Dir     RB1         Out
+Dir     RB2         Out
+Dir     RB3         Out
+
+#DEFINE POTENTIOMETER RA0
+Dir     POTENTIOMETER In
+
+#DEFINE SWITCHIN      RE3
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+
+
 Dim TIMEOUT As Byte
 
-' ----- Constants
-#DEFINE USART_BAUD_RATE 115200
-#DEFINE USART_TX_BLOCKING
-'
-
-
-#DEFINE LEDD2 PORTA.0
-#DEFINE LEDD3 PORTA.1
-#DEFINE LEDD4 PORTA.2
-#DEFINE LEDD5 PORTA.3
-Dir     LEDD2 Out
-Dir     LEDD3 Out
-Dir     LEDD4 Out
-Dir     LEDD5 Out
-
-'   Set portb.0 as out
-Dir portb.0 Out
-'   Set the port as an ouput
-Dir porta Out
 '   Set the first LED on
-Set LEDD5 On
+Set RB3 On
 
 
 '   Initialise the timer.
@@ -103,8 +100,8 @@ Do Forever
 
         ' Rotate our LEDs
         Set C Off
-        Rotate porta Right
-        If C = 1 Then porta.3 = 1
+        Rotate LEDPORT Right
+        If C = 1 Then RB3 = 1
 
         TimeOut= 0
         ' Set timer to 1 second`

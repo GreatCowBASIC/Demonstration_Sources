@@ -67,7 +67,8 @@ Do
 
     Wait 1000 ms
     Set C Off
-    Rotate LEDPORT Right
+    // Shift the register to the right by one bit
+    Rotate LEDPORT Right 
     If C = 1 Then RB3 = 1
 
 Loop

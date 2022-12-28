@@ -5,10 +5,6 @@
 '''
 '''  Rotate the POT counterclockwise to see the LEDs shift faster.
 '''
-'''
-''' The top LSbs of the ADC are mirrored onto the LEDs. Rotate the potentiometer
-''' to change the display.
-'''
 '''  PIC: 16F18855
 '''  Compiler: GCB
 '''  IDE: GC Studio
@@ -64,6 +60,7 @@ Dir     POTENTIOMETER In
 '*****************************************************************************************************
 'Main program commences here.. everything before this is setup for the board.
 
+'Dimension a word variable as the READAD10 returns a 10 bit value
 Dim ADCVal as Word
 
 Do Forever
@@ -78,6 +75,7 @@ Do Forever
 
         ADCVal = ReadAD10 ( AN0 )
 
+        'Scale the returned value to 100 ms to 1000 ms
         Wait  Scale ( ADCVal, 0, 1023, 100, 1000 ) ms
         
         Rotate LEDPORT Left
