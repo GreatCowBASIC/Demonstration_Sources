@@ -86,40 +86,40 @@ Sub xorPSet_SSD1306(In GLCDX, In GLCDY, In GLCDColour As Word)
     'Y is 0 to 63
     'Origin in top left
 
-          'SSD1306_BufferLocationCalc = ( GLCDY / 8 )* GLCD_WIDTH
-          'faster than /8
-          SSD1306_BufferLocationCalc = GLCDY
-          Repeat 3
-            Set C Off
-            Rotate SSD1306_BufferLocationCalc Right
-          End Repeat
-          SSD1306_BufferLocationCalc = SSD1306_BufferLocationCalc * GLCD_WIDTH
+    'SSD1306_BufferLocationCalc = ( GLCDY / 8 )* GLCD_WIDTH
+    'faster than /8
+    SSD1306_BufferLocationCalc = GLCDY
+    Repeat 3
+      Set C Off
+      Rotate SSD1306_BufferLocationCalc Right
+    End Repeat
+    SSD1306_BufferLocationCalc = SSD1306_BufferLocationCalc * GLCD_WIDTH
 
-          SSD1306_BufferLocationCalc = GLCDX + SSD1306_BufferLocationCalc+1
-          GLCDDataTemp = SSD1306_BufferAlias(SSD1306_BufferLocationCalc)
+    SSD1306_BufferLocationCalc = GLCDX + SSD1306_BufferLocationCalc+1
+    GLCDDataTemp = SSD1306_BufferAlias(SSD1306_BufferLocationCalc)
 
-          'Change data to set/clear pixel
-          GLCDBitNo = GLCDY And 7
-          If GLCDColour.0 = 0 Then
-            GLCDChange = 254
-            Set C On
-          Else
-            GLCDChange = 1
-            Set C Off
-          End If
-          Repeat GLCDBitNo
-            Rotate GLCDChange Left
-          End Repeat
+    'Change data to set/clear pixel
+    GLCDBitNo = GLCDY And 7
+    If GLCDColour.0 = 0 Then
+      GLCDChange = 254
+      Set C On
+    Else
+      GLCDChange = 1
+      Set C Off
+    End If
+    Repeat GLCDBitNo
+      Rotate GLCDChange Left
+    End Repeat
 
-          If GLCDColour.0 = 0 Then
-             GLCDDataTemp = GLCDDataTemp And GLCDChange
-          Else
-             GLCDDataTemp = GLCDDataTemp xOr GLCDChange
-          End If
+    If GLCDColour.0 = 0 Then
+        GLCDDataTemp = GLCDDataTemp And GLCDChange
+    Else
+        GLCDDataTemp = GLCDDataTemp xOr GLCDChange
+    End If
 
-          SSD1306_BufferAlias(SSD1306_BufferLocationCalc) = GLCDDataTemp
-          Cursor_Position_SSD1306 ( GLCDX, GLCDY )
-          Write_Data_SSD1306 ( GLCDDataTemp )
+    SSD1306_BufferAlias(SSD1306_BufferLocationCalc) = GLCDDataTemp
+    Cursor_Position_SSD1306 ( GLCDX, GLCDY )
+    Write_Data_SSD1306 ( GLCDDataTemp )
 
 
 End Sub
