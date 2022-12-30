@@ -85,7 +85,7 @@ Sub xorPSet_SSD1306(In GLCDX, In GLCDY, In GLCDColour As Word)
     'X is 0 to 127
     'Y is 0 to 63
     'Origin in top left
-  #if GLCD_TYPE = GLCD_TYPE_SSD1306
+
           'SSD1306_BufferLocationCalc = ( GLCDY / 8 )* GLCD_WIDTH
           'faster than /8
           SSD1306_BufferLocationCalc = GLCDY
@@ -121,6 +121,5 @@ Sub xorPSet_SSD1306(In GLCDX, In GLCDY, In GLCDColour As Word)
           Cursor_Position_SSD1306 ( GLCDX, GLCDY )
           Write_Data_SSD1306 ( GLCDDataTemp )
 
-  #endif
 
 End Sub
