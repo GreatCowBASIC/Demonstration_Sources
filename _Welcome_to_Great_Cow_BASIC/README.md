@@ -5,5 +5,3 @@ This GIT contains the latest user contributed demonstrations that are focused on
 This folder and the contents are curated by William Roth.
 
 Enjoy
-
-
