@@ -20,9 +20,6 @@
   #define GLCD_I2C_Address 0x78
   #define ADSpeed LowSpeed
 
-  'Redirect the standard PSET routine to the XOR routine
-  #define PSet_SSD1306 xorPSet_SSD1306
-
   dim GLCDDATATEMP as word
   dim GLCDBITNO as byte
   dim GLCDCHANGE as byte
@@ -45,28 +42,36 @@
   glcdcls
 
   'Draw the grid
-  line 0,31,128,32
+  line 0,GLCD_HEIGHT/2,128,GLCD_HEIGHT/2
   line 63,0,63,63
   '
   for xpos=0 to 127
-    pset xpos,buffer1(xpos),1 ;plot data 1st time for xor
+    xorPSet_SSD1306 xpos,buffer1(xpos),1 ;plot data 1st time for xor
   next xpos
   '
 
   'Main loop
   do
   for xpos=0 to 127
-    pset xpos,buffer1(xpos),1 ;erase old data
-    pset xpos,buffer2(xpos),1 ;plot new data
+    xorPSet_SSD1306 xpos,buffer1(xpos),1 ;erase old data
+    xorPSet_SSD1306 xpos,buffer2(xpos),1 ;plot new data
   next xpos
   ;
   for xpos=0 to 127
     buffer1 (xpos)=buffer2 (xpos) ;copy new data to old data
     volt = READAD (an0)
-    Repeat 2
-      set c off
-      rotate volt right
-    End Repeat
+    #If GLCD_HEIGHT = 64
+      Repeat 2
+        set c off
+        rotate volt right
+      End Repeat
+    #EndIF
+    #If GLCD_HEIGHT = 32
+      Repeat 3
+        set c off
+        rotate volt right
+      End Repeat
+    #EndIF
    buffer2 (xpos)=volt ;save new data
   next xpos
   ;
@@ -93,7 +98,17 @@ Sub xorPSet_SSD1306(In GLCDX, In GLCDY, In GLCDColour As Word)
       Set C Off
       Rotate SSD1306_BufferLocationCalc Right
     End Repeat
-    SSD1306_BufferLocationCalc = SSD1306_BufferLocationCalc * GLCD_WIDTH
+    
+    'SSD1306_BufferLocationCalc = SSD1306_BufferLocationCalc * GLCD_WIDTH
+      Set C Off
+      Rotate SSD1306_BufferLocationCalc LEFT
+      Rotate SSD1306_BufferLocationCalc LEFT
+      Rotate SSD1306_BufferLocationCalc LEFT
+      Rotate SSD1306_BufferLocationCalc LEFT
+      Rotate SSD1306_BufferLocationCalc LEFT
+      Rotate SSD1306_BufferLocationCalc LEFT
+      Rotate SSD1306_BufferLocationCalc LEFT     
+      
 
     SSD1306_BufferLocationCalc = GLCDX + SSD1306_BufferLocationCalc+1
     GLCDDataTemp = SSD1306_BufferAlias(SSD1306_BufferLocationCalc)
