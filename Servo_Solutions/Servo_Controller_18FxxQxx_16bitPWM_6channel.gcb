@@ -168,19 +168,18 @@ An improvement to this program would be a script to calculate the pulse widths b
     Do
 
         // PWM1 - 2 Servo channels  1 & 2
-        PWM1_1_DUTY = SCALE (READAD12(ANA0), 0, 4095, 2136, 5880)  ;Servo 1
-        PWM1_2_DUTY = SCALE (READAD12(ANA1), 0, 4095, 2136, 5880)  ;Servo 2
+        PWM1_1_DUTY = SCALE (READAD12(ANA0), 0, 4095, 2136, 5880)  ;Servo 1  //! The transformed range is specific to a servo type - updated to modify end of range positioning
+        PWM1_2_DUTY = SCALE (READAD12(ANA1), 0, 4095, 2136, 5880)  ;Servo 2  //! The transformed range is specific to a servo type - updated to modify end of range positioning
 
         // PWM2 - 2 Servo channels  3 & 4
-        PWM2_1_DUTY = SCALE (READAD12(ANA2), 0, 4095, 4272, 11728)  ;Servo 3
-        PWM2_2_DUTY = SCALE (READAD12(ANA3), 0, 4095, 4272, 11728)  ;Servo 4
+        PWM2_1_DUTY = SCALE (READAD12(ANA2), 0, 4095, 4272, 11728)  ;Servo 3  //! The transformed range is specific to a servo type - updated to modify end of range positioning
+        PWM2_2_DUTY = SCALE (READAD12(ANA3), 0, 4095, 4272, 11728)  ;Servo 4  //! The transformed range is specific to a servo type - updated to modify end of range positioning
 
         // PWM3 - 2 Servo channels  5 & 6
-        PWM3_1_DUTY = SCALE (READAD12(ANA4), 0, 4095, 8544, 23500)  ;Servo 5
+        PWM3_1_DUTY = SCALE (READAD12(ANA4), 0, 4095, 8544, 23500)  ;Servo 5  //! The transformed range is specific to a servo type - updated to modify end of range positioning
 
 
-        ;PWM3_2_DUTY = SCALE (READAD12(ANA3), 0, 4095,8544, 23500) ;Servo 6
-        PWM3_2_Duty = 16022 'Not Connected to Potentiometer (Fixed PWM)
+        PWM3_2_DUTY = SCALE (READAD12(ANA3), 0, 4095,8544, 23500) ;Servo 6   //! The transformed range is specific to a servo type - updated to modify end of range positioning
 
         PWMLOAD = 0b0111 ' load New Data to All "PR" Registers
 
