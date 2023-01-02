@@ -1,0 +1,48 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''Attach a servo motor to the port specificied - this program will make it sweep back and forth dependent on the position of the potentiometer
+'''
+'''The constants support setting the frequency of the servo operations to 20ms ( 50 Hz ), adjust SERVOPERIOD to suit your application.
+'''  The SERVOPERIOD will be less that 20000 us as the operations will take a number of us - hence, the adjustment. 
+'''
+'''This will not operate with a microcontroller clock frequency of less then 12Mhz
+'''
+'''@author        EvanV plus works of BillRoth
+'''@licence GPL
+'''@version 1.0
+'''@date    02.01.2023
+'''********************************************************************************
+
+; ----- Configuration
+#chip 18F27Q83,16
+#option explicit
+
+
+    // Change to suit requirements
+    #DEFINE ServoOutChannel1 PORTC.0
+    DIR ServoOutChannel1 OUT
+
+    // Change to suit requirements
+    #DEFINE ADCChannel ANA0
+
+    // Change to suit clock frequency and specifics of the servo - these parameters are for a Tower Pro SG90 servo
+    #DEFINE SERVOPERIOD 19450  // In microseconds.  Adjust as needed
+    #DEFINE FULL_CW     500    // Adjust as needed for CW full position
+    #DEFINE FULL_CCW    3000   // Adjust as Needed for CCW full position
+
+
+    Dim PulsewidthChannel1, lastPulsewidthChannel1 as WORD
+
+    Do
+    
+        //read adc ( range is 8bits/0 to 255 ) then scale to to FULL_CW and FULL_CCW
+        PulsewidthChannel1 = SCALE ( Readad ( ADCChannel ),0,255,FULL_CW,FULL_CCW)
+
+        //If the value (therefore the ADC) is not equal to the last value then update the servo
+        if lastPulsewidthChannel1 <> PulsewidthChannel1 Then
+            Pulseout ServoOutChannel1, PulsewidthChannel1 us
+            Wait (SERVOPERIOD - PulsewidthChannel1) us
+            lastPulsewidthChannel1 = PulsewidthChannel1
+        end if
+
+    Loop
