@@ -1,6 +1,9 @@
 '''A demonstration program for GCGB and GCB.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''Attach a servo motor to pin PORTB.0 - this program will make it sweep back and forth
+'''
+'''This is an example uses an approximation of the 20ms ( 50 hz ) - there is no calculation of the period.
+'''
 '''@author      	EvanV plus works of HughC
 '''@licence	GPL
 '''@version	1.0a

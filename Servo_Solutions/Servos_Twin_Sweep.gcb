@@ -1,8 +1,11 @@
 '''A demonstration program for GCGB and GCB.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program will make the two servos sweep back and forth.
-''':    Attach a servo motor to pin PORTB.0
-''':    Attach another servo motor to pin PORTB.1
+''':    Attach a servo motor to pin ServoOutChannel1
+''':    Attach another servo motor to pin ServoOutChannel2
+'''
+'''This is an example uses an approximation of the 20ms ( 50 hz ) - there is no calculation of the period.
+'''
 '''@author      	EvanV plus works of ChuckH
 '''@licence	GPL
 '''@version	1.0a
@@ -10,15 +13,20 @@
 '''********************************************************************************
 
 ; ----- Configuration
-  #chip 16F886, 16
+  #chip 18F27Q83, 16
   #option explicit
 
 ; ----- Define Hardware settings
  ' No hardware configuration is required as outputs and inputs are set automatically within the methods used.
 
 ; ----- Constants
-  ' No Constants specified in this example.
+    // Change to suit requirements
+    #DEFINE ServoOutChannel1 PORTC.0
+    DIR ServoOutChannel1 OUT
 
+  #DEFINE ServoOutChannel2 PORTC.1
+    DIR ServoOutChannel2 OUT
+    
 ; ----- Variables
   Dim COUNT as Byte
 
@@ -26,13 +34,13 @@
 
   main:
     for count = 100 to 200
-      pulseout Portb.0,count 10us
-      pulseout Portb.1,count 10us
+      pulseout ServoOutChannel1,count 10us
+      pulseout ServoOutChannel2,count 10us
       wait 20 ms
     next
-    for count = 200 to 100
-      pulseout Portb.0,count 10us
-      pulseout Portb.1,count 10us
+    for count = 200 to 100 step -1
+      pulseout ServoOutChannel1,count 10us
+      pulseout ServoOutChannel2,count 10us
       wait 20 ms
     next
   goto main

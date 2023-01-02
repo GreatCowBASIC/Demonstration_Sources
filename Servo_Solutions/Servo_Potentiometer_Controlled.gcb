@@ -1,0 +1,57 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''Attach a servo motor to the port specified in the constant ServoOutChannel1 - this program will make the servo sweep back and forth
+''':    Connect the potentiometer to AN0.
+''':    The position of the servo motor will be respresentive to the position of the potentiometer.
+'''
+'''This is an example with operate at a chip frequency of 1 kHz as the time unit is 10us
+'''This is an example uses an approximation of the 20ms ( 50 hz ) - there is no calculation of the period.
+'''
+'''@author      	EvanV plus works of ChuckH
+'''@licence	GPL
+'''@version	1.0a
+'''@date   	31.01.2015
+'''********************************************************************************
+
+; ----- Configuration
+  #chip 16F886, 16
+  #option explicit
+
+; ----- Define Hardware settings
+  ' No hardware configuration is required as outputs and inputs are set automatically within the methods used.
+
+; ----- Constants
+    // Change to suit requirements
+    #DEFINE ServoOutChannel1 PORTC.0
+    DIR ServoOutChannel1 OUT
+
+    // Change to suit requirements
+    #DEFINE ADCChannel AN0 
+
+    // Change to suit clock frequency and specifics of the servo - these parameters are for a Tower Pro SG90 servo
+    // These values are in units of 10 as the base time unit is 10us 
+    #DEFINE FULL_CW     50    // Adjust as needed for CW full position
+    #DEFINE FULL_CCW    300   // Adjust as Needed for CCW full position
+
+; ----- Variables
+  Dim COUNT as Word
+
+
+; ----- Main body of program commences here.
+
+
+Do
+
+    count = ReadAD(ADCChannel)
+    'Limit CW travel
+    if count < FULL_CW then
+        count = FULL_CW					
+    end if
+    'Limit CCW travel
+    if count > FULL_CCW then
+       count = FULL_CCW					
+    end if
+    pulseout ServoOutChannel1 ,count 10us
+    wait 20 ms
+
+Loop
