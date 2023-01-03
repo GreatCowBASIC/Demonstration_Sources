@@ -27,8 +27,8 @@
 
     // Change to suit clock frequency and specifics of the servo - these parameters are for a Tower Pro SG90 servo
     #DEFINE SERVOPERIOD 19450  // In microseconds.  Adjust as needed
-    #DEFINE FULL_CW     500    // Adjust as needed for CW full position
-    #DEFINE FULL_CCW    3000   // Adjust as Needed for CCW full position
+    #DEFINE FULL_CW     700    // Adjust as needed for CW full position - 500 is lower limit for TPSG9 servo
+    #DEFINE FULL_CCW    2300   // Adjust as Needed for CCW full position - 3000 is uppoer limit for TPSG9 servo
 
 
     Dim PulsewidthChannel1, lastPulsewidthChannel1 as WORD
