@@ -1,6 +1,6 @@
 '''A demonstration program for GCGB and GCB.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''Attach a servo motor to the port specified in the constant ServoOutChannel1 - this program will make the servo sweep back and forth
+'''Attach a servo motor to the port specified in the constant SERVOOUTCHANNEL1 - this program will make the servo sweep back and forth
 '''
 '''This is an example with operate at a chip frequency of 8 kHz, or above, as the time unit is 10us
 '''This is an example uses an approximation of the period - there is compenstation to calculate the 20ms Period ( 50 hz ).
@@ -19,8 +19,8 @@
 
 ; ----- Constants
     // Change to suit requirements
-    #DEFINE ServoOutChannel1 PORTC.0
-    DIR ServoOutChannel1 OUT
+    #DEFINE SERVOOUTCHANNEL1 PORTC.0
+    DIR SERVOOUTCHANNEL1 OUT
 
 
     // Change to suit clock frequency and specifics of the servo - these parameters are for a Tower Pro SG90 servo
@@ -40,7 +40,7 @@
             For PulseTime = FULL_CW to FULL_CCW Step 5
 
                       'Send the right length pulse
-                      PulseOut ServoOutChannel1, PulseTime, 10us
+                      PulseOut SERVOOUTCHANNEL1, PulseTime, 10us
 
                       'After sending pulse, wait a bit before sending the next one
                       Wait 20 ms
@@ -52,7 +52,7 @@
             For PulseTime = FULL_CCW to FULL_CW step -5
 
                       'Send the right length pulse
-                      PulseOut ServoOutChannel1, PulseTime, 10us
+                      PulseOut SERVOOUTCHANNEL1, PulseTime, 10us
 
                       'After sending pulse, wait a bit before sending the next one
                       Wait 20 ms

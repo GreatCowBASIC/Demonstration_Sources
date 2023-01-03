@@ -21,8 +21,8 @@
 
 ; ----- Constants
     // Change to suit requirements
-    #DEFINE ServoOutChannel1 PORTC.0
-    DIR ServoOutChannel1 OUT
+    #DEFINE SERVOOUTCHANNEL1 PORTC.0
+    DIR SERVOOUTCHANNEL1 OUT
 
     #DEFINE SWITCH_PORT PORTA.1
     DIR SWITCH_PORT IN
@@ -31,13 +31,13 @@
       If SWITCH_PORT = 0 Then
 
           'Pulse pin port
-         PulseOut ServoOutChannel1,1 ms 'servo left'
+         PulseOut SERVOOUTCHANNEL1,1 ms 'servo left'
          'Then wait after the pin goes off
          Wait 17 ms
 
       Else
 
-         PulseOut ServoOutChannel1,2 ms  'servo right'
+         PulseOut SERVOOUTCHANNEL1,2 ms  'servo right'
          'Then wait after the pin goes off
          Wait 16 ms
 

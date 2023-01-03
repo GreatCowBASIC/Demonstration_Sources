@@ -1,6 +1,6 @@
 '''A demonstration program for GCGB and GCB.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''Attach a servo motor to pin PORTB.0 - this program will make it sweep back and forth
+'''Attach a servo motor to pin SERVOOUTCHANNEL1 - this program will make it sweep back and forth
 '''
 '''This is an example uses an approximation of the 20ms ( 50 hz ) - there is no calculation of the period.
 '''
@@ -12,6 +12,12 @@
 
 ; ----- Configuration
  #chip mega168, 16
+
+
+
+// Change to suit requirements
+  #DEFINE SERVOOUTCHANNEL1 PORTB.0
+  DIR SERVOOUTCHANNEL1 OUT
 
 
 ; ----- Variables
@@ -26,7 +32,7 @@
             For PulseTime = 65 to 225
 
                       'Send the right length pulse
-                      PulseOut PORTB.0, PulseTime 10us
+                      PulseOut SERVOOUTCHANNEL1, PulseTime 10us
 
                       'After sending pulse, wait a bit before sending the next one
                       Wait 6 ms
@@ -37,7 +43,7 @@
             For PulseTime = 225 to 65
 
                       'Send the right length pulse
-                      PulseOut PORTB.0, PulseTime 10us
+                      PulseOut SERVOOUTCHANNEL1, PulseTime 10us
 
                       'After sending pulse, wait a bit before sending the next one
                       Wait 6 ms

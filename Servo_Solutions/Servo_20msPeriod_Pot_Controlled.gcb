@@ -19,11 +19,11 @@
 
 
     // Change to suit requirements
-    #DEFINE ServoOutChannel1 PORTC.0
-    DIR ServoOutChannel1 OUT
+    #DEFINE SERVOOUTCHANNEL1 PORTC.0
+    DIR SERVOOUTCHANNEL1 OUT
 
     // Change to suit requirements
-    #DEFINE ADCChannel ANA0
+    #DEFINE ADCCHANNEL ANA0
 
     // Change to suit clock frequency and specifics of the servo - these parameters are for a Tower Pro SG90 servo
     #DEFINE SERVOPERIOD 19450  // In microseconds.  Adjust as needed
@@ -36,11 +36,11 @@
     Do
     
         //read adc ( range is 8bits/0 to 255 ) then scale to to FULL_CW and FULL_CCW
-        PulsewidthChannel1 = SCALE ( Readad ( ADCChannel ),0,255,FULL_CW,FULL_CCW)
+        PulsewidthChannel1 = SCALE ( Readad ( ADCCHANNEL ),0,255,FULL_CW,FULL_CCW)
 
         //If the value (therefore the ADC) is not equal to the last value then update the servo
         if lastPulsewidthChannel1 <> PulsewidthChannel1 Then
-            Pulseout ServoOutChannel1, PulsewidthChannel1 us
+            Pulseout SERVOOUTCHANNEL1, PulsewidthChannel1 us
             Wait (SERVOPERIOD - PulsewidthChannel1) us
             lastPulsewidthChannel1 = PulsewidthChannel1
         end if
