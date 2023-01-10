@@ -34,14 +34,9 @@ It has user selectable full scales of +-2g/+-4g/+-8g with high pass filtered dat
 
   #DEFINE GSCALE 2 // SETS FULL-SCALE RANGE TO +/-2, 4, OR 8G. USED TO CALC REAL G VALUES.
 
-
-
-
 // USART settings 
   #DEFINE USART_BAUD_RATE 9600
   #DEFINE USART_TX_BLOCKING
-
-
 
 //  Define I2C settings - CHANGE PORTS if required
   #DEFINE HI2C_BAUD_RATE 400
@@ -53,15 +48,13 @@ It has user selectable full scales of +-2g/+-4g/+-8g with high pass filtered dat
     //  'MASTER
   HI2CMode Master
 
-
-
 // Variables
   Dim count as long 
   count = 0
   dim DataBuffer(6) as byte 
   dim X_data as word  'Alias X_data_H, X_data_L
   dim Y_data as word  'Alias Y_data_H, Y_data_L
-  dim Z_data as word 'Alias Z_data_H, Z_data_L
+  dim Z_data as word  'Alias Z_data_H, Z_data_L
   dim c_read as byte
 
 initMMA8452()
@@ -70,18 +63,16 @@ Do forever
   
   // read 6 bytes into the buffer
 	ReadData  ( OUT_X_MSB, 6, DataBuffer() ) 
-  // Now calculate the accleration value into actual g's
-  	
+
+  // Now calculate the accleration value into actual g's  	
   X_data_L = DataBuffer(2)
-	X_data_H = DataBuffer(1)
+  X_data_H = DataBuffer(1)
 	
   Y_data_L = DataBuffer(4)
-	Y_data_H = DataBuffer(3)
+  Y_data_H = DataBuffer(3)
 	
- 	Z_data_L = DataBuffer(6)
-	Z_data_H = DataBuffer(5)
-
-
+  Z_data_L = DataBuffer(6)
+  Z_data_H = DataBuffer(5)
 
   // Print out values
   HserPrint count
@@ -113,6 +104,7 @@ sub ReadData ( in Address,  in GetByteData as byte, out DataBuffer() )
       For DataBuffer_Pointer = 0 to (GetByteData -1)
           HI2CReceive DataBuffer( DataBuffer_Pointer), ACK
       next
+      
       HI2CReceive DataBuffer( GetByteData  ), NACK
       HI2CStop
   
@@ -151,5 +143,6 @@ sub initMMA8452
     HSerPrint Hex(c_read)
     HSerPrintCRLF
   end if  
+
 end sub
   
