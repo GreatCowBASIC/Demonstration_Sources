@@ -18,10 +18,8 @@ It has user selectable full scales of +-2g/+-4g/+-8g with high pass filtered dat
 '''@version   1.0   
 '''@date      2023-01-10
 '''********************************************************************************
-
  
 #chip PIC18F46K22,16
-
 
 // The SparkFun breakout board defaults to 1, set to 0 if SA0 jumper on the bottom of the board is set
   #DEFINE I2C_ADDRESS 0X1D      // 0X1D IF SA0 IS HIGH, 0X1C IF LOW
@@ -104,7 +102,7 @@ sub ReadData ( in Address,  in GetByteData as byte, out DataBuffer() )
       For DataBuffer_Pointer = 0 to (GetByteData -1)
           HI2CReceive DataBuffer( DataBuffer_Pointer), ACK
       next
-      
+
       HI2CReceive DataBuffer( GetByteData  ), NACK
       HI2CStop
   
