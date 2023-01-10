@@ -1,0 +1,155 @@
+/*
+A demonstration program for GCGB and GCB.
+--------------------------------------------------------------------------------
+This program is a program to show support for the MMA8452 sensor.
+
+The MMA8452Q accelerometer module is a smart low-power, three-axis, capacitive MEMS accelerometer with 12 bits of resolution.
+
+It is has embedded functions with user programmable options, configurable to two interrupt pins. 
+
+Embedded interrupt functions allow for  power savings relieving the host processor from continuously polling data.
+
+It has user selectable full scales of +-2g/+-4g/+-8g with high pass filtered data, as well as non filtered data available real-time.
+
+*/
+
+'''@author    MMOTE   
+'''@license   GPL
+'''@version   1.0   
+'''@date      2023-01-10
+'''********************************************************************************
+
+ 
+#chip PIC18F46K22,16
+
+
+// The SparkFun breakout board defaults to 1, set to 0 if SA0 jumper on the bottom of the board is set
+  #DEFINE I2C_ADDRESS 0X1D      // 0X1D IF SA0 IS HIGH, 0X1C IF LOW
+
+// Define CONSTANTS registers that we will be accessing on the MMA8452
+  #DEFINE OUT_X_MSB 0X01
+  #DEFINE XYZ_DATA_CFG  0X0E
+  #DEFINE WHO_AM_I   0X0D
+  #DEFINE CTRL_REG1  0X2A
+
+  #DEFINE GSCALE 2 // SETS FULL-SCALE RANGE TO +/-2, 4, OR 8G. USED TO CALC REAL G VALUES.
+
+
+
+
+// USART settings 
+  #DEFINE USART_BAUD_RATE 9600
+  #DEFINE USART_TX_BLOCKING
+
+
+
+//  Define I2C settings - CHANGE PORTS if required
+  #DEFINE HI2C_BAUD_RATE 400
+  #DEFINE HI2C_DATA PORTC.4
+  #DEFINE HI2C_CLOCK PORTC.3
+  // I2C pins need to be input for SSP module
+  Dir HI2C_DATA in
+  Dir HI2C_CLOCK in
+    //  'MASTER
+  HI2CMode Master
+
+
+
+// Variables
+  Dim count as long 
+  count = 0
+  dim DataBuffer(6) as byte 
+  dim X_data as word  'Alias X_data_H, X_data_L
+  dim Y_data as word  'Alias Y_data_H, Y_data_L
+  dim Z_data as word 'Alias Z_data_H, Z_data_L
+  dim c_read as byte
+
+initMMA8452()
+
+Do forever
+  
+  // read 6 bytes into the buffer
+	ReadData  ( OUT_X_MSB, 6, DataBuffer() ) 
+  // Now calculate the accleration value into actual g's
+  	
+  X_data_L = DataBuffer(2)
+	X_data_H = DataBuffer(1)
+	
+  Y_data_L = DataBuffer(4)
+	Y_data_H = DataBuffer(3)
+	
+ 	Z_data_L = DataBuffer(6)
+	Z_data_H = DataBuffer(5)
+
+
+
+  // Print out values
+  HserPrint count
+  HserPrint ","
+  HSerPrint X_data
+  HserPrint ","   
+  HSerPrint Y_data
+  HserPrint "," 
+  HSerPrint Z_data
+  HSerPrintCRLF 
+    
+  count++
+
+  // Delay here for visibility
+  wait 500 ms      
+loop
+    
+
+sub ReadData ( in Address,  in GetByteData as byte, out DataBuffer() )
+      
+      GetByteData--
+       
+      HI2CStart
+      HI2CSend(I2C_ADDRESS)
+      HI2CSend(Address)
+      HI2CReStart
+      HI2CSend(I2C_ADDRESS+1)               ';indicate a read operation
+
+      For DataBuffer_Pointer = 0 to (GetByteData -1)
+          HI2CReceive DataBuffer( DataBuffer_Pointer), ACK
+      next
+      HI2CReceive DataBuffer( GetByteData  ), NACK
+      HI2CStop
+  
+end sub
+
+sub ReadByte ( in Address,  out OutByteData as byte )
+    
+      HI2CStart
+      HI2CSend(I2C_ADDRESS)
+      HI2CSend(Address)
+      HI2CReStart
+      HI2CSend(I2C_ADDRESS+1)               ;indicate a read operation
+      HI2CReceive OutByteData, NACK
+      HI2CStop
+    
+end sub
+
+sub WriteData ( in Address,  in SendByte as byte )
+ 
+      HI2CStart
+      HI2CSend(I2C_ADDRESS)
+      HI2CSend(Address)
+      HI2CSend(SendByte)
+      HI2CStop
+      
+end sub
+
+
+sub initMMA8452
+
+  readByte( WHO_AM_I , c_read)   // Read WHO_AM_I register
+  if c_read = 0x2A   Then       // WHO_AM_I should always be 0x2A
+    HSerPrint "INFO: MMA8452Q is online..."
+  else
+    HSerPrint "INFO: Could not connect to MMA8452Q: 0x"
+    HSerPrint Hex(c_read)
+    HSerPrintCRLF
+  end if  
+end sub
+  
