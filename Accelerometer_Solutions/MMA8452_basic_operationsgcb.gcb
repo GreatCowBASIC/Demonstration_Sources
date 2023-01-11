@@ -15,8 +15,8 @@ It has user selectable full scales of +-2g/+-4g/+-8g with high pass filtered dat
 
 '''@author    MMOTE   
 '''@license   GPL
-'''@version   1.0   
-'''@date      2023-01-10
+'''@version   0.2  
+'''@date      2023-01-11
 '''********************************************************************************
  
 #chip PIC18F46K22,16
@@ -53,7 +53,7 @@ It has user selectable full scales of +-2g/+-4g/+-8g with high pass filtered dat
   dim X_data as word  'Alias X_data_H, X_data_L
   dim Y_data as word  'Alias Y_data_H, Y_data_L
   dim Z_data as word  'Alias Z_data_H, Z_data_L
-  dim c_read as byte
+  dim c_read , fsr as byte
 
 initMMA8452()
 
@@ -142,5 +142,30 @@ sub initMMA8452
     HSerPrintCRLF
   end if  
 
+	MMA8452Standby      '// Must be in standby to change registers
+
+  // Set up the full scale range to 2, 4, or 8g.
+  fsr = GSCALE                  // so they want  2G
+  if(fsr > 8) then fsr = 8      //Easy error check
+  fsr= fsr / 4 		              // Neat trick, see page 22. 00 = 2G, 01 = 4A, 10 = 8G
+  writeData(XYZ_DATA_CFG, fsr)
+
+  //The default data rate is 800Hz and we don't modify it in this example code
+  MMA8452Active()            // Set to active to start reading 
+
 end sub
+
+sub MMA8452Standby()
+
+  readByte(CTRL_REG1 , c_read)
+  writeData(CTRL_REG1, c_read & 0xFC )  ' //Clear the active bit to go into 
   
+end sub
+
+
+sub MMA8452Active()
+
+  readByte(CTRL_REG1 , c_read)
+  writeData(CTRL_REG1, c_read | 0x01); //Set the active bit to begin detection
+
+End Sub
