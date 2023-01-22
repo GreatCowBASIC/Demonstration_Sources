@@ -2,13 +2,14 @@
 
  The script will process CPP and H file to create the following files.
 
-	OUTPUT.GCB the converted file
-	UNPROCESSED.CPP	- a file with any C code that was not processed
+OUTPUT.GCB the converted file
+UNPROCESSED.CPP	- a file with any C code that was not processed
 
  The terminal will show messages and warning during the conversion process.
 
- command line
-    cls&gawk  -f ctogcb.awk MAX30100.h MAX30100_Registers.h MAX30100.cpp
+Example command line:
+
+ cls&gawk  -f ctogcb.awk MAX30100.h MAX30100_Registers.h MAX30100.cpp
 
 
 
