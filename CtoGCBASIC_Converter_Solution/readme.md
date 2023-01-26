@@ -18,5 +18,16 @@ Example command line:
  The in-memory arrays have to important features 1) the original C code 2) the original C code plus the meta data.
  The meta data contains key information like the file number, the line number and the method number.  These are all used during the conversion process.  Any meta left at the end with the sub routine '000' is unconverted C code.
 
- The process examines the code sequentially to convert.
+ The process examines the C source code sequentially to convert.  The process iterates through the C source multiple times examing the C source code a follows:
+
+    Determine methods(s)
+    Compile For-Next
+    Compile If(s)
+    Compile I2C
+    Comple Mathematical Logic
+    Compile While
+    Compile Variables
+    Tidy Operations
+    Complexity Inspection
+
 
