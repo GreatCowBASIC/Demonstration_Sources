@@ -145,7 +145,7 @@
   locate 0,0
   Print "DS1307"
   locate 1,0
-  Print "Great Cow Basic"
+  Print "Great Cow BASIC"
   wait 2 s
   CLS
 

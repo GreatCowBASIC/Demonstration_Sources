@@ -52,7 +52,7 @@ Dim FColor as Word
 
 GLCDCLS SSD1289_Blue
 Wait 1 s
-GLCDPrint  75, 100, "GCBasic", SSD1289_Yellow, 2
+GLCDPrint  75, 100, "GCBASIC", SSD1289_Yellow, 2
 GLCDPrint  33, 130, "SSD1289 Driver", SSD1289_Yellow, 2
 Wait 5 s
 GLCDPrint  25, 175, "Fill screen with ", SSD1289_Yellow, 2
@@ -116,11 +116,11 @@ Wait 5 s
 GLCDCLS SSD1289_Blue
 GLCDPrint  1, 10, "Greek Characters", SSD1289_Yellow, 2
 Wait 1 s
-GLCDPrint  1, 60, "ÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑ", SSD1289_Yellow , 2
-GLCDPrint  1, 90, "ÓÔÕÖ×ØÙ", SSD1289_Yellow , 2
-GLCDPrint  1, 120, "áâãäåæçèéêëìíîïðñ", SSD1289_Yellow , 2
-GLCDPrint  1, 150, "óôõö÷øùò", SSD1289_Yellow, 2
-GLCDPrint  1, 180, "ÜÝüýÞß", SSD1289_Yellow, 2
+GLCDPrint  1, 60, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", SSD1289_Yellow , 2
+GLCDPrint  1, 90, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", SSD1289_Yellow , 2
+GLCDPrint  1, 120, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", SSD1289_Yellow , 2
+GLCDPrint  1, 150, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", SSD1289_Yellow, 2
+GLCDPrint  1, 180, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", SSD1289_Yellow, 2
 Wait 5 s
 GLCDCLS SSD1289_Blue
 GLCDPrint  1, 10, "Draw symbols...", SSD1289_Yellow, 2

@@ -77,7 +77,7 @@ HI2CMode Master
 
 ' ----- Main body of program commences here.
 CLS
-Print "Great Cow Basic"
+Print "Great Cow BASIC"
 Locate 1,0
 Print "16F18326 i2C/LCD"
 Wait 3 s

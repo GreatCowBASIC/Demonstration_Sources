@@ -145,7 +145,7 @@ End Table
 
 Print "DS1307 Clock"
 Locate 1,0
-Print "Great Cow Basic"
+Print "Great Cow BASIC"
 Wait 3 s
 CLS
 

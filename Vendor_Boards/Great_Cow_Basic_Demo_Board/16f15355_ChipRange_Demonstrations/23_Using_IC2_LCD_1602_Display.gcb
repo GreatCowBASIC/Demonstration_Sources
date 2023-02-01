@@ -73,7 +73,7 @@
 
 ; ----- Main body of program commences here.
     CLS
-    PRINT "Great Cow Basic"
+    PRINT "Great Cow BASIC"
     LOcate 1,0
     PRINT "16f15355 i2C/LCD"
     WAIT 3 s

@@ -20,7 +20,7 @@
 ' ----- Configuration
 #CHIP 16f18855
 #OPTION Explicit
- 
+
 '' -------------------PORTA----------------
 '' Bit#:  -7---6---5---4---3---2---1---0---
 '' IO:   -----------------------------ADC--
@@ -56,10 +56,10 @@
     #define PPSToolPart 16f18855
 
     Sub InitPPS
-              
-            'Module: EUSART
-            RC7PPS = 0x0010    'TX > RC7
-      
+
+        'Module: EUSART
+        RC7PPS = 0x0010    'TX > RC7
+
     End Sub
     // Template comment at the end of the config file
 

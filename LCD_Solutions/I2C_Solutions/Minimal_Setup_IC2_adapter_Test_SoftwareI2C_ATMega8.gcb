@@ -50,13 +50,13 @@
 ; ----- Main body of program commences here.
 do forever
       CLS
-      PRINT "Great Cow Basic"
+      PRINT "Great Cow BASIC"
       Locate 1,0
       PRINT "I2C Setup"
       Wait 4 s
 
       CLS
-      PRINT "Great Cow Basic"
+      PRINT "Great Cow BASIC"
       Locate 1,0
       PRINT "Minimal Setup"
       Wait 4 s

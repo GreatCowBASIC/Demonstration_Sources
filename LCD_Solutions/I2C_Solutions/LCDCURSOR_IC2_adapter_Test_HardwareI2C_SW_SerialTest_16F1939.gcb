@@ -64,7 +64,7 @@
 
 
 ; ----- Main body of program commences here.
-    PRINT "Great Cow Basic"
+    PRINT "Great Cow BASIC"
     WAIT 1 s
 
     Do Forever

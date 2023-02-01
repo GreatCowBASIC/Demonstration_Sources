@@ -22,6 +22,6 @@
   #define LCD_NO_RW
 
   CLS
-  Print "Great Cow Basic"
+  Print "Great Cow BASIC"
   Locate 1,0
   Print "  Hello World."

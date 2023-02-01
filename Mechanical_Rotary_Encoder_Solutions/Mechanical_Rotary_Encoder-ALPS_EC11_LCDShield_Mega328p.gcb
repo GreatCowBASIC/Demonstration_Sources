@@ -120,7 +120,7 @@
 	CLS
   PRINT "Rotary Enc. Demo"
   Locate 1,0
-  PRINT "Great Cow Basic"
+  PRINT "Great Cow BASIC"
   wait 2 s
   CLS
   Print "@Dec 2019"

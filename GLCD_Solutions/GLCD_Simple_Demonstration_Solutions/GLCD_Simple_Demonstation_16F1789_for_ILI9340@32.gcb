@@ -41,7 +41,7 @@ glcdrotate(landscape_rev)
 
 
 glcdcls
-glcdprint(100,100,"Great Cow Basic",ili9340_white)
+glcdprint(100,100,"Great Cow BASIC",ili9340_white)
 glcdprint(100,124, ChipNameStr )
 
 do

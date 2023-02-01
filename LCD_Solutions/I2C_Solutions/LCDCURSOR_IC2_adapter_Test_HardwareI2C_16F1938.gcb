@@ -50,7 +50,7 @@
  '''Set LCD_10 to 12 for the Ywmjkdz I2C adapter with pot bent over top of chip
 
 ; ----- Main body of program commences here.
-    PRINT "Great Cow Basic"
+    PRINT "Great Cow BASIC"
     WAIT 1 s
 
     Do Forever

@@ -48,7 +48,7 @@
 ; ----- Main program
 
 
-  GLCDPrint (0, 0, "Great Cow Basic")
+  GLCDPrint (0, 0, "Great Cow BASIC")
   GLCDPrint (0, 8, "Anobium 2019")
 
 

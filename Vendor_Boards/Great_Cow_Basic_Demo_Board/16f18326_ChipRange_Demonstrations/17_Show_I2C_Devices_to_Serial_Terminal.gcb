@@ -48,16 +48,27 @@ Sub InitPPS
     LOCKPPS
 End Sub
 
+'' -------------------PORTA----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:   -------------SCL-----SDA----------
+''-----------------------------------------
+''
+
+'' -------------------PORTB----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---------------------------------
+''-----------------------------------------
+''
+
+'' ------------------PORTC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---------RX-TX-LED--LED-LED LED--
+''-----------------------------------------
+
 #DEFINE SWITCH_DOWN         1
 #DEFINE SWITCH_UP           0
 
 
-
-'' -------------------LATC-----------------
-'' Bit#:  -7---6---5---4---3---2---1---0---
-'' LED:   ---------------|D5 |D4 |D3 |D2 |-
-''-----------------------------------------
-''
 #DEFINE LEDD2  PORTC.0
 #DEFINE LEDD3  PORTC.1
 #DEFINE LEDD4  PORTC.2
@@ -69,7 +80,7 @@ Dir     LEDD2 Out
 Dir     LEDD3 Out
 Dir     LEDD4 Out
 Dir     LEDD5 Out
-Dir      SWITCH In
+Dir     SWITCH In
 
 #DEFINE USART_BAUD_RATE 19200
 #DEFINE USART_TX_BLOCKING
@@ -87,8 +98,10 @@ Dir HI2C_CLOCK In
 'MASTER Second Port
 HI2CMode Master
 
-' ----- Main body of program commences here.
+
+' ----- Main body of program commences here *******************************************
 ' Now assumes Serial Terminal is operational
+
 Dim DeviceID As Byte
 Dim DISPLAYNEWLINE As Byte
 

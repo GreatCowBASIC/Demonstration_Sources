@@ -53,7 +53,7 @@ GLCDCLS SSD1289_BLUE
 Do
 		GLCDCLS
     GLCDRotate PORTRAIT
-    GLCDPrint  2, 2,  "GCBasic", SSD1289_YELLOW, 2
+    GLCDPrint  2, 2,  "GCBASIC", SSD1289_YELLOW, 2
     GLCDPrint  2 , 30 ,  "PORTRAIT"
     GLCDPrint  20 , 60 ,  "Orientation"
     Wait 2 s
@@ -61,21 +61,21 @@ Do
 
 		GLCDCLS
     GLCDRotate LANDSCAPE
-    GLCDPrint  2, 2, "GCBasic"
+    GLCDPrint  2, 2, "GCBASIC"
     GLCDPrint  2 , 30 ,  "LANDSCAPE"
     GLCDPrint  20 , 60 ,  "Orientation"
     Wait 2 s
 
 		GLCDCLS
     GLCDRotate PORTRAIT_REV
-    GLCDPrint  2, 2,  "GCBasic"
+    GLCDPrint  2, 2,  "GCBASIC"
     GLCDPrint  2 , 30 , "PORTRAIT_REV"
     GLCDPrint  20 , 60 ,  "Orientation"
     Wait 2 s
 
 		GLCDCLS
     GLCDRotate LANDSCAPE_REV
-    GLCDPrint  2, 2,  "GCBasic"
+    GLCDPrint  2, 2,  "GCBASIC"
     GLCDPrint  2 , 30 ,  "LANDSCAPE_REV"
     GLCDPrint  20 , 60 ,  "Orientation"
     Wait 2 s

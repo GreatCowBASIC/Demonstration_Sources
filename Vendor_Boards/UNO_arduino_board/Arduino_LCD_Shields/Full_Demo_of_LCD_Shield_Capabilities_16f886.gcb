@@ -66,7 +66,7 @@
   'Initial screen messages
   cls
 
-  print "Great Cow Basic"
+  print "Great Cow BASIC"
   Locate 1,0
   print "Anobium 6/2015"
   wait 2 s

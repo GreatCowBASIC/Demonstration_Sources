@@ -59,14 +59,14 @@ do forever
 
     LCD_I2C_Address_Current = LCD_I2C_Address_1
     CLS
-    PRINT "Great Cow Basic"
+    PRINT "Great Cow BASIC"
     Locate 1,0
     PRINT "I2C LCD Driver"
 
 
     LCD_I2C_Address_Current = LCD_I2C_Address_2
     CLS
-    PRINT "Great Cow Basic"
+    PRINT "Great Cow BASIC"
     Locate 1,0
     Print "I2C LCD Driver"
     Locate 2,0
@@ -89,7 +89,7 @@ do forever
     LCD_I2C_Address_Current = LCD_I2C_Address_1
     repeat 2
       CLS
-      PRINT "Great Cow Basic"
+      PRINT "Great Cow BASIC"
       Locate 1,0
       PRINT "Multiple Devices!"
 
