@@ -1,0 +1,122 @@
+'''A demonstration program for GCGB and GCB.
+'''The program shows how the I2C bus can be used to extend the number of IO lines.
+'''A frequently used chip for this is the PCF8574 which offers 8 IO lines.
+'''The PCF8474 has multiple address lines so different I2C devices can be addressed on the same I2C bus.
+''':
+''':This demonstration shows set four LEDs attached to bit0, bit1, bit2 and bit3 of the PCF8574. The LEDs are attached via a suitable LED.  The PCF8474 is sinking the current from the LEDS.
+''':This demonstration also shows to read read the status of four switches attached bit4, bit5, bit6 and bit7.
+''':
+''':
+'''@author 	EvanV
+'''@licence	GPL
+'''@version	1.0a
+'''@date   	01/02/2023
+'''
+' ----- Configuration
+'Chip Settings.
+#CHIP 16f18326,32
+#OPTION Explicit
+
+'Set the PPS of the PWM and the RS232 ports.
+'Set the PPS for this solution.
+#STARTUP InitPPS, 85
+
+Sub InitPPS
+    UNLOCKPPS
+    'Pin RC5 source is an input for RX
+    RXPPS  = 0x15
+    'Pin RC4 source is TX/CK
+    RC4PPS = 0x14
+
+    'RA2->MSSP:SDA;
+    RA2PPS = 0x0019
+    'RA2->MSSP:SDA;
+    SSP1DATPPS = 0x0002
+    'RA4->MSSP:SCL;
+    SSP1CLKPPS = 0x0004
+    'RA4->MSSP:SCL;
+    RA4PPS = 0x0018
+    LOCKPPS
+End Sub
+
+'' -------------------PORTA----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:   -------------SCL-----SDA----------
+''-----------------------------------------
+''
+
+'' -------------------PORTB----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---------------------------------
+''-----------------------------------------
+''
+
+'' ------------------PORTC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---------RX-TX-LED--LED-LED LED--
+''-----------------------------------------
+
+#DEFINE SWITCH_DOWN         1
+#DEFINE SWITCH_UP           0
+
+
+#DEFINE LEDD2  PORTC.0
+#DEFINE LEDD3  PORTC.1
+#DEFINE LEDD4  PORTC.2
+#DEFINE LEDD5  PORTC.3
+#DEFINE LEDBANK portc
+//! #DEFINE SWITCH      PORTA.1
+
+Dir     LEDD2 Out
+Dir     LEDD3 Out
+Dir     LEDD4 Out
+Dir     LEDD5 Out
+//! Dir     SWITCH In
+
+#DEFINE USART_BAUD_RATE 19200
+#DEFINE USART_TX_BLOCKING
+
+
+' ----- Define Hardware settings for HWI2C
+' Define I2C settings - CHANGE PORTS if required for your specific device.
+#DEFINE HI2C_BAUD_RATE 400
+#DEFINE HI2C_DATA PORTA.2
+#DEFINE HI2C_CLOCK PORTA.4
+'Initialise I2C Master
+'I2C pins need to be input for SSP module
+Dir HI2C_DATA In
+Dir HI2C_CLOCK In
+'MASTER Second Port
+HI2CMode Master
+
+
+' ----- Main body of program commences here *******************************************
+' Now assumes Serial Terminal is operational
+
+
+#INCLUDE <PCF8574.H>
+#DEFINE PCF8574_DEVICE_1 0X4E
+
+Dim ledstatus,portstatus as Byte
+//! Initial value
+ledstatus = 1
+
+Do
+    
+    HSerPrint "Send to PCF8574 0x"
+    HserPrint hex(ledstatus)
+    HSerSend 9
+    //! send a variable to the I2C device that sets the device ports
+        PCF8574_sendbyte(PCF8574_DEVICE_1, ledstatus )
+
+    
+    //! read the status of the port into the variable portstatus
+        PCF8574_readbyte(PCF8574_DEVICE_1, portstatus )
+    HSerPrint "Recieved from PCF8574 0x"
+    HSerPrintStringCRLF hex(portstatus)
+
+    ledstatus++
+    wait 100 ms
+
+Loop
+
