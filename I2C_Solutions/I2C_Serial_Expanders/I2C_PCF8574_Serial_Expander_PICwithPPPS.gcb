@@ -94,8 +94,13 @@ HI2CMode Master
 ' Now assumes Serial Terminal is operational
 
 
+'' ------------------PCF8574C-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:   -SW1-SW--SW--SW--LED-LED-LED-LED--
+''-----------------------------------------
+
 #INCLUDE <PCF8574.H>
-#DEFINE PCF8574_DEVICE_1 0X4E
+#DEFINE PCF8574_DEVICE_1 0X7E
 
 Dim ledstatus,portstatus as Byte
 //! Initial value
@@ -109,14 +114,16 @@ Do
     //! send a variable to the I2C device that sets the device ports
         PCF8574_sendbyte(PCF8574_DEVICE_1, ledstatus )
 
-    
+    wait 1000 ms    
     //! read the status of the port into the variable portstatus
         PCF8574_readbyte(PCF8574_DEVICE_1, portstatus )
     HSerPrint "Recieved from PCF8574 0x"
-    HSerPrintStringCRLF hex(portstatus)
+    HSerPrintStringCRLF hex((portstatus & 0XF0 ) / 16 )
 
-    ledstatus++
-    wait 100 ms
+    Set C Off
+    Rotate ledstatus left
+    if ledstatus = 16 then ledstatus = 1
+
 
 Loop
 
