@@ -19,6 +19,7 @@
     'LCD connection settings
     #Define LCD_IO 4
     #Define LCD_SPEED FAST
+    #Define LCD_WIDTH 20                ;specified lcd width for clarity only.  20 is the default width
 
     #Define LCD_NO_RW
 

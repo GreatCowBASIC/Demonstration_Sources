@@ -15,7 +15,8 @@
   ;Setup LCD Parameters
   #define LCD_IO 4
   #define LCD_NO_RW
-  #define LCD_Speed fast 'FAST IS OK ON 16f877a
+  #define LCD_Speed fast 
+  #define LCD_WIDTH 20                ;specified lcd width for clarity only.  20 is the default width
 
   ;Change as necessary
   #define LCD_RS PortB.2

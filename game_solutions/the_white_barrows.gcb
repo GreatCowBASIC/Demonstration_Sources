@@ -93,7 +93,7 @@
     //     'Template comment at the end of the config file
 
 
-    // #chip   16F1939
+    // #define   16F1939
     // #CONFIG MCLRE=ON
 
     // #chip 18f27j53,8
@@ -104,38 +104,38 @@
 
 
     'USART settings for USART1
-    #DEFINE USART_BAUD_RATE 115200
-    #DEFINE USART_BLOCKING
+    #define USART_BAUD_RATE 115200
+    #define USART_BLOCKING
 
-    #DEFINE USART_DELAY OFF
+    #define USART_DELAY OFF
 
-    // #DEFINE DEBUGCODE        'add 'X' option and some movement debug
-    #DEFINE REDUCEDVERBAGE   'reduce the strings to less than 2048 bytes of data
-    #DEFINE EMPTY_CHAMBER           0
-    #DEFINE NOT_VALID_CHAMBER       0
-    #DEFINE RED_DRAGON              1
-    #DEFINE STR_RED_DRAGON          "Red Dragon"
-    #DEFINE GREEN_DRAGON            2
-    #DEFINE STR_GREEN_DRAGON        "Green Dragon"
-    #DEFINE YELLOW_DRAGON           3
-    #DEFINE STR_YELLOW_DRAGON       "Yellow Dragon"
-    #DEFINE PLATINUM_SERPENT        4
-    #DEFINE STR_PLATINUM_SERPENT    "Platinum Serpent"
-    #DEFINE GOLD_SERPENT            5
-    #DEFINE STR_GOLD_SERPENT        "Gold Serpent"
-    #DEFINE SILVER_SERPENT          6
-    #DEFINE STR_SILVER_SERPENT      "Silver Serpent"
-    #DEFINE DWARF_SABRE             7
-    #DEFINE STR_DWARF_SABRE         "Dward with a Sabre"    
-    #DEFINE DWARF_SWORD             8
-    #DEFINE STR_DWARF_SWORD         "Dward with a Sword"
-    #DEFINE DWARF_KNIFE             9
-    #DEFINE  STR_DWARF_KNIFE        "Dward with a Knife"
-    #DEFINE FRIENDLY_GNOME          10
-    #DEFINE STR_FRIENDLY_GNOME      "Friendly Gnome"
-    #DEFINE MAGIC_SPOT              11
-    #DEFINE STR_YOUAREINCHAMBER     "You are in Chamber "
-    #DEFINE STR_SORCERER            "The Sorcerer"
+    // #define DEBUGCODE        'add 'X' option and some movement debug
+    #define REDUCEDVERBAGE   'reduce the strings to less than 2048 bytes of data
+    #define EMPTY_CHAMBER           0
+    #define NOT_VALID_CHAMBER       0
+    #define RED_DRAGON              1
+    #define STR_RED_DRAGON          "Red Dragon"
+    #define GREEN_DRAGON            2
+    #define STR_GREEN_DRAGON        "Green Dragon"
+    #define YELLOW_DRAGON           3
+    #define STR_YELLOW_DRAGON       "Yellow Dragon"
+    #define PLATINUM_SERPENT        4
+    #define STR_PLATINUM_SERPENT    "Platinum Serpent"
+    #define GOLD_SERPENT            5
+    #define STR_GOLD_SERPENT        "Gold Serpent"
+    #define SILVER_SERPENT          6
+    #define STR_SILVER_SERPENT      "Silver Serpent"
+    #define DWARF_SABRE             7
+    #define STR_DWARF_SABRE         "Dward with a Sabre"    
+    #define DWARF_SWORD             8
+    #define STR_DWARF_SWORD         "Dward with a Sword"
+    #define DWARF_KNIFE             9
+    #define STR_DWARF_KNIFE         "Dward with a Knife"
+    #define FRIENDLY_GNOME          10
+    #define STR_FRIENDLY_GNOME      "Friendly Gnome"
+    #define MAGIC_SPOT              11
+    #define STR_YOUAREINCHAMBER     "You are in Chamber "
+    #define STR_SORCERER            "The Sorcerer"
     Dim CurrentKey as String
     Dim CurrentChamber, DesiredRoom as byte
     Dim CurrentPotofMoney as Integer

@@ -24,6 +24,7 @@
     #include  <lcd2serialredirect.h>
     ; Required to LCD to Serial redirection
     #define LCD_IO 0
+    #define LCD_WIDTH 20                ;specified lcd width for clarity only.  20 is the default width
 
      CLS
 

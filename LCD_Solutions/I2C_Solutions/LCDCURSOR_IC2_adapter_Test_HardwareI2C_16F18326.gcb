@@ -51,6 +51,7 @@
   '''Set up LCD
    #define LCD_IO 10
    #define LCD_I2C_Address_1 0x4E
+   #define LCD_WIDTH 20                ;specified lcd width for clarity only.  20 is the default width
 
    'You may need to use SLOW or MEDIUM if your LCD is a slower device.
    #define LCD_SPEED SLOW

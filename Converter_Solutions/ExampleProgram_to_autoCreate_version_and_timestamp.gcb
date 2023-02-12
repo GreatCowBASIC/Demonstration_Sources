@@ -15,6 +15,7 @@
 
   ;Setup LCD Parameters
   #define LCD_IO 8
+  #define LCD_WIDTH 20                ;specified lcd width for clarity only.  20 is the default width
 ; ----- Define LCD Hardware settings
   #define LCD_RS PORTA.5
   #define LCD_RW PORTA.4

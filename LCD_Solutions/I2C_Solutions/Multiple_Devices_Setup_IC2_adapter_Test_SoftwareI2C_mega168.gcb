@@ -45,6 +45,7 @@
    #define LCD_IO 10
    #define LCD_I2C_Address_1 0x4E
    #define LCD_I2C_Address_2 0x4C
+   #define LCD_WIDTH 20                ;specified lcd width for clarity only.  20 is the default width
 
 ; ----- Constants
   'None required beyond the scope of the hardware.

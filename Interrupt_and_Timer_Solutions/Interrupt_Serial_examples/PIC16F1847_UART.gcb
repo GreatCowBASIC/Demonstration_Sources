@@ -35,6 +35,7 @@ On Interrupt UsartRX1Ready Call INT_Serial
 #DEFINE LCD_I2C_ADDRESS_1 0x4e    ' Default = 0x4e
 #DEFINE LCD_BACKLIGHT_ON_STATE  1 ' type 10 LCD
 #DEFINE LCD_BACKLIGHT_OFF_STATE 0 ' type 10 LCD
+#DEFINE LCD_WIDTH 20                ;specified lcd width for clarity only.  20 is the default width
 
 ; ----- Define Hardware settings imported
 ' Define I2C settings - CHANGE PORTS

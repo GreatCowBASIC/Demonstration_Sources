@@ -95,7 +95,8 @@
 
 //! You can change the LCD setup
     #DEFINE LCD_IO              10
-    #DEFINE LCD_I2C_ADDRESS_1   0X7E                
+    #DEFINE LCD_I2C_ADDRESS_1   0X7E
+    #DEFINE LCD_WIDTH 20                ;specified lcd width for clarity only.  20 is the default width                
 //! This constant controls showing the discovered I2C devices on the LCD display
     #DEFINE USE_LCD_SETUP
 

@@ -8,6 +8,7 @@
                                    ;use internal clock
     ;relevant constants for 2-wire mode------------------------------------
     #define LCD_IO 2
+    #define LCD_WIDTH 20                ;specified lcd width for clarity only.  20 is the default width
     #define LCD_DB    GPIO.0            ;shift register data on GP0, pin 7
     #define LCD_CB    GPIO.1            ;shift register clock on GP1, pin 6
 

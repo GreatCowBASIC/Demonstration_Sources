@@ -16,6 +16,7 @@
   ' LCDBacklight is controlling pin 4 74HC595 (in LCD.h)
 
   #define LCD_IO 1
+  #define LCD_WIDTH 20                ;specified lcd width for clarity only.  20 is the default width
   #define LCD_CD PORTD.1            ; clock & databit
   #define LCD_NO_RW
 

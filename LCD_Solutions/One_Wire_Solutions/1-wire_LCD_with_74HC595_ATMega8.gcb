@@ -18,6 +18,7 @@
   #define LCD_IO 1
   #define LCD_CD PORTD.1            ; clock & databit
   #define LCD_NO_RW
+  #define LCD_WIDTH 20                ;specified lcd width for clarity only.  20 is the default width
 
   LCDBacklight On
   Do Forever

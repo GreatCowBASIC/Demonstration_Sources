@@ -17,6 +17,7 @@
   ' Choose a mode setting!
 
   #define LCD_IO 2
+  #define LCD_WIDTH 20                ;specified lcd width for clarity only.  20 is the default width
 
   ' #define LCD_IO 2		' use this mode with shiftreg 74LS174 or old
 					' hardware diagram 74HC164 pre Aug. 2019.

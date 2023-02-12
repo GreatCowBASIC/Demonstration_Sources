@@ -15,6 +15,7 @@
   #define LCD_IO 404
   #define LCD_NO_RW
   #define LCD_Speed slow
+  #define LCD_WIDTH 20                ;specified lcd width for clarity only.  20 is the default width
 
   ;Change as necessary
   #define LCD_RS PORTE.0

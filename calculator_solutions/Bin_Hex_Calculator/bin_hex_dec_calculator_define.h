@@ -9,6 +9,7 @@
 #DEFINE LCD_IO 4
 #DEFINE LCD_SPEED FAST
 #DEFINE LCD_NO_RW
+#DEFINE LCD_WIDTH 20                ;specified lcd width for clarity only.  20 is the default width
 
 'Port assignments
 #DEFINE LCD_RS        PortA.0

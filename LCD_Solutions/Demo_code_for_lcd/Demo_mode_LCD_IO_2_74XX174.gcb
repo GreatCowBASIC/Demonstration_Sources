@@ -20,6 +20,7 @@
   #define LCD_DB PORTC.0           ; data bit
   #define LCD_CB PORTC.1           ; clock bit
   #define LCD_NO_RW
+  #define LCD_WIDTH 20                ;specified lcd width for clarity only.  20 is the default width
 
   CLS
   Print "Great Cow BASIC"

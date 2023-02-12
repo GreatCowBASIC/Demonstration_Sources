@@ -1,4 +1,4 @@
-; -----  Define I2C settings – Change Ports.  This configuration is for Software I2C.
+; -----  Define I2C settings ï¿½ Change Ports.  This configuration is for Software I2C.
    #define I2C_MODE Master
    #define I2C_DATA PORTC.4
    #define I2C_CLOCK PORTC.5
@@ -13,6 +13,7 @@
   '''Set LCD_12 to  for the  Ywmjkdz I2C adapter with pot bent over top of chip.
 
   #define LCD_IO 12                  ;This is required!
+  #define LCD_WIDTH 20                ;specified lcd width for clarity only.  20 is the default width
   #define LCD_I2C_Address_1 0x4e     ;Default = 0x4e,try 0x27
   #define LCD_SPEED FAST             ;Defaults is FAST
   #define LCD_Backlight_On_State  1  ; On

@@ -24,6 +24,7 @@
 '---------------------------------------------------------
 ;Setup LCD Parameters in IO-mode 2 with shift register 74LS164 / 74HC164 / 74LS174
  #define LCD_IO 2
+ #define LCD_WIDTH 20                ;specified lcd width for clarity only.  20 is the default width
  #define LCD_NO_RW
  #define LCD_DB PORTC.0       ; data
  #define LCD_CB PORTC.1       ; clock

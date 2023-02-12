@@ -29,6 +29,7 @@
     'Set up LCD
     #define LCD_IO 10
     #define LCD_I2C_Address_1 0x4E ; default to 0x4E
+    #define LCD_WIDTH 20                ;specified lcd width for clarity only.  20 is the default width
 
     wait 100 ms
     CLS

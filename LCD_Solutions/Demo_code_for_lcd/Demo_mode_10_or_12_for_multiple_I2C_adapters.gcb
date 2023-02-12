@@ -7,6 +7,7 @@
 
 '''Set up LCD
    #define LCD_IO 10					  ; Or LCD_IO 12
+   #define LCD_WIDTH 20                ;specified lcd width for clarity only.  20 is the default width
    #define LCD_I2C_Address_1 0x4E                ; LCD 1
    #define LCD_I2C_Address_2 0x4C                ; LCD 2
    #define LCD_I2C_Address_2 0x4A                ; LCD 3
