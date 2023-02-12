@@ -1,0 +1,215 @@
+'    PID example routine for Great Cow BASIC
+'    This is a example  to implement a PID on an 8 bit contoller with out
+'    Floating point math.
+'    Thank You brettbeauregard for helping me to create this PID implementation.
+'
+'    I tried to range every thing up 100 times because I was using the
+'     DS18B20 which has a variable "TempC_100" with 2 digits whole C temp
+'    and last two digits tenths and hundredths. But Integers only have a range
+'    to +-32768 so when I did a multiply on larger errors they would go over range
+'    So I had to reduce the range of the  kp, ki ,kd to divide by 10.
+'    Their values are 0 for being off and 1 to 50 to used. 1 is a gain of 0.1 and
+'     10 is a gain of 1,   21 is a gain of 2.1 etc
+'
+'    SampleTime is actually execution period which uses the millis routine
+'    to count milliseconds.  i was implement a heater using a tail light bulb running
+'     on HPWM and it would tale 10s of seconds to respond. that is the reason my
+'     sampletime is 12000 secs and this is a major variable to the PID
+'
+'    Copyright (C) 2006 -2023  Mike Otte
+'    1/18/2023
+
+
+
+'#chip 16f886,8
+#chip 18f26K80,64
+
+#include <ds18b20.h>
+#include <PID.h>
+#option explicit          ' Require Explicit declaration of Variables
+
+
+' DS18B20 port settings
+#define DQ PortA.0
+
+'#define HPWM_FAST
+'-------- serial port setup ------------------------------------------
+#define SerOut PORTC.7 'radio tx
+#define USART_BAUD_RATE 9600
+#define USART_BLOCKING
+
+#define USE_HPWMCCP1 FALSE       ' This is not used so optimise
+#define USE_HPWMCCP2 TRUE        ' This is used so include in the compiled code
+#define USE_HPWMCCP3 FALSE       ' This is not used so optimise
+#define USE_HPWMCCP4 FALSE       ' This is not used so optimise
+
+; ----- Variables
+' a variable to handle the temperature calculations
+dim TempC_100 as LONG   ' a variabler to handle the temperature calculations
+Dim DSdata,WHOLE, FRACT, DIG as word
+Dim CCOUNT, SIGNBIT as Byte
+
+Dim inChar as byte
+Dim Bright  as Word
+
+inAuto = 0      'Manual =0  Auto =1
+Output = 0   ' 5000 is 50% ... Output times 100
+outMax  = 10000     'Output times 100
+outMin  = 0
+Setpoint  = 2500    ' degrees C times 100
+SampleTime =12000   ' in millisec
+kp = 20            ' these are also ranged . so 200 is 2 ... 50 is 1/2 ...
+ki = 10            ' these are also ranged . so 200 is 2 ... 50 is 1/2 ...
+kd = 10            ' these are also ranged . so 200 is 2 ... 50 is 1/2 ...
+Bright =50          ' Bright came from PWM of LED  in this case it is the PID output to HPWM
+lastInput=0
+Iterm =0
+    'Set the CCP2 pin to output mode
+DIR PORTC.2 out     ' This the CCP2 pin for HPWM
+Dir PortB.0 out     ' This my I am alive LED
+
+'Main code
+ do forever
+    SampleTemp          'Read the temperature which is measured with a DS18B20 sensor
+    DisplayTempBT         'This prints the temperature measured and also prints some diagnostic
+
+    Input = TempC_100   'Input the measurement to the Comput PID module
+
+    ComputePID             ' Calculate the new PID output if it is time
+                            ' Ouput is calculated in the PID
+    Bright = Output / 100   'Output is ranged 0-10000 , so this is putting it into the range of the HPWM 0-255
+    HPWM 2, 16, Bright      '  Send to the HPWM
+
+    wait 250 ms
+    PortB.0 =1      'Flash Led alive
+
+    wait 250 ms
+    portB.0 =0      'Flash Led alive
+
+'
+' This part allows input of the PID parameters and manual control
+' I use the USART connected to a HC-05 Bluetooth serial port
+'This allows me to control several things with my smart phone
+'
+
+    If USARTHasData Then
+      HSerReceive(InChar)
+
+        Select case inChar
+
+            case "O"
+                Edit_Parm("Output = ", Bright)
+                Output = Bright *100     ' I think the range of the HPWN is 0-255
+
+            case "M"
+                Edit_Parm("Manual =0  Auto =1  AutoMan=   ", inAuto)
+                Initialize()        'Bumpless Transfer
+
+            case "S"
+                Edit_Parm("SetPoint  ", Setpoint)
+                'Setpoint = Setpoint * 100
+
+            case "T"
+                Edit_Parm(" Sampling Time in seconds =  ", SampleTime)
+
+            case "P"
+                Edit_Parm("Kp - Propotional gain= ", Kp)
+
+            case "I"
+                    Edit_Parm("Ki -  Integral=  ", Ki)
+
+            case "D"
+                Edit_Parm("Kd -   Derivative=  ", Kd)
+
+            case else
+                HSerPrint " Not on list     M-Auto/man O-output in man T-SampTime  S-SetPoint "
+                HSersend 0x0d
+                HSerPrint "P-Kp-Proportional I-Ki-Integral D-Kd-Derivative C-ControlDir"
+                HSersend 0x0d
+                HSerPrint "Use Capital Letters to choose the input"
+                HSersend 0x0d
+                HSerPrint "Press <enter> after the number entered"
+                HSersend 0x0d
+        end select
+
+
+
+    end if
+
+ loop
+
+
+sub Initialize()
+
+    lastInput = Input
+    ITerm = Output
+
+    if Output > outMax Then Output = outMax
+    if Output < outMin Then Output = outMin
+
+end sub
+
+sub SampleTemp()
+    ' Create the  decimal value of the sensor
+
+       ' The function readtemp12 returns the raw value of the sensor.
+       ' The sensor is read as a 12 bit value therefore each unit equates to 0.0625 of a degree
+       DSdata = readtemp12
+
+       SignBit = DSdata / 256 / 128
+
+       If SignBit = 0 Then goto Positive
+       ' its negative!
+       DSdata = ( DSdata # 0xffff ) + 1 ' take twos comp
+
+    Positive:
+
+       ' Convert value * 0.0625. Mulitple value by 6 then add result to multiplication of the value with 25 then divide result by 100.
+       TempC_100 =  DSdata * 625
+       DSdata = ( DSdata * 25 ) / 100
+       TempC_100 = (TempC_100 + DSdata)/100
+end sub
+
+sub DisplayTemp ()
+    'HSerSend 69           ' sends E to Blutooth
+    hserprint "  TempC_100= "
+    hserprint TempC_100
+    hserprint " Setpt =  "
+    hserprint SetPoint
+    hserprint " Error =  "
+    hserprint error
+    hserprint " Output = "
+    hserprint Output
+    HSerPrintCRLF 1
+
+end Sub
+
+sub DisplayTempBT ()
+    HSerSend 69           ' sends E to Blutooth
+    'hserprint "  TempC_100= "
+    hserprint TempC_100
+    HSerprint ","
+    'hserprint " Setpt =  "
+    hserprint SetPoint
+    HSerprint ","
+    'hserprint " Error =  "
+    hserprint error
+    HSerprint ","
+    'hserprint " Output = "
+    hserprint Output
+    HSerPrintCRLF 1
+
+end Sub
+
+Sub Edit_Parm(inString as String, inParm as Integer)
+
+    HSerPrint inString
+    HSerprint inParm
+    Hserprint "    > enter new num with ret at end"
+    HSergetnum inParm
+    HSersend 0x0d
+    HSerprint inString
+    HSerprint inParm
+    HSersend 0x0d
+
+end sub
