@@ -57,7 +57,7 @@
 
 '' -------------------PORTA----------------
 '' Bit#:  -7---6---5---4---3---2---1---0---
-'' IO:   -----------------SW----------ADC--
+'' IO:   -----------------SW---ADC---------
 ''-----------------------------------------
 ''
 
@@ -81,7 +81,7 @@ Dir     RC1         Out
 Dir     RC2         Out
 Dir     RC3         Out
 
-#DEFINE POTENTIOMETER PORTA.0
+#DEFINE POTENTIOMETER PORTA.2
 Dir     POTENTIOMETER In
 #DEFINE SWITCHIN      PORTA.3
 Dir     SWITCHIN      In
@@ -95,7 +95,7 @@ Dim ADCVal, MaxVal as byte
 Do
 
     'HPWM CCPchannel, frequency, duty cycle
-    ADCVal = ReadAD( ANA0 )
+    ADCVal = ReadAD( ANA2 )
 
     ADCVal = Scale ( ADCVal, 0 , 255, 0, 255 )
 

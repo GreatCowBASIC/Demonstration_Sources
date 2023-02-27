@@ -25,7 +25,7 @@
 
 '' -------------------PORTA----------------
 '' Bit#:  -7---6---5---4---3---2---1---0---
-'' IO:   -----------------------------ADC--
+'' IO:   ---------------------ADC----------
 ''-----------------------------------------
 ''
 
@@ -44,14 +44,14 @@
 'Define constants to make things easier. We can reuse these at any time.
 #DEFINE LEDPORT LATC
 
-#DEFINE POTENTIOMETER RA0
+#DEFINE POTENTIOMETER RA2
 
 Dir     RC0         Out
 Dir     RC1         Out
 Dir     RC2         Out
 Dir     RC3         Out
 
-'This is the PORTA.0 port
+'This is the PORTA.2 port
 Dir     POTENTIOMETER In
 
 '*****************************************************************************************************
@@ -61,7 +61,7 @@ Dir     POTENTIOMETER In
 
   Do
 
-      adcVal =  ReadAD ( ANA0 )
+      adcVal =  ReadAD ( ANA2 )
 
       Select Case adcVal
 

@@ -24,7 +24,7 @@
 
 '' -------------------PORTA----------------
 '' Bit#:  -7---6---5---4---3---2---1---0---
-'' IO:   -----------------------------ADC--
+'' IO:   ---------------------ADC----------
 ''-----------------------------------------
 ''
 
@@ -49,7 +49,7 @@ Dir     RC1         Out
 Dir     RC2         Out
 Dir     RC3         Out
 
-#DEFINE POTENTIOMETER PORTA.0
+#DEFINE POTENTIOMETER PORTA.2
 Dir     POTENTIOMETER In
 
 '*****************************************************************************************************
@@ -68,7 +68,7 @@ Dim ADCVal As Word
 
   Do
 
-      ADCVal = ReadAD12 ( ANA0 )
+      ADCVal = ReadAD12 ( ANA2 )
 
       ADCVal = Scale ( ADCVal, 0, 4095, 2, 100 )
 
