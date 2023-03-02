@@ -98,7 +98,7 @@ Dir     SWITCHIN      In
 #DEFINE HI2C_BAUD_RATE 75
 #DEFINE HI2C_DATA PORTC.4
 #DEFINE HI2C_CLOCK PORTC.3
-'Initialise I2C - note for the I2C module the ports need to be set to out
+
 Dir HI2C_DATA Out
 Dir HI2C_CLOCK Out
 'Port specific controls may be required - see the datasheet
