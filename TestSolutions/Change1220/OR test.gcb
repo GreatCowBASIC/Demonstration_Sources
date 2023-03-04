@@ -1,0 +1,17 @@
+;Chip Settings
+#chip 18F4550,48
+#config PLLDIV=1, CPUDIV=OSC1_PLL2, OSC=HSPLL_HS, LVP=OFF, MCLRE=ON
+
+;Defines (Constants)
+#define LCD_IO 2
+#define LCD_CB PORTE.1
+#define LCD_DB PORTE.0
+
+  For xx = 1 to 50
+
+    If xx = 1 OR xx = 3 OR  xx = 5 OR xx = 7 OR xx = 9 OR xx = 11 OR xx = 13 OR xx = 15 OR xx = 17 OR xx = 19 OR xx = 22 OR xx = 24 OR xx = 26 OR xx = 28 OR xx = 30 OR xx = 32 then
+      locate 0, 0
+        print "Hello "
+          End If
+
+  Next
