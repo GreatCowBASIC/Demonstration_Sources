@@ -1,0 +1,316 @@
+'''A program  for GCGB and GCB.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''This program examines the GLCD devices and shows the registers on a serial port/terminal, and, or can determine the type of glcd controller.
+'''
+'''This is a standalone program with no supporting libraries.
+'''
+'''This is an SPI for the GLCD controller and supports the mcufriend.com connection options, see below.
+'''
+'''The program has two options, all controlled by constants.
+'''   1. Display of all 256 registers
+'''   2. Examine the registers to determine controller type.
+'''
+'''Refer to the datasheet of the specific device is the controller type is not recognised.
+'''
+'''@author     Evan Venn
+'''@licence    GPL
+'''@version    1.00
+'''@date       16/11/17
+'''********************************************************************************
+
+#chip 18F26K83, 4 
+#option Explicit
+
+ #startup InitPPS, 85
+    #DEFINE PPSToolPart 18f26k83
+
+    Sub InitPPS
+
+        'Module: UART pin directions
+        Dir PORTC.7 Out    ' Make TX1 pin an output
+        'Module: UART1
+        RC7PPS = 0x0013    'TX1 > RC7
+   
+    End Sub
+    // Template comment at the end of the config file
+
+    'Set up your ports
+    #DEFINE GLCD_DC       PORTB.3           ' Data command line
+    #DEFINE GLCD_CS       PORTB.5           ' Chip select line
+    #DEFINE GLCD_RST      PORTB.4           ' Reset line
+
+    #DEFINE GLCD_DI       PORTB.2          ' Data in | MISO
+    #DEFINE GLCD_DO       PORTB.0          ' Data out | MOSI
+    #DEFINE GLCD_SCK      PORTB.1          ' Clock Line
+
+    'USART settings
+    #define USART_BAUD_RATE 9600
+    #define USART_TX_BLOCKING
+    #define USART_DELAY 10 us
+
+
+'   Scan all 256 registers
+   #define fullScan
+
+'   Using some level of intelligence try to determine the type of device.
+    #define determineType
+
+    HSerPrintLn ("")
+    HserPrintLn("Read Registers on GLCD device")
+    HserPrintLn("controllers with an SPI interface")
+    HserPrintLn("")
+
+
+    GLCDInit
+
+    #ifdef fullScan
+      dim studyreg as byte
+      for studyreg = 0 to 255
+          GLCDreadRegStr(studyreg, 4, "f.k")
+      next
+    #endif
+
+
+    #ifdef determineType
+      dim identifier as word
+      dim devicestr as string
+      GLCDInit
+
+      HSerPrintLn ("")
+      HSerPrintLN("Examining  :")
+      GLCDreadID ( identifier )'also sets 'devicestr', a global string variable
+      HSerPrint  ("Read       : GLCD Device ID = ")
+      HSerPrint "0x"
+      HSerPrint hex( identifier_h )
+      HSerPrintLn hex( identifier )
+      Hserprintln("Controller : "+devicestr )
+      HSerPrintLn ("Completed  :")
+
+    #endif
+
+Sub GLCDInit
+
+
+     'Pin directions
+      Dir GLCD_CS Out
+      Dir GLCD_DC Out
+      Dir GLCD_RST Out
+
+      Dir GLCD_DI In
+      Dir GLCD_DO Out
+      Dir GLCD_SCK Out
+
+      Set GLCD_CS On
+      Set GLCD_DC On
+
+      GlcdReset
+      wait 150 ms
+
+
+End Sub
+
+Sub GLCDreadRegStr( reg as word, nparams, lnmsg as string )
+
+    dim val8, regcount as byte
+      regcount = 1
+    dim readdummy as byte
+
+    set GLCD_CS OFF
+
+
+    HserPrint("reg(0x")
+    HSerPrint hex(reg_h)
+    HSerPrint hex(reg)
+    HserPrint(")")
+
+    GLCDSendCommand(0xd9)
+    GLCDSendData(0x10+regcount)
+    GLCDSendCommand(reg)
+    repeat nparams
+
+        regcount++
+        GLCDSPITransfer( readdummy, val8 )
+        
+        HserPrint(" ")
+        HSerPrint hex(val8)
+    end repeat
+
+    HserSend 9
+    HserPrintLn(lnmsg)
+    set GLCD_CS ON
+
+End Sub
+
+Sub GlcdReset
+
+    'Reset
+    'Reset display
+    Wait 50 ms
+    Set GLCD_RST On
+    Wait 5 ms
+    'Reset sequence (lower line for at least 10 us)
+    Set GLCD_RST Off
+    Wait 20 us
+    Set GLCD_RST On
+    Wait 150 ms
+
+End Sub
+
+    dim GlcdReadData32 as long
+function GlcdReadData32 ( in reg ) as long
+
+
+    dim val8, regcount as byte
+      regcount = 1
+    dim readdummy as byte
+    dim registryElements(5)
+
+  GLCDSendCommand(0xB0)
+  GLCDSendData(0x00)
+
+  
+
+    set GLCD_CS OFF
+    repeat 4 
+      GLCDSendCommand(0xFB)
+      GLCDSendData(0x80+regcount)
+      GLCDSendCommand(reg)
+      GLCDSPITransfer( readdummy, val8 )
+      registryElements(regcount) = val8
+      regcount++
+    end repeat
+
+    set GLCD_CS ON
+
+    GlcdReadData32 = registryElements(4)
+    GlcdReadData32_h = registryElements(3)
+    GlcdReadData32_u = registryElements(2)
+    GlcdReadData32_e = registryElements(1)
+
+
+End function
+
+sub  GLCDSendCommand( IN SPISendByte as word )
+
+    set GLCD_DC OFF
+
+    repeat 8
+
+      if SPISendByte.7 = ON  then
+        set GLCD_DO ON
+      else
+        set GLCD_DO OFF
+      end if
+      SET GLCD_SCK On
+      rotate SPISendByte left
+      set GLCD_SCK Off
+
+    end repeat
+    set GLCD_DC ON
+
+
+end Sub
+
+'''Send a data byte to the HX8347 GLCD
+'''@param HX8347SendByte Byte to send
+'''@hide
+sub  GLCDSendData( IN SPISendByte as word )
+
+    set GLCD_DC ON
+
+    repeat 8
+
+      if SPISendByte.7 = ON then
+        set GLCD_DO ON
+      else
+        set GLCD_DO OFF
+      end if
+      SET GLCD_SCK On
+      rotate SPISendByte left
+      set GLCD_SCK Off
+
+    end Repeat
+
+end Sub
+
+
+sub HSerPrintLN (In PrintData As String, optional In comport = 1)
+  dim PrintLen, SysPrintTemp as byte
+  'PrintLen = LEN(PrintData$)
+  PrintLen = PrintData(0)
+
+  If PrintLen <> 0 then
+    'Write Data
+    for SysPrintTemp = 1 to PrintLen
+      HSerSend(PrintData(SysPrintTemp),comport )
+      Wait USART_DELAY
+    next
+  End If
+
+  HSerSend(13,comport)
+  Wait USART_DELAY
+  HSerSend(10,comport)
+  Wait USART_DELAY
+
+End Sub
+
+
+
+sub  GLCDreadID ( out DeviceID as word )
+
+    dim reg as byte
+
+    ' copy this section to add more IDs
+    reg = 0xd3
+    if ( GlcdReadData32 ( reg )  = 0x00934141) then
+        DeviceID = 0x9341
+        devicestr =  "@reg("+hex(reg)+") ILI9341"
+        exit sub
+    else
+       HserPrint "Raw Data from Reg(0xD3):  "
+       HserPrint GlcdReadData32 ( reg )
+       HserPrintCRLF
+    end if
+    ' end of section
+
+    DeviceID = 0x0000
+    devicestr =  "unknown GLCD"
+
+end sub
+
+
+sub  GLCDSPITransfer( IN SPISendByte as byte, OUT SPITempOut as byte )
+
+    SPITempOut = 0
+'    set GLCD_CS OFF
+    set GLCD_DC ON
+    set GLCD_SCK Off
+
+    repeat 8
+
+      if SPISendByte.7 = ON  then
+        set GLCD_DO ON
+      else
+        set GLCD_DO OFF
+      end if
+
+      'Device is cpol = 0. Invert SCK if cpol = 1
+      SET GLCD_SCK ON
+      rotate SPISendByte left
+
+
+      rotate SPITempOut left
+      if GLCD_DI = On then
+        set SPITempOut.0 On
+      Else
+        set SPITempOut.0 Off
+      end if
+
+      SET GLCD_SCK OFF
+      wait 100 us
+
+    end repeat
+
+'    set GLCD_CS ON
+
+end Sub
