@@ -1,0 +1,229 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''This program is a simple GLCD demonstration of the ILI9341 GLCD capabilities.
+'''It is a nice graphical LCD, suitable for a lot of various projects.
+'''This program shows a picture on the screen - is uses table data from ImageConverter565.exe
+'''
+'''The GLCD is connected to the microprocessor as shown in the hardware section of this code.
+'''
+'''This demonstration has a compressed data table. 
+'''The process to compress is.
+''' 1. Ensure data table from ImageConverter565 works.
+''' 2. Add compression to the CompressPNG method to use a Sliding Window technique to compress the data, and, show this on the Serial Terminal
+''' 3. Take data table from Serial Terminal and add to program.
+''' 4. Change DrawPNG() to use compressed table
+''' 5. Enjoy the smaller table - was 28470 bytes now 14070 bytes - ~50% saving
+'''
+'''@author  EvanV
+'''@licence GPL
+'''@version 1.0a
+'''@date    30/03/2023
+'''********************************************************************************
+
+  'Chip Settings.
+  #chip LGT8F328P
+  #option explicit
+  #option ReserveHighProg 1024   'To prevent overwriting of Bootloader
+
+    #include <glcd.h>
+    #include <UNO_mega328p.h >
+
+    #DEFINE GLCD_TYPE GLCD_TYPE_ILI9341
+
+    'Pin mappings for 8bit bus
+    #DEFINE GLCD_RD       ANALOG_0          // read command line
+    #DEFINE GLCD_WR       ANALOG_1          // write command line
+    #DEFINE GLCD_RS       ANALOG_2          // Command/Data line
+    #DEFINE GLCD_CS       ANALOG_3          // Chip select line
+    #DEFINE GLCD_RESET    ANALOG_4          // Reset line
+
+    #DEFINE GLCD_DB0       DIGITAL_8
+    #DEFINE GLCD_DB1       DIGITAL_9
+    #DEFINE GLCD_DB2       DIGITAL_2
+    #DEFINE GLCD_DB3       DIGITAL_3
+    #DEFINE GLCD_DB4       DIGITAL_4
+    #DEFINE GLCD_DB5       DIGITAL_5
+    #DEFINE GLCD_DB6       DIGITAL_6
+    #DEFINE GLCD_DB7       DIGITAL_7
+
+
+    // Add serial controls
+    #DEFINE USART_BAUD_RATE 19200
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+
+'''********************************************************************************
+
+'main program start here
+    #include "rgbcompressed.h"
+
+    // Set the background to TFT_WHITE
+    #DEFINE DEFAULT_GLCDBACKGROUND TFT_WHITE
+    // Set to small OLED fonts
+    #DEFINE GLCD_OLED_FONTS
+
+    GLCDPrint 50, 0, "3s delay for terminal", !GLCDBACKGROUND
+    Wait 3 s                // Allows for serial terminal to connect
+
+    DrawCompressed ( 20 , 20 )       // Compressed picture to GLCD method
+
+
+    End
+
+
+
+
+
+'''Display Picture on the screen
+Sub DrawCompressed ( in TFTXPos as Word, in TFTYPos as Word )
+    Dim TableReadPosition, TableLen As Word
+    // Start of code
+    Dim  PixelRGB, XCount, YCount, objwidth, objHeight, TableReadPosition, GLCDX , GLCDY, CompressedWindow, CompressedPixelData, CompressedCounter, CompressedElements as Word
+
+    'Read selected table
+    ReadTable rgbcompressed, 0, CompressedElements
+    TableReadPosition++
+    ReadTable rgbcompressed, 1, objwidth
+    TableReadPosition++
+    ReadTable rgbcompressed, 2, objHeight
+    
+    // USEPUBLICMETHODS comment out to use public, slower methods
+    #IFNDEF USEPUBLICMETHODS
+      SetAddressWindow_ILI9341 ( TFTXPos, TFTYPos , TFTXPos + objwidth, TFTYPos + objHeight )
+    #ENDIF
+
+    TableReadPosition = 3
+    CompressedCounter = 0
+    'Read selected table less two elements for the objwidth and objHeight and the last element
+    Repeat ( CompressedElements / 2 ) - 1
+
+      ReadTable rgbcompressed, TableReadPosition, CompressedPixelData
+      TableReadPosition++
+      ReadTable rgbcompressed, TableReadPosition, CompressedWindow
+      TableReadPosition++
+
+      Repeat CompressedWindow
+
+        #IFNDEF USEPUBLICMETHODS
+
+          SendWord_ILI9341 CompressedPixelData
+
+        #ELSE
+
+          IF CompressedPixelData <> GLCDBACKGROUND Then 
+            // Optimised to only update the GLCD when pixel is NOT the same as the background color
+            GLCDX=[Word]TFTXPos+( CompressedCounter MOD objwidth )
+            GLCDY=[Word]TFTYPos+( CompressedCounter / objwidth )        
+            PSet GLCDX, GLCDY, CompressedPixelData
+          End If
+
+        #ENDIF
+        CompressedCounter++
+
+      End Repeat
+
+    End Repeat  
+End Sub
+
+'''Display Picture on the screen
+Sub Draw ( in TFTXPos as Word, in TFTYPos as Word )
+    Dim TableReadPosition, TableLen As Word
+    // Start of code
+    Dim  PixelRGB, XCount, YCount, objwidth, objHeight, TableReadPosition, TFTX , TFTY as Word
+    TableReadPosition = 1
+
+    'Read selected table
+    ReadTable Smile, TableReadPosition, objwidth
+    TableReadPosition++
+    ReadTable Smile, TableReadPosition, objHeight
+    
+    TableReadPosition = 3
+    For YCount = 0 to (objHeight - 1)
+      For XCount = 0 to (objwidth - 1)
+        'Read selected table
+        ReadTable Smile, TableReadPosition, PixelRGB
+        TableReadPosition++
+
+        TFTX=[Word]TFTXPos+XCount
+        TFTY=[Word]TFTYPos+YCount
+
+        PSet TFTX, TFTY, PixelRGB
+
+      Next
+    Next
+End Sub
+
+
+'''Compress Table to serial terminal
+Sub CompressDataTable 
+    Dim TableReadPosition, TableLen As Word
+    // Start of code
+    Dim  PixelRGB, XCount, YCount, objwidth, objHeight, TableReadPosition, CompressedWindow, CompressedPixelData, CompressedCounter as Word
+    TableReadPosition = 1
+
+    'Read selected table
+    ReadTable Smile, TableReadPosition, objwidth
+    TableReadPosition++
+    ReadTable Smile, TableReadPosition, objHeight
+  
+    CompressedWindow = 0
+    CompressedPixelData = 0
+    CompressedCounter = 0
+
+    // Output the table header
+    HserPrintCRLF
+    HSerPrintStringCRLF "Table SmileCompressed as Word"
+    HSerPrint objwidth
+    HSerPrint ","
+    HSerPrint objHeight
+    HserPrintCRLF
+
+    TableReadPosition = 3
+    For YCount = 0 to (objHeight - 1)
+      For XCount = 0 to (objwidth - 1)
+        'Read selected table
+        ReadTable Smile, TableReadPosition, PixelRGB
+        TableReadPosition++
+
+        If PixelRGB <> CompressedPixelData Then
+
+          If  CompressedCounter <> 0 Then
+
+            // OutPut PixelRGB and Window Size
+            HserPrint "0x"+hex(CompressedPixelData_H)
+            HserPrint hex(CompressedPixelData)
+            HserPrint","
+            HserPrint "0x"+hex(CompressedWindow_H)
+            HserPrint hex(CompressedWindow)
+            If CompressedCounter mod 64 = 0 Then 
+              HserPrintCRLF
+            Else
+              HSerPrint ","
+            End If
+          End If
+
+          // We have a new value in PixelRGB
+          CompressedPixelData = PixelRGB
+          CompressedWindow = 1
+
+        Else
+          // Another PixelRGB of the same value, so, increase the Window size
+          CompressedWindow++
+        End if 
+
+        CompressedCounter++
+
+      Next
+    Next
+    // OutPut last PixelRGB and Window Size
+    HserPrint "0x"+hex(CompressedPixelData_H)
+    HserPrint hex(CompressedPixelData)
+    HserPrint","
+    HserPrint "0x"+hex(CompressedWindow_H)
+    HserPrint hex(CompressedWindow)
+    HserPrintCRLF
+    HserPrint "// CompressedCounter = " + str( CompressedCounter )
+    HserPrintCRLF
+    HSerPrintStringCRLF "End Table"
+End Sub

@@ -1,0 +1,88 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''This program is a simple GLCD demonstration of the ILI9341 GLCD capabilities.
+'''It is a nice graphical LCD, suitable for a lot of various projects.
+'''This program shows a picture on the screen - is uses table data from ImageConverter565.exe
+'''
+'''The GLCD is connected to the microprocessor as shown in the hardware section of this code.
+''':
+'''This will work with any GLCD.
+''':
+''':
+'''@author  EvanV
+'''@licence GPL
+'''@version 1.0a
+'''@date    30/03/2023
+'''********************************************************************************
+
+  'Chip Settings.
+  #chip LGT8F328P
+  #option explicit
+  #option ReserveHighProg 1024   'To prevent overwriting of Bootloader
+
+    #include <glcd.h>
+    #include <UNO_mega328p.h >
+
+    #define GLCD_TYPE GLCD_TYPE_ILI9341
+
+    'Pin mappings for 8bit bus
+    #define GLCD_RD       ANALOG_0          ' read command line
+    #define GLCD_WR       ANALOG_1          ' write command line
+    #define GLCD_RS       ANALOG_2          ' Command/Data line
+    #define GLCD_CS       ANALOG_3          ' Chip select line
+    #define GLCD_RESET    ANALOG_4          ' Reset line
+
+    #define GLCD_DB0       DIGITAL_8
+    #define GLCD_DB1       DIGITAL_9
+    #define GLCD_DB2       DIGITAL_2
+    #define GLCD_DB3       DIGITAL_3
+    #define GLCD_DB4       DIGITAL_4
+    #define GLCD_DB5       DIGITAL_5
+    #define GLCD_DB6       DIGITAL_6
+    #define GLCD_DB7       DIGITAL_7
+
+'''********************************************************************************
+
+'main program start here
+
+    #include "smileuncompressed.h"  
+    
+    DrawPNG (40,60)
+    
+
+    Wait 5 s
+    GLCDfntDefaultsize = 2
+    GLCDPrint  1, 200, "GCBASIC...", TFT_Yellow
+    GLCDPrint  1, 230, "   ...rocks", TFT_Yellow
+    Do
+    Loop
+
+
+'''Display Picture on the screen
+Sub DrawPNG ( in TFTXPos as Word, in TFTYPos as Word )
+    Dim TableReadPosition, TableLen As Word
+    ' Start of code
+    Dim  PixelRGB, XCount, YCount, objwidth, objHeight, TableReadPosition, TFTX , TFTY as Word
+    TableReadPosition = 1
+
+    'Read selected table
+    ReadTable SmileUncompressed, TableReadPosition, objwidth
+    TableReadPosition++
+    ReadTable SmileUncompressed, TableReadPosition, objHeight
+    
+    TableReadPosition = 3
+    For YCount = 0 to (objHeight - 1)
+      For XCount = 0 to (objwidth - 1)
+        'Read selected table
+        ReadTable SmileUncompressed, TableReadPosition, PixelRGB
+        TableReadPosition++
+
+        TFTX=[Word]TFTXPos+XCount
+        TFTY=[Word]TFTYPos+YCount
+
+        PSet TFTX, TFTY, PixelRGB
+
+      Next
+    Next
+End Sub
+
