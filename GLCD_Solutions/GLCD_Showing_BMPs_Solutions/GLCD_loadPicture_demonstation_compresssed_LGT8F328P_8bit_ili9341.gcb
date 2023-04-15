@@ -64,9 +64,10 @@
     #DEFINE GLCD_OLED_FONTS
 
     GLCDPrint 50, 0, "3s delay for terminal", !GLCDBACKGROUND
-    Wait 3 s                // Allows for serial terminal to connect
+    Wait 3 s                        // Allows for serial terminal to connect
+    GLCDCLS
 
-    DrawCompressed ( 20 , 20 )       // Compressed picture to GLCD method
+    DrawCompressed ( 36, 0 )       // Compressed picture to GLCD method
 
 
     End
@@ -88,11 +89,6 @@ Sub DrawCompressed ( in TFTXPos as Word, in TFTYPos as Word )
     TableReadPosition++
     ReadTable rgbcompressed, 2, objHeight
     
-    // USEPUBLICMETHODS comment out to use public, slower methods
-    #IFNDEF USEPUBLICMETHODS
-      SetAddressWindow_ILI9341 ( TFTXPos, TFTYPos , TFTXPos + objwidth, TFTYPos + objHeight )
-    #ENDIF
-
     TableReadPosition = 3
     CompressedCounter = 0
     'Read selected table less two elements for the objwidth and objHeight and the last element
@@ -105,20 +101,13 @@ Sub DrawCompressed ( in TFTXPos as Word, in TFTYPos as Word )
 
       Repeat CompressedWindow
 
-        #IFNDEF USEPUBLICMETHODS
+        IF CompressedPixelData <> GLCDBACKGROUND Then 
+          // Optimised to only update the GLCD when pixel is NOT the same as the background color
+          GLCDX=[Word]TFTXPos+( CompressedCounter MOD objwidth )
+          GLCDY=[Word]TFTYPos+( CompressedCounter / objwidth )        
+          PSet GLCDX, GLCDY, CompressedPixelData
+        End If
 
-          SendWord_ILI9341 CompressedPixelData
-
-        #ELSE
-
-          IF CompressedPixelData <> GLCDBACKGROUND Then 
-            // Optimised to only update the GLCD when pixel is NOT the same as the background color
-            GLCDX=[Word]TFTXPos+( CompressedCounter MOD objwidth )
-            GLCDY=[Word]TFTYPos+( CompressedCounter / objwidth )        
-            PSet GLCDX, GLCDY, CompressedPixelData
-          End If
-
-        #ENDIF
         CompressedCounter++
 
       End Repeat
@@ -126,33 +115,6 @@ Sub DrawCompressed ( in TFTXPos as Word, in TFTYPos as Word )
     End Repeat  
 End Sub
 
-'''Display Picture on the screen
-Sub Draw ( in TFTXPos as Word, in TFTYPos as Word )
-    Dim TableReadPosition, TableLen As Word
-    // Start of code
-    Dim  PixelRGB, XCount, YCount, objwidth, objHeight, TableReadPosition, TFTX , TFTY as Word
-    TableReadPosition = 1
-
-    'Read selected table
-    ReadTable Smile, TableReadPosition, objwidth
-    TableReadPosition++
-    ReadTable Smile, TableReadPosition, objHeight
-    
-    TableReadPosition = 3
-    For YCount = 0 to (objHeight - 1)
-      For XCount = 0 to (objwidth - 1)
-        'Read selected table
-        ReadTable Smile, TableReadPosition, PixelRGB
-        TableReadPosition++
-
-        TFTX=[Word]TFTXPos+XCount
-        TFTY=[Word]TFTYPos+YCount
-
-        PSet TFTX, TFTY, PixelRGB
-
-      Next
-    Next
-End Sub
 
 
 '''Compress Table to serial terminal
@@ -227,3 +189,4 @@ Sub CompressDataTable
     HserPrintCRLF
     HSerPrintStringCRLF "End Table"
 End Sub
+

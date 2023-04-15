@@ -129,7 +129,7 @@ Sub DrawTableData ( in TFTXPos as Word, in TFTYPos as Word )
     TableReadPosition = 3
     
   // #DEFINE USEPUBLICMETHODS
-  // Uncomment the constant above to use Public methpds..it will be slower 
+  // Uncomment the constant above to use Public methods..it will be slower 
   #IFNDEF USEPUBLICMETHODS
 
       SetAddressWindow_ILI9488 ( TFTXPos, TFTYPos, TFTXPos+objwidth  , TFTYPos+objHeight )
@@ -137,8 +137,8 @@ Sub DrawTableData ( in TFTXPos as Word, in TFTYPos as Word )
       set ILI9488_CS OFF
       set ILI9488_DC ON
       For [WORD]TableReadPosition = 3 to [WORD](objwidth * objHeight)
-        ReadTable BGR, TableReadPosition, HWSPI_Send_24bits
-        HWSPI_Fast_Write_24bits_Macro
+        ReadTable BGR, TableReadPosition, HWSPI_Send_18bits
+        HWSPI_Fast_Write_18bits_Macro
       Next
       set ILI9488_CS ON
     

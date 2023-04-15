@@ -46,14 +46,14 @@
     #DEFINE GLCD_DO       PORTB.0          ' Data out | MOSI
     #DEFINE GLCD_SCK      PORTB.1          ' Clock Line
 
-    #DEFINE DEFAULT_GLCDBACKGROUND TFT_BLUE
+    #DEFINE DEFAULT_GLCDBACKGROUND ILI9488_TFT_BLUE
 
-//! Set GLCDfntDefaultsize = 1, in this demo also sets the demonstration section to execute.
-//! Set GLCDfntDefaultsize = 2, in this demo also sets the demonstration section to execute.
-//! Set GLCDfntDefaultsize = 3, in this demo also sets the demonstration section to execute.
+    //! Set GLCDfntDefaultsize = 1, in this demo also sets the demonstration section to execute.
+    //! Set GLCDfntDefaultsize = 2, in this demo also sets the demonstration section to execute.
+    //! Set GLCDfntDefaultsize = 3, in this demo also sets the demonstration section to execute.
 
 
-    GLCDfntDefaultsize = 1
+    GLCDfntDefaultsize = 2
 
     Dim Bytenumber, Oldfont, Ccount, Oldfont as Byte
     dim Longnumber as Long
@@ -78,8 +78,8 @@
 
         GLCDDrawString (2, 1, "GLCD font")
         GLCDDrawString (2, 25, "size = 3")
-        box 0,0, GLCDDeviceWidth-1, GLCDDeviceHeight-1, TFT_YELLOW
-        box GLCDDeviceWidth-5, GLCDDeviceHeight-5,GLCDDeviceWidth-1, GLCDDeviceHeight-1, TFT_WHITE
+        box 0,0, GLCDDeviceWidth-1, GLCDDeviceHeight-1, ILI9488_TFT_YELLOW
+        box GLCDDeviceWidth-5, GLCDDeviceHeight-5,GLCDDeviceWidth-1, GLCDDeviceHeight-1, ILI9488_TFT_WHITE
 
 	End Select
 
@@ -90,9 +90,9 @@ sub ShowCase1
 
         GLCDRotate ( PORTRAIT )
 
-        GLCDDrawString (2, 1, "GCB", TFT_WHITE )
-        GLCDDrawString (56,1,"v1.00.xx", TFT_YELLOW )
-        GLCDDrawString (2, 16, "DrawStr", TFT_WHITE )
+        GLCDDrawString (2, 1, "GCB", ILI9488_TFT_WHITE )
+        GLCDDrawString (56,1,"v1.00.xx", ILI9488_TFT_YELLOW )
+        GLCDDrawString (2, 16, "DrawStr", ILI9488_TFT_WHITE )
 
         GLCDDrawString ( 60, 31, "Long Number" )
         GLCDDrawString ( 60, 39, "Word Number" )
@@ -100,28 +100,28 @@ sub ShowCase1
 
         GLCDDrawString ( 74, 16, "Asc:" )
 
-        box 0,0,GLCDDeviceWidth-1, GLCDDeviceHeight-1, TFT_YELLOW
-        box GLCDDeviceWidth-5, GLCDDeviceHeight-5,GLCDDeviceWidth-1, GLCDDeviceHeight-1, TFT_WHITE
+        box 0,0,GLCDDeviceWidth-1, GLCDDeviceHeight-1, ILI9488_TFT_YELLOW
+        box GLCDDeviceWidth-5, GLCDDeviceHeight-5,GLCDDeviceWidth-1, GLCDDeviceHeight-1, ILI9488_TFT_WHITE
 
-        Circle( GLCDDeviceWidth/2, GLCDDeviceHeight/2, 50, TFT_BLACK)            ;center
-        FilledCircle( GLCDDeviceWidth/2, GLCDDeviceHeight/2, 25, TFT_YELLOW )
+        Circle( GLCDDeviceWidth/2, GLCDDeviceHeight/2, 50, ILI9488_TFT_BLACK)            ;center
+        FilledCircle( GLCDDeviceWidth/2, GLCDDeviceHeight/2, 25, ILI9488_TFT_YELLOW )
 
-        line 0,  GLCDDeviceHeight-1 , GLCDDeviceWidth/2 +100,  (GLCDDeviceHeight /2) - 50, TFT_CYAN
-        line  0, (GLCDDeviceHeight /2) - 50, GLCDDeviceWidth/2 +100, (GLCDDeviceHeight /2) - 50, TFT_CYAN
+        line 0,  GLCDDeviceHeight-1 , GLCDDeviceWidth/2 +100,  (GLCDDeviceHeight /2) - 50, ILI9488_TFT_CYAN
+        line  0, (GLCDDeviceHeight /2) - 50, GLCDDeviceWidth/2 +100, (GLCDDeviceHeight /2) - 50, ILI9488_TFT_CYAN
 
-        filledbox 2,GLCDDeviceHeight/2+10,42,GLCDDeviceHeight/2+50, TFT_RED
+        filledbox 2,GLCDDeviceHeight/2+10,42,GLCDDeviceHeight/2+50, ILI9488_TFT_RED
 
         Oldfont = GLCDfntDefaultsize
         GLCDfntDefaultsize = 3
-        GLCDDrawString ( 42, GLCDDeviceHeight - 30 , "ILI9488" , TFT_WHITE )
+        GLCDDrawString ( 42, GLCDDeviceHeight - 30 , "ILI9488" , ILI9488_TFT_WHITE )
 
         GLCDfntDefaultsize = 1
-        GLCDDrawString ( GLCDDeviceWidth - 70, 2 , " Apr 2023" , TFT_WHITE )
+        GLCDDrawString ( GLCDDeviceWidth - 70, 2 , " Apr 2023" , ILI9488_TFT_WHITE )
 
 
         'Revert the font size
         GLCDfntDefaultsize = Oldfont
-        GLCDForeground = TFT_WHITE
+        GLCDForeground = ILI9488_TFT_WHITE
 
         DO forever
 
@@ -130,7 +130,7 @@ sub ShowCase1
             GLCDPrint ( 144 , 47, pad( str(Bytenumber),3))
 
             GLCDDrawChar(54, 16, Ccount )
-            Box 52,15,62,26, TFT_WHITE								'Draw a box around the Char below
+            Box 52,15,62,26, ILI9488_TFT_WHITE								'Draw a box around the Char below
 
             GLCDDrawString ( 100, 16 , pad( str(Ccount),3) )
 
@@ -150,9 +150,9 @@ sub ShowCase2
 
         GLCDRotate ( LANDSCAPE_REV )
 
-        GLCDDrawString (2, 1, "GCB",TFT_WHITE)
-        GLCDDrawString (56,1,"v1.00.xx",TFT_YELLOW)
-        GLCDDrawString (2, 18, "DrawStr",TFT_WHITE)
+        GLCDDrawString (2, 1, "GCB",ILI9488_TFT_WHITE)
+        GLCDDrawString (56,1,"v1.00.xx",ILI9488_TFT_YELLOW)
+        GLCDDrawString (2, 18, "DrawStr",ILI9488_TFT_WHITE)
 
         GLCDDrawString ( 2, 52, "Long:" )
         GLCDDrawString ( 2, 70, "Word:" )
@@ -160,28 +160,28 @@ sub ShowCase2
 
         GLCDDrawString ( 128, 18, "Asc:"+"  " )
 
-        box 0,0,GLCDDeviceWidth-1, GLCDDeviceHeight-1, TFT_YELLOW
-        box GLCDDeviceWidth-5, GLCDDeviceHeight-5,GLCDDeviceWidth-1, GLCDDeviceHeight-1, TFT_WHITE
+        box 0,0,GLCDDeviceWidth-1, GLCDDeviceHeight-1, ILI9488_TFT_YELLOW
+        box GLCDDeviceWidth-5, GLCDDeviceHeight-5,GLCDDeviceWidth-1, GLCDDeviceHeight-1, ILI9488_TFT_WHITE
 
-        Circle( GLCDDeviceWidth/2, GLCDDeviceHeight/2, 50, TFT_BLACK )            ;center
-        FilledCircle( GLCDDeviceWidth/2, GLCDDeviceHeight/2, 25, TFT_YELLOW  )
+        Circle( GLCDDeviceWidth/2, GLCDDeviceHeight/2, 50, ILI9488_TFT_BLACK )            ;center
+        FilledCircle( GLCDDeviceWidth/2, GLCDDeviceHeight/2, 25, ILI9488_TFT_YELLOW  )
 
-        line 0,  GLCDDeviceHeight-1 , GLCDDeviceWidth/2 +100,  (GLCDDeviceHeight /2) - 50, TFT_CYAN
-        line  0, (GLCDDeviceHeight /2) - 50, GLCDDeviceWidth/2 +100, (GLCDDeviceHeight /2) - 50, TFT_CYAN
+        line 0,  GLCDDeviceHeight-1 , GLCDDeviceWidth/2 +100,  (GLCDDeviceHeight /2) - 50, ILI9488_TFT_CYAN
+        line  0, (GLCDDeviceHeight /2) - 50, GLCDDeviceWidth/2 +100, (GLCDDeviceHeight /2) - 50, ILI9488_TFT_CYAN
 
-        filledbox 2,GLCDDeviceHeight/2+10,42,GLCDDeviceHeight/2+50, TFT_RED
+        filledbox 2,GLCDDeviceHeight/2+10,42,GLCDDeviceHeight/2+50, ILI9488_TFT_RED
 
         Oldfont = GLCDfntDefaultsize
         GLCDfntDefaultsize = 3
-        GLCDDrawString ( 50, GLCDDeviceHeight - 30 , "ILI9488 Driver" , TFT_WHITE )
+        GLCDDrawString ( 50, GLCDDeviceHeight - 30 , "ILI9488 Driver" , ILI9488_TFT_WHITE )
 
         GLCDfntDefaultsize = 1
-        GLCDDrawString ( GLCDDeviceWidth - 60, 2 , "Apr 2023" , TFT_WHITE )
+        GLCDDrawString ( GLCDDeviceWidth - 60, 2 , "Apr 2023" , ILI9488_TFT_WHITE )
 
         'Revert the font size
         GLCDfntDefaultsize = Oldfont
-        GLCDForeground = TFT_WHITE
-		GLCDPrintLargeFont ( 100 , GLCDDeviceHeight - 60 , "GCBASIC", TFT_WHITE )
+        GLCDForeground = ILI9488_TFT_WHITE
+		GLCDPrintLargeFont ( 100 , GLCDDeviceHeight - 60 , "GCBASIC", ILI9488_TFT_WHITE )
 
         DO forever
 
@@ -192,7 +192,7 @@ sub ShowCase2
 
 
           GLCDDrawChar(99, 18, Ccount )
-          Box 98,18,117,42, TFT_WHITE								'Draw a box around the Char below
+          Box 98,18,117,42, ILI9488_TFT_WHITE								'Draw a box around the Char below
 
           GLCDDrawString ( 180, 18 , pad( str(Ccount),3) )
 
