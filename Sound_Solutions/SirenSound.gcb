@@ -1,0 +1,28 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------
+'''This program makes a siren sound!
+'''
+'''
+'''@author    Veneziano Salvatore    
+'''@license   GPL
+'''@version   1.00   
+'''@date      2023-03-18
+'''********************************************************************************
+
+
+;Chip Settings
+#chip 16F84,4
+#config OSC=XT, WDTE=OFF
+
+;Defines (Constants)
+#define SoundOut PORTA.0
+
+inizio:
+For prova = 1 To 250 step 30
+	Tone 1000 + prova, 2
+Next
+For prova1 = 1 To 250 step 30
+	Tone 1250- (prova1), 2
+Next
+Goto inizio
+
