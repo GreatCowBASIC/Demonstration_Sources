@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Compilation Report</title>
+</head>
+<body>
+<h1>Compilation Report</h1>
+<p>Compiler Version (YYYY-MM-DD): 1.00.00 2023-04-05 (Windows 64 bit) : Build 1228</p>
+<h2>Compilation time</h2>
+<p> (Compile time: 1.4375 seconds)</p>
+<p> (Assembly time: 0.5625 seconds)</p>
+<p> (Download time: 21.25 seconds)</p>
+<p> (Total time: 23.25 seconds)</p>
+<h2>Chip resource usage:</h2>
+<p>Chip Model: 16F1619</p>
+<p>Program Memory: 1026/8192 words (12.52%)</p>
+<p>RAM: 56/1024 bytes (5.47%)</p>
+<p> OSC: INTOSC, 32Mhz (Internal oscillator)</p>
+<h2>RAM Allocation</h2>
+<table border="1">
+</table>
+<h2>Subroutines</h2>
+<table border="1">
+<tr><th>Name</th><th>Code Size (lines)</th><th>Compiled Size (words)</th><th>Page</th><th>Outgoing calls</th></tr>
+<tr><td>Main</td><td>134</td><td>114</td><td>1</td><td>SYSCOMPEQUAL16(1), SYSDIVSUB16(1), Delay_S(2), READMTOUCH(1), READAD(1), HPWMUPDATE(1), HPWM(1), INITPPS(22), INITSYS(49)</td></tr>
+<tr><td>INITPPS</td><td>1</td><td>5</td><td>1</td><td></td></tr>
+<tr><td>READMTOUCH</td><td>39</td><td>101</td><td>1</td><td>SYSCOMPLESSTHAN16(1), READAD10(1)</td></tr>
+<tr><td>READAD</td><td>74</td><td>74</td><td>1</td><td>Delay_10US(1)</td></tr>
+<tr><td>READAD10</td><td>46</td><td>79</td><td>1</td><td>Delay_10US(1)</td></tr>
+<tr><td>INITPWM</td><td>1438</td><td>26</td><td>1</td><td></td></tr>
+<tr><td>HPWM</td><td>2</td><td>1</td><td>1</td><td>HPWM(1)</td></tr>
+<tr><td>HPWM</td><td>501</td><td>185</td><td>1</td><td>SYSDIVSUB32(1), SYSCOMPEQUAL(1), SYSCOMPEQUAL16(1), CALCULATEDUTY(1)</td></tr>
+<tr><td>HPWMUPDATE</td><td>315</td><td>32</td><td>1</td><td>CALCULATEDUTY(2)</td></tr>
+<tr><td>CALCULATEDUTY</td><td>13</td><td>77</td><td>1</td><td>SYSDIVSUB32(1), SYSMULTSUB32(1)</td></tr>
+<tr><td>INITSYS</td><td>895</td><td>20</td><td>1</td><td></td></tr>
+<tr><td>SYSMULTSUB32</td><td>43</td><td>64</td><td>1</td><td>SYSCOMPLESSTHAN32(1)</td></tr>
+<tr><td>SYSDIVSUB16</td><td>38</td><td>52</td><td>1</td><td>SYSCOMPEQUAL16(1)</td></tr>
+<tr><td>SYSDIVSUB32</td><td>40</td><td>90</td><td>1</td><td>SYSCOMPEQUAL32(1)</td></tr>
+<tr><td>SYSCOMPEQUAL</td><td>20</td><td>6</td><td>1</td><td></td></tr>
+<tr><td>SYSCOMPEQUAL16</td><td>34</td><td>11</td><td>1</td><td></td></tr>
+<tr><td>SYSCOMPEQUAL32</td><td>52</td><td>19</td><td>1</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHAN16</td><td>38</td><td>15</td><td>1</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHAN32</td><td>63</td><td>25</td><td>1</td><td></td></tr>
+<tr><td>Delay_10US</td><td>0</td><td>8</td><td>1</td><td></td></tr>
+<tr><td>Delay_MS</td><td>0</td><td>14</td><td>1</td><td></td></tr>
+<tr><td>Delay_S</td><td>0</td><td>8</td><td>1</td><td>Delay_MS(1)</td></tr>
+</table>
+</body>
+</html>

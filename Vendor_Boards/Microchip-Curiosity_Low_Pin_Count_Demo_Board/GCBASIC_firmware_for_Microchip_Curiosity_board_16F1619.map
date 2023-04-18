@@ -1,0 +1,458 @@
+Microchip MPLAB XC8 PIC(R) Assembler V2.41
+
+Linker command line:
+
+-W-3 \
+  --edf=C:\Program Files\Microchip\xc8\v2.41\pic\dat\20230208172133_en.msgs \
+  --msgdisable=0 -cs \
+  -h+d:\GreatCowBASICGits\Demonstration_Sources.git\trunk\Vendor_Boards\Microchip-Curiosity_Low_Pin_Count_Demo_Board\GCBASIC_firmware_for_Microchip_Curiosity_board_16F1619.sym \
+  --cmf=d:\GreatCowBASICGits\Demonstration_Sources.git\trunk\Vendor_Boards\Microchip-Curiosity_Low_Pin_Count_Demo_Board\GCBASIC_firmware_for_Microchip_Curiosity_board_16F1619.cmf \
+  -z -Q16F1619 -oC:\Users\admin\AppData\Local\Temp\xcAsf4k.\driver_tmp_3.o \
+  --fixupoverflow=error -ver=XC8 PIC(R) Assembler --fixupoverflow=lstwarn \
+  -Md:\GreatCowBASICGits\Demonstration_Sources.git\trunk\Vendor_Boards\Microchip-Curiosity_Low_Pin_Count_Demo_Board\GCBASIC_firmware_for_Microchip_Curiosity_board_16F1619.map \
+  -E1 --acfsm=1493 -ACODE=00h-07FFhx4 -ASTRCODE=00h-01FFFh \
+  -ASTRING=00h-0FFhx32 -ACONST=00h-0FFhx32 -AENTRY=00h-0FFhx32 \
+  -ACOMMON=070h-07Fh -ABANK0=020h-06Fh -ABANK1=0A0h-0EFh \
+  -ABANK2=0120h-016Fh -ABANK3=01A0h-01EFh -ABANK4=0220h-026Fh \
+  -ABANK5=02A0h-02EFh -ABANK6=0320h-036Fh -ABANK7=03A0h-03EFh \
+  -ABANK8=0420h-046Fh -ABANK9=04A0h-04EFh -ABANK10=0520h-056Fh \
+  -ABANK11=05A0h-05EFh -ABANK12=0620h-064Fh -ABIGRAM=02000h-023EFh \
+  -ARAM=020h-06Fh,0A0h-0EFh,0120h-016Fh,01A0h-01EFh,0220h-026Fh,02A0h-02EFh,0320h-036Fh,03A0h-03EFh,0420h-046Fh,04A0h-04EFh,0520h-056Fh,05A0h-05EFh,0620h-064Fh \
+  -AABS1=020h-07Fh,0A0h-0EFh,0120h-016Fh,01A0h-01EFh,0220h-026Fh,02A0h-02EFh,0320h-036Fh,03A0h-03EFh,0420h-046Fh,04A0h-04EFh,0520h-056Fh,05A0h-05EFh,0620h-064Fh \
+  -ASFR0=00h-01Fh -ASFR1=080h-09Fh -ASFR2=0100h-011Fh -ASFR3=0180h-019Fh \
+  -ASFR4=0200h-021Fh -ASFR5=0280h-029Fh -ASFR6=0300h-031Fh \
+  -ASFR7=0380h-039Fh -ASFR8=0400h-041Fh -ASFR9=0480h-049Fh \
+  -ASFR10=0500h-051Fh -ASFR11=0580h-059Fh -ASFR12=0600h-061Fh \
+  -ASFR13=0680h-06EFh -ASFR14=0700h-076Fh -ASFR15=0780h-07EFh \
+  -ASFR16=0800h-086Fh -ASFR17=0880h-08EFh -ASFR18=0900h-096Fh \
+  -ASFR19=0980h-09EFh -ASFR20=0A00h-0A6Fh -ASFR21=0A80h-0AEFh \
+  -ASFR22=0B00h-0B6Fh -ASFR23=0B80h-0BEFh -ASFR24=0C00h-0C6Fh \
+  -ASFR25=0C80h-0CEFh -ASFR26=0D00h-0D6Fh -ASFR27=0D80h-0DEFh \
+  -ASFR28=0E00h-0E6Fh -ASFR29=0E80h-0EEFh -ASFR30=0F00h-0F6Fh \
+  -ASFR31=0F80h-0FEFh -ACONFIG=08007h-08009h -DCONFIG=2 \
+  -AIDLOC=08000h-08003h -DIDLOC=2 -DCODE=2 -DSTRCODE=2 -DSTRING=2 -DCONST=2 \
+  -DENTRY=2 \
+  d:\GreatCowBASICGits\Demonstration_Sources.git\trunk\Vendor_Boards\Microchip-Curiosity_Low_Pin_Count_Demo_Board\GCBASIC_firmware_for_Microchip_Curiosity_board_16F1619.o 
+
+Object code version is 3.11
+
+Machine type is 16F1619
+
+
+
+                Name                               Link     Load   Length Selector   Space Scale
+d:\GreatCowBASICGits\Demonstration_Sources.git\trunk\Vendor_Boards\Microchip-Curiosity_Low_Pin_Count_Demo_Board\GCBASIC_firmware_for_Microchip_Curiosity_board_16F1619.o
+                config                             8007     8007        3        0       4
+                PROGMEM3                              0        0     1800        0       0
+                PROGMEM2                              0        0     1000        0       0
+                PROGMEM1                              0        0      800        0       0
+                PROGMEM0                              0        0      407        0       0
+
+TOTAL           Name                               Link     Load   Length     Space
+        CLASS   CODE           
+                PROGMEM3                              0        0     1800         0
+                PROGMEM2                              0        0     1000         0
+                PROGMEM1                              0        0      800         0
+
+        CLASS   STRCODE        
+
+        CLASS   STRING         
+
+        CLASS   CONST          
+
+        CLASS   ENTRY          
+
+        CLASS   COMMON         
+
+        CLASS   BANK0          
+
+        CLASS   BANK1          
+
+        CLASS   BANK2          
+
+        CLASS   BANK3          
+
+        CLASS   BANK4          
+
+        CLASS   BANK5          
+
+        CLASS   BANK6          
+
+        CLASS   BANK7          
+
+        CLASS   BANK8          
+
+        CLASS   BANK9          
+
+        CLASS   BANK10         
+
+        CLASS   BANK11         
+
+        CLASS   BANK12         
+
+        CLASS   BIGRAM         
+
+        CLASS   RAM            
+
+        CLASS   ABS1           
+
+        CLASS   SFR0           
+
+        CLASS   SFR1           
+
+        CLASS   SFR2           
+
+        CLASS   SFR3           
+
+        CLASS   SFR4           
+
+        CLASS   SFR5           
+
+        CLASS   SFR6           
+
+        CLASS   SFR7           
+
+        CLASS   SFR8           
+
+        CLASS   SFR9           
+
+        CLASS   SFR10          
+
+        CLASS   SFR11          
+
+        CLASS   SFR12          
+
+        CLASS   SFR13          
+
+        CLASS   SFR14          
+
+        CLASS   SFR15          
+
+        CLASS   SFR16          
+
+        CLASS   SFR17          
+
+        CLASS   SFR18          
+
+        CLASS   SFR19          
+
+        CLASS   SFR20          
+
+        CLASS   SFR21          
+
+        CLASS   SFR22          
+
+        CLASS   SFR23          
+
+        CLASS   SFR24          
+
+        CLASS   SFR25          
+
+        CLASS   SFR26          
+
+        CLASS   SFR27          
+
+        CLASS   SFR28          
+
+        CLASS   SFR29          
+
+        CLASS   SFR30          
+
+        CLASS   SFR31          
+
+        CLASS   CONFIG         
+                config                             8007     8007        3         4
+
+        CLASS   IDLOC          
+
+        CLASS   UNCLASSED
+                PROGMEM0                              0        0      407         0
+
+
+SEGMENTS        Name                           Load    Length   Top    Selector   Space  Class     Delta
+
+
+
+UNUSED ADDRESS RANGES
+
+        Name                Unused          Largest block    Delta
+        BANK0            00020-0006F              50           1
+        BANK1            000A0-000EF              50           1
+        BANK10           00520-0056F              50           1
+        BANK11           005A0-005EF              50           1
+        BANK12           00620-0064F              30           1
+        BANK2            00120-0016F              50           1
+        BANK3            001A0-001EF              50           1
+        BANK4            00220-0026F              50           1
+        BANK5            002A0-002EF              50           1
+        BANK6            00320-0036F              50           1
+        BANK7            003A0-003EF              50           1
+        BANK8            00420-0046F              50           1
+        BANK9            004A0-004EF              50           1
+        CODE             01800-01FFF             800           2
+        COMMON           00070-0007F              10           1
+        CONST            01800-01FFF             100           2
+        ENTRY            01800-01FFF             100           2
+        IDLOC            08000-08003               4           2
+        RAM              00020-0006F              50           1
+                         000A0-000EF              50
+                         00120-0016F              50
+                         001A0-001EF              50
+                         00220-0026F              50
+                         002A0-002EF              50
+                         00320-0036F              50
+                         003A0-003EF              50
+                         00420-0046F              50
+                         004A0-004EF              50
+                         00520-0056F              50
+                         005A0-005EF              50
+                         00620-0064F              30
+        STRCODE          01800-01FFF             800           2
+        STRING           01800-01FFF             100           2
+
+                                  Symbol Table
+
+ADCVALUEWORD                      (abs)        00020
+ADCVALUEWORD_H                    (abs)        00021
+ADREADPORT                        (abs)        00022
+BASPROGRAMEND                     PROGMEM0     00075
+BASPROGRAMSTART                   PROGMEM0     00005
+CALCULATEDUTY                     PROGMEM0     00077
+CCPCONCACHE                       (abs)        00023
+D10US_START                       PROGMEM0     000C4
+DELAYTEMP                         (abs)        00070
+DELAYTEMP2                        (abs)        00071
+DELAYUS0                          PROGMEM0     000C6
+DELAYUS1                          PROGMEM0     002B8
+DELAY_10US                        PROGMEM0     000C4
+DELAY_MS                          PROGMEM0     000CC
+DELAY_S                           PROGMEM0     000DA
+DMS_INNER                         PROGMEM0     000D1
+DMS_OUTER                         PROGMEM0     000CF
+DMS_START                         PROGMEM0     000CD
+DS_START                          PROGMEM0     000DA
+ELSE16_1                          PROGMEM0     0016F
+ELSE24_1                          PROGMEM0     0018E
+ELSE25_1                          PROGMEM0     00196
+ELSE2_1                           PROGMEM0     0006A
+ELSE5_1                           PROGMEM0     002D8
+ENDIF1                            PROGMEM0     00070
+ENDIF10                           PROGMEM0     00221
+ENDIF11                           PROGMEM0     00257
+ENDIF12                           PROGMEM0     0025C
+ENDIF13                           PROGMEM0     00261
+ENDIF14                           PROGMEM0     00266
+ENDIF15                           PROGMEM0     0026B
+ENDIF16                           PROGMEM0     00177
+ENDIF17                           PROGMEM0     0019A
+ENDIF18                           PROGMEM0     00122
+ENDIF19                           PROGMEM0     00132
+ENDIF2                            PROGMEM0     00070
+ENDIF20                           PROGMEM0     00142
+ENDIF23                           PROGMEM0     00160
+ENDIF24                           PROGMEM0     00190
+ENDIF25                           PROGMEM0     00198
+ENDIF26                           PROGMEM0     001AE
+ENDIF27                           PROGMEM0     001BA
+ENDIF28                           PROGMEM0     003E5
+ENDIF30                           PROGMEM0     0034F
+ENDIF31                           PROGMEM0     00362
+ENDIF32                           PROGMEM0     00395
+ENDIF33                           PROGMEM0     003B4
+ENDIF4                            PROGMEM0     00042
+ENDIF5                            PROGMEM0     002DA
+ENDIF6                            PROGMEM0     0020D
+ENDIF7                            PROGMEM0     00212
+ENDIF8                            PROGMEM0     00217
+ENDIF9                            PROGMEM0     0021C
+FN_READAD108                      PROGMEM0     00239
+FN_READAD6                        PROGMEM0     001EF
+HPWM27                            PROGMEM0     000E2
+HPWM28                            PROGMEM0     000E3
+HPWMUPDATE                        PROGMEM0     0019C
+INITPPS                           PROGMEM0     001BC
+INITPWM                           PROGMEM0     001C1
+INITSYS                           PROGMEM0     001DB
+LEGACY_STARTOFFIXEDCCPPWMMODECODE PROGMEM0     001C3
+MUL32LOOP                         PROGMEM0     003DB
+PRX_TEMP                          (abs)        00024
+PRX_TEMP_CACHE                    (abs)        00028
+PRX_TEMP_CACHE_E                  (abs)        0002B
+PRX_TEMP_CACHE_H                  (abs)        00029
+PRX_TEMP_CACHE_U                  (abs)        0002A
+PRX_TEMP_E                        (abs)        00027
+PRX_TEMP_H                        (abs)        00025
+PRX_TEMP_U                        (abs)        00026
+PWMCHANNEL                        (abs)        0002C
+PWMDIRECTION                      (abs)        0002D
+PWMDIRECTION_H                    (abs)        0002E
+PWMDUTY                           (abs)        0002F
+PWMDUTYVALUE                      (abs)        00031
+PWMDUTY_H                         (abs)        00030
+PWMFREQ                           (abs)        00032
+PWMFREQOLD                        (abs)        00034
+PWMFREQ_H                         (abs)        00033
+PWMRESOLUTION                     (abs)        00035
+PWMRESOLUTION_H                   (abs)        00036
+PWMSETCOUNTER                     (abs)        00037
+PWMSETCOUNTER_H                   (abs)        00038
+PWMTIMEROLD                       (abs)        00039
+PWMUPDATE_CCPMODE                 PROGMEM0     001AE
+PWMUPDATE_HARDWAREMODEPWM1        PROGMEM0     001A1
+PWMUPDATE_HARDWAREMODEPWM3        PROGMEM0     001A1
+PWMUPDATE_HARDWAREMODEPWMCCP1     PROGMEM0     001AE
+PWMUPDATE_HARDWAREMODEPWMCCP3     PROGMEM0     001BA
+READAD                            (abs)        0003A
+READAD10                          (abs)        0003B
+READAD10_H                        (abs)        0003C
+READMTOUCH                        PROGMEM0     00288
+SAVEADCON0                        (abs)        0003D
+SAVEANSELC                        (abs)        0003E
+SAVELATC                          (abs)        0003F
+SAVEODCONC                        (abs)        00040
+SAVETRISC                         (abs)        00041
+SCLT16TRUE                        PROGMEM0     0031E
+SCLT32TRUE                        PROGMEM0     00337
+SETPWMDUTYCODE                    PROGMEM0     001DA
+STARTOFFIXEDPWMMODECODE           PROGMEM0     001DA
+SYSBYTETEMPA                      (abs)        00075
+SYSBYTETEMPB                      (abs)        00079
+SYSBYTETEMPX                      (abs)        00070
+SYSCOMPEQUAL                      PROGMEM0     002ED
+SYSCOMPEQUAL16                    PROGMEM0     002F3
+SYSCOMPEQUAL32                    PROGMEM0     002FE
+SYSCOMPLESSTHAN16                 PROGMEM0     00311
+SYSCOMPLESSTHAN32                 PROGMEM0     00320
+SYSDIV16START                     PROGMEM0     00351
+SYSDIV32START                     PROGMEM0     00397
+SYSDIVLOOP                        (abs)        00074
+SYSDIVMULTA                       (abs)        00077
+SYSDIVMULTA_H                     (abs)        00078
+SYSDIVMULTB                       (abs)        0007B
+SYSDIVMULTB_H                     (abs)        0007C
+SYSDIVMULTX                       (abs)        00072
+SYSDIVMULTX_H                     (abs)        00073
+SYSDIVSUB16                       PROGMEM0     00339
+SYSDIVSUB32                       PROGMEM0     0036D
+SYSDOLOOP_E1                      PROGMEM0     00075
+SYSDOLOOP_S1                      PROGMEM0     00037
+SYSLONGDIVMULTA                   (abs)        00042
+SYSLONGDIVMULTA_E                 (abs)        00045
+SYSLONGDIVMULTA_H                 (abs)        00043
+SYSLONGDIVMULTA_U                 (abs)        00044
+SYSLONGDIVMULTB                   (abs)        00046
+SYSLONGDIVMULTB_E                 (abs)        00049
+SYSLONGDIVMULTB_H                 (abs)        00047
+SYSLONGDIVMULTB_U                 (abs)        00048
+SYSLONGDIVMULTX                   (abs)        0004A
+SYSLONGDIVMULTX_E                 (abs)        0004D
+SYSLONGDIVMULTX_H                 (abs)        0004B
+SYSLONGDIVMULTX_U                 (abs)        0004C
+SYSLONGTEMPA                      (abs)        00075
+SYSLONGTEMPA_E                    (abs)        00078
+SYSLONGTEMPA_H                    (abs)        00076
+SYSLONGTEMPA_U                    (abs)        00077
+SYSLONGTEMPB                      (abs)        00079
+SYSLONGTEMPB_E                    (abs)        0007C
+SYSLONGTEMPB_H                    (abs)        0007A
+SYSLONGTEMPB_U                    (abs)        0007B
+SYSLONGTEMPX                      (abs)        00070
+SYSLONGTEMPX_E                    (abs)        00073
+SYSLONGTEMPX_H                    (abs)        00071
+SYSLONGTEMPX_U                    (abs)        00072
+SYSMULTSUB32                      PROGMEM0     003C7
+SYSREADAD10WORD                   (abs)        0003B
+SYSREADAD10WORD_H                 (abs)        0003C
+SYSREADADBYTE                     (abs)        0003A
+SYSREPEATLOOP1                    PROGMEM0     0009D
+SYSREPEATLOOP2                    PROGMEM0     000BD
+SYSREPEATLOOPEND1                 PROGMEM0     000A3
+SYSREPEATLOOPEND2                 PROGMEM0     000C3
+SYSREPEATTEMP1                    (abs)        0004E
+SYSSELECT1CASE1                   PROGMEM0     001F1
+SYSSELECT1CASE2                   PROGMEM0     001F9
+SYSSELECT2CASE1                   PROGMEM0     0023B
+SYSSELECT2CASE2                   PROGMEM0     00243
+SYSSELECT3CASE1                   PROGMEM0     00142
+SYSSELECTEND1                     PROGMEM0     001FF
+SYSSELECTEND2                     PROGMEM0     00249
+SYSSELECTEND3                     PROGMEM0     00162
+SYSTEMP1                          (abs)        0004F
+SYSTEMP1_E                        (abs)        00052
+SYSTEMP1_H                        (abs)        00050
+SYSTEMP1_U                        (abs)        00051
+SYSTEMP2                          (abs)        00053
+SYSTEMP3                          (abs)        00054
+SYSWAITLOOP1                      PROGMEM0     002BD
+SYSWAITLOOP2                      PROGMEM0     0022A
+SYSWAITLOOP3                      PROGMEM0     00274
+SYSWAITTEMP10US                   (abs)        00075
+SYSWAITTEMPMS                     (abs)        00072
+SYSWAITTEMPMS_H                   (abs)        00073
+SYSWAITTEMPS                      (abs)        00074
+SYSWAITTEMPUS                     (abs)        00075
+SYSWAITTEMPUS_H                   (abs)        00076
+SYSWORDTEMPA                      (abs)        00075
+SYSWORDTEMPA_H                    (abs)        00076
+SYSWORDTEMPB                      (abs)        00079
+SYSWORDTEMPB_H                    (abs)        0007A
+SYSWORDTEMPX                      (abs)        00070
+SYSWORDTEMPX_H                    (abs)        00071
+TENBITPMWSECTION                  PROGMEM0     00177
+TIMERSELECTIONBITS                (abs)        00055
+TX_PR                             (abs)        00056
+_PWMTIMERSELECTED                 (abs)        00057
+__HPROGMEM0                       PROGMEM0     00407
+__HPROGMEM1                       PROGMEM1     00800
+__HPROGMEM2                       PROGMEM2     01000
+__HPROGMEM3                       PROGMEM3     01800
+__H__absolute__                   __absolute__ 00000
+__Hcode                           code         00000
+__Hconfig                         config       0800A
+__Hdata                           data         00000
+__Hspace_0                        (abs)        01800
+__Hspace_1                        (abs)        00000
+__Hspace_4                        (abs)        10011
+__Hudata                          udata        00000
+__Hudata_bank0                    udata_bank0  00000
+__Hudata_bank1                    udata_bank1  00000
+__Hudata_bank10                   udata_bank10 00000
+__Hudata_bank11                   udata_bank11 00000
+__Hudata_bank12                   udata_bank12 00000
+__Hudata_bank2                    udata_bank2  00000
+__Hudata_bank3                    udata_bank3  00000
+__Hudata_bank4                    udata_bank4  00000
+__Hudata_bank5                    udata_bank5  00000
+__Hudata_bank6                    udata_bank6  00000
+__Hudata_bank7                    udata_bank7  00000
+__Hudata_bank8                    udata_bank8  00000
+__Hudata_bank9                    udata_bank9  00000
+__Hudata_shr                      udata_shr    00000
+__LPROGMEM0                       PROGMEM0     00000
+__LPROGMEM1                       PROGMEM1     00000
+__LPROGMEM2                       PROGMEM2     00000
+__LPROGMEM3                       PROGMEM3     00000
+__L__absolute__                   __absolute__ 00000
+__Lcode                           code         00000
+__Lconfig                         config       00000
+__Ldata                           data         00000
+__Lspace_0                        (abs)        00000
+__Lspace_1                        (abs)        00000
+__Lspace_4                        (abs)        00000
+__Ludata                          udata        00000
+__Ludata_bank0                    udata_bank0  00000
+__Ludata_bank1                    udata_bank1  00000
+__Ludata_bank10                   udata_bank10 00000
+__Ludata_bank11                   udata_bank11 00000
+__Ludata_bank12                   udata_bank12 00000
+__Ludata_bank2                    udata_bank2  00000
+__Ludata_bank3                    udata_bank3  00000
+__Ludata_bank4                    udata_bank4  00000
+__Ludata_bank5                    udata_bank5  00000
+__Ludata_bank6                    udata_bank6  00000
+__Ludata_bank7                    udata_bank7  00000
+__Ludata_bank8                    udata_bank8  00000
+__Ludata_bank9                    udata_bank9  00000
+__Ludata_shr                      udata_shr    00000
+__S0                              (abs)        00000
+__S1                              (abs)        00000
