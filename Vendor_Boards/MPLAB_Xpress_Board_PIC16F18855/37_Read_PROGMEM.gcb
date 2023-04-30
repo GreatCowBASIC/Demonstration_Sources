@@ -85,7 +85,7 @@ If Trim("16F18855") <> ChipNameStr Then
 Else
 
     DIM tshr2 AS Word
-    HSerPrint "0x8006a: "
+    HSerPrint "0x8006: "
     deviceconfigurationRead(0x8006,tshr2)
     HSerPrint "0x"+hex(tshr2_h)
     HSerPrint hex(tshr2)
