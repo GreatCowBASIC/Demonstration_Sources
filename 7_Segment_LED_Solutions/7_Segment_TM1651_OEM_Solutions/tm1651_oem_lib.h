@@ -53,8 +53,7 @@
 
 ' TooDoo:
 '
-#Include "tm1651_oem_msg.h"
-//#Include <TM1651_oem_msg.h>   '< for dev
+#Include <TM1651_oem_msg.h>
 
 ' Variables for use in Main User Program (set these to use the library)
 '--------------------------------

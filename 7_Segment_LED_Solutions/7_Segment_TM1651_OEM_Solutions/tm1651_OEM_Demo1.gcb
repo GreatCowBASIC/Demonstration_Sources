@@ -10,8 +10,8 @@
 
 'Set below configuration first for #chip, pins, display etc...
 '*******************************************************
-#Include "tm1651_oem_lib.h"
-//#Include <TM1651_oem_lib.h>
+
+#Include <TM1651_oem_lib.h>
 
 #OPTION explicit
 '---PIC12F683---
