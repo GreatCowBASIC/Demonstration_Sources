@@ -598,35 +598,35 @@ Sub CmdDemo1
     tmSndStr "Long string display"   ' works better on 6d display
      Wait 1 s
     TM_scroll = Off
-' Set Decimal Point
+  ' Set Decimal Point
     TM_dpPos = TM_DispLen - 2    ' dp at position 2 (set = 0 to disable)
     tmSndDec 1234   ' "12.34" displayed
      Wait 1 s
 
-' Show Leading Zero
+  ' Show Leading Zero
     TM_Blank0 = Off  ' Enable leading zeros
     tmSndDec 123     ' "0123" displayed or "000123" on 6d disp.
      Wait 1 s
      TM_dpPos = 0
-' Control Leading Zeros
+  ' Control Leading Zeros
     tmSndDec(23,,3)  ' " 023"  (parameter 2 is default value)
      TM_Blank0 = On
      Wait 1 s
 
-'Set  segments
+  'Set  segments
     tmCLRdisp : tmCLRbuf
     tmSegBuf(2, 1, On)  ' Digit 2, Segment 1
     tmSegBuf(1, 1, On)  ' Digit 1, Segment 1
     tmsndbuf
     Wait 2 s
 
-'               Optional parameters
-'=========================================================
-' Using command Optional parameters - [options override default]
-'     tmSndDec (Value, Position, Num digits)    Value, option1, option2
-'                           ___________
-'     Buffer/Display       |1 2 3 4 5 6|
-'     tmSndDec (186, 5, 3) |    1 8 6  |
+  '               Optional parameters
+  '=========================================================
+  ' Using command Optional parameters - [options override default]
+  '     tmSndDec (Value, Position, Num digits)    Value, option1, option2
+  '                           ___________
+  '     Buffer/Display       |1 2 3 4 5 6|
+  '     tmSndDec (186, 5, 3) |    1 8 6  |
 
     tmSndDec (70, 4, 2)    ' display value, at position 4, send 2 digits
      Wait 1 s
@@ -641,7 +641,7 @@ Sub CmdDemo1
      tmSndChr("h", 4)        ' Result " FEh"
      Wait 1 s
 
-' Control Leading zero
+  ' Control Leading zero
     tmCLRdisp : tmCLRbuf
     TM_Blank0 = Off         ' Enable leading zeros
     tmSndHex (255, 4, 3)    ' Result " 0FF"
@@ -649,7 +649,7 @@ Sub CmdDemo1
     tmSndHex (2047, 4, 3)   ' Result " 7FF"
     TM_Blank0 = On
 
-' Using the Buffer
+  ' Using the Buffer
     tmDecBuf(1234)
     tmSndBuf                ' Result "1234"
     Wait 1 s
@@ -665,7 +665,7 @@ Sub CmdDemo1
     tmSndBuf                ' Result "3.14159"
     Wait 1 s
 
-'User Buffer                  ' See near start of this demo file to "dim the buffer array"
+  'User Buffer                  ' See near start of this demo file to "dim the buffer array"
     tmDecBuf(25,2,2,Mybuf1)
     tmDecBuf(40,4,2,Mybuf1)
     tmSndBuf(Mybuf1)

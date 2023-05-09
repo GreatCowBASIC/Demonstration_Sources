@@ -1,0 +1,210 @@
+' TM1651 7-Segment OEM display library Demonstration - For Great Cow Basic
+' This is a collection of demo subroutines, each demo is run from Main.
+' For a chip with less Prog. memory/RAM, enable just a few demo's.
+' Using Commands... see Sub CmdDemo1.
+' Ask on the forum for help or feedback any comments/issues.
+
+' Note: As this demo is quite "busy" exercising the library functions, there may be
+'       some anomalies experienced with the compiler & or specific chip.
+'       Due to the modular structure it is easy to disable specific demo's in Main:
+
+'Set below configuration first for #chip, pins, display etc...
+'*******************************************************
+#Include "tm1651_oem_lib.h"
+//#Include <TM1651_oem_lib.h>
+
+#OPTION explicit
+'---PIC12F683---
+'#chip 12F683, 8
+'#Define TM1651_CLK GPIO.0
+'#Define TM1651_DIO GPIO.1
+
+'---Mega2560---
+'#Chip mega2560,16
+'#Define TM1638_DIO PortD.0
+'#Define TM1638_CLK PortD.1
+
+'---PIC16F1829---
+#chip 16F1829, 8
+#config Osc = Int
+#define TM1651_CLK PortB.4
+#define TM1651_DIO PortB.5
+'(Port Dir is set in include file)
+
+
+Dim Value as Long   ' number to display
+Dim lp1 as Byte       ' Loops etc
+Dim lp2 as Byte
+'Dim tmp1 as byte     ' Temp var
+'Dim tmp2 as Byte
+Dim cnt1 as Byte     ' count
+Dim cnt2 as Word     ' count
+Dim Mybuf1(TM_DISPLEN+1+TM_LEDs) as Byte  ' user buffer if needed.
+
+
+
+'  Configuration constants: (If not set will be default value)
+'-------------------------------------------------------------
+#Define TM_DISPLEN 3      ' Number of digits on display (default 3)
+'#Define TM_6DREMAP On    ' Remap digits for 6d module with swapped com pins (default Off)
+'#Define SND_SEQ           ' Enable sequential register addressing mode-see pdf help (default Fixed)
+'#Define KEYMAP BUTNMAP2   ' Only used for weird datasheet map. (default ButnMap1)
+'#Define TM_LEDs 2         ' Use when TM_DISPLEN=4, TM_DispBuf(5 & 6) for other LED's  (default 0)
+'#Define TMDLY 10          ' Modify clk <-> DIO delay us -eg. if need a shorter write message. (default 10)
+'---------------------------
+'#Define NACKCOUNT         ' Enable NACK counts (for testing comm issues)  (default no count)
+'#Define NOACK             ' Ignore ACK state.  (default ack test enabled)
+'NackCnt = 0               ' need to ensure clear if counting NACK's
+'-------------------------------------------------------------
+
+Value = 314
+
+wait 1 ms
+
+  TestAll_1 : Wait 900 ms
+  tmCLRdisp : tmCLRbuf
+  OverRange : Wait 500 ms
+  tmCLRdisp : tmCLRbuf
+
+'   comment/un-comment lines in main to run/hide demos
+'===========================================================
+Main:
+
+
+
+   CmdDemo1
+
+Goto Main
+End
+'===========================================================
+
+Sub Test_TM1651
+  ' Using the Buffer
+    tmDecBuf(123)
+    tmSndBuf                ' Result "123"
+    Wait 1 s
+
+End Sub
+
+'Set all segments
+Sub TestAll_1
+    For Cnt1 = 1 to TM_DISPLEN
+      tmSndDig (255,Cnt1)   '    "888" & all dp's
+    Next
+     Wait 1 s
+End Sub
+
+Sub OverRange
+    For Cnt1 = 1 to TM_DISPLEN
+      tmSegBuf(Cnt1,7,On)   '    "---"
+    Next
+     tmSndBuf
+     Wait 1 s
+End Sub
+
+' Count bad ACK's (Use for testing)
+Sub NackCounter '  use  #Define AckCount to enable counter
+  tmSndStr "NackCnt"
+  wait 900 ms
+  tmSndDec(NackCnt)
+  wait 2 s
+End Sub
+
+
+'   Using Commands
+'=========================================================
+' Using Default parameters
+Sub CmdDemo1
+    tmSndDec 123    ' Display value as decimal
+    Wait 1 s    
+    tmSndHex 123    ' Display as hex
+    Wait 1 s
+    tmSndHex (456)  ' parameter brackets are optional (but usefull with multiple)
+    Wait 1 s
+    tmSndStr "FIN" ' Display string (will display what fits)
+    Wait 1 s
+    tmSndChr("b", 1) ' Display single chr at position 1
+    Wait 1 s
+    TM_scroll = On    ' Turn on text scrolling
+    tmSndStr "Long string display"   ' works better on large number of LEDs
+    Wait 1 s
+    TM_scroll = Off
+  ' Set Decimal Point
+    TM_dpPos = TM_DISPLEN - 2    ' dp at position 2 (set = 0 to disable)
+    tmSndDec 123   ' "12.3" displayed
+    Wait 1 s
+
+  ' Show Leading Zero
+    TM_Blank0 = Off  ' Enable leading zeros
+    tmSndDec 123     ' "012" displayed 
+    Wait 1 s
+    TM_dpPos = 0
+  ' Control Leading Zeros
+    tmSndDec(23,,3)  ' " 023"  (parameter 2 is default value)
+    TM_Blank0 = On
+    Wait 1 s
+
+  'Set  segments
+    tmCLRdisp : tmCLRbuf
+    tmSegBuf(2, 1, On)  ' Digit 2, Segment 1
+    tmSegBuf(1, 1, On)  ' Digit 1, Segment 1
+    tmsndbuf
+    Wait 2 s
+
+  '               Optional parameters
+  '=========================================================
+  ' Using command Optional parameters - [options override default]
+  '     tmSndDec (Value, Position, Num digits)    Value, option1, option2
+  '                           ___________
+  '     Buffer/Display       |1 2 3 4 5 6|
+  '     tmSndDec (186, 5, 3) |    1 8 6  |
+
+    tmSndDec (70, 2, 2)    ' display value, at position 2, send 2 digits
+    Wait 1 s
+    TM_dpPos = 2
+    
+    tmSndDec (12, 2, 2)    ' Result "12.70"  or  "12.70  " 
+    Wait 1 s
+    TM_dpPos = 0           ' dp Off
+
+    tmCLRdisp : tmCLRbuf
+    tmSndHex (254, 3, 1)   '
+    Wait 400 ms
+    tmSndChr("h", 3)        ' Result " FEh"
+    Wait 1 s
+
+  ' Control Leading zero
+    tmCLRdisp : tmCLRbuf
+    TM_Blank0 = Off         ' Enable leading zeros
+    tmSndHex (255, 4, 2)    ' Result " 0FF"
+    Wait 1 s
+    tmSndHex (2047, 4, 1)   ' Result " 7FF"
+    TM_Blank0 = On
+
+  ' Using the Buffer
+    tmDecBuf(123)
+    tmSndBuf                ' Result "123"
+    Wait 1 s
+
+    tmDecBuf(12,2,1)
+    tmDecBuf(4,4,1)
+    tmSegBuf(4, 4, ON)      ' (digit 4, segment 4, on)
+    tmSndBuf                ' Result "12_4"
+    Wait 1 s
+
+    TM_dpPos = 1
+    tmDecBuf(Value)
+    tmSndBuf                ' Result "3.14159"
+    Wait 1 s
+
+  'User Buffer                  ' See near start of this demo file to "dim the buffer array"
+    tmDecBuf(25,2,2,Mybuf1)
+    tmDecBuf(40,4,2,Mybuf1)
+    tmSndBuf(Mybuf1)
+    Wait 1 s
+    tmSndBuf
+    Wait 1 s
+    tmSndBuf(Mybuf1)
+    Wait 2 s
+
+End Sub
