@@ -1,0 +1,379 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------
+'''This program add description here
+'''
+'''
+'''This is a library for the Si7021 breakout board.
+'''
+'''
+''' These sensors use I2C to communicate, 2 pins are required to interface.  Silicon labs has ± 3% relative humidity measurements with a range of 0–80% RH, and ±0.4 °C
+''' temperature accuracy at a range of -10 to +85 °C. Great for all of your environmental sensing projects. It uses I2C for
+''' data transfer so it works with a wide range of microcontrollers.
+'''
+''' The Si7021 is a I2C sensor. That means it uses the two I2C data/clock wires available on most microcontrollers, and can share those pins with other sensors as long as they do not have an address collision. 
+''' For future reference, the I2C address is 0x80 and you cannot change it.
+'''
+'''
+'''Power Pins:
+'''Vin - this is the power pin. Since the chip uses 3 VDC, we have included a voltage regulator on board that will take 3-5VDC and safely convert it down. To power the board, give it the same power as the logic level of your microcontroller - e.g. for a 5V micro like Arduino, use 5V
+'''GND - common ground for power and logic
+'''I2C Logic pins:
+''' SCL - I2C clock pin, connect to your microcontrollers I2C clock line.
+''' SDA - I2C data pin, connect to your microcontrollers I2C data line.
+'''
+'''
+'''Reading in the serial look like this with a reading every second
+'''  50%	28.8F	-1.8C
+'''  50%	28.8F	-1.8C
+'''  50%	28.8F	-1.8C
+'''  50%	28.6F	-1.9C
+'''  49%	28.6F	-1.9C
+'''  49%	28.6F	-1.9C
+'''  49%	28.4F	-2.0C
+'''  49%	28.4F	-2.0C
+'''  49%	28.3F	-2.1C
+'''  49%	28.3F	-2.1C
+'''  49%	28.1F	-2.2C
+'''  49%	28.1F	-2.2C
+'''  49%	28.1F	-2.2C
+'''  49%	27.9F	-2.3C
+'''  49%	27.9F	-2.3C
+'''  49%	27.9F	-2.3C
+'''
+''' Usage:
+'''
+''' Read_Humidity ( Humidity ) - return the Humidity as a byte value
+''' Read_Temperature ( TemperatureC, TemperatureC_Hundredths, TemperatureF, TemperatureF_Hundredths ) - returns the temperature as  Integer and a Byte for each scale.
+''' The programs setups the I2C and Serial and/or LCD.  If you use a PPS chip then you will need to set the PPS.  You can use either/both LCD and Serial - just see the comments below.
+''' 
+''' Connect the sensor as shown in the port details below.  
+'''
+'''@author    name   
+'''@license   GPL
+'''@version   version   
+'''@date      2023-05-27
+'''********************************************************************************
+
+'' -------------------PORTA----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    --------------------EN---------
+''-----------------------------------------
+''
+
+'' -------------------PORTB----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    SDA-DB7-DB6-DB5---
+''-----------------------------------------
+''
+
+'' ------------------PORTC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ----------------SCL-DB4--RS--TX--
+''-----------------------------------------
+''
+
+'' ------------------PORTE-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ----------------RST--------------
+''-----------------------------------------
+''
+
+#chip 16f18346,16
+  #config MCLRE = ON
+  #option explicit
+
+  #startup InitPPS, 85
+
+sub InitPPS
+
+  #IFDEF VAR(PPSLOCK)
+    'always unlock PPS
+    UNLOCKPPS  
+    #IFDEF HI2C_DATA
+      'Module: MSSP1
+      SSP1CLKPPS = 0x13    'RC3 > SCL1
+      RC3PPS = 0x18        'SCL1 > RC3 (bi-directional)
+      RB7PPS = 0x0019      'SDA1 > RB7
+      SSP1DATPPS = 0x00f   'RB7 > SDA1 (bi-directional)
+    #ENDIF
+    #IFDEF USART_BAUD_RATE
+      'Module: EUSART
+      RC0PPS = 0x0014        'TX > RC0
+    #ENDIF
+  #ENDIF
+
+  
+
+End Sub
+
+' Set up LCD Display - comment out `USE_LCD` if LCD not attached or not required
+    #DEFINE USE_LCD
+      #DEFINE LCD_IO 4     '4-bit mode
+      #DEFINE LCD_NO_RW
+      #DEFINE LCD_ENABLE    PORTA.2
+      #DEFINE LCD_RS        PORTC.1
+      #DEFINE LCD_DB7       PORTB.6
+      #DEFINE LCD_DB6       PORTB.5
+      #DEFINE LCD_DB5       PORTB.4
+      #DEFINE LCD_DB4       PORTC.2
+
+      ' Use this include and LCD_IO setting to use LCD to Serial redirection. Mutually exclusive to LCD_IO 4
+      // #include  <lcd2serialredirect.h>
+      // #DEFINE LCD_IO 0
+   
+' Set up serial - comment out `USE_SERIAL` if serial terminal not attached or not required
+    #DEFINE USE_SERIAL
+      #DEFINE USART_BAUD_RATE 9600
+      #DEFINE USART_TX_BLOCKING
+      #DEFINE USART_DELAY OFF
+    
+
+' I2C Setup for Si7021 - required
+    #DEFINE HI2C_BAUD_RATE 100
+    #DEFINE HI2C_DATA     PORTB.7
+    #DEFINE HI2C_CLOCK    PORTC.3
+    Dir HI2C_DATA         in
+    Dir HI2C_CLOCK        in
+    HI2cMode Master
+
+' Si7921 I2C ADDRESS/BITS/ADDRESSES - required
+    #DEFINE SI7021_DEFAULT_ADDRESS 0x80             ' Sensor address - ths is typically fixed on most sensor boards
+
+    #DEFINE SI7021_MEASRH_HOLD_CMD      0xE5        '  Measure Relative Humidity, Hold Master Mode
+    #DEFINE SI7021_MEASRH_NOHOLD_CMD    0xF5        '  Measure Relative Humidity, No Hold Master Mode
+    #DEFINE SI7021_MEASTEMP_HOLD_CMD    0xE3        '  Measure Temperature, Hold Master Mode
+    #DEFINE SI7021_MEASTEMP_NOHOLD_CMD  0xF3        '  Measure Temperature, No Hold Master Mode
+    #DEFINE SI7021_READPREVTEMP_CMD     0xE0        '  Read Temperature Value from Previous RH Measurement
+    #DEFINE SI7021_RESET_CMD            0xFE        '  Reset Command
+    #DEFINE SI7021_WRITERHT_REG_CMD     0xE6        '  Write RH/T User Register 1
+    #DEFINE SI7021_READRHT_REG_CMD      0xE7        '  Read RH/T User Register 1
+    #DEFINE SI7021_WRITEHEATER_REG_CMD  0x51        '  Write Heater Control Register
+    #DEFINE SI7021_READHEATER_REG_CMD   0x11        '  Read Heater Control Register
+    #DEFINE SI7021_REG_HTRE_BIT         0x02        '  Control Register Heater Bit
+    #DEFINE SI7021_ID1_CMD              0xFA0F      '  Read Electronic ID 1st Byte
+    #DEFINE SI7021_ID2_CMD              0xFCC9      '  Read Electronic ID 2nd Byte
+    #DEFINE SI7021_FIRMVERS_CMD         0x84B8      '  Read Firmware Revision
+
+    #DEFINE SI7021_REV_1                0xff        '  Sensor revision 1
+    #DEFINE SI7021_REV_2                0x20        '  Sensor revision 2
+
+' Variables
+    Dim Si7021_HighByte, Si7021_LowByte as byte
+    Dim SiRaw Alias Si7021_HighByte, Si7021_LowByte as Word
+    SiRaw = 0
+    Dim SensorFail as Bit
+    
+    Dim Humidity as Word
+    DIM Temperature as Word
+
+    Dim __Cntr, __ProcessSensor as Byte       'each timer count is 250 ms
+    __Cntr = 0
+
+    Dim TemperatureC as integer
+    Dim TemperatureF as Integer
+    Dim TemperatureC_Hundredths as Byte
+    Dim TemperatureF_Hundredths as Byte
+  
+
+  
+' Main program
+
+  #IFDEF USE_LCD 
+    'Show message on LCD
+    CLS
+    'Print Messages at Fixed locations - conditional on the use of an LCD
+    Locate 0,0
+    Print "TEMP"
+    Locate 1,0
+    Print "HUMD"
+  #ENDIF 
+
+  #IFDEF USE_SERIAL
+    'Show message on Serial Terminal  
+    HserPrintCRLF 2
+    HSerPrint "HUMD"
+    HserSend 9
+    HSerPrint "TEMPf"
+    HserSend 9
+    HSerPrintStringCRLF "TEMPc"
+    
+  #ENDIF
+
+  'Setup a ms timer on timer 2 
+    PR0 = 244                                       ' 250 ms * 16Mz
+    Inittimer0 (OSC, Pre0_32 + TMR0_LFINTOSC, 0)
+    Starttimer 0
+    On interrupt Timer0Overflow Call OneSecond_ISR
+
+
+  ' Main loop
+  Do
+
+    ' Has 1 second passed ? Check the statw id the variable __ProcessSensor
+    If __ProcessSensor = TRUE Then
+
+      //!Do the work...
+      Read_Humidity ( Humidity )
+      
+        #IFDEF USE_LCD 
+          'Display result on LCD
+          If NOT SensorFail Then
+            Locate 1,6
+            If Humidity  < 10 then Print "0"
+            Print Humidity : Print "%": Print " "
+          Else
+            CLS
+            Locate 0,0
+            Print "Sensor Read"
+            Locate 1,0
+            Print "Failure"
+          End If
+          #ENDIF
+        #IFDEF USE_SERIAL
+          If NOT SensorFail Then
+          'Display result on Serial Terminal
+            If Humidity  < 10 then HSerPrint "0"
+            HserPrint Humidity : HserPrint "%": HSerSend 9
+          Else
+            HSerPrintStringCRLF "Humidity Sensor Read Failure"
+          End If
+            #ENDIF        
+
+
+      
+      //!Do the work...
+      Read_Temperature ( TemperatureC, TemperatureC_Hundredths, TemperatureF, TemperatureF_Hundredths )
+        #IFDEF USE_LCD 
+          If NOT SensorFail Then
+            'Display result on LCD
+            Locate 0,6
+            Print TemperatureF : Print "." : Print TemperatureF_Hundredths:Print "f": Print " "
+            Locate 0,12
+            Print TemperatureC : Print "." : Print TemperatureC_Hundredths:Print "c": Print " "
+          Else
+            CLS
+            Locate 0,0
+            Print "Sensor Read"
+            Locate 1,0
+            Print "Failure"
+          End If
+          #ENDIF
+
+        #IFDEF USE_SERIAL
+          If NOT SensorFail Then
+            'Display result on Serial Terminal
+            HserPrint TemperatureF : HserPrint "." : HSerPrint TemperatureF_Hundredths: HSerPrint "f"
+            HSerSend 9
+            HserPrint TemperatureC : HserPrint "." : HSerPrint TemperatureC_Hundredths: HSerPrint "c"
+          Else
+            HSerPrintStringCRLF "Temp Sensor Read Failure"
+          End If
+          #ENDIF
+
+        #IFDEF USE_SERIAL
+          HserPrintCRLF
+          #ENDIF
+      __ProcessSensor = False
+
+    End If
+
+  Loop
+
+
+
+
+Sub Read_Humidity ( out Humidity as Word )
+
+  Dim Humidity as Word
+  Dim Si7021_HighByte, Si7021_LowByte as byte
+  Dim SiRaw Alias Si7021_HighByte, Si7021_LowByte as Word
+
+  SensorFail = False
+  SiRaw = 0
+
+  HI2CStart
+  HI2CSend (SI7021_DEFAULT_ADDRESS)  'Write
+  HI2cSend (SI7021_MEASRH_NOHOLD_CMD)
+  HI2CReStart
+  HI2CSend (SI7021_DEFAULT_ADDRESS | 1)  'read
+  wait 50 ms   ' for conversion 
+  HI2CReStart
+  HI2CSend (SI7021_DEFAULT_ADDRESS | 1 )  'read
+
+  If HI2CWaitMSSPTimeout <> 255 Then
+
+    HI2CReceive (Si7021_HighByte, ACK)
+    HI2CReceive (Si7021_Lowbyte, NACK)
+    HI2Cstop
+
+    'now do the maths
+    Humidity = (([long]SiRaw * 125) / 65536) -6
+
+  else
+
+    SensorFail = TRUE
+    HI2Cstop
+    
+  End If
+
+
+
+End Sub
+
+Sub Read_Temperature ( out TemperatureC as Integer, out TemperatureC_Hundredths, out TemperatureF as Integer, out TemperatureF_Hundredths )
+
+  Dim TemperatureC as integer
+  Dim TemperatureF as Integer
+  Dim TemperatureF_Hundredths as Byte
+
+  SensorFail = False
+
+  HI2CStart
+  HI2CSend (SI7021_DEFAULT_ADDRESS)  'Write
+  HI2cSend (SI7021_READPREVTEMP_CMD)
+  HI2CReStart
+  HI2CSend (SI7021_DEFAULT_ADDRESS | 1 )  'read
+
+  If HI2CWaitMSSPTimeout <> 255  Then
+    HI2CReceive (Si7021_HighByte, ACK)
+    HI2CReceive (Si7021_Lowbyte, NACK)
+    HI2Cstop
+    wait 20 ms
+
+    TemperatureC = (([long]SiRaw * 17572) / 65536) - 4685
+    TemperatureC = TemperatureC / 10
+
+    TemperatureF =   (([integer]TemperatureC * 9) /5) + 320
+    TemperatureF_Hundredths = TemperatureF % 10  'Modulud Divide
+    TemperatureF = TemperatureF / 10
+
+    If TemperatureC < 0 Then
+      TemperatureC_Hundredths = ABS(TemperatureC % 10)
+      TemperatureC = TemperatureC / 10
+    Else
+        TemperatureC_Hundredths = TemperatureC % 10
+        TemperatureC = TemperatureC / 10
+    End If  
+
+
+
+
+  Else
+    SensorFail = TRUE
+    HI2Cstop
+  End If
+End Sub
+
+sub OneSecond_ISR  'ISR
+
+  __Cntr++  'increment 250 ms counter
+
+  'One Second timer checl
+  If __Cntr >= 4 then  '1 seconds has elapsed
+        __Cntr = 0
+        __ProcessSensor = True
+  End if
+
+End Sub
+
+

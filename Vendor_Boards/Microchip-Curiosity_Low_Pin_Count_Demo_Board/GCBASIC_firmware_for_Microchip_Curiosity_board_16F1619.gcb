@@ -119,7 +119,7 @@
         LED4 = !SWITCH1
 
         If PWMSetCounter MOD 64 = 0 Then
-           ' PMW Duty change
+            ' PMW Duty change
             HPWMUpdate 3, ReadAD ( AN4 )
             'PWMDutyValue
             'Cycle the Duty up and down
@@ -129,11 +129,14 @@
             Else If PWMDutyValue = 0 Then
                 PWMDirection = 1
             End If
+
+            ' Read mTouch state
+            ReadmTouch 
+
         End If
         PWMSetCounter++
 
-        ' Read mTouch state
-        ReadmTouch 
+
 
     Loop
 
@@ -213,7 +216,9 @@ Sub ReadmTouch
     ADCvalueWord = ReadAD10(AN5)
 
     'Action result
-    LATC = SaveLATC 
+'LATC = SaveLATC 
+HSerSend ADCvalueWord
+
     If ADCvalueWord > 10 Then
         'If touching S3 touch button
         LED6 = 1

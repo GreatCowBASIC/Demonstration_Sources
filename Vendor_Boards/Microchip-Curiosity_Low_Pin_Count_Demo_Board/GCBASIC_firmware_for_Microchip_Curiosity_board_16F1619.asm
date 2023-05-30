@@ -1,4 +1,4 @@
-;Program compiled by Great Cow BASIC (1.00.00 2023-04-05 (Windows 64 bit) : Build 1228) for Microchip MPASM/MPLAB-X Assembler using FreeBASIC 1.07.1/2023-04-05 CRC29
+;Program compiled by Great Cow BASIC (1.00.00 2023-05-14 (Windows 64 bit) : Build 1247) for Microchip MPASM/MPLAB-X Assembler using FreeBASIC 1.07.1/2023-05-15 CRC29
 ;Need help? 
 ;  See the GCBASIC forums at http://sourceforge.net/projects/gcbasic/forums,
 ;  Check the documentation and Help at http://gcbasic.sourceforge.net/help/,
@@ -12,132 +12,134 @@
  LIST p=16F1619, r=DEC
 #include <P16F1619.inc>
  __CONFIG _CONFIG1, _FCMEN_ON & _CLKOUTEN_OFF & _CP_OFF & _MCLRE_ON & _FOSC_INTOSC
- __CONFIG _CONFIG2, _LVP_ON & _PLLEN_OFF & _WRT_OFF
+ __CONFIG _CONFIG2, _LVP_OFF & _PLLEN_OFF & _WRT_OFF
  __CONFIG _CONFIG3, _WDTE_OFF
 
 ;********************************************************************************
 
 ;Set aside memory locations for variables
-ADCVALUEWORD                     EQU      32          ; 0X20
-ADCVALUEWORD_H                   EQU      33          ; 0X21
-ADREADPORT                       EQU      34          ; 0X22
-CCPCONCACHE                      EQU      35          ; 0X23
-DELAYTEMP                        EQU     112          ; 0X70
-DELAYTEMP2                       EQU     113          ; 0X71
-PRX_TEMP                         EQU      36          ; 0X24
-PRX_TEMP_CACHE                   EQU      40          ; 0X28
-PRX_TEMP_CACHE_E                 EQU      43          ; 0X2B
-PRX_TEMP_CACHE_H                 EQU      41          ; 0X29
-PRX_TEMP_CACHE_U                 EQU      42          ; 0X2A
-PRX_TEMP_E                       EQU      39          ; 0X27
-PRX_TEMP_H                       EQU      37          ; 0X25
-PRX_TEMP_U                       EQU      38          ; 0X26
-PWMCHANNEL                       EQU      44          ; 0X2C
-PWMDIRECTION                     EQU      45          ; 0X2D
-PWMDIRECTION_H                   EQU      46          ; 0X2E
-PWMDUTY                          EQU      47          ; 0X2F
-PWMDUTYVALUE                     EQU      49          ; 0X31
-PWMDUTY_H                        EQU      48          ; 0X30
-PWMFREQ                          EQU      50          ; 0X32
-PWMFREQOLD                       EQU      52          ; 0X34
-PWMFREQ_H                        EQU      51          ; 0X33
-PWMRESOLUTION                    EQU      53          ; 0X35
-PWMRESOLUTION_H                  EQU      54          ; 0X36
-PWMSETCOUNTER                    EQU      55          ; 0X37
-PWMSETCOUNTER_H                  EQU      56          ; 0X38
-PWMTIMEROLD                      EQU      57          ; 0X39
-READAD                           EQU      58          ; 0X3A
-READAD10                         EQU      59          ; 0X3B
-READAD10_H                       EQU      60          ; 0X3C
-SAVEADCON0                       EQU      61          ; 0X3D
-SAVEANSELC                       EQU      62          ; 0X3E
-SAVELATC                         EQU      63          ; 0X3F
-SAVEODCONC                       EQU      64          ; 0X40
-SAVETRISC                        EQU      65          ; 0X41
-SYSBYTETEMPA                     EQU     117          ; 0X75
-SYSBYTETEMPB                     EQU     121          ; 0X79
-SYSBYTETEMPX                     EQU     112          ; 0X70
-SYSDIVLOOP                       EQU     116          ; 0X74
-SYSDIVMULTA                      EQU     119          ; 0X77
-SYSDIVMULTA_H                    EQU     120          ; 0X78
-SYSDIVMULTB                      EQU     123          ; 0X7B
-SYSDIVMULTB_H                    EQU     124          ; 0X7C
-SYSDIVMULTX                      EQU     114          ; 0X72
-SYSDIVMULTX_H                    EQU     115          ; 0X73
-SYSLONGDIVMULTA                  EQU      66          ; 0X42
-SYSLONGDIVMULTA_E                EQU      69          ; 0X45
-SYSLONGDIVMULTA_H                EQU      67          ; 0X43
-SYSLONGDIVMULTA_U                EQU      68          ; 0X44
-SYSLONGDIVMULTB                  EQU      70          ; 0X46
-SYSLONGDIVMULTB_E                EQU      73          ; 0X49
-SYSLONGDIVMULTB_H                EQU      71          ; 0X47
-SYSLONGDIVMULTB_U                EQU      72          ; 0X48
-SYSLONGDIVMULTX                  EQU      74          ; 0X4A
-SYSLONGDIVMULTX_E                EQU      77          ; 0X4D
-SYSLONGDIVMULTX_H                EQU      75          ; 0X4B
-SYSLONGDIVMULTX_U                EQU      76          ; 0X4C
-SYSLONGTEMPA                     EQU     117          ; 0X75
-SYSLONGTEMPA_E                   EQU     120          ; 0X78
-SYSLONGTEMPA_H                   EQU     118          ; 0X76
-SYSLONGTEMPA_U                   EQU     119          ; 0X77
-SYSLONGTEMPB                     EQU     121          ; 0X79
-SYSLONGTEMPB_E                   EQU     124          ; 0X7C
-SYSLONGTEMPB_H                   EQU     122          ; 0X7A
-SYSLONGTEMPB_U                   EQU     123          ; 0X7B
-SYSLONGTEMPX                     EQU     112          ; 0X70
-SYSLONGTEMPX_E                   EQU     115          ; 0X73
-SYSLONGTEMPX_H                   EQU     113          ; 0X71
-SYSLONGTEMPX_U                   EQU     114          ; 0X72
-SYSREPEATTEMP1                   EQU      78          ; 0X4E
-SYSTEMP1                         EQU      79          ; 0X4F
-SYSTEMP1_E                       EQU      82          ; 0X52
-SYSTEMP1_H                       EQU      80          ; 0X50
-SYSTEMP1_U                       EQU      81          ; 0X51
-SYSTEMP2                         EQU      83          ; 0X53
-SYSTEMP3                         EQU      84          ; 0X54
-SYSWAITTEMP10US                  EQU     117          ; 0X75
-SYSWAITTEMPMS                    EQU     114          ; 0X72
-SYSWAITTEMPMS_H                  EQU     115          ; 0X73
-SYSWAITTEMPS                     EQU     116          ; 0X74
-SYSWAITTEMPUS                    EQU     117          ; 0X75
-SYSWAITTEMPUS_H                  EQU     118          ; 0X76
-SYSWORDTEMPA                     EQU     117          ; 0X75
-SYSWORDTEMPA_H                   EQU     118          ; 0X76
-SYSWORDTEMPB                     EQU     121          ; 0X79
-SYSWORDTEMPB_H                   EQU     122          ; 0X7A
-SYSWORDTEMPX                     EQU     112          ; 0X70
-SYSWORDTEMPX_H                   EQU     113          ; 0X71
-TIMERSELECTIONBITS               EQU      85          ; 0X55
-TX_PR                            EQU      86          ; 0X56
-_PWMTIMERSELECTED                EQU      87          ; 0X57
+ADCVALUEWORD                     EQU      32          ; 0x20
+ADCVALUEWORD_H                   EQU      33          ; 0x21
+ADREADPORT                       EQU      34          ; 0x22
+CCPCONCACHE                      EQU      35          ; 0x23
+DELAYTEMP                        EQU     112          ; 0x70
+DELAYTEMP2                       EQU     113          ; 0x71
+PRX_TEMP                         EQU      36          ; 0x24
+PRX_TEMP_CACHE                   EQU      40          ; 0x28
+PRX_TEMP_CACHE_E                 EQU      43          ; 0x2B
+PRX_TEMP_CACHE_H                 EQU      41          ; 0x29
+PRX_TEMP_CACHE_U                 EQU      42          ; 0x2A
+PRX_TEMP_E                       EQU      39          ; 0x27
+PRX_TEMP_H                       EQU      37          ; 0x25
+PRX_TEMP_U                       EQU      38          ; 0x26
+PWMCHANNEL                       EQU      44          ; 0x2C
+PWMDIRECTION                     EQU      45          ; 0x2D
+PWMDIRECTION_H                   EQU      46          ; 0x2E
+PWMDUTY                          EQU      47          ; 0x2F
+PWMDUTYVALUE                     EQU      49          ; 0x31
+PWMDUTY_H                        EQU      48          ; 0x30
+PWMFREQ                          EQU      50          ; 0x32
+PWMFREQOLD                       EQU      52          ; 0x34
+PWMFREQ_H                        EQU      51          ; 0x33
+PWMRESOLUTION                    EQU      53          ; 0x35
+PWMRESOLUTION_H                  EQU      54          ; 0x36
+PWMSETCOUNTER                    EQU      55          ; 0x37
+PWMSETCOUNTER_H                  EQU      56          ; 0x38
+PWMTIMEROLD                      EQU      57          ; 0x39
+READAD                           EQU      58          ; 0x3A
+READAD10                         EQU      59          ; 0x3B
+READAD10_H                       EQU      60          ; 0x3C
+SAVEADCON0                       EQU      61          ; 0x3D
+SAVEANSELC                       EQU      62          ; 0x3E
+SAVELATC                         EQU      63          ; 0x3F
+SAVEODCONC                       EQU      64          ; 0x40
+SAVETRISC                        EQU      65          ; 0x41
+SERDATA                          EQU      66          ; 0x42
+SYSBYTETEMPA                     EQU     117          ; 0x75
+SYSBYTETEMPB                     EQU     121          ; 0x79
+SYSBYTETEMPX                     EQU     112          ; 0x70
+SYSDIVLOOP                       EQU     116          ; 0x74
+SYSDIVMULTA                      EQU     119          ; 0x77
+SYSDIVMULTA_H                    EQU     120          ; 0x78
+SYSDIVMULTB                      EQU     123          ; 0x7B
+SYSDIVMULTB_H                    EQU     124          ; 0x7C
+SYSDIVMULTX                      EQU     114          ; 0x72
+SYSDIVMULTX_H                    EQU     115          ; 0x73
+SYSLONGDIVMULTA                  EQU      67          ; 0x43
+SYSLONGDIVMULTA_E                EQU      70          ; 0x46
+SYSLONGDIVMULTA_H                EQU      68          ; 0x44
+SYSLONGDIVMULTA_U                EQU      69          ; 0x45
+SYSLONGDIVMULTB                  EQU      71          ; 0x47
+SYSLONGDIVMULTB_E                EQU      74          ; 0x4A
+SYSLONGDIVMULTB_H                EQU      72          ; 0x48
+SYSLONGDIVMULTB_U                EQU      73          ; 0x49
+SYSLONGDIVMULTX                  EQU      75          ; 0x4B
+SYSLONGDIVMULTX_E                EQU      78          ; 0x4E
+SYSLONGDIVMULTX_H                EQU      76          ; 0x4C
+SYSLONGDIVMULTX_U                EQU      77          ; 0x4D
+SYSLONGTEMPA                     EQU     117          ; 0x75
+SYSLONGTEMPA_E                   EQU     120          ; 0x78
+SYSLONGTEMPA_H                   EQU     118          ; 0x76
+SYSLONGTEMPA_U                   EQU     119          ; 0x77
+SYSLONGTEMPB                     EQU     121          ; 0x79
+SYSLONGTEMPB_E                   EQU     124          ; 0x7C
+SYSLONGTEMPB_H                   EQU     122          ; 0x7A
+SYSLONGTEMPB_U                   EQU     123          ; 0x7B
+SYSLONGTEMPX                     EQU     112          ; 0x70
+SYSLONGTEMPX_E                   EQU     115          ; 0x73
+SYSLONGTEMPX_H                   EQU     113          ; 0x71
+SYSLONGTEMPX_U                   EQU     114          ; 0x72
+SYSREPEATTEMP1                   EQU      79          ; 0x4F
+SYSTEMP1                         EQU      80          ; 0x50
+SYSTEMP1_E                       EQU      83          ; 0x53
+SYSTEMP1_H                       EQU      81          ; 0x51
+SYSTEMP1_U                       EQU      82          ; 0x52
+SYSTEMP2                         EQU      84          ; 0x54
+SYSTEMP3                         EQU      85          ; 0x55
+SYSWAITTEMP10US                  EQU     117          ; 0x75
+SYSWAITTEMPMS                    EQU     114          ; 0x72
+SYSWAITTEMPMS_H                  EQU     115          ; 0x73
+SYSWAITTEMPS                     EQU     116          ; 0x74
+SYSWAITTEMPUS                    EQU     117          ; 0x75
+SYSWAITTEMPUS_H                  EQU     118          ; 0x76
+SYSWORDTEMPA                     EQU     117          ; 0x75
+SYSWORDTEMPA_H                   EQU     118          ; 0x76
+SYSWORDTEMPB                     EQU     121          ; 0x79
+SYSWORDTEMPB_H                   EQU     122          ; 0x7A
+SYSWORDTEMPX                     EQU     112          ; 0x70
+SYSWORDTEMPX_H                   EQU     113          ; 0x71
+TIMERSELECTIONBITS               EQU      86          ; 0x56
+TX_PR                            EQU      87          ; 0x57
+_PWMTIMERSELECTED                EQU      88          ; 0x58
 
 ;********************************************************************************
 
-;ALIAS VARIABLES
-SYSREADAD10WORD                  EQU 59
-SYSREADAD10WORD_H                EQU 60
-SYSREADADBYTE                    EQU 58
+;Alias variables
+SYSREADAD10WORD EQU 59
+SYSREADAD10WORD_H EQU 60
+SYSREADADBYTE EQU 58
 
 ;********************************************************************************
 
-;VECTORS
+;Vectors
 	ORG	0
-	PAGESEL	BASPROGRAMSTART
-	GOTO	BASPROGRAMSTART
+	pagesel	BASPROGRAMSTART
+	goto	BASPROGRAMSTART
 	ORG	4
-	RETFIE
+	retfie
 
 ;********************************************************************************
 
-;START OF PROGRAM MEMORY PAGE 0
+;Start of program memory page 0
 	ORG	5
 BASPROGRAMSTART
-;CALL INITIALISATION ROUTINES
-	CALL	INITSYS
-	CALL	INITPPS
-	CALL	INITPWM
+;Call initialisation routines
+	call	INITSYS
+	call	INITPPS
+	call	INITUSART
+	call	INITPWM
 
-;START OF THE MAIN PROGRAM
+;Start of the main program
 ;''A demonstration program for GCGB and GCB.
 ;''--------------------------------------------------------------------------------
 ;'' This program recreation of Microchip Curiosity firmware for the 16F1619
@@ -181,170 +183,170 @@ BASPROGRAMSTART
 ;Ensure all variables are explicitly defined
 ;---- Define hardware settings
 ;Dir SWITCH1 In
-	BANKSEL	TRISC
-	BSF	TRISC,4
+	banksel	TRISC
+	bsf	TRISC,4
 ;Dir PORTA.5 Out
-	BCF	TRISA,5
+	bcf	TRISA,5
 ;Dir PORTA.1 Out
-	BCF	TRISA,1
+	bcf	TRISA,1
 ;Dir PORTA.2 Out
-	BCF	TRISA,2
+	bcf	TRISA,2
 ;Dir PORTC.5 Out
-	BCF	TRISC,5
+	bcf	TRISC,5
 ;Dir PORTC.0 In
-	BSF	TRISC,0
+	bsf	TRISC,0
 ;startup wait in seconds
 ;---- Variables
 ;Dim PWMSetCounter As Word
 ;PWMSetCounter = 0
-	BANKSEL	PWMSETCOUNTER
-	CLRF	PWMSETCOUNTER
-	CLRF	PWMSETCOUNTER_H
+	banksel	PWMSETCOUNTER
+	clrf	PWMSETCOUNTER
+	clrf	PWMSETCOUNTER_H
 ;---- Main body of program
 ;LED init on program startup
 ;Wait WAITSECS s
-	MOVLW	1
-	MOVWF	SYSWAITTEMPS
-	CALL	DELAY_S
+	movlw	1
+	movwf	SysWaitTempS
+	call	Delay_S
 ;Set LED4 = 1
-	BANKSEL	LATA
-	BSF	LATA,5
+	banksel	LATA
+	bsf	LATA,5
 ;Set LED5 = 1
-	BSF	LATA,1
+	bsf	LATA,1
 ;Set LED6 = 1
-	BSF	LATA,2
+	bsf	LATA,2
 ;Set LED7 = 1
-	BSF	LATC,5
+	bsf	LATC,5
 ;Wait WAITSECS s
-	MOVLW	1
-	MOVWF	SYSWAITTEMPS
-	BANKSEL	STATUS
-	CALL	DELAY_S
+	movlw	1
+	movwf	SysWaitTempS
+	banksel	STATUS
+	call	Delay_S
 ;Set LED7 = 0
-	BANKSEL	LATC
-	BCF	LATC,5
+	banksel	LATC
+	bcf	LATC,5
 ;Set LED6 = 0
-	BCF	LATA,2
+	bcf	LATA,2
 ;Set LED5 = 0
-	BCF	LATA,1
+	bcf	LATA,1
 ;Set LED4 = 0
-	BCF	LATA,5
+	bcf	LATA,5
 ;Required to support HPWMUpdate when using PWM/CCPn module
 ;PMW Freqency and Duty to value
 ;Dim PWMDutyValue as Byte
 ;Dim PWMDirection as Integer
 ;PWMDirection = 1
-	MOVLW	1
-	BANKSEL	PWMDIRECTION
-	MOVWF	PWMDIRECTION
-	CLRF	PWMDIRECTION_H
+	movlw	1
+	banksel	PWMDIRECTION
+	movwf	PWMDIRECTION
+	clrf	PWMDIRECTION_H
 ;PWMDutyValue = 127
-	MOVLW	127
-	MOVWF	PWMDUTYVALUE
+	movlw	127
+	movwf	PWMDUTYVALUE
 ;PWM3 is an 8 bit signal
 ;HPWM 3, 3, PWMDutyValue, 2
-	MOVLW	3
-	MOVWF	PWMCHANNEL
-	MOVLW	3
-	MOVWF	PWMFREQ
-	CLRF	PWMFREQ_H
-	MOVF	PWMDUTYVALUE,W
-	MOVWF	PWMDUTY
-	CLRF	PWMDUTY_H
-	MOVLW	2
-	MOVWF	_PWMTIMERSELECTED
-	MOVLW	255
-	MOVWF	PWMRESOLUTION
-	CLRF	PWMRESOLUTION_H
-	CALL	HPWM27
+	movlw	3
+	movwf	PWMCHANNEL
+	movlw	3
+	movwf	PWMFREQ
+	clrf	PWMFREQ_H
+	movf	PWMDUTYVALUE,W
+	movwf	PWMDUTY
+	clrf	PWMDUTY_H
+	movlw	2
+	movwf	_PWMTIMERSELECTED
+	movlw	255
+	movwf	PWMRESOLUTION
+	clrf	PWMRESOLUTION_H
+	call	HPWM28
 ;Program infinite loop
 ;Do Forever
-SYSDOLOOP_S1
+SysDoLoop_S1
 ;Set LED to state of switch
 ;LED4 = !SWITCH1
-	CLRF	SYSTEMP2
-	BTFSC	PORTC,4
-	INCF	SYSTEMP2,F
-	COMF	SYSTEMP2,F
-	BANKSEL	LATA
-	BCF	LATA,5
-	BANKSEL	SYSTEMP2
-	BTFSS	SYSTEMP2,0
-	GOTO	ENDIF4
-	BANKSEL	LATA
-	BSF	LATA,5
+	clrf	SysTemp2
+	btfsc	PORTC,4
+	incf	SysTemp2,F
+	comf	SysTemp2,F
+	banksel	LATA
+	bcf	LATA,5
+	banksel	SYSTEMP2
+	btfss	SysTemp2,0
+	goto	ENDIF4
+	banksel	LATA
+	bsf	LATA,5
 ENDIF4
 ;If PWMSetCounter MOD 64 = 0 Then
-	BANKSEL	PWMSETCOUNTER
-	MOVF	PWMSETCOUNTER,W
-	MOVWF	SYSWORDTEMPA
-	MOVF	PWMSETCOUNTER_H,W
-	MOVWF	SYSWORDTEMPA_H
-	MOVLW	64
-	MOVWF	SYSWORDTEMPB
-	CLRF	SYSWORDTEMPB_H
-	CALL	SYSDIVSUB16
-	MOVF	SYSWORDTEMPX,W
-	MOVWF	SYSTEMP1
-	MOVF	SYSWORDTEMPX_H,W
-	MOVWF	SYSTEMP1_H
-	MOVF	SYSTEMP1,W
-	MOVWF	SYSWORDTEMPA
-	MOVF	SYSTEMP1_H,W
-	MOVWF	SYSWORDTEMPA_H
-	CLRF	SYSWORDTEMPB
-	CLRF	SYSWORDTEMPB_H
-	CALL	SYSCOMPEQUAL16
-	BTFSS	SYSBYTETEMPX,0
-	GOTO	ENDIF1
+	banksel	PWMSETCOUNTER
+	movf	PWMSETCOUNTER,W
+	movwf	SysWORDTempA
+	movf	PWMSETCOUNTER_H,W
+	movwf	SysWORDTempA_H
+	movlw	64
+	movwf	SysWORDTempB
+	clrf	SysWORDTempB_H
+	call	SYSDIVSUB16
+	movf	SysWORDTempX,W
+	movwf	SysTemp1
+	movf	SysWORDTempX_H,W
+	movwf	SysTemp1_H
+	movf	SysTemp1,W
+	movwf	SysWORDTempA
+	movf	SysTemp1_H,W
+	movwf	SysWORDTempA_H
+	clrf	SysWORDTempB
+	clrf	SysWORDTempB_H
+	call	SYSCOMPEQUAL16
+	btfss	SysByteTempX,0
+	goto	ENDIF1
 ;PMW Duty change
 ;HPWMUpdate 3, ReadAD ( AN4 )
-	MOVLW	3
-	MOVWF	PWMCHANNEL
-	MOVLW	4
-	MOVWF	ADREADPORT
-	CALL	FN_READAD6
-	MOVF	SYSREADADBYTE,W
-	MOVWF	PWMDUTY
-	CLRF	PWMDUTY_H
-	CALL	HPWMUPDATE
+	movlw	3
+	movwf	PWMCHANNEL
+	movlw	4
+	movwf	ADREADPORT
+	call	FN_READAD7
+	movf	SYSREADADBYTE,W
+	movwf	PWMDUTY
+	clrf	PWMDUTY_H
+	call	HPWMUPDATE
 ;PWMDutyValue
 ;Cycle the Duty up and down
 ;PWMDutyValue = PWMDutyValue + PWMDirection
-	MOVF	PWMDIRECTION,W
-	ADDWF	PWMDUTYVALUE,F
+	movf	PWMDIRECTION,W
+	addwf	PWMDUTYVALUE,F
 ;If PWMDutyValue = 255 Then
-	INCF	PWMDUTYVALUE,W
-	BTFSS	STATUS, Z
-	GOTO	ELSE2_1
+	incf	PWMDUTYVALUE,W
+	btfss	STATUS, Z
+	goto	ELSE2_1
 ;PWMDirection = -1
-	MOVLW	255
-	MOVWF	PWMDIRECTION
-	MOVWF	PWMDIRECTION_H
+	movlw	255
+	movwf	PWMDIRECTION
+	movwf	PWMDIRECTION_H
 ;Else If PWMDutyValue = 0 Then
-	GOTO	ENDIF2
+	goto	ENDIF2
 ELSE2_1
-	MOVF	PWMDUTYVALUE,F
-	BTFSS	STATUS, Z
-	GOTO	ENDIF2
+	movf	PWMDUTYVALUE,F
+	btfss	STATUS, Z
+	goto	ENDIF2
 ;PWMDirection = 1
-	MOVLW	1
-	MOVWF	PWMDIRECTION
-	CLRF	PWMDIRECTION_H
+	movlw	1
+	movwf	PWMDIRECTION
+	clrf	PWMDIRECTION_H
 ;End If
 ENDIF2
+;Read mTouch state
+;ReadmTouch
+	call	READMTOUCH
 ;End If
 ENDIF1
 ;PWMSetCounter++
-	INCF	PWMSETCOUNTER,F
-	BTFSC	STATUS,Z
-	INCF	PWMSETCOUNTER_H,F
-;Read mTouch state
-;ReadmTouch
-	CALL	READMTOUCH
+	incf	PWMSETCOUNTER,F
+	btfsc	STATUS,Z
+	incf	PWMSETCOUNTER_H,F
 ;Loop
-	GOTO	SYSDOLOOP_S1
-SYSDOLOOP_E1
+	goto	SysDoLoop_S1
+SysDoLoop_E1
 ;---- Methods
 ;GCODE Optimisation file - this will optimise ADC operations by disabling the ADC operations on the AD channel that is set to FALSE
 ;to enable ADC operations on a specific AD channel set to TRUE
@@ -360,199 +362,199 @@ SYSDOLOOP_E1
 ;Optimise PWM
 ;Optimise Timers associated with PWM operations
 BASPROGRAMEND
-	SLEEP
-	GOTO	BASPROGRAMEND
+	sleep
+	goto	BASPROGRAMEND
 
 ;********************************************************************************
 
-;SOURCE: PWM.H (4566)
+;Source: pwm.h (4566)
 CALCULATEDUTY
 ;dim PRx_Temp as long
 ;dim PWMDuty as word
 ;dim PWMResolution as word
 ;assumes PRx_Temp and PWMDuty are valid
 ;PRx_Temp = PWMDuty  * ( PRx_Temp + 1 )
-	MOVLW	1
-	ADDWF	PRX_TEMP,W
-	MOVWF	SYSTEMP1
-	MOVLW	0
-	ADDWFC	PRX_TEMP_H,W
-	MOVWF	SYSTEMP1_H
-	MOVLW	0
-	ADDWFC	PRX_TEMP_U,W
-	MOVWF	SYSTEMP1_U
-	MOVLW	0
-	ADDWFC	PRX_TEMP_E,W
-	MOVWF	SYSTEMP1_E
-	MOVF	PWMDUTY,W
-	MOVWF	SYSLONGTEMPA
-	MOVF	PWMDUTY_H,W
-	MOVWF	SYSLONGTEMPA_H
-	CLRF	SYSLONGTEMPA_U
-	CLRF	SYSLONGTEMPA_E
-	MOVF	SYSTEMP1,W
-	MOVWF	SYSLONGTEMPB
-	MOVF	SYSTEMP1_H,W
-	MOVWF	SYSLONGTEMPB_H
-	MOVF	SYSTEMP1_U,W
-	MOVWF	SYSLONGTEMPB_U
-	MOVF	SYSTEMP1_E,W
-	MOVWF	SYSLONGTEMPB_E
-	CALL	SYSMULTSUB32
-	MOVF	SYSLONGTEMPX,W
-	MOVWF	PRX_TEMP
-	MOVF	SYSLONGTEMPX_H,W
-	MOVWF	PRX_TEMP_H
-	MOVF	SYSLONGTEMPX_U,W
-	MOVWF	PRX_TEMP_U
-	MOVF	SYSLONGTEMPX_E,W
-	MOVWF	PRX_TEMP_E
+	movlw	1
+	addwf	PRX_TEMP,W
+	movwf	SysTemp1
+	movlw	0
+	addwfc	PRX_TEMP_H,W
+	movwf	SysTemp1_H
+	movlw	0
+	addwfc	PRX_TEMP_U,W
+	movwf	SysTemp1_U
+	movlw	0
+	addwfc	PRX_TEMP_E,W
+	movwf	SysTemp1_E
+	movf	PWMDUTY,W
+	movwf	SysLONGTempA
+	movf	PWMDUTY_H,W
+	movwf	SysLONGTempA_H
+	clrf	SysLONGTempA_U
+	clrf	SysLONGTempA_E
+	movf	SysTemp1,W
+	movwf	SysLONGTempB
+	movf	SysTemp1_H,W
+	movwf	SysLONGTempB_H
+	movf	SysTemp1_U,W
+	movwf	SysLONGTempB_U
+	movf	SysTemp1_E,W
+	movwf	SysLONGTempB_E
+	call	SYSMULTSUB32
+	movf	SysLONGTempX,W
+	movwf	PRX_TEMP
+	movf	SysLONGTempX_H,W
+	movwf	PRX_TEMP_H
+	movf	SysLONGTempX_U,W
+	movwf	PRX_TEMP_U
+	movf	SysLONGTempX_E,W
+	movwf	PRX_TEMP_E
 ;Set C off
-	BCF	STATUS,C
+	bcf	STATUS,C
 ;Repeat 2
-	MOVLW	2
-	MOVWF	SYSREPEATTEMP1
-SYSREPEATLOOP1
+	movlw	2
+	movwf	SysRepeatTemp1
+SysRepeatLoop1
 ;rotate PRx_Temp left
-	RLF	PRX_TEMP,F
-	RLF	PRX_TEMP_H,F
-	RLF	PRX_TEMP_U,F
-	RLF	PRX_TEMP_E,F
+	rlf	PRX_TEMP,F
+	rlf	PRX_TEMP_H,F
+	rlf	PRX_TEMP_U,F
+	rlf	PRX_TEMP_E,F
 ;End Repeat
-	DECFSZ	SYSREPEATTEMP1,F
-	GOTO	SYSREPEATLOOP1
-SYSREPEATLOOPEND1
+	decfsz	SysRepeatTemp1,F
+	goto	SysRepeatLoop1
+SysRepeatLoopEnd1
 ;PRx_Temp = PRx_Temp / PWMResolution    'where PWMResolution is 255 or 1023
-	MOVF	PRX_TEMP,W
-	MOVWF	SYSLONGTEMPA
-	MOVF	PRX_TEMP_H,W
-	MOVWF	SYSLONGTEMPA_H
-	MOVF	PRX_TEMP_U,W
-	MOVWF	SYSLONGTEMPA_U
-	MOVF	PRX_TEMP_E,W
-	MOVWF	SYSLONGTEMPA_E
-	MOVF	PWMRESOLUTION,W
-	MOVWF	SYSLONGTEMPB
-	MOVF	PWMRESOLUTION_H,W
-	MOVWF	SYSLONGTEMPB_H
-	CLRF	SYSLONGTEMPB_U
-	CLRF	SYSLONGTEMPB_E
-	CALL	SYSDIVSUB32
-	MOVF	SYSLONGTEMPA,W
-	MOVWF	PRX_TEMP
-	MOVF	SYSLONGTEMPA_H,W
-	MOVWF	PRX_TEMP_H
-	MOVF	SYSLONGTEMPA_U,W
-	MOVWF	PRX_TEMP_U
-	MOVF	SYSLONGTEMPA_E,W
-	MOVWF	PRX_TEMP_E
+	movf	PRX_TEMP,W
+	movwf	SysLONGTempA
+	movf	PRX_TEMP_H,W
+	movwf	SysLONGTempA_H
+	movf	PRX_TEMP_U,W
+	movwf	SysLONGTempA_U
+	movf	PRX_TEMP_E,W
+	movwf	SysLONGTempA_E
+	movf	PWMRESOLUTION,W
+	movwf	SysLONGTempB
+	movf	PWMRESOLUTION_H,W
+	movwf	SysLONGTempB_H
+	clrf	SysLONGTempB_U
+	clrf	SysLONGTempB_E
+	call	SYSDIVSUB32
+	movf	SysLONGTempA,W
+	movwf	PRX_TEMP
+	movf	SysLONGTempA_H,W
+	movwf	PRX_TEMP_H
+	movf	SysLONGTempA_U,W
+	movwf	PRX_TEMP_U
+	movf	SysLONGTempA_E,W
+	movwf	PRX_TEMP_E
 ;Set C off
-	BCF	STATUS,C
+	bcf	STATUS,C
 ;Repeat 6
-	MOVLW	6
-	MOVWF	SYSREPEATTEMP1
-SYSREPEATLOOP2
+	movlw	6
+	movwf	SysRepeatTemp1
+SysRepeatLoop2
 ;rotate PRx_Temp left
-	RLF	PRX_TEMP,F
-	RLF	PRX_TEMP_H,F
-	RLF	PRX_TEMP_U,F
-	RLF	PRX_TEMP_E,F
+	rlf	PRX_TEMP,F
+	rlf	PRX_TEMP_H,F
+	rlf	PRX_TEMP_U,F
+	rlf	PRX_TEMP_E,F
 ;End Repeat
-	DECFSZ	SYSREPEATTEMP1,F
-	GOTO	SYSREPEATLOOP2
-SYSREPEATLOOPEND2
+	decfsz	SysRepeatTemp1,F
+	goto	SysRepeatLoop2
+SysRepeatLoopEnd2
 ;exits with PRx_Temp calculated
-	RETURN
+	return
 
 ;********************************************************************************
 
-DELAY_10US
+Delay_10US
 D10US_START
-	MOVLW	25
-	MOVWF	DELAYTEMP
-DELAYUS0
-	DECFSZ	DELAYTEMP,F
-	GOTO	DELAYUS0
-	NOP
-	DECFSZ	SYSWAITTEMP10US, F
-	GOTO	D10US_START
-	RETURN
+	movlw	25
+	movwf	DELAYTEMP
+DelayUS0
+	decfsz	DELAYTEMP,F
+	goto	DelayUS0
+	nop
+	decfsz	SysWaitTemp10US, F
+	goto	D10US_START
+	return
 
 ;********************************************************************************
 
-DELAY_MS
-	INCF	SYSWAITTEMPMS_H, F
+Delay_MS
+	incf	SysWaitTempMS_H, F
 DMS_START
-	MOVLW	14
-	MOVWF	DELAYTEMP2
+	movlw	14
+	movwf	DELAYTEMP2
 DMS_OUTER
-	MOVLW	189
-	MOVWF	DELAYTEMP
+	movlw	189
+	movwf	DELAYTEMP
 DMS_INNER
-	DECFSZ	DELAYTEMP, F
-	GOTO	DMS_INNER
-	DECFSZ	DELAYTEMP2, F
-	GOTO	DMS_OUTER
-	DECFSZ	SYSWAITTEMPMS, F
-	GOTO	DMS_START
-	DECFSZ	SYSWAITTEMPMS_H, F
-	GOTO	DMS_START
-	RETURN
+	decfsz	DELAYTEMP, F
+	goto	DMS_INNER
+	decfsz	DELAYTEMP2, F
+	goto	DMS_OUTER
+	decfsz	SysWaitTempMS, F
+	goto	DMS_START
+	decfsz	SysWaitTempMS_H, F
+	goto	DMS_START
+	return
 
 ;********************************************************************************
 
-DELAY_S
+Delay_S
 DS_START
-	MOVLW	232
-	MOVWF	SYSWAITTEMPMS
-	MOVLW	3
-	MOVWF	SYSWAITTEMPMS_H
-	CALL	DELAY_MS
-	DECFSZ	SYSWAITTEMPS, F
-	GOTO	DS_START
-	RETURN
+	movlw	232
+	movwf	SysWaitTempMS
+	movlw	3
+	movwf	SysWaitTempMS_H
+	call	Delay_MS
+	decfsz	SysWaitTempS, F
+	goto	DS_START
+	return
 
 ;********************************************************************************
 
-;OVERLOADED SIGNATURE: BYTE:WORD:BYTE:BYTE:WORD:, SOURCE: PWM.H (3368)
-HPWM27
+;Overloaded signature: BYTE:WORD:BYTE:BYTE:word:, Source: pwm.h (3368)
+HPWM28
 ;dim PWMDuty as word
 ;HPWM ( PWMChannel, PWMFreq, [word]PWMDuty, _PWMTimerSelected, PWMResolution  )
-	GOTO	HPWM28
+	goto	HPWM29
 
 ;********************************************************************************
 
-;OVERLOADED SIGNATURE: BYTE:WORD:WORD:BYTE:WORD:, SOURCE: PWM.H (3375)
-HPWM28
+;Overloaded signature: BYTE:WORD:WORD:BYTE:word:, Source: pwm.h (3375)
+HPWM29
 ;Dim PRx_Temp as LONG
 ;Dim TimerSelectionBits as byte
 ;If HPWM_FAST operation selected, only recalculate duty timer prescaler when
 ;needed.
 ;If ( PWMFreq <> PWMFreqOld )  or ( _PWMTimerSelected <> PWMTimerOld ) Then
-	MOVF	PWMFREQ,W
-	MOVWF	SYSWORDTEMPA
-	MOVF	PWMFREQ_H,W
-	MOVWF	SYSWORDTEMPA_H
-	MOVF	PWMFREQOLD,W
-	MOVWF	SYSWORDTEMPB
-	CLRF	SYSWORDTEMPB_H
-	CALL	SYSCOMPEQUAL16
-	COMF	SYSBYTETEMPX,F
-	MOVF	SYSBYTETEMPX,W
-	MOVWF	SYSTEMP2
-	MOVF	_PWMTIMERSELECTED,W
-	MOVWF	SYSBYTETEMPA
-	MOVF	PWMTIMEROLD,W
-	MOVWF	SYSBYTETEMPB
-	CALL	SYSCOMPEQUAL
-	COMF	SYSBYTETEMPX,F
-	MOVF	SYSBYTETEMPX,W
-	MOVWF	SYSTEMP1
-	MOVF	SYSTEMP2,W
-	IORWF	SYSTEMP1,W
-	MOVWF	SYSTEMP3
-	BTFSS	SYSTEMP3,0
-	GOTO	ELSE16_1
+	movf	PWMFREQ,W
+	movwf	SysWORDTempA
+	movf	PWMFREQ_H,W
+	movwf	SysWORDTempA_H
+	movf	PWMFREQOLD,W
+	movwf	SysWORDTempB
+	clrf	SysWORDTempB_H
+	call	SYSCOMPEQUAL16
+	comf	SysByteTempX,F
+	movf	SysByteTempX,W
+	movwf	SysTemp2
+	movf	_PWMTIMERSELECTED,W
+	movwf	SysBYTETempA
+	movf	PWMTIMEROLD,W
+	movwf	SysBYTETempB
+	call	SYSCOMPEQUAL
+	comf	SysByteTempX,F
+	movf	SysByteTempX,W
+	movwf	SysTemp1
+	movf	SysTemp2,W
+	iorwf	SysTemp1,W
+	movwf	SysTemp3
+	btfss	SysTemp3,0
+	goto	ELSE16_1
 ;Commence calculations of PMW parameters
 ;This figures out Prescaler required.  We can set to 1, 4 or 16 to set Tx_PR
 ;So, start with 1 - check the remainder. If the remainder in the high byte is greater then zero then do same with a prescaler value of 4
@@ -560,211 +562,211 @@ HPWM28
 ;So, using 16
 ;This simply sets up Tx_PR to 1,4 or 16
 ;PRx_Temp  = PWMOsc1 / PWMFreq
-	MOVLW	64
-	MOVWF	SYSLONGTEMPA
-	MOVLW	31
-	MOVWF	SYSLONGTEMPA_H
-	CLRF	SYSLONGTEMPA_U
-	CLRF	SYSLONGTEMPA_E
-	MOVF	PWMFREQ,W
-	MOVWF	SYSLONGTEMPB
-	MOVF	PWMFREQ_H,W
-	MOVWF	SYSLONGTEMPB_H
-	CLRF	SYSLONGTEMPB_U
-	CLRF	SYSLONGTEMPB_E
-	CALL	SYSDIVSUB32
-	MOVF	SYSLONGTEMPA,W
-	MOVWF	PRX_TEMP
-	MOVF	SYSLONGTEMPA_H,W
-	MOVWF	PRX_TEMP_H
-	MOVF	SYSLONGTEMPA_U,W
-	MOVWF	PRX_TEMP_U
-	MOVF	SYSLONGTEMPA_E,W
-	MOVWF	PRX_TEMP_E
+	movlw	64
+	movwf	SysLONGTempA
+	movlw	31
+	movwf	SysLONGTempA_H
+	clrf	SysLONGTempA_U
+	clrf	SysLONGTempA_E
+	movf	PWMFREQ,W
+	movwf	SysLONGTempB
+	movf	PWMFREQ_H,W
+	movwf	SysLONGTempB_H
+	clrf	SysLONGTempB_U
+	clrf	SysLONGTempB_E
+	call	SYSDIVSUB32
+	movf	SysLONGTempA,W
+	movwf	PRX_TEMP
+	movf	SysLONGTempA_H,W
+	movwf	PRX_TEMP_H
+	movf	SysLONGTempA_U,W
+	movwf	PRX_TEMP_U
+	movf	SysLONGTempA_E,W
+	movwf	PRX_TEMP_E
 ;Tx_PR = 1
-	MOVLW	1
-	MOVWF	TX_PR
+	movlw	1
+	movwf	TX_PR
 ;IF PRx_Temp_H > 0 then
-	MOVF	PRX_TEMP_H,W
-	SUBLW	0
-	BTFSC	STATUS, C
-	GOTO	ENDIF18
+	movf	PRX_TEMP_H,W
+	sublw	0
+	btfsc	STATUS, C
+	goto	ENDIF18
 ;Tx_PR = 4
-	MOVLW	4
-	MOVWF	TX_PR
+	movlw	4
+	movwf	TX_PR
 ;Divide by 4
 ;set STATUS.C off
-	BCF	STATUS,C
+	bcf	STATUS,C
 ;rotate PRx_Temp right
-	RRF	PRX_TEMP_E,F
-	RRF	PRX_TEMP_U,F
-	RRF	PRX_TEMP_H,F
-	RRF	PRX_TEMP,F
+	rrf	PRX_TEMP_E,F
+	rrf	PRX_TEMP_U,F
+	rrf	PRX_TEMP_H,F
+	rrf	PRX_TEMP,F
 ;set STATUS.C off
-	BCF	STATUS,C
+	bcf	STATUS,C
 ;rotate PRx_Temp right
-	RRF	PRX_TEMP_E,F
-	RRF	PRX_TEMP_U,F
-	RRF	PRX_TEMP_H,F
-	RRF	PRX_TEMP,F
+	rrf	PRX_TEMP_E,F
+	rrf	PRX_TEMP_U,F
+	rrf	PRX_TEMP_H,F
+	rrf	PRX_TEMP,F
 ;end if
 ENDIF18
 ;IF PRx_Temp_H > 0 then
-	MOVF	PRX_TEMP_H,W
-	SUBLW	0
-	BTFSC	STATUS, C
-	GOTO	ENDIF19
+	movf	PRX_TEMP_H,W
+	sublw	0
+	btfsc	STATUS, C
+	goto	ENDIF19
 ;Tx_PR = 16
-	MOVLW	16
-	MOVWF	TX_PR
+	movlw	16
+	movwf	TX_PR
 ;Divide by 4
 ;set STATUS.C off
-	BCF	STATUS,C
+	bcf	STATUS,C
 ;rotate PRx_Temp right
-	RRF	PRX_TEMP_E,F
-	RRF	PRX_TEMP_U,F
-	RRF	PRX_TEMP_H,F
-	RRF	PRX_TEMP,F
+	rrf	PRX_TEMP_E,F
+	rrf	PRX_TEMP_U,F
+	rrf	PRX_TEMP_H,F
+	rrf	PRX_TEMP,F
 ;set STATUS.C off
-	BCF	STATUS,C
+	bcf	STATUS,C
 ;rotate PRx_Temp right
-	RRF	PRX_TEMP_E,F
-	RRF	PRX_TEMP_U,F
-	RRF	PRX_TEMP_H,F
-	RRF	PRX_TEMP,F
+	rrf	PRX_TEMP_E,F
+	rrf	PRX_TEMP_U,F
+	rrf	PRX_TEMP_H,F
+	rrf	PRX_TEMP,F
 ;end if
 ENDIF19
 ;IF PRx_Temp_H > 0 then
-	MOVF	PRX_TEMP_H,W
-	SUBLW	0
-	BTFSC	STATUS, C
-	GOTO	ENDIF20
+	movf	PRX_TEMP_H,W
+	sublw	0
+	btfsc	STATUS, C
+	goto	ENDIF20
 ;Tx_PR = 64
-	MOVLW	64
-	MOVWF	TX_PR
+	movlw	64
+	movwf	TX_PR
 ;Divide by 4
 ;set STATUS.C off
-	BCF	STATUS,C
+	bcf	STATUS,C
 ;rotate PRx_Temp right
-	RRF	PRX_TEMP_E,F
-	RRF	PRX_TEMP_U,F
-	RRF	PRX_TEMP_H,F
-	RRF	PRX_TEMP,F
+	rrf	PRX_TEMP_E,F
+	rrf	PRX_TEMP_U,F
+	rrf	PRX_TEMP_H,F
+	rrf	PRX_TEMP,F
 ;set STATUS.C off
-	BCF	STATUS,C
+	bcf	STATUS,C
 ;rotate PRx_Temp right
-	RRF	PRX_TEMP_E,F
-	RRF	PRX_TEMP_U,F
-	RRF	PRX_TEMP_H,F
-	RRF	PRX_TEMP,F
+	rrf	PRX_TEMP_E,F
+	rrf	PRX_TEMP_U,F
+	rrf	PRX_TEMP_H,F
+	rrf	PRX_TEMP,F
 ;end if
 ENDIF20
 ;This section setups the timer
 ;Set up PRx dependent on timer selected
 ;Select Case _PWMTimerSelected
 ;case 2 'Select timer2 as the driver for PWM
-SYSSELECT3CASE1
-	MOVLW	2
-	SUBWF	_PWMTIMERSELECTED,W
-	BTFSS	STATUS, Z
-	GOTO	SYSSELECTEND3
+SysSelect3Case1
+	movlw	2
+	subwf	_PWMTIMERSELECTED,W
+	btfss	STATUS, Z
+	goto	SysSelectEnd3
 ;Set PR2
 ;PR2 = PRx_Temp  'This is required in the next sction of code, and as will not know which timer has been selected
-	MOVF	PRX_TEMP,W
-	MOVWF	PR2
+	movf	PRX_TEMP,W
+	movwf	PR2
 ;Set Clock Source, if required
 ;Set to FOSC/4 for backward compatibility@2d where CS<3:0> = 0000 = Fosc/4
 ;T2CLKCON.T2CS0 = 0
-	BCF	T2CLKCON,T2CS0
+	bcf	T2CLKCON,T2CS0
 ;T2CLKCON.T2CS1 = 0
-	BCF	T2CLKCON,T2CS1
+	bcf	T2CLKCON,T2CS1
 ;T2CLKCON.T2CS2 = 0
-	BCF	T2CLKCON,T2CS2
+	bcf	T2CLKCON,T2CS2
 ;T2CLKCON.T2CS3 = 0
-	BCF	T2CLKCON,T2CS3
+	bcf	T2CLKCON,T2CS3
 ;T2PSYNC Not Synchronized; T2MODE Software control; T2CKPOL Rising Edge; T2CKSYNC Not Synchronized
 ;T2HLT = 0x00
 ;#ifdef var(T2HLT): T2HLT = 0x00: #ENDIF
-	CLRF	T2HLT
+	clrf	T2HLT
 ;T2RSEL T2CKIPPS pin
 ;T2RST = 0x00
 ;#ifdef var(T2RST): T2RST = 0x00: #ENDIF
-	CLRF	T2RST
+	clrf	T2RST
 ;TMR2.  Holding Register for the 8-bit TMR2 Register
 ;T2TMR = 0x00
 ;#ifdef var(T2TMR): T2TMR = 0x00: #ENDIF
-	CLRF	T2TMR
+	clrf	T2TMR
 ;Setup Timerx by clearing the Prescaler bits - it is set next....
 ;SET T2CKPS0 OFF
-	BCF	T2CON,T2CKPS0
+	bcf	T2CON,T2CKPS0
 ;SET T2CKPS1 OFF
-	BCF	T2CON,T2CKPS1
+	bcf	T2CON,T2CKPS1
 ;SET T2CKPS2 OFF
-	BCF	T2CON,T2CKPS2
+	bcf	T2CON,T2CKPS2
 ;Set Prescaler bits T2CON @3
 ;if Tx_PR = 4  then SET T2CKPS1 ON
-	MOVLW	4
-	SUBWF	TX_PR,W
-	BTFSC	STATUS, Z
+	movlw	4
+	subwf	TX_PR,W
+	btfsc	STATUS, Z
 ;if Tx_PR = 4  then SET T2CKPS1 ON
-	BSF	T2CON,T2CKPS1
+	bsf	T2CON,T2CKPS1
 ;if Tx_PR = 4  then SET T2CKPS1 ON
 ;if Tx_PR = 16 then SET T2CKPS2 ON
-	MOVLW	16
-	SUBWF	TX_PR,W
-	BTFSC	STATUS, Z
+	movlw	16
+	subwf	TX_PR,W
+	btfsc	STATUS, Z
 ;if Tx_PR = 16 then SET T2CKPS2 ON
-	BSF	T2CON,T2CKPS2
+	bsf	T2CON,T2CKPS2
 ;if Tx_PR = 16 then SET T2CKPS2 ON
 ;if Tx_PR = 64 then SET T2CKPS2 ON: SET T2CKPS1 ON
-	MOVLW	64
-	SUBWF	TX_PR,W
-	BTFSS	STATUS, Z
-	GOTO	ENDIF23
+	movlw	64
+	subwf	TX_PR,W
+	btfss	STATUS, Z
+	goto	ENDIF23
 ;if Tx_PR = 64 then SET T2CKPS2 ON: SET T2CKPS1 ON
-	BSF	T2CON,T2CKPS2
+	bsf	T2CON,T2CKPS2
 ;if Tx_PR = 64 then SET T2CKPS2 ON: SET T2CKPS1 ON
-	BSF	T2CON,T2CKPS1
+	bsf	T2CON,T2CKPS1
 ;if Tx_PR = 64 then SET T2CKPS2 ON: SET T2CKPS1 ON
 ENDIF23
 ;Clearing IF flag.
 ;SET TMR2IF OFF
-	BCF	PIR1,TMR2IF
+	bcf	PIR1,TMR2IF
 ;Start Timer2
 ;SET TMR2ON ON
-	BSF	T2CON,TMR2ON
+	bsf	T2CON,TMR2ON
 ;End Select
-SYSSELECTEND3
+SysSelectEnd3
 ;PWMFreqOld = PWMFreq
-	MOVF	PWMFREQ,W
-	MOVWF	PWMFREQOLD
+	movf	PWMFREQ,W
+	movwf	PWMFREQOLD
 ;PWMTimerOld = _PWMTimerSelected
-	MOVF	_PWMTIMERSELECTED,W
-	MOVWF	PWMTIMEROLD
+	movf	_PWMTIMERSELECTED,W
+	movwf	PWMTIMEROLD
 ;Cache the PRx_Temp to support HPWM_FAST.
 ;PRx_Temp_Cache = PRx_Temp
-	MOVF	PRX_TEMP,W
-	MOVWF	PRX_TEMP_CACHE
-	MOVF	PRX_TEMP_H,W
-	MOVWF	PRX_TEMP_CACHE_H
-	MOVF	PRX_TEMP_U,W
-	MOVWF	PRX_TEMP_CACHE_U
-	MOVF	PRX_TEMP_E,W
-	MOVWF	PRX_TEMP_CACHE_E
+	movf	PRX_TEMP,W
+	movwf	PRX_TEMP_CACHE
+	movf	PRX_TEMP_H,W
+	movwf	PRX_TEMP_CACHE_H
+	movf	PRX_TEMP_U,W
+	movwf	PRX_TEMP_CACHE_U
+	movf	PRX_TEMP_E,W
+	movwf	PRX_TEMP_CACHE_E
 ;Else
-	GOTO	ENDIF16
+	goto	ENDIF16
 ELSE16_1
 ;As wierd as this looks.... restore the cache to PRX_temp as we need it when in HPWM_Fast mode
 ;PRx_Temp is used in channel setting section, so, if we did not restore we would not have a consistent set of information.
 ;PRx_Temp = PRx_Temp_Cache
-	MOVF	PRX_TEMP_CACHE,W
-	MOVWF	PRX_TEMP
-	MOVF	PRX_TEMP_CACHE_H,W
-	MOVWF	PRX_TEMP_H
-	MOVF	PRX_TEMP_CACHE_U,W
-	MOVWF	PRX_TEMP_U
-	MOVF	PRX_TEMP_CACHE_E,W
-	MOVWF	PRX_TEMP_E
+	movf	PRX_TEMP_CACHE,W
+	movwf	PRX_TEMP
+	movf	PRX_TEMP_CACHE_H,W
+	movwf	PRX_TEMP_H
+	movf	PRX_TEMP_CACHE_U,W
+	movwf	PRX_TEMP_U
+	movf	PRX_TEMP_CACHE_E,W
+	movwf	PRX_TEMP_E
 ;End if
 ENDIF16
 TENBITPMWSECTION
@@ -773,75 +775,75 @@ TENBITPMWSECTION
 ;Dim PRx_Temp_Cache as Long
 ;Cache the PRx_Temp value ONLY when NOT HPWM_FAST - this can be then used by HPWMUpdate
 ;if PWMChannel = 3 then  'in section USE_HPWM3
-	MOVLW	3
-	SUBWF	PWMCHANNEL,W
-	BTFSS	STATUS, Z
-	GOTO	ENDIF17
+	movlw	3
+	subwf	PWMCHANNEL,W
+	btfss	STATUS, Z
+	goto	ENDIF17
 ;calculates duty, assisgns duty to  bits 15-8 and 7-6 of PMWxDH(H&L) and links this PWM to the correct timer
 ;calculateDuty 'Sets PRx_Temp  to the duty value for bits 15-8 and 7-6
-	CALL	CALCULATEDUTY
+	call	CALCULATEDUTY
 ;PWM3DCH = PRx_Temp_H
-	MOVF	PRX_TEMP_H,W
-	BANKSEL	PWM3DCH
-	MOVWF	PWM3DCH
+	movf	PRX_TEMP_H,W
+	banksel	PWM3DCH
+	movwf	PWM3DCH
 ;PWM3DCL = PRx_Temp
-	BANKSEL	PRX_TEMP
-	MOVF	PRX_TEMP,W
-	BANKSEL	PWM3DCL
-	MOVWF	PWM3DCL
+	banksel	PRX_TEMP
+	movf	PRX_TEMP,W
+	banksel	PWM3DCL
+	movwf	PWM3DCL
 ;Select timer by updating CCPTMRS register
 ;TimerSelectionBits =  (_PWMTimerSelected / 2 )-1 'This is a ChipPWMTimerVariant chip.  Move the timer bits to the left by one bit to cater for different addressing
-	BCF	STATUS,C
-	BANKSEL	_PWMTIMERSELECTED
-	RRF	_PWMTIMERSELECTED,W
-	MOVWF	SYSTEMP2
-	DECF	SYSTEMP2,W
-	MOVWF	TIMERSELECTIONBITS
+	bcf	STATUS,C
+	banksel	_PWMTIMERSELECTED
+	rrf	_PWMTIMERSELECTED,W
+	movwf	SysTemp2
+	decf	SysTemp2,W
+	movwf	TIMERSELECTIONBITS
 ;SetWith ( P3TSEL0, TimerSelectionBits.0 )
 ;Macro Source: stdbasic.h (370)
 ;if Source then
-	BTFSS	TIMERSELECTIONBITS,0
-	GOTO	ELSE24_1
+	btfss	TIMERSELECTIONBITS,0
+	goto	ELSE24_1
 ;TargetBit = 1
-	BANKSEL	CCPTMRS
-	BSF	CCPTMRS,P3TSEL0
+	banksel	CCPTMRS
+	bsf	CCPTMRS,P3TSEL0
 ;else
-	GOTO	ENDIF24
+	goto	ENDIF24
 ELSE24_1
 ;TargetBit = 0
-	BANKSEL	CCPTMRS
-	BCF	CCPTMRS,P3TSEL0
+	banksel	CCPTMRS
+	bcf	CCPTMRS,P3TSEL0
 ;end if
 ENDIF24
 ;SetWith ( P3TSEL1, TimerSelectionBits.1 )
 ;Macro Source: stdbasic.h (370)
 ;if Source then
-	BANKSEL	TIMERSELECTIONBITS
-	BTFSS	TIMERSELECTIONBITS,1
-	GOTO	ELSE25_1
+	banksel	TIMERSELECTIONBITS
+	btfss	TIMERSELECTIONBITS,1
+	goto	ELSE25_1
 ;TargetBit = 1
-	BANKSEL	CCPTMRS
-	BSF	CCPTMRS,P3TSEL1
+	banksel	CCPTMRS
+	bsf	CCPTMRS,P3TSEL1
 ;else
-	GOTO	ENDIF25
+	goto	ENDIF25
 ELSE25_1
 ;TargetBit = 0
-	BANKSEL	CCPTMRS
-	BCF	CCPTMRS,P3TSEL1
+	banksel	CCPTMRS
+	bcf	CCPTMRS,P3TSEL1
 ;end if
 ENDIF25
 ;Start PMW3
 ;Set PWM3EN On
-	BANKSEL	PWM3CON
-	BSF	PWM3CON,PWM3EN
+	banksel	PWM3CON
+	bsf	PWM3CON,PWM3EN
 ;End if
 ENDIF17
-	BANKSEL	STATUS
-	RETURN
+	banksel	STATUS
+	return
 
 ;********************************************************************************
 
-;SOURCE: PWM.H (4076)
+;Source: pwm.h (4076)
 HPWMUPDATE
 ;The following code can be optimised via 'defines'
 ;dim PRx_Temp as long
@@ -849,112 +851,118 @@ HPWMUPDATE
 ;dim PWMResolution as word
 ;Restore the cache value
 ;PRx_Temp = PRx_Temp_Cache
-	MOVF	PRX_TEMP_CACHE,W
-	MOVWF	PRX_TEMP
-	CLRF	PRX_TEMP_H
-	CLRF	PRX_TEMP_U
-	CLRF	PRX_TEMP_E
+	movf	PRX_TEMP_CACHE,W
+	movwf	PRX_TEMP
+	clrf	PRX_TEMP_H
+	clrf	PRX_TEMP_U
+	clrf	PRX_TEMP_E
 PWMUPDATE_HARDWAREMODEPWM1
 PWMUPDATE_HARDWAREMODEPWM3
 ;if PWMChannel = 3 then  'in section USE_HPWM3
-	MOVLW	3
-	SUBWF	PWMCHANNEL,W
-	BTFSS	STATUS, Z
-	GOTO	ENDIF26
+	movlw	3
+	subwf	PWMCHANNEL,W
+	btfss	STATUS, Z
+	goto	ENDIF26
 ;calculates duty, assisgns duty to  bits 15-8 and 7-6 of PMWxDH(H&L) and links this PWM to the correct timer
 ;calculateDuty 'Sets PRx_Temp  to the duty value for bits 15-8 and 7-6
-	CALL	CALCULATEDUTY
+	call	CALCULATEDUTY
 ;assumes PRx_Temp and PWMDuty are valid
 ;PWM3DCH = PRx_Temp_H
-	MOVF	PRX_TEMP_H,W
-	BANKSEL	PWM3DCH
-	MOVWF	PWM3DCH
+	movf	PRX_TEMP_H,W
+	banksel	PWM3DCH
+	movwf	PWM3DCH
 ;PWM3DCL = PRx_Temp
-	BANKSEL	PRX_TEMP
-	MOVF	PRX_TEMP,W
-	BANKSEL	PWM3DCL
-	MOVWF	PWM3DCL
+	banksel	PRX_TEMP
+	movf	PRX_TEMP,W
+	banksel	PWM3DCL
+	movwf	PWM3DCL
 ;Set PWM3EN On
-	BSF	PWM3CON,PWM3EN
+	bsf	PWM3CON,PWM3EN
 ;End if
 ENDIF26
 PWMUPDATE_CCPMODE
 PWMUPDATE_HARDWAREMODEPWMCCP1
 ;ifdef BIT(CCPR1L) Testing this bit is to identify the use of CCPR1L for PWM
 ;if PWMChannel = 1 then  'in section USE_HPWMCCP1
-	BANKSEL	PWMCHANNEL
-	DECF	PWMCHANNEL,W
-	BTFSS	STATUS, Z
-	GOTO	ENDIF27
+	banksel	PWMCHANNEL
+	decf	PWMCHANNEL,W
+	btfss	STATUS, Z
+	goto	ENDIF27
 ;Assume more that one CCP
 ;ifdef BIT(CCP1FMT) Testing this bit is to identify the use of CCPR1H and CCPR1L for PWM
 ;calculateDuty 'Sets PRx_Temp  to the duty value for bits 15-8 and 7-6
-	CALL	CALCULATEDUTY
+	call	CALCULATEDUTY
 ;CCPR1H = PRx_Temp_H
-	MOVF	PRX_TEMP_H,W
-	BANKSEL	CCPR1H
-	MOVWF	CCPR1H
+	movf	PRX_TEMP_H,W
+	banksel	CCPR1H
+	movwf	CCPR1H
 ;CCPR1L = PRx_Temp
-	BANKSEL	PRX_TEMP
-	MOVF	PRX_TEMP,W
-	BANKSEL	CCPR1L
-	MOVWF	CCPR1L
+	banksel	PRX_TEMP
+	movf	PRX_TEMP,W
+	banksel	CCPR1L
+	movwf	CCPR1L
 ;End if
 ENDIF27
 PWMUPDATE_HARDWAREMODEPWMCCP3
-	BANKSEL	STATUS
-	RETURN
+	banksel	STATUS
+	return
 
 ;********************************************************************************
 
-;SOURCE: GCBASIC_FIRMWARE_FOR_MICROCHIP_CURIOSITY_BOARD_16F1619.GCB (49)
+;Overloaded signature: BYTE:, Source: usart.h (1387)
+HSERSEND297
+	return
+
+;********************************************************************************
+
+;Source: GCBASIC_firmware_for_Microchip_Curiosity_board_16F1619.gcb (49)
 INITPPS
 ;Module: PWM3
 ;RC5PPS = 0x000E    'PWM3OUT > RC5
-	MOVLW	14
-	BANKSEL	RC5PPS
-	MOVWF	RC5PPS
-	BANKSEL	STATUS
-	RETURN
+	movlw	14
+	banksel	RC5PPS
+	movwf	RC5PPS
+	banksel	STATUS
+	return
 
 ;********************************************************************************
 
-;SOURCE: PWM.H (253)
+;Source: pwm.h (253)
 INITPWM
 ;_PWMTimerSelected = 2
-	MOVLW	2
-	MOVWF	_PWMTIMERSELECTED
+	movlw	2
+	movwf	_PWMTIMERSELECTED
 ;Dim PRx_Temp as LONG
 LEGACY_STARTOFFIXEDCCPPWMMODECODE
 ;DIM CCPCONCache as BYTE
 ;CCPCONCache = 0
-	CLRF	CCPCONCACHE
+	clrf	CCPCONCACHE
 ;Set PWM Period
 ;PR2 = PR2_CPP_PWM_Temp
-	MOVLW	210
-	MOVWF	PR2
+	movlw	210
+	movwf	PR2
 ;SET T2CON.T2CKPS0 OFF
-	BCF	T2CON,T2CKPS0
+	bcf	T2CON,T2CKPS0
 ;SET T2CON.T2CKPS1 OFF
-	BCF	T2CON,T2CKPS1
+	bcf	T2CON,T2CKPS1
 ;SET T2CON.T2CKPS2 OFF
-	BCF	T2CON,T2CKPS2
+	bcf	T2CON,T2CKPS2
 ;Set Duty cycle
 ;CCPCONCache.CCP1FMT = 1
-	BSF	CCPCONCACHE,CCP1FMT
+	bsf	CCPCONCACHE,CCP1FMT
 ;CCPR1H = DutyCycleH
-	MOVLW	105
-	BANKSEL	CCPR1H
-	MOVWF	CCPR1H
+	movlw	105
+	banksel	CCPR1H
+	movwf	CCPR1H
 ;CCPR1L = DutyCycleL*64
-	MOVLW	128
-	MOVWF	CCPR1L
+	movlw	128
+	movwf	CCPR1L
 ;[canskip]T2CLKCON = 1
-	MOVLW	1
-	BANKSEL	T2CLKCON
-	MOVWF	T2CLKCON
+	movlw	1
+	banksel	T2CLKCON
+	movwf	T2CLKCON
 ;[canskip]CCPCONCache.en = 1
-	BSF	CCPCONCACHE,EN
+	bsf	CCPCONCACHE,EN
 ;legacy code, replaced by canskip
 ;Finish preparing CCP*CON
 ;SET CCPCONCache.CCP1M3 ON
@@ -962,79 +970,97 @@ LEGACY_STARTOFFIXEDCCPPWMMODECODE
 ;SET CCPCONCache.CCP1M1 OFF
 ;SET CCPCONCache.CCP1M0 OFF'
 ;CCPCONCache.CCP1M3, CCPCONCache.CCP1M2, CCPCONCache.CCP1M1, CCPCONCache.CCP1M0 = b'1100'
-	BSF	CCPCONCACHE,CCP1MODE3
-	BSF	CCPCONCACHE,CCP1MODE2
-	BCF	CCPCONCACHE,CCP1MODE1
-	BCF	CCPCONCACHE,CCP1MODE0
+	bsf	CCPCONCACHE,CCP1MODE3
+	bsf	CCPCONCACHE,CCP1MODE2
+	bcf	CCPCONCACHE,CCP1MODE1
+	bcf	CCPCONCACHE,CCP1MODE0
 ;Enable Timer 2
 ;SET T2CON.TMR2ON ON
-	BSF	T2CON,TMR2ON
+	bsf	T2CON,TMR2ON
 ;PWMFreqOld = 0
-	CLRF	PWMFREQOLD
+	clrf	PWMFREQOLD
 ;PWMTimerOld = 0
-	CLRF	PWMTIMEROLD
+	clrf	PWMTIMEROLD
 STARTOFFIXEDPWMMODECODE
 SETPWMDUTYCODE
-	RETURN
+	return
 
 ;********************************************************************************
 
-;SOURCE: SYSTEM.H (162)
+;Source: system.h (173)
 INITSYS
 ;asm showdebug This code block sets the internal oscillator to ChipMHz
 ;asm showdebug OSCCON type is 105 'Bit(SPLLEN) Or Bit(IRCF3) And NoBit(INTSRC) and ifdef Bit(IRCF3)
 ;equates to OSCCON = OSCCON AND b'10000111' & OSCCON = OSCCON OR b'11110000'
 ;= 32Mhz
 ;Set IRCF3 On
-	BANKSEL	OSCCON
-	BSF	OSCCON,IRCF3
+	banksel	OSCCON
+	bsf	OSCCON,IRCF3
 ;Set IRCF2 On
-	BSF	OSCCON,IRCF2
+	bsf	OSCCON,IRCF2
 ;Set IRCF1 On
-	BSF	OSCCON,IRCF1
+	bsf	OSCCON,IRCF1
 ;Set IRCF0 Off
-	BCF	OSCCON,IRCF0
+	bcf	OSCCON,IRCF0
 ;Set SPLLEN On
-	BSF	OSCCON,SPLLEN
+	bsf	OSCCON,SPLLEN
 ;asm showdebug _Complete_the_chip_setup_of_BSR,ADCs,ANSEL_and_other_key_setup_registers_or_register_bits
 ;Ensure all ports are set for digital I/O and, turn off A/D
 ;SET ADFM OFF
-	BCF	ADCON1,ADFM
+	bcf	ADCON1,ADFM
 ;Switch off A/D Var(ADCON0)
 ;SET ADCON0.ADON OFF
-	BCF	ADCON0,ADON
+	bcf	ADCON0,ADON
 ;ANSELA = 0
-	BANKSEL	ANSELA
-	CLRF	ANSELA
+	banksel	ANSELA
+	clrf	ANSELA
 ;ANSELB = 0
-	CLRF	ANSELB
+	clrf	ANSELB
 ;ANSELC = 0
-	CLRF	ANSELC
+	clrf	ANSELC
 ;Set comparator register bits for many MCUs with register CM2CON0
 ;C2ON = 0
-	BANKSEL	CM2CON0
-	BCF	CM2CON0,C2ON
+	banksel	CM2CON0
+	bcf	CM2CON0,C2ON
 ;C1ON = 0
-	BCF	CM1CON0,C1ON
+	bcf	CM1CON0,C1ON
 ;
 ;'Turn off all ports
 ;PORTA = 0
-	BANKSEL	PORTA
-	CLRF	PORTA
+	banksel	PORTA
+	clrf	PORTA
 ;PORTB = 0
-	CLRF	PORTB
+	clrf	PORTB
 ;PORTC = 0
-	CLRF	PORTC
-	RETURN
+	clrf	PORTC
+	return
 
 ;********************************************************************************
 
-;OVERLOADED SIGNATURE: BYTE:, SOURCE: A-D.H (2101)
-FN_READAD6
+;Source: usart.h (946)
+INITUSART
+;! Your program has a reference to Serial opertions however the Serial setup has not been completed.
+;!
+;! You should add the constants like those shown below.
+;!
+;! #DEFINE USART_BAUD_RATE 9600
+;! #DEFINE USART_TX_BLOCKING
+;! #DEFINE USART_DELAY OFF
+;!
+;! Please close this library once you have resolved or remove the Serial setup or commands respectively.
+;!
+;RaiseCompilerError "%USART_NO_BAUD_RATE%"   'uses messages.dat
+RAISECOMPILERERROR	;STRING57;	;?F18L965S296I19?
+	return
+
+;********************************************************************************
+
+;Overloaded signature: BYTE:, Source: a-d.h (2101)
+FN_READAD7
 ;ADFM should configured to ensure LEFT justified
 ;SET ADFM OFF
-	BANKSEL	ADCON1
-	BCF	ADCON1,ADFM
+	banksel	ADCON1
+	bcf	ADCON1,ADFM
 ;***************************************
 ;Perform conversion
 ;LLReadAD 1
@@ -1045,139 +1071,139 @@ FN_READAD6
 ;ChipPins = 20
 ;#ifNdef Bit(CHS5)
 ;Case 2: Set ANSELA.2 On
-SYSSELECT1CASE1
-	MOVLW	2
-	BANKSEL	ADREADPORT
-	SUBWF	ADREADPORT,W
-	BTFSS	STATUS, Z
-	GOTO	SYSSELECT1CASE2
+SysSelect1Case1
+	movlw	2
+	banksel	ADREADPORT
+	subwf	ADREADPORT,W
+	btfss	STATUS, Z
+	goto	SysSelect1Case2
 ;Case 2: Set ANSELA.2 On
-	BANKSEL	ANSELA
-	BSF	ANSELA,2
+	banksel	ANSELA
+	bsf	ANSELA,2
 ;Case 4: Set ANSELc.0 On
-	GOTO	SYSSELECTEND1
-SYSSELECT1CASE2
-	MOVLW	4
-	SUBWF	ADREADPORT,W
-	BTFSS	STATUS, Z
-	GOTO	SYSSELECTEND1
+	goto	SysSelectEnd1
+SysSelect1Case2
+	movlw	4
+	subwf	ADREADPORT,W
+	btfss	STATUS, Z
+	goto	SysSelectEnd1
 ;Case 4: Set ANSELc.0 On
-	BANKSEL	ANSELC
-	BSF	ANSELC,0
+	banksel	ANSELC
+	bsf	ANSELC,0
 ;End Select  'End Select #1
-SYSSELECTEND1
+SysSelectEnd1
 ;SET ADCS2 OFF
-	BANKSEL	ADCON1
-	BCF	ADCON1,ADCS2
+	banksel	ADCON1
+	bcf	ADCON1,ADCS2
 ;SET ADCS1 OFF
-	BCF	ADCON1,ADCS1
+	bcf	ADCON1,ADCS1
 ;SET ADCS0 ON
-	BSF	ADCON1,ADCS0
+	bsf	ADCON1,ADCS0
 ;Choose port
 ;SET CHS0 OFF
-	BCF	ADCON0,CHS0
+	bcf	ADCON0,CHS0
 ;SET CHS1 OFF
-	BCF	ADCON0,CHS1
+	bcf	ADCON0,CHS1
 ;SET CHS2 OFF
-	BCF	ADCON0,CHS2
+	bcf	ADCON0,CHS2
 ;SET CHS3 OFF
-	BCF	ADCON0,CHS3
+	bcf	ADCON0,CHS3
 ;SET CHS4 OFF
-	BCF	ADCON0,CHS4
+	bcf	ADCON0,CHS4
 ;IF ADReadPort.0 On Then Set CHS0 On
-	BANKSEL	ADREADPORT
-	BTFSS	ADREADPORT,0
-	GOTO	ENDIF6
+	banksel	ADREADPORT
+	btfss	ADREADPORT,0
+	goto	ENDIF6
 ;IF ADReadPort.0 On Then Set CHS0 On
-	BANKSEL	ADCON0
-	BSF	ADCON0,CHS0
+	banksel	ADCON0
+	bsf	ADCON0,CHS0
 ;IF ADReadPort.0 On Then Set CHS0 On
 ENDIF6
 ;IF ADReadPort.1 On Then Set CHS1 On
-	BANKSEL	ADREADPORT
-	BTFSS	ADREADPORT,1
-	GOTO	ENDIF7
+	banksel	ADREADPORT
+	btfss	ADREADPORT,1
+	goto	ENDIF7
 ;IF ADReadPort.1 On Then Set CHS1 On
-	BANKSEL	ADCON0
-	BSF	ADCON0,CHS1
+	banksel	ADCON0
+	bsf	ADCON0,CHS1
 ;IF ADReadPort.1 On Then Set CHS1 On
 ENDIF7
 ;IF ADReadPort.2 On Then Set CHS2 On
-	BANKSEL	ADREADPORT
-	BTFSS	ADREADPORT,2
-	GOTO	ENDIF8
+	banksel	ADREADPORT
+	btfss	ADREADPORT,2
+	goto	ENDIF8
 ;IF ADReadPort.2 On Then Set CHS2 On
-	BANKSEL	ADCON0
-	BSF	ADCON0,CHS2
+	banksel	ADCON0
+	bsf	ADCON0,CHS2
 ;IF ADReadPort.2 On Then Set CHS2 On
 ENDIF8
 ;If ADReadPort.3 On Then Set CHS3 On
-	BANKSEL	ADREADPORT
-	BTFSS	ADREADPORT,3
-	GOTO	ENDIF9
+	banksel	ADREADPORT
+	btfss	ADREADPORT,3
+	goto	ENDIF9
 ;If ADReadPort.3 On Then Set CHS3 On
-	BANKSEL	ADCON0
-	BSF	ADCON0,CHS3
+	banksel	ADCON0
+	bsf	ADCON0,CHS3
 ;If ADReadPort.3 On Then Set CHS3 On
 ENDIF9
 ;If ADReadPort.4 On Then Set CHS4 On
-	BANKSEL	ADREADPORT
-	BTFSS	ADREADPORT,4
-	GOTO	ENDIF10
+	banksel	ADREADPORT
+	btfss	ADREADPORT,4
+	goto	ENDIF10
 ;If ADReadPort.4 On Then Set CHS4 On
-	BANKSEL	ADCON0
-	BSF	ADCON0,CHS4
+	banksel	ADCON0
+	bsf	ADCON0,CHS4
 ;If ADReadPort.4 On Then Set CHS4 On
 ENDIF10
 ;Enable AD Operations
 ;SET ADON ON
-	BANKSEL	ADCON0
-	BSF	ADCON0,ADON
+	banksel	ADCON0
+	bsf	ADCON0,ADON
 ;Acquisition Delay
 ;Wait AD_Delay
-	MOVLW	2
-	MOVWF	SYSWAITTEMP10US
-	BANKSEL	STATUS
-	CALL	DELAY_10US
+	movlw	2
+	movwf	SysWaitTemp10US
+	banksel	STATUS
+	call	Delay_10US
 ;Read A/D @1
 ;SET GO_NOT_DONE ON
-	BANKSEL	ADCON0
-	BSF	ADCON0,GO_NOT_DONE
+	banksel	ADCON0
+	bsf	ADCON0,GO_NOT_DONE
 ;nop
-	NOP
+	nop
 ;Wait While GO_NOT_DONE ON
-SYSWAITLOOP2
-	BTFSC	ADCON0,GO_NOT_DONE
-	GOTO	SYSWAITLOOP2
+SysWaitLoop2
+	btfsc	ADCON0,GO_NOT_DONE
+	goto	SysWaitLoop2
 ;Switch off A/D
 ;SET ADCON0.ADON OFF
-	BCF	ADCON0,ADON
+	bcf	ADCON0,ADON
 ;ANSELA = 0
-	BANKSEL	ANSELA
-	CLRF	ANSELA
+	banksel	ANSELA
+	clrf	ANSELA
 ;ANSELB = 0
-	CLRF	ANSELB
+	clrf	ANSELB
 ;ANSELC = 0
-	CLRF	ANSELC
+	clrf	ANSELC
 ;ReadAD = ADRESH
-	BANKSEL	ADRESH
-	MOVF	ADRESH,W
-	BANKSEL	READAD
-	MOVWF	READAD
+	banksel	ADRESH
+	movf	ADRESH,W
+	banksel	READAD
+	movwf	READAD
 ;SET ADFM OFF
-	BANKSEL	ADCON1
-	BCF	ADCON1,ADFM
-	BANKSEL	STATUS
-	RETURN
+	banksel	ADCON1
+	bcf	ADCON1,ADFM
+	banksel	STATUS
+	return
 
 ;********************************************************************************
 
-;OVERLOADED SIGNATURE: BYTE:, SOURCE: A-D.H (2388)
-FN_READAD108
+;Overloaded signature: BYTE:, Source: a-d.h (2388)
+FN_READAD109
 ;Always RIGHT justified
 ;SET ADFM ON
-	BANKSEL	ADCON1
-	BSF	ADCON1,ADFM
+	banksel	ADCON1
+	bsf	ADCON1,ADFM
 ;Do conversion
 ;LLReadAD 0
 ;Macro Source: a-d.h (577)
@@ -1187,521 +1213,521 @@ FN_READAD108
 ;ChipPins = 20
 ;#ifNdef Bit(CHS5)
 ;Case 2: Set ANSELA.2 On
-SYSSELECT2CASE1
-	MOVLW	2
-	BANKSEL	ADREADPORT
-	SUBWF	ADREADPORT,W
-	BTFSS	STATUS, Z
-	GOTO	SYSSELECT2CASE2
+SysSelect2Case1
+	movlw	2
+	banksel	ADREADPORT
+	subwf	ADREADPORT,W
+	btfss	STATUS, Z
+	goto	SysSelect2Case2
 ;Case 2: Set ANSELA.2 On
-	BANKSEL	ANSELA
-	BSF	ANSELA,2
+	banksel	ANSELA
+	bsf	ANSELA,2
 ;Case 4: Set ANSELc.0 On
-	GOTO	SYSSELECTEND2
-SYSSELECT2CASE2
-	MOVLW	4
-	SUBWF	ADREADPORT,W
-	BTFSS	STATUS, Z
-	GOTO	SYSSELECTEND2
+	goto	SysSelectEnd2
+SysSelect2Case2
+	movlw	4
+	subwf	ADREADPORT,W
+	btfss	STATUS, Z
+	goto	SysSelectEnd2
 ;Case 4: Set ANSELc.0 On
-	BANKSEL	ANSELC
-	BSF	ANSELC,0
+	banksel	ANSELC
+	bsf	ANSELC,0
 ;End Select  'End Select #1
-SYSSELECTEND2
+SysSelectEnd2
 ;SET ADCS2 OFF
-	BANKSEL	ADCON1
-	BCF	ADCON1,ADCS2
+	banksel	ADCON1
+	bcf	ADCON1,ADCS2
 ;SET ADCS1 OFF
-	BCF	ADCON1,ADCS1
+	bcf	ADCON1,ADCS1
 ;SET ADCS0 ON
-	BSF	ADCON1,ADCS0
+	bsf	ADCON1,ADCS0
 ;Choose port
 ;SET CHS0 OFF
-	BCF	ADCON0,CHS0
+	bcf	ADCON0,CHS0
 ;SET CHS1 OFF
-	BCF	ADCON0,CHS1
+	bcf	ADCON0,CHS1
 ;SET CHS2 OFF
-	BCF	ADCON0,CHS2
+	bcf	ADCON0,CHS2
 ;SET CHS3 OFF
-	BCF	ADCON0,CHS3
+	bcf	ADCON0,CHS3
 ;SET CHS4 OFF
-	BCF	ADCON0,CHS4
+	bcf	ADCON0,CHS4
 ;IF ADReadPort.0 On Then Set CHS0 On
-	BANKSEL	ADREADPORT
-	BTFSS	ADREADPORT,0
-	GOTO	ENDIF11
+	banksel	ADREADPORT
+	btfss	ADREADPORT,0
+	goto	ENDIF11
 ;IF ADReadPort.0 On Then Set CHS0 On
-	BANKSEL	ADCON0
-	BSF	ADCON0,CHS0
+	banksel	ADCON0
+	bsf	ADCON0,CHS0
 ;IF ADReadPort.0 On Then Set CHS0 On
 ENDIF11
 ;IF ADReadPort.1 On Then Set CHS1 On
-	BANKSEL	ADREADPORT
-	BTFSS	ADREADPORT,1
-	GOTO	ENDIF12
+	banksel	ADREADPORT
+	btfss	ADREADPORT,1
+	goto	ENDIF12
 ;IF ADReadPort.1 On Then Set CHS1 On
-	BANKSEL	ADCON0
-	BSF	ADCON0,CHS1
+	banksel	ADCON0
+	bsf	ADCON0,CHS1
 ;IF ADReadPort.1 On Then Set CHS1 On
 ENDIF12
 ;IF ADReadPort.2 On Then Set CHS2 On
-	BANKSEL	ADREADPORT
-	BTFSS	ADREADPORT,2
-	GOTO	ENDIF13
+	banksel	ADREADPORT
+	btfss	ADREADPORT,2
+	goto	ENDIF13
 ;IF ADReadPort.2 On Then Set CHS2 On
-	BANKSEL	ADCON0
-	BSF	ADCON0,CHS2
+	banksel	ADCON0
+	bsf	ADCON0,CHS2
 ;IF ADReadPort.2 On Then Set CHS2 On
 ENDIF13
 ;If ADReadPort.3 On Then Set CHS3 On
-	BANKSEL	ADREADPORT
-	BTFSS	ADREADPORT,3
-	GOTO	ENDIF14
+	banksel	ADREADPORT
+	btfss	ADREADPORT,3
+	goto	ENDIF14
 ;If ADReadPort.3 On Then Set CHS3 On
-	BANKSEL	ADCON0
-	BSF	ADCON0,CHS3
+	banksel	ADCON0
+	bsf	ADCON0,CHS3
 ;If ADReadPort.3 On Then Set CHS3 On
 ENDIF14
 ;If ADReadPort.4 On Then Set CHS4 On
-	BANKSEL	ADREADPORT
-	BTFSS	ADREADPORT,4
-	GOTO	ENDIF15
+	banksel	ADREADPORT
+	btfss	ADREADPORT,4
+	goto	ENDIF15
 ;If ADReadPort.4 On Then Set CHS4 On
-	BANKSEL	ADCON0
-	BSF	ADCON0,CHS4
+	banksel	ADCON0
+	bsf	ADCON0,CHS4
 ;If ADReadPort.4 On Then Set CHS4 On
 ENDIF15
 ;Enable AD Operations
 ;SET ADON ON
-	BANKSEL	ADCON0
-	BSF	ADCON0,ADON
+	banksel	ADCON0
+	bsf	ADCON0,ADON
 ;Acquisition Delay
 ;Wait AD_Delay
-	MOVLW	2
-	MOVWF	SYSWAITTEMP10US
-	BANKSEL	STATUS
-	CALL	DELAY_10US
+	movlw	2
+	movwf	SysWaitTemp10US
+	banksel	STATUS
+	call	Delay_10US
 ;Read A/D @1
 ;SET GO_NOT_DONE ON
-	BANKSEL	ADCON0
-	BSF	ADCON0,GO_NOT_DONE
+	banksel	ADCON0
+	bsf	ADCON0,GO_NOT_DONE
 ;nop
-	NOP
+	nop
 ;Wait While GO_NOT_DONE ON
-SYSWAITLOOP3
-	BTFSC	ADCON0,GO_NOT_DONE
-	GOTO	SYSWAITLOOP3
+SysWaitLoop3
+	btfsc	ADCON0,GO_NOT_DONE
+	goto	SysWaitLoop3
 ;Switch off A/D
 ;SET ADCON0.ADON OFF
-	BCF	ADCON0,ADON
+	bcf	ADCON0,ADON
 ;ANSELA = 0
-	BANKSEL	ANSELA
-	CLRF	ANSELA
+	banksel	ANSELA
+	clrf	ANSELA
 ;ANSELB = 0
-	CLRF	ANSELB
+	clrf	ANSELB
 ;ANSELC = 0
-	CLRF	ANSELC
+	clrf	ANSELC
 ;Write output
 ;ReadAD10 = ADRESL
-	BANKSEL	ADRESL
-	MOVF	ADRESL,W
-	BANKSEL	READAD10
-	MOVWF	READAD10
-	CLRF	READAD10_H
+	banksel	ADRESL
+	movf	ADRESL,W
+	banksel	READAD10
+	movwf	READAD10
+	clrf	READAD10_H
 ;ReadAD10_H = ADRESH
-	BANKSEL	ADRESH
-	MOVF	ADRESH,W
-	BANKSEL	READAD10_H
-	MOVWF	READAD10_H
+	banksel	ADRESH
+	movf	ADRESH,W
+	banksel	READAD10_H
+	movwf	READAD10_H
 ;Put A/D format back to normal
 ;SET ADFM OFF
-	BANKSEL	ADCON1
-	BCF	ADCON1,ADFM
-	BANKSEL	STATUS
-	RETURN
+	banksel	ADCON1
+	bcf	ADCON1,ADFM
+	banksel	STATUS
+	return
 
 ;********************************************************************************
 
-;SOURCE: GCBASIC_FIRMWARE_FOR_MICROCHIP_CURIOSITY_BOARD_16F1619.GCB (141)
+;Source: GCBASIC_firmware_for_Microchip_Curiosity_board_16F1619.gcb (144)
 READMTOUCH
 ;Dim ADCvalueWord As Word
 ;Dim SaveADCON0, SaveODCONC, SaveANSELC, SaveTRISC, SaveLATC as Byte
 ;SaveADCON0 = ADCON0
-	BANKSEL	ADCON0
-	MOVF	ADCON0,W
-	BANKSEL	SAVEADCON0
-	MOVWF	SAVEADCON0
+	banksel	ADCON0
+	movf	ADCON0,W
+	banksel	SAVEADCON0
+	movwf	SAVEADCON0
 ;SaveTRISC = TRISC
-	BANKSEL	TRISC
-	MOVF	TRISC,W
-	BANKSEL	SAVETRISC
-	MOVWF	SAVETRISC
+	banksel	TRISC
+	movf	TRISC,W
+	banksel	SAVETRISC
+	movwf	SAVETRISC
 ;SaveLATC = LATC
-	BANKSEL	LATC
-	MOVF	LATC,W
-	BANKSEL	SAVELATC
-	MOVWF	SAVELATC
+	banksel	LATC
+	movf	LATC,W
+	banksel	SAVELATC
+	movwf	SAVELATC
 ;ADCvalueWord = 0
-	CLRF	ADCVALUEWORD
-	CLRF	ADCVALUEWORD_H
+	clrf	ADCVALUEWORD
+	clrf	ADCVALUEWORD_H
 ;---- Constants
 ;AN5/RC1 - sensor channel
 ;Dir SENSORCHANNEL In
-	BANKSEL	TRISC
-	BSF	TRISC,1
+	banksel	TRISC
+	bsf	TRISC,1
 ;AN6/RC2 - secondary (dummy) channel
 ;Dir SECONDARYCHANNEL Out
-	BCF	TRISC,2
+	bcf	TRISC,2
 ;IntOff
 ;AN1298 - Step 1: Set secondary (dummy) channel high (VDD)
 ;set as output
 ;Dir SECONDARYCHANNEL Out	
-	BCF	TRISC,2
+	bcf	TRISC,2
 ;set as open drain
 ;SaveODCONC = ODCONC
-	BANKSEL	ODCONC
-	MOVF	ODCONC,W
-	BANKSEL	SAVEODCONC
-	MOVWF	SAVEODCONC
+	banksel	ODCONC
+	movf	ODCONC,W
+	banksel	SAVEODCONC
+	movwf	SAVEODCONC
 ;Set ODCONC.2 = 1
-	BANKSEL	ODCONC
-	BSF	ODCONC,2
+	banksel	ODCONC
+	bsf	ODCONC,2
 ;set as digital
 ;ANSELC = SaveANSELC
-	BANKSEL	SAVEANSELC
-	MOVF	SAVEANSELC,W
-	BANKSEL	ANSELC
-	MOVWF	ANSELC
+	banksel	SAVEANSELC
+	movf	SAVEANSELC,W
+	banksel	ANSELC
+	movwf	ANSELC
 ;Set ANSELC.2 = 0
-	BCF	ANSELC,2
+	bcf	ANSELC,2
 ;set high (VDD)
 ;Set SECONDARYCHANNEL = 1
-	BANKSEL	LATC
-	BSF	LATC,2
+	banksel	LATC
+	bsf	LATC,2
 ;AN1298 - Step 2: Select secondary channel on ADC (charge CHOLD to VDD)
 ;ADC channel select -> AN6/RC2 (bits 2-6)
 ;Set ADCON0 = 0b00011001
-	MOVLW	25
-	BANKSEL	ADCON0
-	MOVWF	ADCON0
+	movlw	25
+	banksel	ADCON0
+	movwf	ADCON0
 ;AN1298 - Step 3: Set sensor pin as output, low (GND) to eliminate any charge
 ;Set as output
 ;Dir SENSORCHANNEL Out
-	BCF	TRISC,1
+	bcf	TRISC,1
 ;Set as digital
 ;Set ANSELC.1 = 0
-	BANKSEL	ANSELC
-	BCF	ANSELC,1
+	banksel	ANSELC
+	bcf	ANSELC,1
 ;set low (ground)
 ;Set SENSORCHANNEL = 0
-	BANKSEL	LATC
-	BCF	LATC,1
+	banksel	LATC
+	bcf	LATC,1
 ;AN1298 - Step 4: Set sensor pin as input
 ;Set as input
 ;Dir SENSORCHANNEL In	
-	BANKSEL	TRISC
-	BSF	TRISC,1
+	banksel	TRISC
+	bsf	TRISC,1
 ;Set as analog
 ;Set ANSELC.1 = 1
-	BANKSEL	ANSELC
-	BSF	ANSELC,1
+	banksel	ANSELC
+	bsf	ANSELC,1
 ;AN1298 - Step 5: Select sensor channel on ADC (V-div sensor:CHOLD)
 ;ADC channel select -> AN5/RC1 (bits 2-6)
 ;Set ADCON0 = 0b00010101
-	MOVLW	21
-	BANKSEL	ADCON0
-	MOVWF	ADCON0
+	movlw	21
+	banksel	ADCON0
+	movwf	ADCON0
 ;Enable ADC (bit 0)
 ;Delay to allow ADC voltage to stabilise
 ;Wait 10 us 		
-	MOVLW	26
-	MOVWF	DELAYTEMP
-DELAYUS1
-	DECFSZ	DELAYTEMP,F
-	GOTO	DELAYUS1
-	NOP
+	movlw	26
+	movwf	DELAYTEMP
+DelayUS1
+	decfsz	DELAYTEMP,F
+	goto	DelayUS1
+	nop
 ;AN1298 - Step 6: Start ADC conversion
 ;SET ADFM ON
-	BSF	ADCON1,ADFM
+	bsf	ADCON1,ADFM
 ;Start ADC conversion (set go/done bit 1 = 1)
 ;Set ADCON0.1 = 1  	
-	BSF	ADCON0,1
+	bsf	ADCON0,1
 ;Wait for ADC conversion (done bit 1 = 0)
 ;Wait While ADCON0.1 = 1
-SYSWAITLOOP1
-	BTFSC	ADCON0,1
-	GOTO	SYSWAITLOOP1
+SysWaitLoop1
+	btfsc	ADCON0,1
+	goto	SysWaitLoop1
 ;AN1298 - Step 7: Read ADC result
 ;ADCvalueWord = ReadAD10(AN5)
-	MOVLW	5
-	BANKSEL	ADREADPORT
-	MOVWF	ADREADPORT
-	CALL	FN_READAD108
-	MOVF	SYSREADAD10WORD,W
-	MOVWF	ADCVALUEWORD
-	MOVF	SYSREADAD10WORD_H,W
-	MOVWF	ADCVALUEWORD_H
+	movlw	5
+	banksel	ADREADPORT
+	movwf	ADREADPORT
+	call	FN_READAD109
+	movf	SYSREADAD10WORD,W
+	movwf	ADCVALUEWORD
+	movf	SYSREADAD10WORD_H,W
+	movwf	ADCVALUEWORD_H
 ;Action result
 ;LATC = SaveLATC
-	MOVF	SAVELATC,W
-	BANKSEL	LATC
-	MOVWF	LATC
+;HSerSend ADCvalueWord
+	movf	ADCVALUEWORD,W
+	movwf	SERDATA
+	call	HSERSEND297
 ;If ADCvalueWord > 10 Then
-	BANKSEL	ADCVALUEWORD
-	MOVF	ADCVALUEWORD,W
-	MOVWF	SYSWORDTEMPB
-	MOVF	ADCVALUEWORD_H,W
-	MOVWF	SYSWORDTEMPB_H
-	MOVLW	10
-	MOVWF	SYSWORDTEMPA
-	CLRF	SYSWORDTEMPA_H
-	CALL	SYSCOMPLESSTHAN16
-	BTFSS	SYSBYTETEMPX,0
-	GOTO	ELSE5_1
+	movf	ADCVALUEWORD,W
+	movwf	SysWORDTempB
+	movf	ADCVALUEWORD_H,W
+	movwf	SysWORDTempB_H
+	movlw	10
+	movwf	SysWORDTempA
+	clrf	SysWORDTempA_H
+	call	SYSCOMPLESSTHAN16
+	btfss	SysByteTempX,0
+	goto	ELSE5_1
 ;If touching S3 touch button
 ;LED6 = 1
-	BANKSEL	LATA
-	BSF	LATA,2
+	banksel	LATA
+	bsf	LATA,2
 ;Else
-	GOTO	ENDIF5
+	goto	ENDIF5
 ELSE5_1
 ;LED6 = 0
-	BANKSEL	LATA
-	BCF	LATA,2
+	banksel	LATA
+	bcf	LATA,2
 ;End If
 ENDIF5
 ;TRISC = SaveTRISC
-	BANKSEL	SAVETRISC
-	MOVF	SAVETRISC,W
-	BANKSEL	TRISC
-	MOVWF	TRISC
+	banksel	SAVETRISC
+	movf	SAVETRISC,W
+	banksel	TRISC
+	movwf	TRISC
 ;ANSELC = SaveANSELC
-	BANKSEL	SAVEANSELC
-	MOVF	SAVEANSELC,W
-	BANKSEL	ANSELC
-	MOVWF	ANSELC
+	banksel	SAVEANSELC
+	movf	SAVEANSELC,W
+	banksel	ANSELC
+	movwf	ANSELC
 ;ODCONC = SaveODCONC
-	BANKSEL	SAVEODCONC
-	MOVF	SAVEODCONC,W
-	BANKSEL	ODCONC
-	MOVWF	ODCONC
+	banksel	SAVEODCONC
+	movf	SAVEODCONC,W
+	banksel	ODCONC
+	movwf	ODCONC
 ;ADCON0 = SaveADCON0
-	BANKSEL	SAVEADCON0
-	MOVF	SAVEADCON0,W
-	BANKSEL	ADCON0
-	MOVWF	ADCON0
+	banksel	SAVEADCON0
+	movf	SAVEADCON0,W
+	banksel	ADCON0
+	movwf	ADCON0
 ;ADCON0.ADON = 0
-	BCF	ADCON0,ADON
+	bcf	ADCON0,ADON
 ;IntOn
-	BANKSEL	STATUS
-	RETURN
+	banksel	STATUS
+	return
 
 ;********************************************************************************
 
-;SOURCE: SYSTEM.H (3081)
+;Source: system.h (3092)
 SYSCOMPEQUAL
 ;Dim SysByteTempA, SysByteTempB, SysByteTempX as byte
 ;clrf SysByteTempX
-	CLRF	SYSBYTETEMPX
+	clrf	SYSBYTETEMPX
 ;movf SysByteTempA, W
-	MOVF	SYSBYTETEMPA, W
+	movf	SYSBYTETEMPA, W
 ;subwf SysByteTempB, W
-	SUBWF	SYSBYTETEMPB, W
+	subwf	SYSBYTETEMPB, W
 ;btfsc STATUS, Z
-	BTFSC	STATUS, Z
+	btfsc	STATUS, Z
 ;comf SysByteTempX,F
-	COMF	SYSBYTETEMPX,F
-	RETURN
+	comf	SYSBYTETEMPX,F
+	return
 
 ;********************************************************************************
 
-;SOURCE: SYSTEM.H (3107)
+;Source: system.h (3118)
 SYSCOMPEQUAL16
 ;dim SysWordTempA as word
 ;dim SysWordTempB as word
 ;dim SysByteTempX as byte
 ;clrf SysByteTempX
-	CLRF	SYSBYTETEMPX
+	clrf	SYSBYTETEMPX
 ;Test low, exit if false
 ;movf SysWordTempA, W
-	MOVF	SYSWORDTEMPA, W
+	movf	SYSWORDTEMPA, W
 ;subwf SysWordTempB, W
-	SUBWF	SYSWORDTEMPB, W
+	subwf	SYSWORDTEMPB, W
 ;btfss STATUS, Z
-	BTFSS	STATUS, Z
+	btfss	STATUS, Z
 ;return
-	RETURN
+	return
 ;Test high, exit if false
 ;movf SysWordTempA_H, W
-	MOVF	SYSWORDTEMPA_H, W
+	movf	SYSWORDTEMPA_H, W
 ;subwf SysWordTempB_H, W
-	SUBWF	SYSWORDTEMPB_H, W
+	subwf	SYSWORDTEMPB_H, W
 ;btfss STATUS, Z
-	BTFSS	STATUS, Z
+	btfss	STATUS, Z
 ;return
-	RETURN
+	return
 ;comf SysByteTempX,F
-	COMF	SYSBYTETEMPX,F
-	RETURN
+	comf	SYSBYTETEMPX,F
+	return
 
 ;********************************************************************************
 
-;SOURCE: SYSTEM.H (3161)
+;Source: system.h (3172)
 SYSCOMPEQUAL32
 ;dim SysLongTempA as long
 ;dim SysLongTempB as long
 ;dim SysByteTempX as byte
 ;clrf SysByteTempX
-	CLRF	SYSBYTETEMPX
+	clrf	SYSBYTETEMPX
 ;Test low, exit if false
 ;movf SysLongTempA, W
-	MOVF	SYSLONGTEMPA, W
+	movf	SYSLONGTEMPA, W
 ;subwf SysLongTempB, W
-	SUBWF	SYSLONGTEMPB, W
+	subwf	SYSLONGTEMPB, W
 ;btfss STATUS, Z
-	BTFSS	STATUS, Z
+	btfss	STATUS, Z
 ;return
-	RETURN
+	return
 ;Test high, exit if false
 ;movf SysLongTempA_H, W
-	MOVF	SYSLONGTEMPA_H, W
+	movf	SYSLONGTEMPA_H, W
 ;subwf SysLongTempB_H, W
-	SUBWF	SYSLONGTEMPB_H, W
+	subwf	SYSLONGTEMPB_H, W
 ;btfss STATUS, Z
-	BTFSS	STATUS, Z
+	btfss	STATUS, Z
 ;return
-	RETURN
+	return
 ;Test upper, exit if false
 ;movf SysLongTempA_U, W
-	MOVF	SYSLONGTEMPA_U, W
+	movf	SYSLONGTEMPA_U, W
 ;subwf SysLongTempB_U, W
-	SUBWF	SYSLONGTEMPB_U, W
+	subwf	SYSLONGTEMPB_U, W
 ;btfss STATUS, Z
-	BTFSS	STATUS, Z
+	btfss	STATUS, Z
 ;return
-	RETURN
+	return
 ;Test exp, exit if false
 ;movf SysLongTempA_E, W
-	MOVF	SYSLONGTEMPA_E, W
+	movf	SYSLONGTEMPA_E, W
 ;subwf SysLongTempB_E, W
-	SUBWF	SYSLONGTEMPB_E, W
+	subwf	SYSLONGTEMPB_E, W
 ;btfss STATUS, Z
-	BTFSS	STATUS, Z
+	btfss	STATUS, Z
 ;return
-	RETURN
+	return
 ;comf SysByteTempX,F
-	COMF	SYSBYTETEMPX,F
-	RETURN
+	comf	SYSBYTETEMPX,F
+	return
 
 ;********************************************************************************
 
-;SOURCE: SYSTEM.H (3416)
+;Source: system.h (3427)
 SYSCOMPLESSTHAN16
 ;dim SysWordTempA as word
 ;dim SysWordTempB as word
 ;dim SysByteTempX as byte
 ;clrf SysByteTempX
-	CLRF	SYSBYTETEMPX
+	clrf	SYSBYTETEMPX
 ;Test High, exit if more
 ;movf SysWordTempA_H,W
-	MOVF	SYSWORDTEMPA_H,W
+	movf	SYSWORDTEMPA_H,W
 ;subwf SysWordTempB_H,W
-	SUBWF	SYSWORDTEMPB_H,W
+	subwf	SYSWORDTEMPB_H,W
 ;btfss STATUS,C
-	BTFSS	STATUS,C
+	btfss	STATUS,C
 ;return
-	RETURN
+	return
 ;Test high, exit true if less
 ;movf SysWordTempB_H,W
-	MOVF	SYSWORDTEMPB_H,W
+	movf	SYSWORDTEMPB_H,W
 ;subwf SysWordTempA_H,W
-	SUBWF	SYSWORDTEMPA_H,W
+	subwf	SYSWORDTEMPA_H,W
 ;btfss STATUS,C
-	BTFSS	STATUS,C
+	btfss	STATUS,C
 ;goto SCLT16True
-	GOTO	SCLT16TRUE
+	goto	SCLT16TRUE
 ;Test Low, exit if more or equal
 ;movf SysWordTempB,W
-	MOVF	SYSWORDTEMPB,W
+	movf	SYSWORDTEMPB,W
 ;subwf SysWordTempA,W
-	SUBWF	SYSWORDTEMPA,W
+	subwf	SYSWORDTEMPA,W
 ;btfsc STATUS,C
-	BTFSC	STATUS,C
+	btfsc	STATUS,C
 ;return
-	RETURN
+	return
 SCLT16TRUE
 ;comf SysByteTempX,F
-	COMF	SYSBYTETEMPX,F
-	RETURN
+	comf	SYSBYTETEMPX,F
+	return
 
 ;********************************************************************************
 
-;SOURCE: SYSTEM.H (3474)
+;Source: system.h (3485)
 SYSCOMPLESSTHAN32
 ;dim SysLongTempA as long
 ;dim SysLongTempB as long
 ;dim SysByteTempX as byte
 ;clrf SysByteTempX
-	CLRF	SYSBYTETEMPX
+	clrf	SYSBYTETEMPX
 ;Test Exp, exit if more
 ;movf SysLongTempA_E,W
-	MOVF	SYSLONGTEMPA_E,W
+	movf	SYSLONGTEMPA_E,W
 ;subwf SysLongTempB_E,W
-	SUBWF	SYSLONGTEMPB_E,W
+	subwf	SYSLONGTEMPB_E,W
 ;btfss STATUS,C
-	BTFSS	STATUS,C
+	btfss	STATUS,C
 ;return
-	RETURN
+	return
 ;If not more and not zero, is less
 ;btfss STATUS,Z
-	BTFSS	STATUS,Z
+	btfss	STATUS,Z
 ;goto SCLT32True
-	GOTO	SCLT32TRUE
+	goto	SCLT32TRUE
 ;Test Upper, exit if more
 ;movf SysLongTempA_U,W
-	MOVF	SYSLONGTEMPA_U,W
+	movf	SYSLONGTEMPA_U,W
 ;subwf SysLongTempB_U,W
-	SUBWF	SYSLONGTEMPB_U,W
+	subwf	SYSLONGTEMPB_U,W
 ;btfss STATUS,C
-	BTFSS	STATUS,C
+	btfss	STATUS,C
 ;return
-	RETURN
+	return
 ;If not more and not zero, is less
 ;btfss STATUS,Z
-	BTFSS	STATUS,Z
+	btfss	STATUS,Z
 ;goto SCLT32True
-	GOTO	SCLT32TRUE
+	goto	SCLT32TRUE
 ;Test High, exit if more
 ;movf SysLongTempA_H,W
-	MOVF	SYSLONGTEMPA_H,W
+	movf	SYSLONGTEMPA_H,W
 ;subwf SysLongTempB_H,W
-	SUBWF	SYSLONGTEMPB_H,W
+	subwf	SYSLONGTEMPB_H,W
 ;btfss STATUS,C
-	BTFSS	STATUS,C
+	btfss	STATUS,C
 ;return
-	RETURN
+	return
 ;If not more and not zero, is less
 ;btfss STATUS,Z
-	BTFSS	STATUS,Z
+	btfss	STATUS,Z
 ;goto SCLT32True
-	GOTO	SCLT32TRUE
+	goto	SCLT32TRUE
 ;Test Low, exit if more or equal
 ;movf SysLongTempB,W
-	MOVF	SYSLONGTEMPB,W
+	movf	SYSLONGTEMPB,W
 ;subwf SysLongTempA,W
-	SUBWF	SYSLONGTEMPA,W
+	subwf	SYSLONGTEMPA,W
 ;btfsc STATUS,C
-	BTFSC	STATUS,C
+	btfsc	STATUS,C
 ;return
-	RETURN
+	return
 SCLT32TRUE
 ;comf SysByteTempX,F
-	COMF	SYSBYTETEMPX,F
-	RETURN
+	comf	SYSBYTETEMPX,F
+	return
 
 ;********************************************************************************
 
-;SOURCE: SYSTEM.H (2864)
+;Source: system.h (2875)
 SYSDIVSUB16
 ;dim SysWordTempA as word
 ;dim SysWordTempB as word
@@ -1710,87 +1736,87 @@ SYSDIVSUB16
 ;dim SysDivMultB as word
 ;dim SysDivMultX as word
 ;SysDivMultA = SysWordTempA
-	MOVF	SYSWORDTEMPA,W
-	MOVWF	SYSDIVMULTA
-	MOVF	SYSWORDTEMPA_H,W
-	MOVWF	SYSDIVMULTA_H
+	movf	SYSWORDTEMPA,W
+	movwf	SYSDIVMULTA
+	movf	SYSWORDTEMPA_H,W
+	movwf	SYSDIVMULTA_H
 ;SysDivMultB = SysWordTempB
-	MOVF	SYSWORDTEMPB,W
-	MOVWF	SYSDIVMULTB
-	MOVF	SYSWORDTEMPB_H,W
-	MOVWF	SYSDIVMULTB_H
+	movf	SYSWORDTEMPB,W
+	movwf	SYSDIVMULTB
+	movf	SYSWORDTEMPB_H,W
+	movwf	SYSDIVMULTB_H
 ;SysDivMultX = 0
-	CLRF	SYSDIVMULTX
-	CLRF	SYSDIVMULTX_H
+	clrf	SYSDIVMULTX
+	clrf	SYSDIVMULTX_H
 ;Avoid division by zero
 ;if SysDivMultB = 0 then
-	MOVF	SYSDIVMULTB,W
-	MOVWF	SYSWORDTEMPA
-	MOVF	SYSDIVMULTB_H,W
-	MOVWF	SYSWORDTEMPA_H
-	CLRF	SYSWORDTEMPB
-	CLRF	SYSWORDTEMPB_H
-	CALL	SYSCOMPEQUAL16
-	BTFSS	SYSBYTETEMPX,0
-	GOTO	ENDIF30
+	movf	SYSDIVMULTB,W
+	movwf	SysWORDTempA
+	movf	SYSDIVMULTB_H,W
+	movwf	SysWORDTempA_H
+	clrf	SysWORDTempB
+	clrf	SysWORDTempB_H
+	call	SYSCOMPEQUAL16
+	btfss	SysByteTempX,0
+	goto	ENDIF30
 ;SysWordTempA = 0
-	CLRF	SYSWORDTEMPA
-	CLRF	SYSWORDTEMPA_H
+	clrf	SYSWORDTEMPA
+	clrf	SYSWORDTEMPA_H
 ;exit sub
-	RETURN
+	return
 ;end if
 ENDIF30
 ;Main calc routine
 ;SysDivLoop = 16
-	MOVLW	16
-	MOVWF	SYSDIVLOOP
+	movlw	16
+	movwf	SYSDIVLOOP
 SYSDIV16START
 ;set C off
-	BCF	STATUS,C
+	bcf	STATUS,C
 ;Rotate SysDivMultA Left
-	RLF	SYSDIVMULTA,F
-	RLF	SYSDIVMULTA_H,F
+	rlf	SYSDIVMULTA,F
+	rlf	SYSDIVMULTA_H,F
 ;Rotate SysDivMultX Left
-	RLF	SYSDIVMULTX,F
-	RLF	SYSDIVMULTX_H,F
+	rlf	SYSDIVMULTX,F
+	rlf	SYSDIVMULTX_H,F
 ;SysDivMultX = SysDivMultX - SysDivMultB
-	MOVF	SYSDIVMULTB,W
-	SUBWF	SYSDIVMULTX,F
-	MOVF	SYSDIVMULTB_H,W
-	SUBWFB	SYSDIVMULTX_H,F
+	movf	SYSDIVMULTB,W
+	subwf	SYSDIVMULTX,F
+	movf	SYSDIVMULTB_H,W
+	subwfb	SYSDIVMULTX_H,F
 ;Set SysDivMultA.0 On
-	BSF	SYSDIVMULTA,0
+	bsf	SYSDIVMULTA,0
 ;If C Off Then
-	BTFSC	STATUS,C
-	GOTO	ENDIF31
+	btfsc	STATUS,C
+	goto	ENDIF31
 ;Set SysDivMultA.0 Off
-	BCF	SYSDIVMULTA,0
+	bcf	SYSDIVMULTA,0
 ;SysDivMultX = SysDivMultX + SysDivMultB
-	MOVF	SYSDIVMULTB,W
-	ADDWF	SYSDIVMULTX,F
-	MOVF	SYSDIVMULTB_H,W
-	ADDWFC	SYSDIVMULTX_H,F
+	movf	SYSDIVMULTB,W
+	addwf	SYSDIVMULTX,F
+	movf	SYSDIVMULTB_H,W
+	addwfc	SYSDIVMULTX_H,F
 ;End If
 ENDIF31
 ;decfsz SysDivLoop, F
-	DECFSZ	SYSDIVLOOP, F
+	decfsz	SYSDIVLOOP, F
 ;goto SysDiv16Start
-	GOTO	SYSDIV16START
+	goto	SYSDIV16START
 ;SysWordTempA = SysDivMultA
-	MOVF	SYSDIVMULTA,W
-	MOVWF	SYSWORDTEMPA
-	MOVF	SYSDIVMULTA_H,W
-	MOVWF	SYSWORDTEMPA_H
+	movf	SYSDIVMULTA,W
+	movwf	SYSWORDTEMPA
+	movf	SYSDIVMULTA_H,W
+	movwf	SYSWORDTEMPA_H
 ;SysWordTempX = SysDivMultX
-	MOVF	SYSDIVMULTX,W
-	MOVWF	SYSWORDTEMPX
-	MOVF	SYSDIVMULTX_H,W
-	MOVWF	SYSWORDTEMPX_H
-	RETURN
+	movf	SYSDIVMULTX,W
+	movwf	SYSWORDTEMPX
+	movf	SYSDIVMULTX_H,W
+	movwf	SYSWORDTEMPX_H
+	return
 
 ;********************************************************************************
 
-;SOURCE: SYSTEM.H (2940)
+;Source: system.h (2951)
 SYSDIVSUB32
 ;dim SysLongTempA as long
 ;dim SysLongTempB as long
@@ -1801,125 +1827,125 @@ SYSDIVSUB32
 ;dim SysLongDivMultX as long
 ;#endif
 ;SysLongDivMultA = SysLongTempA
-	MOVF	SYSLONGTEMPA,W
-	MOVWF	SYSLONGDIVMULTA
-	MOVF	SYSLONGTEMPA_H,W
-	MOVWF	SYSLONGDIVMULTA_H
-	MOVF	SYSLONGTEMPA_U,W
-	MOVWF	SYSLONGDIVMULTA_U
-	MOVF	SYSLONGTEMPA_E,W
-	MOVWF	SYSLONGDIVMULTA_E
+	movf	SYSLONGTEMPA,W
+	movwf	SYSLONGDIVMULTA
+	movf	SYSLONGTEMPA_H,W
+	movwf	SYSLONGDIVMULTA_H
+	movf	SYSLONGTEMPA_U,W
+	movwf	SYSLONGDIVMULTA_U
+	movf	SYSLONGTEMPA_E,W
+	movwf	SYSLONGDIVMULTA_E
 ;SysLongDivMultB = SysLongTempB
-	MOVF	SYSLONGTEMPB,W
-	MOVWF	SYSLONGDIVMULTB
-	MOVF	SYSLONGTEMPB_H,W
-	MOVWF	SYSLONGDIVMULTB_H
-	MOVF	SYSLONGTEMPB_U,W
-	MOVWF	SYSLONGDIVMULTB_U
-	MOVF	SYSLONGTEMPB_E,W
-	MOVWF	SYSLONGDIVMULTB_E
+	movf	SYSLONGTEMPB,W
+	movwf	SYSLONGDIVMULTB
+	movf	SYSLONGTEMPB_H,W
+	movwf	SYSLONGDIVMULTB_H
+	movf	SYSLONGTEMPB_U,W
+	movwf	SYSLONGDIVMULTB_U
+	movf	SYSLONGTEMPB_E,W
+	movwf	SYSLONGDIVMULTB_E
 ;SysLongDivMultX = 0
-	CLRF	SYSLONGDIVMULTX
-	CLRF	SYSLONGDIVMULTX_H
-	CLRF	SYSLONGDIVMULTX_U
-	CLRF	SYSLONGDIVMULTX_E
+	clrf	SYSLONGDIVMULTX
+	clrf	SYSLONGDIVMULTX_H
+	clrf	SYSLONGDIVMULTX_U
+	clrf	SYSLONGDIVMULTX_E
 ;Avoid division by zero
 ;if SysLongDivMultB = 0 then
-	MOVF	SYSLONGDIVMULTB,W
-	MOVWF	SYSLONGTEMPA
-	MOVF	SYSLONGDIVMULTB_H,W
-	MOVWF	SYSLONGTEMPA_H
-	MOVF	SYSLONGDIVMULTB_U,W
-	MOVWF	SYSLONGTEMPA_U
-	MOVF	SYSLONGDIVMULTB_E,W
-	MOVWF	SYSLONGTEMPA_E
-	CLRF	SYSLONGTEMPB
-	CLRF	SYSLONGTEMPB_H
-	CLRF	SYSLONGTEMPB_U
-	CLRF	SYSLONGTEMPB_E
-	CALL	SYSCOMPEQUAL32
-	BTFSS	SYSBYTETEMPX,0
-	GOTO	ENDIF32
+	movf	SYSLONGDIVMULTB,W
+	movwf	SysLONGTempA
+	movf	SYSLONGDIVMULTB_H,W
+	movwf	SysLONGTempA_H
+	movf	SYSLONGDIVMULTB_U,W
+	movwf	SysLONGTempA_U
+	movf	SYSLONGDIVMULTB_E,W
+	movwf	SysLONGTempA_E
+	clrf	SysLONGTempB
+	clrf	SysLONGTempB_H
+	clrf	SysLONGTempB_U
+	clrf	SysLONGTempB_E
+	call	SYSCOMPEQUAL32
+	btfss	SysByteTempX,0
+	goto	ENDIF32
 ;SysLongTempA = 0
-	CLRF	SYSLONGTEMPA
-	CLRF	SYSLONGTEMPA_H
-	CLRF	SYSLONGTEMPA_U
-	CLRF	SYSLONGTEMPA_E
+	clrf	SYSLONGTEMPA
+	clrf	SYSLONGTEMPA_H
+	clrf	SYSLONGTEMPA_U
+	clrf	SYSLONGTEMPA_E
 ;exit sub
-	RETURN
+	return
 ;end if
 ENDIF32
 ;Main calc routine
 ;SysDivLoop = 32
-	MOVLW	32
-	MOVWF	SYSDIVLOOP
+	movlw	32
+	movwf	SYSDIVLOOP
 SYSDIV32START
 ;set C off
-	BCF	STATUS,C
+	bcf	STATUS,C
 ;Rotate SysLongDivMultA Left
-	RLF	SYSLONGDIVMULTA,F
-	RLF	SYSLONGDIVMULTA_H,F
-	RLF	SYSLONGDIVMULTA_U,F
-	RLF	SYSLONGDIVMULTA_E,F
+	rlf	SYSLONGDIVMULTA,F
+	rlf	SYSLONGDIVMULTA_H,F
+	rlf	SYSLONGDIVMULTA_U,F
+	rlf	SYSLONGDIVMULTA_E,F
 ;Rotate SysLongDivMultX Left
-	RLF	SYSLONGDIVMULTX,F
-	RLF	SYSLONGDIVMULTX_H,F
-	RLF	SYSLONGDIVMULTX_U,F
-	RLF	SYSLONGDIVMULTX_E,F
+	rlf	SYSLONGDIVMULTX,F
+	rlf	SYSLONGDIVMULTX_H,F
+	rlf	SYSLONGDIVMULTX_U,F
+	rlf	SYSLONGDIVMULTX_E,F
 ;SysLongDivMultX = SysLongDivMultX - SysLongDivMultB
-	MOVF	SYSLONGDIVMULTB,W
-	SUBWF	SYSLONGDIVMULTX,F
-	MOVF	SYSLONGDIVMULTB_H,W
-	SUBWFB	SYSLONGDIVMULTX_H,F
-	MOVF	SYSLONGDIVMULTB_U,W
-	SUBWFB	SYSLONGDIVMULTX_U,F
-	MOVF	SYSLONGDIVMULTB_E,W
-	SUBWFB	SYSLONGDIVMULTX_E,F
+	movf	SYSLONGDIVMULTB,W
+	subwf	SYSLONGDIVMULTX,F
+	movf	SYSLONGDIVMULTB_H,W
+	subwfb	SYSLONGDIVMULTX_H,F
+	movf	SYSLONGDIVMULTB_U,W
+	subwfb	SYSLONGDIVMULTX_U,F
+	movf	SYSLONGDIVMULTB_E,W
+	subwfb	SYSLONGDIVMULTX_E,F
 ;Set SysLongDivMultA.0 On
-	BSF	SYSLONGDIVMULTA,0
+	bsf	SYSLONGDIVMULTA,0
 ;If C Off Then
-	BTFSC	STATUS,C
-	GOTO	ENDIF33
+	btfsc	STATUS,C
+	goto	ENDIF33
 ;Set SysLongDivMultA.0 Off
-	BCF	SYSLONGDIVMULTA,0
+	bcf	SYSLONGDIVMULTA,0
 ;SysLongDivMultX = SysLongDivMultX + SysLongDivMultB
-	MOVF	SYSLONGDIVMULTB,W
-	ADDWF	SYSLONGDIVMULTX,F
-	MOVF	SYSLONGDIVMULTB_H,W
-	ADDWFC	SYSLONGDIVMULTX_H,F
-	MOVF	SYSLONGDIVMULTB_U,W
-	ADDWFC	SYSLONGDIVMULTX_U,F
-	MOVF	SYSLONGDIVMULTB_E,W
-	ADDWFC	SYSLONGDIVMULTX_E,F
+	movf	SYSLONGDIVMULTB,W
+	addwf	SYSLONGDIVMULTX,F
+	movf	SYSLONGDIVMULTB_H,W
+	addwfc	SYSLONGDIVMULTX_H,F
+	movf	SYSLONGDIVMULTB_U,W
+	addwfc	SYSLONGDIVMULTX_U,F
+	movf	SYSLONGDIVMULTB_E,W
+	addwfc	SYSLONGDIVMULTX_E,F
 ;End If
 ENDIF33
 ;decfsz SysDivLoop, F
-	DECFSZ	SYSDIVLOOP, F
+	decfsz	SYSDIVLOOP, F
 ;goto SysDiv32Start
-	GOTO	SYSDIV32START
+	goto	SYSDIV32START
 ;SysLongTempA = SysLongDivMultA
-	MOVF	SYSLONGDIVMULTA,W
-	MOVWF	SYSLONGTEMPA
-	MOVF	SYSLONGDIVMULTA_H,W
-	MOVWF	SYSLONGTEMPA_H
-	MOVF	SYSLONGDIVMULTA_U,W
-	MOVWF	SYSLONGTEMPA_U
-	MOVF	SYSLONGDIVMULTA_E,W
-	MOVWF	SYSLONGTEMPA_E
+	movf	SYSLONGDIVMULTA,W
+	movwf	SYSLONGTEMPA
+	movf	SYSLONGDIVMULTA_H,W
+	movwf	SYSLONGTEMPA_H
+	movf	SYSLONGDIVMULTA_U,W
+	movwf	SYSLONGTEMPA_U
+	movf	SYSLONGDIVMULTA_E,W
+	movwf	SYSLONGTEMPA_E
 ;SysLongTempX = SysLongDivMultX
-	MOVF	SYSLONGDIVMULTX,W
-	MOVWF	SYSLONGTEMPX
-	MOVF	SYSLONGDIVMULTX_H,W
-	MOVWF	SYSLONGTEMPX_H
-	MOVF	SYSLONGDIVMULTX_U,W
-	MOVWF	SYSLONGTEMPX_U
-	MOVF	SYSLONGDIVMULTX_E,W
-	MOVWF	SYSLONGTEMPX_E
-	RETURN
+	movf	SYSLONGDIVMULTX,W
+	movwf	SYSLONGTEMPX
+	movf	SYSLONGDIVMULTX_H,W
+	movwf	SYSLONGTEMPX_H
+	movf	SYSLONGDIVMULTX_U,W
+	movwf	SYSLONGTEMPX_U
+	movf	SYSLONGDIVMULTX_E,W
+	movwf	SYSLONGTEMPX_E
+	return
 
 ;********************************************************************************
 
-;SOURCE: SYSTEM.H (2685)
+;Source: system.h (2696)
 SYSMULTSUB32
 ;dim SysLongTempA as long
 ;dim SysLongTempB as long
@@ -1930,93 +1956,93 @@ SYSMULTSUB32
 ;dim SysLongDivMultB as long
 ;dim SysLongDivMultX as long
 ;SysLongDivMultA = SysLongTempA
-	MOVF	SYSLONGTEMPA,W
-	MOVWF	SYSLONGDIVMULTA
-	MOVF	SYSLONGTEMPA_H,W
-	MOVWF	SYSLONGDIVMULTA_H
-	MOVF	SYSLONGTEMPA_U,W
-	MOVWF	SYSLONGDIVMULTA_U
-	MOVF	SYSLONGTEMPA_E,W
-	MOVWF	SYSLONGDIVMULTA_E
+	movf	SYSLONGTEMPA,W
+	movwf	SYSLONGDIVMULTA
+	movf	SYSLONGTEMPA_H,W
+	movwf	SYSLONGDIVMULTA_H
+	movf	SYSLONGTEMPA_U,W
+	movwf	SYSLONGDIVMULTA_U
+	movf	SYSLONGTEMPA_E,W
+	movwf	SYSLONGDIVMULTA_E
 ;SysLongDivMultB = SysLongTempB
-	MOVF	SYSLONGTEMPB,W
-	MOVWF	SYSLONGDIVMULTB
-	MOVF	SYSLONGTEMPB_H,W
-	MOVWF	SYSLONGDIVMULTB_H
-	MOVF	SYSLONGTEMPB_U,W
-	MOVWF	SYSLONGDIVMULTB_U
-	MOVF	SYSLONGTEMPB_E,W
-	MOVWF	SYSLONGDIVMULTB_E
+	movf	SYSLONGTEMPB,W
+	movwf	SYSLONGDIVMULTB
+	movf	SYSLONGTEMPB_H,W
+	movwf	SYSLONGDIVMULTB_H
+	movf	SYSLONGTEMPB_U,W
+	movwf	SYSLONGDIVMULTB_U
+	movf	SYSLONGTEMPB_E,W
+	movwf	SYSLONGDIVMULTB_E
 ;SysLongDivMultX = 0
-	CLRF	SYSLONGDIVMULTX
-	CLRF	SYSLONGDIVMULTX_H
-	CLRF	SYSLONGDIVMULTX_U
-	CLRF	SYSLONGDIVMULTX_E
+	clrf	SYSLONGDIVMULTX
+	clrf	SYSLONGDIVMULTX_H
+	clrf	SYSLONGDIVMULTX_U
+	clrf	SYSLONGDIVMULTX_E
 MUL32LOOP
 ;IF SysLongDivMultB.0 ON then SysLongDivMultX += SysLongDivMultA
-	BTFSS	SYSLONGDIVMULTB,0
-	GOTO	ENDIF28
+	btfss	SYSLONGDIVMULTB,0
+	goto	ENDIF28
 ;IF SysLongDivMultB.0 ON then SysLongDivMultX += SysLongDivMultA
-	MOVF	SYSLONGDIVMULTA,W
-	ADDWF	SYSLONGDIVMULTX,F
-	MOVF	SYSLONGDIVMULTA_H,W
-	ADDWFC	SYSLONGDIVMULTX_H,F
-	MOVF	SYSLONGDIVMULTA_U,W
-	ADDWFC	SYSLONGDIVMULTX_U,F
-	MOVF	SYSLONGDIVMULTA_E,W
-	ADDWFC	SYSLONGDIVMULTX_E,F
+	movf	SYSLONGDIVMULTA,W
+	addwf	SYSLONGDIVMULTX,F
+	movf	SYSLONGDIVMULTA_H,W
+	addwfc	SYSLONGDIVMULTX_H,F
+	movf	SYSLONGDIVMULTA_U,W
+	addwfc	SYSLONGDIVMULTX_U,F
+	movf	SYSLONGDIVMULTA_E,W
+	addwfc	SYSLONGDIVMULTX_E,F
 ;IF SysLongDivMultB.0 ON then SysLongDivMultX += SysLongDivMultA
 ENDIF28
 ;set STATUS.C OFF
-	BCF	STATUS,C
+	bcf	STATUS,C
 ;rotate SysLongDivMultB right
-	RRF	SYSLONGDIVMULTB_E,F
-	RRF	SYSLONGDIVMULTB_U,F
-	RRF	SYSLONGDIVMULTB_H,F
-	RRF	SYSLONGDIVMULTB,F
+	rrf	SYSLONGDIVMULTB_E,F
+	rrf	SYSLONGDIVMULTB_U,F
+	rrf	SYSLONGDIVMULTB_H,F
+	rrf	SYSLONGDIVMULTB,F
 ;set STATUS.C off
-	BCF	STATUS,C
+	bcf	STATUS,C
 ;rotate SysLongDivMultA left
-	RLF	SYSLONGDIVMULTA,F
-	RLF	SYSLONGDIVMULTA_H,F
-	RLF	SYSLONGDIVMULTA_U,F
-	RLF	SYSLONGDIVMULTA_E,F
+	rlf	SYSLONGDIVMULTA,F
+	rlf	SYSLONGDIVMULTA_H,F
+	rlf	SYSLONGDIVMULTA_U,F
+	rlf	SYSLONGDIVMULTA_E,F
 ;if SysLongDivMultB > 0 then goto MUL32LOOP
-	MOVF	SYSLONGDIVMULTB,W
-	MOVWF	SYSLONGTEMPB
-	MOVF	SYSLONGDIVMULTB_H,W
-	MOVWF	SYSLONGTEMPB_H
-	MOVF	SYSLONGDIVMULTB_U,W
-	MOVWF	SYSLONGTEMPB_U
-	MOVF	SYSLONGDIVMULTB_E,W
-	MOVWF	SYSLONGTEMPB_E
-	CLRF	SYSLONGTEMPA
-	CLRF	SYSLONGTEMPA_H
-	CLRF	SYSLONGTEMPA_U
-	CLRF	SYSLONGTEMPA_E
-	CALL	SYSCOMPLESSTHAN32
-	BTFSC	SYSBYTETEMPX,0
+	movf	SYSLONGDIVMULTB,W
+	movwf	SysLONGTempB
+	movf	SYSLONGDIVMULTB_H,W
+	movwf	SysLONGTempB_H
+	movf	SYSLONGDIVMULTB_U,W
+	movwf	SysLONGTempB_U
+	movf	SYSLONGDIVMULTB_E,W
+	movwf	SysLONGTempB_E
+	clrf	SysLONGTempA
+	clrf	SysLONGTempA_H
+	clrf	SysLONGTempA_U
+	clrf	SysLONGTempA_E
+	call	SYSCOMPLESSTHAN32
+	btfsc	SysByteTempX,0
 ;if SysLongDivMultB > 0 then goto MUL32LOOP
-	GOTO	MUL32LOOP
+	goto	MUL32LOOP
 ;if SysLongDivMultB > 0 then goto MUL32LOOP
 ;SysLongTempX = SysLongDivMultX
-	MOVF	SYSLONGDIVMULTX,W
-	MOVWF	SYSLONGTEMPX
-	MOVF	SYSLONGDIVMULTX_H,W
-	MOVWF	SYSLONGTEMPX_H
-	MOVF	SYSLONGDIVMULTX_U,W
-	MOVWF	SYSLONGTEMPX_U
-	MOVF	SYSLONGDIVMULTX_E,W
-	MOVWF	SYSLONGTEMPX_E
-	RETURN
+	movf	SYSLONGDIVMULTX,W
+	movwf	SYSLONGTEMPX
+	movf	SYSLONGDIVMULTX_H,W
+	movwf	SYSLONGTEMPX_H
+	movf	SYSLONGDIVMULTX_U,W
+	movwf	SYSLONGTEMPX_U
+	movf	SYSLONGDIVMULTX_E,W
+	movwf	SYSLONGTEMPX_E
+	return
 
 ;********************************************************************************
 
-;START OF PROGRAM MEMORY PAGE 1
+;Start of program memory page 1
 	ORG	2048
-;START OF PROGRAM MEMORY PAGE 2
+;Start of program memory page 2
 	ORG	4096
-;START OF PROGRAM MEMORY PAGE 3
+;Start of program memory page 3
 	ORG	6144
 
  END
