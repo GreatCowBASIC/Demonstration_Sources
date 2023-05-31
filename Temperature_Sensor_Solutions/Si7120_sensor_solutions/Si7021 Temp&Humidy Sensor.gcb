@@ -12,22 +12,22 @@
 ''' The Si7021 is a I2C sensor. That means it uses the two I2C data/clock wires available on most microcontrollers, and can share those pins with other sensors as long as they do not have an address collision. 
 ''' The default I2C address is 0x80.
 '''
-''' The default demonstration uses:
+''' The defaults used in this demonstration are:
 '''             Software I2C ( therefore PPS is not required [ if you examine InitPPS() then you will see a method to ensure PPS is not set when not using HardwareI2C])
 '''             LCD in 4bit is enabled - see the setup for the port.pin(s) used
 '''             LCD emulation to a serial terminal is disabled              
 '''             Serial Terminal is enabled but you will have to set PPS for PPS chips.  Serial Terminal BPS is 9600.
 '''             
 '''
-'''Power Pins:
-'''Vin - this is the power pin. Since the chip uses 3 VDC, we have included a voltage regulator on board that will take 3-5VDC and safely convert it down. To power the board, give it the same power as the logic level of your microcontroller - e.g. for a 5V micro like Arduino, use 5V
-'''GND - common ground for power and logic
-'''I2C Logic pins:
-''' SCL - I2C clock pin, connect to your microcontrollers I2C clock line.
-''' SDA - I2C data pin, connect to your microcontrollers I2C data line.
+''' Connectivity:
+'''  Vin - this is the power pin. Since the chip uses 3 VDC, we have included a voltage regulator on board that will take 3-5VDC and safely convert it down. To power the board, give it the same power as the logic level of your microcontroller - e.g. for a 5V micro like Arduino, use 5V
+'''  GND - common ground for power and logic
+'''  I2C Logic pins:
+'''   SCL - I2C clock pin, connect to your microcontrollers I2C clock line.
+'''   SDA - I2C data pin, connect to your microcontrollers I2C data line.
 '''
 '''
-'''Reading in the serial look like this with a reading every second
+''' Reading  the sensor to the  serial terminal looks like this with a reading every second
 '''  50%	28.8F	-1.8C
 '''  50%	28.8F	-1.8C
 '''  50%	28.8F	-1.8C
@@ -53,10 +53,10 @@
 ''' 
 ''' Connect the sensor as shown in the port details below.  
 '''
-'''@author    name   
+'''@author    EvanV   
 '''@license   GPL
-'''@version   version   
-'''@date      2023-05-27
+'''@version   1.01   
+'''@date      2023-05-31
 '''********************************************************************************
 
 '' -------------------PORTA----------------
