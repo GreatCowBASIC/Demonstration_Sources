@@ -1,9 +1,8 @@
 '''A demonstration program for GCGB and GCB.
 '''--------------------------------------------------------------------------------
-'''This program add description here
 '''
 '''
-'''This is a library for the Si7021 breakout board.
+'''This is a demonstration for the Si7021 breakout board.
 '''
 '''
 ''' These sensors use I2C to communicate, 2 pins are required to interface.  Silicon labs has ± 3% relative humidity measurements with a range of 0–80% RH, and ±0.4 °C
@@ -11,8 +10,14 @@
 ''' data transfer so it works with a wide range of microcontrollers.
 '''
 ''' The Si7021 is a I2C sensor. That means it uses the two I2C data/clock wires available on most microcontrollers, and can share those pins with other sensors as long as they do not have an address collision. 
-''' For future reference, the I2C address is 0x80 and you cannot change it.
+''' The default I2C address is 0x80.
 '''
+''' The default demonstration uses:
+'''             Software I2C ( therefore PPS is not required [ if you examine InitPPS() then you will see a method to ensure PPS is not set when not using HardwareI2C])
+'''             LCD in 4bit is enabled - see the setup for the port.pin(s) used
+'''             LCD emulation to a serial terminal is disabled              
+'''             Serial Terminal is enabled but you will have to set PPS for PPS chips.  Serial Terminal BPS is 9600.
+'''             
 '''
 '''Power Pins:
 '''Vin - this is the power pin. Since the chip uses 3 VDC, we have included a voltage regulator on board that will take 3-5VDC and safely convert it down. To power the board, give it the same power as the logic level of your microcontroller - e.g. for a 5V micro like Arduino, use 5V
@@ -121,20 +126,29 @@ End Sub
       // #include  <lcd2serialredirect.h>
       // #DEFINE LCD_IO 0
    
-' Set up serial - comment out `USE_SERIAL` if serial terminal not attached or not required
-    #DEFINE USE_SERIAL
+' Set up serial - comment out `USE_SERIAL_TERMINAL` if serial terminal not attached or not required
+    #DEFINE USE_SERIAL_TERMINAL
+
+    'Required for USE_SERIAL_TERMINAL or LCD redirection
       #DEFINE USART_BAUD_RATE 9600
       #DEFINE USART_TX_BLOCKING
       #DEFINE USART_DELAY OFF
     
 
 ' I2C Setup for Si7021 - required
-    #DEFINE HI2C_BAUD_RATE 100
-    #DEFINE HI2C_DATA     PORTB.7
-    #DEFINE HI2C_CLOCK    PORTC.3
-    Dir HI2C_DATA         in
-    Dir HI2C_CLOCK        in
-    HI2cMode Master
+  'Hardware I2C
+      // #DEFINE HI2C_BAUD_RATE 100
+      // #DEFINE HI2C_DATA     PORTB.7
+      // #DEFINE HI2C_CLOCK    PORTC.3
+      // Dir HI2C_DATA         in
+      // Dir HI2C_CLOCK        in
+      // HI2cMode Master
+  ' Software I2C
+      #DEFINE I2C_MODE      MASTER
+      #DEFINE I2C_DATA      PORTB.7
+      #DEFINE I2C_CLOCK     PORTC.3
+      #DEFINE I2C_DISABLE_INTERRUPTS ON
+
 
 ' Si7921 I2C ADDRESS/BITS/ADDRESSES - required
     #DEFINE SI7021_DEFAULT_ADDRESS 0x80             ' Sensor address - ths is typically fixed on most sensor boards
@@ -181,6 +195,17 @@ End Sub
   #IFDEF USE_LCD 
     'Show message on LCD
     CLS
+    Print "GCBASIC 2023"
+    Locate 1,0
+    #IFDEF HI2C_DATA
+      Print "Hardware I2C"
+    #ELSE
+      #IFDEF I2C_DATA
+        Print "Software I2C"
+      #ENDIF
+    #ENDIF
+    Wait 3 s
+    CLS
     'Print Messages at Fixed locations - conditional on the use of an LCD
     Locate 0,0
     Print "TEMP"
@@ -188,16 +213,23 @@ End Sub
     Print "HUMD"
   #ENDIF 
 
-  #IFDEF USE_SERIAL
+  #IFDEF USE_SERIAL_TERMINAL
     'Show message on Serial Terminal  
     HserPrintCRLF 2
     HSerPrint "HUMD"
     HserSend 9
     HSerPrint "TEMPf"
     HserSend 9
-    HSerPrintStringCRLF "TEMPc"
-    
+    HSerPrint "TEMPc"
+    #IFDEF HI2C_DATA
+      HSerPrintStringCRLF " - Hardware I2C"
+    #ELSE
+      #IFDEF I2C_DATA
+        HSerPrintStringCRLF " - Software I2C"
+      #ENDIF
+    #ENDIF
   #ENDIF
+
 
   'Setup a ms timer on timer 2 
     PR0 = 244                                       ' 250 ms * 16Mz
@@ -229,7 +261,7 @@ End Sub
             Print "Failure"
           End If
           #ENDIF
-        #IFDEF USE_SERIAL
+        #IFDEF USE_SERIAL_TERMINAL
           If NOT SensorFail Then
           'Display result on Serial Terminal
             If Humidity  < 10 then HSerPrint "0"
@@ -243,6 +275,7 @@ End Sub
       
       //!Do the work...
       Read_Temperature ( TemperatureC, TemperatureC_Hundredths, TemperatureF, TemperatureF_Hundredths )
+
         #IFDEF USE_LCD 
           If NOT SensorFail Then
             'Display result on LCD
@@ -259,7 +292,7 @@ End Sub
           End If
           #ENDIF
 
-        #IFDEF USE_SERIAL
+        #IFDEF USE_SERIAL_TERMINAL
           If NOT SensorFail Then
             'Display result on Serial Terminal
             HserPrint TemperatureF : HserPrint "." : HSerPrint TemperatureF_Hundredths: HSerPrint "f"
@@ -270,7 +303,7 @@ End Sub
           End If
           #ENDIF
 
-        #IFDEF USE_SERIAL
+        #IFDEF USE_SERIAL_TERMINAL
           HserPrintCRLF
           #ENDIF
       __ProcessSensor = False
@@ -291,31 +324,45 @@ Sub Read_Humidity ( out Humidity as Word )
   SensorFail = False
   SiRaw = 0
 
-  HI2CStart
-  HI2CSend (SI7021_DEFAULT_ADDRESS)  'Write
-  HI2cSend (SI7021_MEASRH_NOHOLD_CMD)
-  HI2CReStart
-  HI2CSend (SI7021_DEFAULT_ADDRESS | 1)  'read
-  wait 50 ms   ' for conversion 
-  HI2CReStart
-  HI2CSend (SI7021_DEFAULT_ADDRESS | 1 )  'read
+  #IFDEF HI2C_DATA
+    HI2CStart
+    HI2CSend (SI7021_DEFAULT_ADDRESS)  'Write
+    HI2cSend (SI7021_MEASRH_NOHOLD_CMD)
+    HI2CReStart
+    HI2CSend (SI7021_DEFAULT_ADDRESS | 1)  'read
+    wait 50 ms   ' for conversion 
+    HI2CReStart
+    HI2CSend (SI7021_DEFAULT_ADDRESS | 1 )  'read
 
-  If HI2CWaitMSSPTimeout <> 255 Then
+    If HI2CWaitMSSPTimeout <> 255 Then
+      HI2CReceive (Si7021_HighByte, ACK)
+      HI2CReceive (Si7021_Lowbyte, NACK)
+      HI2Cstop
 
-    HI2CReceive (Si7021_HighByte, ACK)
-    HI2CReceive (Si7021_Lowbyte, NACK)
-    HI2Cstop
+      'now do the maths
+      Humidity = (([long]SiRaw * 125) / 65536) -6
+    else
+      SensorFail = TRUE
+      HI2Cstop
+    End If
+  #ELSE
+    I2CStart
+    I2CSend (SI7021_DEFAULT_ADDRESS)  'Write
+    I2CSend (SI7021_MEASRH_NOHOLD_CMD)
+    I2CReStart
+    I2CSend (SI7021_DEFAULT_ADDRESS | 1)  'read
+    wait 50 ms   ' for conversion ( could be less)
+    I2CReStart
+    I2CSend (SI7021_DEFAULT_ADDRESS | 1 )  'read
+
+    I2CReceive (Si7021_HighByte, ACK)
+    I2CReceive (Si7021_Lowbyte, NACK)
+    I2Cstop
 
     'now do the maths
     Humidity = (([long]SiRaw * 125) / 65536) -6
 
-  else
-
-    SensorFail = TRUE
-    HI2Cstop
-    
-  End If
-
+  #ENDIF
 
 
 End Sub
@@ -328,40 +375,65 @@ Sub Read_Temperature ( out TemperatureC as Integer, out TemperatureC_Hundredths,
 
   SensorFail = False
 
-  HI2CStart
-  HI2CSend (SI7021_DEFAULT_ADDRESS)  'Write
-  HI2cSend (SI7021_READPREVTEMP_CMD)
-  HI2CReStart
-  HI2CSend (SI7021_DEFAULT_ADDRESS | 1 )  'read
+  #IFDEF HI2C_DATA
+    HI2CStart
+    HI2CSend (SI7021_DEFAULT_ADDRESS)  'Write
+    HI2cSend (SI7021_READPREVTEMP_CMD)
+    HI2CReStart
+    HI2CSend (SI7021_DEFAULT_ADDRESS | 1 )  'read
 
-  If HI2CWaitMSSPTimeout <> 255  Then
-    HI2CReceive (Si7021_HighByte, ACK)
-    HI2CReceive (Si7021_Lowbyte, NACK)
-    HI2Cstop
-    wait 20 ms
+    If HI2CWaitMSSPTimeout <> 255  Then
+      HI2CReceive (Si7021_HighByte, ACK)
+      HI2CReceive (Si7021_Lowbyte, NACK)
+      HI2Cstop
 
-    TemperatureC = (([long]SiRaw * 17572) / 65536) - 4685
-    TemperatureC = TemperatureC / 10
-
-    TemperatureF =   (([integer]TemperatureC * 9) /5) + 320
-    TemperatureF_Hundredths = TemperatureF % 10  'Modulud Divide
-    TemperatureF = TemperatureF / 10
-
-    If TemperatureC < 0 Then
-      TemperatureC_Hundredths = ABS(TemperatureC % 10)
+      TemperatureC = (([long]SiRaw * 17572) / 65536) - 4685
       TemperatureC = TemperatureC / 10
-    Else
-        TemperatureC_Hundredths = TemperatureC % 10
+
+      TemperatureF =   (([integer]TemperatureC * 9) /5) + 320
+      TemperatureF_Hundredths = TemperatureF % 10  'Modulud Divide
+      TemperatureF = TemperatureF / 10
+
+      If TemperatureC < 0 Then
+        TemperatureC_Hundredths = ABS(TemperatureC % 10)
         TemperatureC = TemperatureC / 10
-    End If  
+      Else
+          TemperatureC_Hundredths = TemperatureC % 10
+          TemperatureC = TemperatureC / 10
+      End If  
+    Else
+      SensorFail = TRUE
+      HI2Cstop
+    End If
+  #ELSE
 
+    I2CStart
+    I2CSend (SI7021_DEFAULT_ADDRESS)  'Write
+    I2CSend (SI7021_READPREVTEMP_CMD)
 
+    I2CReStart
+    I2CSend (SI7021_DEFAULT_ADDRESS | 1 )  'read
+    I2CReceive (Si7021_HighByte, ACK)
+    I2CReceive (Si7021_Lowbyte, NACK)
+    I2Cstop
 
+      TemperatureC = (([long]SiRaw * 17572) / 65536) - 4685
+      TemperatureC = TemperatureC / 10
 
-  Else
-    SensorFail = TRUE
-    HI2Cstop
-  End If
+      TemperatureF =   (([integer]TemperatureC * 9) /5) + 320
+      TemperatureF_Hundredths = TemperatureF % 10  'Modulud Divide
+      TemperatureF = TemperatureF / 10
+
+      If TemperatureC < 0 Then
+        TemperatureC_Hundredths = ABS(TemperatureC % 10)
+        TemperatureC = TemperatureC / 10
+      Else
+          TemperatureC_Hundredths = TemperatureC % 10
+          TemperatureC = TemperatureC / 10
+      End If 
+
+  #ENDIF
+
 End Sub
 
 sub OneSecond_ISR  'ISR
