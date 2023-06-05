@@ -1,4 +1,7 @@
 '''
+'''  THIS IS A PROOF OF CONCEPT GLCD DRIVER. THERE IS NOT SUPPORT FOR GLCD COMMANDS.
+'''
+'''
 '''  This demonstration shows the I2C devices attached the microcontroller support harware I2C.
 '''
 '''  I2C device required a data bus and a clock bus 'devices also required an input voltage and 0v.
