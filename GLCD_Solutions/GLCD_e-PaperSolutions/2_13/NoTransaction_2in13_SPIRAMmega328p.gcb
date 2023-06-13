@@ -87,7 +87,7 @@
     UpdatePageData_EPD2in13D
     Refresh_EPD2in13D
 
-    wait 5 s
+    WAIT 3 S
     GLCDDisplay off
 
     end

@@ -146,7 +146,7 @@
      GLCD_Close_PageTransaction
 
      GLCDDisplay off
-     wait 1800 ms
+     WAIT 3 S
 
 
     CCount++

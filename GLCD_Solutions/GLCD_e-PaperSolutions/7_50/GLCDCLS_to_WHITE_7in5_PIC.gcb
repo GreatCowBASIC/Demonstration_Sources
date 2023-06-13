@@ -56,6 +56,6 @@
     GLCDBackground=TFT_WHITE
 
     GLCDDisplay on
-    Wait 5 s
+    WAIT 3 S
     GLCDCLS TFT_WHITE
     GLCDDisplay off

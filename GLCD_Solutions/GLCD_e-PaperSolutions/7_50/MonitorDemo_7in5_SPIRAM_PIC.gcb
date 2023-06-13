@@ -101,7 +101,7 @@
     EPD_LoadBMP  fine,       false, TFT_BLACK
     SendCommand_EPD2in13D(DISPLAY_REFRESH)
 
-    wait 5 s
+    WAIT 3 S
 
     GLCDDisplay on
     GLCD_Open_PageTransaction
@@ -118,7 +118,7 @@
     SendCommand_EPD2in13D(DISPLAY_REFRESH)
 
 
-    wait 5 s
+    WAIT 3 S
 
     GLCDDisplay on
     GLCD_Open_PageTransaction
@@ -136,7 +136,7 @@
 
 
     GLCDDisplay Off
-    wait 5 s
+    WAIT 3 S
 
 
 wait 30 s

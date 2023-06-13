@@ -74,7 +74,7 @@
      GLCD_Close_PageTransaction
 
      GLCDDisplay off
-     wait 2 s
+     WAIT 3 S
      GLCDDisplay on
 
 
@@ -88,7 +88,7 @@
      GLCD_Close_PageTransaction
 
      GLCDDisplay off
-     wait 2 s
+     WAIT 3 S
      GLCDDisplay on
 
 
@@ -103,7 +103,7 @@
      GLCD_Close_PageTransaction
 
      GLCDDisplay off
-     wait 2 s
+     WAIT 3 S
      GLCDDisplay on
 
      GLCDRotate Landscape
@@ -116,7 +116,7 @@
      GLCD_Close_PageTransaction
 
      GLCDDisplay off
-     wait 2 s
+     WAIT 3 S
      GLCDDisplay on
 
      GLCDRotate Landscape_Rev
@@ -129,7 +129,7 @@
      GLCD_Close_PageTransaction
 
      GLCDDisplay off
-     wait 2 s
+     WAIT 3 S
      GLCDDisplay on
 
      GLCDCLS

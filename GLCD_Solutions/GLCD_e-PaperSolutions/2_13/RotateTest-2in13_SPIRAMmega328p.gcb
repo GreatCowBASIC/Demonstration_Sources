@@ -62,7 +62,7 @@
         GLCDLocateString (0, 4)
         GLCDPrintStringLN "Line 4"
      GLCD_Close_PageTransaction
-     wait 2 s
+     WAIT 3 S
 
      GLCDRotate Portrait_rev
 
@@ -81,7 +81,7 @@
         GLCDLocateString (0, 4)
         GLCDPrintStringLN "Line 4"
      GLCD_Close_PageTransaction
-     wait 2 s
+     WAIT 3 S
 
      GLCDRotate Portrait_rev
      GLCDForeground = TFT_BLACK
@@ -98,7 +98,7 @@
         GLCDLocateString (0, 4)
         GLCDPrintStringLN "Line 4"
      GLCD_Close_PageTransaction
-     wait 2 s
+     WAIT 3 S
 
      GLCDRotate Landscape
      GLCDForeground = TFT_WHITE
@@ -115,7 +115,7 @@
         GLCDLocateString (0, 4)
         GLCDPrintStringLN "Line 4"
      GLCD_Close_PageTransaction
-     wait 2 s
+     WAIT 3 S
 
      GLCDRotate Landscape_Rev
      GLCDForeground = TFT_BLACK
@@ -132,7 +132,7 @@
         GLCDLocateString (0, 4)
         GLCDPrintStringLN "Line 4"
      GLCD_Close_PageTransaction
-     wait 2 s
+     WAIT 3 S
 
      GLCDCLS TFT_WHITE
      GLCDDisplay off

@@ -39,7 +39,7 @@
      GLCD_Close_PageTransaction
 
      GLCDDisplay Off
-     wait 2 s
+     WAIT 3 S
      GLCDDisplay On
 
     GLCDForeground=TFT_WHITE
@@ -55,7 +55,7 @@
      GLCD_Close_PageTransaction
 
      GLCDDisplay Off
-     wait 2 s
+     WAIT 3 S
      GLCDDisplay On
 
 

@@ -53,7 +53,7 @@
      GLCD_Close_PageTransaction
      GLCDDisplay Off
 
-     wait 2 s
+     wait 3 s
     GLCDDisplay On
 
      GLCDRotate Portrait
@@ -68,7 +68,7 @@
      GLCD_Close_PageTransaction
 
      GLCDDisplay Off
-     wait 2 s
+     wait 3 s
      GLCDDisplay On
      GLCDRotate Portrait_rev
      GLCDForeground = TFT_WHITE
@@ -83,7 +83,7 @@
      GLCD_Close_PageTransaction
 
      GLCDDisplay Off
-     wait 2 s
+     wait 3 s
      GLCDDisplay On
 
      GLCDRotate Landscape
@@ -98,7 +98,7 @@
      GLCD_Close_PageTransaction
 
      GLCDDisplay Off
-     wait 2 s
+     wait 3 s
      GLCDDisplay On
 
      GLCDRotate Landscape_Rev
@@ -113,7 +113,7 @@
      GLCD_Close_PageTransaction
 
      GLCDDisplay Off
-     wait 2 s
+     WAIT 3 S
      GLCDDisplay On
 
 

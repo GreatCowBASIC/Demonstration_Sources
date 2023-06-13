@@ -41,7 +41,7 @@
 
       EPD_LoadBMP  anobium104x212
       SendCommand_EPD2in13D(DISPLAY_REFRESH)
-      wait 2 s
+      WAIT 3 S
       EPD_LoadBMP  anobium104x212a
       SendCommand_EPD2in13D(DISPLAY_REFRESH)
 

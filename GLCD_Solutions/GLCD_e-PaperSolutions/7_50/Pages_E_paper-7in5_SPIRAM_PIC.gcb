@@ -95,7 +95,7 @@
   GLCD_Close_PageTransaction
 
   GLCDDisplay on
-  Wait 5 s
+  WAIT 3 S
   GLCDCLS TFT_WHITE
   GLCDDisplay off
 

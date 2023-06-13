@@ -61,7 +61,7 @@
   GLCD_Close_PageTransaction
 
   GLCDDisplay off
-  wait 5 s
+  WAIT 3 S
   GLCDDisplay on
   GLCDCLS
   GLCDDisplay off
