@@ -137,43 +137,43 @@ Dim DISPLAYNEWLINE As Byte
 #DEFINE DISPLAY_RESISTOR_RATIO  5
 #DEFINE DISPLAY_POWER_MODE      7
 
-#DEFINE       cmddisplayON  = 0xaf   //display on.
-#DEFINE       cmddisplayOFF = 0xae   //display off.
+#DEFINE       cmddisplayON      0xaf   //display on.
+#DEFINE       cmddisplayOFF     0xae   //display off.
       
-#DEFINE       startLine  = 0x40   //Set display start line.
-#DEFINE       restart    = 0xe2   //restart command.
-#DEFINE       seg        = 0xa0   //Set scan direction of SEG, SEG = 1-0-1-0-0-0-0-MX; 
-                          //MX=1-->reverse direction, MX=0-->normal direction.
+#DEFINE       startLine         0x40   //Set display start line.
+#DEFINE       restart           0xe2   //restart command.
+#DEFINE       seg               0xa0   //Set scan direction of SEG, SEG = 1-0-1-0-0-0-0-MX; 
+                                       //MX=1-->reverse direction, MX=0-->normal direction.
 
-#DEFINE       INV_normal = 0xa6   //normal display.
-#DEFINE       AP_normal  = 0xa4   //normal display.
+#DEFINE       INV_normal        0xa6   //normal display.
+#DEFINE       AP_normal         0xa4   //normal display.
       
-#DEFINE       BS         = 0xa3   //select bias setting, bias = 1-0-1-0-0-0-1-BS, BS(0)=1/9,  BS(1)=1/7(at 1/65 duty).
-#DEFINE       com        = 0xc8   //Set output direction of COM, COM = 1-1-0-0-MY-X-X-X;
-                          //MY=1-->reverse direction, MY=0-->normal direction.
+#DEFINE       BS                0xa3   //select bias setting, bias = 1-0-1-0-0-0-1-BS, BS(0)=1/9,  BS(1)=1/7(at 1/65 duty).
+#DEFINE       com               0xc8   //Set output direction of COM, COM = 1-1-0-0-MY-X-X-X;
+                                       //MY=1-->reverse direction, MY=0-->normal direction.
                           
-#DEFINE       powerCon1  = 0x2c   //Controls the built-in power circuits;
-#DEFINE       powerCon2  = 0x2e   //Define instructions on page 43 of the ST7567A data sheet.
-#DEFINE       powerCon3  = 0x2f   //
+#DEFINE       powerCon1         0x2c   //Controls the built-in power circuits;
+#DEFINE       powerCon2         0x2e   //Define instructions on page 43 of the ST7567A data sheet.
+#DEFINE       powerCon3         0x2f   //
 
       /********Adjust display brightness********/
-#DEFINE       regRatio   = 0x22   //Controls the regulation ratio of the built-in regulator;
-                          //Define instructions on page 43 of the ST7567A data sheet.
-#DEFINE       EV1        = 0x81   //Define instructions on page 44 of the ST7567A data sheet.
-#DEFINE       EV2        = 0x30   //  
+#DEFINE       regRatio          0x22   //Controls the regulation ratio of the built-in regulator;
+                                       //Define instructions on page 43 of the ST7567A data sheet.
+#DEFINE       EV1               0x81   //Define instructions on page 44 of the ST7567A data sheet.
+#DEFINE       EV2               0x30   //  
 
       /**********entension command set**********/
-#DEFINE       exit_EC    = 0xfe   //exit extension command set.
-#DEFINE       enter_EC   = 0xff   //enter extension command set.
+#DEFINE       exit_EC           0xfe   //exit extension command set.
+#DEFINE       enter_EC          0xff   //enter extension command set.
 
-#DEFINE       DSM_ON     = 0x72   //display setting mode on.
-#DEFINE       DSM_OFF    = 0x70   //display setting mode off.
-#DEFINE       DT         = 0xd6   //set the display duty, DT=33.
-#DEFINE       BA         = 0x90   //BA=1/9, selects LCD bias ratio for the internal voltage follower to drive the LCD. 
-                          //This command has priority over the Bias Select (BS).
-#DEFINE       FR         = 0x9d   //specifies the frame rate for duty.
+#DEFINE       DSM_ON            0x72   //display setting mode on.
+#DEFINE       DSM_OFF           0x70   //display setting mode off.
+#DEFINE       DT                0xd6   //set the display duty, DT=33.
+#DEFINE       BA                0x90   //BA=1/9, selects LCD bias ratio for the internal voltage follower to drive the LCD. 
+                                     //This command has priority over the Bias Select (BS).
+#DEFINE       FR                0x9d   //specifies the frame rate for duty.
 
-#DEFINE       RMW        = 0xe0   //Read-modify-Write command on page 42 of ST7567A datasheet.
+#DEFINE       RMW               0xe0   //Read-modify-Write command on page 42 of ST7567A datasheet.
 
 
  Sub WriteByte_Command ( in _i2cdata )
