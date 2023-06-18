@@ -148,7 +148,7 @@ Do
     HSerPrint   "End of Search"
     HSerPrintCRLF 2
 
-    Wait While SwitchIn = On
+    Wait While SwitchIn = OFF
 Loop
 
 ' ----- Support methods.  Subroutines and Functions
