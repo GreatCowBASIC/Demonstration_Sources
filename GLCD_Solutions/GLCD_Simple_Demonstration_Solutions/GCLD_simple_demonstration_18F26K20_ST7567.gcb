@@ -1,0 +1,106 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''This program is a simple GLCD demonstration of the ST7567 GLCD capabilities.
+'''It is a nice graphical LCD, suitable for a lot of various projects.
+'''This program draws lines, boxes, circles and prints strings and numbers.
+'''The GLCD is connected to the microprocessor as shown in the hardware section of this code.
+'''@author 	EvanV
+'''@licence	GPL
+'''@version	1.0
+'''@date   	18.06.2023
+'''********************************************************************************
+'Chip Settings.
+#CHIP 18F26K20
+#OPTION Explicit
+
+'' -------------------PORTC----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ------------SDA--SCL-------------
+''-----------------------------------------
+
+' Define Software I2C settings
+    #DEFINE I2C_MODE MASTER
+    #DEFINE I2C_DATA PORTC.4
+    #DEFINE I2C_CLOCK PORTC.3
+    #DEFINE I2C_DISABLE_INTERRUPTS ON
+
+// ' Define Hardware I2C settings
+//     #DEFINE HI2C_BAUD_RATE 400
+//     #DEFINE HI2C_DATA PORTC.4
+//     #DEFINE HI2C_CLOCK PORTC.3
+//     DIR HI2C_DATA IN
+//     DIR HI2C_CLOCK IN
+
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the chip.
+
+    Dim DeviceID As Byte
+    Dim DISPLAYNEWLINE As Byte
+
+    #include <glcd.h>
+    #DEFINE GLCD_TYPE GLCD_TYPE_ST7567
+    #DEFINE GLCDDIRECTION INVERTED
+
+; ----- Define variables
+    Dim BYTENUMBER, CCOUNT as Byte
+
+    CCount = 0
+    dim longNumber as long
+    longNumber = 123456 ' max value = 4294967290
+    dim wordNumber as Word
+    dim outstring as string
+    wordNumber = 0
+    byteNumber = 0
+
+; ----- Main program
+
+    GLCDPrint 0, 0,   "Great Cow BASIC"
+    GLCDPrint (0, 16, "Anobium 2023")
+    GLCDPrint (0, 32, "Portability Demo")
+    GLCDPrint (0, 48, ChipNameStr )
+
+    wait 3 s
+    GLCDCLS
+
+    ' Prepare the static components of the screen
+    GLCDPrint ( 2,   2, "PrintStr")                                   ; Print some text
+    GLCDPrint ( 64,  2, "@")                                          ; Print some more text
+    GLCDPrint ( 72,  2, ChipMhz)                                      ; Print chip speed
+    GLCDPrint ( 86, 2, "Mhz")                                         ; Print some text
+    GLCDDrawString( 2,10,"DrawStr")                                    ; Draw some text
+    box 0,0,GLCD_WIDTH-1, GLCD_HEIGHT-1                               ; Draw a box
+    box GLCD_WIDTH-5, GLCD_HEIGHT-5,GLCD_WIDTH-1, GLCD_HEIGHT-1       ; Draw a box
+    Circle( 44,41,15)                                                 ; Draw a circle
+    line 64,31,0,31                                                   ; Draw a line
+
+    DO forever
+
+        for CCount = 32 to 127
+
+            GLCDPrint ( 64 ,  36,  hex(longNumber_E ) )                 ; Print a HEX string
+            GLCDPrint ( 76 ,  36,  hex(longNumber_U ) )                 ; Print a HEX string
+            GLCDPrint ( 88 ,  36,  hex(longNumber_H ) )                 ; Print a HEX string
+            GLCDPrint ( 100 ,  36, hex(longNumber   ) )                 ; Print a HEX string
+            GLCDPrint ( 112 ,  36, "h" )                                ; Print a HEX string
+
+
+            GLCDPrint ( 64 ,  44, pad(str(wordNumber), 5 ) )           ; Print a padded string
+            GLCDPrint ( 64 ,  52, pad(str(byteNumber), 3 ) )           ; Print a padded string
+
+
+            box (46,9,56,19)                                           ; Draw a Box
+            GLCDDrawChar(48, 10, CCount )                               ; Draw a character
+            outString = str( CCount )                                  ; Prepare a string
+            GLCDDrawString(64, 10, pad(outString,3) )                   ; Draw a string
+
+            filledbox 3,43,11,51, wordNumber                           ; Draw a filled box
+
+            FilledCircle( 44,41,9, longNumber xor 1)                   ; Draw a filled box
+            line 0,63,64,31                                            ; Draw a line
+
+                                                                        ; Do some simple maths
+            longNumber = longNumber + 7 : wordNumber = wordNumber + 3 : byteNumber++
+        NEXT
+    LOOP
+    end
