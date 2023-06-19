@@ -1,0 +1,136 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''This program is a simple GLCD demonstration of the ST7567 GLCD capabilities.
+'''It is a nice graphical LCD, suitable for a lot of various projects.
+'''This program draws lines, boxes, circles and prints strings and numbers.
+'''The GLCD is connected to the microprocessor as shown in the hardware section of this code.
+'''@author 	EvanV
+'''@licence	GPL
+'''@version	1.0
+'''@date   	18.06.2023
+'''********************************************************************************
+'Chip Settings.
+#CHIP 18F26Q71, 64
+#OPTION Explicit
+
+#startup InitPPS, 85
+    #define PPSToolPart 18F26Q71
+
+    Sub InitPPS
+        UNLOCKPPS
+        RB6PPS = 0
+        RB4PPS = 0
+    End Sub
+    'Template comment at the end of the config file
+
+
+'' -------------------PORTA----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:   -----------------SW---ADC---------
+''-----------------------------------------
+''
+
+'' -------------------PORTB----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ----SCL-----SDA------------------
+''-----------------------------------------
+''
+
+'' ------------------PORTC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ----TX1--------LED--LED-LED LED--
+''-----------------------------------------
+
+
+'For a specific test board
+'Define constants to make things easier. We can reuse these at any time.
+    #DEFINE LEDPORT LATC
+
+    Dir     RC0         Out
+    Dir     RC1         Out
+    Dir     RC2         Out
+    Dir     RC3         Out
+
+    #DEFINE POTENTIOMETER PORTA.2
+    Dir     POTENTIOMETER In
+    #DEFINE SWITCHIN      PORTA.3
+    Dir     SWITCHIN      In
+
+' Define Software I2C settings
+    #DEFINE I2C_MODE MASTER
+    #DEFINE I2C_DATA PORTB.4
+    #DEFINE I2C_CLOCK PORTB.6
+    #DEFINE I2C_DISABLE_INTERRUPTS ON
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the chip.
+
+    Dim DeviceID As Byte
+    Dim DISPLAYNEWLINE As Byte
+
+    #include <glcd.h>
+    #DEFINE GLCD_TYPE GLCD_TYPE_ST7567
+    #DEFINE GLCDDIRECTION INVERTED
+
+; ----- Define variables
+    Dim BYTENUMBER, CCOUNT as Byte
+
+    CCount = 0
+    dim longNumber as long
+    longNumber = 123456 ' max value = 4294967290
+    dim wordNumber as Word
+    dim outstring as string
+    wordNumber = 0
+    byteNumber = 0
+
+; ----- Main program
+
+    GLCDPrint 0, 0,   "Great Cow BASIC"
+    GLCDPrint (0, 16, "Anobium 2023")
+    GLCDPrint (0, 32, "Portability Demo")
+    GLCDPrint (0, 48, ChipNameStr )
+
+    wait 3 s
+    GLCDCLS
+
+    ' Prepare the static components of the screen
+    GLCDPrint ( 2,   2, "PrintStr")                                   ; Print some text
+    GLCDPrint ( 64,  2, "@")                                          ; Print some more text
+    GLCDPrint ( 72,  2, ChipMhz)                                      ; Print chip speed
+    GLCDPrint ( 86, 2, "Mhz")                                         ; Print some text
+    GLCDDrawString( 2,10,"DrawStr")                                    ; Draw some text
+    box 0,0,GLCD_WIDTH-1, GLCD_HEIGHT-1                               ; Draw a box
+    box GLCD_WIDTH-5, GLCD_HEIGHT-5,GLCD_WIDTH-1, GLCD_HEIGHT-1       ; Draw a box
+    Circle( 44,41,15)                                                 ; Draw a circle
+    line 64,31,0,31                                                   ; Draw a line
+
+    DO forever
+
+        for CCount = 32 to 127
+
+            GLCDPrint ( 64 ,  36,  hex(longNumber_E ) )                 ; Print a HEX string
+            GLCDPrint ( 76 ,  36,  hex(longNumber_U ) )                 ; Print a HEX string
+            GLCDPrint ( 88 ,  36,  hex(longNumber_H ) )                 ; Print a HEX string
+            GLCDPrint ( 100 ,  36, hex(longNumber   ) )                 ; Print a HEX string
+            GLCDPrint ( 112 ,  36, "h" )                                ; Print a HEX string
+
+
+            GLCDPrint ( 64 ,  44, pad(str(wordNumber), 5 ) )           ; Print a padded string
+            GLCDPrint ( 64 ,  52, pad(str(byteNumber), 3 ) )           ; Print a padded string
+
+
+            box (46,9,56,19)                                           ; Draw a Box
+            GLCDDrawChar(48, 10, CCount )                               ; Draw a character
+            outString = str( CCount )                                  ; Prepare a string
+            GLCDDrawString(64, 10, pad(outString,3) )                   ; Draw a string
+
+            filledbox 3,43,11,51, wordNumber                           ; Draw a filled box
+
+            FilledCircle( 44,41,9, longNumber xor 1)                   ; Draw a filled box
+            line 0,63,64,31                                            ; Draw a line
+
+                                                                        ; Do some simple maths
+            longNumber = longNumber + 7 : wordNumber = wordNumber + 3 : byteNumber++
+        NEXT
+    LOOP
+    end
