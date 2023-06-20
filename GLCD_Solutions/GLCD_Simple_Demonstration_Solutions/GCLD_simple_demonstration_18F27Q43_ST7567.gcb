@@ -53,6 +53,7 @@
 
     #include <glcd.h>
     #DEFINE GLCD_TYPE GLCD_TYPE_ST7567
+    #DEFINE ST7567_BIAS ST7567_SET_BIAS_7    ' ST7567_SET_BIAS_7 or ST7567_SET_BIAS_9
     #DEFINE GLCDDIRECTION INVERTED
 
 ; ----- Define variables
@@ -67,6 +68,8 @@
     byteNumber = 0
 
 ; ----- Main program
+
+
 
     GLCDPrint 0, 0,   "Great Cow BASIC"
     GLCDPrint (0, 16, "Anobium 2023")
