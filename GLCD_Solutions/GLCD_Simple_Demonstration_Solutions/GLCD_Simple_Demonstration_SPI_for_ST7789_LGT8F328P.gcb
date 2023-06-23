@@ -22,7 +22,6 @@
 #include <LGT8F328P.h>
 #option explicit
 #include <glcd.h>
-#include <glcd_st7789.h>
 
 #define ST7789_HardwareSPI
 #define HWSPIMode MASTERULTRAFAST
