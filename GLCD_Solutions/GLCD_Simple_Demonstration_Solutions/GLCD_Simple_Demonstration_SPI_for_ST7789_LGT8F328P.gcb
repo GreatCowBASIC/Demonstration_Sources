@@ -1,0 +1,65 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''This program is a simple GLCD demonstration of the ST7789.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''This program is a simple GLCD demonstration of the ST7789 GLCD capabilities.
+'''This program draws lines, boxes, circles and prints strings and numbers.
+'''The ST7789 controller a  graphical OLED, suitable for a lot of various projects.  The ST7789 is typically a 3v3 device - please check the datasheet before uing 5v0
+'''The display has an active display surface of 1.5/2.0 inches , and a 240*240 or 320*240 pixel resolution.
+'''The display is easy to interface, using a SPI type of communication.   The SPI uses SPI mode 3 and therefore the GLCD may not interoprate with other SPI devices.
+'''
+'''The GLCD is connected to the microprocessor as shown in the hardware section of this code.
+'''
+'''@author  Dan Goss
+'''@licence GPL
+'''@version 1.5
+'''@date    23.06.23
+'''********************************************************************************
+
+
+#chip LGT8F328P
+
+#include <LGT8F328P.h>
+#option explicit
+#include <glcd.h>
+#include <glcd_st7789.h>
+
+#define ST7789_HardwareSPI
+#define HWSPIMode MASTERULTRAFAST
+
+
+// Use one of the following constants to define geometry
+  #define GLCD_TYPE GLCD_TYPE_ST7789_240_240
+  '#define GLCD_TYPE GLCD_TYPE_ST7789_320_240
+
+'Pin mappings for SPI - this GLCD driver supports Hardware SPI and Software SPI
+
+#define GLCD_DC       DIGITAL_8           ' Data command line
+#define GLCD_CS       DIGITAL_10          ' Chip select line
+#define GLCD_RESET    DIGITAL_9           ' Reset line
+#define GLCD_DI       DIGITAL_12          ' Data in | MISO    - Not used therefore not really required
+#define GLCD_DO       DIGITAL_11          ' Data out | MOSI
+#define GLCD_SCK      DIGITAL_13          ' Clock Line
+
+#define GLCD_EXTENDEDFONTSET1
+GLCDBackground = TFT_BLACK
+
+GLCDCLS TFT_BLACK
+GLCDfntDefaultsize = 2
+
+GLCDRotate Portrait_Rev
+GLCDPrint (0,0,"Hello World",TFT_GREEN)
+
+
+
+GLCDRotate Portrait
+GLCDPrint (0,0,"Hello World",TFT_GREEN)
+
+GLCDROTATE Landscape
+GLCDPrint (0,0,"Hello World",TFT_GREEN)
+
+GLCDROTATE Landscape_Rev
+GLCDPrint (0,0,"Hello World",TFT_GREEN)
+
+Wait 1 s
+End
