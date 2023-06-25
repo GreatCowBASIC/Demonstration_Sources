@@ -28,8 +28,8 @@
 
 
 // Use one of the following constants to define geometry
-  #define GLCD_TYPE GLCD_TYPE_ST7789_240_240
-  '#define GLCD_TYPE GLCD_TYPE_ST7789_320_240
+  // #define GLCD_TYPE GLCD_TYPE_ST7789_240_240
+  #define GLCD_TYPE GLCD_TYPE_ST7789_320_240
 
 'Pin mappings for SPI - this GLCD driver supports Hardware SPI and Software SPI
 
@@ -48,8 +48,6 @@ GLCDfntDefaultsize = 2
 
 GLCDRotate Portrait_Rev
 GLCDPrint (0,0,"Hello World",TFT_GREEN)
-
-
 
 GLCDRotate Portrait
 GLCDPrint (0,0,"Hello World",TFT_GREEN)
