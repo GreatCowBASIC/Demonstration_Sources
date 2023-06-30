@@ -1,4 +1,8 @@
 #CHIP tiny13a, 1.2
+//! Optiomising FOR-NEXT loops to use a legacy method.  See the HELP.
+#DEFINE USELEGACYFORNEXT 
+
+
 #DEFINE RS232Out PORTB.1
 
 'Config Software-UART
@@ -9,11 +13,13 @@
 
 DIR RS232Out OUT
 DIR PortB.4 IN
+
 InitSer 1, r9600, 1+WaitForStart, 8, 1, none, normal
-DIM POTI AS BYTE
 
 DO
-    POTI = READAD(ADC2)
-    Sersend 1, POTI
+
+    Sersend 1, READAD(ADC2)
 	WAIT 500 MS
+    
 LOOP
+
