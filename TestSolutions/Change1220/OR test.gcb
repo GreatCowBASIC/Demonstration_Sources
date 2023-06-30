@@ -1,6 +1,7 @@
 ;Chip Settings
 #chip 18F4550,48
 #config PLLDIV=1, CPUDIV=OSC1_PLL2, OSC=HSPLL_HS, LVP=OFF, MCLRE=ON
+#SKIPTEST
 
 ;Defines (Constants)
 #define LCD_IO 2

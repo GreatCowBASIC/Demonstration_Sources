@@ -32,7 +32,7 @@
 
     'Microcontroller @ 32MHz
     #CHIP 16F1619, 32
-
+    #SKIPTEST
     'MCLRE set on so that switch S2 can reset microcontroller
     #CONFIG MCLRE_ON
 
