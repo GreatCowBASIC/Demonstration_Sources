@@ -1,4 +1,4 @@
-'    USART routines for Great Cow BASIC
+'    USART routines for GCBASIC
 '    Copyright (C) 2009-2020 Hugh Considine, William Roth and Mike Otte and Evan Venn
 
 '    This library is free software; you can redistribute it and/or

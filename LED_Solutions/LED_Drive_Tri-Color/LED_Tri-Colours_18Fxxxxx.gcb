@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a demonstration of controlling a color of Tri-colour LED based upon  time of 1 s
 '''The LED is connected to Portb.1,2 and 3 via a suitable resistor .

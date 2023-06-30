@@ -1,4 +1,4 @@
-;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-08-27 (Windows 64 bit) : Build 1163) for Microchip MPASM/MPLAB-X Assembler
+;Program compiled by GCBASIC (1.00.00 Release Candidate 2022-08-27 (Windows 64 bit) : Build 1163) for Microchip MPASM/MPLAB-X Assembler
 ;Need help? 
 ;  See the GCBASIC forums at http://sourceforge.net/projects/gcbasic/forums,
 ;  Check the documentation and Help at http://gcbasic.sourceforge.net/help/,
@@ -123,7 +123,7 @@ BASPROGRAMSTART
 	bcf	TRISC,2
 
 ;Start of the main program
-;''A demonstration program for GCGB and GCB.
+;''A demonstration program for GCBASIC.
 ;''--------------------------------------------------------------------------------------------------------------------------------
 ;''This program will show the functionality of the TM1637a.h library.
 ;''The TM1637 module is connected to PortD.2 CLK and PortD.3 DIO

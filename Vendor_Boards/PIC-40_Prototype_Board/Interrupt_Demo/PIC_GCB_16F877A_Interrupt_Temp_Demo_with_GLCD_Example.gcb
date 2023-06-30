@@ -3,7 +3,7 @@
 '  VERSION: 0.1b
 '  AUTHOR:  Anobium
 '
-'This program was written using the Great Cow Basic IDE for use with the PIC
+'This program was written using the GCBASIC IDE for use with the PIC
 '16F8777A development board (HCDVBD0003) and a GLCD module to display the value of the a DS18B20 sensor.
 'Press button KEY1 to take a measurement.
 'Pressing KEY1 raises an interrupt that starts the GLCD update process.

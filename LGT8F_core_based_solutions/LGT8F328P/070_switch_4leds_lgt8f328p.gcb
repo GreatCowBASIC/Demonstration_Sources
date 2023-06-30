@@ -1,9 +1,9 @@
-'''A demonstration program for GCB
+'''A demonstration program for GCBASIC
 '''---------------------------------------------------------------------------------
 ''' This demonstration simply turns the LED on and off with a wait of 500 ms.
 '''
 '''
-''' Great Cow BASIC will set the state of the LEDS dependent on the state of an input switch
+''' GCBASIC will set the state of the LEDS dependent on the state of an input switch
 '''
 '''
 ''' In this demo we connect four LEDs and a switch.

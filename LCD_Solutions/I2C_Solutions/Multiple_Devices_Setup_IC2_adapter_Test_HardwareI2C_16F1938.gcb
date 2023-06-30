@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program demonstrates shows two LCD's (16x2 & 16x4) being driven using 2 LCD I2C adapters.  Up to four I2C adapters are supported.
 '''This uses the GCB software implementation of IC2 for Microchip devices.

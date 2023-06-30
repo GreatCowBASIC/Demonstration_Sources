@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program blink one LED on PORTB.5 using the ON and OFF commands.
 '''The LED is connected to Portb.5 via appropiate resistors on the HiLetgo UNO board

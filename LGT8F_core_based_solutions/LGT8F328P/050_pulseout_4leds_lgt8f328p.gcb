@@ -1,9 +1,9 @@
-'''A demonstration program for GCB
+'''A demonstration program for GCBASIC
 '''---------------------------------------------------------------------------------
 ''' This demonstration simply turns the LED on and off with a wait of 500 ms.
 '''
 '''
-''' Great Cow BASIC will send a pulse to each LED sequentially.
+''' GCBASIC will send a pulse to each LED sequentially.
 ''' In this demo we connect four LEDs and flash them.
 ''' Connect the LEDs via suitable resistors using a standard LED connection.
 '''

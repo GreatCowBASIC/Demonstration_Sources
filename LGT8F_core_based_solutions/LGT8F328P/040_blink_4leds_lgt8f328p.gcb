@@ -1,10 +1,10 @@
-'''A demonstration program for GCB
+'''A demonstration program for GCBASIC
 '''---------------------------------------------------------------------------------
 ''' This demonstration simply turns the LED on and off with a wait of 500 ms.
 '''
 ''' This shows how you can use the logic of NOT to toggle an LED.
 '''
-''' Great Cow BASIC will read the state of the port controlling the LED,
+''' GCBASIC will read the state of the port controlling the LED,
 ''' In this demo we connect four LEDs and flash them. We will be using this LEDs in the next demos.
 ''' Connect the LEDs via suitable resistors using a standard LED connection.
 '''

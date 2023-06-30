@@ -1,9 +1,9 @@
-''' Great Cow BASIC demonstration
+''' GCBASIC demonstration
 '''
 ''' This demonstration simply turns the LED on using the status of the switch using an Interrupt.  See http://gcbasic.sourceforge.net/help/_on_interrupt_the_default_handler.html
 ''' There is no main program... the Interrupt does all the clever work.
 '''
-''' Attach an LED to the MPLAB® Xpress PIC16F15356 board that can be turned ON via a suitable resistor.
+''' Attach an LED to the MPLABï¿½ Xpress PIC16F15356 board that can be turned ON via a suitable resistor.
 ''' and OFF. The LED can be activated by driving the connected I/O line.
 '''
 ''' Atttach a mechanical button with a 10k pull resistor. This is a generic user configurable

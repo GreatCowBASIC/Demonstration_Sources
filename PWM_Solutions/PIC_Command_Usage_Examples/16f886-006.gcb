@@ -1,4 +1,4 @@
-' Use program uses the Great Cow BASIC CCP/PWM.
+' Use program uses the GCBASIC CCP/PWM.
 ' This enables you to change the frequency and duty dynanically.
 ' This example uses  CCP2/PWM set the PWM parameters and optimises subsequent PWM calls to use the fast method.
 ' Use HPWM_FAST to enable optimisation.

@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program powers and dims an LED on PORTB.5 slowly, very slowly.
 '''The LED should be connected the microprocessor via appropiate resistors.

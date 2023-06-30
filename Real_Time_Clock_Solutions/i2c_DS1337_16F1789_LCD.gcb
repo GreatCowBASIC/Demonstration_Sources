@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program shows the real time clock on a LCD. The LCD is driven by a LCD I2C adapter.
 '''Two types of LCD are supported using this method, as shown below:

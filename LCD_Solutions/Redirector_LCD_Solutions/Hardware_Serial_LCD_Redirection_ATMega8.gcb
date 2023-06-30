@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program demonstrates the redirection of the LCD output to an ANSI serial PC terminal.
 '''The LCD is using an 0-bit option for connectivity which requires <LCD2SerialRedirect.h>

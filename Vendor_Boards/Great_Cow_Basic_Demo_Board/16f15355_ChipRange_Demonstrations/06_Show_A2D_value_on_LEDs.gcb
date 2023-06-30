@@ -1,4 +1,4 @@
-''' A demonstration program for GCGB and GCB.
+''' A demonstration program for GCBASIC.
 '''
 ''' This shows how to read the A2D converter and display the
 ''' A proportioanal value on the 4 bit LED display.

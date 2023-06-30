@@ -1,7 +1,7 @@
 '''A program  for GCGB and GCB.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''
-'''Demonstration of the Great Cow BASIC capabilities for LibK/WinUSB library.  Use the Windows application to control!
+'''Demonstration of the GCBASIC capabilities for LibK/WinUSB library.  Use the Windows application to control!
 '''
 '''Connect the 16f1454 to the USB
 '''  D- to porta.1
@@ -30,7 +30,7 @@
 '''
 '''
 '''
-'''This program is the very first program for Great Cow BASICUSB
+'''This program is the very first program for GCBASICUSB
 '''
 '''@author     EvanV
 '''@licence    GPL
@@ -45,8 +45,8 @@
     #config mclre_on
     ' ----- Constants for the usb.h
     #Define USB_PRODUCT_NAME  "GCASM-PIC Anobium's Test Rig"
-    #Define USB_VID 0x1209      'Should not be changed unless you have your own Vendor Identity - this VID is allocate to Great Cow BASIC Lib/WinUSB Solutions.
-    #Define USB_PID 0x2006      'Should not be changed unless you have your own Vendor Identity - this PID is allocate to Great Cow BASIC Lib/WinUSB Solutions.
+    #Define USB_VID 0x1209      'Should not be changed unless you have your own Vendor Identity - this VID is allocate to GCBASIC Lib/WinUSB Solutions.
+    #Define USB_PID 0x2006      'Should not be changed unless you have your own Vendor Identity - this PID is allocate to GCBASIC Lib/WinUSB Solutions.
     #Define USB_REV 0x0000      'You MUST obtain a REV number from https://github.com/Anobium/GreatCowBASICpidcodes1209_2006 to develop your own Open Source USB solutions
 
     'Constants that match the codes in the PC application

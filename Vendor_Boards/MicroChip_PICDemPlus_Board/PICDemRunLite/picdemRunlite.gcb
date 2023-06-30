@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a ddemonstration of sequencing four LEDs.
 '''The LEDS are connected of PortC.b0,b1, b.2, b.3 via a resistor per LED..

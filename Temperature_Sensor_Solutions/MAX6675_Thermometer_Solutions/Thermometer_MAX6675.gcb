@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------
 '''This program mall example of working with a thermocouple on the MAX6675. 
 '''It uses hardware SPI and dynamic indication on a seven-segment indicator. 

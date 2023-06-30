@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a simple GLCD demonstration of the Touch Screen adapater working with the SSD1289 GLCD display.
 '''The XPT2046 is a 8-bit sampling Analog-to-Digital Converter (ADC) with a synchronous serial interface and low

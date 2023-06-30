@@ -1,6 +1,6 @@
 '''A program  for GCGB and GCB.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program demonstrates the basic Great Cow BASIC GLCD and to use GCB fonts.
+'''This program demonstrates the basic GCBASIC GLCD and to use GCB fonts.
 '''
 '''The setup is:
 '''     Include the <glcd.h>

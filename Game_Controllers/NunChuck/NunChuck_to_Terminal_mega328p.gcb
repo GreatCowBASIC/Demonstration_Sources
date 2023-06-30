@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program uses the Wii Nunchuck I2C devices and display the values to the attached PC terminal.
 '''This program uses the hardware implementation of I2C and TWI for the Microchip and ATMEL microprocessors.  The microprocessor must have a suitable I2C or TWI module.

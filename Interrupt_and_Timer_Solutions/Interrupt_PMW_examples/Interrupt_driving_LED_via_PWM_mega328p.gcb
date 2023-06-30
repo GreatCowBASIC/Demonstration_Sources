@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program adjusts the power to a LED over 2.5 seconds, from 100% then to 0% power again over 2.5 seconds with a hold of 1 second between each ramp up/down.
 '''The LED is connected to Portb.5 via appropiate resistors.

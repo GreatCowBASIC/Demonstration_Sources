@@ -1,4 +1,4 @@
-  '''A demonstration program for GCGB and GCB.
+  '''A demonstration program for GCBASIC.
   '''--------------------------------------------------------------------------------------------------------------------------------
   '''This program demostrates use of the Logical Shift Left (FnLsl) command.
   '''A set eigth LEDs are connected to PortC via eigth suitable resistors, 1k resistors should be adequate for a 5v supply voltage.

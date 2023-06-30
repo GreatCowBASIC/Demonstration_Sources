@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program demonstrates the use of the Infrarad (IRR) TSOP4838 type IRR receiver sensor.
 ''':
@@ -18,7 +18,7 @@
 ''' | 'o-o-o'  |                                                 *
 ''' |  | | |   |  PIC16F1939                                     *
 ''' |  | | |   |    ___                                          *
-''' |  | '-----o--o|º  |o---.                                    *
+''' |  | '-----o--o|ï¿½  |o---.                                    *
 ''' '--|   |     -o|   |o                                        *
 '''    |   |     -o|   |o-                                       *
 '''    '- - )-B.0-o|   |o-                                       *

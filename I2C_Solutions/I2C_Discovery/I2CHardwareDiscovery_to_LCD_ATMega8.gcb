@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program searches for I2C devices and display their adresses to the attached LCD.
 '''This program uses the hardware implementation of TWI for the ATMEL microprocessors.  The microprocessor must have a suitable TWI module.

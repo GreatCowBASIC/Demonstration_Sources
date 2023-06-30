@@ -6,7 +6,7 @@
     '#define PCA9685_ADDRESS_4 0x86
 
 
-    ' Set the frequency using the Great Cow BASIC PWM constant
+    ' Set the frequency using the GCBASIC PWM constant
     #define PWM_Freq 38
     '  Range is 24-1526
       '#define PWM_Freq 1526

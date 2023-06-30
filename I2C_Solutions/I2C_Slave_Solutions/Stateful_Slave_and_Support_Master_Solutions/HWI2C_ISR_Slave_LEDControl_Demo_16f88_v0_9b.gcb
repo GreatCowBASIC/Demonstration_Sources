@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''------------------------------------------------------------------------------------------------------------------------------
 ''' Description: this library provides an ISR to implement
 ''' a stateful i2c hardware slave.

@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program provides an example of how to use bitwise addressing of a word variable, therefore, addressing 16 bits.
 '''

@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program scroll text on the LED Matrix.
 ''':
@@ -49,7 +49,7 @@
   do Forever
 
       GLCDCLS
-      myString = "Space Invaders... if Arduino users can do it... so can Great Cow BASIC users!!"
+      myString = "Space Invaders... if Arduino users can do it... so can GCBASIC users!!"
       Max7219_LEDMatrix_ScrollMessage ( myString, 1 )
 
       repeat 2

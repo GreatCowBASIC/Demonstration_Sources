@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a Light Logger demonstration.  The program logs sensor values to the microprocessors internal EEPROM memory.
 '''The sensor is attached to ADC0.

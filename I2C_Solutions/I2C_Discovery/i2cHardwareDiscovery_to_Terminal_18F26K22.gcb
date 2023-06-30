@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program searches for I2C devices and display their adresses to the attached PC terminal.
 '''This program uses the hardware implementation of I2C for the Microchip microprocessors.

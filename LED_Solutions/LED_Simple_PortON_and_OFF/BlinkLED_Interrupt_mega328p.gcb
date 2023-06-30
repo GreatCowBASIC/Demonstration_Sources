@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program blinks the LED with timer match interrupt
 '''The LED is connected to Portb.5 via appropiate resistors.

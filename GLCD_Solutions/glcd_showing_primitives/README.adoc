@@ -1,13 +1,13 @@
 This GIT contains the demonstrations to show GLCD primitives like circles, lines and elipses.  And, these demonstrations now include Hyperbole and Parabola.
 
-The baseline set of demonstrations was created at version 1.00.xx of the Great Cow BASIC distribution.
+The baseline set of demonstrations was created at version 1.00.xx of the GCBASIC distribution.
 
 Please add your demonstrations and improve those that have been posted.
 
-The GIT contains the source Great Cow BASIC that can be used to program the specific MCU configuration.{nbsp}{nbsp}For Great Cow BASIC please download from https://sourceforge.net/projects/gcbasic/files/latest/download
+The GIT contains the source GCBASIC that can be used to program the specific MCU configuration.{nbsp}{nbsp}For GCBASIC please download from https://sourceforge.net/projects/gcbasic/files/latest/download
 
 
-Use the Great Cow BASIC IDE to adapt the source GCB files.
+Use the GCBASIC IDE to adapt the source GCB files.
 {empty} +
 {empty} +
 {empty} +

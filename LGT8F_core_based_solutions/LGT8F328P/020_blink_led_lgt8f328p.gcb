@@ -1,4 +1,4 @@
-'''A demonstration program for GCB
+'''A demonstration program for GCBASIC
 '''---------------------------------------------------------------------------------
 ''' This demonstration simply turns the LED on and off with a wait of 500 ms.
 '''

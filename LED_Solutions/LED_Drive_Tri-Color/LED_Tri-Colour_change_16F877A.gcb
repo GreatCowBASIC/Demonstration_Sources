@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a demonstration of controling a color of Tri-colour LED based upon the value of ANO.
 '''A LCD is attached to show introduction text only.  See the program for the LCD configuration.

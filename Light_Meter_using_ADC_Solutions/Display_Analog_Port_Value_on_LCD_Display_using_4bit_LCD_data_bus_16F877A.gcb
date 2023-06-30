@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program reads the potentiometer/light sensor on AN0 on a LCD.
 '''See the hardare section for the LCD connections.  The LCD uses LCD_IO mode 4.

@@ -1,4 +1,4 @@
-''' A demonstration program for GCGB and GCB.
+''' A demonstration program for GCBASIC.
 '''
 ''' This demstrations examines the I2C/TWI devices attached and displays then devices discovered on a serial terminal using the secondary I2C module.
 '''

@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This example code implements a serial buffer ring.
 '''This means the incoming serial port data is placed into a buffer that can be read at anytime.

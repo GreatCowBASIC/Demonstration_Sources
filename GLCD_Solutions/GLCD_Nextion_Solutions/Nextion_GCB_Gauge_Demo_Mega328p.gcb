@@ -1,6 +1,6 @@
 '''A program  for GCGB and GCB.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program demonstrates the using Great Cow BASIC to update the gauges.
+'''This program demonstrates the using GCBASIC to update the gauges.
 '''
 '''The setup is:
 '''     Include the <glcd.h>

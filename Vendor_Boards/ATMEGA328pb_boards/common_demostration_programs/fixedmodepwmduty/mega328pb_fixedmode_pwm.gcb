@@ -1,4 +1,4 @@
-'''A demonstration program for GCB
+'''A demonstration program for GCBASIC
 '''---------------------------------------------------------------------------------
 ''' This program shows how to set the PWM in fixed frequency on OCOB = portD.5.  You will need a scope on OCOB to see the signal.
 '''

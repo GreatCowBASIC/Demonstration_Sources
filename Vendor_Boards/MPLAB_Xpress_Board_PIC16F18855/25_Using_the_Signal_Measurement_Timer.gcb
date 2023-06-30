@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program demonstrates the Signal Measurement Timer Test capabilities of the microcontroller.
 '''This program will use the LEDs to show the different frequencies plus Portc.3 for your scope.

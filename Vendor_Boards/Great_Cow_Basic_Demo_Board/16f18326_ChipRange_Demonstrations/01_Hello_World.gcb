@@ -1,4 +1,4 @@
-''' A demonstration program for GCGB and GCB.
+''' A demonstration program for GCBASIC.
 ''' The  most simple demonstration for GCGB and GCB.
 '''
 ''' This simply set one of the LEDs on portc.0 to ON.

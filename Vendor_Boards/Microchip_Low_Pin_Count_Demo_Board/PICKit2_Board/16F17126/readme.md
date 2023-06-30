@@ -7,14 +7,14 @@
 
 This GIT contains the latest demonstrations.
 
-The baseline set of demonstrations was created at version 1.00.xx of the Great Cow BASIC distribution.
+The baseline set of demonstrations was created at version 1.00.xx of the GCBASIC distribution.
 
 Enjoy
 
 
 # Layout of Demo programs
 
-This is the standard program. This is included in every Great Cow BASIC installation.  See IDE/Snippets.
+This is the standard program. This is included in every GCBASIC installation.  See IDE/Snippets.
 
 ----
     '''A program  for GCGB and GCB the demonsations......

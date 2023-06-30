@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''Attach a servo motor to pin SERVOOUTCHANNEL1 - this program will make it sweep back and forth
 '''

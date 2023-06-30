@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program reads the value of a DS18B20 connected to Portc.3.  The DS18B20 must be setup to correctly.
 '''The multiple LCD display connections must be to the correct addresses as shown in the hardware section.

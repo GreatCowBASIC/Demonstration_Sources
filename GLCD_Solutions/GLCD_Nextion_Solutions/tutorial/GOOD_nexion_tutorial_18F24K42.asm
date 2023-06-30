@@ -1,4 +1,4 @@
-;Program compiled by Great Cow BASIC (0.98.<<>> 2019-11-14 (Windows 32 bit))
+;Program compiled by GCBASIC (0.98.<<>> 2019-11-14 (Windows 32 bit))
 ;Need help? See the GCBASIC forums at http://sourceforge.net/projects/gcbasic/forums,
 ;check the documentation or email w_cholmondeley at users dot sourceforge dot net.
 
@@ -173,7 +173,7 @@ BASPROGRAMSTART
 ;Start of the main program
 ;''A program  for GCGB and GCB.
 ;''--------------------------------------------------------------------------------------------------------------------------------
-;''This program demonstrates the using Great Cow BASIC to update the Nextion display.
+;''This program demonstrates the using GCBASIC to update the Nextion display.
 ;''
 ;''Enjoy.
 ;''

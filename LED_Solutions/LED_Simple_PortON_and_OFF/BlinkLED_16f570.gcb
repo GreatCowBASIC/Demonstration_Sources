@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program blink one LED on PORTB.3 using the ON and OFF commands.
 '''The LED must be attached via appropiate resistors.

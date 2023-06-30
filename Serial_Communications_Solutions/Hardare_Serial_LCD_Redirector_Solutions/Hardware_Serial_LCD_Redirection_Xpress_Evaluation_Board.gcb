@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program redirects the normal LCD output to an ANSI serial terminal.
 '''On the Microchip MPLab Xpress Evaluation Board

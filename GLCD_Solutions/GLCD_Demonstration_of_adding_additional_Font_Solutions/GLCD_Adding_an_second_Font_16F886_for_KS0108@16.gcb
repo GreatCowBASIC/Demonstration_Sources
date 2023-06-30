@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program demonstrates adding an additional font for use on the GLCD.
 '''Multiple fonts can be added - this example shows adding one font.

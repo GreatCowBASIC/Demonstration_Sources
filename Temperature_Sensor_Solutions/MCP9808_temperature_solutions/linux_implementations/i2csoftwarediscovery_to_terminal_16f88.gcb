@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB. 
+'''A demonstration program for GCBASIC. 
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''i2csoftwarediscovery_to_terminal_16f88.gcb
 '''This program searches for I2C devices and display their adresses to the attached PC terminal.

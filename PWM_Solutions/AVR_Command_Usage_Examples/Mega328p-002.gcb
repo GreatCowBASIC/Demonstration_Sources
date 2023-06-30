@@ -1,6 +1,6 @@
 '''A demonstration program for GCGB and GCB
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program will toggle the output port using Great Cow BASIC software PWM option.
+'''This program will toggle the output port using GCBASIC software PWM option.
 ''' This should be 2.66khz at 50% duty.
 
 '''@author  EvanV plus works of KentS

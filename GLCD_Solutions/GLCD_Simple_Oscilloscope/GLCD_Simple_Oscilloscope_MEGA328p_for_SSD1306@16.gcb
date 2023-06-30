@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a very basic simple GLCD demonstration of the SSD1306 GLCD capabilities as a very simple scope.
 '''This program updates the GLCD using XOR via a

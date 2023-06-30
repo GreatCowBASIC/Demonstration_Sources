@@ -1,7 +1,7 @@
 '''
 '''  One way to create a delay is to spend time wait for time to pass in milliseconds.
 '''
-'''  The demonstration will use a Great Cow BASIC method to toggle the LED.
+'''  The demonstration will use a GCBASIC method to toggle the LED.
 '''
 '''  LED blinks at a rate of approximately 1.0 seconds.
 '''

@@ -1,4 +1,4 @@
-'''A demonstration program for GCB
+'''A demonstration program for GCBASIC
 '''---------------------------------------------------------------------------------
 ''' This demonstration uses a simple software routine to avoid the initial noise on the switch
 ''' pin. The code will inspect the switch status, but should overcome most of the noise from a switch.

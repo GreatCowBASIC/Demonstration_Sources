@@ -1,6 +1,6 @@
 '''A program  for GCGB and GCB.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program test the Great Cow BASIC compiler for the K90 microcontroller
+'''This program test the GCBASIC compiler for the K90 microcontroller
 '''
 '''@author     Evan R. Venn
 '''@licence    GPL

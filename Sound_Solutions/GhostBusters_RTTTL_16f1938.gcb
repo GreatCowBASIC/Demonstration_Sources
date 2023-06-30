@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program plays 'Ghostbusters' on portc.2 connected to Piezo speaker.
 '''This example uses the Chipino shield

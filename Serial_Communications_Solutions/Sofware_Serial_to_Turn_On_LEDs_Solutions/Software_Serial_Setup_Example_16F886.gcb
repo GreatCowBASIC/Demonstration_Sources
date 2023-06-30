@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This example code receives input from a serial terminal solution and as result turns an LED off or on.
 '''The LED will be turned ON a '1' is received.

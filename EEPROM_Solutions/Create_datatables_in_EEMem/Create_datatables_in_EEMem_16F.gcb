@@ -2,9 +2,9 @@
 '''--------------------------------------------------------------------------------------------------------------------------------
 ''' This program will permit the correct placement in EEMEM of data/information.
 '''
-''' Requires Great Cow Basic Compiler v1.00.xx or greater.  This will NOT generate a HEX using Great Cow Basic GCASM.  Use an altertive linker.
+''' Requires GCBASIC Compiler v1.00.xx or greater.  This will NOT generate a HEX using GCBASIC GCASM.  Use an altertive linker.
 '''
-''' You can generate the ASM in Great Cow BASIC but YOU MUST link using MPASMX or an alternative to MPASMX
+''' You can generate the ASM in GCBASIC but YOU MUST link using MPASMX or an alternative to MPASMX
 '''
 '''@author     EvanV
 '''@licence    GPL

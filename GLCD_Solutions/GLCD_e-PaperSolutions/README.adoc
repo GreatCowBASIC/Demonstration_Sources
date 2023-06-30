@@ -1,13 +1,13 @@
 This GIT contains the demonstrations created for the Waveshare Electronics suite of products.
 
-The baseline set of demonstrations was created at version 1.00.xx of the Great Cow BASIC distrubution.
+The baseline set of demonstrations was created at version 1.00.xx of the GCBASIC distrubution.
 
 Please add your demonstrations and improve those that have been posted.
 
-The GIT contains the source Great Cow BASIC and a HEX file that can be used to program the specific product configuration.{nbsp}{nbsp}For Great Cow BASIC please download from https://sourceforge.net/projects/gcbasic/files/latest/download
+The GIT contains the source GCBASIC and a HEX file that can be used to program the specific product configuration.{nbsp}{nbsp}For GCBASIC please download from https://sourceforge.net/projects/gcbasic/files/latest/download
 
 
-Use the Great Cow BASIC IDE to adapt the source GCB files, or, simply load the HEX via the USB connection (using a suitable programmer like PICkitPlus or AVRDUDE) to use the hex file.
+Use the GCBASIC IDE to adapt the source GCB files, or, simply load the HEX via the USB connection (using a suitable programmer like PICkitPlus or AVRDUDE) to use the hex file.
 {empty} +
 {empty} +
 {empty} +

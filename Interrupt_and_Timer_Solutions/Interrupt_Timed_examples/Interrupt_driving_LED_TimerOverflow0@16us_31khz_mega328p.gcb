@@ -1,12 +1,12 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''     Description.
-'''    A demonstration program for GCGB and GCB.
+'''    A demonstration program for GCBASIC.
 '''    This adjusts the power to the LED over 2.5 seconds, then to zero power again over 2.5 seconds with a hold of 1 second between each ramp up/dowwn.
 '''    Timer0 overflows every 15.8us. We use this overflow to create the PWM'ed LED.
 '''    The LED is connected to Portb.5 via appropiate resistors.
 ''':
-'''     This file is part of the Great Cow Basic compiler.
+'''     This file is part of the GCBASIC compiler.
 '''
 '''     This demonstration code is distributed in the hope that it will be useful,
 '''     but WITHOUT ANY WARRANTY'''  without even the implied warranty of

@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program blink four LEDs on the specific ports using the ON and OFF commands.
 '''The LEDs must be attached via appropiate resistors.

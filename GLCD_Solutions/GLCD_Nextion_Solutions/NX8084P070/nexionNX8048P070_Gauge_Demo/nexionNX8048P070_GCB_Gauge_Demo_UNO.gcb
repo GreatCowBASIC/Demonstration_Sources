@@ -1,6 +1,6 @@
 '''A program  for GCGB and GCB.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program demonstrates the using Great Cow BASIC to update the gauges using an UNO and an ADC on ADC0.
+'''This program demonstrates the using GCBASIC to update the gauges using an UNO and an ADC on ADC0.
 '''
 '''The setup is:
 '''     Include the <glcd.h>

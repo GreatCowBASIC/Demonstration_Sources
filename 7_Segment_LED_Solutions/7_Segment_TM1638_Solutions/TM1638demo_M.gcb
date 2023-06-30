@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program will show the functionality of the TM1637a.h library.
 '''The TM1637 module is connected to PortD.2 CLK and PortD.3 DIO

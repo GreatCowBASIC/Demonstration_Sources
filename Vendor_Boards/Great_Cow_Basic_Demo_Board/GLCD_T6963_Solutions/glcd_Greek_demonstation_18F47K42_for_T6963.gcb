@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a simple GLCD demonstration of the T6963 GLCD capabilities.
 '''This program will draws lines, boxes, circles and prints strings and numbers.
@@ -45,7 +45,7 @@
 'Chip Enable (Active Low)
 #DEFINE GLCD_CS        PORTc.0
 
-'FS1 Font Select port. 6x8 font: FS1=“High”=1 8x8 font FS1=“Low”=0 for GLCD_FS_SELECT
+'FS1 Font Select port. 6x8 font: FS1=οΏ½HighοΏ½=1 8x8 font FS1=οΏ½LowοΏ½=0 for GLCD_FS_SELECT
 #DEFINE GLCD_FS_SELECT 1
 '***********************************************************************************************
 '*
@@ -82,9 +82,9 @@ Do Forever
 
     CLS
     GLCDCLS
-    GLCDPrint 0,10,"Γειά σου κόσμε"
+    GLCDPrint 0,10,"οΏ½οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½οΏ½οΏ½"
     'Evan you are very cool guy
-    GLCDPrint 10,20,"Evan είσαι πολύ cool τύπος"
+    GLCDPrint 10,20,"Evan οΏ½οΏ½οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½οΏ½ cool οΏ½οΏ½οΏ½οΏ½οΏ½"
     Wait 4 s
 
     CLS

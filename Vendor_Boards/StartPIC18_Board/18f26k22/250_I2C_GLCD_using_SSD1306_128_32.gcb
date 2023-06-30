@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a simple GLCD demonstration of the SSD1306 GLCD capabilities.
 '''This program draws lines, boxes, circles and prints strings and numbers.
@@ -7,7 +7,7 @@
 '''The display is easy to interface, using an I2C type of communication.
 '''The GLCD is connected to the microprocessor as shown in the hardware section of this code.
 '''
-'''This version is compatible will all version of Great Cow BASIC but only version greater than v1.00.xx support low memory GLCD modes.
+'''This version is compatible will all version of GCBASIC but only version greater than v1.00.xx support low memory GLCD modes.
 '''
 '''@author  EvanV
 '''@licence GPL

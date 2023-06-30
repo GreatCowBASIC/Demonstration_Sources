@@ -1,7 +1,7 @@
-'''A demonstration program for Great Cow Basic.
+'''A demonstration program for GCBASICASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program shows Time, Date, Temperature and Humidity on MAX7219 Dot Matrix Display using Arduino Nano, DS3231 and DHT22.
-'''Credit goes to Great Cow Basic Team
+'''Credit goes to GCBASIC Team
 '''@author  Owais Najam
 '''@licence GPL
 '''@version 1.0

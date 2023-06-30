@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program reads a 4 * $ keypad and sends the key pressed to PC terminal or the PICkit 2 UART Tool.
 ''':

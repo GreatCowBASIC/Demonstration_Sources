@@ -1,5 +1,5 @@
 /*
-A demonstration program for GCGB and GCB.
+A demonstration program for GCBASIC.
 --------------------------------------------------------------------------------
 This program is for an UNO received SPI data from a SPI Master and shows on the serial terminal.
 

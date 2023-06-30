@@ -4,7 +4,7 @@
 '   AUTHOR:  Anobium
 
 '    Demo of a complete clock/calendar using the DS1307 RTC for a 16F877a 40 PIN Prototype board.
-'    Install GCB - you are recommended to use GCB@SYN from the Great Cow Basic website.
+'    Install GCB - you are recommended to use GCB@SYN from the GCBASIC website.
 
 '    This code is free software; you can redistribute it and/or
 '    modify it under the terms of the GNU Lesser General Public

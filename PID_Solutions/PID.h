@@ -13,7 +13,7 @@
 '    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 '********************************************************************************
-'    PID routine for Great Cow BASIC
+'    PID routine for GCBASIC
 '    This is a library  to implement a PID on an 8 bit contoller without
 '    Floating point math.
 '    Thank You brettbeauregard for helping me to create this PID implementation.

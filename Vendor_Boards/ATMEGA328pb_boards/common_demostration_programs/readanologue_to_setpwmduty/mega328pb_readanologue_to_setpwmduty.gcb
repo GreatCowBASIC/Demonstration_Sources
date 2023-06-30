@@ -1,4 +1,4 @@
-'''A demonstration program for GCB
+'''A demonstration program for GCBASIC
 '''---------------------------------------------------------------------------------
 ''' This program shows how to read the ADC, and then to set PWM duty% - the 10K pot is attached to AN4/Pin18/PortC.4
 '''

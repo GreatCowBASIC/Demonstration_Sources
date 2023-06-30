@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a GLCD demonstration maps the #1 character for the OLED font 1
 '''The GLCD is connected to the microprocessor as shown in the hardware section of this code.

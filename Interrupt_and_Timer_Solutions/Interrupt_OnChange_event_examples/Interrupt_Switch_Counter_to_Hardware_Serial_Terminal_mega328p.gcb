@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program demonstrates Interrupt upon the button press on portb.0
 '''Each microprocessor will have different commands to setup the Interrupt. Refer to datasheet.

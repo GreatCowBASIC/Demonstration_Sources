@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program plays 'Mary had a little lamb' on portc.2 connected to Piezo speaker.
 '''It plays once and stops until the momentary switch on portb.0 is pressed then it plays again.

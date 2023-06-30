@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program shows the real time clock on a serial terminal.
 '''The MCP7940N is attached to the I2C ports with appropiate resistors to the supply voltage.  Typically a 5k or 2.2k resistor 'pulling up' to the supply voltage can be used.

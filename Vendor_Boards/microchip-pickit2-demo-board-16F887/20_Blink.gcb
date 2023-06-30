@@ -1,5 +1,5 @@
 /*
-A demonstration program for GCGB and GCB.
+A demonstration program for GCBASIC.
 --------------------------------------------------------------------------------
 The first lesson showed how to turn on a LED, this lesson shows how to make it blink. 
 While this might seem a trivial change from Lesson 1, it gives a context to explore several more instructions.

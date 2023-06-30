@@ -1,5 +1,5 @@
 /*
-A demonstration program for GCGB and GCB.
+A demonstration program for GCBASIC.
 --------------------------------------------------------------------------------
 TThe first lesson shows how to turn on a LED and discusses the I/O pin structures. This
 is the PIC microcontroller version of “Hello World”.

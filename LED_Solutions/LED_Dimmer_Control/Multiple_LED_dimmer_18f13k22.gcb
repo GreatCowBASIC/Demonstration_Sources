@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a demonstration of a simple 4-LED dimmer.
 '''The pot on port ANO controls the value of the dimmer state.

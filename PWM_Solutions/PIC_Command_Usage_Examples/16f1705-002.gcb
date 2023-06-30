@@ -1,4 +1,4 @@
-' Use the Great Cow BASIC software PWM option.
+' Use the GCBASIC software PWM option.
 
 #chip 16f1705, 32
 

@@ -6,7 +6,7 @@
 '
 ' xx can be 1 through 12, for this specifc microcontroller there are three PWM16 channels.
 '
-' To set the parameters of Great Cow BASIC PWM fixed mode for the channels use the commands shown below::
+' To set the parameters of GCBASIC PWM fixed mode for the channels use the commands shown below::
 
     #chip 12F1572, 32
     #config mclr=on

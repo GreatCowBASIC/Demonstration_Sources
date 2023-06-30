@@ -1,6 +1,6 @@
 '''
 '''  One way to create a delay is to spend time decrementing to a value.
-'''  The demonstration will use a Great Cow BASIC method to toggle the LED.
+'''  The demonstration will use a GCBASIC method to toggle the LED.
 '''
 '''  LED DS1 blinks at a rate of approximately 1.0 seconds.
 '''

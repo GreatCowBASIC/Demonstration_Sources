@@ -3,7 +3,7 @@
 '  VERSION: 0.1a
 '  AUTHOR:  Anobium
 '
-'This program was written using the Great Cow Basic IDE for use with the PIC
+'This program was written using the GCBASIC IDE for use with the PIC
 '16F8777A development board (HCDVBD0003) and a 1602 parallel LCD module
 '(HCMODU0013 or HCMODU0038) to display the value of the a DS18B20 sensor to a serial terminal using the hardware module for RS232 communications.
 

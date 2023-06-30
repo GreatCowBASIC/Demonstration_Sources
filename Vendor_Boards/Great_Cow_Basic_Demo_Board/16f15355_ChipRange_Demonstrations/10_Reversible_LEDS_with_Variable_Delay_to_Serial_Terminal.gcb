@@ -1,4 +1,4 @@
-''' A demonstration program for GCGB and GCB.
+''' A demonstration program for GCBASIC.
 '''
 '''  This demonstration produces a variable speed rotating LED display that is proportional to the ADC value.
 '''  The ADC value and LED rotate speed are inversely proportional to each other.

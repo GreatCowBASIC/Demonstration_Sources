@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a GLCD demonstration multifunctional capabilities.
 '''This program reads the SRF04 distance sensor and dispays the results on the serial terminal.

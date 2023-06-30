@@ -6,7 +6,7 @@
 '_______________________________________________________________________
 '
 '
-'    multitasking routines for the Great Cow BASIC compiler
+'    multitasking routines for the GCBASIC compiler
 '    2009 Santiago Gonzalez and 2017 Evan Venn
 '
 '    This library is free software; you can redistribute it and/or

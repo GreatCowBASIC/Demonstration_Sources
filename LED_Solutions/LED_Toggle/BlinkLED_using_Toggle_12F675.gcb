@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program blink one LED on GPIO.0 (bit 1)  using the Toggle command.
 '''The LED must be attached via appropiate resistors.

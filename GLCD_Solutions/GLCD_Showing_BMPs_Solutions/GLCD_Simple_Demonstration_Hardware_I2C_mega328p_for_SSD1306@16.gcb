@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a simple GLCD demonstration of the SSD1306 GLCD capabilities.
 '''This program draws lines, boxes, circles and prints strings and numbers.

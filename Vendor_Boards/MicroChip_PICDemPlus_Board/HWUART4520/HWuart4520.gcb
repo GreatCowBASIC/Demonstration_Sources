@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program sends characters from microprocessor using the GCB Hardware-UART methods
 '''via the on-board TTL converter at 1 second intervals using 9600-8n-1 format.view in 'terminal' window.

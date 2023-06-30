@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program shows the humidity and the temperature of a DHT11 on the LCD.
 '''This program shows an LCD being driven using the GCB AXE133 emulator.

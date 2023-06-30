@@ -1,11 +1,11 @@
 '''
 '''******************************************************************
 ''' LCD demonstration for the board. We have added the LCD section to specific the ports.
-''' All the LCD commands are standard Great Cow BASIC LCD commands, as are the ReadAD and HPWM commands.
+''' All the LCD commands are standard GCBASIC LCD commands, as are the ReadAD and HPWM commands.
 '''
 ''' The program uses PWM/CCP1 channel (which is on Portc.2), at a frequency of 40hz and the PWM width is set to 255 minus the LDR value to invert the display.
 '''
-''' These are all standard Great Cow BASIC commands
+''' These are all standard GCBASIC commands
 '''
 ''' See the section "Setup LCD Parameters" for the specification of the LCD commands.
 '''
@@ -100,7 +100,7 @@ Do Forever
 
     'Use PWM to vary the backlight
     'Use PWM/CCP1 channel, frequency of 40hz and the 255 minus the LDR value to invert the display.
-    'These are standard Great Cow BASIC commands
+    'These are standard GCBASIC commands
     PWMLEVEL = 255 - ReadAD( AN11 )
     HPWM 1, 40, PWMLEVEL
     CLS

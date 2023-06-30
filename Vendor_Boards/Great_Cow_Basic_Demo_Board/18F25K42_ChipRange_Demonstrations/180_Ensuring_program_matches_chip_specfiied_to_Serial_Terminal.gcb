@@ -70,7 +70,7 @@ Dir     SwitchIn      In
 
 
 HSerPrintCRLF
-HSerPrint  ChipNameStr + " Great Cow BASIC Demo"
+HSerPrint  ChipNameStr + " GCBASIC Demo"
 HSerPrintCRLF
 Wait 1 s
 

@@ -1,4 +1,4 @@
-'''A demonstration program for GCB
+'''A demonstration program for GCBASIC
 '''---------------------------------------------------------------------------------
 ''' This program shows PWM duty changer test in the AVRrc chips - change the constant CURRENTTEST to change the program
 '''

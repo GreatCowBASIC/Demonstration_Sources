@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program ia a demonstration of Hardare Serial Communication, but, this also shows how to use PPS.
 '''The RS232 transmit port is set to be on PortB.7, you can choose but in this demo you can easily change this to another port changing the PPS commands.

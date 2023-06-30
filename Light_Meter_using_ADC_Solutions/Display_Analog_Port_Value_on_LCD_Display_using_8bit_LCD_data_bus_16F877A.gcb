@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program reads the potentiometer/light sensor on AN0 and display results on the GLCD.
 '''See the hardare section for the GLCD connections.

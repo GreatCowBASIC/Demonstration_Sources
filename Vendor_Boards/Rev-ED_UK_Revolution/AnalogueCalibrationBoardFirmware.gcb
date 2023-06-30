@@ -11,7 +11,7 @@
 '''
 ''' Why? I removed the original 16C710 as this had failed.
 '''
-''' Solution?  Rewrite using Great Cow BASIC.  Compile, program and enjoy.
+''' Solution?  Rewrite using GCBASIC.  Compile, program and enjoy.
 '''            The responsiveness can now be set by set the ADC value and applying power.  The higher the ADC value the slower the response.
 '''
 '''@author    EvanV

@@ -1,5 +1,5 @@
 
-' TM1638 7-Segment OEM display library Demonstration - For Great Cow Basic
+' TM1638 7-Segment OEM display library Demonstration - For GCBASIC
 ' This is a collection of demo subroutines, each demo is run from Main.
 ' for chip with less Prog. memory/RAM, enable just a few demo's.
 ' Using Commands... see Sub CmdDemo1.

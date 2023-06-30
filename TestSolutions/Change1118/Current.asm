@@ -1,4 +1,4 @@
-;Program compiled by Great Cow BASIC (0.99.02 2022-04-27 (Windows 64 bit) : Build 1113) for Microchip AVR Assembler
+;Program compiled by GCBASIC (0.99.02 2022-04-27 (Windows 64 bit) : Build 1113) for Microchip AVR Assembler
 ;Need help? See the GCBASIC forums at http://sourceforge.net/projects/gcbasic/forums,
 ;check the documentation or email w_cholmondeley at users dot sourceforge dot net.
 

@@ -1,6 +1,6 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program is a Great Cow Basic implementation of the Picaxe AXE133 Serial LCD/OLED driver.
+'''This program is a GCBASIC implementation of the Picaxe AXE133 Serial LCD/OLED driver.
 '''    Uses the GCB One Wire AXE133 emualator via the Serial Port
 '''    This requires the GCB AXE133 emulator.
 '''    See www.picaxe.com for details of the AXE133 and the Open Source code this is based upon.

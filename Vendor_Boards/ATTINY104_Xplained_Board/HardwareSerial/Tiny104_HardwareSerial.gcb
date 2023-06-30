@@ -1,4 +1,4 @@
-'''A demonstration program for GCB
+'''A demonstration program for GCBASIC
 '''---------------------------------------------------------------------------------
 ''' This program shows how to use hardware serial.
 '''
@@ -111,7 +111,7 @@ Diagram Author : Ardunaut
     Loop
 
 
-    table Strings  'Welcome to Great Cow BASIC 2020
+    table Strings  'Welcome to GCBASIC 2020
     87,101,108,99,111,109,101,32,116,111,32,71,114,101,97,116,32,67,111,119,32,66,65,83,73,67,32,50,48,50,48
     end table
 

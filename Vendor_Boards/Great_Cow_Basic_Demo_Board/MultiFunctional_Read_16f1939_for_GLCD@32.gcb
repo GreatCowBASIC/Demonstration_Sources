@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a GLCD demonstration multifunctional capabilities.
 '''This program reads the Sony Remote, reads DS18B20 and reads the DHT22 device.

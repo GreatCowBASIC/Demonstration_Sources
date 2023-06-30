@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a simple GLCD demonstration of the T6963 GLCD capabilities using BMPs (pictures).
 '''This program will display two BMPs then swap pages between pages 0 and 1. You can use any other value page.
@@ -45,7 +45,7 @@
 'Chip Enable (Active Low)
 #DEFINE GLCD_CS        PORTc.0
 
-'FS1 Font Select port. 6x8 font: FS1=“High”=1 8x8 font FS1=“Low”=0 for GLCD_FS_SELECT
+'FS1 Font Select port. 6x8 font: FS1=ï¿½Highï¿½=1 8x8 font FS1=ï¿½Lowï¿½=0 for GLCD_FS_SELECT
 #DEFINE GLCD_FS_SELECT 1
 
 '***********************************************************************************************

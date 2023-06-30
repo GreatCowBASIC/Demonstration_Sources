@@ -1,4 +1,4 @@
-' Use program uses the Great Cow BASIC Fixed Mode PWM
+' Use program uses the GCBASIC Fixed Mode PWM
 ' This uses two constants to fix the PWM parameters.
 ' This method can ONLY use CCP1
 

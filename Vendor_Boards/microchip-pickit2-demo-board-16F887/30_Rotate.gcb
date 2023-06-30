@@ -1,5 +1,5 @@
 /*
-A demonstration program for GCGB and GCB.
+A demonstration program for GCBASIC.
 --------------------------------------------------------------------------------
 This lesson shows how to use the ADC, run a conversion, read the analog voltage controlled by the potentiometer (RP1) on the board, and display the high order 8 bits on the LEDs.
 The PIC16F887 has an on-board Analog-to-Digital Converter (ADC) with 10 bits of res-olution on any of 14 channels. 

@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a simple GLCD demonstration of the T6963 GLCD capabilities.
 '''This program will create multiple GLCD pages and then swap them in turn.  The ADC is simple the method to adjust the delay.
@@ -35,7 +35,7 @@
   #define GLCD_WR        PORTA.2           'Write control line port
   #define GLCD_RESET     PORTA.3           'Reset port
   #define GLCD_FS        PORTA.5           'FS port
-  #define GLCD_FS_SELECT 1                 'FS1 Font Select port. 6x8 font: FS1=“High”=1 8x8 font FS1=“Low”=0 for GLCD_FS_SELECT
+  #define GLCD_FS_SELECT 1                 'FS1 Font Select port. 6x8 font: FS1=ï¿½Highï¿½=1 8x8 font FS1=ï¿½Lowï¿½=0 for GLCD_FS_SELECT
 
   '***********************************************************************************************
   '*

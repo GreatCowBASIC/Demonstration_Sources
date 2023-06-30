@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program drives a servo-motor pulse generator pressing button on SWITCH_PORT (active low) produces a 1ms wide
 '''pulse-train,sending the servo left.

@@ -1,8 +1,8 @@
-'''A demonstration program for GCB
+'''A demonstration program for GCBASIC
 '''---------------------------------------------------------------------------------
 ''' This program shows how use WDT to generate delays.
 '''
-''' This method reduces power consumption during the operation, however, uses more PROGMEM than the Great Cow BASIC `wait` instruction.
+''' This method reduces power consumption during the operation, however, uses more PROGMEM than the GCBASIC `wait` instruction.
 '''
 ''' This will only work in the fuse WDT is enabled.
 '''

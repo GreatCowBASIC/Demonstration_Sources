@@ -1,4 +1,4 @@
-' Use program uses the Great Cow BASIC  CCP/PWM
+' Use program uses the GCBASIC  CCP/PWM
 ' This uses a method to support the frequency and duty to be changed as the PWM parameters.
 ' This used CCP1/PMW
 '

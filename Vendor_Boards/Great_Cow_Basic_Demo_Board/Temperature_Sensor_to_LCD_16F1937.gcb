@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program reads the value of a DS18B20 connected to Portc.7.  The DS18B20 must be inserted correctly.
 '''The LCD connection is shown in the program below - the standard connection for the GCB Demo Board

@@ -1,4 +1,4 @@
-'''A demonstration program for GCB
+'''A demonstration program for GCBASIC
 '''---------------------------------------------------------------------------------
 ''' This demonstration will provide code for writing and reading a single byte onto
 ''' the on-board EEPROM. EEPROM is non-volatile memory, meaning that it does

@@ -4,12 +4,12 @@
 ;   AUTHOR:         Theo Loermans based on the works of Evan R. Venn
 ;
 ;    Description.
-'    A demonstration program for GCGB and GCB.
+'    A demonstration program for GCBASIC.
 '    This adjusts the power to the LED over 2.5 seconds, then to zero power again over 2.5 seconds.
 '    The LED is connected to Portd.0 via appropiate resistors.
 
 
-;    This file is part of the Great Cow Basic compiler.
+;    This file is part of the GCBASIC compiler.
 ;
 ;    This demonstration code is distributed in the hope that it will be useful,
 ;    but WITHOUT ANY WARRANTY; without even the implied warranty of

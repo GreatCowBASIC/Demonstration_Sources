@@ -1,4 +1,4 @@
-;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-09-11 (Windows 64 bit) : Build 1168x) for Microchip PIC-AS
+;Program compiled by GCBASIC (1.00.00 Release Candidate 2022-09-11 (Windows 64 bit) : Build 1168x) for Microchip PIC-AS
 ;  See the GCBASIC forums at http://sourceforge.net/projects/gcbasic/forums,
 ;  Check the documentation and Help at http://gcbasic.sourceforge.net/help/,
 ;or, email:

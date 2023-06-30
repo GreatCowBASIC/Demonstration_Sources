@@ -3,7 +3,7 @@
 '  VERSION: 0.1
 '  AUTHOR:  Anobium
 '
-'This program was written using the Great Cow Basic IDE for use with the PIC
+'This program was written using the GCBASIC IDE for use with the PIC
 '16F8777A development board (HCDVBD0003) and our 1602 parallel LCD module
 '(HCMODU0013 or HCMODU0038) to display some example text.
 '

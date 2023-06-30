@@ -1,9 +1,9 @@
-'''A demonstration program for GCB
+'''A demonstration program for GCBASIC
 '''---------------------------------------------------------------------------------
 ''' This demonstration simply turns the LED on and off with a wait of 500 ms.
 '''
 '''
-''' Great Cow BASIC will flash each LED sequentially using a method that shifts the port to the right. This means the each LED is set on sequentially.
+''' GCBASIC will flash each LED sequentially using a method that shifts the port to the right. This means the each LED is set on sequentially.
 '''
 ''' See http://gcbasic.sourceforge.net/help/_rotate.html
 '''

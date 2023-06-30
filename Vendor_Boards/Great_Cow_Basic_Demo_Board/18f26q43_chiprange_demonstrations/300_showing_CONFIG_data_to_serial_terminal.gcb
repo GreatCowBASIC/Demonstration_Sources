@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------
 '''This program shows the config as read from the chip.  This information is useful to ensure the config write operations are correct.
 '''

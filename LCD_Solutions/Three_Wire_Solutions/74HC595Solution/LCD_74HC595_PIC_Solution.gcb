@@ -1,5 +1,5 @@
 /*
-A program for Great Cow BASIC that provides support for a LCD via a 74HC595
+A program for GCBASIC that provides support for a LCD via a 74HC595
 
 The solution is fast as the connect from the 74HC595 is an 8bit serial interface.
 

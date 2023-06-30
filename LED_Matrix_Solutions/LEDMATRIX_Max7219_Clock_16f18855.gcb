@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program shows a clock on the LED Matrix
 '''This is not an accurate clock as this uses the internal clock source. Use an external or better clock source to make a real clock.

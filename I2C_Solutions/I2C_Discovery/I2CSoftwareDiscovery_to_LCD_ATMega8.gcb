@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program searches for I2C devices and display their adresses to the attached LCD.
 '''This program uses the GCB software TWI implementation for the I2C protocol.

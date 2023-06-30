@@ -1,6 +1,6 @@
 '''
 '''  One way to create a delay is to spend time decrementing to a value.
-'''  The demonstration will use a Great Cow BASIC method to toggle the LED.
+'''  The demonstration will use a GCBASIC method to toggle the LED.
 '''
 '''  LED DS1 blinks at a rate of approximately 1.0 seconds.
 '''
@@ -26,7 +26,7 @@ Dir porta.0 Out
 
 Do
     Wait 1000 ms
-    'An alternative Great Cow BASIC method.
+    'An alternative GCBASIC method.
     SetWith ( porta.0, FnNotBit (porta.0) )
 
 Loop

@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a demonstration of controling a color of Tri-colour LED based upon the value of the loop variable
 '''The LED is connected to Portb.1,2 and 3 via a suitable resistor .

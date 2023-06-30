@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This example code receive a character from Software-UART and send it back using Hardware-UART.
 '''@author 	EvanV plus works of others

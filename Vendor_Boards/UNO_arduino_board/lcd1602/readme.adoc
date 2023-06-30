@@ -28,9 +28,9 @@ The LCD was connected using a LCD 4-wire bus connection and with LCD Enable and 
 
 *Test Results*
 
-Tested Great Cow BASIC and Arduino - both tested successfully.
+Tested GCBASIC and Arduino - both tested successfully.
 
-This is the output from the Great Cow BASIC software.
+This is the output from the GCBASIC software.
 
 image::https://github.com/Anobium/HiLetgo/blob/master/images/lcdoutput.gif[50%,50%]
 {empty} +
@@ -39,7 +39,7 @@ image::https://github.com/Anobium/HiLetgo/blob/master/images/lcdoutput.gif[50%,5
 
 *Performance Test Results*
 
-Performance tests where completed using https://www.pjrc.com/teensy/td_libs_LiquidCrystal.html as reference.{nbsp}{nbsp}Programs were created for the Arduino compiler and the Great Cow BASIC compiler.{nbsp}{nbsp}The functionality in the programs provided the same output on the LCD.{nbsp}{nbsp}Code segments are shown below in the picture - then, test results are then show below this picture.
+Performance tests where completed using https://www.pjrc.com/teensy/td_libs_LiquidCrystal.html as reference.{nbsp}{nbsp}Programs were created for the Arduino compiler and the GCBASIC compiler.{nbsp}{nbsp}The functionality in the programs provided the same output on the LCD.{nbsp}{nbsp}Code segments are shown below in the picture - then, test results are then show below this picture.
 {empty} +
 {empty} +
 

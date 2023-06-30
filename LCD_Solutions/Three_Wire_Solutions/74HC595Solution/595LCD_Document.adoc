@@ -15,7 +15,7 @@ Hence my need to learn a higher language.&#160;&#160;
 in that area.&#160;&#160;
 So I started this project in July 2018 using a Picaxe 14M2, and completed the initial phase in Dec'18. I then spent some time porting the software to GCB and
 finalised v1 in Dec 2019. &#160;&#160;
-It was posted on Great Cow BASIC forum in April 2020. &#160;&#160;
+It was posted on GCBASIC forum in April 2020. &#160;&#160;
 
 Most of the 595->lcd drivers I had seen to date were convoluted and or involved nibble
 twiddling and slowish.&#160;&#160;
@@ -60,5 +60,5 @@ AVR – Uno, Nano, Hiland Barebones Kit (328P DIP), LGT8F, all at 16MHz. (= 64MH
 Note. &#160;&#160;That the upper limit for the 595 clock is around 24MHz, so using this with the
 LGT8F at high frequencies is problematic.
 
-The Great Cow BASIC program works in I/O mode 0, has some interesting subs and drives a
+The GCBASIC program works in I/O mode 0, has some interesting subs and drives a
 character LCD with only 3 pins in an easy to understand and efficient manner.

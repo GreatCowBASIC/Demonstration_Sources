@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''The program shows how the I2C bus can be used to extend the number of IO lines.
 '''A frequently used chip for this is the PCF8574 which offers 8 IO lines.
 '''The PCF8474 has multiple address lines so different I2C devices can be addressed on the same I2C bus.

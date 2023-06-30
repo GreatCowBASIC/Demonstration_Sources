@@ -1,4 +1,4 @@
-'''A demonstration program for GCB
+'''A demonstration program for GCBASIC
 '''---------------------------------------------------------------------------------
 ''' This demonstration uses a  Interrupt routine to detect the switch being depressed.
 ''' When the switch is held down, the LEDs will toggle.

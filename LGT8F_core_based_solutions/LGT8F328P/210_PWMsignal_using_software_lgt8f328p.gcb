@@ -1,6 +1,6 @@
 '''A demonstration program for GCGB and GCB
 '''--------------------------------------------------------------------------------------------------------------------------------
-''' This program will toggle the output port using Great Cow BASIC software PWM option.
+''' This program will toggle the output port using GCBASIC software PWM option.
 ''' This should generate a PWM of 5.7Khz with a chip frequency of 32Mhz at 50% duty.
 '''
 ''' Changing the chip frequency and the PWM frequency is proportionally scaled.

@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a demonstration of a simple dimmer using a microcontroller Interrupt.
 '''This adjusts the power to the LED over 2.5 seconds, then two zero power again over 2.5 seconds.

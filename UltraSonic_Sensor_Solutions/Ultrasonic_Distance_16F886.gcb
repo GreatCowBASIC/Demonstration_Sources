@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a Distance measuring program
 '''Turns on an LED if an object comes to close to the SRF04 ultrasonic sensor

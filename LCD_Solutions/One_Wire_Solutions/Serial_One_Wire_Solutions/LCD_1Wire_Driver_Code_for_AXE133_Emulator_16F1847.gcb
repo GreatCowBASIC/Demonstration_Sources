@@ -1,6 +1,6 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This is the driver for the LCD. This program is a Great Cow Basic implementation of the Picaxe AXE133 Serial LCD/OLED driver.
+'''This is the driver for the LCD. This program is a GCBASIC implementation of the Picaxe AXE133 Serial LCD/OLED driver.
 '''    See www.picaxe.com for details of the AXE133 and the Open Source code this is based upon.
 '''     Supported Commands, see LCD Wire Usage.txt
 '''     0-252 normal ASCII characters

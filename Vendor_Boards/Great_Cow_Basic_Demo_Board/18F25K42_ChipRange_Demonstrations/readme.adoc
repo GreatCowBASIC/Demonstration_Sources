@@ -1,4 +1,4 @@
-*The I2C Challenge for the new I2C Module for Great Cow BASIC*
+*The I2C Challenge for the new I2C Module for GCBASIC*
 
 
 This document discusses implementing 'legacy mode methods using the new I2C module such as the 18F25K42 microcontroller called 'K mode' [after the K42] in this document.
@@ -31,7 +31,7 @@ The big difference between 'legacy mode' and 'K mode' is not being able to use n
 i2c1_writeNBytes or i2c1_write2ByteRegister where good enough to handle all use case.   Compate these methods the 'legacy mode' methods
 of start(), send(address), send(data), send(data_of_unknownlength) and stop().
 
-For Great Cow BASIC a reference implementation is required to support 'legacy mode'.
+For GCBASIC a reference implementation is required to support 'legacy mode'.
 
 
 [[background]]
@@ -549,7 +549,7 @@ An Implementation of 'K mode' that interoperates with 'Legacy mode'
     I2CStop
 ----
 
-The Great Cow BASIC implementation generates as transmission as shown below. This is a correct I2C packet
+The GCBASIC implementation generates as transmission as shown below. This is a correct I2C packet
 transmission.
 
 image:media/image1.png[image,width=601,height=264]

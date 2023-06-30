@@ -1,9 +1,9 @@
-'''A demonstration program for GCB
+'''A demonstration program for GCBASIC
 '''---------------------------------------------------------------------------------
 
 '''
 '''
-''' Great Cow BASIC will flash each LED sequentially with a delay read from an ADC port.
+''' GCBASIC will flash each LED sequentially with a delay read from an ADC port.
 ''' The LEDs use a method that shifts the port to the right. This means the each LED is set on sequentially.
 '''
 ''' See http://gcbasic.sourceforge.net/help/_rotate.html

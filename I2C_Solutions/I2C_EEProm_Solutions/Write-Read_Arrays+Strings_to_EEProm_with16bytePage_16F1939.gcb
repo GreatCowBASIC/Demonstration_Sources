@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''This program shows how to write and read EEProm devices via the I2C protocol using the GCB software I2C implementation and the microprocessors hardware I2C implementation.
 '''To use the software or hardware I2C implementation change the I2C implementation to 'software' or 'hardware'.
 ''':

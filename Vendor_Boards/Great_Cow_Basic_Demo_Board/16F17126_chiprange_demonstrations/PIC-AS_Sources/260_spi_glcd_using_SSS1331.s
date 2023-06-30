@@ -1,4 +1,4 @@
-;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-10-19 (Windows 64 bit) : Build 1181) for Microchip PIC-AS
+;Program compiled by GCBASIC (1.00.00 Release Candidate 2022-10-19 (Windows 64 bit) : Build 1181) for Microchip PIC-AS
 ;  See the GCBASIC forums at http://sourceforge.net/projects/gcbasic/forums,
 ;  Check the documentation and Help at http://gcbasic.sourceforge.net/help/,
 ;or, email:
@@ -542,7 +542,7 @@ BASPROGRAMSTART:
 	CALL	INITGLCD_SSD1331
 
 ;START OF THE MAIN PROGRAM
-;''A demonstration program for GCGB and GCB.
+;''A demonstration program for GCBASIC.
 ;''--------------------------------------------------------------------------------------------------------------------------------
 ;''This program is a simple GLCD demonstration of the SPI capabilities using an GLCD SSD1331.
 ;''It is a nice graphical LCD, suitable for a lot of various projects.

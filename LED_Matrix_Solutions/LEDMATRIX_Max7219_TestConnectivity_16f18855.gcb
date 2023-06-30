@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program simply tests the connections to the LED Matrix
 '''This purely toggles the control lines  - not needed for production code

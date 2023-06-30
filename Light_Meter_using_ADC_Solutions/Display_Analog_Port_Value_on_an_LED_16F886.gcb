@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program monitors a photoresistor connected to the AN1 pin.
 '''If its in the dark it will light the LED on Portb.5. If its in the light then LED is turn off.

@@ -1,6 +1,6 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program shows the converter capabilities of Great Cow Basic by converting an external BMP file to a GCB table.
+'''This program shows the converter capabilities of GCBASIC by converting an external BMP file to a GCB table.
 '''This program will convert a graphical BMP file to a GCB table.  The table will be then used as the data source of the GLCD device.
 '''This program requires the BMP2GCB.exe utility and the configuration file to be installed in the GCBasic converters folder.  The source BMP should be in the same folder.
 '''The GLCD should be connected as shown in the program.  The GLCD connection can be changed to suit your specific configuration.

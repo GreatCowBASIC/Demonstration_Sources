@@ -1,7 +1,7 @@
 '''
 '''--------------------------------------------------------------------
 '''
-'''  One way to create a delay is to spend time decrementing a value. In Great Cow BASIC the timing
+'''  One way to create a delay is to spend time decrementing a value. In GCBASIC the timing
 '''  can be accurately programmed since the user has control on how the time delays are executed.
 '''
 '''

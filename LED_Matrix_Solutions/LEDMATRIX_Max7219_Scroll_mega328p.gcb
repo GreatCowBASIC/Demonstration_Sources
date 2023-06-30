@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program scroll text on the LED Matrix.
 ''':
@@ -57,7 +57,7 @@
 
 
       GLCDCLS
-      myString = "made by Great Cow BASIC Signs Ltd.  2019       "
+      myString = "made by GCBASIC Signs Ltd.  2019       "
       Max7219_LEDMatrix_ScrollMessage ( myString, 0 )
       wait 1 s
 

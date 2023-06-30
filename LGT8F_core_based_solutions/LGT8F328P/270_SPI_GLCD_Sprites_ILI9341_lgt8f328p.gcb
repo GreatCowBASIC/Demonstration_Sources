@@ -1,4 +1,4 @@
-'''A demonstration program for GCB
+'''A demonstration program for GCBASIC
 '''---------------------------------------------------------------------------------
 '''  This demonstration shows sprites on the GLCD using an SPI device can use hardware or software SPI.
 '''

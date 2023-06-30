@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program ia a demonstration of Hardare PWM, but, this also shows how to use PWMON.
 '''The PWM is set to be on CCP1 and CCP2.

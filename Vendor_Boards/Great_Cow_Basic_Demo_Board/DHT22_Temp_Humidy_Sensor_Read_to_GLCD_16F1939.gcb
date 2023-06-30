@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program shows the humidity and the temperature of a DHT11 on the GLCD.
 '''The data/output from the DHT11 requires a 4.k pull-up to VDD.

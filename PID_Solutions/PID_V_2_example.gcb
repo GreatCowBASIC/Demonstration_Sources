@@ -1,4 +1,4 @@
-'    PID example routine for Great Cow BASIC
+'    PID example routine for GCBASIC
 '    This is a example  to implement a PID on an 8 bit contoller with out
 '    Floating point math.
 '    Thank You brettbeauregard for helping me to create this PID implementation.
@@ -25,7 +25,7 @@
 #chip 18f26K80,64
 
 #include <ds18b20.h>
-#include <PID.h>
+#include "PID.h"
 #option explicit          ' Require Explicit declaration of Variables
 
 

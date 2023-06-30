@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''The display is 120*24 mm, with an active display surface of 4inches, and a 132*22 pixel resolution.
 '''The display is easy to interface, using an I2C and SPI type of communication.

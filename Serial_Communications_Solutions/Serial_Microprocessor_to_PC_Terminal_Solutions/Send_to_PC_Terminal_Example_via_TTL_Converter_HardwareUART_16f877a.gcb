@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program sends characters from microprocess using the GCB Hardware-UART methods via a TTL converter.
 '''You have to add SCKP - Synchronous Clock Polarity Select bit acts differently depending on EUSART mode.

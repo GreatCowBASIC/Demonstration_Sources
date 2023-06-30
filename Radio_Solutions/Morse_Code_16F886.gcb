@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program accepts messages from a standard PS/2 keyboard.
 '''Incoming messages are played as morse code using a speaker when the Enter key is pressed.

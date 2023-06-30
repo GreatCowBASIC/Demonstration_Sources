@@ -1,11 +1,11 @@
 '''
 '''******************************************************************
 ''' LCD demonstration for the board. We have added the LCD section to specific the ports.
-''' All the LCD commands are standard Great Cow BASIC LCD commands..
+''' All the LCD commands are standard GCBASIC LCD commands..
 '''
 ''' The program turns the LCD backlight on and off dependent upon the state of the switch
 '''
-''' These are all standard Great Cow BASIC commands
+''' These are all standard GCBASIC commands
 '''
 ''' See the section "Setup LCD Parameters" for the specification of the LCD commands.
 '''

@@ -1,4 +1,4 @@
-'''A demonstration program for GCB
+'''A demonstration program for GCBASIC
 '''---------------------------------------------------------------------------------
 ''' This program shows how to use hardware serial to receive and toggle the LED
 '''
@@ -119,7 +119,7 @@ Sub StartMessage
     HserSend 10
     HserSend 13
 
-    table Strings  'Welcome to Great Cow BASIC 2021
+    table Strings  'Welcome to GCBASIC 2021
     87,101,108,99,111,109,101,32,116,111,32,71,114,101,97,116,32,67,111,119,32,66,65,83,73,67,32,50,48,50,49
     end table
 

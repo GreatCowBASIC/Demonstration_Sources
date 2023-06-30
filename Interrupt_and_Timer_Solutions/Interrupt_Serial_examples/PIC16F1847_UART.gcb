@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''
 '''A program for read interrupt on the serial port using UART on PIC16F1847.
 '''Adapted from https://sourceforge.net/p/gcbasic/discussion/579126/thread/88f6e6de/

@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''The program shows how the I2C2 bus can be used to extend the number of IO lines.
 ''':
 ''':This demonstration how to use the second hardware I2C port to discover all the attached I2C devices.

@@ -8,7 +8,7 @@
 '''The display is easy to interface, using an I2C type of communication.
 '''The GLCD is connected to the microprocessor as shown in the hardware section of this code.
 '''
-'''This version is compatible will all version of Great Cow BASIC as this demonstration uses Full Memory GLCD mode only.  This can be adapted to Low Memory GLCD mode.
+'''This version is compatible will all version of GCBASIC as this demonstration uses Full Memory GLCD mode only.  This can be adapted to Low Memory GLCD mode.
 '''
 '''************************************************************************
 '''@author  EvanV

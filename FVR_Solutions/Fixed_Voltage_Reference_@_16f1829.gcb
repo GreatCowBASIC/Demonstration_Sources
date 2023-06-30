@@ -1,6 +1,6 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program shows the Fixed Voltage Reference capabilities of Great Cow Basic
+'''This program shows the Fixed Voltage Reference capabilities of GCBASIC
 '''The Fixed Voltage Reference, or FVR, is a stable voltage reference, independent of VDD, with 1.024V,
 '''2.048V or 4.096V selectable output levels. The output of the FVR can be configured to supply a reference
 '''voltage to the ADC positive reference

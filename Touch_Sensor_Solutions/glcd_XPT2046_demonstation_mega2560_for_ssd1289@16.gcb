@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a simple GLCD demonstration of the Touch Screen adapater working with the SSD1289 GLCD display.
 '''The XPT2046 is a 8-bit sampling Analog-to-Digital Converter (ADC) with a synchronous serial interface and low
@@ -6,7 +6,7 @@
 ''':
 '''It is a low power, high speed device with onboard switches make the XPT2046 ideal for battery-operated systems
 '''such as personal digital assistants with resistive touch screens and other portable equipment.
-'''The ADS7843 is available in an SSOP-16 package and is specified over the –40°C to +85°C temperature range.
+'''The ADS7843 is available in an SSOP-16 package and is specified over the ï¿½40ï¿½C to +85ï¿½C temperature range.
 ''':
 ''':
 '''The GLCD is connected to the microprocessor as shown in the hardware section of this code.

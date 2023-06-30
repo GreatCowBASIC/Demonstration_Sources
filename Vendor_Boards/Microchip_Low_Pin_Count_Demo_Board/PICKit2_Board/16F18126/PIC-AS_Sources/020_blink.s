@@ -1,4 +1,4 @@
-;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-11-06 (Windows 64 bit) : Build 1189) for Microchip PIC-AS
+;Program compiled by GCBASIC (1.00.00 Release Candidate 2022-11-06 (Windows 64 bit) : Build 1189) for Microchip PIC-AS
 ;  See the GCBASIC forums at http://sourceforge.net/projects/gcbasic/forums,
 ;  Check the documentation and Help at http://gcbasic.sourceforge.net/help/,
 ;or, email:
@@ -81,7 +81,7 @@ BASPROGRAMSTART:
 ;''
 ;''******************************************************************
 ;''
-;''  One way to create a delay is to spend time decrementing a value. In Great Cow BASIC the timing
+;''  One way to create a delay is to spend time decrementing a value. In GCBASIC the timing
 ;''  can be accurately programmed since the user has control on how the
 ;''  time delays are executed.
 ;''

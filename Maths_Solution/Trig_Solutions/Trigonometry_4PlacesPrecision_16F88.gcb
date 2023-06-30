@@ -1,7 +1,7 @@
 '''A program  for GCGB and GCB.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program shows the trigonometric values to four decimal places shows SINe and COSine.
-'''As Tangent cannot be represented at this 4 places of precision with the Great Cow Basic Integer type, and so, is not displayed.
+'''As Tangent cannot be represented at this 4 places of precision with the GCBASIC Integer type, and so, is not displayed.
 '''
 '''
 '''@author    EvanV based on works of ThomasH

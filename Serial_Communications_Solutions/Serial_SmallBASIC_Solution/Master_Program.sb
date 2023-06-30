@@ -1,7 +1,7 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program will enable the control of the UNO LED from the PC control application written in Microsoft Small BASIC
-'''A really simply communications tools for Great Cow BASIC
+'''A really simply communications tools for GCBASIC
 '''Critical things to do...
 '''  1.Load the UNO with the UNO slave program called uno_msb_slave_program.gcb
 ''' 2.Ensure you get the comPort (shown below correct).

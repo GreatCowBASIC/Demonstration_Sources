@@ -1,11 +1,11 @@
-''' Great Cow BASIC demonstration
+''' GCBASIC demonstration
 '''
 ''' This demonstration a frequency generator with the a range of  0hz to  40000Hz(40kHz)
 '''
 ''' This program uses two CLC module, the NCO module, the CLKREF module to calculate the frequency and Timer6 for the duty.
 '''
 '''
-''' There is one yellow LED available on the MPLAB® Xpress PIC16F18446 board that can be turned ON
+''' There is one yellow LED available on the MPLABï¿½ Xpress PIC16F18446 board that can be turned ON
 ''' and OFF.
 '''
 '''

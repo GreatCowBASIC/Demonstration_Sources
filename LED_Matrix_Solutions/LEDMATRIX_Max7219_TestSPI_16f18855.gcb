@@ -1,6 +1,6 @@
-''' A demonstration program for GCGB and GCB.
+''' A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
-''' This program tests the SPI connections, this uses the serial port to display information on an ANSI serial terminal - use PUUTY in your Great Cow BASIC Installation.
+''' This program tests the SPI connections, this uses the serial port to display information on an ANSI serial terminal - use PUUTY in your GCBASIC Installation.
 ''' You may not need PPS for your specific chip - simply remove if not required.
 ''':
 '''@author  Evan R. Venn

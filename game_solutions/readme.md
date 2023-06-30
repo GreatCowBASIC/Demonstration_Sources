@@ -11,7 +11,7 @@ It was later converted for the BBC Micro and published in Personal Software maga
 
 The game was then expanded and released commercially in 1983 by ASP Software.
 
-The game is now ported to micro controllers by Evan R Venn in 2022 to showcase the capabilities Great Cow BASIC.
+The game is now ported to micro controllers by Evan R Venn in 2022 to showcase the capabilities GCBASIC.
 
 -----
 

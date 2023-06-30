@@ -7,7 +7,7 @@
 '
 ' xx can be 1 through 12
 '
-' To set the parameters of Great Cow BASIC PWM fixed mode on channel 1 use the following:
+' To set the parameters of GCBASIC PWM fixed mode on channel 1 use the following:
 '
 '    #define HPWM16_1_Freq 0.1 to > 1000         'Set the frequency, but, the clock speed must be low for low PWM frequency
 '    #define HPWM16_1_Duty 0.1 to 100            'Set duty cycle as percentage 0-100%, just change the number

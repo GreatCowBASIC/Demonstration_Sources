@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program demonstrates Greek characters using the GLCD_EXTENDEDFONTSET1 fontset.
 '''Greek characters are placed in the fontset, the first Greek character starts 190 ASCII and the counting goes on until the last Greek letter omega.
@@ -46,9 +46,9 @@
 ; ----- Main body of program commences here.
   do
     GLCDCLS
-    GLCDPrint 0,10,"Γειά σου κόσμε"
-    GLCDPrint 0,20,"Evan είσαι πολύ"
-    GLCDPrint 0,30,"cool τύπος";Evan you are very cool guy
+    GLCDPrint 0,10,"οΏ½οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½οΏ½οΏ½"
+    GLCDPrint 0,20,"Evan οΏ½οΏ½οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½οΏ½"
+    GLCDPrint 0,30,"cool οΏ½οΏ½οΏ½οΏ½οΏ½";Evan you are very cool guy
 
     Wait 10 s
   loop

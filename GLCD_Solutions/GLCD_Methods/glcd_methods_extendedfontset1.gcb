@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------
 '''This program demonstrates GCLD methods and BASELINE operations
 '''
@@ -45,7 +45,7 @@ HI2CMODE MASTER
   Range of characters is 15 to 255
   GLCDfntDefaultSize = 1 to n with multiple the character size to make a larger character
   Characters are a basic mono sized font
-  This is the original font set of Great Cow BASIC plus a set of Greek character.
+  This is the original font set of GCBASIC plus a set of Greek character.
   Characters between 128 and 247 are NOT defined therefore blanks will be displayed.
 
   GLCDFontWidth = 5 is the default value - this DOES control the intercharacter spacing.

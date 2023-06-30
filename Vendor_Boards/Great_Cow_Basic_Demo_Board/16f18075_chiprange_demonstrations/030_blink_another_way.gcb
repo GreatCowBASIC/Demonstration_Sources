@@ -1,6 +1,6 @@
 '''
-'''  One way to create a delay is to spend time decrementing to a value, but Great Cow BASIC  has timer calculations built in.
-'''  The demonstration will also use a Great Cow BASIC method to toggle the LED using CONSTANTS rather than the port address.
+'''  One way to create a delay is to spend time decrementing to a value, but GCBASIC  has timer calculations built in.
+'''  The demonstration will also use a GCBASIC method to toggle the LED using CONSTANTS rather than the port address.
 '''
 '''  LED blinks at a rate of approximately 1.0 seconds, we use CONSTANTS to refer to the LED port.
 '''

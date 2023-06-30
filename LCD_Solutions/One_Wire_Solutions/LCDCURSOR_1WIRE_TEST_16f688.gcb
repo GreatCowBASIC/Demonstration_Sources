@@ -1,6 +1,6 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program is a Great Cow Basic implementation using a combined data-clock line; LCD_CD.
+'''This program is a GCBASIC implementation using a combined data-clock line; LCD_CD.
 '''This mode, LCD_IO 1, is used when the LCD is connected through a shift register 74HC595,
 '''as detailed in the GCB Help file.
 '''This  method of driving an LCD requires an additional integrated circuit and other passive

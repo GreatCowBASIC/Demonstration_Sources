@@ -1,10 +1,10 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program sends characters from microprocess using the GCB Hardware-UART methods drect to the PC terminal.
 '''You have to add SCKP - Synchronous Clock Polarity Select bit acts differently depending on EUSART mode.
 '''Asynchronous mode:
-'''•1 - Transmit inverted data to the TX/CK pin; and
-'''•0 - Transmit non-inverted data to the same pin.
+'''ï¿½1 - Transmit inverted data to the TX/CK pin; and
+'''ï¿½0 - Transmit non-inverted data to the same pin.
 
 '''
 '''@author  Evan R. Venn

@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a implements a library to read the Microchip ID.
 '''This program will work or not work depending on the type of chip and having the correct configuration.

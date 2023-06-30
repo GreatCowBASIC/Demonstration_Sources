@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program shows some very simple maths and the method to handle the scope of variables.
 '''  This shows the reults on a simple GLCD SSD1306.

@@ -1,7 +1,7 @@
 # 1 "d:\\GreatCowBASICGits\\Demonstration_Sources.git\\trunk\\Radio_Solutions\\DCF77\\DCFprototype.S"
 # 1 "<built-in>" 1
 # 1 "d:\\GreatCowBASICGits\\Demonstration_Sources.git\\trunk\\Radio_Solutions\\DCF77\\DCFprototype.S" 2
-;Program compiled by Great Cow BASIC (1.00.00 Release Candidate 2022-10-13 (Windows 64 bit) : Build 1178) for Microchip PIC-AS
+;Program compiled by GCBASIC (1.00.00 Release Candidate 2022-10-13 (Windows 64 bit) : Build 1178) for Microchip PIC-AS
 ; See the GCBASIC forums at http:
 ; Check the documentation and Help at http:
 ;or, email:

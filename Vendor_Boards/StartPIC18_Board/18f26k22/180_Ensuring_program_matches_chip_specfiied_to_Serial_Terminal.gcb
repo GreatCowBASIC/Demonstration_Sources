@@ -1,4 +1,4 @@
-''' This demonstration is for Great Cow BASIC
+''' This demonstration is for GCBASIC
 '''
 ''' This demonstration how you can check your program is intented for a specific Microcontroller
 '''
@@ -61,7 +61,7 @@ LCDControl = 1
 
 
 HSerPrintCRLF
-HSerPrint  ChipNameStr + " Great Cow BASIC Demo"
+HSerPrint  ChipNameStr + " GCBASIC Demo"
 HSerPrintCRLF
 Wait 1 s
 

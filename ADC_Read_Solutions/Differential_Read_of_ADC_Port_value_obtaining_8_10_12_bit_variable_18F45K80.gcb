@@ -1,13 +1,13 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program will demonstrate reading the analog to digital converter (ADC or A/D) module.
-'''This is implemented within Great Cow Basic to support 8-bit, 10-bit and 12-bit read operations.
+'''This is implemented within GCBASIC to support 8-bit, 10-bit and 12-bit read operations.
 '''This is demonstration shows the Diffential channel measurement mode.
 ''':
 '''This is a Diffential measurement mode.
 ''':
 '''Great Cow Basic will configure the analog to digitalconverter clock source, the programmed acquisition time and justification of the returned value.
-'''The response can be a byte, word or integer (as defined in the Great Cow Basic method) these are 8-bit, 10-bit and 12-bit values respectively.
+'''The response can be a byte, word or integer (as defined in the GCBASIC method) these are 8-bit, 10-bit and 12-bit values respectively.
 ''':
 '''This demonstration show the usage for a Diffential channel measurement of the ADC.
 '''See the Help for connectivity but essential the source device is connected to the appropiate ADC (ANx) pins.

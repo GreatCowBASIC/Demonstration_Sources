@@ -1,11 +1,11 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program set the configuration of the MPU6050 device and display the results to the attached PC terminal.
 '''
 '''The MPU6060 features three 16-bit analog-to-digital converters (ADCs) for digitizing the gyroscope outputs
 '''and three 16-bit ADCs for digitizing the accelerometer outputs. For precision tracking of both fast and slow
-'''motions, the parts feature a user-programmable gyroscope full-scale range of ±250, ±500, ±1000, and
-'''±2000°/sec (dps) and a user-programmable accelerometer full-scale range of ±2g, ±4g, ±8g, and ±16g.
+'''motions, the parts feature a user-programmable gyroscope full-scale range of ï¿½250, ï¿½500, ï¿½1000, and
+'''ï¿½2000ï¿½/sec (dps) and a user-programmable accelerometer full-scale range of ï¿½2g, ï¿½4g, ï¿½8g, and ï¿½16g.
 '''
 '''This program uses the hardware implementation of I2C for the Microchip and ATMEL microprocessors.
 '''The microprocessor must have a suitable I2C or TWI module.

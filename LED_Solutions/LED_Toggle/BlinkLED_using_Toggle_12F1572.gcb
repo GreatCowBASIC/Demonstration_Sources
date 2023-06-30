@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program blink one LED on PORTA (bit 2)  using the Toggle command.
 '''The LED must be attached via appropriate resistor.

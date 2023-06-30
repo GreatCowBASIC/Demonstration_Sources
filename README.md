@@ -2,7 +2,7 @@
 
 This GIT contains the latest user contributed demonstrations. 
 
-The baseline set of demonstrations was created at version 1.00.xx of the Great Cow BASIC distrubution.
+The baseline set of demonstrations was created at version 1.00.xx of the GCBASIC distrubution.
 
 Please add your demonstrations and improve those that have been posted.
 
@@ -15,13 +15,13 @@ Key Point: Try to provide a complete reference, describing all relevant aspects 
 
 When you are documenting a demonstration, provide a complete reference, typically generated from source code using documentation comments that describe all public constants, methods, local constants, and other variables.
 
-Use the basic guidelines in this document as appropriate for the Great Cow BASIC language.
+Use the basic guidelines in this document as appropriate for the GCBASIC language.
 
-This page also does not cover libraries.   The style suggestions below may be useful to keep in mind while documenting Great Cow BASIC demonstrations.   Libraries are covered by a Library Developer Guide.
+This page also does not cover libraries.   The style suggestions below may be useful to keep in mind while documenting GCBASIC demonstrations.   Libraries are covered by a Library Developer Guide.
 
 # Overall Program Layout
 
-This is the standard program. This is included in every Great Cow BASIC installation.  See IDE/Snippets.
+This is the standard program. This is included in every GCBASIC installation.  See IDE/Snippets.
 
 ----
     '''A program  for GCGB and GCB the demonsations......
@@ -63,15 +63,15 @@ This is the standard program. This is included in every Great Cow BASIC installa
 
 The template should be completed with the sections marked `[todo]` being updated as appropiate.
 
-The header is strict.  Great Cow Graphical BASIC and Great Cow BASIC test routines use the header to determine parameters and key information.
+The header is strict.  Great Cow Graphical BASIC and GCBASIC test routines use the header to determine parameters and key information.
 
 # Language Style
 
 It is *Great Cow BASIC* always not any variant. 
 
-The license is for Great Cow BASIC and not any other variant.
+The license is for GCBASIC and not any other variant.
 
-Do not use slang and do not use contractions - for example use `do not` do not use `don't`.  Great Cow BASIC users may not have English as their first language.
+Do not use slang and do not use contractions - for example use `do not` do not use `don't`.  GCBASIC users may not have English as their first language.
 
 Use microcontroller not `part`, `chip`, `pic` or any other variant.
 
@@ -85,7 +85,7 @@ Porting to another microcontroller is easier as the user can locate the PPS meth
 
 # Coding Good Practice
 
-The Great Cow BASIC demonstration must provide a description for each of the following:
+The GCBASIC demonstration must provide a description for each of the following:
  - Every constant, variable,  etc.
  - Every method, with a description for each parameter, the return value, and any exceptions thrown.
 

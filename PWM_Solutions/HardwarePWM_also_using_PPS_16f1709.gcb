@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program ia a demonstration of Hardare PWM, but, this also shows how to use PPS.
 '''The PWM is set to be on PortA.0, you can choose but in this demo you can easily change this to portc.5 by changing the commands.

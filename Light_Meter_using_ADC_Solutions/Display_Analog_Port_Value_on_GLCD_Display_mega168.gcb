@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program monitors the value of the Analog Port on an GLCD.
 '''The analog device is connected to Analog port O.

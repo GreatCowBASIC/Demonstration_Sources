@@ -18,7 +18,7 @@
 '''ie subtract 1 from the x or y co-ordinate.
 '''the cpu direction is the same process.
 '''
-'''This Great Cow BASIC version uses a state engine to control the game.
+'''This GCBASIC version uses a state engine to control the game.
 ''':
 ''':
 '''Player starts on screen right and initially moves left

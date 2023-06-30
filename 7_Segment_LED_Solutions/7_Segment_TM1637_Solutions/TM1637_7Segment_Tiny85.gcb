@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program will show the functionality of the TM1637a.h library.
 '''The TM1637 module is connected to PortB.0 CLK and PortB.1 DIO
@@ -107,7 +107,7 @@ sentence = "    Gcb Tm1637 demo for Attiny 85    "
         'Alternative command
         TMWriteChar (0 , "?")
         TMWriteChar (1 , "-")
-        TMWriteChar (2 , "°")
+        TMWriteChar (2 , "?")
         TMWriteChar (3 , ")")
         wait 2 s
 
@@ -162,13 +162,13 @@ sentence = "    Gcb Tm1637 demo for Attiny 85    "
         TMWriteChar (2 , "r")
         TMWriteChar (3 , "m")
         wait 2 s
-        TMWrite4Dig(2,2,18,12,10,0)  ' 22°C
+        TMWrite4Dig(2,2,18,12,10,0)  ' 22ï¿½C
         wait 2 s
-        TMWrite4Dig(9,3,18,15,11,0)  ' 93°F
+        TMWrite4Dig(9,3,18,15,11,0)  ' 93ï¿½F
         wait 2 s
-        TMWrite4Dig(16,9,18,12,10,0)  ' 3°C
+        TMWrite4Dig(16,9,18,12,10,0)  ' 3ï¿½C
         wait 2 s
-        TMWrite4Dig(17,7,18,12,9,0)  ' -7°C
+        TMWrite4Dig(17,7,18,12,9,0)  ' -7ï¿½C
         wait 2 s
 
         'Clock demo

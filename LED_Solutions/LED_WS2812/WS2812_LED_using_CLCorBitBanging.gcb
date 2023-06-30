@@ -1,4 +1,4 @@
-'''A demonstration of Great Cow BASIC supporting the WS2812 LED devices.
+'''A demonstration of GCBASIC supporting the WS2812 LED devices.
 '''
 '''This demonstration contains three operational demonstrations, and two methods of driving the WS2812 LEDs.
 '''

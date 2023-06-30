@@ -1,12 +1,12 @@
-''' Great Cow BASIC demonstration
+''' GCBASIC demonstration
 '''
 ''' This demonstration simply turns the LED into a flickering 'candle' using software Pule Width Module (PWM).
-''' Great Cow BASIC support many different methods of PWM - this method is Available on all microcontrollers.
+''' GCBASIC support many different methods of PWM - this method is Available on all microcontrollers.
 ''' This method does NOT require a PWM module within the microcontroller.
-''' This command uses a software PWM routine within Great Cow BASIC to produce a PWM signal on the selected port of the chip.
+''' This command uses a software PWM routine within GCBASIC to produce a PWM signal on the selected port of the chip.
 ''' The method PWMOut does not make use of any special hardware within the microcontroller. The PWM signal is generated only while the PWMOut command is executing - therefore, when the PWMOut is not executing by moving onto the next command, the PWM signal will stop.
 '''
-''' Attach an LED to the MPLAB® Xpress PIC16F15356 board that can be turned ON via a suitable resistor.
+''' Attach an LED to the MPLABï¿½ Xpress PIC16F15356 board that can be turned ON via a suitable resistor.
 ''' and OFF. The LED can be activated by driving the connected I/O line.
 '''
 '''

@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a example line follower program.
 '''Left and right motor are on GPIO.2 and GPIO.0 respectively.

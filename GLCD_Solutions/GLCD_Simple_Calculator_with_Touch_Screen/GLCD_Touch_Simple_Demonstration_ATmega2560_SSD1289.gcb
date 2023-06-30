@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a simple GLCD demonstration of the Touch Screen adapater working with the SSD1289 GLCD display.
 '''The ADS7843 is a 12-bit sampling Analog-to-Digital Converter (ADC) with a synchronous serial interface and low

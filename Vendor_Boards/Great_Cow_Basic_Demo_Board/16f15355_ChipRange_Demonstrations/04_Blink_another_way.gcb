@@ -1,7 +1,7 @@
-''' A demonstration program for GCGB and GCB.
+''' A demonstration program for GCBASIC.
 '''
 '''  One way to create a delay is to spend time decrementing to a value.
-'''  The demonstration will use a Great Cow BASIC method to toggle the LED.
+'''  The demonstration will use a GCBASIC method to toggle the LED.
 '''
 '''  LED DS1 blinks at a rate of approximately 1.0 seconds.
 '''
@@ -35,7 +35,7 @@
 
     do
         wait 1000 ms
-        'An alternative Great Cow BASIC method.
+        'An alternative GCBASIC method.
         PORTC.0 = !PORTC.0
 
     loop

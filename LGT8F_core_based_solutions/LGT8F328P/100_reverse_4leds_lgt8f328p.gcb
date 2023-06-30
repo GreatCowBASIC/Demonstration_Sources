@@ -1,4 +1,4 @@
-'''A demonstration program for GCB
+'''A demonstration program for GCBASIC
 '''---------------------------------------------------------------------------------
 '''  This demonstration shows the impact of the time delay to manage the debouncing of a switch.
 '''  The ADC value creates a delay and LEDs switch between each other when the switch is depressed.

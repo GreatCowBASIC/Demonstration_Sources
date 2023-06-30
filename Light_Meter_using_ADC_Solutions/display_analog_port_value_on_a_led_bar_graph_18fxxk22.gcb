@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program reads the potentiometer/light sensor on AN0 and lights the LEDs connected to PORTB.
 '''This is in the form a bar graph (4 LEDS) to show the value of the potentiometer.

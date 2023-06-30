@@ -1,8 +1,8 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program reads and writes tables.
 '''
-'''The purpose is to validate the Great Cow BASIC binary table usage
+'''The purpose is to validate the GCBASIC binary table usage
 '''
 '''
 '''

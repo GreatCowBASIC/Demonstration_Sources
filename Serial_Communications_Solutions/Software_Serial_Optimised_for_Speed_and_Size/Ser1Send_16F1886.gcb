@@ -1,4 +1,4 @@
-'''A demonstration program for GCB
+'''A demonstration program for GCBASIC
 '''---------------------------------------------------------------------------------
 '''This program uses the SoftSerial library for serial sending.
 ''' SoftSerial uses ASM routines for minimal overhead.

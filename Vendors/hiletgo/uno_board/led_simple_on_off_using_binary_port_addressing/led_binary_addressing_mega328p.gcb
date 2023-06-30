@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a demonstration of flashing an LED on PORTB.5 using port binary addressing.
 '''The LED is connected to Portb.5 via appropiate resistors on the HiLetgo UNO board

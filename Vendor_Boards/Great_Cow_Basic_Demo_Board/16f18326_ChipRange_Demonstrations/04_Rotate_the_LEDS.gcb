@@ -1,7 +1,7 @@
 '''
 '''  This lesson will introduce shifting instructions as well as bit-oriented skip operations to
 '''  move the LEDs.
-''' A demonstration program for GCGB and GCB.
+''' A demonstration program for GCBASIC.
 '''
 '''  LEDs rotate from right to left at a rate of 1.0s.  This shows the use of Rotate and testing the Carry Bit.
 '''

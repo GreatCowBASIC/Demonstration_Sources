@@ -1,4 +1,4 @@
-'''A demonstration program for GCGB and GCB.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program saves a long variable to EEPROM. The program logs these values to the microprocessors internal EEPROM memory.
 '''The process shown below can be used for Word and Integer variables.

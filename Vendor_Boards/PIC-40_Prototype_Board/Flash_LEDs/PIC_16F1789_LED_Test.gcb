@@ -4,8 +4,8 @@
 '   AUTHOR:  Anobium, based on the work of Andrew Davies dated 26/07/14
 
 '  This test program will flash the LEDs connected to port D on the development board.
-'  It was written using the Great Cow Basic (GCB) complier. Install GCB - you are recommended to use
-'  GCB@SYN from the Great Cow Basic website.
+'  It was written using the GCBASIC (GCB) complier. Install GCB - you are recommended to use
+'  GCB@SYN from the GCBASIC website.
 
 '    This code is free software; you can redistribute it and/or
 '    modify it under the terms of the GNU Lesser General Public
