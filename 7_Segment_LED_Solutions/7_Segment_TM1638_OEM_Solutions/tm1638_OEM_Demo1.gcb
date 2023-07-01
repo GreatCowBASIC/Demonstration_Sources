@@ -674,7 +674,7 @@ Sub Scroll_1
      tmSndStr"   no_Fan"
      tmSndBuf
       wait 700 ms
-     tmSndStr"  CASE =85�C"
+     tmSndStr"  CASE =85°C"
      tmSndBuf
       Wait 1 s
 
@@ -685,7 +685,7 @@ Sub Scroll_1
       Wait 1 s
      TM_ScrollRate = 35
     tmClrbuf ': tmClrDisp
-     tmSndStr "Special chr . . .    "" = _ ~ | ) ( � ' - ?"
+     tmSndStr "Special chr . . .    "" = _ ~ | ) ( ° ' - ?"
      tmSndBuf
       Wait 1 s
     TM_Scroll = Off

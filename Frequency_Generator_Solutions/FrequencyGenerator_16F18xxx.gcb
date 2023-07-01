@@ -5,7 +5,7 @@
 ''' This program uses two CLC module, the NCO module, the CLKREF module to calculate the frequency and Timer6 for the duty.
 '''
 '''
-''' There is one yellow LED available on the MPLAB� Xpress PIC16F18446 board that can be turned ON
+''' There is one yellow LED available on the MPLAB® Xpress PIC16F18446 board that can be turned ON
 ''' and OFF.
 '''
 '''

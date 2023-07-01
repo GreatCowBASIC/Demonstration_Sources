@@ -508,7 +508,7 @@ Sub Scroll_1
      Wait 1 s
 
     tmClrbuf ': tmClrDisp
-     tmSndStr "Error.3 no_Fan  CASE =75�C"
+     tmSndStr "Error.3 no_Fan  CASE =75°C"
      tmSndBuf
      Wait 1 s
 
@@ -518,7 +518,7 @@ Sub Scroll_1
      Wait 1 s
 
     tmClrbuf ': tmClrDisp
-     tmSndStr "Special chr . . .    "" = _ ~ | ) ( � ' - ?"
+     tmSndStr "Special chr . . .    "" = _ ~ | ) ( ° ' - ?"
      tmSndBuf
      Wait 1 s
     TM_Scroll = Off

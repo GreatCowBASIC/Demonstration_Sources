@@ -4,7 +4,7 @@
 ''' There are two PWM channel called PMW6 and PWM7. We use PWM6 for this demonstration.  These PWM channels are 10-bit channels, so, we need to use a value between 0 and 1023.
 ''' When using GCBASIC you use the PPSTool to set the output port for the PWM6.  We have chosen the LED0 port.
 '''
-''' Attach an LED to the MPLAB� Xpress PIC16F15356 board that can be turned ON via a suitable resistor.
+''' Attach an LED to the MPLAB® Xpress PIC16F15356 board that can be turned ON via a suitable resistor.
 ''' and OFF. The LED can be activated by driving the connected I/O line.
 '''
 '''

@@ -43,12 +43,12 @@
 
  ; READ ROM [33h]
  ; This command can only be used when there is one slave on the bus.
- ; It allows the bus master to read the slave�s 64-bit ROM code without using the Search ROM procedure.
+ ; It allows the bus master to read the slave 64-bit ROM code without using the Search ROM procedure.
  ; If this command is used when there is more than one slave present on the bus, a data collision will occur when all the slaves attempt to respond at the same time.
 
  ; 64-BIT LASERED ROM CODE
- ; Each DS18B20 contains a unique 64�bit code (see Figure 6) stored in ROM.
- ; The least significant 8 bits of the ROM code contain the DS18B20�s 1-Wire family code: 28h.
+ ; Each DS18B20 contains a unique 64bit code (see Figure 6) stored in ROM.
+ ; The least significant 8 bits of the ROM code contain the DS18B20s 1-Wire family code: 28h.
  ; The next 48 bits contain a unique serial number.
  ; The most significant 8 bits contain a cyclic redundancy check (CRC) byte that is calculated from the first 56 bits of the ROM code. A detailed explanation of the CRC bits is provided in the CRC Generation section. The 64-bit ROM code and associated ROM function control logic allow the DS18B20 to operate as a 1-Wire device using the protocol detailed in the 1-Wire Bus System section.
  ; 64-Bit Lasered ROM Code

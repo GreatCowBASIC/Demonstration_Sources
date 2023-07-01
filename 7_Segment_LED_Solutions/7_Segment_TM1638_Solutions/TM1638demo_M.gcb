@@ -69,7 +69,7 @@ TM_reset
 ' All letters demo
   For letter = 65 to 90
 
-    small_chr = letter + 32 'Siekoo a�phabet
+    small_chr = letter + 32 'Siekoo alphabet
 
     WriteChar (0 , letter)
     WriteChar (1 , " ")
@@ -163,13 +163,13 @@ WriteChar (1 , "e")
 WriteChar (2 , "r")
 WriteChar (3 , "m")
 wait 2 s
-Write4Dig(2,2,18,12,10,0)  ' 22�C
+Write4Dig(2,2,18,12,10,0)  ' 22°C
 wait 2 s
-Write4Dig(9,3,18,15,11,0)  ' 93�F
+Write4Dig(9,3,18,15,11,0)  ' 93°F
 wait 2 s
-Write4Dig(16,9,18,12,10,0)  ' 3�C
+Write4Dig(16,9,18,12,10,0)  ' 3°C
 wait 2 s
-Write4Dig(17,7,18,12,9,0)  ' -7�C
+Write4Dig(17,7,18,12,9,0)  ' -7°C
 wait 2 s
 
 'Clock demo

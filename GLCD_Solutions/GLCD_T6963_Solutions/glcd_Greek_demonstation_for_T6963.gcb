@@ -37,7 +37,7 @@
   #define GLCD_WR        PORTA.2           'Write control line port
   #define GLCD_RESET     PORTA.3           'Reset port
   #define GLCD_FS        PORTA.5           'FS port
-  #define GLCD_FS_SELECT 1                 'FS1 Font Select port. 6x8 font: FS1=�High�=1 8x8 font FS1=�Low�=0 for GLCD_FS_SELECT
+  #define GLCD_FS_SELECT 1                 'FS1 Font Select port. 6x8 font: FS1="High"=1 8x8 font FS1="Low"=0 for GLCD_FS_SELECT
 
   '***********************************************************************************************
   '*
@@ -67,8 +67,8 @@
 
         CLS
         GLCDCLS
-        GLCDPrint 0,10,"���� ��� �����"
-        GLCDPrint 10,20,"Evan ����� ���� cool �����" ;Evan you are very cool guy
+        GLCDPrint 0,10,"ÃåéÜ óïõ êüóìå"
+        GLCDPrint 10,20,"Evan åßóáé ðïëý cool ôýðïò" ;Evan you are very cool guy
         wait 4 s
 
         CLS

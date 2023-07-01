@@ -1,4 +1,4 @@
-; -----  Define I2C settings � Change Ports.  This configuration is for Software I2C.
+; -----  Define I2C settings   Change Ports.  This configuration is for Software I2C.
    #define I2C_MODE Master
    #define I2C_DATA PORTC.4
    #define I2C_CLOCK PORTC.5

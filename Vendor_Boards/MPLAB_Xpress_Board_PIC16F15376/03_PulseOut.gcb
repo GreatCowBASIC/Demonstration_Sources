@@ -4,7 +4,7 @@
 '''
 ''' This demonstration simply turns the LED on using a pulse - this is useful for motors also.  See http://gcbasic.sourceforge.net/help/_pulseout.html
 '''
-''' Attach an LED to the MPLAB� Xpress PIC16F15376 board that can be turned ON via a suitable resistor.
+''' Attach an LED to the MPLAB® Xpress PIC16F15376 board that can be turned ON via a suitable resistor.
 ''' and OFF. The LED can be activated by driving the connected I/O line.
 '''
 '''

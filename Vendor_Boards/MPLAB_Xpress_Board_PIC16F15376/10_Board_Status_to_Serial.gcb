@@ -3,7 +3,7 @@
 ''' This demonstration simply turns the LED on using the status of the switch AND sends the status to the USB CDC serial port!
 '''
 '''
-''' Attach an LED to the MPLAB� Xpress PIC16F15376 board that can be turned ON via a suitable resistor.
+''' Attach an LED to the MPLAB® Xpress PIC16F15376 board that can be turned ON via a suitable resistor.
 ''' and OFF. The LED can be activated by driving the connected I/O line.
 '''
 ''' Atttach a mechanical button with a 10k pull resistor. This is a generic user configurable
@@ -73,10 +73,16 @@ Dim switchState As BIT
 'Set the initial state
 switchState = LEDOn
 
-Wait 1 s
+Wait 3 s
 HSerPrintCRLF
-HSerPrint "Great Cow BASIC Demonstration for the MPLAB� Xpress PIC16F15376 Evaluation Board"
+HSerPrintStringCRLF "Great Cow BASIC Demonstration for the MPLAB Xpress PIC16F15376 Evaluation Board"
 HSerPrintCRLF
+HSerPrintStringCRLF "Atttach a mechanical button with a 10k pull resistor to PORTC.0"
+HSerPrintStringCRLF "Atttach a LED to PORTC.1 via a suitable resistor (1k0)"
+HSerPrintCRLF
+HSerPrintCRLF
+
+
 
 Do Forever
     'the switch has change state

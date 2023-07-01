@@ -280,7 +280,7 @@ sub ad_let    'legge i 4 ADC delle batterie
     med(tmp)=0
   next
  repeat 100
-  vbat(1)= (ReadAD10(an0) * AG_volt)/100      'batteria 1� /10
+  vbat(1)= (ReadAD10(an0) * AG_volt)/100      'batteria 1/10
   vbat(2)= (ReadAD10(an1) * 55)/102      ' /10
   vbat(3)= (ReadAD10(an2) * 52)/97      ' /10
   vbat(4)= (ReadAD10(an3) * 65)/101      ' /11

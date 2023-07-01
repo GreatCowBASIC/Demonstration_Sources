@@ -2,7 +2,7 @@
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program shows how to use the NXP PCF 8591 8-bit A/D and D/A IC with GCB.
 '''This prvovided more analogue input pins on your project and you can generate analogue signals.
-'''The NXP PCF8591 IC has a single DAC (digital to analogue) converter as well as four ADCs (analogue to digital converters) � all accessible via the I2C bus.
+'''The NXP PCF8591 IC has a single DAC (digital to analogue) converter as well as four ADCs (analogue to digital converters), all accessible via the I2C bus.
 '''If the I2C bus is new to you, please familiarise yourself with I2C here before moving forward.
 '''The PCF8591 is available in DIP form, which makes it easy to experiment with:
 '''@author  EvanV

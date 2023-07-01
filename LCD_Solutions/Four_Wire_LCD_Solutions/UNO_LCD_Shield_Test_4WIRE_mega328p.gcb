@@ -3,7 +3,7 @@
 '''Requires  LCD Keypad Shield attached to a Arduino UNO.
 '''The LCD Keypad shield is developed for Arduino compatible boards, to provide a user-friendly interface that allows users to go through the menu, make selections etc.
 '''It consists of a 1602 white character blue backlight LCD.
-'''The keypad consists of 5 keys � select, up, right, down and left. To save the digital IO pins, the keypad interface uses only one ADC channel. The key value is read through a 5 stage voltage divider.
+'''The keypad consists of 5 keys, select, up, right, down and left. To save the digital IO pins, the keypad interface uses only one ADC channel. The key value is read through a 5 stage voltage divider.
 '''@author 	EvanV
 '''@licence	GPL
 '''@version	1.0a
@@ -54,7 +54,7 @@
 ; ----- Quick Command Reference:
   'The LCD Keypad shield is developed for Arduino compatible boards, to provide a user-friendly interface that allows users to go through the menu, make selections etc.
   'It consists of a 1602 white character blue backlight LCD.
-  'The keypad consists of 5 keys � select, up, right, down and left. To save the digital IO pins, the keypad interface uses only one ADC channel. The key value is read through a 5 stage voltage divider.
+  'The keypad consists of 5 keys, select, up, right, down and left. To save the digital IO pins, the keypad interface uses only one ADC channel. The key value is read through a 5 stage voltage divider.
 
 
 

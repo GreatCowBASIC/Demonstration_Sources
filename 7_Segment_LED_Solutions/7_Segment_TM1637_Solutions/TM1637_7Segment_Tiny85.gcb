@@ -162,13 +162,13 @@ sentence = "    Gcb Tm1637 demo for Attiny 85    "
         TMWriteChar (2 , "r")
         TMWriteChar (3 , "m")
         wait 2 s
-        TMWrite4Dig(2,2,18,12,10,0)  ' 22�C
+        TMWrite4Dig(2,2,18,12,10,0)  ' 22°C
         wait 2 s
-        TMWrite4Dig(9,3,18,15,11,0)  ' 93�F
+        TMWrite4Dig(9,3,18,15,11,0)  ' 93°F
         wait 2 s
-        TMWrite4Dig(16,9,18,12,10,0)  ' 3�C
+        TMWrite4Dig(16,9,18,12,10,0)  ' 3°C
         wait 2 s
-        TMWrite4Dig(17,7,18,12,9,0)  ' -7�C
+        TMWrite4Dig(17,7,18,12,9,0)  ' -7°C
         wait 2 s
 
         'Clock demo

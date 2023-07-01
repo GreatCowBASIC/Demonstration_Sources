@@ -5,7 +5,7 @@
 ''' Rather than being a general purpose logic block which can be connected to anything and configured to do anything, there is quite a rigid combination of possible connections.
 ''' But, we are connecting the Switch to the LED via gates and latches.
 '''
-''' Attach an LED to the MPLAB� Xpress PIC16F15356 board that can be turned ON via a suitable resistor.
+''' Attach an LED to the MPLAB® Xpress PIC16F15356 board that can be turned ON via a suitable resistor.
 ''' and OFF. The LED can be activated by driving the connected I/O line.
 '''
 '''

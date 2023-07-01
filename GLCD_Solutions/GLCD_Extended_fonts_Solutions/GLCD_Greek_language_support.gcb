@@ -46,9 +46,9 @@
 ; ----- Main body of program commences here.
   do
     GLCDCLS
-    GLCDPrint 0,10,"���� ��� �����"
-    GLCDPrint 0,20,"Evan ����� ����"
-    GLCDPrint 0,30,"cool �����";Evan you are very cool guy
+    GLCDPrint 0,10,"ÃåéÜ óïõ êüóìå"
+    GLCDPrint 0,20,"Evan åßóáé ðïëý"
+    GLCDPrint 0,30,"cool ôýðïò";Evan you are very cool guy
 
     Wait 10 s
   loop

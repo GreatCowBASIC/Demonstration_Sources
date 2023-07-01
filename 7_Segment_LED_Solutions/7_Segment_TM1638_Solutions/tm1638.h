@@ -36,11 +36,11 @@
 '  initial h file build  12/10/2020  by Mike Otte
 '
 '
-' - Support for Siekoo 7 digit alphabet created by Alexander Fako�,
+' - Support for Siekoo 7 digit alphabet created by Alexander Fako°,
 ''   more info at:  http://en.fakoo.de/siekoo.html
 '
 ' - 3 new special characters:
-'   � Degree sign as special character 18
+'   ° Degree sign as special character 18
 '   ) Bracket sign as special character 19
 '   ? Question mark as special character 20
 '

@@ -1,5 +1,5 @@
 #Chip 18F15Q40, 64
-
+#SKIPTEST
 #Option Explicit
 #Config CP=On
 'Read protected

@@ -14,7 +14,7 @@
 
 
 ; ----- Konfiguration/Configuration
-; verf�gbare CPU Taktfrequenz/Available cpu clock speed: 48*, 20, 8, 4, 2, 1, 0.5, 0.25, 0.125   *para 48mhz habilitar flags
+; verfgbare CPU Taktfrequenz/Available cpu clock speed: 48*, 20, 8, 4, 2, 1, 0.5, 0.25, 0.125   *para 48mhz habilitar flags
   #chip 18F4550, 48
 
   ;Konfigurationsflag 48 MHZ
@@ -68,10 +68,10 @@
   #define HI2C_BAUD_RATE 600
   #define HI2C_DATA PORTB.0
   #define HI2C_CLOCK PORTB.1
-  'F�r das SSP-Modul m�ssen Pins eingegeben werden/pins need to be input for SSP module
+  'For das SSP-Modul mosen Pins eingegeben werden/pins need to be input for SSP module
   Dir HI2C_DATA in
   Dir HI2C_CLOCK in
-  'Ger�temodus/Device mode
+  'Gerotemodus/Device mode
   HI2CMode Master
 
   '''Kombi High
