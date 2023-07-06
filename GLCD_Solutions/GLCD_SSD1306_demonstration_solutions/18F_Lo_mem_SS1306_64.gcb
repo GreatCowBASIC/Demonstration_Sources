@@ -21,11 +21,6 @@
             RB4PPS = 0x0021    'SDA1 > RB4
             I2C1SDAPPS = 0x000C    'RB4 > SDA1 (bi-directional)
 
-            'Module: UART pin directions
-            Dir PORTC.6 Out    ' Make TX1 pin an output
-            'Module: UART1
-            RC6PPS = 0x0015    'TX1 > RC6
-
     End Sub
     'Template comment at the end of the config file
 
@@ -51,8 +46,7 @@
   ; ----- Define GLCD Hardware settings
   #DEFINE GLCD_TYPE GLCD_TYPE_SSD1306
   #DEFINE GLCD_I2C_Address 0x78
-  #DEFINE GLCD_PROTECTOVERRUrN
-
+  
   HI2CMode Master
   #DEFINE GLCD_DISABLE_OLED_FONT2
   GLCDfntDefaultsize= 1 
