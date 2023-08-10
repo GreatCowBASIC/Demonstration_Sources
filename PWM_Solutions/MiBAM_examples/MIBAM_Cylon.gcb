@@ -1,0 +1,118 @@
+#Chip 18F47Q10, 32
+
+// ----( MIBAM Setup )--------------------------------------------------------
+// #DEFINE BAM_FREQ     100                  ; Desired Refresh rate Limit
+// #DEFINE SCOPESYNC    PORTB.0              ; if declared, generates sync for OScope
+// #DEFINE BAM_INFO     1                    ; use to display MIBAM results
+
+#INCLUDE "MIBAM.h"                          ; Bit Angle Modulation module
+
+
+
+    'PPS Tool version: 0.0.6.3
+    // Generated for 18f46q10
+    //
+    // Template comment at the start of the config file
+    //
+    #startup InitPPS, 85
+    #define PPSToolPart 18f46q10
+
+    Sub InitPPS
+              
+            'Module: EUSART1
+            RB2PPS = 0x0009    'TX1 > RB2
+        
+      
+    End Sub
+    // Template comment at the end of the config file
+
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
+    ' 
+    #DEFINE     BAM_COUNT   8                   ; How many BAM Pins are used  
+      DIM BAM_DUTY(BAM_COUNT)
+      DIM LED1 as Byte ALIAS BAM_DUTY(1)                 ; group them in an array for easy access
+      DIM LED2 as Byte ALIAS BAM_DUTY(2)                 ; group them in an array for easy access
+      DIM LED3 as Byte ALIAS BAM_DUTY(3)                 ; group them in an array for easy access
+      DIM LED4 as Byte ALIAS BAM_DUTY(4)                 ; group them in an array for easy access
+      DIM LED5 as Byte ALIAS BAM_DUTY(5)                 ; group them in an array for easy access
+      DIM LED6 as Byte ALIAS BAM_DUTY(6)                 ; group them in an array for easy access
+      DIM LED7 as Byte ALIAS BAM_DUTY(7)                 ; group them in an array for easy access
+      DIM LED8 as Byte ALIAS BAM_DUTY(8)                 ; group them in an array for easy access
+      For myInit = 0 to 7
+          BAM_DUTY(myInit+1) = FnLSL( 1, myInit )
+      Next  
+
+#include "gcbversionnumber.cnt"
+'Include the GCBVersionNumber.cnt to increment versionString and create the build time string called GCBBuildTimeStr.
+' versionString a string is created automatically.
+' GCBBuildTimeStr is a string that is also created automatically.
+' use "GCBVersionNumber.cnt" as this will create a local copy of the versionString tracker.
+' if you use <GCBVersionNumber.cnt> this is a system wide versionString tracker.
+
+
+dim versionString as string * 40
+versionString = "Build# "+GCBBuildStr
+versionString = versionString + "@"+GCBBuildTimeStr
+Wait 1 s
+HSerPrintStringCRLF versionString
+
+  BAM_INIT()
+HSerPrintStringCRLF "Back from INIT()"
+
+
+  Sub BAM_LIST                       ; Define PIN's to use for BAM
+      // HSerPrint "BAM_LIST"
+      // HserPrintCRLF
+      BAM_PIN (PORTD.0, LED1 , 1 )        ;   and the associated Duty variables
+      BAM_PIN (PORTD.1, LED2 , 2 )
+      BAM_PIN (PORTD.2, LED3 , 3 )
+      BAM_PIN (PORTD.3, LED4 , 4 )
+      BAM_PIN (PORTD.4, LED5 , 5 )
+      BAM_PIN (PORTD.5, LED6 , 6 )
+      BAM_PIN (PORTD.6, LED7 , 7 )
+      BAM_PIN (PORTD.7, LED8 , 8 )
+  End Sub
+  // _________________________________________________
+
+  #DEFINE SPEED           6         ; Smaller = Faster
+  #DEFINE TRACERSPEED     15        ; Smaller = Faster Left/Right
+  #DEFINE BRIGHTNESS      200       ; Tracers DutyCycle
+  #DEFINE DRAINSPEED      30        ; Smaller = Shorter Trail
+
+
+// Variables
+    Dim Idx         
+    Dim LoopCount   
+    Dim NextLED     
+    Dim TraceDIR as BIT  
+
+    TraceDIR  = 0
+    LoopCount = 0
+    NextLED   = 1
+
+ Do
+    // if LoopCount = TRACERSPEED then             ; __( Cylon/Kitt Scanner )__
+    //   LoopCount = 0
+    //   BAM_DUTY(NextLED) = BRIGHTNESS
+    //   if TraceDIR = 1 then                          ; if scanning left
+    //     NextLED = NextLED - 1
+    //     if NextLED = 1 then TraceDIR = 0
+    //   else                                      ; else scanning right
+    //     NextLED = NextLED + 1
+    //     if NextLED = BAM_COUNT then TraceDIR = 1
+    //   end if
+    // end if
+    
+    // FOR Idx = 1 to BAM_COUNT                ; Drain all dutycycles
+    //   if BAM_DUTY(Idx) > 0 then
+    //       BAM_DUTY(Idx) = BAM_DUTY(Idx)*DRAINSPEED/(DRAINSPEED+1)
+    //   end if
+    // NEXT Idx
+    // Wait SPEED ms
+    // LoopCount = LoopCount + 1
+Loop  
+
