@@ -1,0 +1,956 @@
+/*
+    A demonstration program for GCGB and GCB.
+    --------------------------------------------------------------------------------
+
+    The program us designed for Microchip’s Explorer 8 Development Board. The Explorer 8 Development board supports 8/14/20/28/40-pin 8-bit PIC microcontrollers as well as up to 80-pin PIMmounted devices. 
+    The demos included in this document are developed for high pin count devices (64 pin). 
+    
+    GCBASIC for these devices can be downloaded from the GCBASIC web site at https://sourceforge.net/projects/gcbasic/
+
+    This program comprises 11 demos utilizing the different peripherals and features of 8-bit PIC® MCUs
+    while demonstrating the different capabilities of the Explorer 8 Development Board. Each lesson contains
+    a brief description of the lab, code snippets, and discussions to make you become easily acquainted with
+    the different peripherals and registers of PIC® MCUs. These demos also make use of the PPSTOOL, 
+    an easy-to-use tool that you can use to generate codes for a more efficient use of the CPU and memory resources. 
+    All labs are written in GCBASIC language and are compatible with the latest GCBASIC compilers.
+
+    Demos
+
+    The demo in this program are presented in the same order as they appear on the programmed labs.
+    You can navigate through each lab by pressing the S2 button.
+    • Lesson 1: Hello World (Turn On an LED)
+    • Lesson 2: Blink
+    • Lesson 3: Rotate (Moving the Light Across LEDs)
+    • Lesson 4: Analog-to-Digital Conversion (ADC)
+    • Lesson 5: Variable Speed Rotate
+    • Lesson 6: Debounce
+    • Lesson 7: Pulse-Width Modulation (PWM)
+    • Lesson 8: Timer1
+    • Lesson 9: Interrupts
+    • Lesson 10: Sleep/Wakeup
+    • Lesson 11: EEPROM
+
+
+
+*/
+'''@author    Evan R. Venn   
+'''@license   GPL
+'''@version   1.00   
+'''@date      2023-08-18
+'''********************************************************************************
+
+
+#chip 18F67K40, 8
+    #option explicit 
+    #config MCLRE = EXTMCLR
+
+    #config WDTCPS = WDTCPS_13      // WDT Period Select bits->Divider ratio 1:262144
+    #config WDTE = SWDTEN           // WDT operating mode->WDT enabled/disabled by SWDTEN bit
+    #config WDTCWS = WDTCWS_7       // WDT Window Select bits->window always open (100%); software control; keyed access not required
+    #config WDTCCS = LFINTOSC       // WDT input clock selector->WDT reference clock is the 31.0 kHz LFINTOSC
+
+    // PPS Tool version: 0.0.6.3
+        // Generated for 18f67k40
+        
+        #startup InitPPS, 85
+        #define PPSToolPart 18f67k40
+
+        Sub InitPPS
+                
+                #ifdef USART_BAUD_RATE
+                    'Module: EUSART1
+                    RC6PPS = 0x000C    'TX1 > RC6
+                #endif
+
+                #ifdef LCD_HARDWARESPI
+                    // This is conditional to support Software SPI
+                    SSP1CLKPPS = 0x13;   //RC3->MSSP1:SCK1;    
+                    RC3PPS = 0x19;   //RC3->MSSP1:SCK1;    
+                    RC5PPS = 0x1A;   //RC5->MSSP1:SDO1;    
+                    SSP1DATPPS = 0x14;   //RC4->MSSP1:SDI1;  
+                #endif
+
+                'Module: CCP1
+                RC2PPS = 0x0005    'CCP1 > RC2
+                CCP1PPS = 0x0012    'RC2 > CCP1 (bi-directional)
+                RE5PPS = 0x0005    'CCP1 > RE5
+                CCP1PPS = 0x0025    'RE5 > CCP1 (bi-directional)
+                RE7PPS = 0x0005    'CCP1 > RE7
+                CCP1PPS = 0x0027    'RE7 > CCP1 (bi-directional)
+            
+            End Sub
+
+    // Constants - Serial support
+        #define USART_BAUD_RATE 9600
+        #define USART_TX_BLOCKING
+        #define USART_DELAY OFF
+
+
+    //Constants - LCD connectivity type;controls whether to use HW SPI; The inter character delay
+    #define LCD_IO 14
+        // #define LCD_HARDWARESPI
+        #define LCD_SPEED FAST
+        #define HWSPIMODE MASTERFAST
+        //These are phyiscal connections from the expander to the LCD.  These are automatically set in the library and are shown here purely for clarity.
+            #define     LCD_SPI_EXPD_ADDRESS        0x40
+            #define LCD_SPI_EXPANDER_E_ADDRESS      0x40     // GPA6 on the expander
+            #define LCD_SPI_EXPANDER_RS_ADDRESS     0x80     // GPA7 on the expander   
+
+        'Pin mappings for LCD IO SPI Expander
+        #define LCD_SPI_DO          portc.5
+        #define LCD_SPI_SCK         portc.3
+        #define LCD_SPI_CS          porta.2
+        // Optional(s) reset Port.Pin connection to expander, select one.
+            // #define LCD_SPI_RESET_IN       portb.5
+            #define LCD_SPI_RESET_OUT      portb.5
+
+
+; ----- Main body of program commences here.
+
+    // Hardware configuration
+        #define SWITCH_S1_PORT      PORTB.0
+        #define SWITCH_S2_PORT      PORTA.5
+        #define LED_D1              PORTD.0
+        #define LED_D2              PORTD.1
+        #define LED_D3              PORTD.2
+        #define LED_D4              PORTD.3
+        #define LED_D5              PORTB.0
+        #define LED_D6              PORTB.1
+        #define LED_D7              PORTB.2
+        #define LED_D8              PORTB.3
+        #define CCPPWM_D1           PORTE.7
+        #define CCPPWM_D2           PORTE.5
+        #define CCPPWM_D3           PORTC.2
+        
+        Dir SWITCH_S1_PORT  In
+        Dir SWITCH_S2_PORT  In
+        Dir LED_D1          Out
+        Dir LED_D2          Out
+        Dir LED_D3          Out
+        Dir LED_D4          Out
+        Dir LED_D5          Out
+        Dir LED_D6          Out
+        Dir LED_D7          Out
+        Dir LED_D8          Out
+        Dir CCPPWM_D1       Out
+        Dir CCPPWM_D2       Out
+        Dir CCPPWM_D3       Out
+        
+
+    // Common macro and constants
+        #define LEDS_OFF            LED_D8=0:LED_D7=0:LED_D6=0:LED_D5=0:LED_D4=0:LED_D3=0:LED_D2=0:LED_D1=0
+        #define PRESSED             1
+        #define NOT_PRESSED         0
+        #define RUNNING             1
+        #define NOT_RUNNING         0
+        #define RIGHTDIRECTION      1
+        #define LEFTDIRECTION       0        
+        #define MAX_LABS            11
+
+
+    // Variable Definitions
+        Dim labNumber as Byte:          labNumber = 0               
+        Dim switchEvent as Byte:        switchEvent = 0
+        Dim labState as Byte:           labState = NOT_RUNNING
+        Dim btnState as Byte:           btnState = NOT_PRESSED
+        Dim activeLedNum as Byte
+
+    Print "    Welcome     "
+    Locate 1,0
+    Print "  to Explorer 8 "
+
+    Do Forever
+
+        // Check button state
+        checkButtonS2
+        // Select labnumber
+        Select Case labNumber
+            case 1:     HelloWorld
+            case 2:     Blink
+            case 3:     RotateLEDs
+            case 4:     ADC
+            case 5:     VSR
+            case 6:     Debounce
+            case 7:     PWM
+            case 8:     Timer_1
+            case 9:     Interrupts
+            case 10:    SleepWakeUp
+            case 11:    EEPROM
+        End Select
+        // Change lab
+        if switchEvent = 1 then
+            nextLab
+        End if     
+
+    Loop
+
+sub HelloWorld
+    
+    /*
+    The LEDs are connected to the microcontroller input-output pins (I/O). First, the I/O pin must be
+    configured as an output. When one of these pins is driven high, the LED will turn on. The
+    two logic levels ‘1’ (high) and ‘0’ (low) are derived from the power pins of the MCU. ‘1’ is equivalent
+    to the device’s power pin (VDD) and ‘0’ to the source (VSS). VDD may vary depending upon the
+    supply requirements of the specific device used but VSS is always connected to ground and is equal
+    to ‘0’.
+    */
+
+    if labState = NOT_RUNNING Then
+        Locate 0,0
+        LEDS_OFF
+        Print "  Hello World   "
+        labState = RUNNING                                      
+    end if
+
+    if labState = RUNNING Then
+        LED_D8 = 1
+        Locate 1,0
+        Print "  LED_D8 = ON   "
+    end if
+
+    if switchEvent = 1 Then
+        labState = NOT_RUNNING
+    End If
+
+End Sub
+
+Sub Blink
+
+    /*
+    LED D8 blinks at a rate of approximately 1.5 seconds. The LCD displays “Blink” on the first line
+    while displaying “LED_D8 = ON” and “LED_D8 = OFF” alternately every 1.5 seconds on the second
+    line.
+
+    */
+
+    Dim flagCounter as  Byte
+    #define BLINK_FLAG_COUNTER_MAX  6  // Maximum flag count to create 1.5 seconds delay
+
+    if labState = NOT_RUNNING Then
+        flagCounter = 0
+        Locate 0,0
+        LEDS_OFF
+        Print "     Blink      "
+        InitTimer1 OSC , PS1_4
+        Settimer 1, 0x0BDC
+        TMR1IE = 0
+        TMR1IF = 0
+        StartTimer 1
+        labState = RUNNING    
+    end if    
+
+    if labState = RUNNING Then
+        if  LED_D8 = 1 Then
+            Locate 1,0
+            Print "  LED_D8 = ON   "   
+        else
+            Locate 1,0
+            Print "  LED_D8 = OFF   "
+        end if
+        
+        wait while TMR1IF = 0
+
+        StopTimer 1
+        Settimer 1, 0x0BDC
+        StartTimer 1
+        // Clear the interrupt flag
+        TMR1IF = 0
+
+        flagCounter++
+        if flagCounter = BLINK_FLAG_COUNTER_MAX Then      
+            LED_D8 = !LED_D8
+            flagCounter = 0
+        end if      
+    end if
+
+    if switchEvent = 1 Then
+        StopTimer 1
+        labState = NOT_RUNNING
+    End If
+
+End Sub
+
+sub RotateLEDs
+        
+    /*
+    LEDs D6, D7 and D8 light up in turn every 500 milliseconds. Once D8 is lit, D6 lights up and the
+    pattern repeats. The LCD displays “Rotate” on the first line and “LED_Dx = ON” on the second line,
+    where x indicates which LED is currently lit
+    */
+
+    Dim LEDState as Byte
+    if labState = NOT_RUNNING Then
+        // Begin with D6 high
+        PORTB = PORTB AND 0xF1
+        LED_D6 = 1
+        activeLedNum = 6
+        Locate 0,0
+        Print "     Rotate     "
+        labState = RUNNING                                      
+    end if
+
+    if labState = RUNNING Then
+        // Use delay to keep D6 ON for 0.5s, or, fast exit if button pushed
+        repeat 10 
+            wait 50 ms
+            checkButtonS2
+            if switchEvent = 1 Then
+                Exit Repeat
+            End If
+        end repeat 
+
+        // Rotate LEDs: Get the bits with the LEDs
+        LEDState = PORTB AND 0x0E
+        Set C Off
+        Rotate LEDState Left
+        // Set the bits with the LEDs leaving the upper bits as-was.
+        LATB = ( PORTB AND 0xF1 ) OR LEDState
+    
+
+        activeLedNum++       
+        // If the last LED (D8) is lit, go back to the first LED (D6)
+        if activeLedNum > 8 then
+            LED_D6 = 1
+            activeLedNum = 6
+        end if
+
+        // Display which LED is ON on the LCD
+        Locate 1, 0 
+        Print "  LED_D  = ON   "
+        Locate 1,7
+        Print activeLedNum
+
+    end if
+
+    if switchEvent = 1 Then
+        labState = NOT_RUNNING
+    End If
+
+End Sub
+
+Sub ADC
+
+    /*
+    The top three MSBs of the ADC are displayed on the LEDs. Rotate the potentiometer to change
+    the display. The LCD displays “ADC” on the first line and “ADC Result = x” on the second line where
+    x shows the current ADC conversion result from 0 (0b000) to 7(0b111).
+    */
+
+    Dim adcResult as Word
+
+    if labState = NOT_RUNNING Then
+        CLS
+        LEDS_OFF
+        Print "      ADC      "
+        labState = RUNNING     
+    end if
+
+    if labState = RUNNING Then
+        // Get the top 3 MSBs and display these on the LEDs
+        adcResult = ReadAD10 ( AN0 )
+        
+        // Display the ADC result on the LCD
+        Locate 0,0
+        Print " ADC Result =   "
+        Locate 1,10
+        Print leftpad( str(adcResult), 4, " " )
+
+        //Now show on LEDS
+        //Get the top 3 MSBs (Shift LEFT), then *2 ( Shift Right) and display these on the LEDs
+        adcResult = (FnLSR ( adcResult, 7)) * 2
+        PortB = ( PortB and 0xF1) OR adcResult 
+    end if
+
+    if switchEvent = 1 Then
+        labState = NOT_RUNNING
+    end If
+
+End Sub
+
+sub VSR
+    
+    /*
+    Rotate the potentiometer R25 counterclockwise to see the LEDs shift faster. The LCD displays
+    “VSR” on the first line and “Delay = xxx ms” on the second line, where xxx indicates the time interval
+    between LED shifts.
+    */
+
+    Dim LEDState
+    Dim adcResult as Word
+    if labState = NOT_RUNNING Then
+        // Begin with D6 high
+        PORTB = PORTB AND 0xF1
+        LED_D6 = 1
+        activeLedNum = 6
+        Locate 0,0
+        Print "      VSR       "
+        labState = RUNNING                                      
+    end if
+
+    if labState = RUNNING Then
+
+        adcResult = ReadAD ( AN0 )
+        adcResult = Scale ( adcResult, 0, 255,1, 50)
+
+        // Use delay to keep D6 ON for 0.5s, or, fast exit if button pushed
+        repeat 10 
+            wait adcresult ms
+            checkButtonS2
+            if switchEvent = 1 Then
+                Exit Repeat
+            End If
+        end repeat 
+
+        // Get the bits with the LEDs
+        LEDState = PORTB AND 0x0E
+        Set C Off
+        Rotate LEDState Left
+        // Set the bits with the LEDs leaving the upper bits as-was.
+        LATB = ( PORTB AND 0xF1 ) OR LEDState
+    
+
+        activeLedNum++       
+        // If the last LED (D8) is lit, go back to the first LED (D6)
+        if activeLedNum > 8 then
+            LED_D6 = 1
+            activeLedNum = 6
+        end if
+
+        // Display value ON on the LCD
+        Locate 1, 0 
+        Print " Delay =     ms "
+        Locate 1,9
+        Print Pad( str(adcresult), 3, " " )
+
+    end if
+
+    if switchEvent = 1 Then
+        labState = NOT_RUNNING
+    End If
+
+End Sub
+
+sub Debounce
+
+    /*
+    LEDs D6, D7 and D8 light up in turn on every S1 button press. Once D8 is lit and S1 is pressed,
+    D6 lights up and the pattern repeats. Holding the button moves the light continuously across the
+    LEDs. The LCD displays “Debounce” on the first line and “LED_Dx = ON” on the second line, where
+    x indicates which LED is currently lit.
+    */
+
+    Dim LEDState
+    Dim adcResult as Word
+    if labState = NOT_RUNNING Then
+        
+        // Begin with D6 high
+        PORTB = PORTB AND 0xF1
+        LED_D6 = 1
+        activeLedNum = 6
+
+        CLS
+        Print "    Debounce    "
+        Locate 1,0
+        Print "    Press S1    "
+        labState = RUNNING                                      
+    end if
+
+    if labState = RUNNING Then
+
+        if checkButtonS1 = 0 Then
+            // Debounce by delaying
+            wait 100 ms
+
+            // If S1 is still pressed, shift the light to the next LED to the right
+            if checkButtonS1 = 0 Then
+
+                // Rotate LEDs: Get the bits with the LEDs
+                LEDState = PORTB AND 0x0E
+                Set C Off
+                Rotate LEDState Left
+                // Set the bits with the LEDs leaving the upper bits as-was.
+                LATB = ( PORTB AND 0xF1 ) OR LEDState
+            
+
+                activeLedNum++       
+                // If the last LED (D8) is lit, go back to the first LED (D6)
+                if activeLedNum > 8 then
+                    LED_D6 = 1
+                    activeLedNum = 6
+                end if
+
+                // Display which LED is ON on the LCD
+                Locate 1, 0 
+                Print "  LED_D  = ON   "
+                Locate 1,7
+                Print activeLedNum
+            end if
+        end if
+    end if
+
+    if switchEvent = 1 Then
+        DIR LED_D5 OUT
+        labState = NOT_RUNNING
+    End If
+
+End Sub
+
+Sub PWM
+
+    /*
+    Rotating the potentiometer R25 will adjust the brightness of attached LEDs. The LCD displays “PWM” on
+    the first line and “Duty Cycle = xx%” on the second line, where xx corresponds to the PWM duty
+    cycle.
+
+    The attached LEDs needs a suitable resistor to 0v0 from the CCP1/PWM define output.  For PPS chips this needs to setup in InitPPS().
+
+    Note: for the 18F67K40 the constraints of PPS prevents usage of the onboard LEDs.
+    */
+
+
+    /* GCODE Optimisation file - this will optimise PWM operations by disabling the PWM operations on the PWM channel and Timer that is set to FALSE
+                                    to enable PWM and Timer operations set to FALSE
+
+                Optimise CCP/PWM    
+        */
+                #DEFINE USE_HPWMCCP1 TRUE
+                #DEFINE USE_HPWMCCP2 FALSE
+                #DEFINE USE_HPWMCCP4 FALSE
+                #DEFINE USE_HPWMCCP5 FALSE
+
+        //         Optimise PWM
+                #DEFINE USE_HPWM1 FALSE
+                #DEFINE USE_HPWM2 FALSE
+                #DEFINE USE_HPWM3 FALSE
+                #DEFINE USE_HPWM4 FALSE
+                #DEFINE USE_HPWM5 FALSE
+                #DEFINE USE_HPWM6 FALSE
+                #DEFINE USE_HPWM7 FALSE
+                #DEFINE USE_HPWM8 FALSE
+
+        //         Optimise Timers associated with PWM operations
+                #DEFINE USE_HPWM_TIMER2 TRUE
+                #DEFINE USE_HPWM_TIMER4 FALSE
+                #DEFINE USE_HPWM_TIMER6 FALSE
+
+    Dim adcResult, oldadcResult as Word         // Store ADC values
+
+    if labState = NOT_RUNNING Then
+        CLS
+        LEDS_OFF
+        Print "      PWM      "
+        Locate 1,0
+        Print "Duty Cycle    0%"        
+        labState = RUNNING     
+        HPWM 1, 40, 0
+    end if
+
+    if labState = RUNNING Then
+        adcResult = ReadAD ( AN0 )
+        //Only update if the ADC changes.. stops LCD flashing as the ADC has to change by a value of 2 or greater.
+        if ABS( adcResult- oldadcResult ) > 1 then 
+            HPWM 1, 40, adcResult
+            oldadcResult = adcResult
+            // Display the result on the LCD
+            Locate 1,0
+            Print "Duty Cycle     %"
+            Locate 1,12
+            Print leftpad( str(adcResult*100/255), 3, " " )
+        end if
+    end if
+
+    if switchEvent = 1 Then
+        labState = NOT_RUNNING
+        HPWMOff
+    end If
+
+End Sub
+
+Sub Timer_1
+
+    /*
+    LEDs D6, D7 and D8 light in turn every 500 milliseconds. Once D8 is lit, D6 lights up and the pattern
+    repeats. The LCD displays “TIMER1” on the first line and “Time = xxx secs” on the second line
+    where xxx indicates a value between 0 and 100 corresponding to the time since TIMER1 started
+    incrementing. A 1-second increment is equivalent to two LED shifts. When the display reaches 100,
+    it will reset to 0 and the counting goes on.
+    */
+
+
+    #define FLAG_COUNTER_MAX    2       // 0.5 seconds delay
+    #define SHIFT_COUNTER_MAX   2       // 1 second delay
+    #define TIME_COUNT_MIN      0       // seconds
+    #define TIME_COUNT_MAX      100     // seconds
+
+    Dim LEDState
+    Dim adcResult as Word
+    Dim flagCounter, timeCount, shiftCounter as Byte
+    if labState = NOT_RUNNING Then
+        // Begin with D6 high
+        PORTB = PORTB AND 0xF1
+        LED_D6 = 1
+        activeLedNum = 6
+        Locate 0,0
+        Print "    Timer 1    "
+        Locate 1,0
+        Print "  Start Timer   "
+
+        flagCounter = 0
+        timeCount = 0
+        shiftCounter = 0
+        
+        wait 100 ms
+        InitTimer1 OSC, PS1_8
+        SetTimer 1, 0x0BDC
+        StartTimer 1
+
+        labState = RUNNING                                      
+    end if
+
+    if labState = RUNNING Then
+
+        // check if  overflow has occurred by checking the TMRIF bit
+        if TMR1IF = 1 then 
+            // Clear the  event flag
+            TMR1IF = 0
+            flagCounter++
+        End If
+
+        // If the second overflow occurs (0.5s delay)
+        if flagCounter = FLAG_COUNTER_MAX Then
+
+            // Get the bits with the LEDs
+            LEDState = PORTB AND 0x0E
+            Set C Off
+            Rotate LEDState Left
+            // Set the bits with the LEDs leaving the upper bits as-was.
+            LATB = ( PORTB AND 0xF1 ) OR LEDState
+        
+            activeLedNum++       
+            // If the last LED (D8) is lit, go back to the first LED (D6)
+            if activeLedNum > 8 then
+                LED_D6 = 1
+                activeLedNum = 6
+            end if
+
+            flagCounter = 0
+            shiftCounter++
+
+        End If
+
+        if shiftCounter = SHIFT_COUNTER_MAX Then
+            // Display value ON on the LCD
+            Locate 1, 0 
+            Print "Time =     secs"
+            Locate 1,7
+            Print LeftPad( str(timeCount), 3, " " )
+            
+            shiftCounter = 0
+            timeCount++
+
+        end if
+
+        if timeCount > TIME_COUNT_MAX Then
+            timeCount = TIME_COUNT_MIN
+        end if                              
+
+    end if
+
+    if switchEvent = 1 Then
+        StopTimer 1
+        labState = NOT_RUNNING
+    End If
+
+End Sub
+
+Sub Interrupts
+
+    /*
+    Light on LEDs D6, D7 and D8 rotate at a constant speed and pressing switch S1 reverses the
+    direction of rotation. The LCD displays “Interrupt” on the first line and “Direction = x” on the second
+    line, where x can either be “Left” or “Right” depending upon the direction of rotation.
+    */
+
+    Dim LEDState
+    Dim rotateCounter, rotateDirection as Bit
+
+    if labState = NOT_RUNNING Then
+        // Begin with D6 high
+        PORTB = PORTB AND 0xF1
+        LED_D6 = 1
+        activeLedNum = 6
+        Locate 0,0
+
+        rotateDirection = RIGHTDIRECTION
+        rotateCounter = 6
+
+        Print "   Interrupt    "
+        Locate 1,0
+        Print "Direction: Right"
+
+        // Set up interrupt handlers
+        On Interrupt Timer0Overflow Call Lab_Timer0_ISR
+
+        // Set up the timer.  This required PreScaler and PostScaler.  See the HELP for explaination.
+        InitTimer0 Osc, PRE0_4096 + TMR0_FOSC4 ,  POST0_1
+        StartTimer 0
+
+        labState = RUNNING                                      
+    end if
+
+    if labState = RUNNING Then
+
+        if checkButtonS1 = 0 Then
+            rotateDirection = !rotateDirection
+            if rotateDirection = RIGHTDIRECTION then
+                Locate 1,0
+                Print "Direction: Right"
+            else 
+                Locate 1,0
+                Print "Direction: Left "
+            end if
+
+            wait while checkButtonS1 = 0
+
+        end If
+    end if
+
+    if switchEvent = 1 Then
+        On Interrupt Timer0Overflow Ignore
+        StopTimer 0
+        DIR LED_D5 OUT
+        labState = NOT_RUNNING
+    End If
+
+End Sub
+
+sub Lab_Timer0_ISR
+
+    /*
+    Supporting ISR routine, see the assiociated lab
+    */
+
+    Dir LED_D6          Out
+    Dir LED_D7          Out
+    Dir LED_D8          Out
+
+    // Rotate LEDs: Get the Bits with the LEDs
+    LEDState = PORTB AND 0x0E
+    if rotateDirection = RIGHTDIRECTION Then
+        Set C Off
+        Rotate LEDState Left
+        // Set the Bits with the LEDs leaving the upper bits as-was.
+        LATB = ( PORTB AND 0xF1 ) OR LEDState
+        activeLedNum++       
+        // If the last LED (D8) is lit, go back to the first LED (D6)
+        if activeLedNum > 8 then
+            LED_D6 = 1
+            activeLedNum = 6
+        end if
+    else 
+        Set C Off
+        Rotate LEDState RIGHT
+        // Set the Bits with the LEDs leaving the upper bits as-was.
+        LATB = ( PORTB AND 0xF1 ) OR LEDState
+        activeLedNum--       
+        // If the last LED (D6) is lit, go back to the first LED (D8)
+        if activeLedNum < 6 then
+            LED_D8 = 1
+            activeLedNum = 8
+        end if
+    End If
+End Sub
+
+Sub SleepWakeUp
+
+    /*
+    Upon entering this lab, a countdown timer will be displayed on the LCD and the device will be put
+    into Sleep after 5 seconds. The device will then wake up after 8 seconds and the LCD will display
+    “I’m now awake!” on the second line.
+    */
+
+    Dim wdtTimer, counterloop as Byte
+    Dim OSCState as Byte Alias counterloop
+    #define COUNTDOWN_MAX   5           // seconds
+
+    if labState = NOT_RUNNING Then
+        Locate 0,0
+        LEDS_OFF
+        LED_D7 = 1
+        Print " Sleep/Wake Up  "
+
+        // WDR enable
+        SWDTEN = 1
+
+        wdtTimer = COUNTDOWN_MAX
+        for counterloop = 0 to COUNTDOWN_MAX - 1
+            Locate 1,0
+            Print " Sleeping in    "
+            Locate 1,13
+            Print wdtTimer
+            wdtTimer--
+            // Permits exiting by pressing S2
+            Repeat 100   // wait 1 s 100ms * 10
+                wait 10 ms
+                checkButtonS2
+                if switchEvent = 1 Then
+                        Locate 1,0
+                        Print "             "
+                    Exit Sub
+                End If
+            End Repeat            
+        next
+
+        Locate 1,0
+        Print "Wait for 8 secs "
+        
+        // Switch back to external clock after sleeping
+        OSCState = OSCCON1
+
+        SLEEP
+
+        //  Restore operational state
+        OSCFIF = 0
+        OSCCON1 = OSCState
+        
+        labState = RUNNING                                      
+    end if    
+
+    if labState = RUNNING Then
+        // Wait for 8s for the WDT time-out; and the LEDs will toggle
+        LED_D7 = 0   
+        LED_D6 = LED_D8 = 1
+        
+        Locate 1,0
+        Print " I'm now awake! "
+
+        //Disable WDT
+        SWDTEN = 0         
+    end if
+
+    if switchEvent = 1 Then
+        labState = NOT_RUNNING
+    End If
+
+
+End Sub
+
+Sub EEPROM
+
+    /*
+    Press the switch to show the ADC reading on the LCD and save it to the on-chip Data EEPROM.
+    The LCD displays “EEPROM” on the first line and “Value = x” on the second line, where x
+    corresponds to the saved ADC result in the EEPROM. 
+    */
+
+    #DEFINE EEPROM_ADDR     0x80
+
+    Dim flagCounter, adcResult as  Byte
+    #define EEPROM_FLAG_COUNTER_MAX  6  // Maximum flag count to create 1.5 seconds delay
+
+    if labState = NOT_RUNNING Then
+        flagCounter = 0
+        CLS
+        LEDS_OFF
+        Print "     EEPROM        "
+        InitTimer1 FOSC4 , PS1_4
+        Settimer 1, 0x0BDC
+        TMR1IF = 0
+        StartTimer 1
+        On Interrupt Timer1Overflow Call EEPROM_ISR
+        labState = RUNNING    
+    end if    
+
+    if labState = RUNNING Then
+
+        If flagCounter = 0 Then
+
+            EPRead ( EEPROM_ADDR, adcResult )
+            locate 0,0
+            Print " ADC Result =   "
+            locate 1,0
+            Print "EEPROM "
+            Locate 1,11
+            Print leftpad( str(adcResult), 4, " " )
+
+            //Now show on LEDS
+            //Get the top 3 MSBs (Shift LEFT), then *2 ( Shift Right) and display these on the LEDs
+            adcResult = (FnLSR ( adcResult, 7)) * 2
+            PortB = ( PortB and 0xF1) OR adcResult 
+
+        end if
+    end if
+
+    if switchEvent = 1 Then
+        StopTimer 1
+        labState = NOT_RUNNING
+    End If
+
+End Sub
+
+Sub EEPROM_ISR
+
+    /*
+    Supporting ISR routine, see the assiociated lab
+    */
+
+    wait 20 ms
+
+    flagCounter++
+    
+    if flagCounter = EEPROM_FLAG_COUNTER_MAX Then
+        // Toggle the LED and write the ADC value to EEPROM
+        LED_D8 = !LED_D8
+        EPWrite (  EEPROM_ADDR, ReadAD(AN0) )
+        flagCounter = 0
+    end if
+
+    // Clear the interrupt flag
+    TMR1IF = 0
+    // Reset the timer
+    StopTimer 1
+    Settimer 1, 0x0BDC
+    StartTimer 1
+
+End Sub
+
+Function checkButtonS1 as Bit
+
+        // Toggle the port to Input/High to cater for the attached LED and the Switch - this action is specific to the 18F67K40 in the Explorer 8 board where the S1 is also tied to the LED5.
+        // This action sets the port in a state where the S1 switch state can read.
+        // Typically not required
+        DIR SWITCH_S1_PORT OUT
+        SWITCH_S1_PORT = 1
+        DIR SWITCH_S1_PORT IN
+        SWITCH_S1_PORT = 1
+
+        // The Switch is normally tied to VDD ...when it is pressed, the switch port is connected to GND
+        // Return the value
+        checkButtonS1 = SWITCH_S1_PORT
+
+End Function
+
+Sub checkButtonS2
+
+    if btnState = NOT_PRESSED Then
+        if SWITCH_S2_PORT = 0 Then  
+            wait 100 ms
+            btnState = PRESSED
+        end If
+    else if SWITCH_S2_PORT = 1 Then
+            btnState = NOT_PRESSED
+            switchEvent = 1                                                   
+    end if
+
+End Sub
+
+Sub nextLab
+    
+    switchEvent = 0
+    labNumber++                                                        
+
+    if labNumber > MAX_LABS then labNumber = 1
+    
+End Sub
+
+
