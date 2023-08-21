@@ -20,7 +20,7 @@ Dir PORTB Out
 Dim Tablepos, TimerDelayVariable As Byte
 
 
-' ----- Main body of program commences here.
+// ----- Main body of program commences here.
 
 Do
 

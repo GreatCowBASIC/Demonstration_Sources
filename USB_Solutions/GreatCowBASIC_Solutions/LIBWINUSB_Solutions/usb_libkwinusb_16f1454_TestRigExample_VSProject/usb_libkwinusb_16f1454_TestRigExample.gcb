@@ -106,7 +106,7 @@
         Dir INPUT3            IN
         Dir INPUT4            IN
 
-        ' ----- Main body of program commences here
+        // ----- Main body of program commences here
         Do
               'Do nothing just wait for the USB Interrupt
               'Do not sleep the MCU!!

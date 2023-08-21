@@ -29,7 +29,7 @@
 '  #chip LGT8F328P        'Uncomment to simply use the LGT chipset
 
 
-' ----- Main body of program commences here.
+// ----- Main body of program commences here.
 Do Forever
 
     'Lighten Arduinos onboard LED for 100 milliseconds

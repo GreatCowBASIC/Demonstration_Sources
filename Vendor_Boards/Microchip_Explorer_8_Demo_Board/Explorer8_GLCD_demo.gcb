@@ -1,0 +1,192 @@
+/*
+    A demonstration program for GCGB and GCB.
+    --------------------------------------------------------------------------------
+
+    The program us designed for Microchip’s Explorer 8 Development Board. The Explorer 8 Development board supports 8/14/20/28/40-pin 8-bit PIC microcontrollers as well as up to 80-pin PIMmounted devices. 
+    The demos included in this document are developed for high pin count devices (64 pin). 
+    
+    GCBASIC for these devices can be downloaded from the GCBASIC web site at https://sourceforge.net/projects/gcbasic/
+
+    This program comprises of a GLCD demonstration for the SSD1306 I2C GLCD.  You can use hardare or software.  Just comment out the block of configuration code.
+    
+    All labs are written in GCBASIC language and are compatible with the latest GCBASIC compilers.
+
+*/
+'''@author    Evan R. Venn   
+'''@license   GPL
+'''@version   1.00   
+'''@date      2023-08-20
+'''********************************************************************************
+
+' ----- Configuration
+#CHIP 18F67K40, 8
+#option Explicit
+
+#STARTUP InitPPS, 85
+    Sub InitPPS
+
+        #ifdef HI2C_DATA
+            SSP1CLKPPS = 0x13;   //RC3->MSSP1:SCL1;    
+            RC3PPS = 0x19;   //RC3->MSSP1:SCL1;    
+            RC4PPS = 0x1A;   //RC4->MSSP1:SDA1;    
+            SSP1DATPPS = 0x14;   //RC4->MSSP1:SDA1;
+        #endif
+
+    End Sub
+//  To use hardware I2C uncomment the following
+    // #DEFINE HI2C_BAUD_RATE 100
+    // #DEFINE HI2C_DATA PORTC.4
+    // #DEFINE HI2C_CLOCK PORTC.3
+    // // Set the port direction
+    // Dir HI2C_DATA In
+    // Dir HI2C_CLOCK In
+    // HI2CMode (Master)
+
+		#define I2CPreSendMacro     myI2CSend: exit sub
+
+
+        sub myI2CSend
+            // your i2C handler
+        end sub
+
+// To use software I2C uncomment the following
+    #define I2C_MODE Master
+    #define I2C_DATA PORTC.4
+    #define I2C_CLOCK PORTC.3
+    #define I2C_BIT_DELAY 1 us
+    #define I2C_CLOCK_DELAY 1 us
+
+// A script to ensure the configusation is only one of the I2C options
+#script
+    DemoSetupErrorScript = 0
+    if DEF(HI2C_DATA) then 
+        DemoSetupErrorScript = DemoSetupErrorScript + 1
+    end if
+    if DEF(I2C_DATA) Then
+        DemoSetupErrorScript = DemoSetupErrorScript + 1
+    end if
+    if DemoSetupErrorScript = 2 then
+        error Select_only_hardware_or_software_I2C.. not_both
+    end if
+
+#endscript
+
+// ----- Main body of program commences here.
+
+    #INCLUDE <trig2places.h>
+
+    #INCLUDE <glcd.h>
+    #DEFINE GLCD_TYPE GLCD_TYPE_SSD1306
+    #DEFINE GLCD_I2C_Address 0x78
+    #DEFINE  GLCDDIRECTION GLCDXYFLIP 
+
+    GLCD_Meter_Init
+
+
+    Do Forever
+
+        GLCD_Meter_Update
+
+    Loop
+
+
+Sub GLCD_Meter_Init
+
+    Dim radius,xcentre,ycentre,xend,old_xend,yend,old_yend As Byte
+    Dim angle,old_angle,adcval As Word
+    Dim volts As String * 4
+
+    xcentre=63
+    ycentre=58
+    'draw dial
+    GLCDCLS
+    Box 0,0,127,63
+    For radius=144 To 141 step -1
+        dial
+    Next radius
+    GLCDDrawChar (5,40,Asc("0")):GLCDDrawChar (115,40,Asc("5"))
+    radius=120
+    angle=1
+    anglecheck
+
+End Sub
+
+Sub GLCD_Meter_Update
+
+    Dim radius,xcentre,ycentre,xend,old_xend,yend,old_yend As Byte
+    Dim angle,old_angle,adcval As Word
+    Dim volts As String * 4
+
+    old_angle=angle
+    '--- DVM
+    adcval=ReadAD(AN0)
+    angle=adcval/2
+    '
+    adcval=adcval*100
+    adcval=adcval/51
+    volts=Str(adcval)
+    If adcval<10 Then
+        volts="0.0"+Left(volts,1,1)
+        Goto volt_format_done
+    End If
+    If adcval<100 Then
+        volts="0."+Mid(volts,1,2)
+    Else
+        volts=Left(volts,1,1)+"."+Mid(volts,2,2)
+    End If
+volt_format_done:
+    '---
+    anglecheck
+    old_xend = xcentre + radius  * sin (old_angle)/255
+    old_yend = ycentre - radius  * cos(old_angle)/255
+    xend = xcentre + radius  * sin(angle)/255
+    yend = ycentre - radius  * cos(angle)/255
+    If old_angle<>angle Then
+        '-- update screen if volts has changed
+        '   erase old needle
+
+        Line (xcentre,ycentre,old_xend,old_yend,0)
+        '   draw V
+        Line (55,22,63,38):Line (63,38,71,22)
+        '   print new voltage
+        'print Voltage
+        GLCDPrint (50,10,volts,1)
+        '   draw new needle
+        Line (xcentre,ycentre,xend,yend,1)
+        Wait 20 ms
+    End If
+End Sub
+
+    Sub plotdial
+
+        Dim angle As Word
+
+        xend = 63 + radius  * sin (angle)/255
+        yend = 58 - radius  * cos (angle)/255
+        Pset (xend,yend,1)
+    End Sub
+    '
+    Sub dial
+
+        Dim angle As Word
+
+        For angle= 296 To 359
+            plotdial
+        Next angle
+        '
+        For angle= 0 To 63
+            plotdial
+        Next angle
+    End Sub
+    '
+    Sub anglecheck
+
+        Dim angle As Word
+
+        If angle>127 Then
+            angle =angle-127
+        Else
+            angle =296+angle
+        End If
+    End Sub
+

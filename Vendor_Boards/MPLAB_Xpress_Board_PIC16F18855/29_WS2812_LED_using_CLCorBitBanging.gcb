@@ -180,7 +180,7 @@ SwitchState = SWITCH_UP
 Dim CurrentAddessedLED, CurrentLEDColorSequence As Byte
 Dim ColortoSend, ColorofLED As Long
 
-' ----- Main body of program commences here.
+// ----- Main body of program commences here.
 
 MainCode:
 

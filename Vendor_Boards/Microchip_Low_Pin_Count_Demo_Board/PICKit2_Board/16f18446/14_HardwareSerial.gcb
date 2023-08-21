@@ -29,7 +29,7 @@ Wait 100 ms
 ' ----- Variables
 Dim INCHAR As Byte
 
-' ----- Main body of program commences here.
+// ----- Main body of program commences here.
 'Message after reset
 HSerPrintStringCRLF "Hello World!"
 

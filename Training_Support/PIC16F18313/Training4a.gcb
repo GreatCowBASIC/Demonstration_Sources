@@ -18,7 +18,7 @@
   'Declare or dimensiona a Byte variable to store the ADC value
   Dim ADCValue as Byte
 
-  ' ----- Main body of program commences here.
+  // ----- Main body of program commences here.
   Do Forever
 
     'ReadAD return a byte value of 0 to 255

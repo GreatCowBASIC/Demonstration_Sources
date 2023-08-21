@@ -63,7 +63,7 @@
     Dir     SWITCHIN      In
 
     
-' ----- Main body of program commences here.
+// ----- Main body of program commences here.
 
 // Set this the constant to your desired USART command, HERSEND, Ser1Send, Ser2Send or Ser3Send
 #DEFINE DATAVISUALIZERSERIALCOMMAND     HSerSend

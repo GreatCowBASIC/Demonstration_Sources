@@ -118,7 +118,7 @@ Dir PORTB.1 Out
 Dir PORTB.5 Out
 Dir PORTB.0 In
 
-' ----- Main program
+// ----- Main program
 
 #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
     GLCD_Open_PageTransaction 0,3

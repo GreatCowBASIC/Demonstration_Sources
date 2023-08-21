@@ -64,7 +64,7 @@ Dim DISPLAYNEWLINE As Byte
 Dim DeviceID As Byte
 
 
-' ----- Main body of program commences here.
+// ----- Main body of program commences here.
 ' Now assumes Serial Terminal is operational
 
 Do Forever

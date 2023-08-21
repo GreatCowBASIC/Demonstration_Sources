@@ -64,19 +64,17 @@
                     RC6PPS = 0x000C    'TX1 > RC6
                 #endif
 
-                #ifdef HARDWAREMSSP1
-                    // This is conditional to support Software SPI
+                #ifdef LCD_HARDWARESPI
+                    // This is conditional to support Hardware SPI
                     SSP1CLKPPS = 0x13;   //RC3->MSSP1:SCK1;    
                     RC3PPS = 0x19;   //RC3->MSSP1:SCK1;    
                     RC5PPS = 0x1A;   //RC5->MSSP1:SDO1;    
-                    SSP1DATPPS = 0x14;   //RC4->MSSP1:SDI1;
-
-                    RC4PPS = 0x001A    'SDA1 > RC4
-
+                    SSP1DATPPS = 0x14;   //RC4->MSSP1:SDI1;  
                 #endif
 
-                #ifdef GLCD_HARDWARE
-                #endif
+
+                Dir LCD_SPI_DO      In
+                Dir LCD_SPI_SCK     In
 
                 'Module: CCP1
                 RC2PPS = 0x0005    'CCP1 > RC2
@@ -96,11 +94,11 @@
 
     //Constants - LCD connectivity type;controls whether to use HW SPI; The inter character delay
     #define LCD_IO 14
-        #define HARDWAREMSSP1
+        #define LCD_HARDWARESPI
         #define LCD_SPEED FAST
         #define HWSPIMODE MASTERFAST
         //These are phyiscal connections from the expander to the LCD.  These are automatically set in the library and are shown here purely for clarity.
-            #define     LCD_SPI_EXPD_ADDRESS        0x40
+            #define LCD_SPI_EXPD_ADDRESS            0x40
             #define LCD_SPI_EXPANDER_E_ADDRESS      0x40     // GPA6 on the expander
             #define LCD_SPI_EXPANDER_RS_ADDRESS     0x80     // GPA7 on the expander   
 
@@ -112,6 +110,20 @@
             // #define LCD_SPI_RESET_IN       portb.5
             #define LCD_SPI_RESET_OUT      portb.5
 
+
+;-------Lab Constants
+        #define     Lab_HelloWorld      1
+        #define     Lab_Blink           2
+        #define     Lab_RotateLEDs      3
+        #define     Lab_ADC             4
+        #define     Lab_VSR             5
+        #define     Lab_Debounce        6
+        #define     Lab_PWM             7
+        #define     Lab_Timer_1         8
+        #define     Lab_Interrupts      9
+        #define     Lab_SleepWakeUp     10
+        #define     Lab_EEPROM          11
+        #define     Lab_GLCD            12
 
 ; ----- Main body of program commences here.
 
@@ -143,7 +155,10 @@
         Dir CCPPWM_D1       Out
         Dir CCPPWM_D2       Out
         Dir CCPPWM_D3       Out
-        
+        // Ensure SPI_Expander Ports are outputs.  These WILL have been changed during the INIT phase of the chip.
+        Dir LCD_SPI_DO      Out: LCD_SPI_DO     = 0
+        Dir LCD_SPI_SCK     Out: LCD_SPI_SCK    = 0
+        INITLCD        
 
     // Common macro and constants
         #define LEDS_OFF            LED_D8=0:LED_D7=0:LED_D6=0:LED_D5=0:LED_D4=0:LED_D3=0:LED_D2=0:LED_D1=0
@@ -157,15 +172,27 @@
 
 
     // Variable Definitions
-        Dim labNumber as Byte:          labNumber = 11               
+        Dim labNumber as Byte:          labNumber   = 0               
         Dim switchEvent as Byte:        switchEvent = 0
         Dim labState as Byte:           labState = NOT_RUNNING
         Dim btnState as Byte:           btnState = NOT_PRESSED
         Dim activeLedNum as Byte
+        Dim LabI2CState as Bit:         LabI2CState = 0
 
     Print "    Welcome     "
     Locate 1,0
     Print "  to Explorer 8 "
+    wait 1 s
+    CLS
+    Print "    GCBASIC     "
+    Locate 1,0
+    Print " Anobium   2023 "
+    wait 5 s
+    CLS
+    Print "    Welcome     "
+    Locate 1,0
+    Print "  to Explorer 8 "
+
 
     Do Forever
 
@@ -173,21 +200,22 @@
         checkButtonS2
         // Select labnumber
         Select Case labNumber
-            case 1:     HelloWorld
-            case 2:     Blink
-            case 3:     RotateLEDs
-            case 4:     ADC
-            case 5:     VSR
-            case 6:     Debounce
-            case 7:     PWM
-            case 8:     Timer_1
-            case 9:     Interrupts
-            case 10:    SleepWakeUp
-            case 11:    EEPROM
-            case 12:    GLCD
+            case Lab_HelloWorld:    HelloWorld
+            case Lab_Blink:         Blink
+            case Lab_RotateLEDs:    RotateLEDs
+            case Lab_ADC:           ADC
+            case Lab_VSR:           VSR
+            case Lab_Debounce:      Debounce
+            case Lab_PWM:           PWM
+            case Lab_Timer_1:       Timer_1
+            case Lab_Interrupts:    Interrupts
+            case Lab_SleepWakeUp:   SleepWakeUp
+            case Lab_EEPROM:        EEPROM
+            case Lab_GLCD:          GLCD
         End Select
-        // Change lab
+        
         if switchEvent = 1 then
+            // Change lab
             nextLab
         End if     
 
@@ -788,9 +816,6 @@ Sub SleepWakeUp
         LED_D7 = 1
         Print " Sleep/Wake Up  "
 
-        // WDR enable
-        SWDTEN = 1
-
         wdtTimer = COUNTDOWN_MAX
         for counterloop = 0 to COUNTDOWN_MAX - 1
             Locate 1,0
@@ -812,7 +837,8 @@ Sub SleepWakeUp
 
         Locate 1,0
         Print "Wait for 8 secs "
-        
+        // WDR enable
+        SWDTEN = 1        
         // Switch back to external clock after sleeping
         OSCState = OSCCON1
 
@@ -928,48 +954,61 @@ Sub GLCD
     /* 
     */
 
+    // Prefix I2CSend() operations using the I2CPreSendMacro to ensure GLCD operations only operate within this lab number.
+    // Setting LabI2CState = True will exit I2CSend().
+    #define I2CPreSendMacro if LabI2CState <> True then exit Sub  'I2CPreSendMacro to ensure GLCD operations only operate within specfic lab
+    
+
     if labState = NOT_RUNNING Then
 
         CLS
         LEDS_OFF
         Print "     GLCD        "
-
+        wait 500 ms
         #INCLUDE <trig2places.h>
 
-        // Define I2C settings
-        #DEFINE HI2C_BAUD_RATE 100
-        #DEFINE HI2C_DATA PORTC.4
-        #DEFINE HI2C_CLOCK PORTC.3
+        Dim LabI2CState as Bit
+        LabI2CState = True
+        // Use I2C settings to ensure the PIC hardware is not a constraint
+            #define I2C_MODE Master
+            #define I2C_DATA PORTC.4
+            #define I2C_CLOCK PORTC.3
+            #define I2C_BIT_DELAY 1 us
+            #define I2C_CLOCK_DELAY 1 us
+            // Reset the PPS to ensure the program can use the ports
+            RC3PPS = 0
+            RC4PPS = 0
 
-        Dir HI2C_DATA   In
-        Dir HI2C_CLOCK  In
-        #ifdef HARDWAREMSSP1
-
-        #else
-            // Software GLCD
-            !!
-        #endif
         #INCLUDE <glcd.h>
         #DEFINE GLCD_TYPE GLCD_TYPE_SSD1306
         #DEFINE GLCD_I2C_Address 0x78
         'These constants allow you to change the GLCD memory usage.
         #DEFINE GLCD_PROTECTOVERRUN
-
+        
+        // Need to initialise the I2C and SSD1306 here, as the automatic init will have been when the chip started... and, the I2C was not operational
+        INITI2C
+        INITGLCD_SSD1306
+        // Setup the voltmeter
         GLCD_Meter_Init
 
         labState = RUNNING    
     end if    
 
     if labState = RUNNING Then
+        // Update the voltmeter
         GLCD_Meter_Update
     end if
 
     if switchEvent = 1 Then
         GLCDCLS
-        GLCDPrint 2, 10, "GCGBASIC GLCD"
-        // Restore LCD support
+        GLCDPrint 2, 10, "GCBASIC GLCD"
+        // This will disable I2CSend(), see the macro above
+        LabI2CState = False
+        // Restore LCD support by setting the ports and calling the init routines
         Dir LCD_SPI_DO  Out
         Dir LCD_SPI_SCK Out
+        InitPPS
+        INITLCD
         labState = NOT_RUNNING
     End If
 
@@ -1020,7 +1059,7 @@ Sub GLCD_Meter_Update
     Else
         volts=Left(volts,1,1)+"."+Mid(volts,2,2)
     End If
-volt_format_done:
+    volt_format_done:
     '---
     anglecheck
     old_xend = xcentre + radius  * sin (old_angle)/255
@@ -1043,38 +1082,38 @@ volt_format_done:
     End If
 End Sub
 
-    Sub plotdial
+Sub plotdial
 
-        Dim angle As Word
+    Dim angle As Word
 
-        xend = 63 + radius  * sin (angle)/255
-        yend = 58 - radius  * cos (angle)/255
-        Pset (xend,yend,1)
-    End Sub
+    xend = 63 + radius  * sin (angle)/255
+    yend = 58 - radius  * cos (angle)/255
+    Pset (xend,yend,1)
+End Sub
+'
+Sub dial
+
+    Dim angle As Word
+
+    For angle= 296 To 359
+        plotdial
+    Next angle
     '
-    Sub dial
+    For angle= 0 To 63
+        plotdial
+    Next angle
+End Sub
+'
+Sub anglecheck
 
-        Dim angle As Word
+    Dim angle As Word
 
-        For angle= 296 To 359
-            plotdial
-        Next angle
-        '
-        For angle= 0 To 63
-            plotdial
-        Next angle
-    End Sub
-    '
-    Sub anglecheck
-
-        Dim angle As Word
-
-        If angle>127 Then
-            angle =angle-127
-        Else
-            angle =296+angle
-        End If
-    End Sub
+    If angle>127 Then
+        angle =angle-127
+    Else
+        angle =296+angle
+    End If
+End Sub
 
 
 Function checkButtonS1 as Bit
@@ -1115,5 +1154,6 @@ Sub nextLab
     if labNumber > MAX_LABS then labNumber = 1
     
 End Sub
+
 
 

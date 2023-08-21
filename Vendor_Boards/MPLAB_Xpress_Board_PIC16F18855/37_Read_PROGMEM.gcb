@@ -70,7 +70,7 @@ Dir SWITCH                  In
 '[todo]
 
 
-' ----- Main body of program commences here.
+// ----- Main body of program commences here.
 
 HSerPrintCRLF
 HSerPrint  ChipNameStr + " GCBASIC Demo"

@@ -38,7 +38,7 @@ Dim TempC_100 As Word
 Dim CCOUNT, SIGNBIT, WHOLE, FRACT, DIG As Byte
 
 
-' ----- Main body of program commences here.
+// ----- Main body of program commences here.
 
 ccount = 0
 CLS

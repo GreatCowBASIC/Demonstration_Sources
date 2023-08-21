@@ -36,7 +36,7 @@
     #define USART_DELAY 0
 
 
-' ----- Main program
+// ----- Main program
 
 
 '   Ensure this CONSTANTS SHOULD BE CORRECT and they match for Nextion project components in the tutorial... but, bect check

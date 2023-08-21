@@ -114,7 +114,7 @@ Dim outstring As String
 wordNumber = 0
 byteNumber = 0
 
-' ----- Main program
+// ----- Main program
 
 GLCDPrint 0, 0,   "Great Cow BASIC"
 GLCDPrint (0, 16, "Anobium 2017")

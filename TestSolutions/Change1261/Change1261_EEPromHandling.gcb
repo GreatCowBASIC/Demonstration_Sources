@@ -1,0 +1,45 @@
+'''A demonstration program for GCGB and GCB.
+'''--------------------------------------------------------------------------------------------------------------------------------
+
+#chip 12F629      'Velocit� in Mhz oscillatore interno
+#config INTRC_OSC_NOCLKOUT, WDT_OFF, MCLR_Off, BOD_on, PWRT_on
+#option explicit  'dichiarazione variabile obbligatoria
+
+/*
+' -- 30uS =0   60uS =1  uSecondi X 10   Lcode= 0b0011001100110011001101001  25bit
+  -- START = LOW 104mS
+*/
+TABLE code0 Store data
+    1,2,3,4
+End Table
+Table code1 Store data
+    5,6,7,8
+End Table 
+Table code2 Store data
+    "1234"
+End Table
+
+
+dim XVars0,XVars1, XVars       as byte
+
+
+XVars0=0x30
+XVars1= 1:ReadTable  code0,XVars1,XVars:epwrite XVars0,XVars:XVars0 ++
+XVars1 ++:ReadTable  code0,XVars1,XVars:epwrite XVars0,XVars:XVars0 ++
+XVars1 ++:ReadTable  code0,XVars1,XVars:epwrite XVars0,XVars:XVars0 ++
+XVars1 ++:ReadTable  code0,XVars1,XVars:epwrite XVars0,XVars:XVars0 ++
+
+XVars0=0X40
+XVars1= 1:ReadTable  code1,XVars1,XVars:epwrite XVars0,XVars:XVars0 ++
+XVars1 ++:ReadTable  code1,XVars1,XVars:epwrite XVars0,XVars:XVars0 ++
+XVars1 ++:ReadTable  code1,XVars1,XVars:epwrite XVars0,XVars:XVars0 ++
+XVars1 ++:ReadTable  code1,XVars1,XVars:epwrite XVars0,XVars:XVars0 ++
+
+XVars0=0x50
+XVars1= 1:ReadTable  code2,XVars1,XVars:epwrite XVars0,XVars:XVars0 ++
+XVars1 ++:ReadTable  code2,XVars1,XVars:epwrite XVars0,XVars:XVars0 ++
+XVars1 ++:ReadTable  code2,XVars1,XVars:epwrite XVars0,XVars:XVars0 ++
+XVars1 ++:ReadTable  code2,XVars1,XVars:epwrite XVars0,XVars:XVars0 ++
+
+do
+loop

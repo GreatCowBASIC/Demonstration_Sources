@@ -26,7 +26,7 @@ Dir PORTB.0 Out
 '----- Variables
 Dim PWMCOUNT, PWMLEVEL As Byte
 
-' ----- Main body of program commences here.
+// ----- Main body of program commences here.
 Main:
 ' Get value of the Pot connected to 0
 ' You can use 0 [zero], or ADC0 or ANO they are mapped to the correct analog port.

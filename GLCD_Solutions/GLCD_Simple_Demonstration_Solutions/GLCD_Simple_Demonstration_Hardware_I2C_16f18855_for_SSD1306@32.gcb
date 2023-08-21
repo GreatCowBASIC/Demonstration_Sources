@@ -83,7 +83,7 @@ Dim outstring As String
 wordNumber = 0
 byteNumber = 0
 
-' ----- Main program
+// ----- Main program
 
 #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
     GLCD_Open_PageTransaction 0,7

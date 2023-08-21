@@ -61,7 +61,7 @@ Dim YPOS, OLDDSDATA, XPOS, EIGHTBYTES, CLOCKS, SYSINTSTATESAVE0 As Byte
 ' 8-BIT CRC      48-BIT SERIAL NUMBER          8-BIT FAMILY CODE (28h)
 ' MSB  LSB       MSB              LSB          MSB                 LSB
 
-' ----- Main body of program commences here.
+// ----- Main body of program commences here.
 
 'Note: there is NO On Interrupt handler
 'This flashes the Boards LEDs only... just for show

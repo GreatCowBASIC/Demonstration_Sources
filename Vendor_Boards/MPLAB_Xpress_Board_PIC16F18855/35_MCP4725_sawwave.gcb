@@ -68,7 +68,7 @@ Dir hi2c_DATA In
 Dir hi2c_CLOCK In
 HI2CMode Master
 
-' ----- Main body of program commences here.
+// ----- Main body of program commences here.
 ' Now assumes Serial Terminal is operational
 
   #Define MCP4725Device 0XC0

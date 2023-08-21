@@ -7,7 +7,7 @@
   RA1 = 0
   RA2 = 1
 
-  ' ----- Main body of program commences here.
+  // ----- Main body of program commences here.
   Do Forever
 
     wait 1 s

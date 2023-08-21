@@ -64,7 +64,7 @@ Dir     LEDD5 Out
 ' ----- Variables
 Dim INC_VAL_U, INC_VAL_H As Byte
 
-' ----- Main body of program commences here.
+// ----- Main body of program commences here.
 
 'Configure the Numerically Controlled Oscillator capabilities
 'FOSC (ChipMhz)

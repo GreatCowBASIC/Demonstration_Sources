@@ -96,7 +96,7 @@ Do Forever
     CLS
     GLCDCLS
 
-    ' ----- Main body of program commences here.
+    // ----- Main body of program commences here.
     Repeat 1
         CLS
         Print "START TEST"

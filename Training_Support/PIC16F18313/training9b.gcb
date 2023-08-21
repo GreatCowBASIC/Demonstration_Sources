@@ -49,7 +49,7 @@ STATE 5       | 1 | 0 |   | 0 | 0 |   |
   Direction = -1
 
 
-  ' ----- Main body of program commences here.
+  // ----- Main body of program commences here.
   Do Forever
 
     Select Case LEDState

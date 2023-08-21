@@ -76,7 +76,7 @@ HI2CMode Master
 '''Set LCD_10 to 10 for the YwRobot LCD1602 IIC V1 or the Sainsmart LCD_PIC I2C adapter
 '''Set LCD_10 to 12 for the Ywmjkdz I2C adapter with pot bent over top of chip
 
-' ----- Main body of program commences here.
+// ----- Main body of program commences here.
 CLS
 Print "Great Cow BASIC"
 Locate 1,0

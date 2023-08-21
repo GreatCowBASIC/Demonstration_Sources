@@ -49,7 +49,7 @@ Dim YPOS, XPOS As Byte
 
 Wait 500 ms
 
-' ----- Main body of program commences here.
+// ----- Main body of program commences here.
 
 Do Forever
 

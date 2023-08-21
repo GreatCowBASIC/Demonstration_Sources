@@ -9,7 +9,7 @@
 ''' for the ALARM1 output. If you intend to use the second output you will have to mount a second
 ''' pull up resistor yourself (a ~10K ohm resistor will do).
 '''
-''' The ALARM1 output is activated (pulled low) only when Ttherm is passed (>85°C by default).
+''' The ALARM1 output is activated (pulled low) only when Ttherm is passed (>85ï¿½C by default).
 ''' You can change this value by writing to the Therm Limit register (0x20).
 ''' Note: This is an 8-bit (integer) value.
 '''
@@ -98,7 +98,7 @@ HI2C2Mode Master
 Dim HI, LO, EMC_TEMP_H, SIGNBIT, WHOLE, FRACT, DIG, SHOWDEGREECHAR, DATA, OLDSTATUS As Byte
 showDegreeChar = FALSE
 
-' ----- Main body of program commences here.
+// ----- Main body of program commences here.
 
 HSerPrintCRLF 2
 HSerPrint "Great Cow Basic @2016": HSerPrintCRLF

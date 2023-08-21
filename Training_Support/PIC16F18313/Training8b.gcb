@@ -42,7 +42,7 @@ STATE 5       | 1 | 0 |   | 0 | 0 |   |
   Dim ADCValue as Byte
 
 
-  ' ----- Main body of program commences here.
+  // ----- Main body of program commences here.
   Do Forever
 
     ADCValue = READAD ( ANA0 )

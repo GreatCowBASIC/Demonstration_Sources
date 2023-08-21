@@ -49,7 +49,7 @@ HSerPrint "Loop Back Test Program"
 HSerPrintCRLF
 
 
-' ----- Main body of program commences here.
+// ----- Main body of program commences here.
 
 Do Forever
 

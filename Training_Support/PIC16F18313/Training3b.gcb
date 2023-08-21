@@ -10,7 +10,7 @@
   Dir SWITCH   in
 
 
-  ' ----- Main body of program commences here.
+  // ----- Main body of program commences here.
   Do Forever
 
     SetWith ( GREENLED, SWITCH )

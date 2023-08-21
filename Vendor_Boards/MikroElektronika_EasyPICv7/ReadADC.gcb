@@ -49,7 +49,7 @@
 Dim ad_val As Integer
 
 
-' ----- Main body of program commences here.
+// ----- Main body of program commences here.
 'Show start up message
 SPLASH
 Wait 1 s

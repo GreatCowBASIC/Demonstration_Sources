@@ -49,7 +49,7 @@ Dim PULSE_WIDTH As Long
 Dim PERIOD As Long
 Dim DUTY As Long
 
-' ----- Main body of program commences here.
+// ----- Main body of program commences here.
 
 'SMT1 Signal in on the switch
 Dir PORTA.5 In

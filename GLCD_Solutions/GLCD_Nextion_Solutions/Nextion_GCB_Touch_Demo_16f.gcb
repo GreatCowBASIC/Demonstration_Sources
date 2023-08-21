@@ -77,7 +77,7 @@
     End Sub
     'Template comment at the end of the config file
 
-' ----- Main program
+// ----- Main program
     wait 1 s
     ;Disable all the objects
     ;Hide or Show component on current page

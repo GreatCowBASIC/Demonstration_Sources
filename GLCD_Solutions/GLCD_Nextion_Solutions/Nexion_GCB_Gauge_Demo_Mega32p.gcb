@@ -70,7 +70,7 @@
 ' ----- End of set up for Serial
 
 
-' ----- Main program
+// ----- Main program
 
     'show front screen
     wait 3 s

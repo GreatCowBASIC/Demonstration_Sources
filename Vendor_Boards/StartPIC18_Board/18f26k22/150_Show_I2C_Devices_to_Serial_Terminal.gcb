@@ -72,7 +72,7 @@ Dir HI2C_CLOCK In
 HI2CMode Master
 
 
-' ----- Main body of program commences here.
+// ----- Main body of program commences here.
 ' Now assumes Serial Terminal is operational
 Dim DeviceID As Byte
 Dim DISPLAYNEWLINE As Byte
