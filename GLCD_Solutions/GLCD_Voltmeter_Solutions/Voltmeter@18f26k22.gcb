@@ -70,7 +70,7 @@
     #define HI2C_BAUD_RATE 400
     #define HI2C_DATA PORTC.4
     #define HI2C_CLOCK PORTC.3
-    'Initialise I2C Slave
+    'Initialise I2C
     'I2C pins need to be input for SSP module - this is not an option
     Dir HI2C_DATA in
     Dir HI2C_CLOCK in

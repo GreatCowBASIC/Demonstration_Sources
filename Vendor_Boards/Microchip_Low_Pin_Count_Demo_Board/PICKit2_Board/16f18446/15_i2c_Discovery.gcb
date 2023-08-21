@@ -45,7 +45,7 @@ Wait 500 ms
 #DEFINE HI2C_BAUD_RATE 400
 #DEFINE HI2C_DATA PORTB.4
 #DEFINE HI2C_CLOCK PORTB.6
-'Initialise I2C Slave
+'Initialise I2C
 'I2C pins need to be input for SSP module
 Dir HI2C_DATA In
 Dir HI2C_CLOCK In
