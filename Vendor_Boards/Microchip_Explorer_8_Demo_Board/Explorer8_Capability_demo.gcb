@@ -954,16 +954,18 @@ Sub GLCD
     /* 
     */
 
+    // This macro resolves the interaction of the SPI Expander interacting with the I2C GLCD.  The Explorer8 board shares the data anc clock lines and therefore there is need to prevent I2C operations until this point.  This macro does this.
     // Prefix I2CSend() operations using the I2CPreSendMacro to ensure GLCD operations only operate within this lab number.
     // Setting LabI2CState = True will exit I2CSend().
-    #define I2CPreSendMacro if LabI2CState <> True then exit Sub  'I2CPreSendMacro to ensure GLCD operations only operate within specfic lab
-    
+    #define I2CPreSendMacro if LabI2CState <> True then exit Sub  'I2CPreSendMacro to ensure GLCD operations only operate within this specfic lab
 
     if labState = NOT_RUNNING Then
 
         CLS
         LEDS_OFF
         Print "     GLCD        "
+        Locate 1, 0
+        Print "SSD1306 @ 64 Mhz"
         wait 500 ms
         #INCLUDE <trig2places.h>
 
@@ -978,6 +980,11 @@ Sub GLCD
             // Reset the PPS to ensure the program can use the ports
             RC3PPS = 0
             RC4PPS = 0
+
+        //  Change the Frequency to 64mHz
+        Dim OSCFRQcache as Byte
+        OSCFRQcache = OSCFRQ
+        OSCFRQ = 0b00001000  '64mhz
 
         #INCLUDE <glcd.h>
         #DEFINE GLCD_TYPE GLCD_TYPE_SSD1306
@@ -1004,6 +1011,12 @@ Sub GLCD
         GLCDPrint 2, 10, "GCBASIC GLCD"
         // This will disable I2CSend(), see the macro above
         LabI2CState = False
+        // Restore Frequency
+        OSCFRQ = OSCFRQcache
+        NOP
+        NOP
+        NOP
+        NOP
         // Restore LCD support by setting the ports and calling the init routines
         Dir LCD_SPI_DO  Out
         Dir LCD_SPI_SCK Out

@@ -42,13 +42,6 @@
     // Dir HI2C_CLOCK In
     // HI2CMode (Master)
 
-		#define I2CPreSendMacro     myI2CSend: exit sub
-
-
-        sub myI2CSend
-            // your i2C handler
-        end sub
-
 // To use software I2C uncomment the following
     #define I2C_MODE Master
     #define I2C_DATA PORTC.4
