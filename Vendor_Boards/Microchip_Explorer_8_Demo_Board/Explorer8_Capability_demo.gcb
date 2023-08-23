@@ -28,16 +28,14 @@
     • Lesson 8: Timer1
     • Lesson 9: Interrupts
     • Lesson 10: Sleep/Wakeup
-    • Lesson 11: EEPROM
+    • Lesson 11: EEPROM Memory Operations
     • Lesson 12: Graphical LCD ( GLCD )
+    • Lesson 13: NVM Memory Operations
     
-
-
-
 */
 '''@author    Evan R. Venn   
 '''@license   GPL
-'''@version   1.00   
+'''@version   1.02   
 '''@date      2023-08-20
 '''********************************************************************************
 
@@ -124,6 +122,7 @@
         #define     Lab_SleepWakeUp     10
         #define     Lab_EEPROM          11
         #define     Lab_GLCD            12
+        #define     Lab_NVMemory        13
 
 ; ----- Main body of program commences here.
 
@@ -168,7 +167,7 @@
         #define NOT_RUNNING         0
         #define RIGHTDIRECTION      1
         #define LEFTDIRECTION       0        
-        #define MAX_LABS            12
+        #define MAX_LABS            13
 
 
     // Variable Definitions
@@ -179,23 +178,23 @@
         Dim activeLedNum as Byte
         Dim LabI2CState as Bit:         LabI2CState = 0
 
-    Print "    Welcome     "
-    Locate 1,0
-    Print "  to Explorer 8 "
-    wait 1 s
-    CLS
-    Print "    GCBASIC     "
-    Locate 1,0
-    Print " Anobium   2023 "
-    wait 5 s
-    CLS
-    Print "    Welcome     "
-    Locate 1,0
-    Print "  to Explorer 8 "
-
+    if labNumber = 0 Then
+        Print "    Welcome     "
+        Locate 1,0
+        Print "  to Explorer 8 "
+        wait 1 s
+        CLS
+        Print "    GCBASIC     "
+        Locate 1,0
+        Print " Anobium   2023 "
+        wait 5 s
+        CLS
+        Print "    Welcome     "
+        Locate 1,0
+        Print "  to Explorer 8 "
+    end if
 
     Do Forever
-
         // Check button state
         checkButtonS2
         // Select labnumber
@@ -212,6 +211,7 @@
             case Lab_SleepWakeUp:   SleepWakeUp
             case Lab_EEPROM:        EEPROM
             case Lab_GLCD:          GLCD
+            case Lab_NVMemory:      NVMemory 
         End Select
         
         if switchEvent = 1 then
@@ -731,7 +731,6 @@ Sub Interrupts
         // Set up the timer.  This required PreScaler and PostScaler.  See the HELP for explaination.
         InitTimer0 Osc, PRE0_4096 + TMR0_FOSC4 ,  POST0_1
         StartTimer 0
-
         labState = RUNNING                                      
     end if
 
@@ -878,12 +877,16 @@ Sub EEPROM
     corresponds to the saved ADC result in the EEPROM. 
     */
 
-    #DEFINE EEPROM_ADDR     0x80
+    Dim flagCounter, adcResult, eeprom_address as  Byte
 
-    Dim flagCounter, adcResult as  Byte
     #define EEPROM_FLAG_COUNTER_MAX  6  // Maximum flag count to create 1.5 seconds delay
 
     if labState = NOT_RUNNING Then
+        // Use randomize, with the value of ADC as the seed
+        Randomize ReadAD( AN0 )
+        // Set the address to a random address.  To protect EEProm write usage constraint
+        eeprom_address = Random
+
         flagCounter = 0
         CLS
         LEDS_OFF
@@ -892,7 +895,7 @@ Sub EEPROM
         Settimer 1, 0x0BDC
         TMR1IF = 0
         StartTimer 1
-        On Interrupt Timer1Overflow Call EEPROM_ISR
+        On Interrupt Timer1Overflow Call Memory_ISR
         labState = RUNNING    
     end if    
 
@@ -900,7 +903,7 @@ Sub EEPROM
 
         If flagCounter = 0 Then
 
-            EPRead ( EEPROM_ADDR, adcResult )
+            EPRead ( eeprom_address, adcResult )
             locate 0,0
             Print " ADC Result =   "
             locate 1,0
@@ -917,28 +920,46 @@ Sub EEPROM
     end if
 
     if switchEvent = 1 Then
+        On Interrupt Timer1Overflow Ignore
         StopTimer 1
         labState = NOT_RUNNING
     End If
 
 End Sub
 
-Sub EEPROM_ISR
+Sub Memory_ISR
 
+    // (Re)DIMension nvaddress as Long as this is declared within the subroutine constraint
+    Dim nvmaddress as Long
     /*
     Supporting ISR routine, see the assiociated lab
     */
 
-    wait 20 ms
-
     flagCounter++
-    
-    if flagCounter = EEPROM_FLAG_COUNTER_MAX Then
-        // Toggle the LED and write the ADC value to EEPROM
-        LED_D8 = !LED_D8
-        EPWrite (  EEPROM_ADDR, ReadAD(AN0) )
-        flagCounter = 0
-    end if
+
+    Select Case labNumber
+
+    Case Lab_EEPROM:
+
+        if flagCounter = EEPROM_FLAG_COUNTER_MAX Then
+            // Toggle the LED and write the ADC value to EEPROM
+            LED_D8 = !LED_D8
+            EPWrite (  eeprom_address, ReadAD(AN0) )
+            flagCounter = 0
+        end if
+    Case Lab_NVMemory:
+
+        if flagCounter = NVM_FLAG_COUNTER_MAX Then
+            // Toggle the LED and write the ADC value to NVMemory
+            LED_D8 = !LED_D8
+
+            // The PFM write needs to complete without the interrupts
+            // Ensure the address and the data is passed as LONG and WORD respectively
+            PFMWrite (  [Long]nvmaddress, [WORD]ReadAD10(AN0) )
+            
+            flagCounter = 0
+        end if
+    End Select        
 
     // Clear the interrupt flag
     TMR1IF = 0
@@ -985,6 +1006,8 @@ Sub GLCD
         Dim OSCFRQcache as Byte
         OSCFRQcache = OSCFRQ
         OSCFRQ = 0b00001000  '64mhz
+        // Now serial operations and timings are all 8 times different...
+
 
         #INCLUDE <glcd.h>
         #DEFINE GLCD_TYPE GLCD_TYPE_SSD1306
@@ -995,9 +1018,10 @@ Sub GLCD
         // Need to initialise the I2C and SSD1306 here, as the automatic init will have been when the chip started... and, the I2C was not operational
         INITI2C
         INITGLCD_SSD1306
+
         // Setup the voltmeter
         GLCD_Meter_Init
-
+    
         labState = RUNNING    
     end if    
 
@@ -1023,6 +1047,7 @@ Sub GLCD
         InitPPS
         INITLCD
         labState = NOT_RUNNING
+
     End If
 
 
@@ -1128,6 +1153,90 @@ Sub anglecheck
     End If
 End Sub
 
+Sub NVMemory 
+	
+    /*
+    This is a psuedo data logger.
+
+    Press the switch to show the ADC reading on the LCD and save it to NVMemory.
+    The LCD displays NVMemory on the first line and “0Xnnnn = x” on the second line, where x
+    corresponds to the saved ADC result in the NVMemory. 
+
+    The ADC reads are held in NVRAM. The last 128 are retained.  Use PICKITPLUS to read the PROGMEM!
+    */
+
+    Dim flagCounter as Byte
+    Dim PFMadcResult as  Word
+
+    // (Re)DIMension nvaddress as Long as this is declared within the subroutine constraint
+    Dim nvmaddress as Long
+
+    #define NVM_FLAG_COUNTER_MAX  20 // The maximum flag count to create ~3 seconds delay
+
+    if labState = NOT_RUNNING Then
+        // Make the write event happen, the first time
+        flagCounter = 0
+        // top of PROGMEM. Should be safe! Nothing should be up there!
+        nvmaddress = ( CHIPWORDS * 2 ) - CHIPWRITEFLASHBLOCKSIZE
+
+        CLS
+        LEDS_OFF
+        Print "   NVMemory     "
+        
+        // Call ISR set first value.  This will populate the first word in PROGMEM
+        Memory_ISR
+
+        // Now setup interrupt
+        InitTimer1 FOSC4 , PS1_4
+        Settimer 1, 0x0BDC
+        TMR1IF = 0
+        StartTimer 1
+        On Interrupt Timer1Overflow Call Memory_ISR      
+        labState = RUNNING    
+        
+    end if    
+
+    if labState = RUNNING Then
+
+        If flagCounter = 0 Then
+            flagCounter = 1
+            // It is time to read and show the memory results
+            PFMadcResult = PFMReadWord( nvmaddress )
+            locate 0,0
+            Print " NVM Result =   "
+            locate 1,0
+            Print "0x"
+            Print Hex( nvmaddress_u )
+            Print Hex( nvmaddress_h )
+            Print Hex( nvmaddress )
+
+            Locate 1,10
+            Print "0x"
+            Print hex(PFMadcResult_h)
+            Print hex(PFMadcResult)
+
+            // Increment and manage the PROGMEM address to save the data.            
+            // We are writing WORD values, so increment by 2
+            nvmaddress = nvmaddress + 2
+            If nvmaddress = ( CHIPWORDS * 2 ) then nvmaddress = ( CHIPWORDS * 2 ) - CHIPWRITEFLASHBLOCKSIZE
+
+            //Now show on LEDS
+            //Get the top 3 MSBs (Shift LEFT), then *2 ( Shift Right) and display these on the LEDs
+            PFMadcResult = (FnLSR ( PFMadcResult, 7)) * 2
+            PortB = ( PortB and 0xF1) OR PFMadcResult 
+
+        end if
+        
+    end if
+
+    if switchEvent = 1 Then
+        On Interrupt Timer1Overflow Ignore
+        StopTimer 1
+        labState = NOT_RUNNING
+    End If
+
+
+End Sub
 
 Function checkButtonS1 as Bit
 
@@ -1167,6 +1276,4 @@ Sub nextLab
     if labNumber > MAX_LABS then labNumber = 1
     
 End Sub
-
-
 
