@@ -1,0 +1,82 @@
+'''An example program for GCBASIC.
+'''------------------------------------------------------------------------
+'''This program is an example of creating a software SPI routine to control the CLOCK, DATA OUT and the CHIP SELECT. 
+'''
+'''This sends the MSB bit first.  You can change this, to LSB, by changing direction of ROTATE and the test bit. 
+'''
+'''Enjoy.
+'''
+'''
+'''************************************************************************
+
+' ----- Configuration
+'Make into a comment to use the AVR chipset
+#CHIP 16f886
+'  #chip mega328p         'Uncomment to simply use the AVR chipset
+'  #chip LGT8F328P        'Uncomment to simply use the LGT chipset
+#option Explicit
+
+// required ports
+#define SPI_CS      portc.5
+#define SPI_CLK     portc.4
+#define SPI_DO      portc.3
+
+
+// Configuration timers
+// Delays are in us seconds
+#define SPICLOCKDELAY   3
+#define  SPIDUTYDELAY   3
+
+
+' ----- Main body of program commences here.
+
+dim cc as byte
+do 
+Send_AddressData_WordSPI ( 0xAA , cc )
+    cc++
+loop
+
+
+
+// Usage  adress, data
+//  Send_AddressData_WordSPI ( 1, 2 )
+Sub Send_AddressData_WordSPI ( In _address as Byte , in _SPIdata as Byte )
+
+        // Create a variable using an alias
+        Dim _SPIoutword as Word Alias _address, _SPIdata
+
+        // Dim local variable
+        Dim _SPIlocalcounter as Byte
+
+        //  Chip Select
+        SPI_CS = 1                                                             
+        
+        // Set the Clock High
+        SPI_CLK = 1
+        
+        Repeat 16
+            
+            if _SPIoutword.15 = 1 then
+                SPI_DO = 1
+            else
+                SPI_DO = 0
+            end if
+            // Set Clock Low
+            SPI_CLK = 0
+            
+            // Rotate the variable to expose the next bit, this rotate take a few cycles, so, this will create a inter CLOCK transistion delay 
+            Set C Off
+            Rotate _SPIoutword LEFT
+
+            // Wait Clock Delay,  adjust as required to complete 
+            wait SPICLOCKDELAY us
+
+            SPI_CLK = 1
+            // Wot Duty Delay, adjust as required
+            wait SPIDUTYDELAY us
+
+        End Repeat
+        
+        SPI_CS = 0                                                           
+End Sub
+
