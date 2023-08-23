@@ -179,6 +179,15 @@
         Dim LabI2CState as Bit:         LabI2CState = 0
 
     if labNumber = 0 Then
+        
+        #ifdef USART_BAUD_RATE
+            HserPrintCRLF
+            HserPrint "Welcome to Explorer 8"
+            HserPrintCRLF
+            HserPrint "GCBASIC - Anobium   2023"
+            HserPrintCRLF
+        #endif
+
         Print "    Welcome     "
         Locate 1,0
         Print "  to Explorer 8 "
@@ -192,6 +201,7 @@
         Print "    Welcome     "
         Locate 1,0
         Print "  to Explorer 8 "
+
     end if
 
     Do Forever
@@ -236,7 +246,12 @@ sub HelloWorld
         Locate 0,0
         LEDS_OFF
         Print "  Hello World   "
-        labState = RUNNING                                      
+        labState = RUNNING  
+        
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": Hello World Lab"
+        #endif
+
     end if
 
     if labState = RUNNING Then
@@ -273,7 +288,12 @@ Sub Blink
         TMR1IE = 0
         TMR1IF = 0
         StartTimer 1
-        labState = RUNNING    
+        labState = RUNNING
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": Blink Lab"
+        #endif
+        
     end if    
 
     if labState = RUNNING Then
@@ -323,7 +343,12 @@ sub RotateLEDs
         activeLedNum = 6
         Locate 0,0
         Print "     Rotate     "
-        labState = RUNNING                                      
+        labState = RUNNING
+        
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": RotateLEDs Lab"
+        #endif
+
     end if
 
     if labState = RUNNING Then
@@ -379,7 +404,12 @@ Sub ADC
         CLS
         LEDS_OFF
         Print "      ADC      "
-        labState = RUNNING     
+        labState = RUNNING
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": ADC Lab"
+        #endif
+                    
     end if
 
     if labState = RUNNING Then
@@ -421,7 +451,12 @@ sub VSR
         activeLedNum = 6
         Locate 0,0
         Print "      VSR       "
-        labState = RUNNING                                      
+        labState = RUNNING
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": VSR Lab"
+        #endif
+
     end if
 
     if labState = RUNNING Then
@@ -490,6 +525,11 @@ sub Debounce
         Locate 1,0
         Print "    Press S1    "
         labState = RUNNING                                      
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": Debounce Lab"
+        #endif
+        
     end if
 
     if labState = RUNNING Then
@@ -580,6 +620,11 @@ Sub PWM
         Print "Duty Cycle    0%"        
         labState = RUNNING     
         HPWM 1, 40, 0
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": PWM Lab"
+        #endif
+
     end if
 
     if labState = RUNNING Then
@@ -640,6 +685,10 @@ Sub Timer_1
         InitTimer1 OSC, PS1_8
         SetTimer 1, 0x0BDC
         StartTimer 1
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": Timer1 Lab"
+        #endif
 
         labState = RUNNING                                      
     end if
@@ -731,6 +780,11 @@ Sub Interrupts
         // Set up the timer.  This required PreScaler and PostScaler.  See the HELP for explaination.
         InitTimer0 Osc, PRE0_4096 + TMR0_FOSC4 ,  POST0_1
         StartTimer 0
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": Interrupt Lab"
+        #endif
+
         labState = RUNNING                                      
     end if
 
@@ -815,6 +869,10 @@ Sub SleepWakeUp
         LED_D7 = 1
         Print " Sleep/Wake Up  "
 
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": SleepWakeUp Lab"
+        #endif
+
         wdtTimer = COUNTDOWN_MAX
         for counterloop = 0 to COUNTDOWN_MAX - 1
             Locate 1,0
@@ -897,6 +955,11 @@ Sub EEPROM
         StartTimer 1
         On Interrupt Timer1Overflow Call Memory_ISR
         labState = RUNNING    
+        
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": EEPROM Lab"
+        #endif
+
     end if    
 
     if labState = RUNNING Then
@@ -1022,6 +1085,10 @@ Sub GLCD
         // Setup the voltmeter
         GLCD_Meter_Init
     
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": GLCD Lab"
+        #endif
+
         labState = RUNNING    
     end if    
 
@@ -1194,6 +1261,10 @@ Sub NVMemory
         On Interrupt Timer1Overflow Call Memory_ISR      
         labState = RUNNING    
         
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": NVM Memory Lab"
+        #endif
+
     end if    
 
     if labState = RUNNING Then
