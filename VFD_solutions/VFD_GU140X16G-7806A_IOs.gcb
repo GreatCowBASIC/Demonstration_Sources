@@ -63,7 +63,7 @@
   wait 7 s
   ClS
 
-  Print "Great Cow BASIC 2020"
+  Print "GCBASIC 2023"
   Locate 1,0
   Print "I/O Control"
 

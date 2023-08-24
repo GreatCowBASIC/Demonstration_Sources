@@ -13,7 +13,7 @@
 '''********************************************************************
 
     #chip 16F15356          'Specify the Device you are compiling for - this board is the 16F15356
-                            'Great Cow BASIC simplifies the configuration by setting the frequency and the configuration for you.
+                            'GCBASIC simplifies the configuration by setting the frequency and the configuration for you.
 
 
 

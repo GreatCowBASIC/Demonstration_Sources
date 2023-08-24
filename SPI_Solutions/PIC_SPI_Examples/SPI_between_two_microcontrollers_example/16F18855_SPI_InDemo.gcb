@@ -69,7 +69,7 @@
 
 
     HSerPrintCRLF 2
-    HSerPrint "Great Cow Basic @2016": HSerPrintCRLF
+    HSerPrint "GCBASIC @2023": HSerPrintCRLF
     HSerPrint "SPI Board": HSerPrintCRLF 2
     wait 1 s
 

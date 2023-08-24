@@ -8,7 +8,7 @@
 '''  We set one of the LEDs on and off, you can try setting the other LED. This is attached to Portb.1 via a suitable resistor
 '''
 '''
-'''Great Cow  BASIC Header block
+'''GCBASIC Header block
 '''
 '''@author  Evan R. Venn
 '''@licence GPL

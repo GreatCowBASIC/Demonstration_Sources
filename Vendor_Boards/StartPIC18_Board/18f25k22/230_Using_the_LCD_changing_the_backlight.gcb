@@ -83,19 +83,19 @@ Dim PWMLEVEL As Byte
 
 Do Forever
     CLS
-    Print "GREAT"
+    Print "GCBASIC"
     Locate 1, 0
-    Print "COW"
+    Print ""
     Wait 1 s
     Locate 0, 0
-    Print "COW  "
+    Print ""
     Locate 1, 0
-    Print "BASIC"
+    Print "GCBASIC"
     Wait 1 s
     Locate 0, 0
-    Print "BASIC"
+    Print "GCBASIC"
     Locate 1, 0
-    Print "2022  "
+    Print "2023  "
     Wait 1 s
 
     'Use PWM to vary the backlight

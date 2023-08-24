@@ -45,7 +45,7 @@ Dim msg1 As String * 16
 
 
 GLCDCLS
-GLCDPrint 0, 1, "Great Cow Basic "
+GLCDPrint 0, 1, "GCBASIC "
 Wait 1 s
 
 

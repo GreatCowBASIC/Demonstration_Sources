@@ -1,6 +1,6 @@
 '''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program demonstrates the basic primatives of a Graphical LCD (GLCD)
+'''This program demonstrates theGCBASIC primatives of a Graphical LCD (GLCD)
 '''
 '''
 '''This program uses the Low Memory Mode GLCD - this means the microcontroller does not require a large amount of RAM.

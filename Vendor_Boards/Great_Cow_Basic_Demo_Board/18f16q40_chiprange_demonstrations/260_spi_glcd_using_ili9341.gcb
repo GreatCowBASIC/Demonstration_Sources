@@ -212,7 +212,7 @@ Sub ShowCase1
     GLCDDrawString ( 42, ILI9341_GLCD_HEIGHT - 30 , "ILI9341 Driver" , ILI9341_WHITE )
 
     GLCDfntDefaultSize = 1
-    GLCDDrawString ( ILI9341_GLCD_WIDTH - 68, 2 , "Jan 2022" , ILI9341_WHITE )
+    GLCDDrawString ( ILI9341_GLCD_WIDTH - 68, 2 , "Jan 2023" , ILI9341_WHITE )
     #IFDEF ILI9341_HardwareSPI
         GLCDDrawString ( ILI9341_GLCD_WIDTH - 42, 10 , "HW SPI" , ILI9341_WHITE )
     #ENDIF
@@ -280,7 +280,7 @@ Sub ShowCase2
     GLCDDrawString ( 50, ILI9341_GLCD_HEIGHT - 30 , "ILI9341 Driver" , ILI9341_WHITE )
 
     GLCDfntDefaultSize = 1
-    GLCDDrawString ( ILI9341_GLCD_WIDTH - 68, 2 , "Jan 2022" , ILI9341_WHITE )
+    GLCDDrawString ( ILI9341_GLCD_WIDTH - 68, 2 , "Jan 2023" , ILI9341_WHITE )
 
     #IFDEF ILI9341_HardwareSPI
         GLCDDrawString ( ILI9341_GLCD_WIDTH - 42, 10 , "HW SPI" , ILI9341_WHITE )
@@ -293,7 +293,7 @@ Sub ShowCase2
     'Revert the font size
     GLCDfntDefaultSize = oldfont
     GLCDForeground = ILI9341_WHITE
-    GLCDPrintLargeFont ( 100 , ILI9341_GLCD_HEIGHT - 60 , "Great Cow BASIC" )
+    GLCDPrintLargeFont ( 100 , ILI9341_GLCD_HEIGHT - 60 , "GCBASIC" )
 
     Do Forever
 

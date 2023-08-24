@@ -59,8 +59,8 @@
       GLCD_Open_PageTransaction 0, 7
     #endif
 
-        GLCDPrint 0, 0,   "Great Cow BASIC"
-        GLCDPrint (0, 16, "Anobium 2019")
+        GLCDPrint 0, 0,   "GCBASIC"
+        GLCDPrint (0, 16, "Anobium 2023")
         GLCDPrint (76, 16, GLCD_WIDTH )
         GLCDPrint (96, 16, "*" )
         GLCDPrint (104, 16, GLCD_HEIGHT )

@@ -73,7 +73,7 @@ Sub InitLEDControl
     ' Set the correct regsisters.  These registers give us the correct timed Interrupt.
     ' Use the TimerCalculator from MikroElectronika to obtain the correct values for these registers.
     ' When using the TimerCalculator from MikroElectronika paste the any registers with *_Bit registers
-    ' Simple cut and paste from the BASIC tab
+    ' Simple cut and paste from theGCBASIC tab
 
     'Timer0 Prescaler = 0; Preload = 159; Actual Interrupt Time = 10 us
     OCR0 = 159

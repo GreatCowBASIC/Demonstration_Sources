@@ -1,7 +1,7 @@
 '''A program  for GCGB and GCB ......
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program is a basic demostration for the GCBlib USB Library
-'''It shows all the basic ways of interaction whit the PC.
+'''This program is aGCBASIC demostration for the GCBlib USB Library
+'''It shows all theGCBASIC ways of interaction whit the PC.
 '''
 '''Uses a PIC 18F45K50 whit a i2c LCD display and a led connected to PORTa.1 (obviously and a USB cable to the PC)
 '''

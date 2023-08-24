@@ -97,7 +97,7 @@ HI2CMode Master
 #DEFINE GLCD_TYPE_SSD1306_CHARACTER_MODE_ONLY
 
 Dim myString As String * 28
-myString = "Great Cow BASIC 2017"
+myString = "GCBASIC 2023"
 
 GLCDFontWidth = 5
 GLCDfntDefaultSize = 2

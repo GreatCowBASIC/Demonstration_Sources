@@ -1,6 +1,6 @@
 '''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program demonstrates the basic primatives of a Graphical LCD (GLCD)
+'''This program demonstrates theGCBASIC primatives of a Graphical LCD (GLCD)
 '''
 '''
 '''This program uses the Full Mode GLCD - this means the microcontroller need to have a 1024 byte buffer for the GLCD.
@@ -103,7 +103,7 @@
 
 '*******************************************************************************************
    DIM myString as string * 28
-   myString = "Great Cow BASIC 2017"
+   myString = "GCBASIC 2023"
 
    GLCDfntDefaultSize = 2
    GLCDFontWidth = 5

@@ -4,7 +4,7 @@
 ''' This simply set one of the LEDs on - the LED is attached to Portb.0 via a suitable resistor
 '''
 '''
-''' Great Cow  BASIC Header block
+''' GCBASIC Header block
 '''
 '''@author  Evan R. Venn
 '''@licence GPL

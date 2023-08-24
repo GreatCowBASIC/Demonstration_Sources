@@ -80,7 +80,7 @@ Sub DisplayInformation ( LCDCommand )
 
     Case 1
       CLS
-      print "GCBasic 2019"
+      print "GCBasic 2023"
       locate 1,0
       print "DS18B20 Demo"
 

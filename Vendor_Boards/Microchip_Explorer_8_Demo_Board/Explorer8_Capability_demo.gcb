@@ -1051,7 +1051,7 @@ End Sub
 Sub GLCD
 
     /* 
-    The is a graphical LCD ( GLCD) showing a basic voltmeter.  This shows the ADC reading on the GLCD coverted into a voltage. 
+    The is a graphical LCD ( GLCD) showing aGCBASIC voltmeter.  This shows the ADC reading on the GLCD coverted into a voltage. 
 
     The GLCD uses software I2C.
     */

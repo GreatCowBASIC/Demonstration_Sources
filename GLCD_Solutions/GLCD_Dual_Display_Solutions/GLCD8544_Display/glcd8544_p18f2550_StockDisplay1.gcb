@@ -27,8 +27,8 @@
         wait 1 s
         GlcdPrint( 5,5, "Display-1" )
         GLCDLocateString ( 8, 3)
-        GLCDPrintStringLn ("Great Cow")
-        GLCDPrintStringLn ("   BASIC")
+        GLCDPrintStringLn ("GCBASIC")
+        GLCDPrintStringLn ("  GCBASIC")
 
         filledCircle ( 42, 24, 20 )
         wait 1 s

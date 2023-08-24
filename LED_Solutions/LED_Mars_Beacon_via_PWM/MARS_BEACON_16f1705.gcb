@@ -56,7 +56,7 @@
 
 
  ; ----- Quick Command Reference:
-  'A MARS Beacon simulation for your enjoyment. I originally written for Picaxe Basic for an Experimental Aircraft owner/ pilot who  uses it on his Airplane.
+  'A MARS Beacon simulation for your enjoyment. I originally written for PicaxeGCBASIC for an Experimental Aircraft owner/ pilot who  uses it on his Airplane.
   'It passed U.S. Federal regulations and was approved by the FAA inspector who really liked it.
   'To get best performance on a breadboard, use a general purpose NPN transistor (2N3904. etc )  to drive a  5mm LED.
   'Recommend a 220 Ohm resistor from 5v to the collector to limit current and a series resistor of 3K3  from the PIC CCP pin to the transistor base.

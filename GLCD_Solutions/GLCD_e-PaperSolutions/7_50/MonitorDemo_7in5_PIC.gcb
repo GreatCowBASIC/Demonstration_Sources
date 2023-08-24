@@ -86,7 +86,7 @@
         GLCDPrintLargeFont ( 20 ,  100 , tempstring )
         GLCDPrintLargeFont ( 20 ,  60 , "Preston" )
         GLCDPrintLargeFont ( 200 , GLCDDeviceHeight - 100 , "Fine Weather today" )
-        GLCDPrintLargeFont ( 200 , GLCDDeviceHeight - 60 , "Great Cow BASIC" )
+        GLCDPrintLargeFont ( 200 , GLCDDeviceHeight - 60 , "GCBASIC" )
 
     GLCD_Close_PageTransaction
 
@@ -102,7 +102,7 @@
         GLCDPrintLargeFont ( 20 ,  100 , tempstring )
         GLCDPrintLargeFont ( 20 ,  60 , "Johannesburg" )
         GLCDPrintLargeFont ( 200 , GLCDDeviceHeight - 100 , "Cloudy Weather today" )
-        GLCDPrintLargeFont ( 200 , GLCDDeviceHeight - 60 , "Great Cow BASIC" )
+        GLCDPrintLargeFont ( 200 , GLCDDeviceHeight - 60 , "GCBASIC" )
 
     GLCD_Close_PageTransaction
 
@@ -119,7 +119,7 @@
         GLCDPrintLargeFont ( 20 ,  100 , tempstring )
         GLCDPrintLargeFont ( 20 ,  60 , "Johannesburg" )
         GLCDPrintLargeFont ( 200 , GLCDDeviceHeight - 100 , "Sunny and cloudy today" )
-        GLCDPrintLargeFont ( 200 , GLCDDeviceHeight - 60 , "Great Cow BASIC" )
+        GLCDPrintLargeFont ( 200 , GLCDDeviceHeight - 60 , "GCBASIC" )
 
     GLCD_Close_PageTransaction
 

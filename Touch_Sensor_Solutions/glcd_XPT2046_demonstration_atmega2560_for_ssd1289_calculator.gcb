@@ -94,7 +94,7 @@
   'We have the GLCD_WIDTH to scale the Touch Axis which is the Y Axis in this configuration, same therefore GLCD_HEIGHT being second
   SetCalibation_XPT2046 ( XPT2046XMIN, XPT2046XMAX, XPT2046YMIN, XPT2046YMAX, GLCD_WIDTH, GLCD_HEIGHT)
 
-  CreateButton 20 , 10, SSD1289_GLCD_WIDTH-20 , 50, SSD1289_BLUE, SSD1289_YELLOW , "Great Cow Basic v1.xx" ,SSD1289_YELLOW , 2
+  CreateButton 20 , 10, SSD1289_GLCD_WIDTH-20 , 50, SSD1289_BLUE, SSD1289_YELLOW , "GCBASIC v1.xx" ,SSD1289_YELLOW , 2
 
 
   CreateButton 20 , 60, 70, 90, SSD1289_BLUE, SSD1289_YELLOW , "7" ,SSD1289_YELLOW , 2

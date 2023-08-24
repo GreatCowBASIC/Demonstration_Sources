@@ -104,5 +104,5 @@
 
 ; ----- Main program
 
-    GLCDPrint 0, 0,   "Great Cow BASIC"
+    GLCDPrint 0, 0,   "GCBASIC"
    

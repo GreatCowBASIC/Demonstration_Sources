@@ -117,7 +117,7 @@ ODCC3=1
 
 CLS
 
-Print "Great Cow BASIC"
+Print "GCBASIC"
 Locate 1,0
 Print "Ver 1.00.xx"
 Wait 3 s

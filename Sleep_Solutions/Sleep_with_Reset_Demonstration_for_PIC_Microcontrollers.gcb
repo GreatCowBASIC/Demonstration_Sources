@@ -54,7 +54,7 @@
 
 
 ; ----- Quick Command Reference:
-  'This file is a basic code template for using the reset on change,
+  'This file is aGCBASIC code template for using the reset on change,
   'reset on WDT, and reset of comparator output change features of
   'the PIC10F20X microcontrollers.
 

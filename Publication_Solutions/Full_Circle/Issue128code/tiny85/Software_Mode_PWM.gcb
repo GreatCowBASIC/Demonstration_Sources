@@ -2,7 +2,7 @@
   #chip tiny85, 8
 
   #OPTION EXPLICIT 'provide that variables are dimensioned before use
-  #DEFINE PWM_Out1 PortB.1 'Great Cow BASIC Software PWM channel 1
+  #DEFINE PWM_Out1 PortB.1 'GCBASIC Software PWM channel 1
   #OPTION VOLATILE PortB.1 'avoid glitches on the LED
   #DEFINE ADSpeed MediumSpeed 'Measure at medium speed, around 128 KHz
   'Set initial PIN direction and state:

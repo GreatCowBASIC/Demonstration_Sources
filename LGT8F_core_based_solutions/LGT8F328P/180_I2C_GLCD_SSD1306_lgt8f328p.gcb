@@ -1,7 +1,7 @@
 '''A demonstration program for GCBASIC
 '''---------------------------------------------------------------------------------
 '''
-'''  This shows how to display a basic BMP on the GLCD and the GLCD basic commands.
+'''  This shows how to display aGCBASIC BMP on the GLCD and the GLCDGCBASIC commands.
 '''
 '''
 '''
@@ -29,7 +29,7 @@
 ; ----- Configuration
 #chip  LGT8F328P
 #option Explicit
-'Great Cow BASIC simplifies the configuration by setting the frequency and the configuration for you.
+'GCBASIC simplifies the configuration by setting the frequency and the configuration for you.
 
   ; ----- Define GLCD Hardware settings
   #define GLCD_TYPE GLCD_TYPE_SSD1306

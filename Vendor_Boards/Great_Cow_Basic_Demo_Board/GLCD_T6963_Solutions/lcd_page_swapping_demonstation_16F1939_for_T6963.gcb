@@ -74,7 +74,7 @@ Wait 3 s
 
 Print "WG24064A-TMI-TZ#"
 LCDSpace 16
-Print "Feb 2019"
+Print "Feb 2023"
 Locate 7,0
 Print "LCDPAGESIZE = "
 Print LCDPAGESIZE

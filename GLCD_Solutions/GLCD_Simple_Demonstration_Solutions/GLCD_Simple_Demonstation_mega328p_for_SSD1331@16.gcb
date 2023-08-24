@@ -56,9 +56,9 @@
     SetPowerMode_SSD1331(0x1A)                    'Explicit commmands for this device
     SetBrightness_SSD1331( 0xFF )                 'Explicit commmands for this device - full brightness
 
-    GLCDPrintStringLN "Great Cow BASIC"
+    GLCDPrintStringLN "GCBASIC"
     GLCDPrintStringLN ""
-    GLCDPrintStringLN "December 2019"
+    GLCDPrintStringLN "December 2023"
     GLCDPrintStringLN "SSD1331 GLCD"
     GLCDPrintStringLN ""
     GLCDPrintStringLN "by Anobium"

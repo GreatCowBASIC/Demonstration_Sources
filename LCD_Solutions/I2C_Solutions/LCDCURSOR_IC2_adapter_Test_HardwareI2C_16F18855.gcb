@@ -77,10 +77,10 @@
 
 ; ----- Main body of program commences here.
     CLS
-    PRINT "Great Cow BASIC 2022"
+    PRINT "GCBASIC 2023"
 
     Locate 1,0
-    PRINT "Great Cow BASIC 2022"
+    PRINT "GCBASIC 2023"
     WAIT 3 s
 
     Do Forever

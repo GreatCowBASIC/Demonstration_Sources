@@ -87,19 +87,19 @@
 
 do
    CLS
-   PRINT "GREAT"
+   PRINT "GCBASIC"
    lOCATE 1, 0
-   PRINT "COW"
+   PRINT ""
    WAIT 1 s
    LOCATE 0, 0
-   PRINT "COW  "
+   PRINT ""
    LOCATE 1, 0
-   PRINT "BASIC"
+   PRINT "GCBASIC"
    WAIT 1 s
    LOCATE 0, 0
-   PRINT "BASIC"
+   PRINT "GCBASIC"
    LOCATE 1, 0
-   PRINT "2017  "
+   PRINT "2023  "
    WAIT 2 s
    cls
 loop

@@ -14,7 +14,7 @@
 
 'Specify the Device you are compiling for - this board is the 16F18446
 #CHIP 16F18446
-'Great Cow BASIC simplifies the configuration by setting the frequency and the configuration for you.
+'GCBASIC simplifies the configuration by setting the frequency and the configuration for you.
 
 
 

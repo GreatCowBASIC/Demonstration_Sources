@@ -498,7 +498,7 @@ End Sub
 Sub Scroll_1
     TM_Scroll = On : TM_ScrollRate = 50
     tmClrbuf
-     tmSndStr "Great CoLJ basic 7seg_Display      "
+     tmSndStr "GCBASIC 7seg_Display      "
      tmSndBuf
      Wait 1 s
 

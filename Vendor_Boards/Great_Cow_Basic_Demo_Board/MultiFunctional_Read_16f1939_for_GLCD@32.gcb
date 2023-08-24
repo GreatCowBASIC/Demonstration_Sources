@@ -91,7 +91,7 @@ Dim rh, cels, fahr As Integer
 
 ccount = 0
 GLCDCLS
-GLCDPrint 0,   0, "GCBasic 2019"
+GLCDPrint 0,   0, "GCBasic 2023"
 GLCDPrint 0,   8, "Multifunctional Demo"
 GLCDPrint 0,   24,"DS18B20, Sony Remote,"
 GLCDPrint 0,   32,"DHT22, Pots and GLCD "

@@ -83,7 +83,7 @@
 
 
 ; ----- Main body of program commences here.
-    PRINT "Great Cow BASIC"
+    PRINT "GCBASIC"
     WAIT 1 s
 
     Do Forever

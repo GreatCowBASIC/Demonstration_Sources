@@ -98,7 +98,7 @@ leds = 0b10000
 wait 2 s
 
 HSerPrintCRLF
-HSerPrint "Great Cow BASIC 2021 "
+HSerPrint "GCBASIC 2021 "
 HSerPrint ChipNameStr
 HSerPrint " at "
 HSerPrint ChipMHz

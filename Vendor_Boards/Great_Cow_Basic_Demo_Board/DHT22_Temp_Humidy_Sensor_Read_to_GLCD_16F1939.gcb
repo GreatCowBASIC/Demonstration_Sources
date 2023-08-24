@@ -87,9 +87,9 @@ Dim rh, cels, fahr As Integer
 Box 0,0,GLCD_WIDTH-1, GLCD_HEIGHT-1
 GLCDfntDefaultSize = 2
 ' Print some texT
-GLCDPrint ( 0,   0, "Great Cow")
+GLCDPrint ( 0,   0, "GCBASIC")
 ' Print some text
-GLCDPrint ( 0,   18, "BASIC 2019")
+GLCDPrint ( 0,   18, "GCBASIC")
 GLCDfntDefaultSize = 1
 
 ' Print some text

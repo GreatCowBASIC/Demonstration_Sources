@@ -16,7 +16,7 @@
 
 'Specify the Device you are compiling for - this board is the 16F15356
 #CHIP 16F15356
-'Great Cow BASIC simplifies the configuration by setting the frequency and the configuration for you.
+'GCBASIC simplifies the configuration by setting the frequency and the configuration for you.
 
 ' External Oscillator mode selection bits->Oscillator not enabled - we need this to enable ANA7 - which is PortA.7
 FEXTOSC = Off

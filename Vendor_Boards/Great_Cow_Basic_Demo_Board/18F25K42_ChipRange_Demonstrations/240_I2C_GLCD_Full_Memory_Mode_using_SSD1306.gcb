@@ -90,7 +90,7 @@ HI2CMode Master
 
 '*******************************************************************************************
 Dim myString As String * 28
-myString = "Great Cow BASIC 2017"
+myString = "GCBASIC 2023"
 
 GLCDfntDefaultSize = 2
 GLCDFontWidth = 5

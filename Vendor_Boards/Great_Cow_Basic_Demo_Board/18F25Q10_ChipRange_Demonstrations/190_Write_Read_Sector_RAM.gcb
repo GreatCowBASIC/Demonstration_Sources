@@ -6,7 +6,7 @@
 ''' This will show the values written and read from Sector RAM.
 '''
 '''
-'''Great Cow  BASIC Header block
+'''GCBASIC Header block
 '''
 '''@author  William Roth and Evan R. Venn
 '''@licence GPL

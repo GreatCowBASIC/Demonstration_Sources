@@ -1,6 +1,6 @@
 '''A demonstration program for GCBASIC
 '''---------------------------------------------------------------------------------
-''' This program shows basic logic test.
+''' This program showsGCBASIC logic test.
 '''
 ''' GCBASIC will automatically setup the chip for you.  You can add a parameter to the #chip line to change the frequency, as follows:
 '''

@@ -1,6 +1,6 @@
 '''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program displays some basic GLCD graphics on the Matrix
+'''This program displays someGCBASIC GLCD graphics on the Matrix
 ''':
 '''You must select the correct Pset constant to match your LED Matrix.  See Configuration below.
 ''':

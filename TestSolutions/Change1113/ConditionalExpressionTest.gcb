@@ -29,9 +29,9 @@ This program demonstrates fix 1113
     #DEFINE LCD_DB6 PortB.6
     #DEFINE LCD_DB7 PortB.7
 
-// Print "Great Cow BASIC"
+// Print "GCBASIC"
 // Locate 1,0
-// Print "@2022"
+// Print "@2023"
 // Wait 1 s
 
 // CLS

@@ -34,7 +34,7 @@
 
         CLS
         WAIT 3 s
-        PRINT "GreatCowBASIC"
+        PRINT "GCBASIC"
         locate 1,0
         PRINT "DISPLAY TEST"
         wait 5 s

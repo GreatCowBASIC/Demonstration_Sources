@@ -1,6 +1,6 @@
 '''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program demonstrates the basic primatives a voltmeter on a Graphical LCD (GLCD)
+'''This program demonstrates theGCBASIC primatives a voltmeter on a Graphical LCD (GLCD)
 ''':
 '''You can change the microcontroller, the GLCD and the analogue port.
 '''

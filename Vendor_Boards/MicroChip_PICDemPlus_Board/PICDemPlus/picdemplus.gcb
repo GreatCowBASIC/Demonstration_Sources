@@ -1,6 +1,6 @@
 '''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program is a basic led flash for sure picdem+ pcb
+'''This program is aGCBASIC led flash for sure picdem+ pcb
 '''Flashes an LED on PORTB 0 at 1hz
 '''
 '''@author HiB

@@ -1,4 +1,4 @@
-'''A demonstration program for GreatCowBASIC.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a demonstration of a simple dimmer.
 '''acting on PORTB.0.

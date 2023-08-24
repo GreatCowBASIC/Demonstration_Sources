@@ -14,7 +14,7 @@
 ; ----- Configuration
 #chip  LGT8F328P
 #option Explicit
-'Great Cow BASIC simplifies the configuration by setting the frequency and the configuration for you.
+'GCBASIC simplifies the configuration by setting the frequency and the configuration for you.
 
     'Set a constant.  The LED can be activated
     #DEFINE LEDOn  = 1

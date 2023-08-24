@@ -1,6 +1,6 @@
 '''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program demonstrates the basic primatives of a Graphical LCD (GLCD)
+'''This program demonstrates theGCBASIC primatives of a Graphical LCD (GLCD)
 '''
 '''
 '''This program uses the Text Mode GLCD - this means the microcontroller does not require a large amount of RAM.
@@ -108,7 +108,7 @@
    #define GLCD_TYPE_SSD1306_CHARACTER_MODE_ONLY
 
    DIM myString as string * 28
-   myString = "Great Cow BASIC 2017"
+   myString = "GCBASIC 2023"
 
    'Set the LED states
     LEDD1 = 1
@@ -117,20 +117,20 @@
     dim ADCVal as word   'we have change to a larger variable to hold the range of 0 to 1023
 
          GLCDfntDefaultSize = 2
-         GLCDPrint(0, 0,"Great")
-         GLCDPrint(36, 17,"Cow")
-         GLCDPrint( 54 , 33,"BASIC")
-         GLCDPrint( 0 , 49,"v1.xx @ 2017")
+         GLCDPrint(0, 0,"GCBASIC")
+         GLCDPrint(36, 17,"")
+         GLCDPrint( 54 , 33,"GCBASIC")
+         GLCDPrint( 0 , 49,"v1.xx @ 2023")
          wait 4 S
 
     do
 
 
          GLCDfntDefaultSize = 2
-         GLCDPrint(0, 0,"Great")
-         GLCDPrint(36, 17,"Cow")
-         GLCDPrint( 54 , 33,"BASIC")
-         GLCDPrint( 0 , 49,"v1.xx @ 2017")
+         GLCDPrint(0, 0,"GCBASIC")
+         GLCDPrint(36, 17,"")
+         GLCDPrint( 54 , 33,"GCBASIC")
+         GLCDPrint( 0 , 49,"v1.xx @ 2023")
          wait 1 S
 
          GLCDCLS

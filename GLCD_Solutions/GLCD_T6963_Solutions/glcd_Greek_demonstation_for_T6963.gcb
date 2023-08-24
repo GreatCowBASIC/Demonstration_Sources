@@ -62,7 +62,7 @@
     do Forever
 
         GLCDPrintLargeFont ( 0, 0, "WG24064A-TMI-TZ#")
-        GLCDPrintLargeFont ( 0, 20, "Feb 2019")
+        GLCDPrintLargeFont ( 0, 20, "Feb 2023")
         wait 2 s
 
         CLS

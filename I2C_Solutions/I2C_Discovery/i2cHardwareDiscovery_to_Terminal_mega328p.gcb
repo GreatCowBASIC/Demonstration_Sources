@@ -83,7 +83,7 @@ If you get this... then, check your connnections - you have NOT connected anythi
 ; ----- Configuration
 #chip mega328p,16
 #option Explicit
-;Great Cow BASIC simplifies the configuration by setting the frequency and the configuration for you.
+;GCBASIC simplifies the configuration by setting the frequency and the configuration for you.
 
     'USART settings for USART1 on the chip which is sent via the USB to the PC
     #DEFINE USART_BAUD_RATE 9600

@@ -51,13 +51,13 @@
 ; ----- Main body of program commences here.
 do forever
       CLS
-      PRINT "Great Cow BASIC"
+      PRINT "GCBASIC"
       Locate 1,0
       PRINT "I2C LCD Driver"
       Wait 4 s
 
       CLS
-      PRINT "Great Cow BASIC"
+      PRINT "GCBASIC"
       Locate 1,0
       PRINT "Minimal Setup"
       Wait 4 s

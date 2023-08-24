@@ -79,7 +79,7 @@ porta = 1
 
 'Main loop
 CLS
-Print "Great Cow Basic "
+Print "GCBASIC "
 Locate 1 , 0
 Print "DS18B20   @2015 "
 Wait 3 s

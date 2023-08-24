@@ -179,7 +179,7 @@ sub ShowCase1
         GLCDDrawString ( 36, GLCDDeviceHeight - 30 , "ST7735 Driver" , TFT_WHITE )
 
         GLCDfntDefaultsize = 1
-        GLCDDrawString ( GLCDDeviceWidth - 57, 1 , "Apr 2019" , TFT_WHITE )
+        GLCDDrawString ( GLCDDeviceWidth - 57, 1 , "Apr 2023" , TFT_WHITE )
         #ifdef ST7735_HardwareSPI
             GLCDDrawString ( GLCDDeviceWidth - 42, 10 , "HW SPI" , TFT_WHITE )
         #endif
@@ -249,7 +249,7 @@ sub ShowCase2
         GLCDDrawString ( 50, GLCDDeviceHeight - 30 , "ST7735 " , TFT_WHITE )
 
         GLCDfntDefaultsize = 1
-        GLCDDrawString ( GLCDDeviceWidth - 57, 1 , "Apr 2019" , TFT_WHITE )
+        GLCDDrawString ( GLCDDeviceWidth - 57, 1 , "Apr 2023" , TFT_WHITE )
         #ifdef ST7735_HardwareSPI
             GLCDDrawString ( GLCDDeviceWidth - 42, 10 , "HW SPI" , TFT_WHITE )
         #endif

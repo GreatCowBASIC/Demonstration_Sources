@@ -89,7 +89,7 @@ Dir porta.0 In
 Dir SWITCH In
 
 HSerPrintCRLF 2
-HSerPrint "Great Cow Basic @2016": HSerPrintCRLF
+HSerPrint "GCBASIC @2023": HSerPrintCRLF
 HSerPrint "16f18877 Demo ": HSerPrintCRLF
 HSerPrintCRLF 3
 Wait 1 s

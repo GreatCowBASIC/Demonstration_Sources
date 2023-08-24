@@ -128,8 +128,8 @@ byteNumber = 0
 
 // ----- Main program
 
-GLCDPrint 0, 0,   "Great Cow BASIC"
-GLCDPrint (0, 16, "Anobium 2022")
+GLCDPrint 0, 0,   "GCBASIC"
+GLCDPrint (0, 16, "Anobium 2023")
 GLCDPrint (0, 32, "Portability Demo")
 GLCDPrint (0, 48, ChipNameStr )
 

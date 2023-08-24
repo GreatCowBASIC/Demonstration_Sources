@@ -138,7 +138,7 @@
   locate 0,0
   Print "MCP7940"
   locate 1,0
-  Print "Great Cow BASIC"
+  Print "GCBASIC"
   wait 2 s
   CLS
 

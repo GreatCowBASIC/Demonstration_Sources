@@ -37,7 +37,7 @@
 
     'splash screen
 
-    Print "Great Cow BASIC"
+    Print "GCBASIC"
     Locate 1,0
     Print "Ver 1.00.xx"
     WAIT 3 s

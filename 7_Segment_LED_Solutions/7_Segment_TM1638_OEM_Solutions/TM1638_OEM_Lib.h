@@ -93,9 +93,11 @@ Dim Tmp_1 as Byte    ' Temp, eg. var->array bitset, not var bitset, calc bitn
   IF NODEF(TM_LEDs) then
     TM_LEDs=0       ' LEDs other than 7Seg display (use high buffer bytes)
   END IF
-  IF NODEF(Com_Cathode) And NODEF(Com_Anode) then ' Set const "Com_Cathode"
-    Com_Cathode=""
+  IF NODEF(Com_Cathode) Then
+    If NODEF(Com_Anode) then ' Set const "Com_Cathode"
+      Com_Cathode=""
 '    Warning "====== Message: Com_Cathode Selected ======"
+    END IF
   END IF
   IF NODEF(TMDly) then
     TMdly=5       ' clk <-> DIO delay us

@@ -30,7 +30,7 @@
 
 ;Preamble
     CLS
-    print "GCBasic 2020"
+    print "GCBasic 2023"
     locate 1,0
     print "DS18B20 Demo"
     wait 2 s

@@ -117,8 +117,8 @@ byteNumber = 0
 
 // ----- Main program
 
-GLCDPrint 2, 2,   "Great Cow BASIC"
-GLCDPrint (2, 18, "Anobium 2022")
+GLCDPrint 2, 2,   "GCBASIC"
+GLCDPrint (2, 18, "Anobium 2023")
 GLCDPrint (2, 34, "GLCD Portability Demo")
 GLCDPrint (2, 50, ChipNameStr )
 Box 0,0,127,63

@@ -4,7 +4,7 @@ A demonstration program for GCBASIC.
 Some PIC microcontrollers have 16-bit PWM peripherals.
 
 These include 12F/16F15xx, 16F17xx and 18FxxQxx microcontrollers and possibly a few others. 
-Great Cow Basic supports 16-bit PWM on the 12F/16F chips. 
+GCBASIC supports 16-bit PWM on the 12F/16F chips. 
 
 18F series family of chips the 16-Bit PWM is supported by direct access to the PWM registers. This enable the use of the dedicated PWM modules.
 

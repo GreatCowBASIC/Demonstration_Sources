@@ -108,7 +108,7 @@ sub ShowCase1
         GLCDDrawString ( 42, SSD1289_GLCD_HEIGHT - 30 , "SSD1289" , SSD1289_WHITE )
 
         GLCDfntDefaultsize = 1
-        GLCDDrawString ( SSD1289_GLCD_WIDTH - 60, 2 , " Dec 2019" , SSD1289_WHITE )
+        GLCDDrawString ( SSD1289_GLCD_WIDTH - 60, 2 , " Dec 2023" , SSD1289_WHITE )
 
 
         'Revert the font size
@@ -168,12 +168,12 @@ sub ShowCase2
         GLCDDrawString ( 50, SSD1289_GLCD_HEIGHT - 30 , "SSD1289 Driver" , SSD1289_WHITE )
 
         GLCDfntDefaultsize = 1
-        GLCDDrawString ( SSD1289_GLCD_WIDTH - 60, 2 , "Dec 2019" , SSD1289_WHITE )
+        GLCDDrawString ( SSD1289_GLCD_WIDTH - 60, 2 , "Dec 2023" , SSD1289_WHITE )
 
         'Revert the font size
         GLCDfntDefaultsize = oldfont
         GLCDForeground = SSD1289_WHITE
-				BigPrint_SSD1289 ( 100 , SSD1289_GLCD_HEIGHT - 60 , "Great Cow BASIC" )
+				BigPrint_SSD1289 ( 100 , SSD1289_GLCD_HEIGHT - 60 , "GCBASIC" )
 
         DO forever
 

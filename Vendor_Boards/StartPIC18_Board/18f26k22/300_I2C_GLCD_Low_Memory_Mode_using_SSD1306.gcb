@@ -1,6 +1,6 @@
 '''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program demonstrates the basic primatives of a Graphical LCD (GLCD)
+'''This program demonstrates theGCBASIC primatives of a Graphical LCD (GLCD)
 '''
 '''
 '''This program uses the Low Memory Mode GLCD - this means the microcontroller does not require a large amount of RAM.
@@ -95,7 +95,7 @@ HI2CMode Master
 #DEFINE GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
 
 Dim myString As String * 28
-myString = "Great Cow BASIC 2022"
+myString = "GCBASIC 2023"
 
 
 'Open GLCD page mode of operations. The SSD1306 has 8 pages, so, we use the pages 0 and 7

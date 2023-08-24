@@ -59,7 +59,7 @@
 ; ----- Main body of program commences here.
   'Main loop
   cls
-  print "Great Cow Basic "
+  print "GCBASIC "
   locate 1 , 0
   print "DS18B20   @2015 "
   wait 3 s

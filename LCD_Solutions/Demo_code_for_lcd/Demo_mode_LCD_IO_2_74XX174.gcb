@@ -23,6 +23,6 @@
   #define LCD_WIDTH 20                ;specified lcd width for clarity only.  20 is the default width
 
   CLS
-  Print "Great Cow BASIC"
+  Print "GCBASIC"
   Locate 1,0
   Print "  Hello World."

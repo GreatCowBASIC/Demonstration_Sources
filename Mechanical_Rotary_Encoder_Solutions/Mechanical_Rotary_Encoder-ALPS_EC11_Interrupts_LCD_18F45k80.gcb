@@ -90,10 +90,10 @@
 	CLS
   PRINT "Rotary Enc. Demo"
   Locate 1,0
-  PRINT "Great Cow BASIC"
+  PRINT "GCBASIC"
   wait 2 s
   CLS
-  Print "@Dec 2019"
+  Print "@Dec 2023"
   Locate 1,0
   PRINT "Immo's&Ano Code"
   wait 2 s

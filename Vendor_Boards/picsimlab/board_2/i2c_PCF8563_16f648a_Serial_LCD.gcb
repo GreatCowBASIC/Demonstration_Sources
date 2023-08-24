@@ -117,7 +117,7 @@ LCDCursor CURSOROFF
 Locate 0,0
 Print "PCF85x3 Clock"
 Locate 1,0
-Print "Great Cow Basic 2019"
+Print "GCBASIC 2023"
 Wait 2 s
 CLS
 

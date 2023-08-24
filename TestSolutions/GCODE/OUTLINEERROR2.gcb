@@ -1,0 +1,741 @@
+'Line 413
+#Skiptest
+'       $formattagcb
+'       ===================================================================================================================================================
+'       Nuova_stazione_meteo3.gcb
+'       -
+'       Stazione meteo con la misura della:
+'       '       Temperatura
+'       '       Umidità
+'       '       Pressione atmosferica
+'       '       Velocità del vento
+'       '       Direzione del vento
+'       '       Ricezione segnale orario DCF77
+'       -
+'       -
+'       La velocità e la direzione del vento sono dati da un segnale analogico 0-5V
+'       La ricezione del segnale DCF77 è effettuata da un micro PIC12F1840 che
+'       dialoga con questo tramite un pin più la porta seriale software.
+'       ---------------------------------------------------------------------------------------------------------------------------------------------------
+'       -
+'       -
+'       ===================================================================================================================================================
+'       REVISIONE:
+'       -
+'       04/07/2023 R1A
+'       Prima versione
+'       -
+'       STATO DI REVISIONE
+        #Define REVISIONE "R1A - 04/07/23"
+'       ---------------------------------------------------------------------------------------------------------------------------------------------------
+'       -
+'       -
+'       -
+'       -                         PIC16F18346A
+'       '                       ______   ______
+'       '                      |     |___|     |
+'       '                VDD  o[ 1          20 ]o  Vss
+'       '     Lett DCF   RA5  o[ 2          19 ]o  RA0/AN0  ADC Anemometro
+'       '     RX         RA4  o[ 3          18 ]o  RA1/AN1  ADC Anemoscopio
+'       '     TX         RA3  o[ 4          17 ]o  RA2      Sensore pioggia
+'       '     Buzzer     RC5  o[ 5          16 ]o  RC0      RX software
+'       '     S.P.Inst   RC4  o[ 6          15 ]o  RC1      TX software
+'       '     INT DS3231 RC3  o[ 7          14 ]o  RC2      HC-12 SET
+'       '                RC6  o[ 8          13 ]o  RB4      SCL1
+'       '     Led clock  RC7  o[ 9          12 ]o  RB5      SDA1
+'       '     Tasto TX   RB7  o[ 10         11 ]o  RB6      Alimentazione HC-12
+'       '                      |_______________|
+'       -
+'       -
+'       Messaggi memorizzati nella eeprom del DS3231
+'       Commentare se usano i messaggi di stringa inseriti nel programma.
+'       Dopo alcune prove, con i pochi messaggi usati, si risparmia più spazio usando le stringhe. Quindi va commentato.
+'       #Define MESS_EEPROM
+'       -
+'       -
+'       ===================================================================================================================================================
+'       Calcolo della velocità del vento con gli impulsi
+'       -
+'       F = 0.2 + 0.096 * M
+'       -
+'       ' Dove:
+'       '       F = Velocità in metri al secondo
+'       '       M = Inpulsi al secondo
+'       ===================================================================================================================================================
+'       -
+'       -
+'       ===================================================================================================================================================
+'       Calcolo della velocità del vento in base alla Tensione
+'       -
+'       Con tensione di 0-5V:
+'       F = V/5 * A + B
+'       ' Dove:
+'       '       F = Velocità in metri al secondo
+'       '       A = Larghezza della gamma del sensore (limite superiore meno limite inferiore)
+'       '       B = Il valore più basso della gamma del sensore
+'       '       Ad esempio: il campo sensore è 0-30 m/s quindi A = 30, B = 0
+'       ===================================================================================================================================================
+'       -
+'       -
+'       ===================================================================================================================================================
+'       LETTURA ADC TENSIONI
+'       -
+'       Proporzione:
+'       Vref : VDigMax = x : Digin
+'       Dove:
+'       Vref = 4.096  VDigMax = 1024  DigIn = valore letto ADC
+'       Resolution = (Vref+ – Vref-)/(1024)   (as it is 10 bit ADC)
+'       ------------------------------------------------------------------------------------------------------------------------------------
+'       -
+'       -
+'       -
+'       Inizio programma:
+'       -
+        #Option Explicit
+'       -
+'       Oscillatore interno 32MHz
+        #Chip 16F18346, 32
+        #Config RSTOSC = HFINT32
+        #Config FEXTOSC = Off
+'       #Config OSC = INT
+'       -
+'       INCLUDE
+'       BME280
+        #Include "BME280.H"
+'       DS3231
+        #Include "DS3231.H"
+'       Seriale software
+        #Include <softserial.h>
+'       Definizone dei Comandi riconosciuti
+        #Include "..\comandi mia codifica aggiornato\comandi_mia_codifica.h"
+'       Definizione di alcune costanti
+        #Include "Definizioni_Costanti.gcb"
+'       Per usare i messaggi registrati sulla eeprom del ds3231
+        #Include "messaggi.gcb"
+'       Usandolo si risparmiano più di 100 bytes
+        #Include "optimization.h"
+'       -
+'       -
+'       ====================================================================================================================================
+'       Numero di secondi da usare per il campionamento della
+'       velocità del vento. OK da 5 a 15.
+'       Anemometro ad impulsi.
+        #Define SECONDICAMP 5
+'       -
+'       Numero di impulsi dell'anemometro per ogni giro completo
+        #Define NUMIMPULSIPERGIRO  1
+'       ------------------------------------------------------------------------------------------------------------------------------------
+'       -
+        #StartUp InitPPS, 85
+        #Define PPSTOOLPART 16f18346
+'       -
+'       -
+'       Costanti logiche
+        #Define VERO    1
+        #Define FALSO   0
+'       -
+'       USART settings
+        #Define USART_BAUD_RATE 9600 'sets up comport 1 For 9600 baud
+        #Define SERINPORT       PORTB.2
+        #Define SEROUTPORT      PORTB.5
+'       -
+'       -
+'       Stato che deve avere il pin per effettuare la lettura dal ricevitore DCF77
+        #Define STATOLETTURA 1
+'       -
+'       -
+'       ====================================================================================================================================
+'       Configurazione Software Serial UART :
+'       ------------------------------------------------------------------------------------------------------------------------------------
+        #Define SER1_BAUD 1200     ' Baudrate must be defined
+        #Define SER1_DATABITS 8    ' Databits Optional (default = 8)
+        #Define SER1_STOPBITS 1    ' Stopbits Optional (default = 1)
+        #Define SER1_INVERT Off    ' Inverted polarity Optional (default = Off)
+'       -
+'       Config I/O ports for transmitting:
+        #Define SER1_TXPORT PORTC  ' I/O port (without .Bit) must be defined
+        #Define SER1_TXPIN 1       ' Portbit must be defined
+'       -
+'       Config I/O ports for receiving:
+        #Define SER1_RXPORT PORTC  ' I/O port (without .Bit) must be defined
+        #Define SER1_RXPIN 0       ' Portbit must be defined
+        #Define SER1_RXNOWAIT Off  ' Don't Wait For stopbit Optional (default = Off)
+'       ------------------------------------------------------------------------------------------------------------------------------------
+'       -
+'       -
+'       ====================================================================================================================================
+'       ESEMPIO TRASMISSIONE SERIALE SOFTWARE
+'       Ser1Send  13   'new line in Terminal
+'       Ser1Send  10
+'       Ser1Print "Software-UART: "  'send a text
+'       Ser1Print xx   'send the value of xx
+'       xx += 1
+'       ESEMPIO RICEZIONE SERIALE SOFTWARE:
+'       Do Forever
+'       LoopedReceive(120)       'wait 120 * 10000 loops for startbit
+'       Ser1Send 10              'new line in Terminal
+'       Ser1Send 13
+'       If RxTimeOut Then        'if timeout counter > 0 a byte is received
+'       Ser1Print "You sent: "
+'       Ser1Send RecByte       'send the byte
+'       Else                    'if timeout counter is down to 0, nothing is received
+'       Ser1Print "TimeOut!"   '... so sent a hint
+'       End If
+'       Loop
+'       ------------------------------------------------------------------------------------------------------------------------------------
+'       -
+'       -
+'       ====================================================================================================================================
+'       Definizione I2C settings HARDWARE
+'       -
+        HI2CMode Master
+        #Define HI2C_BAUD_RATE 400
+        #Define HI2C_DATA      PORTB.5
+        #Define HI2C_CLOCK     PORTB.4
+'       ------------------------------------------------------------------------------------------------------------------------------------
+'       -
+'       -
+'       =====================================================================================================================================
+'       LCD I2C
+'       -
+        #Define LCD_IO 10                  ' This is required!
+'       #Define LCD_I2C_ADDRESS_1 0x7E     ' 126 Default = 0x4e 0x7e=lcd giallo
+        #Define LCD_I2C_ADDRESS_1 126      ' OK
+        #Define LCD_SPEED FAST             ' Defaults is FAST
+        #Define LCD_BACKLIGHT_ON_STATE  1  ' type 10 LCD
+        #Define LCD_BACKLIGHT_OFF_STATE 0  ' type 10 LCD
+'       ------------------------------------------------------------------------------------------------------------------------------------
+'       -
+'       -
+'       ====================================================================================================================================
+'       Comandi trasmessi al ricevitore DCF77 con il PIC12F1840
+'       -
+        #Define COM_PREPARA_ORARIO   = "@"   ' Leggi RF e prepara l'orario
+        #Define COM_TX_ORARIO        = "#"   ' Inviami l'orario letto
+        #Define COM_AZZERA_PIN       = "Z"   ' Azzera il pin In uscita che indica la lettura OK DCF77
+        #Define COM_DISP_ON          = "1"   ' Display attivo
+        #Define COM_DISP_OFF         = "0"   ' Display NON attivo
+        #Define COM_RESET            = "R"   ' Resetta il circuito
+'       -
+'       I dati dell'orario vengono trasferiti sull'array 'a_orario' e,
+'       una volta calcolato il checksum vengono inviati tramite
+'       la seriale a 1200 bps.
+'       ------------------------------------------------------------------------------------------------------------------------------------
+'       -
+'       -
+'       ====================================================================================================================================
+'       Gamma MAX di lettura dell'anemometro.
+'       Massimo valore in metri/secondo misurabile dall'anemometro usato.
+'       -
+        #Define GAMMA_MAX 30 ' 30 metri al secondo
+'       ------------------------------------------------------------------------------------------------------------------------------------
+'       -
+'       -
+'       ====================================================================================================================================
+'       Nomi mnemonici per i vari pin
+'       -
+        #Define MOSFET_HC12   LATB.6     ' Alimentazione HC-12
+        #Define PIN_DCF_LETTO PORTA.5    ' Il ricevitore ha letto il segnale DCF77
+'       ------------------------------------------------------------------------------------------------------------------------------------
+'       -
+'       -
+'       Numero di letture ADC
+        #Define NUMEROLETTURE  3
+'       -
+'       ====================================================================================================================================
+'       Stato del pin per settare il TX HC-12, pin relativo e velocità seriale hardware
+'       -
+        #Define HC12_SET_STATO  0             ' Stato del pin per settare l' HC-12
+        #Define HC12_FUN_STATO  1             ' Funzionamento normale HC-12
+        #Define HC12_SET_PIN    LATC.2        ' Pin settaggio HC-12
+        #Define S_SER_SPEED     SPEED_2400    ' Velocitè seriale (2=2400)
+        #Define CANALE_DEFAULT  99            ' Canale RF utilizzato
+'       ------------------------------------------------------------------------------------------------------------------------------------
+'       -
+'       -
+'       ====================================================================================================================================
+'       Tasto per test di trasmissione e led indicante il clock
+'       -
+        #Define TASTOTEST      PORTB.7    ' Pin del tasto
+        #Define STATOTASTOTEST 0          ' Stato che deve avere per eseguire le operazioni
+        #Define LED_CLOCK      PORTC.7    ' Pin del led
+'       ------------------------------------------------------------------------------------------------------------------------------------
+'       -
+'       -
+'       BUZZER
+        #Define SOUNDOUT PORTC.5
+'       -
+'       -
+'       ====================================================================================================================================
+'       '                                                  Dimensionamento variabili
+'       ====================================================================================================================================
+'       -
+'       Array contenente i valori standard di Tensione relativi gli otto punti cardinali
+'       Questi valori si possono ruotare a secondo dell'orientamento dell'anemoscopio
+        Dim ValoriAnemoscopio (8) As Byte  ' Sequenza di valori con 0=NORD
+        Dim DatiAnemoscopio   (8) As Byte  ' Sequenza di valori con 0 impostato su un altro punto cardinale (ruotati)
+'       -
+'       Altre variabili
+        Dim Int_Value        As Integer              ' Per uso generico
+        Dim Tensione         As Integer              ' Per la lettura della Tensione ADC
+        Dim MetriSecondo     As Integer              ' Velocità vento In metri/secondo
+        Dim ChilometriOrari  As Integer              ' Velocità vento In KmH
+        Dim Temperatura      As Integer              ' Temperatura misurata
+        Dim Umidita          As Long                 ' Umidità
+        Dim Pressione        As Long                 ' Pressione atmosferica
+        Dim bDCF77           As Byte                 ' Vera se è stato inviato l'orario dal ricevitore DCF77
+        Dim CntSec           As Byte                 ' Contatore secondi per timeout
+        Dim CntC             As Byte                 ' Contatore Loop per la lettura della Configurazione
+        Dim DirezioneVento   As Byte                 ' Lo dice il nome
+        Dim bUnSecondo       As Bit                  ' Trascorso 1 secondo
+        Dim MAcceso          As Byte                 ' Memoria stazione spenta/accesa
+'       -
+'       Quale comando eseguire
+        #Define ESEGUI_DCF   100
+        #Define ESEGUI_METEO 200
+'       Dim CosaEseguire    As Byte                 ' Meteo o DCF
+        
+        Dim bEseguiMeteo     As Bit
+        Dim bEseguiDCF       As Bit
+'       -
+'       Per la lettura seriale
+        #Define SER_TIMEOUT 5                      ' Timeout sulla seriale In Secondi
+        Dim bSeriale        As Bit
+        Dim bLettura        As Bit
+        Dim bComEs          As Bit
+        Dim bExit           As Bit
+        Dim bOk             As Bit
+        Dim bTimeOut        As Bit
+        Dim bUsc            As Bit
+        Dim MSeq            As Byte                 ' Memoria sequenza comandi ricevuta
+        Dim Tmp             As Byte
+        Dim CntSec2         As Byte
+'       -
+'       Per leggere l'orario DCF77
+        Dim bLeggi_DCF      As Bit                  ' Comando per effettuare la lettura
+        Dim bDCF_Letto      As Bit                  ' La lettura è stata effettuata
+'       -
+'       Cosa Sto visualizzando
+        #Define DSP_VENTO 1'
+        #Define DSP_TEMP  2'
+        Dim CosaVedo As Byte
+'       -
+'       ====================================================================================================================================
+'       COMANDI MIA CODIFICA
+'       Queste definizioni servono solo per mantenere una certa
+'       compatibilità con la struttura dei programmi scritti in MikroBasic.
+'       Il primo indice parte da 0 invece che da 1 come gli altri array.
+'       ------------------------------------------------------------------------------------------------------------------------------------
+        Dim Record (12) As    Byte
+        #Define DATI_UNIT     Record (0)
+        #Define DATI_IND1     Record (1)
+        #Define DATI_IND2     Record (2)
+        #Define DATI_COMANDO  Record (3)
+        #Define DATI_PARAM1   Record (4)
+        #Define DATI_PARAM2   Record (5)
+        #Define DATI_PARAM3   Record (6)
+        #Define DATI_PARAM4   Record (7)
+        #Define DATI_PARAM5   Record (8)
+        #Define DATI_PARAM6   Record (9)
+        #Define DATI_SEQUENZA Record (10)
+        #Define DATI_CRC      Record (11)
+'       -
+'       ====================================================================================================================================
+'       Configurazione
+'       L'Indice parte da 0
+        #Define LUNG_CONFIGURAZIONE 30
+        Dim Configurazione (LUNG_CONFIGURAZIONE ) As Byte
+        #Define CONF_UNIT            Configurazione (0)
+        #Define CONF_IND1            Configurazione (1)
+        #Define CONF_IND2            Configurazione (2)
+        #Define CONF_SETTATO         Configurazione (3)
+        #Define CONF_ACCESO          Configurazione (4)
+'       Abilitazioni (ON/OFF) dei vari sensori
+        #Define CONF_ANEMOMETRO_ON   Configurazione (5)
+        #Define CONF_ANEMOSCOPIO_ON  Configurazione (6)
+        #Define CONF_TEMP_ON         Configurazione (7)
+        #Define CONF_UMIDITA_ON      Configurazione (8)
+        #Define CONF_PRESSIONE_ON    Configurazione (90)
+        #Define CONF_DCF77_ON        Configurazione (10)
+'       Intervallo di tempo per la lettura dei vari sensori
+        #Define CONF_INT_TEMPERATURA Configurazione (11)
+        #Define CONF_INT_UMIDITA     Configurazione (12)
+        #Define CONF_INT_PRESSIONE   Configurazione (13)
+        #Define CONF_INT_DCF77       Configurazione (14)
+        #Define CONF_INT_ANEMOMETRO  Configurazione (15)
+        #Define CONF_INT_ANEMOSCOPIO Configurazione (16)
+'       Altri settaggi
+        #Define CONF_SLEEP           Configurazione (17) ' Se settato manda il circuito In Sleep per N minuti
+        #Define CONF_ZEROCARDINALE   Configurazione (18) ' Punto cardinale che esce il valore 0
+'       Zona per il DCF77
+        #Define CONF_UNIT_DCF        Configurazione (19) ' Indirizzo Unit DCF77
+        #Define CONF_IND1_DCF        Configurazione (20) ' Indirizzo Ind1 DCF77
+        #Define CONF_IND2_DCF        Configurazione (21) ' Indirizzo Ind2 DCF77
+'       Per usare il display LCD
+        #Define CONF_USA_DISPLCD     Configurazione (22) ' Se VERO usa il display LCD
+'       Intervallo per visualizzare i dati meteo sul display
+        #Define CONF_INT_DISP_LCD    Configurazione (23) ' Intervallo In minuti per visualizzare i dati meteo sul display
+'       Intervallo per la trasmissione periodica dei dati
+        #Define CONT_INT_TXDATI      Configurazione (24) ' Intervallo In minuti per la trasmissione radio di tutti i dati (0=disabilitata)
+'       Display attivo sul ricevitore DCF77
+        #Define CONF_LCDDCF77_ON     Configurazione (25) ' Se VERO display attivo sul ricevitore DCF77
+'       Tempo di visualizzazione del display info temperatura e info vento
+        #Define CONF_INT_SWITCHDISP  Configurazione (26) ' Tempo In secondi
+'       Numero di secondi accensione luce del display LCD (0=sempre accesa)
+        #Define CONF_SEC_LUCELCD     Configurazione (27) ' Secondi accensione luce LCD
+'       Sensori di pioggia
+        #Define CONF_PIOGTEMPOREALE  Configurazione (28) ' Se >0 abilita il sensore e invia la pioggia In tempo reale. Non ha bisogno del contatore tempo.
+        #Define CONF_PIOGGIA         Configurazione (29) ' Se >0 abilita il sensore di pioggia sughero abilitato
+        #Define CONF_TEMPOPIOGGIA    Configurazione (30) ' Tempo per la lettura del sensore di pioggia sughero
+'       -
+'       -
+'       ====================================================================================================================================
+'       Contatori
+'       Contatori tempo trascorso
+        #Define LUNG_CONTATORI       16
+        Dim Contatori (LUNG_CONTATORI) As Byte
+        #Define CONT_SECDISP         Contatori (1)   ' Secondi per la visualizzazione delle informazioni Temperatura e vento sul display
+        #Define CONT_SECONDI         Contatori (2)   ' Secondi trascorsi
+        #Define CONT_MINUTI          Contatori (3)   ' Minuti trascorsi
+        #Define CONT_ORE             Contatori (4)   ' Ore
+        #Define CONT_GIORNI          Contatori (5)   ' Giorni
+        #Define CONT_MIN_ANEMOMETRO  Contatori (6)   ' Minuti trascorsi per lettura anemometro
+        #Define CONT_MIN_ANEMOSCOPIO Contatori (7)   ' Minuti trascorsi per lettura anemoscopio
+        #Define CONT_MIN_TEMPERATURA Contatori (8)   ' Minuti trascorsi per lettura Temperatura
+        #Define CONT_MIN_UMIDITA     Contatori (9)   ' Minuti trascorsi per lettura umidità
+        #Define CONT_MIN_DCF77       Contatori (10)  ' Minuti trascorsi per lettura DCF77
+        #Define CONT_ORE_DCF77       Contatori (11)  ' Ore trascorse per lettura DCF77
+        #Define CONT_GIORNI_DCF77    Contatori (12)  ' Giorni trascorsi per lettura DCF77
+        #Define CONT_MIN_VENTO       Contatori (13)  ' Minuti trascordsi per la lettura della velocità del vento
+        #Define CONT_SEC_LUCE_LCD    Contatori (14)  ' Contatore minuti trascorsi per la visualizzazione dei dati meteo sul display
+        #Define CONT_MIN_DISP_LCD    Contatori (15)  ' Minuti trascorsi per display info su LCD
+        #Define CONT_MIN_SENSPIOGGIA Contatori (16)  ' Secondi da attendere tra le letture del sensore di pioggia
+'       -
+'       -
+'       Delete next line to see the structure
+//*     DELETE THIS LINE TO SEE THE STRUCURE ON THE LEFT OF THE SCREEN
+'       -
+'       ====================================================================================================================================
+'       TRASMISSIONE DATI Temperatura UMIDITA' E Pressione
+'       L'array parte da 0
+'       #Define LUNG_TXDATI 14
+'       Dim TxDati (LUNG_TXDATI -1) As Byte
+'       I primi 4 bytes equivalgono all'indirizzamento della Mia codifica più il Comando
+'       #Define TXD_UNIT     TxDati (0)
+'       #Define TXD_IND1     TxDati (1)
+'       #Define TXD_IND2     TxDati (2)
+'       #Define TXD_COMANDO  TxDati (3)
+'       Seguono i dati da trasmettere
+'       #Define TXD_SEGNO    TxDati (4)      ' Segno Temperatura (+ -)
+'       #Define TXD_TEMPINT  TxDati (5)      ' Temperatura intero
+'       #Define TXD_TEMPDEC  TxDati (6)      ' Temperatura decimal
+'       #Define TXD_UMIDITA  TxDati (7)      ' Umidità
+'       #Define TXD_TEMPFAR  TxDati (8)      ' Temperatura fareneith
+'       #Define TXD_VENTO_H  TxDati (9)      ' Velocità vento Byte alto
+'       #Define TXD_VENTO_L  TxDati (10)     ' Velocità vento Byte basso
+'       #Define TXD_BEAUFORT TxDati (11)     ' Velocità vento Byte alto
+'       #Define TXD_VENTO_H  TxDati (12)     ' Velocità vento Byte alto
+'       -
+'       ====================================================================================================================================
+'       REMOTE CONTROL
+'       Comandi
+        #Define RC_GOTO_REMOTE 161        ' Si PORTA In remote control (*)
+        #Define RC_EXIT_REMOTE 162        ' Esce dal remote control    (*)
+'       -
+'       Prompt utilizzati per il remote control
+        #Define PROMPT_OK           "OK"
+        #Define PROMPT_OK2          ">OK<"
+        #Define PROMPT_REMOTE       "RC>"      ' Prompt remote control
+        #Define PROMPT_EXIT_REMOTE  "<RC"      ' Prompt Exit remote control
+        #Define PROMPT_RCCOMMAND    ">RC"      ' Prompt Dentro remote control
+        #Define PROMPT_INREMOTE     "R>C"      ' Prompt risposta già In remote control
+'       -
+'       ====================================================================================================================================
+'       Circuito acceso/spento
+        Dim StatoOnOff    As Byte
+        #Define STATO_ON  1
+        #Define STATO_OFF 0
+'       -
+'       Stringa per la stampa sulla seriale dei valori in uscita
+        #Define LUNG_STRINGATX 30
+        Dim StringaTx As String *LUNG_STRINGATX
+'       -
+'       -
+'       ===============================================================
+'       Interrupts
+'       ---------------------------------------------------------------
+'       ---> Arrivo dati sulla porta seriale
+        On Interrupt UsartRX1Ready Call INT_LeggiSeriale
+'       -
+'       ---> Interrupt sulla porta C.3. Un impulso al secondo
+'       INTEDG= Interrupt Edge Select bit
+'       1 = Interrupt on rising edge of INT pin
+'       0 = Interrupt on falling edge of INT pin
+        INTEDG   = 1  ' INTCON.INTEDG Abilita Interrupt
+'       Enable portc.3 as the source of the interrupt.
+'       See the datasheet for more information.
+        IOCCP.IOCCP3 = 1
+        On Interrupt PORTChange Call INT_UnSecondo 'OK
+'       -
+'       -
+'       ====================================================================================================================================
+'       ORARIO DCF77
+'       Array con l'orario ricevuto e il Crc
+        Dim a_Orario (7) As Byte
+        Dim CrcCalc      As Byte
+'       -
+        Dim wLung  As Word
+        Dim wLCnt  As Word
+        Dim LgCnt  As Byte
+        Dim LgCnt2 As Byte
+        Dim LgPunt As Byte
+        Dim MmCRC  As Byte
+        Dim LgbOk  As Bit
+        Dim LGCrc1 As Byte
+        Dim LGCrc2 As Byte
+'       -
+'       -
+'       ====================================================================================================================================
+'       ANEMOSCOPIO
+'       Tabella con i valori di Tensione misurati all'uscita dell'anemoscopio:
+'       Per definizione il valore 0 è indicato come NORD.
+'       -
+'       Tensione misurata
+'       NORD       = 0V
+'       NORD-EST   = 0.71 V
+'       EST        = 1.43 V
+'       SUD-EST    = 2.14 V
+'       SUD        = 2.86 V
+'       SUD-OVEST  = 3.57 V
+'       OVEST      = 4.28 V
+'       NORD-OVEST = 5 V
+'       -
+'       Corrispondenza tra la Tensione in uscita dal sensore e il valore 8 bit letto dall'ADC del micro
+'       0 V     Rapportati a 255 (lettura 8 bit) = 0    NORD
+'       0.71 V       "     "  "          "       = 36   NORD-EST
+'       1.43 V       "     "  "          "       = 72   EST
+'       2.14 V       "     "  "          "       = 109  SUD-EST
+'       2.86 V       "     "  "          "       = 145  SUD
+'       3.57 V       "     "  "          "       = 182  SUD-OVEST
+'       4.28 V       "     "  "          "       = 218  OVEST
+'       5 V          "     "  "          "       = 255  NORD-OVEST
+'       -
+'       TOLLERANZA (valore) in più o in meno per la lettura dell'anemoscopio.
+'       Usata sul valore letto dall'ADC e non sul valore di tensione convertito.
+        #Define TOLLERANZA = 5
+'       ------------------------------------------------------------------------------------------------------------------------------------
+'       -
+'       -
+'       Definizione degli otto punti cardinali riconosciuti dal sensore anemoscopio.
+        #Define NORD      11
+        #Define NORDEST   12
+        #Define EST       13
+        #Define SUDEST    14
+        #Define SUD       15
+        #Define SUDOVEST  16
+        #Define OVEST     17
+        #Define NORDOVEST 18
+'       -
+'       -
+'       ====================================================================================================================================
+'       PIOGGIA
+        #Define PIN_PIOGGIA      PORTA.2      ' Sensore di pioggia con sughero
+        #Define PIN_PIOGGIA_INST PORTC.4      ' Sensore di pioggia istantaneo
+        #Define STATOPIOGGIA     1            ' Valore misurato con la pioggia
+        Dim MPioggia     As Byte              ' Memoria stato pioggia
+        Dim MPioggiaInst As Byte              ' Memoria pioggia istantanea
+'       ------------------------------------------------------------------------------------------------------------------------------------
+'       -
+'       -
+'       -
+'       ************************************************************************************************************************************
+'       ------------------------------------------------------------------------------------------------------------------------------------
+'       '                                                  M A I N   P R O G R A M
+'       ------------------------------------------------------------------------------------------------------------------------------------
+'       ************************************************************************************************************************************
+main:
+        SettaRegistri
+        IntOff
+'       -
+        If CONF_USA_DISPLCD Then
+           LuceDisplay (1)
+           Dsp_Splash
+        End If
+'       -
+        LeggiConfigurazione
+        If CONF_SETTATO <> 27 Then
+           InizializzaConfigurazione
+           SalvaConfigurazione
+        End If
+'       -
+        InizializzaValoriPuntiCardinale
+        ImpostaZeroCardinale (CONF_ZEROCARDINALE)
+        HC12_InitHC12
+'       -
+        BME280_Init
+        DS3231_Init
+'       -
+'       Presenza o meno del display LCD sul ricevitore DCF77
+'       Trasmette il comando
+        If CONF_LCDDCF77_ON Then
+           Ser1Send COM_DISP_ON
+        Else
+           Ser1Send COM_DISP_OFF
+        End If
+'       -
+'       Flags per la lettura pereiodica del DCF77
+        bLeggi_DCF = FALSO
+        bDCF_Letto = FALSO
+'       -
+        AzzeraContatori
+'       -
+'       Per stabilizzare
+        Wait 1 s
+'       Set2400
+'       Set9600
+'       -
+        Dsp_PreparaDisplay
+'       -
+'       -
+'       -
+'       ========================================================================
+'       '                          Loop principale
+'       ========================================================================
+        Do ForEver                                           ' Loop principale
+'          E' stato ricevuto qualcosa sulla seriale
+           If bSeriale Then
+              bSeriale = FALSO
+              LeggiSeriale
+              If bLettura Then                          ' Se ha letto da seriale
+                 EseguiComando                    ' Esegue il comando ricevuto
+                 If MAcceso <> CONF_ACCESO Then
+                    MAcceso = CONF_ACCESO
+                    Dsp_PreparaDisplay
+                 End If
+                 bLettura = FALSO
+                 If bComEs Then
+'                   Dsp_Tutto
+                    bComEs = FALSE
+                 End If
+              End If
+           End If
+'          -
+'          Trascorso un secondo
+           If CONF_USA_DISPLCD Then
+              If bUnSecondo Then
+                 bUnSecondo = FALSE
+                 Dsp_AggiornaDisplay            ' Aggiorna il display
+              End If
+           End If
+'          -
+'          Operazioni da eseguire solo se la stazione meteo è accesa
+           If CONF_ACCESO Then
+'             Lettura stato del pin
+              bDCF77 = (PIN_DCF_LETTO = STATOLETTURA)
+              If bDCF77 Then
+                 If bEseguiDCF Then
+                    If LeggiOrarioDCF77 Then
+                       TrasmettiOraEsatta
+                    End If
+                 Else
+                    Ser1Send COM_AZZERA_PIN
+                 End If
+                 bDCF77 = FALSO
+                 bEseguiDCF = 0
+              End If
+'             Intervallo misura Temperatura
+              If CONF_INT_TEMPERATURA Then
+                 If CONT_MIN_TEMPERATURA >= CONF_INT_TEMPERATURA Then
+                    CONT_MIN_TEMPERATURA = 0
+                    InviaTemperaturaAllaCentrale
+                 End If
+              End If
+'             Intervallo lettura velocità vento
+              If CONF_INT_ANEMOMETRO Then
+                 If CONF_ANEMOMETRO_ON Then
+                    If CONT_MIN_ANEMOMETRO >= CONF_INT_ANEMOMETRO Then
+                       CONT_MIN_ANEMOMETRO = 0
+                       LeggiAnemometro
+                       DirezioneVento = LeggiAnemoscopio
+                       InviaDatiVentoAllaCentrale
+                    End If
+                 End If
+              End If
+'             Intervallo lettura direzione vento
+              If CONF_INT_ANEMOSCOPIO Then
+                 If CONF_ANEMOSCOPIO_ON Then
+                    If CONT_MIN_ANEMOSCOPIO >= CONF_INT_ANEMOSCOPIO Then
+                       CONT_MIN_ANEMOSCOPIO = 0
+                       LeggiAnemometro
+                       DirezioneVento = LeggiAnemoscopio
+                       InviaDatiVentoAllaCentrale
+                    End If
+                 End If
+              End If
+'             Verifica Pressione tasto tasmissione dati
+              If TASTOTEST = STATOTASTOTEST Then
+                 If CONF_USA_DISPLCD Then
+                    If CONF_SEC_LUCELCD Then
+                       LuceDisplay (1)
+                    End If
+                 End If
+                 EseguiTrasmissioneDatasto
+'                Aspetta il rilascio del tasto premuto
+                 Do
+                    nop
+                 Loop Until TASTOTEST <> STATOTASTOTEST
+              End If
+'             Verifica la Pioggia in tempo reale.
+'             Nel momento che inizia a piovere invia il messaggio.
+              If CONF_PIOGTEMPOREALE Then
+                 If MPioggiaInst <> OraPioveInst Then
+                    MPioggiaInst = OraPioveInst
+                    InviadatiPioggiaAllaCentrale 3
+                 End If
+              End If
+'             Verifica della pioggia ad ogni intervallo di N minuti.
+'             Legge il sensore sughero.
+              If CONF_PIOGGIA Then
+                 If CONF_TEMPOPIOGGIA Then                               ' Se > 0
+                    If CONT_MIN_SENSPIOGGIA > CONF_TEMPOPIOGGIA Then
+                       CONT_MIN_SENSPIOGGIA = 0
+                       If MPioggia <> OraPiove Then
+                          MPioggia = OraPiove
+                          InviadatiPioggiaAllaCentrale 1
+                       End If
+                    End If
+                 End If
+              End If
+           End If
+'          ----- Fine delle operazioni da eseguire solo se accesa -----
+'          -
+'          Verifica il tempo trascorso illuminazione display LCD. Anche a stazione spenta.
+           If CONF_USA_DISPLCD Then
+              If CONF_SEC_LUCELCD Then
+                 If bDspLightOn Then
+                    If CONT_SEC_LUCE_LCD >= CONF_SEC_LUCELCD Then
+                       LuceDisplay (FALSE)
+                    End If
+                 End If
+              End If
+           End If
+        Loop
+'       ----- Fine Loop principale -----
+'       -
+'       -
+'       -
+'       ====================================================================================================================================
+'       '                                                     I N T E R R U P T S
+'       ------------------------------------------------------------------------------------------------------------------------------------
+'       -
+'       ========================================================================
+'       Interrupt dati seriali ricevuti.
+'       Setta il flag relativo.
+'       ------------------------------------------------------------------------
+Sub INT_LeggiSeriale
+        Tmp = HSerReceive   ' Legge il primo carattere
+        bSeriale = VERO
+'       clrwdt
+End Sub
+'       -
+'       -

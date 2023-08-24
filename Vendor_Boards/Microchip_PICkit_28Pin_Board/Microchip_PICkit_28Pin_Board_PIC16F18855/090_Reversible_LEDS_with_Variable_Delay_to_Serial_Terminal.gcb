@@ -90,7 +90,7 @@ leds = 8
 Dir portA.0 In
 
 HSerPrintCRLF 2
-HSerPrint "Great Cow Basic @2020": HSerPrintCRLF
+HSerPrint "GCBASIC @2023": HSerPrintCRLF
 HSerPrint "28Pin Demo Board": HSerPrintCRLF
 HSerPrint "Rotate demonstrations with serial": HSerPrintCRLF 3
 Wait 1 s

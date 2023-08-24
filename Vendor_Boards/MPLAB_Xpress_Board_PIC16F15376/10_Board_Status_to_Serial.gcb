@@ -20,7 +20,7 @@
 
 'Specify the Device you are compiling for - this board is the 16F15376
 #CHIP 16F15376
-'Great Cow BASIC simplifies the configuration by setting the frequency and the configuration for you.
+'GCBASIC simplifies the configuration by setting the frequency and the configuration for you.
 'This option ensures that all variables are dimensioned in the user program.  See http://gcbasic.sourceforge.net/help/__option_explicit.html
 #OPTION Explicit
 
@@ -75,7 +75,7 @@ switchState = LEDOn
 
 Wait 3 s
 HSerPrintCRLF
-HSerPrintStringCRLF "Great Cow BASIC Demonstration for the MPLAB Xpress PIC16F15376 Evaluation Board"
+HSerPrintStringCRLF "GCBASIC Demonstration for the MPLAB Xpress PIC16F15376 Evaluation Board"
 HSerPrintCRLF
 HSerPrintStringCRLF "Atttach a mechanical button with a 10k pull resistor to PORTC.0"
 HSerPrintStringCRLF "Atttach a LED to PORTC.1 via a suitable resistor (1k0)"

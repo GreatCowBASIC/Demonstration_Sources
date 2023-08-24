@@ -56,8 +56,8 @@
     box 0,0, GLCD_WIDTH-1, GLCD_HEIGHT-1, TFT_YELLOW
 
     GLCDfntDefaultsize = 1
-    GLCDPrint 22, 309, "Great Cow BASIC a compiler for Microchip AVR & PIC", TFT_BLACK
-    GLCDPrint  196, 6, "April 2019", TFT_BLACK
+    GLCDPrint 22, 309, "GCBASIC a compiler for Microchip AVR & PIC", TFT_BLACK
+    GLCDPrint  196, 6, "April 2023", TFT_BLACK
 
     'loop forever
     do

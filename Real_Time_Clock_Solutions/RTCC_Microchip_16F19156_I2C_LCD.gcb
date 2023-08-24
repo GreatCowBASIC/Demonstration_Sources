@@ -136,9 +136,9 @@
   CLS
 
   locate 0,0
-  Print "Great Cow BASIC"
+  Print "GCBASIC"
   locate 1,0
-  Print "@2018"
+  Print "@2023"
   wait 2 s
   CLS
 

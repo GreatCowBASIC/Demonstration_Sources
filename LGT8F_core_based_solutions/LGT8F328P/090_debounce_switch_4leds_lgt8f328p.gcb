@@ -40,7 +40,7 @@
 ; ----- Configuration
 #chip  LGT8F328P
 #option Explicit
-'Great Cow BASIC simplifies the configuration by setting the frequency and the configuration for you.   'Set constants to refer to the LEDs.
+'GCBASIC simplifies the configuration by setting the frequency and the configuration for you.   'Set constants to refer to the LEDs.
 
     #DEFINE LED1 portc.0
     #DEFINE LED2 portc.1

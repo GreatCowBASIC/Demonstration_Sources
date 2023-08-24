@@ -48,7 +48,7 @@ Dim POSX, CCOUNT, SIGNBIT, WHOLE, FRACT, DIG, MSG1LEN As Byte
 
 
 GLCDCLS
-GLCDPrint 0, 1, "Great Cow Basic "
+GLCDPrint 0, 1, "GCBASIC "
 Wait 1 s
 
 

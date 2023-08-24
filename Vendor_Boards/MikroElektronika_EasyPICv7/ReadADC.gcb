@@ -1,4 +1,4 @@
-'''A demonstration program for GreatCowBASIC.
+'''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program will demonstrate reading the analog to digital converter (ADC or A/D) module.
 '''This is implemented within GCBASIC to support 8-bit, 10-bit and 12-bit read operations.
@@ -6,7 +6,7 @@
 ''':
 '''This is a Single channel measurement mode, or normal mode demonstration.
 ''':
-'''Great Cow Basic will configure the analog to digitalconverter clock source, the programmed acquisition time and justification of the returned value.
+'''GCBASIC will configure the analog to digitalconverter clock source, the programmed acquisition time and justification of the returned value.
 '''The response can be a byte, word or integer (as defined in the GCBASIC method) these are 8-bit, 10-bit and 12-bit values respectively.
 ''':
 '''This demonstration show the usage for normal or Single channel measurement of the ADC.

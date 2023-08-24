@@ -46,7 +46,7 @@
       Print ChipNameStr + ": "+Str(ChipMHz) + "Mhz"
 
       Locate 1,0
-      Print "Great Cow BASIC"
+      Print "GCBASIC"
       wait 1 s
 
       dim TableLength, TablePosition, GraphicData as byte
@@ -130,17 +130,17 @@ Sub VFDFontSelect ( in VFDFontSelected )
 
 /*
   Select font type, font size and font spacing.
-  Font:- ‘A’ or ‘a’ = proportional 64 character mini-font.
-  ‘B’ = 5x7 LCD compatible font with Katakana characters.
-  ‘C’ = 10x14 LCD compatible font with Katakana characters.
+  Font:- ï¿½Aï¿½ or ï¿½aï¿½ = proportional 64 character mini-font.
+  ï¿½Bï¿½ = 5x7 LCD compatible font with Katakana characters.
+  ï¿½Cï¿½ = 10x14 LCD compatible font with Katakana characters.
 
-  ‘L’ = LCD Font (default)*
-  ‘I’ = International Font*
+  ï¿½Lï¿½ = LCD Font (default)*
+  ï¿½Iï¿½ = International Font*
 
-  ‘b’ = 5x7 international font with European characters.
-  ‘c’ = 10x14 international font with European characters.
-  ‘1’ = set the inter-character pixel spacing to 1 pixel.
-  ‘2’ = set the inter-character pixel spacing to 2 pixels.
+  ï¿½bï¿½ = 5x7 international font with European characters.
+  ï¿½cï¿½ = 10x14 international font with European characters.
+  ï¿½1ï¿½ = set the inter-character pixel spacing to 1 pixel.
+  ï¿½2ï¿½ = set the inter-character pixel spacing to 2 pixels.
 */
 
       SET LCD_RS OFF

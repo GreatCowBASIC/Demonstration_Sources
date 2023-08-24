@@ -22,13 +22,13 @@
 '#Include "millis.h"
 
 
-'If the millis.h file has been copied into your GreatCowBasic/include folder,
+'If the millis.h file has been copied into your GCBASIC/include folder,
 'use the following #Include statement
 '#Include <millis.h>
 '*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*^*
 
 #INCLUDE <millis.h>
-'Include the millis() library. This is stored in the /GreatCowBasic/include/
+'Include the millis() library. This is stored in the /GCBASIC/include/
 'folder so can be referenced with the filename encased in < > not encased in " "
 
 Dim     Dat           As Byte

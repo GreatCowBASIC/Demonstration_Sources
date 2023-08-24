@@ -129,9 +129,9 @@
       GLCDPrintStringLN "Sprite Demonstration"
 '      GLCDPrintStringLN str(GLCDfntDefaultSize)
 '      GLCDPrintStringLN ""
-      GLCDPrintStringLN "ILI9481     Nov 2019"
+      GLCDPrintStringLN "ILI9481     Nov 2023"
 '      GLCDPrintStringLN ""
-      GLCDPrintStringLN "Great Cow BASIC"
+      GLCDPrintStringLN "GCBASIC"
       wait 3 s
       glcdcls
       started = 1

@@ -38,7 +38,7 @@ Dim CCOUNT, SIGNBIT, WHOLE, FRACT, DIG As Byte
 
 ST7920GLCDDisableGraphics
 GLCDCLS
-GLCDPrint 0, 0, "Great Cow Basic "
+GLCDPrint 0, 0, "GCBASIC "
 Wait 2 s
 
 ST7920GLCDEnableGraphics

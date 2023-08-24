@@ -50,14 +50,14 @@
 
 ; ----- Main program
   GLCDfntDefaultSize = 2
-  GLCDPrint 0, 0,   "Great Cow"
-  GLCDPrint 0, 15,  "  BASIC"
+  GLCDPrint 0, 0,   "GCBASIC"
+  GLCDPrint 0, 15,  " GCBASIC"
 
   wait 3 s
   GLCDCLS
 
   GLCDfntDefaultSize = 1
-  GLCDPrint (0, 0, "Anobium 2019")
+  GLCDPrint (0, 0, "Anobium 2023")
   GLCDPrint (0, 9, "Timed pixel demo")
   GLCDPrint (76, 18, GLCD_WIDTH )
   GLCDPrint (96, 18, "*" )

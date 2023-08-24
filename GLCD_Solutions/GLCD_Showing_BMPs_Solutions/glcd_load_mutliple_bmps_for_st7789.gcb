@@ -82,7 +82,7 @@
 
     GLCDBMPLoad ( 0, 0, Anobium  )
 
-    GLCDPrint   ( 10, 230, "Great Cow BASIC 2021" )
+    GLCDPrint   ( 10, 230, "GCBASIC 2023" )
 
 '    GLCDCLS
 '    GLCDBMPLoad ( 0, 0, Another1 )

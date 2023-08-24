@@ -32,6 +32,6 @@
   ' LCDBacklight On	' Only with 74HC164/74LS164
 
   CLS
-  Print "Great Cow BASIC"
+  Print "GCBASIC"
   Locate 1,0
   Print "  Hello World."

@@ -1,6 +1,6 @@
 '''A program  for GCGB and GCB.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program demonstrates the basic GCBASIC GLCD commands plus the Nextion specifics to use Nextion fonts.
+'''This program demonstrates theGCBASIC GCBASIC GLCD commands plus the Nextion specifics to use Nextion fonts.
 '''
 '''The setup is:
 '''     Include the <glcd.h>
@@ -98,11 +98,11 @@
 
     GLCDLocateString_Nextion 1,1
     GLCDPrintDefaultFont_Nextion ( NextionFont0 )
-    GLCDPrintString_Nextion ( "Great Cow BASIC " )
+    GLCDPrintString_Nextion ( "GCBASIC " )
     GLCDLocateString_Nextion 130,1
     GLCDPrintStringLn_Nextion ( "v1.00.xx" )
 
-    GLCDPrint_Nextion ( 60, GLCD_HEIGHT - 40 , "Great Cow BASIC" , TFT_WHITE, NextionFont2 )
+    GLCDPrint_Nextion ( 60, GLCD_HEIGHT - 40 , "GCBASIC" , TFT_WHITE, NextionFont2 )
 
     GLCDPrintDefaultFont_Nextion ( NextionFont0 )
     GLCDPrint_Nextion ( 2, 18, "DrawStr",TFT_YELLOW)
@@ -124,7 +124,7 @@
 
     filledbox 2,GLCD_HEIGHT/2+10,42,GLCD_HEIGHT/2+50, TFT_RED
 
-    GLCDPrint_Nextion ( GLCD_WIDTH - 78, 2 , "Feb 2019" , TFT_WHITE, NextionFont0 )
+    GLCDPrint_Nextion ( GLCD_WIDTH - 78, 2 , "Feb 2023" , TFT_WHITE, NextionFont0 )
 
     GLCDForeground = TFT_WHITE
     GLCDPrint_Nextion ( 100 , GLCD_HEIGHT - 60 , "Nextion Driver", NextionFont1 )

@@ -53,11 +53,11 @@
 
 '    GLCDRotate ( Landscape )
 '
-'    GLCDPrint (4, 0, "Great", TFT_YELLOW )
+'    GLCDPrint (4, 0, "GCBASIC", TFT_YELLOW )
 '    GLCDForeground = TFT_GREEN
-'    GLCDPrintString (" Cow")
+'    GLCDPrintString ("GCBASIC")
 '    GLCDForeground = TFT_WHITE
-'    GLCDPrintString ( " BASIC 2020" )
+'    GLCDPrintString ( "GCBASIC 2023" )
 '    Circle  80,40, 10
 '    FilledCircle  80,40, 9, TFT_RED
 '    Wait 2 s

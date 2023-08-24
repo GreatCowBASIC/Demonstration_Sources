@@ -96,8 +96,8 @@
 
 
   DO forever
-      GLCDPrint (1, 0, "Great Cow BASIC")
-      GLCDPrint (1, 8, "Anobium 2020")
+      GLCDPrint (1, 0, "GCBASIC")
+      GLCDPrint (1, 8, "Anobium 2023")
 
       GLCDPrint (1,  24, "GLCD_WIDTH " )
       GLCDPrint (80, 24, str(GLCD_WIDTH) )

@@ -1,6 +1,6 @@
 '''An example program for GCGB and GCB.
 '''------------------------------------------------------------------------
-'''  This program shows the basics of Voltage reference
+'''  This program shows theGCBASICs of Voltage reference
 '''
 '''  This sets the reference voltage and then reads ADC6, the shows results on Terminal
 '''

@@ -73,9 +73,9 @@
 
 
   'Initial screen messages
-  print "Great Cow BASIC"
+  print "GCBASIC"
   Locate 1,0
-  print "Anobium 5/2015"
+  print "Anobium 5/2023"
   wait 2 s
   cls
   print "Keypad Demo"

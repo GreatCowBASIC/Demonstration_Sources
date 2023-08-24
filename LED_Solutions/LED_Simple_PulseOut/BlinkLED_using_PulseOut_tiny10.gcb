@@ -1,4 +1,4 @@
-' basic blink for ATTiny10
+'GCBASIC blink for ATTiny10
 ' ----- Configuration
   #chip tiny10,1
 

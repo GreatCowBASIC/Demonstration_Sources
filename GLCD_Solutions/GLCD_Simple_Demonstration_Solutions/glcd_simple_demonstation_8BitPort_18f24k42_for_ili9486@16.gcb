@@ -182,7 +182,7 @@ sub ShowCase1
         GLCDDrawString ( 36, ILI9486L_GLCD_HEIGHT - 30 , "ILI9486L Driver" , TFT_WHITE )
 
         GLCDfntDefaultsize = 1
-        GLCDDrawString ( ILI9486L_GLCD_WIDTH - 64, 2 , "Jan 2019" , TFT_WHITE )
+        GLCDDrawString ( ILI9486L_GLCD_WIDTH - 64, 2 , "Jan 2023" , TFT_WHITE )
 
         GLCDDrawString ( ILI9486L_GLCD_WIDTH - 64, 10 , "8Bit_Port" , TFT_WHITE )
 
@@ -190,7 +190,7 @@ sub ShowCase1
         'Revert the font size
         GLCDfntDefaultsize = oldfont
         GLCDForeground = TFT_RED
-        GLCDPrintLargeFont ( 100 , ILI9486L_GLCD_HEIGHT - 60 , "Great Cow BASIC" )
+        GLCDPrintLargeFont ( 100 , ILI9486L_GLCD_HEIGHT - 60 , "GCBASIC" )
         GLCDForeground = TFT_WHITE
         DO forever
 
@@ -243,14 +243,14 @@ sub ShowCase2
         GLCDDrawString ( 36, ILI9486L_GLCD_HEIGHT - 30 , "ILI9486L Driver" , TFT_WHITE )
 
         GLCDfntDefaultsize = 1
-        GLCDDrawString ( ILI9486L_GLCD_WIDTH - 64, 2 , "Jan 2019" , TFT_WHITE )
+        GLCDDrawString ( ILI9486L_GLCD_WIDTH - 64, 2 , "Jan 2023" , TFT_WHITE )
 
         GLCDDrawString ( ILI9486L_GLCD_WIDTH - 64, 10 , "8Bit_Port" , TFT_WHITE )
 
         'Revert the font size
         GLCDfntDefaultsize = oldfont
         GLCDForeground = TFT_RED
-        GLCDPrintLargeFont ( 100 , ILI9486L_GLCD_HEIGHT - 60 , "Great Cow BASIC" )
+        GLCDPrintLargeFont ( 100 , ILI9486L_GLCD_HEIGHT - 60 , "GCBASIC" )
         GLCDForeground = TFT_WHITE
         DO forever
 

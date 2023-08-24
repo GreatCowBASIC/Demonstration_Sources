@@ -11,7 +11,7 @@
 ''' Adjust the LDR or rotate the pot to change the LEDs state displayed.
 '''
 '''
-'''Great Cow  BASIC Header block
+'''GCBASIC Header block
 '''
 '''@author  Evan R. Venn
 '''@licence GPL

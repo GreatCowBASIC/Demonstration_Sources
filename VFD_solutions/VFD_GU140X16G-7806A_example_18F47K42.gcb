@@ -42,7 +42,7 @@
       Print ChipNameStr + ": "+Str(ChipMHz) + "Mhz"
 
       Locate 1,0
-      Print "Great Cow BASIC"
+      Print "GCBASIC"
       wait 1 s
 
       dim TableLength, TablePosition, GraphicData as byte

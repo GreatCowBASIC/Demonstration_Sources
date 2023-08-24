@@ -136,7 +136,7 @@
   locate 0,0
   Print "PCF85x3 Clock"
   locate 1,0
-  Print "Great Cow Basic 2019"
+  Print "GCBASIC 2023"
   wait 2 s
   CLS
 

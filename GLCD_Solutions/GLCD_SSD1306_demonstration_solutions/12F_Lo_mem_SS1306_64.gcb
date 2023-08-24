@@ -58,7 +58,7 @@
 '   #DEFINE GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
 '
 '      GLCD_Open_PageTransaction 0,3
-'        GLCDPrint 0,10, "Great Cow BASIC"
+'        GLCDPrint 0,10, "GCBASIC"
 '        GLCDPrint 0,52, "Page 2"
 '        Box 0,0,127,63
 '      GLCD_Close_PageTransaction

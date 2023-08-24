@@ -96,7 +96,7 @@ device = 255
 
 '----- Program
 GLCDCLS
-GLCDPrint 0,0,"GCBasic 2019"
+GLCDPrint 0,0,"GCBasic 2023"
 GLCDPrint 0,8, "IRR Demo"
 
 GLCDPrint 0,32, "Device: "

@@ -113,8 +113,8 @@
   HserPrintStringCRLF "Demonstration v1.1"
   HserPrintStringCRLF ""
   HserPrintStringCRLF "VBATEN support"
-  HserPrintStringCRLF "Great Cow BASIC"
-  HserPrintStringCRLF "December 2019"
+  HserPrintStringCRLF "GCBASIC"
+  HserPrintStringCRLF "December 2023"
 
   wait 2 s
   cls

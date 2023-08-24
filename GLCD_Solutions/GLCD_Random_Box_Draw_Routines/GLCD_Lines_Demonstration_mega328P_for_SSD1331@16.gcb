@@ -19,11 +19,11 @@
     #define GLCD_OLED_FONT
     GLCDfntDefaultsize = 1
 
-    GLCDPrintStringLN ("Great Cow BASIC")
+    GLCDPrintStringLN ("GCBASIC")
     GLCDPrintStringLN ("")
     GLCDPrintStringLN ("SSD1331 Boxes!!")
     GLCDPrintStringLN ("")
-    GLCDPrintStringLN ("Anobium 2019")
+    GLCDPrintStringLN ("Anobium 2023")
 
     Wait 4 s
 

@@ -95,7 +95,7 @@ ccount = 0
 CLS
 Print "GCBASIC"
 Locate 1,0
-Print " 2022"
+Print " 2023"
 Wait 2 s
 CLS
 Print "DS18B20"

@@ -1,6 +1,6 @@
 '''A program  for GCGB and GCB.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program demonstrates the basic GCBASIC GLCD and to use GCB fonts.
+'''This program demonstrates theGCBASIC GCBASIC GLCD and to use GCB fonts.
 '''
 '''The setup is:
 '''     Include the <glcd.h>
@@ -85,11 +85,11 @@
     GLCDCLS TFT_BLACK
 
     GLCDLocateString 1,1
-    GLCDPrintString ( "Great Cow BASIC " )
+    GLCDPrintString ( "GCBASIC " )
     GLCDLocateString 130,1
     GLCDPrintStringLn ( "v1.00.xx" )
 
-    GLCDPrint ( 60, GLCD_HEIGHT - 40 , "Great Cow BASIC"  )
+    GLCDPrint ( 60, GLCD_HEIGHT - 40 , "GCBASIC"  )
 
     GLCDPrint ( 2, 18, "DrawStr" )
     GLCDPrint ( 2, 52, "Long:" )
@@ -110,7 +110,7 @@
 
     filledbox 2,GLCD_HEIGHT/2+10,42,GLCD_HEIGHT/2+50, TFT_RED
 
-    GLCDPrint ( GLCD_WIDTH - 78, 2 , "Feb 2019" )
+    GLCDPrint ( GLCD_WIDTH - 78, 2 , "Feb 2023" )
 
     GLCDForeground = TFT_WHITE
     GLCDPrint ( 100 , GLCD_HEIGHT - 60 , "Nextion Driver" )

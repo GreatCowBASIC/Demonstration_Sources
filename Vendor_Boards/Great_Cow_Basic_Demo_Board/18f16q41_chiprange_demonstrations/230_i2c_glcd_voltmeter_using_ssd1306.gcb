@@ -1,7 +1,7 @@
 '''
 '''This demonstration program is a simple GLCD demonstration of the SSD1306 GLCD capabilities and Maths/Trig capabilities.
 '''
-'''This program demonstrates the basic primatives a voltmeter on a Graphical LCD (GLCD)
+'''This program demonstrates theGCBASIC primatives a voltmeter on a Graphical LCD (GLCD)
 ''':
 '''You can change the microcontroller, the GLCD and the analogue port.
 '''

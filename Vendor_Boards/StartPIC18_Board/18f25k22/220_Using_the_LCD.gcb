@@ -74,19 +74,19 @@ LCDControl = 0
 'Main program commences here.. everything before this is setup for the board.
 
 CLS
-Print "GREAT"
+Print "GCBASIC"
 Locate 1, 0
-Print "COW"
+Print ""
 Wait 1 s
 Locate 0, 0
-Print "COW  "
+Print ""
 Locate 1, 0
-Print "BASIC"
+Print "GCBASIC"
 Wait 1 s
 Locate 0, 0
-Print "BASIC"
+Print "GCBASIC"
 Locate 1, 0
-Print "2022  "
+Print "2023  "
 Wait 2 s
 CLS
 

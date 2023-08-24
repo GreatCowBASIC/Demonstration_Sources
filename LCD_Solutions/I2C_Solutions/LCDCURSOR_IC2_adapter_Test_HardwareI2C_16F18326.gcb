@@ -71,7 +71,7 @@
     InitLCD
     wait 100 ms
     CLS
-    PRINT "Great Cow BASIC"
+    PRINT "GCBASIC"
     Locate 1,0
     Print "@v1.00.xx"
     WAIT 3 s

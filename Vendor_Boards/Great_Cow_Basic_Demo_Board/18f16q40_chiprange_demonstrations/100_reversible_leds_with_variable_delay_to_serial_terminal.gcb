@@ -106,7 +106,7 @@ direction = LED_RIGHT
 leds = 0b10000
 
 HSerPrintCRLF
-HSerPrint "Great Cow BASIC 2022 "
+HSerPrint "GCBASIC 2022 "
 HSerPrint ChipNameStr
 HSerPrint " at "
 HSerPrint ChipMHz

@@ -84,8 +84,8 @@
     GLCDCLS
 
 
-    GLCDPrint 0, 0,   "Great Cow BASIC"
-    GLCDPrint (0, 7, "Anobium 2019")
+    GLCDPrint 0, 0,   "GCBASIC"
+    GLCDPrint (0, 7, "Anobium 2023")
     GLCDPrint (0, 14, "MPLAB Xpress Board")
     GLCDPrint (94, 0, ChipNameStr )
     GLCDPrint (64, 7, "I2C GLCD UC1601" )

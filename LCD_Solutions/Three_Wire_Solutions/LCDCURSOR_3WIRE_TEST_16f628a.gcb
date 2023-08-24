@@ -28,9 +28,9 @@
 
 'Program Start
 
- PRINT "Great Cow BASIC"
+ PRINT "GCBASIC"
  Locate 1,0
- PRINT "@2018"
+ PRINT "@2023"
  Wait 4 s
 
   DO Forever

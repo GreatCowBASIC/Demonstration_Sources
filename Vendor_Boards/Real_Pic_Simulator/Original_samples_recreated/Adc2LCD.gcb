@@ -27,7 +27,7 @@
 #DEFINE LCD_DB7 PortB.3
 
 
-Print "Great Cow BASIC"
+Print "GCBASIC"
 Locate 1,0
 Print "@2022 v1.0"
 Wait 4 s

@@ -1,0 +1,2340 @@
+'LINE 1810 and 1812
+#Skiptest
+// // // ----- Configuration
+#chip 18f4520, 32
+
+// ----- Includes
+#include <SoftSerial.h>
+#include <ds3231.h>
+#include <maths.h>
+
+//  Define I2C settings
+#define HI2C_BAUD_RATE 400
+#define HI2C_DATA PORTC.4
+#define HI2C_CLOCK PORTC.3
+// I2C pins need to be input for SSP module when used on Microchip PIC device
+Dir HI2C_DATA in
+Dir HI2C_CLOCK in
+
+// MASTER MODE
+HI2CMode Master
+
+// -------- RADIO/RS232/RS485 ---------
+Dir PORTC.6 Out // TX
+Dir PORTC.7 In  // RX
+Dir PORTC.5 Out // 485 Enable
+
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+
+#define TXEN485 PORTC.5
+#define TXEN_On Set TXEN485 On
+#define TXEN_Off Set TXEN485 Off
+
+On Interrupt UsartRX1Ready Call RxInt
+
+// ---------- DISP --------------------
+Dir PORTB.3 Out
+Dir PORTB.2 In
+
+#define SER1_BAUD 9600
+#define SER1_RXNOWAIT On
+
+#define SER1_TXPORT PORTB  ; I/O port (without .bit) must be defined
+#define SER1_TXPIN 3       ; portbit  must be defined
+#define SER1_RXPORT PORTB  ; I/O port (without .bit) must be defined
+#define SER1_RXPIN 2       ; portbit  must be defined
+
+INTEDG2 = 0 // Interrupt on falling edge
+On Interrupt ExtInt2 Call DispRX
+
+// // // ----- Timer 0 ---------------------
+// Timer0 counts 0.1 seconds
+#define TMR0_16bit
+Settimer 0, 15536
+InitTimer0 OSC, PS0_16
+On Interrupt Timer0Overflow Call SecCounter
+StartTimer 0
+
+// // // ----- Variables -------------------
+#define RunLED 1
+#define CalLED 2
+#define PgmLED 4
+#define TestLED 8
+#define AlarmLED 16
+
+Dim wnum1, wnum2, wnum3, wnum4, wnum5, DS_TempF as Word
+Dim num1, num2, num3, num4, msgID, msgLen, xxx as Byte
+wnum1 = 0: wnum2 = 0: wnum3 = 0: wnum4 = 0: wnum5 = 0: DS_TempF = 0
+num1 = 0: num2 = 0: num3 = 0: num4 = 0: msgID = 0: msgLen = 0: xxx = 0
+
+#define RxBuffer 30
+Dim RxData as string * RxBuffer
+Dim RxFlag as Bit
+Dim RxPtr as Byte
+RxPtr = 0
+RxData = ""
+RxData(0) = 0
+RxFlag = False
+
+#define DispRxBuffer 30
+Dim DRxData as String * DispRxBuffer
+Dim DRxFlag as Bit
+DRxData = ""
+DRxFlag = False
+
+#define TxtBuffer 15
+Dim Txt as string * TxtBuffer
+Txt = ""
+Dim Txt1 as string * TxtBuffer
+Txt1 = ""
+Dim Txt2 as string * TxtBuffer
+Txt2 = ""
+
+// ------------ RELAY CONTROL ----------
+Dir PORTD Out
+#define RELAY1 PORTD.0
+#define RELAY2 PORTD.1
+#define RELAY3 PORTD.2
+#define PUMP   PORTD.3
+#define SMPCAL PORTD.4
+#define RELAY4 PORTD.5
+#define RELAY5 PORTD.6  // ties to unused daughter card pin
+#define RELAY6 PORTD.7  // ties to unused daughter card pin
+
+#define SmpOn Set SMPCAL Off: Wait 500 ms: Set PUMP On
+#define SmpOff Set PUMP Off: Wait 500 ms: Set SMPCAL Off
+#define CalOn Set SMPCAL On: Wait 500 ms: Set PUMP On
+#define CalOff Set PUMP Off: Wait 500 ms: Set SMPCAL Off
+
+#define R1On Set RELAY1 On
+#define R1Off Set RELAY1 Off
+#define R2On Set RELAY2 On
+#define R2Off Set RELAY2 Off
+#define R3On Set RELAY3 On
+#define R3Off Set RELAY3 Off
+#define R4On Set RELAY4 On
+#define R4Off Set RELAY4 Off
+#define SmpCalOn Set SMPCAL On
+#define SmpCalOff Set SMPCAL Off
+#define PumpOn Set PUMP On
+#define PumpOff Set PUMP Off
+
+// ------------ ADC READINGS -----------
+Dir PORTA.0 In
+Dir PORTA.1 In
+Dir PORTA.2 In
+Dir PORTA.3 In
+#define AMP1 AN0
+#define AMP2 AN1
+#define AMP3 AN2
+#define AMP4 AN3
+
+Dir PORTA.5 In
+Dir PORTE.0 In
+Dir PORTE.1 In
+#define TempSensor AN4
+#define OxySensor AN5
+#define PumpAmp AN6
+
+// ------ PP EEPROM LOCATIONS ----------
+#define ProbeCal 0
+#define A1Zero 2
+#define A1Factor 4
+#define A2Zero 6
+#define A2Factor 8
+#define A3Zero 10
+#define A3Factor 12
+#define A4Zero 14
+#define A4Factor 16
+#define LastOxy 18
+#define LastTemp 20
+#define TempAdj 22
+#define CalPtr 23
+#define CalHistory 24   // 23 - 52, 30 day calibration pump history (byte value 180 e.i. 1.80 amps)
+
+Dim LastAdc, LastTempF, CurAdc, CurTempF as Word
+LastAdc = 0: LastTempF = 0: CurAdc = 0: CurTempF = 0
+
+Dim Hours, Minutes, Seconds, ampm as byte
+Hours = 0: Minutes = 0: Seconds = 0: ampm = 0
+
+Dim SecChanged, MinChanged, HourChanged, NegTemp, Dimmed as Bit
+SecChanged = False: MinChanged = False: HourChanged = False: NegTemp = False: Dimmed = False
+
+Dim ADCMv, ADCMvTotal, MvLast, MvDiff, ADCAmp as Word
+ADCMv = 0: ADCMvTotal = 0: MvLast = 0: MvDIff = 0: ADCAmp = 0
+
+Dim ADCcnt, EntryCnt, EntryMode, EntryModeSel, DValue as Byte
+ADCcnt = 0: EntryCnt = 0: EntryMode = 0: EntryModeSel = 0: DValue = 0
+
+Dim CalVal as Word
+Dim MemCorr as Word
+Dim PumpAvg, LastPA as Word
+Dim CalPumpAmp, SmpPumpAmp as Byte
+CalVal = 0: MemCorr = 0: PumpAvg = 0: LastPA = 0
+CalPumpAmp = 0: SmpPumpAmp = 0
+
+Dim Oxy as Word
+Dim Salinity as Byte
+Dim Err as Byte
+Oxy = 0: Salinity = 0: Err = 0
+
+Dim CalMv as Word
+Dim CalTemp as Word
+Dim CheckMv as Byte
+Dim TempAdjust as Byte
+CalMv = 0: CalTemp = 0: CheckMv = 0: TempAdjust = 127
+
+Dim TableLoc as Word
+Dim Mem as Byte
+Dim MemType as Byte
+TableLoc = 0: Mem = 0: MemType = 0
+
+Dim DispMode as Byte
+Dim DispTxt as String * 20
+Dim DispElapsed as Byte
+Dim TempFW, TempCW as Word
+Dim TempF, TempC as Byte
+Dim Txt as String * 10
+Dim TimeText as string
+TempFW = 0: TempCW = 0: Txt = "": TimeText = ""
+DispMode = 0: DispTxt = "": DispElapsed = 1
+TempF = 0
+
+Dim ButtonStatus, LEDStatus, BlinkLED as Byte
+ButtonStatus = 0: LEDStatus = 0: BlinkLED = 0
+
+Dim BuoyMode as Byte
+BuoyMode = 0
+Dim PLow, PDef, PHigh, PInc, PDec as Word
+PLow = 0: PDef = 0: PHigh = 0: PInc = 0: PDec = 0
+Dim PPDec(3) as Byte: PPDec = 0, 4, 2
+
+// R1036910300006600524D1C0000230024001E001F0019001A00000000000000000001F4000000000001F4000000000001F4000000000001F40686
+Dim TXStr as String * 120
+TXStr = "R003691"
+Pad(TXStr, 117, "0")
+
+Dim MSBStr as String * 2
+Dim LSBStr as String * 2
+Dim WordStr as String * 4
+MSBStr = "": LSBStr = "": WordStr = ""
+
+#define CalFlush 1
+#define CalRead 2
+#define SmpFlush 3
+#define SmpRead 4
+#define NxtSmp 5
+
+Dim elapsedtmr as Word
+elapsedtmr = 0
+
+Dim DspFlag, DspShow as Bit
+DspFlag = False: DspShow = False
+Dim DspPtr as Byte
+DspPtr = 1
+Dim Dsp as String * 33
+Pad(Dsp, 32, " ")
+
+DS3231_Init
+// DS3231_SetTime(9, 46, 0)
+
+DS3231_ReadTime(Hours, Minutes, Seconds, ampm)
+
+DispTxt = "!B "
+DispTxt(3) = 200
+DispTxt(0) = 3
+Ser1Print DispTxt
+Wait 500 ms
+HPrint "AquaTECH v1.0", True
+
+Do
+    If DRxFlag = True Then
+        If (DRxData(1) = "?") Or (DRxData(1) = "!") Then
+            DRxFlag = False
+            Txt = DRxData
+
+            Select Case Txt(1)            
+                Case "?"                              
+                    If Txt(0) > 1 Then
+                        Select Case Txt(2)
+                            Case "?"
+                                Ser1Print "!?"  // Received "check in" from Display
+                                DNxtData
+                            Case "!"    // OK back from display
+                                EPRead ProbeCal + 1, CalVal
+                                EPRead ProbeCal, CalVal_H
+
+                                If CalVal = 65535 Then  // been reprogrammed
+                                    RestoreDefaults     // will place 0 in CalVal in EEPROM
+                                    TempAdjust = 127
+                                    PutPP(81, TempAdjust)
+                                    Oxy = 0
+                                    TempF = 0  
+                                    DispElapsed = 4
+                                    StartCal
+
+                                Else
+                                    // Read last oxygen and temp and set relays
+                                    EPRead LastOxy , Oxy
+                                    EPRead LastOxy + 1, Oxy_H
+                                    EPRead LastTemp, TempF 
+                                    EPRead LastTemp + 1, TempF_H
+                                    SetRelays
+                                    TempAdjust = GetPP(81)
+                                    DispElapsed = 4
+                                    StartSmp
+
+                                End If                            
+                                DNxtData
+                            Case Else
+                                DNxtData
+                        End Select
+                    End If
+                Case "!"           
+                    If Txt(0) > 1 Then                        
+                        Select Case Txt(2)
+                            Case "B"
+                                If Txt(0) > 2 Then
+                                    If Txt(3) > 0 Then
+                                        ButtonStatus = Txt(3) 
+                                    Else
+                                        ButtonStatus = 0
+                                    End If
+
+                                    // ---------->>> Need to check for RUN & TEST pressed at startup <<<--------------
+                                    If (ButtonStatus.2 = True) And (ButtonStatus.5 = True) Then   //Run and Test are pressed. Load Defaults
+                                        RestoreDefaults
+                                        Oxy = 0
+                                        TempF = 0  
+                                        DispElapsed = 4
+                                        StartCal
+                                        ButtonStatus = 0    // clear status
+                                    End If
+
+                                    If ButtonStatus.0 = True Then
+                                        // HSerPrint "UP "
+                                        ButtonStatus = 0
+
+                                        Select Case EntryMode
+                                            Case 1      //PGM
+                                                Select Case EntryModeSel
+                                                    Case 1      //Select PP (1 - 69), EntryCnt hold the value
+                                                        If EntryCnt < 69 Then
+                                                            EntryCnt ++
+                                                            ShowVal(EntryCnt, 0, 2)
+                                                        End If
+                                                    Case 2      //View/change value, (PLow, PDef, PHigh, PInc, PDec)
+                                                        If (PDef + PInc) <= PHigh Then
+                                                            PDef += PInc
+                                                            ShowVal(PDef, PDec)
+                                                        End If
+                                                End Select
+                                            
+                                            Case 2      //TEST UP
+                                                Select Case EntryModeSel
+                                                    Case 1      //Select Test (1 - 27), EntryCnt hold the value
+                                                       If EntryCnt < 27 Then
+                                                            EntryCnt ++
+                                                            ShowVal(EntryCnt, 0, 2)
+                                                        End If
+                                                    Case 2      //View/change value, (PLow, PDef, PHigh, PInc, PDec)
+                                                        // EntryCnt holds TEST parameter number
+                                                        // PDef holds value
+                                                        DispTxt = "!T On  "
+                                                        DispTxt(7) = 0
+
+                                                        Select Case EntryCnt
+                                                            Case 1 To 2
+                                                                IF (PDef + PInc) < PHigh Then
+                                                                    PDef += PInc
+                                                                    ShowVal(PDef, PDec)
+                                                                End If
+                                                            Case 3  // Relay 1 ON
+                                                                R1On
+                                                                Ser1Print DispTxt
+
+                                                            Case 4  // Relay 2 ON
+                                                                R2On
+                                                                Ser1Print DispTxt
+                                                                
+                                                            Case 5  // Relay 3 ON
+                                                                R3On
+                                                                Ser1Print DispTxt
+                                                                
+                                                            Case 6  // Relay Pump Pwr ON
+                                                                PumpOn
+                                                                Ser1Print DispTxt
+                                                                
+                                                            Case 7  // Relay (Smp/) Cal ON
+                                                                SmpCalON
+                                                                Ser1Print DispTxt
+
+                                                            Case 8 To 9  // Probe Mv - Temperature
+                                                                    // Turn pump power on/off
+                                                                    If PUMP = On Then
+                                                                        PumpOff
+                                                                    Else
+                                                                        PumpOn
+                                                                    End If
+                                                            Case 16
+                                                                IF (PDef + PInc) <= PHigh Then
+                                                                    PDef += PInc
+                                                                    ShowVal(PDef, PDec)
+                                                                End If
+
+                                                            Case 27 // Relay 4 ON
+                                                                R4On
+                                                                Ser1Print DispTxt
+
+                                                        End Select                                                                
+                                                End Select
+                                        End Select
+                                    End If
+
+                                    If ButtonStatus.1 = True Then
+                                        // HSerPrint "DN "
+                                        ButtonStatus = 0
+
+                                        Select Case EntryMode
+                                            Case 1      // PGM
+                                                Select Case EntryModeSel
+                                                    Case 1      // Select PP (1 - 69), EntryCnt hold the value
+                                                        If EntryCnt > 1 Then
+                                                            EntryCnt --
+                                                            ShowVal(EntryCnt, 0, 2)
+                                                        End If                                                       
+                                                    Case 2      // View/change value
+                                                        If (PLow + PInc) <= PDef Then
+                                                            PDef -= PInc
+                                                            ShowVal(PDef, PDec)
+                                                        End If
+                                                End Select
+                                            
+                                            Case 2      //TEST
+                                                Select Case EntryModeSel
+                                                    Case 1      // Select Test (1 - 27), EntryCnt hold the value
+                                                       If EntryCnt > 1 Then
+                                                            EntryCnt --
+                                                            ShowVal(EntryCnt, 0, 2)
+                                                        End If
+                                                    Case 2      // View/change, (PLow, PDef, PHigh, PInc, PDec)
+                                                        // EntryCnt holds TEST parameter number
+                                                        // PDef holds value
+
+                                                        DispTxt = "!T Off "
+                                                        DispTxt(7) = 0
+
+                                                        Select Case EntryCnt
+                                                            Case 1 To 2
+                                                                IF PDef > PLow Then
+                                                                    PDef --
+                                                                    ShowVal(PDef, PDec)
+                                                                End If
+
+                                                            Case 3  // Relay 1 OFF
+                                                                R1Off
+                                                                Ser1Print DispTxt
+
+                                                            Case 4  // Relay 2 OFF
+                                                                R2Off
+                                                                Ser1Print DispTxt
+                                                                
+                                                            Case 5  // Relay 3 OFF
+                                                                R3Off
+                                                                Ser1Print DispTxt
+                                                                
+                                                            Case 6  // Relay Pump Pwr OFF
+                                                                PumpOff
+                                                                Ser1Print DispTxt
+                                                                
+                                                            Case 7  // Relay Smp (/Cal) ON
+                                                                SmpCalOff
+                                                                Ser1Print DispTxt
+                                                            
+                                                            Case 8 To 9  // Probe Mv/Temperature
+                                                                    // Change between sample and cal pumps
+                                                                If SMPCAL = On Then
+                                                                    SmpCalOff
+                                                                Else
+                                                                    SmpCalOn
+                                                                End If
+
+                                                            Case 16
+                                                                If (PLow + PInc) <= PDef Then
+                                                                    PDef -= PInc
+                                                                    ShowVal(PDef, PDec)
+                                                                End If                                                                                                                        
+
+                                                            Case 27 // Relay 4 OFF
+                                                                R4Off
+                                                                Ser1Print DispTxt
+
+                                                        End Select               
+
+                                                End Select
+                                        End Select
+                                    End If
+
+                                    If ButtonStatus.2 = True Then
+                                        // HSerPrint "RUN "
+                                        ButtonStatus = 0
+                                        EntryMode = 0                                        
+                                        DispElapsed = 4
+                                        DispMode = 1
+
+                                        // take a sample
+                                        StartSmp
+
+                                    End If
+
+                                    If ButtonStatus.3 = True Then
+                                        // HSerPrint "CAL "
+                                        ButtonStatus = 0                                        
+                                        EntryMode = 0                                        
+                                        DispElapsed = 4
+                                        DispMode = 1
+
+                                        // take a calibrationn                                        
+                                        StartCal
+
+                                    End If
+
+                                    If ButtonStatus.4 = True Then
+                                        // HSerPrint "PGM "
+                                        ButtonStatus = 0
+
+                                        If EntryMode = 1 Then
+                                            // already PGM mode
+                                            Select Case EntryModeSel
+                                                Case 1  // show program parameter
+                                                    GetPPExtents(EntryCnt, PLow, PDef, PHigh, PInc, PDec)
+                                                    PDef = GetPP(EntryCnt)
+                                                    PDec = PPDec(PDec + 1)  // translates (0,1,2) to (0,4,2)
+
+                                                    SetLimits(6, 7, 8)
+                                                    SetLimits(11, 12 ,13)
+                                                    SetLimits(57, 58, 59)
+                                                    SetLimits(63, 64, 65)
+
+                                                    ShowVal(PDef, PDec)
+
+                                                    EntryModeSel = 2
+
+                                                Case 2  // record program parameter that is in display
+                                                    If PDef <> GetPP(EntryCnt) Then
+                                                        PutPP(EntryCnt, PDef)
+                                                    End If
+
+                                                    ShowVal(EntryCnt, 0, 2)
+                                                    EntryModeSel = 1
+
+                                            End Select
+                                        Else
+                                            // stop everything and put in program mode
+                                            DispElapsed = 0
+                                            CalOff
+                                            SmpOff
+
+                                            DispMode = 0        // turn off DO/TEMP mode 
+                                            BuoyMode = 0
+                                            LEDStatus = PgmLED
+                                            BlinkLED = 0
+                                            DispTxt = "!L  "
+                                            DispTxt(3) = LEDStatus
+                                            DispTxt(4) = BlinkLED
+                                            Ser1Print DispTxt                                                                   
+
+                                            EntryMode = 1       // PGM mode                                            
+                                            EntryModeSel = 1    // select program parameter
+                                            EntryCnt = 1        // first program parameter
+                                            ShowVal(EntryCnt, 0, 2)
+                                        End If
+                                    End If
+
+                                    If ButtonStatus.5 = True Then
+                                        // HSerPrint "TEST "
+                                        ButtonStatus = 0
+
+                                        If EntryMode = 2 Then
+                                            // in TEST mode
+                                            Select Case EntryModeSel
+                                                Case 1  // show test parameter
+                                                    // PLow, PDef, PHigh, PInc, PDec
+                                                    // EntryCnt holds TEST parameter value 1 - 27
+                                                    // some parameters need numbers adjusted some do not
+
+                                                    EntryModeSel = 2
+
+                                                    Select Case EntryCnt
+                                                        Case 1              // Current Hour
+                                                            PDef = Hours    // Adjust Hours from 0 to 23 inc 1 no dec
+                                                            PLow = 0: PHigh = 23: PInc = 1: PDec = 0
+                                                            ShowVal(PDef, PDec)
+
+                                                        Case 2              //Current Minute
+                                                            PDef = Minutes  // Adjust Minutes from 0 to 59 inc 1 no dec
+                                                            PLow = 0: PHigh = 59: PInc = 1: PDec = 0
+                                                            ShowVal(PDef, PDec)
+
+                                                        Case 3 to 7
+                                                            DispTxt = "!T Off "
+                                                            DispTxt(7) = 0
+                                                            Ser1Print DispTxt
+
+                                                        Case 8              // Show DO Mv
+                                                            DispMode = 10
+
+                                                        Case 9              // Show Temperatute Mv
+                                                            DispMode = 11   // 4.48 = 5F to 1.25 = 131F
+
+                                                        Case 10             // Zero Mv ???
+
+                                                        Case 11             // Pump Amps not active (Need to store this somewhere to deduct from Pump when active)
+                                                            PumpOff
+                                                            PumpAvg = 0
+                                                            DispMode = 12
+
+                                                        Case 12             // Pump Amps with Sample active
+                                                            SmpOn
+                                                            PumpAvg = 0
+                                                            DispMode = 12
+
+                                                        Case 13             // Pump Amps with Calibration active
+                                                            CalOn
+                                                            PumpAvg = 0
+                                                            DispMode = 13
+
+                                                        Case 14             // Display Test, all components active
+                                                            DispTxt = "!L  "                                                            
+                                                            DispTxt(3) = 15
+                                                            DispTxt(4) = 0
+                                                            DispTxt(0) = 4
+                                                            Ser1Print DispTxt
+
+                                                            DispTxt = "!T8888 "
+                                                            DispTxt(7) = 15
+                                                            DispTxt(0) = 7
+                                                            Ser1Print DispTxt
+
+                                                        Case 15             // Digital Communication Test: 0 - Fail, 1 - Pass
+
+                                                        Case 16             // Calibrate Temperature
+                                                            GetTempNTC
+
+                                                            PDef = TempFW  // Adjust Temp -12.7 to + 12.7
+                                                            PLow = PDef - TempAdjust                                                            
+                                                            PHigh = PLow + 254
+                                                            PInc = 1: PDec = 1
+                                                            PDec = PPDec(PDec + 1)  // translates (0,1,2) to (0,4,2)
+
+                                                            ShowVal(PDef, PDec)
+
+                                                        Case 17             // Set Sercurity Code
+
+                                                        Case 18             // Digital input status
+
+                                                        Case 19             // View Aer 1 Current
+                                                            DispMode = 19
+
+                                                        Case 20             // View Aer 2 Current
+                                                            DispMode = 20
+
+                                                        Case 21             // View Aer 3 Current
+                                                            DispMode = 21
+
+                                                        Case 22             // View Aer 4 Current
+                                                            DispMode = 22
+
+                                                        Case 23             // Calibrate Aer 1 Current
+                                                            // Get Zero value (should be around 200)
+                                                            // Read Amp1 and place in PDef with PHigh and PLow Set
+                                                            GetAmp(1)
+                                                            PLow = 0: PDef = wnum3: pHigh = 500: PInc = 1: PDec = 4
+
+                                                        Case 24             // Calibrate Aer 2 Current
+                                                            GetAmp(2)
+                                                            PLow = 0: PDef = wnum3: pHigh = 500: PInc = 1: PDec = 4
+                                                        
+                                                        Case 25             // Calibrate Aer 3 Current
+                                                            GetAmp(3)
+                                                            PLow = 0: PDef = wnum3: pHigh = 500: PInc = 1: PDec = 4
+                                                        
+                                                        Case 26             // Calibrate Aer 4 Current
+                                                            GetAmp(4)
+                                                            PLow = 0: PDef = wnum3: pHigh = 500: PInc = 1: PDec = 4
+
+                                                        Case 27             // Relay 4
+                                                                            // Arrows turn relay ON or OFF
+
+                                                    End Select
+ 
+                                                Case 2  // record test parameter that is in display and/or return
+                                                    EntryModeSel = 1
+
+                                                    Select Case EntryCnt    // Where are we coming from
+                                                        Case 1              // Set Hours if different
+                                                            If PDef <> Hours Then
+                                                                Hours = PDef
+                                                                DS3231_SetTime(Hours, Minutes, 0)
+                                                            End If
+                                                        Case 2              // Set Minutes if different
+                                                            If PDef <> Minutes Then
+                                                                Minutes = PDef
+                                                                DS3231_SetTime(Hours, Minutes, 0)
+                                                            End If
+                                                        Case 11             // Pump off value
+
+                                                        Case 12             // Smp pump current
+                                                            SmpOff
+
+                                                        Case 13             // Cal pump current
+                                                            CalOff
+                                                            
+                                                        Case 16     // Temp adjust value
+                                                            If PDef > TempFW Then
+                                                                // + direction
+                                                                num3 = (PDef - TempFW) + 127
+                                                            Else
+                                                                // - direction
+                                                                num3 = 127 - (TempFW - PDef)
+                                                            End If
+                                                            If num3 > TempAdjust Then
+                                                                // + direction
+                                                                TempAdjust += (num3 - TempAdjust) 
+                                                            Else
+                                                                // -direction
+                                                                TempAdjust -= (TempAdjust - num3)
+                                                            End If
+                                                            
+                                                            PutPP(81, TempAdjust)
+
+                                                        Case 23             // Calibrate Aer 1 Current
+                                                            // PDef = new Amp, ADCAmp = ADC to use for calibration                                                            
+                                                            GetAmp(1)
+                                                            wnum3 = ([long]PDef * 10000)/(ADCAmp - GetPP(71))
+                                                            PutPP(72, wnum3)
+
+                                                        Case 24             // Calibrate Aer 2 Current
+                                                            GetAmp(2)
+                                                             wnum3 = ([long]PDef * 10000)/(ADCAmp - GetPP(73))
+                                                             PutPP(74, wnum3)
+                                                        
+                                                        Case 25             // Calibrate Aer 3 Current
+                                                            GetAmp(3)
+                                                             wnum3 = ([long]PDef * 10000)/(ADCAmp - GetPP(75))
+                                                             PutPP(76, wnum3)
+
+                                                        Case 26             // Calibrate Aer 4 Current
+                                                            GetAmp(4)
+                                                             wnum3 = ([long]PDef * 10000)/(ADCAmp - GetPP(77))
+                                                             PutPP(78, wnum3)
+
+                                                    End Select
+                                                    DispMode = 0
+                                                    EntryModeSel = 1
+                                                    ShowVal(EntryCnt, 0, 2)
+                                            End Select
+                                        Else
+                                            // stop everything and put in test mode
+                                            DispElapsed = 0
+                                            PumpAvg = 0
+                                            CalOff
+                                            SmpOff
+
+                                            DispMode = 0    // turn off DO/TEMP mode
+                                            BuoyMode = 0
+                                            LEDStatus = TestLED
+                                            BlinkLED = 0
+                                            DispTxt = "!L  "
+                                            DispTxt(3) = LEDStatus
+                                            DispTxt(4) = BlinkLED
+                                            Ser1Print DispTxt
+
+                                            EntryMode = 2       // TEST mode
+                                            EntryModeSel = 1    // select test
+                                            EntryCnt = 1        // first test parameter
+                                            ShowVal(EntryCnt, 0, 2)
+                                        End If
+                                    End If
+                                    
+                                    DNxtData
+                                End If
+                            Case Else
+                                DNxtData                           
+                        End Select
+                    End If
+                Case Else                
+                    DNxtData
+            End Select
+        Else
+            If DRxData(0) > 1 Then
+                DRxData = RIght(DRxData, DRxData(0) - 1)
+            Else
+                DRxData = ""
+                DRxFlag = False
+            End If
+        End If
+    End If
+
+    If RxFlag = True Then
+        RxFlag = False        
+        Txt1 = RxData
+        Select Case Txt1(1)
+            Case "M"    // message                
+                If Txt1(0) > 2 Then // M{id]
+                    Txt2 = Mid(Txt1, 2, 2)
+                    msgID = Hex2Dec(Txt2)
+                    If msgID = GetPP(16) Then // id matches
+                        If Txt1(0) > 4 Then
+                            msgLen = Hex2Dec(Mid(Txt1, 2, 2)) + 9
+                            If Txt1(0) > msgLen Then // should be full message
+                                wnum4 = 0
+                                For xxx = 2 to (msgLen - 4) Step 2
+                                    Txt2 = Mid(Txt1, xxx, 2)                                    
+                                    wnum4 += Hex2Dec(Txt2)    
+                                Next xxx
+                                Txt2 = Mid(Txt1, msgLen - 2, 4)                                
+                                wnum5 = Hex2Dec(Txt2)
+                                If wnum4 = wnum5 Then    // Checksum matches
+                                    wnum5 = Hex2Dec(Mid(Txt1, 6, 2))
+                                    Select Case wnum5
+                                        Case 1      // $01 Request Full Data Report                                                    
+                                            TXStr = "R"
+                                            TXStr += Mid(Txt1,2,2) + "0981"      // Full Data Report
+                                                                                // Data Length:	    $09
+                                                                                // Message Type:	$81
+                                            TXStr += HexStrB(FnLSR(Err, 4))      // Additional Data:	$02:	bits 0‑1: Digital Input status
+                                                                                //                          bits 4‑7: Error status
+                                            TXStr += HexStrB(PORTD & 31)         //                  $03:	bits 0-4: Relay status
+                                            TXStr += HexStrW(Oxy)                //                  $04: Dissolved Oxygen MSB
+                                                                                //                  $05: Dissolved Oxygen LSB
+                                            TXStr += HexStrW(TempC)             //                  $06: Temperature MSB
+                                                                                //                  $07: Temperature LSB
+                                            TXStr += HexStrW(SmpPumpAmp)         //                  $08: Sample Pump Current
+                                            TXStr += HexStrW(CalPumpAmp)         //                  $09: Calibration Pump Current
+                                            TXStr += HexStrW(CheckSum(TXStr))
+                                            
+                                            HPrint TXStr
+                                            
+
+                                                    // ----------------- Error Status Info ------------------
+                                                    // 0: No errors detected
+                                                    // 1: Probe voltage is outside normal range (E1 error code on display)
+                                                    // 2: Temperature is outside the 0 to 50 deg C range (E2 error code on display)
+                                                    // 3: Temperature is outside the user-defined range (E3 error code on display)
+                                                    // 4: Unit ADC electronics are unresponsive (E4 error code on display)
+                                                    // 5: Dissolved oxygen value not determined yet
+                                                    // 6: Probe voltage not stable during calibration (C1 error code on display)
+                                                    // 7: Probe temperature not stable during calibration (C2 error code on display)
+                                                    // 8: Probe voltage too low during calibration (C3 error code on display)
+                                                    // 9: Sample pump current values are out of tolerance
+                                                    // 10: Calibration pump current values are out of tolerance
+                                                    // 11: Digital Input error
+                                                    // 12: CABL error                                                    
+
+                                                    // ---------------- Relay Status Info -------------------
+                                                    // Bit 0 	Status of setpoint relay #1
+                                                    // Bit 1 	Status of setpoint relay #2
+                                                    // Bit 2 	Status of alarm relay (note that the relay is energized when the analyzer is not in an alarm condition)
+                                                    // Bit 3	Status of either of the two pumps (0 = off, 1 = on)
+                                                    // Bit 4	Currently selected pump (0 = sample pump, 1 = cal pump)
+
+                                            NxtData
+
+                                        Case 3      // $03 Request Relay Configuration                                                    
+                                            TXStr = "R"
+                                            TXStr += Mid(Txt1,2,2) + "0A83"  // Relay Configuration
+                                                                            // Data Length:	    $0A
+                                                                            // Message Type:    $83
+                                            TXStr += HexStrB(PORTD & 3)      // Additional Data:	$02: bits 0‑1: High/low selection
+                                            TXStr += HexStrW(GetPP(7))       // $03: Relay 1 on value MSB
+                                                                            // $04: Relay 1 on value LSB
+                                            TXStr += HexStrW(GetPP(8))       // $05: Relay 1 off value MSB
+                                                                            // $06: Relay 1 off value LSB
+                                            TXStr += HexStrW(GetPP(12))      // $07: Relay 2 on value MSB
+                                                                            // $08: Relay 2 on value LSB
+                                            TXStr += HexStrW(GetPP(13))      // $09: Relay 2 off value MSB
+                                                                            // $0A: Relay 2 off value LSB
+                                            TXStr += HexStrW(CheckSum(TXStr))
+                                            
+                                            HPrint TXStr                                            
+
+                                            NxtData
+
+                                        Case 4      // $04 Change Instrument Mode
+                                                    // Data Length:	$02
+                                                    // Message Type:	$04
+                                                    // Additional Data:	(one of the following:)
+                                                    // $00 - Changes unit to Run Mode
+                                                    // $02 - Changes unit to Calibration Mode
+                                                    // Expected Reply:	Acknowledge Message or Negative Acknowledge Message
+                                            TXStr = Mid(Txt1, 8, 2)
+                                            num1 = Hex2Dec(TXStr)
+
+                                            TXStr = "R" + Mid(Txt1,2,2)                                            
+
+                                            If num1 = 0 Then
+                                                // Run Mode
+                                                DispElapsed = 4
+                                                StartSmp
+
+                                                // send OK
+                                                TXStr += "01F0"                                                
+
+                                            Else If num1 = 2 Then
+                                                // Cal Mode
+                                                // Oxy = 0
+                                                // TempF = 0  
+                                                DispElapsed = 4
+                                                StartCal
+
+                                                // send OK
+                                                TXStr += "01F0"
+
+                                            Else
+                                                // send NAK
+                                                TXStr += "01FF"
+
+                                            End If
+                                            
+                                            TXStr += HexStrW(CheckSum(TXStr))
+                                            
+                                            HPrint TXStr                                            
+
+                                            NxtData
+
+                                        Case 5      // $05 Request Program Parameter
+                                                    // Data Length:	$02
+                                                    // Message Type:	$05
+                                                    // Additional Data:	The parameter number to be reported
+                                                    // Expected Reply:	Program Parameter Report or Negative Acknowledge Message                                        
+
+                                                    // Data Length:		$04
+                                                    // Message Type:	$85
+                                                    // Data Bytes:		$02 = Parameter Number
+                                                    // $03 = MSB of the Parameter Value
+                                                    // $04 = LSB of the Parameter Value
+                                            TXStr = "R"                                            
+                                            num4 = Hex2Dec(Mid(Txt1, 8, 2))                         // PP Number to retrieve
+                                            wnum4 = GetPP(num4)                                     // PP Value
+                                            TXStr +=  Mid(Txt1,2,2) + "0485"                         // ID + Len + Type
+                                            TXStr += HexStrB(num4) + HexStrW(wnum4)                  // PP Number + PP Value
+                                            TXStr += HexStrW(CheckSum(TXStr))                         // Complete Response
+                                            
+                                            HPrint TXStr
+
+                                            NxtData
+
+                                        Case 6      // $06 Change Program Parameter
+                                                    // Data Length:                 $04
+                                                    // Message Type:	            $06
+                                                    // Additional data:	Byte        $02 =  Parameter Number
+                                                    // Byte $03 =                   MSB of the Parameter Value
+                                                    // Byte $04 =                   LSB of the Parameter Value
+                                                    // Expected Reply:	Acknowledge Message or Negative Acknowledge Message
+                                            TXStr = Mid(Txt1, 8, 2)
+                                            num4 = Hex2Dec(TXStr)    // parameter number
+                                            TXStr = Mid(Txt1, 10,4)
+                                            wnum4 = Hex2Dec(TXStr)   // new value
+
+                                            TXStr = "R"
+
+                                            // see if value is within bounds
+                                            GetPPExtents(num4, PLow, PDef, PHigh, PInc, PDec)
+                                            If (wnum4 >= PLow) And (wnum4 <= PHigh) Then
+                                                PutPP(num4, wnum4)
+                                                // send OK
+                                                TXStr += Mid(Txt1,2,2) + "01F0"           // OK response                                            
+                                            Else
+                                                // send NAK
+                                                TXStr += Mid(Txt1,2,2) + "01FF"           // NAK response
+                                            End If
+                                            TXStr += HexStrW(CheckSum(TXStr))          // Complete Msg
+                                            
+                                            HPrint TXStr
+
+                                            NxtData
+
+                                        Case 7      // $07 Request Dissolved Oxygen                                                    
+
+                                                    // Data Length:		$03
+                                                    // Message Type:	$87
+                                                    // Data Bytes:		$02 = MSB of the D.O. reading
+                                                    //                  $03 = LSB of the D.O. reading
+                                            TXStr = "R"
+                                            TXStr += Mid(Txt1,2,2) + "0387"               // ID + Msg len and type
+                                            TXStr += HexStrW(Oxy)                        // Oxy value                                            
+                                            TXStr += HexStrW(CheckSum(TXStr))             //Complete Msg
+
+                                            HPrint TXStr
+
+                                            NxtData
+
+                                        Case 8      // $08 Request Temperature                                                    
+
+                                                    // Data Length:		$03
+                                                    // Message Type:	$88
+                                                    // Data Bytes:		$02 = MSB of temperature
+                                                    //                  $03 = LSB of temperature
+                                            
+                                            TXStr = "R"
+                                            TXStr += Mid(Txt1,2,2) + "0388"
+                                            TXStr += HexStrW(TempC)
+                                            TXStr += HexStrW(CheckSum(TXStr))
+                                            
+                                            HPrint TXStr
+
+                                            NxtData
+
+                                        Case 16     // $10 Extended Data Report
+                                            TXStr = "R" + Mid(Txt1,2,2)  // R + ID
+                                            TXStr += "3090"                      // Data Length:     $30	(total ASCII length is 109 bytes, R through Cksum)
+                                                                                // Message Type:    $90
+                                            TXStr += HexStrB(FnLSR(Err, 4))      // Additional Data: $02:	bits 0-1: Digital input (inside current window) status
+                                                                                //                          bits 4-7: Error status
+                                            TXStr += HexStrB(PORTD & 31)         //                  $03:	bits 0-4: Relay status
+                                            TXStr += HexStrW(Oxy)                //                  $04:	Dissolved Oxygen MSB
+                                                                                //                  $05:	Dissolved Oxygen LSB
+                                            TXStr += HexStrW(TempCW)             //                  $06:	Temperature MSB
+                                                                                //                  $07:	Temperature LSB
+                                            TXStr += HexStrB(SmpPumpAmp)         //                  $08:	Sample Pump Current
+                                            TXStr += HexStrB(CalPumpAmp)         //                  $09:	Calibration Pump Current
+                                            TXStr += HexStrB(GetPP(6))           //                  $0A:	bits 0-1: High/Low Selection of relay function
+                                            TXStr += HexStrW(GetPP(7))           //                  $0B:	Relay 1 "ON" value MSB
+                                                                                //                  $0C:	Relay 1 "ON" value LSB
+                                            TXStr += HexStrW(GetPP(8))           //                  $0D:	Relay 1 "OFF" value MSB
+                                                                                //                  $0E:	Relay 1 "OFF" value LSB
+                                            TXStr += HexStrW(GetPP(12))          //                  $0F:	Relay 2 "ON" value MSB
+                                                                                //                  $10:	Relay 2 "ON" value LSB
+                                            TXStr += HexStrW(GetPP(13))          //                  $11:	Relay 2 "OFF" value MSB
+                                                                                //                  $12:	Relay 2 "OFF" value LSB
+                                            TXStr += HexStrW(GetPP(58))          //                  $13:	Alarm Relay low setpoint MSB (Relay 3)
+                                                                                //                  $14:	Alarm Relay low Setpoint LSB (Relay 3)
+                                            TXStr += HexStrB(GetPP(37))          //                  $15:	Assignment of current monitor 1
+                                            GetAmp(1)                           //                  $16:	#1 Current Value MSB
+                                            TXStr += HexStrW(wnum3)              //                  $17:	#1 Current Value LSB
+                                            TXStr += HexStrW(GetPP(38))          //                  $18:	#1 Low Window MSB
+                                                                                //                  $19:	#1 Low Window LSB
+                                            TXStr += HexStrW(GetPP(39))          //                  $1A:	#1 High Window MSB
+                                                                                //                  $1B:	#1 High Window LSB
+                                            TXStr += HexStrB(GetPP(40))          //                  $1C:	Assignment of current monitor 2
+                                            GetAmp(2)                           //                  $1D:	#2 Current Value MSB
+                                            TXStr += HexStrW(wnum3)              //                  $1E:	#2 Current Value LSB
+                                            TXStr += HexStrW(GetPP(41))          //                  $1F:	#2 Low Window MSB
+                                                                                //                  $20:	#2 Low Window LSB
+                                            TXStr += HexStrW(GetPP(42))          //                  $21:	#2 High Window MSB
+                                                                                //                  $22:	#2 High Window LSB
+                                            TXStr += HexStrB(GetPP(43))          //                  $23:	Assignment of current monitor 3
+                                            GetAmp(3)                           //                  $24:	#3 Current Value MSB
+                                            TXStr += HexStrW(wnum3)              //                  $25:	#3 Current Value LSB
+                                            TXStr += HexStrW(GetPP(44))          //                  $26:	#3 Low Window MSB
+                                                                                //                  $27:	#3 Low Window LSB
+                                            TXStr += HexStrW(GetPP(45))          //                  $28:	#3 High Window MSB
+                                                                                //                  $29:	#3 High Window LSB
+                                            TXStr += HexStrB(GetPP(46))          //                  $2A:	Assignment of current monitor 4
+                                            GetAmp(4)                           //                  $2B:	#4 Current Value MSB
+                                            TXStr += HexStrW(wnum3)              //                  $2C:	#4 Current Value LSB
+                                            TXStr += HexStrW(GetPP(47))          //                  $2D:	#4 Low Window MSB
+                                                                                //                  $2E:	#4 Low Window LSB
+                                            TXStr += HexStrW(GetPP(48))          //                  $2F:	#4 High Window MSB
+                                                                                //                  $30:	#4 High Window LSB
+                                            
+                                            HPrint TXStr
+                                            CheckSum(TXStr)
+                                            TXStr += HexStrW(wnum4)
+
+                                            NxtData
+
+                                        Case 17     // $11 Super Extended Data Report
+                                            TXStr = "R" + Mid(Txt1,2,2)  // R + ID
+                                            TXStr += "3691"                  // Data Length:     $36	(total ASCII length is 109 bytes, R through Cksum)
+                                                                            // Message Type:    $91
+                                            TXStr += HexStrB(FnLSR(Err, 4))  // Additional Data:	$02:	bits 0-1: Digital input (inside current window) status
+                                                                            //                          bits 4-7: Error status
+                                            TXStr += HexStrB(PORTD & 63)     //                          $03:	bits 0-5: Relay status 
+                                            TXStr += HexStrW(Oxy)            //                  $04:	Dissolved Oxygen MSB
+                                                                            //                  $05:	Dissolved Oxygen LSB
+                                            TXStr += HexStrW(TempC)         //                  $06:	Temperature MSB
+                                                                            //                  $07:	Temperature LSB
+                                            TXStr += HexStrB(SmpPumpAmp)     //                  $08:	Sample Pump Current
+                                            TXStr += HexStrB(CalPumpAmp)     //                  $09:	Calibration Pump Current                                            
+                                            TXStr += HexStrB(RelayFunc)      //                  $0A:	bits 0-3: High/Low Selection of relay function
+                                                                            //                          (if bit 4 hi, Rly3 is Alarm relay or if low setpoint relay)
+                                            TXStr += HexStrW(GetPP(7))       //                  $0B:	Relay 1 "ON" value MSB
+                                                                            //                  $0C:	Relay 1 "ON" value LSB
+                                            TXStr += HexStrW(GetPP(8))       //                  $0D:	Relay 1 "OFF" value MSB
+                                                                            //                  $0E:	Relay 1 "OFF" value LSB
+                                            TXStr += HexStrW(GetPP(12))      //                  $0F:	Relay 2 "ON" value MSB
+                                                                            //                  $10:	Relay 2 "ON" value LSB
+                                            TXStr += HexStrW(GetPP(13))      //                  $11:	Relay 2 "OFF" value MSB
+                                                                            //                  $12:	Relay 2 "OFF" value LSB
+                                            TXStr += HexStrW(GetPP(58))      //                  $13:	Relay 3 "ON" value MSB or Alarm low setpoint MSB
+                                                                            //                  $14:	Relay 3 "ON" value LSB or Alarm low setpoint LSB
+                                            TXStr += HexStrW(GetPP(59))      //                  $15:	Relay 3 "OFF" value MSB
+                                                                            //                  $16:	Relay 3 "OFF" value LSB
+                                            TXStr += HexStrW(GetPP(64))      //                  $17:	Relay 4 "ON" value MSB
+                                                                            //                  $18:	Relay 4 "ON" value LSB
+                                            TXStr += HexStrW(GetPP(65))      //                  $19:	Relay 4 "OFF" value MSB
+                                                                            //                  $1A:	Relay 4 "OFF" value LSB
+                                            TXStr += HexStrB(GetPP(37))      //                  $1B:	Assignment of current monitor 1
+                                            GetAmp(1)                       //                  $1C:	#1 Current Value MSB
+                                            TXStr += HexStrW(wnum3)          //                  $1D:	#1 Current Value LSB
+                                            TXStr += HexStrW(GetPP(38))      //                  $1E:	#1 Low Window MSB
+                                                                            //                  $1F:	#1 Low Window LSB
+                                            TXStr += HexStrW(GetPP(39))      //                  $20:	#1 High Window MSB
+                                                                            //                  $21:	#1 High Window LSB
+                                            TXStr += HexStrB(GetPP(40))      //                  $22:	Assignment of current monitor 2
+                                            GetAmp(2)                       //                  $23:	#2 Current Value MSB
+                                            TXStr += HexStrW(wnum3)          //                  $24:	#2 Current Value LSB
+                                            TXStr += HexStrW(GetPP(41))      //                  $25:	#2 Low Window MSB
+                                                                            //                  $26:	#2 Low Window LSB
+                                            TXStr += HexStrW(GetPP(42))      //                  $27:	#2 High Window MSB
+                                                                            //                  $28:	#2 High Window LSB
+                                            TXStr += HexStrB(GetPP(43))      //                  $29:	Assignment of current monitor 3
+                                            GetAmp(3)                       //                  $2A:	#3 Current Value MSB
+                                            TXStr += HexStrW(wnum3)          //                  $2B:	#3 Current Value LSB
+                                            TXStr += HexStrW(GetPP(44))      //                  $2C:	#3 Low Window MSB
+                                                                            //                  $2D:	#3 Low Window LSB
+                                            TXStr += HexStrW(GetPP(45))      //                  $2E:	#3 High Window MSB
+                                                                            //                  $2F:	#3 High Window LSB
+                                            TXStr += HexStrB(GetPP(46))      //                  $30:	Assignment of current monitor 4
+                                            GetAmp(3)                       //                  $31:	#4 Current Value MSB
+                                            TXStr += HexStrW(wnum3)          //                  $32:	#4 Current Value LSB
+                                            TXStr += HexStrW(GetPP(47))      //                  $33:	#4 Low Window MSB
+                                                                            //                  $34:	#4 Low Window LSB
+                                            TXStr += HexStrW(GetPP(48))      //                  $35:	#4 High Window MSB
+                                                                            //                  $36:	#4 High Window LSB
+                                            wnum3 = CheckSum(TXStr)
+                                            TXStr += HexStrW(wnum3)
+                                            
+                                            HPrint TXStr
+                                            NxtData
+
+                                        Case 240    // $F0 ACK
+                                            NxtData
+                                        Case 255    // $FF NAK                                        
+                                            NxtData
+                                        Case Else
+                                            NxtData
+                                    End Select
+                                End If
+                            End If                 
+                        End If
+                    Else    // id doesn// t match ignore
+                        NxtData
+                    End If
+                End If
+            Case Else
+                NxtData
+        End Select
+    End If
+
+    If (DispMode > 9) And (SecChanged = True) Then    // Test Mode, show values
+        Select Case DispMode
+            Case 10
+                GetMv                       
+                ShowVal(ADCMv, 4)
+
+            Case 11
+                If GetPP(51) = 0 Then
+                    ShowVal(TempCW, 4)   // Celsius
+                Else
+                    ShowVal(TempFW, 4)  // Farenheight
+                End If
+
+            Case 12 To 13   // Sample/Calibration pumps
+                ShowVal(GetPumpAmp(PumpAvg), 2)
+
+            Case 19 // Aer 1 Current
+                GetAmp(1)
+                ShowVal(wnum3, 4)
+
+            Case 20 // Aer 2 Current
+                GetAmp(2)
+                ShowVal(wnum3, 4)
+
+            Case 21 // Aer 3 Current
+                GetAmp(3)
+                ShowVal(wnum3, 4)
+
+            Case 22 // Aer 4 Current
+                GetAmp(4)
+                ShowVal(wnum3, 4)
+
+        End Select
+    End If
+
+   If (PUMP = On) And (SecChanged = True) Then
+        wnum3 = ReadAD10(PumpAmp)
+        If PumpAvg = 0 Then
+            PumpAvg = wnum3
+        Else
+            PumpAvg = ([long]PumpAvg * 4 + wnum3) / 5
+        End If
+    End If
+
+    If DispElapsed = 0 Then
+        SecChanged = False
+        Goto Skip
+    End If
+
+    // Check if time for auto calibration
+    If (MinChanged = True) And (GetPP(28) = Hours) And (GetPP(29) = Minutes) And (DispElapsed > 0)Then
+        // time to calibrate
+        MinChanged = False
+        BuoyMode = CalFlush
+        CalOn
+        elapsedtmr = 300 // sec, 5 minute flush, 2 min sample after flush
+    End If
+
+    If (DispMode < 10) And (DispElapsed > 3) Then
+        DispElapsed = 1
+        Select Case DispMode
+            Case 0
+
+                DispMode = 1
+                ShowVal(Oxy, 4)
+            Case 1
+                DispMode = 2
+                ShowVal(TempF, 0)
+            Case 2
+                DispMode = 3
+                If PUMP = On Then
+                    ShowVal(elapsedtmr, 0)
+                    DispElapsed = 2
+                Else
+                    DispElapsed = 4
+                End If
+            Case 3
+                DispMode = 0
+                DispTxt = "!L  "
+                DispTxt(3) = LEDStatus
+                DispTxt(4) = BlinkLED
+                Ser1Print DispTxt 
+                DispElapsed = 2
+
+            Case Else 
+                DispElapsed = 4
+                DispMode = 0                
+        End Select
+    End If
+
+    If SecChanged = True Then
+        DispTxt = "!L  "
+        DispTxt(3) = LEDStatus
+        DispTxt(4) = BlinkLED
+        Ser1Print DispTxt        
+    End If
+
+    // If (SecChanged = True) And (DispElapsed = 0) Then        
+    //     SecChanged = False
+    //     If PUMP = On Then           
+    //         If LastPA <> PumpAvg Then
+    //             LastPA = PumpAvg
+    //             wnum3 = GetPumpAmp(PumpAvg)
+    //             DispTxt = "!T"
+    //             DispTxt += Right("    " + Str(wnum3), 4)            
+    //             DispTxt += Chr(2)
+    //             DispTxt(0) = 7
+    //             If DispTxt(4) = 32 Then DispTxt(4) = 48
+    //             Ser1Print DispTxt
+    //         End If
+    //     End If
+    // End If
+
+    If HourChanged = True Then
+        HourChanged = False
+        DS3231_ReadTime(Hours, Minutes, Seconds, ampm)
+        If (Hours >= 6) And (Hours < 20) Then
+            // Full bright because of daylight
+            DispTxt = "!B "
+            DispTxt(3) = 200
+            DispTxt(0) = 3
+            Ser1Print DispTxt
+        Else
+            // Dim because of night, this is to save the LED Display
+            DispTxt = "!B "
+            DispTxt(3) = 128
+            DispTxt(0) = 3
+            Ser1Print DispTxt
+        End If
+    End If
+
+    Select Case BuoyMode
+        Case CalFlush  // Cal Flush is running
+            If elapsedtmr < 2 Then
+                // check if pump current is in parameters
+                wnum3 = GetPumpAmp(PumpAvg)                
+                If (wnum3 >= GetPP(54)) And (wnum3 <= GetPP(55)) Or (1 = 1)Then // remove (1 = 1) after testing
+                    // E1 - Mv is higher or lower than is normally possible
+                    // E2 - Temperature is outside 0 to 50 C (122 F)
+                    // E3 - Temperature has exceeded PP31 or PP32
+
+                    // C1 - Temperature not stable (Temp needed for calibration)
+
+                    If MvDiff > 2 Then
+                        // C2 - mv not stable
+
+                    Else If ADCMv < C3byMil Then
+                        // C3 - mv to weak
+                    
+                    Else
+                        // store num1 in 30 day list
+
+                        // start Cal Read time 2 min
+                        ADCMvTotal = 0
+                        ADCCnt = 0
+                        BuoyMode = CalRead
+                        elapsedtmr = GetPP(21)  // default is 2 min
+                    End If                    
+                Else
+                    // pump not in tolerance, generate error ErCP, DO NOT FINISH CALIBRATING
+
+
+
+                End If
+            End If
+
+        Case CalRead  // do cal read
+            If SecChanged = True Then
+                SecChanged = False
+                GetMv
+            End If
+
+            If elapsedtmr < 2 Then
+                CalOff
+                GetCalVal
+                CalPumpAmp = GetPumpAmp(PumpAvg)
+
+                DispTxt = "!L  "
+                LEDStatus = 1
+                BlinkLED = 1
+                DispTxt(3) = LEDStatus
+                DispTxt(4) = BlinkLED
+                DispTxt(0) = 4
+                Ser1Print DispTxt
+
+                BuoyMode = SmpFlush
+                PumpAvg = 0
+                elapsedtmr = GetPP(26)
+                SmpOn
+            End If
+
+        Case SmpFlush
+            If DispElapsed = 0 Then
+                DispElapsed = 1
+            End If
+
+            If elapsedtmr < 2 Then
+                // check pump current is in parameters
+                wnum3 = GetPumpAmp(PumpAvg)                
+                If (wnum3 >= GetPP(52)) And (wnum3 <= GetPP(53)) Or (1 = 1) Then    // remove (1 = 1) after testing
+                    // start Sample Read                    
+                    ADCMvTotal = 0                    
+                    ADCCnt = 0
+                    BuoyMode = SmpRead
+                    elapsedtmr = GetPP(27)
+                Else
+                    // pump not in tolerance, generate error ErSP
+
+                    // turn off run LED
+                    DispTxt = "!L  "
+                    LEDStatus = 1
+                    BlinkLED = 0
+                    DispTxt(3) = LEDStatus
+                    DispTxt(4) = BlinkLED
+                    DispTxt(0) = 4
+                    Ser1Print DispTxt
+                End If
+            End If
+
+        Case SmpRead
+            If SecChanged = True Then
+                SecChanged = False
+                GetMv
+            End If
+            If elapsedtmr < 2 Then              // finished sampling
+                SmpOff
+                SmpPumpAmp = GetPumpAmp(PumpAvg)
+                CalcOxy                         // calculate the oxygen value
+
+                elapsedtmr = GetPP(25) * 60     // load minutes to next read. * 60 for second timer
+                BuoyMode = NxtSmp
+
+                DispTxt = "!L  "
+                LEDStatus = 1
+                BlinkLED = 0
+                DispTxt(3) = LEDStatus
+                DispTxt(4) = BlinkLED
+                DispTxt(0) = 4
+                Ser1Print DispTxt
+
+                // Save Oxy
+                EPWrite LastOxy, Oxy
+                EPWrite LastOxy + 1, Oxy_H
+                // Save Temp
+                EPWrite LastTemp, TempF
+                EPWrite LastTemp + 1, TempF_H
+
+                // Check oxy to control relays
+                SetRelays
+
+            End If
+
+        Case NxtSmp
+            If elapsedtmr < 2 Then
+                BuoyMode = SmpFlush
+                elapsedtmr = GetPP(26)
+                SmpOn
+
+                DispTxt = "!L  "
+                LEDStatus = 1
+                BlinkLED = 1
+                DispTxt(3) = LEDStatus
+                DispTxt(4) = BlinkLED
+                DispTxt(0) = 4
+                Ser1Print DispTxt
+
+            End If
+
+        Case Else
+            // do nothing
+    End Select
+
+Skip:
+    If (DspShow = True) And (DspFlag = True) Then
+        ShowText
+    End If
+Loop
+
+// // // --------------- Subroutines -----------------
+Sub SetLimits(HighLow, AerOn, AerOff)
+    ///////////////////////////////////////////////////////
+    // uses: wnum3                                       //
+    ///////////////////////////////////////////////////////
+    
+    If EntryCnt = AerOn Then
+        wnum3 = GetPP(AerOff)
+        If GetPP(HighLow) = 0 Then        // Low setpoint for Relay
+            PHigh = wnum3               // don// t go above
+            If PHigh < PDef Then
+                PHigh = PDef
+                PutPP(AerOff, PHigh)
+            End If
+        Else                            // High setpoint for Relay
+            PLow = wnum3
+            If PLow > PDef Then
+                PLow = PDef
+                PutPP(AerOn, PLow)
+            End If
+        End If
+    End If
+End Sub
+
+Sub HPrint(in hpStr as String, Optional CRLF as Bit = False)
+    TXEN_On
+    Wait 1 ms
+    HSerPrint hpStr    
+    If CRLF = True Then
+        HSerPrintCRLF
+    End If
+    Wait 1 ms
+    TXEN_Off
+End Sub
+
+Function RelayFunc as Byte
+    num4 = 0
+    num4.0 = GetPP(6)
+    num4.1 = GetPP(11)
+    num4.2 = (GetPP(57) = 1)
+    num4.3 = GetPP(63)
+    num4.4 = (GetPP(57) = 2)
+
+    RelayFunc = num4
+End Function
+
+Function HexStrB(in hbyte as Byte) as String * 3
+    HexStrB = Right("00" + Hex(hbyte), 2)
+End Function
+
+Function HexStrW(in hword as Word) as String * 5
+    Txt2 = Right("00" + Hex(hword / 256), 2)
+    Txt2 += Right("00" + Hex(hword % 256), 2)
+    HexStrW = Txt2
+End Function
+
+Function CheckSum(in hckstr as string) as Word
+    wnum4 = 0    
+    For xxx = 2 to hckstr(0) Step 2
+        num4 = Hex2Dec(Mid(hckstr, xxx, 2))
+        wnum4 += num4        
+    Next xxx
+    CheckSum = wnum4
+End Function
+
+Sub StartCal
+    // turn on CAL LED and Blink it
+    DispTxt = "!L  "
+    LEDStatus = 2
+    BlinkLED = 2
+    DispTxt(3) = LEDStatus
+    DispTxt(4) = BlinkLED
+    Ser1Print DispTxt
+    BuoyMode = CalFlush // use cal flush and run numbers
+    ShowVal(Oxy, 4)
+    Wait 500 ms
+    CalOn
+    elapsedtmr = GetPP(20)    // sec, 5 minute flush is default, 2 min sample after flush is default
+End Sub
+
+Sub StartSmp
+    DispTxt = "!L  "
+    LEDStatus = 1
+    BlinkLED = 1
+    DispTxt(3) = LEDStatus
+    DispTxt(4) = BlinkLED
+    DispTxt(0) = 4
+    Ser1Print DispTxt                                                                
+    BuoyMode = SmpFlush     // use sample flush and
+    SmpOn
+    ShowVal(Oxy, 4)
+    elapsedtmr = GetPP(26)  // sample startup time    
+End Sub
+
+Function Hex2Dec(hxdstr as String) as Long
+    Dim iii as Byte
+	Dim res as Long
+    Dim pow as Long
+
+	res = 0
+	For iii = 1 to hxdstr(0)        
+		pow = power(16, (hxdstr(0) - iii))        
+        num1 = INSTR("0123456789ABCDEF", Chr(hxdstr(iii)))
+        num1 -= 1
+		res += num1 * pow
+	Next
+	Hex2Dec = res
+End Function
+
+Sub SetRelays
+    // Relay #1
+    Select Case GetPP(6)
+        Case 0  // low setpoint
+            If Oxy <= GetPP(7) Then R1On
+            If Oxy >= GetPP(8) Then R1Off
+
+        Case 1  // high setpoint
+            If Oxy >= GetPP(7) Then R1On
+            If Oxy <= GetPP(8) Then R1Off
+    End Select
+
+    // Relay #2
+    Select Case GetPP(11)
+        Case 0  // low setpoint
+            If Oxy <= GetPP(12) Then R2On
+            If Oxy >= GetPP(13) Then R2Off
+
+        Case 1  // high setpoint
+            If Oxy >= GetPP(12) Then R2On
+            If Oxy <= GetPP(13) Then R2Off
+    End Select
+
+    // Relay #3
+    Select Case GetPP(57)
+        Case 0  // low setpoint
+            If Oxy <= GetPP(58) Then R3On
+            If Oxy >= GetPP(59) Then R3Off
+
+        Case 1  // high setpoint
+            If Oxy >= GetPP(58) Then R1On
+            If Oxy <= GetPP(59) Then R1Off
+    End Select
+
+    // Relay #4
+    Select Case GetPP(63)
+        Case 0  // low setpoint
+            If Oxy <= GetPP(64) Then R4On
+            If Oxy >= GetPP(65) Then R4Off
+
+        Case 1  // high setpoint
+            If Oxy >= GetPP(64) Then R4On
+            If Oxy <= GetPP(65) Then R4Off
+    End Select
+End Sub
+
+Function GetPumpAmp(In Avg as Word) as Word
+    GetPumpAmp = ([long]Avg * 3462)/10000
+End Function
+
+Function GetPP(in PPNumber) as Word
+    ///////////////////////////////////////////////////////////////////
+    // uses: num1, num2, num3 and wnum3                              //
+    ///////////////////////////////////////////////////////////////////
+
+    num1 = (PPNumber - 1) * 2 + 1
+    ReadTable MemLoc, num1, num2        // mem location
+    ReadTable MemLoc, (num1 + 1), num3  // byte or word
+
+    Select Case num3
+        Case 1  // byte
+            EPRead num2, num1
+            wnum3 = num1            
+        Case 2  // word
+            EPRead num2, num1
+            wnum3 = num1
+            EPRead (num2 + 1), num1
+            wnum3 += (num1 * 256)
+        Case Else
+            wnum3 = 0   // how to show error?
+    End Select
+    GetPP = wnum3
+End Function
+
+Sub PutPP(In PPNumber, In PPValue as Word)
+    //////////////////////////////////////////////////////
+    // uses: num1, num2, and num3                       //
+    //////////////////////////////////////////////////////
+
+    num1 = (PPNumber - 1) * 2 + 1
+    ReadTable MemLoc, num1, num2        // mem location
+    ReadTable MemLoc, (num1 + 1), num3  // byte or word
+
+    Select Case num3
+        Case 1  // byte
+            EPWrite num2, PPValue     // store byte
+        Case 2  // word
+            EPWrite num2, PPValue
+            EPWrite (num2 + 1),  PPValue_H
+    End Select
+End Sub
+
+Sub GetPPExtents(In PPNumber as Byte, Out PLow as Word, Out PDef as Word, Out PHigh as Word, Out PInc as Word, Out PDec as Word)
+    ///////////////////////////////////////////////////////
+    // uses: wnum3                                       //
+    ///////////////////////////////////////////////////////
+    wnum3 = (PPNumber - 1) * 5 + 1
+    ReadTable PgmParameters, wnum3, PLow
+    ReadTable PgmParameters, (wnum3 + 1), PDef
+    ReadTable PgmParameters, (wnum3 + 2), PHigh
+    ReadTable PgmParameters, (wnum3 + 3), PInc
+    ReadTable PgmParameters, (wnum3 + 4), PDec
+End Sub
+
+Sub RestoreDefaults
+    ///////////////////////////////////////////////////////////////////////////
+    // uses: xxx, wnum3, num1, num2 and num3                                 //
+    ///////////////////////////////////////////////////////////////////////////
+    For xxx = 1 to 78
+        GetPPExtents xxx , PLow, PDef, PHigh, PInc, PDec   //  we are just needing PDef
+        PutPP xxx, PDef                                    // write to EEPROM
+    Next
+End Sub
+
+// ------------------ C3 Error by Mil of Membrane -------------------
+Function C3byMil as Word
+    ///////////////////////////////////////////////////////////////////////////
+    // Returns lowest mv reading allowed according to membrane thickness     //
+    // This routine uses: wnum3                                              //
+    ///////////////////////////////////////////////////////////////////////////
+    Dim Mil as Word
+
+    Mil = GetPP(2)
+    wnum3 = (32000/[long]Mil - 5333/([long]Mil * Mil) - 2666) / 10
+    C3byMil = wnum3
+End Function
+
+Sub DS_Temperature(Out Temperature as Word, Out NegTemp as Bit)
+    num4 = DS3231_ReadRegister(0x11)      
+    NegTemp = num4.7    
+    num4 = num4 & 0b01111111
+    wnum4 = [word]num4 * 100
+    wnum4 += FnLSR(DS3231_ReadRegister(0x12), 6) * 25 
+    Temperature = wnum4       
+End Sub
+
+Sub DS3231_Init
+    // DS3231_ResetClock
+    DS3231_ClearOscillatorStopFlag
+    DS3231_EnableOscillator (1)  //  Abilita oscillatore
+    DS3231_EnableSQW             //  Uscita 1Hz
+    DS3231_SetHourMode (24)      //  24 ore
+    DS3231_SetSQW (0)            //  Abilita uscita 1Hz
+End Sub
+
+Sub NxtData
+    If RxData(0) > Txt1(0) Then
+        RxData = Mid(RxData, Txt1(0) + 1)
+        RxFlag = True
+    Else
+        RxData(0) = 0
+    End If    
+End Sub
+
+Sub DNxtData
+    If DRxData(0) > Txt(0) Then
+        DRxData = Mid(DRxData, Txt(0) + 1)
+        DRxFlag = True
+    Else
+        DRxData(0) = 0
+    End If
+End Sub
+
+Sub RxInt   // Data from radio/computer
+    RxData(0) ++
+    RxData(RxData(0)) = HSerReceive
+    If RxData(0) = RxBuffer Then
+        RxData(0) = 0
+    End If
+    RxFlag = True
+End Sub
+
+Sub DispRX  // Data from Display Board
+  DRxData(0) ++  
+  DRxData(DRxData(0)) = Ser1Receive
+  If DRxData(0) = DispRxBuffer Then
+      DRxData(0) = 0
+  End If
+  DRxFlag = True
+End Sub
+
+Sub SecCounter
+    Settimer 0, 15536
+    StartTimer 0
+    Tenths ++
+
+    If (Tenths % 5) = 0 Then
+        DspFlag = True
+    End If
+
+    If Tenths > 9 Then
+        Tenths = 0
+
+        // decrement state machine variables
+        If elapsedtmr > 1 Then
+            elapsedtmr --
+        End If
+
+        If DispElapsed > 0 Then
+            DispElapsed ++
+        End If
+
+        Seconds ++
+        
+        SecChanged = True
+
+        If Seconds > 59 Then
+            Seconds = 0
+            Minutes ++
+
+            MinChanged = True   // for calibration
+
+            If Minutes > 59 Then
+                Minutes = 0
+                Hours ++
+
+                HourChanged = True                
+
+                If Hours > 23 Then
+                    Hours = 0
+                End If
+            End If
+        End If
+    End If
+End Sub
+
+//------------ Get Amp reading ---------------------
+Sub GetAmp(in AmpVal as Byte)
+    Select Case AmpVal
+        Case 1
+            ADCAmp = ReadAD10(AMP1)
+            EPRead A1Zero, wnum1
+            EPRead (A1Zero + 1), wnum1_H
+            EPRead A1Factor, wnum4
+            EPRead (A1Factor + 1), wnum4_H
+        Case 2
+            ADCAmp = ReadAD10(AMP2)
+            EPRead A2Zero, wnum1
+            EPRead (A2Zero + 1), wnum1_H
+            EPRead A2Factor, wnum4
+            EPRead (A2Factor + 1), wnum4_H
+        Case 3
+            ADCAmp = ReadAD10(AMP3)
+            EPRead A3Zero, wnum1
+            EPRead (A3Zero + 1), wnum1_H
+            EPRead A3Factor, wnum4
+            EPRead (A3Factor + 1), wnum4_H
+        Case 4
+            ADCAmp = ReadAD10(AMP4)
+            EPRead A4Zero, wnum1
+            EPRead (A4Zero + 1), wnum1_H
+            EPRead A4Factor, wnum4
+            EPRead (A4Factor + 1), wnum4_H
+        Case Else
+            ADCAmp = 0
+            wnum1 = 0
+            wnum4 = 0
+    End Select
+
+    If ADCAmp < 200 Then
+        ADCAmp = 0
+    Else
+        wnum3 = ((ADCAmp - wnum1) * [long]wnum4) / 10000    //  gives one decimal place (e.i. 12.3)
+    End If
+ 
+    // Factor computations
+    // zero_adc should be around 200
+    //
+    // ((adc - zero_adc) * factor)
+    // ------------------------  = amp
+    //         10,000
+            
+    // (adc - zero_adc) * factor = (amp * 10,000)
+
+    // (amp * 10,000)
+    // --------------  = factor
+    // (adc - zero_adc)
+
+End Sub
+
+// -------------------- Temperature Conversions ---------------------
+Function FtoC(in Fahrenheit as Word) as Word
+    FtoC = ([Long]Fahrenheit - 320) * 5 / 9
+End Function
+
+Function CtoF(in Celsius as Word) as Word
+    CtoF = ([Long]Celsius * 9 / 5) + 320
+End Function
+
+// ------------------------ Calc Oxy --------------------------------
+Sub CalcOxy
+    ADCMv = ([long]ADCMvTotal / ADCcnt) //* 11896 / 10000 // change ADC readings to millivolt (10125)
+    
+    MvDiff = ([long]MvDiff) // * 11896 / 10000 // change ADC Difference readings to millivolts
+    
+    // Check for stable ADCMv and MvDiff readings
+
+    //Get Temp reading
+    GetTempNTC
+
+    MembraneCorrection
+
+    HPrint Str(TempF)
+    HPrint ","
+
+    wnum2 = DoAtTemp(Salinity)    
+    HPrint Str(wnum2)
+    HPrint ","
+    HPrint Str(ADCMv)
+    HPrint ","    
+    HPrint Str(MemCorr)
+    HPrint ","    
+    HPrint Str(CalVal)
+    HPrint ","
+
+    //----------------------------------- Old Buoy Code --------------------------------
+    // MembraneCorrection
+    // wnum2 = DoAtTemp(Salinity)
+
+    // Oxy = (((([long]ADCMv * wnum2) / MemCorr) * [long]CalVal)/10000) * 10202 / 10000
+    //----------------------------------------------------------------------------------
+    
+    Oxy = (((([long]ADCMv * wnum2) / MemCorr) * [long]CalVal) / 8205)  // * 10202 / 10000
+
+    wnum2 = (((([long]ADCMv * wnum2) / MemCorr) * [long]CalVal)) / ((wnum2 + 5) / 10) // this is what my divisor should be
+    HPrint Str(wnum2)
+    HPrint ","
+    HPrint Str(Oxy), True
+End Sub
+
+// ------------ MEMBRANE CORRECTION FOR PROBE -----------------------------------
+Sub MembraneCorrection    
+    MemCorr = (324771 + 2447 * [long]TempF + (([long]TempF * [long]TempF * [long]TempF * 1000) / 517) - (([long]TempF * [long]TempF * 100) / 327) * (([long]TempF * [long]TempF * 10) / 271)) / 1000
+    // MemCorr = 483 - 2904/TempF + (([long]TempF * TempF * TempF)/458) - (([long]TempF * TempF * TempF * TempF)/79363)  - 2
+End Sub
+
+// ------------------------ get temp reading of 2252 NTC + 2K ohm, reading taken off the 2252 NTC, formula was so complex I finally used a lookup table
+Sub GetTempNTC
+    wnum3 = READAD10(TempSensor)
+
+    If wnum3 > 308 And wnum3 < 1111 Then
+        // able to look up temp
+        num1 = 1
+        ReadTable ADCtoTemp, num1, CurADC  // adc reading
+        num1 ++
+        ReadTable ADCtoTemp, num1, CurTempF // temperature
+
+        Do While CurADC >= wnum3
+            LastADC = CurADC
+            LastTempF = CurTempF
+            num1 ++
+            ReadTable ADCtoTemp, num1, CurADC  // adc reading
+            num1 ++
+            ReadTable ADCtoTemp, num1, CurTempF // temperature
+        Loop
+
+        TempFW = (((([long]LastADC - wnum3) * 1000) / ([long]LastADC - CurADC)) * ([long]CurTempF - LastTempF) + ([long]LastTempF * 1000))  / 10
+        
+        // TempFW = ([long]TempFW * 10000) / 9800  // 11304   // adjust temp
+
+        If TempFW % 10 > 5 Then
+            TempFW += 10
+        End If
+        TempFW = TempFW / 10
+    Else
+        // temp out of range
+        If wnum3 < 309 Then
+            TempFW = 1310       // HOT 131.0 F
+        End If
+        If wnum3 > 1110 Then
+            TempFW = 50         // COLD 5.0 F
+        End If
+    End If
+
+    If TempAdjust < 127 Then
+        TempFW -= (127 - TempAdjust)
+    Else
+        TempFW += (TempAdjust - 127)
+    End If
+
+    TempCW = (([long]TempFW - 320) * 5) / 9
+    wnum3 = TempFW + 5
+
+    TempF = wnum3 / 10
+    TempC = (([long]TempF - 32) * 5) / 9
+End Sub
+
+// ------------------------- DO at Temp -----------------------------------------
+Function DoAtTemp(In Sal as Word) as Word
+    Dim temp1 as Word
+    Dim temp2 as Word
+    Dim numerator as Word
+    Dim denominator as Word
+    temp1 = 0: temp2 = 0: numerator = 0: denominator = 0
+
+    If Sal=0 Then
+        Chlorinity0(TempF, temp1)
+        temp2 = temp1
+        numerator = 1
+        denominator = 1
+    End If
+
+    If Sal>0 and Sal<5 Then
+        Chlorinity0(TempF, temp1)
+        Chlorinity5(TempF, temp2)
+        numerator = Sal
+        denominator = 5
+    End If
+
+    If Sal=5 Then
+        Chlorinity5(TempF, temp1)
+        temp2 = temp1
+        numerator = 1
+        denominator = 1
+    End If
+
+    If Sal>5 and Sal<10 Then
+        Chlorinity5(TempF, temp1)
+        Chlorinity10(TempF, temp2)
+        numerator = Sal - 5
+        denominator = 5
+    End If
+
+    If Sal=10 Then
+        Chlorinity10(TempF, temp1)
+        temp2 = temp1
+        numerator = 1
+        denominator = 1
+    End If
+
+    If Sal>10 and Sal<15 Then
+        Chlorinity10(TempF, temp1)
+        Chlorinity15(TempF, temp2)
+        numerator = Sal - 10
+        denominator = 5
+    End If
+
+    If Sal=15 Then
+        Chlorinity15(TempF, temp1)
+        temp2 = temp1
+        numerator = 1
+        denominator = 1
+    End If
+
+    If Sal>15 and Sal<20 Then
+        Chlorinity15(TempF, temp1)
+        Chlorinity20(TempF, temp2)
+        numerator = Sal - 15
+        denominator = 5
+    End If
+
+    If Sal=20 Then
+        Chlorinity20(TempF, temp1)
+        temp2 = temp1
+        numerator = 1
+        denominator = 1
+    End If
+
+    If Sal>20 and Sal<25 Then
+        Chlorinity20(TempF, temp1)
+        Chlorinity25(TempF, temp2)
+        numerator = Sal - 20
+        denominator = 5
+    End If
+
+    If Sal>=25 Then
+        Chlorinity25(TempF, temp1)
+        temp2 = temp1
+        numerator = 1
+        denominator = 1
+    End If
+
+    DoAtTemp = temp1 - ((temp1 - temp2) * [long]numerator / denominator)
+
+End Function
+
+// -------------------------- Get mv reading of probe -------------------------
+Sub GetMv
+    If ADCCnt = 0 Then
+        ADCMv = READAD10(OxySensor)
+    End If
+    ADCMv = (READAD10(OxySensor) + ADCMv) / 2
+
+    ADCMv = (1150 * [long]ADCMv - 1155 - ([long]ADCMv * ADCMv * 1000) / 198306) / 913 // 1000
+
+    If ADCCnt = 0 Then
+        MvLast = ADCMv
+    End If
+
+    ADCMv = (MvLast * 2 + ADCMv) / 3 // gives most weight to the last reading
+
+    ADCMvTotal += ADCMv
+    ADCCnt += 1
+
+    If MvLast > ADCMv then
+        wnum2 = MvLast - ADCMv
+    Else
+        wnum2 = ADCMv - MvLast
+    End If
+
+    If wnum2 > MvDIff Then
+        MvDIff = wnum2
+    End If
+
+    MvLast = ADCMv
+
+End Sub
+
+Sub ShowText
+    DspFlag = False
+    DispTxt = "    " + Dsp + "    "
+    Txt2  = Mid(DispTxt, DspPtr, 4)
+    DispTxt =  "!T" + Txt2
+    If DspPtr < (Dsp(0) + 8) Then
+        DspPtr ++
+    Else
+        DspPtr = 1
+    End If
+    DispTxt += Chr(0)
+    DispTxt(0) = 7
+
+    Ser1Print DispTxt
+End Sub
+
+Sub ShowVal(DispVal as Word, in Decs as Byte, Optional TrailingSpaces as Byte = 0)
+    If DispVal > 9999 Then
+        HPrint Str(DispVal)
+        HSerSend 13
+
+        DispTxt = "!TErr  "
+        DispTxt(7) = 0
+    Else        
+        Txt2 = Right("0000" + Str(DispVal), 4)
+        Select Case Decs
+            Case 1
+                wnum3 = 1000
+                num4 = 3
+            Case 2
+                wnum3 = 100
+                num4 = 2
+            Case 4
+                wnum3 = 10
+                num4 = 1
+            Case Else
+                wnum3 = 1
+                num4 = 0
+        End Select
+
+        Txt2 = Right("    " +Str(DispVal / wnum3), (4 - num4))
+        Txt2 += Right("0000" + Str(DispVal % wnum3), num4)
+
+        If TrailingSpaces > 0 Then
+            Txt2 = Right("    " + Str(DispVal), 4)
+            Txt2 += Fill(TrailingSpaces)
+            DispTxt = "!T" + Right(Txt2, 4)
+        Else
+            DispTxt = "!T" + Txt2
+        End If
+        
+        DispTxt += Chr(Decs)
+    End If
+    DispTxt(0) = 7
+
+    Ser1Print DispTxt
+
+End Sub
+
+// --------------- GET CALIBRATION VALUE ---------------------------
+Sub GetCalVal
+    ADCMv = ([long]ADCMvTotal / ADCcnt) * 11896 / 10000 // change ADC readings to millivolt (10125)
+    
+    MvDiff = ([long]MvDiff * 11896) / 10000 // change ADC Difference readings to millivolts
+
+    GetTempNTC
+    
+    MembraneCorrection  // uses Temp
+
+    wnum3 = GetPP(3)
+    wnum2 = 1000 + (([long]wnum3 * [long]wnum3) / 1876663) - ([long]wnum3 / 27)
+
+    wnum3 = ([long]MemCorr * wnum2) / [long]ADCMv
+
+    If wnum3 <> CalVal Then   // only write to EEPROM If value is dIfferent
+      CalVal = wnum3
+      EPWrite ProbeCal + 1, CalVal
+      EPWrite ProbeCal, CalVal_H
+    End If
+End Sub
+
+// ---- Chlorinity Subroutines --------------------------------------
+Sub Chlorinity0(in temp as word, out ret as word)
+  ret = (3123 + 558396 / [long]temp - 5610441 / ([long]temp * temp) - 15 * temp) / 10
+End Sub
+
+Sub Chlorinity5(in temp as word, out ret as word)
+  ret =(3385 + 504131 / [long]temp - 5000625 / ([long]temp * temp) - 16 * temp) / 10
+End Sub
+
+Sub Chlorinity10(in temp as word, out ret as word)
+  ret = (3342 + 469060 / [long]temp - 4746775 / ([long]temp * temp) - 15 * temp) / 10
+End Sub
+
+Sub Chlorinity15(in temp as word, out ret as word)
+  ret = (3409 + 429437 / [long]temp - 4358759 / ([long]temp * temp) - 15 * temp) / 10
+End Sub
+
+Sub Chlorinity20(in temp as word, out ret as word)
+  ret = (3493 + 389818 / [long]temp - 3929661 / ([long]temp * temp) - 15 * temp) / 10
+End Sub
+
+Sub Chlorinity25(in temp as word, out ret as word)
+  ret = (3438 + 359417 / [long]temp - 3656245 / ([long]temp * temp) - 14 * temp) / 10
+End Sub
+
+// ---------- Table Entries -----------------------------------------
+// --------- storage example -----
+// low value, default, high value, step, dec places
+Table PgmParameters as Word
+    1, 3, 3, 1, 0       // (1) 1 inc Cal Procedure
+    5, 20, 50, 5, 1     // (2) 0.5 inc Membrane thickness
+    0, 500, 5000, 500, 0// (3) 500 inc Elev above sea level
+    0, 0, 25, 1, 0      // (4) 1 inc Chlorinity (Sea Water is 19)
+    1, 5, 8, 1, 0       // (5) 1 inc Instrument Response Dampening Factor
+    0, 0, 1, 1, 0       // (6) 1 inc Relay #1 Low/High Setpoint (0 - Low, 1 - High)
+    0, 0, 999, 1, 1     // (7) 0.1 inc Relay #1 On Setpoint (0 to 99.9 PPM)
+    0, 0, 999, 1, 1     // (8) 0.1 inc Relay #1 Off Setpoint (0 to 99.9 PPM, Limited by Parameter 7)
+    0, 0, 4, 1, 0       // (9) 1 inc Relay #1 Exclusive Digital Input (0I= No change in status of Relay #1
+                                                                    // 1 = Deactivate Relay #1, and Alarm if DI.1 open
+                                                                    // 2 = Deactivate Relay #1, and Alarm if DI.1 closed
+                                                                    // 3 = Alarm only if DI.1 open
+                                                                    // 4 = Alarm only if DI.1 closed)
+    0, 0, 1, 1, 0       // (10) 1 inc Relay #1 Transverse Digit Input (0I= No change in status of Relay #1
+                                                                    // 1 = Energize Relay #1 if Relay #2 failed Exclusive test (Parameter 14))
+    0, 0, 1, 1, 0       // (11) 1 inc Relay #2 Low/High Setpoint (0 = Low setpoint, 1 = High setpoint)
+    0, 0, 999, 1, 1     // (12) 0.1 inc Relay #2 On Setpoint (0 to 99.9 PPM)
+    0, 0, 999, 1, 1     // (13) 0.1 inc Relay #2 Off Setpoint (0 to 99.9 PPM Limited by Parameter 12)
+    0, 0, 4, 1, 0       // (14) 1 inc Relay #2 Exclusive Digital Input
+    0, 0, 1, 1, 0       // (15) 1 inc Relay #2 Transverse Digit Input
+    1, 1, 99, 1, 0      // (16) 1 inc Serial Port Address
+    2, 2, 7, 1, 0       // (17) 1 inc Baud rate for serial communications (2 = 9600, 3 = 4800, 4 = 2400, 5 = 1200, 6 = 600, 7 = 300)
+    0, 0, 1, 1, 0       // (18) 1 inc Invert Transmit Enamble (0 = Yes, 1 = No)
+    1, 1, 30, 1, 0      // (19) 1 inc Delay between message received and message sent (tenths of a second)
+    0, 300, 420, 1, 0   // (20) Cal Flush -- 1 inc Analog Output selection (0 = Output N/A,  1 = 0 to 20 mA, 0 mA on errors,  2 = 0 to 20 mA, hold value on errors             <-- Cal Flush (20)
+                                                        // 3 = 4 to 20 mA, 0 mA on errors, 4 = 4 to 20 mA, 4 mA on errors,  5 = 4 to 20 mA, hold value on errors
+    0, 120, 240, 1, 0   // (21) Cal Read --- 0.1 inc Analog output scale (D.O.)                                                                                                <-- Cal Read (21)
+    0, 1, 1, 1, 0       // (22) 1 inc Check probe voltage during calibration (0 = No, 1 = Yes)
+    1, 20, 120, 1, 0    // (23) 1 inc Logging to RAM rate
+    0, 1, 0, 1, 0       // (24) 1 inc Sampling Mode (0 = Off, 1 = On)
+    5, 20, 60, 1, 0     // (25) 1 inc Sampling Mode Cycle Time (5 to 60 minutes)
+    0, 60, 120, 1, 0    // (26) 1 inc Sample Mode Startup Time (0 to 120 seconds)
+    10, 60, 240, 1, 0   // (27) 1 inc Sample Mode Read Time (5 to 240 seconds
+                                                    // Length of time that the instrument will “read” before beginning the “hold” portion of the cycle.)
+    0, 9, 23, 1, 0      // (28) 1 inc Hour for Auto Cal (0 to 23 hours)
+    0, 0, 59, 1, 0      // (29) 1 inc Minute for Auto Cal (0 to 59 minutes)
+    0, 20, 999, 1, 1    // (30) 0.1 inc Minimum DO before Alarm
+    0, 1, 50, 1, 0      // (31) 1 inc Low Temperature Setpoint for E3 error condition
+    0, 40, 50, 1, 0     // (32) 1 inc High Temperature Setpoint for E3 error condition
+    0, 3, 3, 1, 0       // (33) 1 inc 0 = No change, 1 = Activate Relay #1 only, 2 = Activate Relay #2 only, 3 = Activate Relays #1 & #2
+    0, 0, 1, 1, 0       // (34) 1 inc Relay #1 Digital Input Retry on Sample (0 = Do not retry, 1 = Retry on Sample)
+    0, 0, 1, 1, 0       // (35) 1 inc Relay #2 Digital Input Retry on Sample (0 = Do not retry, 1 = Retry on Sample)
+    0, 0, 1, 1, 0       // (36) 1 inc Type of Daughter Board (0 = digital inputs, 1 = current inputs)
+    0, 1, 3, 1, 0       // (37) 1 inc assignment of Input Current #1 (0 = Not assigned (Off), 1 = assigned to Relay 1, 2 = assigned to Relay 2, 3 = Reports Value, but not assigned alarm)
+    0, 0, 500, 1, 1     // (38) 0.1 inc Input Current #1 Low end of Window (0.0 to 50.0 Amps)
+    0, 500, 500, 1, 1   // (39) 0.1 inc Input Current #1 High end of Window (0.0 to 50.0 Amps (Larger than parameter 38))
+    0, 2, 3, 1, 0       // (40) 1 inc assignment of Input Current #2 (0 = Not assigned (Off), 1 = assigned to Relay 1, 2 = assigned to Relay 2, 3 = Reports Value, but not assigned alarm)
+    0, 0, 500, 1, 1     // (41) 0.1 inc Input Current #2 Low end of Window (0.0 to 50.0 Amps)
+    0, 500, 500, 1, 1   // (42) 0.1 inc Input Current #2 High end of Window (0.0 to 50.0 Amps (Larger than parameter 41))
+    0, 3, 3, 1, 0       // (43) 1 inc assignment of Input Current #3 (0 = Not assigned (Off), 1 = assigned to Relay 1, 2 = assigned to Relay 2, 3 = Reports Value, but not assigned alarm)
+    0, 0, 500, 1, 1     // (44) 0.1 inc Input Current #3 Low end of Window (0.0 to 50.0 Amps)
+    0, 500, 500, 1, 1   // (45) 0.1 inc Input Current #3 High end of Window (0.0 to 50.0 Amps (Larger than parameter 44))
+    0, 3, 3, 1, 0       // (46) 1 inc assignment of Input Current #4 (0 = Not assigned (Off), 1 = assigned to Relay 1, 2 = assigned to Relay 2, 3 = Reports Value, but not assigned alarm)
+    0, 0, 500, 1, 1     // (47) 0.1 inc Input Current #4 Low end of Window (0.0 to 50.0 Amps)
+    0, 500, 500, 1, 1   // (48) 0.1 inc Input Current #4 High end of Window (0.0 to 50.0 Amps (Larger than parameter 47))
+    10, 10, 30, 1, 0    // (49) 1 inc Delay to current alarm after relay activation (10 to 30 seconds)
+    5, 50, 50, 1, 1     // (50) 1 inc Temperature Change Threshold for Cable Leakage Alarm(0.5 to 5.0 degrees C)
+    0, 1, 1, 1, 0       // (51) 1 inc Celsius or Fahrenheit Display (0 = degrees Celsius, 1 = degrees Fahrenheit)
+    0, 80, 240, 1, 2    // (52) 0.1 inc Sample Pump Low Limit 0.00 to 2.40 Amps)
+    0, 120, 250, 1, 2   // (53) 0.1 inc Sample Pump Hi Limit(0.00 to 2.50 Amps)
+    0, 10, 240, 1, 2    // (54) 0.1 inc Calibration Pump Low Limit (0.00 to 2.40 Amps)
+    0, 60, 250, 1, 2    // (55) 0.1 inc Calibration Pump Hi Limit (0.00 to 2.50 Amps)
+    0, 0, 1, 1, 0       // (56) 1 inc Auto Cycle Time Adjust (0 = Off (PP 25 reset to 20), 1 = On (PP 25 Set by Temperature)
+                                                                                                //  PP25 = 20 (Temp  26ºC), PP25 = 40 (15C  Temp  25C), PP25 = 60 (Temp  14C))
+    0, 0, 2, 1, 0       // (57) 1 inc Relay #3 Function Alarm Relay or Setpoint Relay (0 = Low setpoint, 1 = High setpoint, 2 = Alarm Relay)
+    0, 0, 999, 1, 1     // (58) 0.1 inc Relay #3 “on” Setpoint (ignored if PP57=2)
+    0, 999, 999, 1, 1   // (59) 0.1 inc Relay #3 “off” Setpoint  (ignored if PP57=2)
+    0, 0, 7, 1, 0       // (60) 1 inc Relay #3 Exclusive Digital Input Function (0I= No change in status of Relay #3
+                                                                              // 1 = Deactivate Relay #1, and Alarm if DI.1 open
+                                                                              // 2 = Deactivate Relay #1, and Alarm if DI.1 closed
+                                                                              // 3 = Alarm only if DI.1 open
+                                                                              // 4 = Alarm only if DI.1 closed)
+    0, 0, 1, 1, 0       // (61) 1 inc Relay #3 Transverse Digit Input (0I= No change in status of Relay #3
+                                                                    // 1 = Energize Relay #1 if Relay #3 failed Exclusive test)
+    0, 0, 1, 1, 0       // (62) 1 inc Relay #3 Digital Input Retry on Sample (0 = Do not retry)
+    0, 0, 1, 1, 0       // (63) 1 inc Relay #4 Function Setpoint Relay (0 = Low setpoint, 1 = High setpoint)
+    0, 0, 999, 1, 1     // (64) 0.1 inc Relay #4 “on” Setpoint (ignored if PP57=2) (0 to 99.9 PPM)
+    0, 999, 999, 1, 1   // (65) 0.1 inc Relay #4 “off” Setpoint (ignored if PP57=2) (0 to 99.9 PPM)
+    0, 0, 1, 1, 0       // (66) 1 inc Relay #4 Exclusive Digital Input Function (0I= No change in status of Relay #4)
+    0, 0, 1, 1, 0       // (67) 1 inc Relay #4 Transverse Digital Input Function (0I= No change in status of Relay #4)
+    0, 0, 1, 1, 0       // (68) 1 inc Relay #4 Digital Input Retry on Sample (0 = Do not retry)
+    0, 15, 15, 1, 0     // (69) 1 inc Auto Air Calibration Inhibit (0 = Function is disabled, 1 to 15 deg C temp setpoint, below which air cal is inhibited)
+    0, 0, 65535, 1, 0   // (70) Probe calibration number (shouldn' t have this)
+    100, 200, 400, 1, 0 // (71) Aer1 Zero value
+    0, 8897, 10000, 1, 0// (72) Aer1 Calibraiton Factor
+    100, 200, 400, 1, 0 // (73) Aer2 Zero value
+    0, 8897, 10000, 1, 0// (74) Aer2 Calibraiton Factor
+    100, 200, 400, 1, 0 // (75) Aer3 Zero value
+    0, 8897, 10000, 1, 0// (76) Aer3 Calibraiton Factor
+    100, 200, 400, 1, 0 // (77) Aer4 Zero value
+    0, 8897, 10000, 1, 0// (78) Aer4 Calibraiton Factor
+End Table
+
+// ------------- Memory Location for Program Parameters Values and other data ------------
+//    loc, (1 - byte, 2 - word)
+// ---------------------------------------------------------------------------------------
+Table MemLoc as Byte
+    168, 1
+    169, 1
+    170, 2
+    172, 1
+    173, 1
+    174, 1
+    175, 2
+    177, 2
+    179, 1
+    180, 1
+    181, 1
+    182, 2
+    184, 2
+    186, 1
+    187, 1
+    188, 1
+    189, 1
+    190, 1
+    191, 1
+    192, 1
+    193, 2
+    195, 1
+    196, 1
+    197, 1
+    198, 1
+    199, 1
+    200, 1
+    201, 1
+    202, 1
+    203, 2
+    205, 1
+    206, 1
+    207, 1
+    208, 1
+    209, 1
+    210, 1
+    211, 1
+    212, 2
+    214, 2
+    216, 1
+    217, 2
+    219, 2
+    221, 1
+    222, 2
+    224, 2
+    226, 1
+    227, 2
+    229, 2
+    231, 1
+    232, 1
+    233, 1
+    234, 1
+    235, 1
+    236, 1
+    237, 1
+    238, 1
+    239, 1
+    240, 2
+    242, 2
+    244, 1
+    245, 1
+    246, 1
+    247, 1
+    248, 2
+    250, 2
+    252, 1
+    253, 1
+    254, 1
+    255, 1
+    0, 2    // 70 - 139, 140  ProbeCal (shouldn// t have this)
+    2, 2    // 71             A1Zero
+    4, 2    // 72             A1CalFactor
+    6, 2    // 73             A2Zero
+    8, 2    // 74             A2CalFactor
+    10, 2   // 75             A3Zero
+    12, 2   // 76             A3CalFactor
+    14, 2   // 77             A4Zero
+    16, 2   // 78             A4CalFactor
+    18, 2   // 79             LastOxy
+    20, 2   // 80             LastTemp
+    22, 1   // 81             TempAdj (adj to add to temperature)
+    23, 1   // 82             ptr to bytes of cal pump data
+    24, 1   // 83             cal pump data
+End Table
+
+// ------------- ADC to Temperature Readings ---------------------------------------------
+//    ADC, Temperature  This is taken off of a 2K NTC Thermistor
+// ---------------------------------------------------------------------------------------
+Table ADCtoTemp As Word
+    895, 5
+    864, 14
+    828, 23
+    787, 32
+    741, 41
+    691, 50
+    638, 59
+    583, 68
+    527, 77
+    473, 86
+    421, 95
+    372, 104
+    327, 113
+    286, 122
+    249, 131
+End Table

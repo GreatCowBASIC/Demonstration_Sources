@@ -53,7 +53,7 @@
 ; ----- Main body of program commences here.
 
     GLCDCLS
-    glcdprint 0,   0, "GCBasic 2019"
+    glcdprint 0,   0, "GCBasic 2023"
     glcdprint 0,   8, "SRF04 Demo"
     wait 2 s
 

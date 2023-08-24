@@ -32,7 +32,7 @@
 ; ----- Configuration
 #chip  LGT8F328P, 16
 #option Explicit
-'Great Cow BASIC simplifies the configuration by setting the frequency and the configuration for you.
+'GCBASIC simplifies the configuration by setting the frequency and the configuration for you.
     #DEFINE SWITCH porte.3
     Dir SWITCH in
 

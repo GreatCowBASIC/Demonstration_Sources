@@ -29,7 +29,7 @@
 
     do Forever
       CLS
-      Print "Great Cow BASIC 2020"
+      Print "GCBASIC 2023"
       Locate 1, 0
       Print "Reading ADC ANA0"
 

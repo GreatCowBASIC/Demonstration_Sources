@@ -33,8 +33,8 @@
 
     GLCDCLS
     GLCD_Open_PageTransaction 0,7
-        GLCDPrint 0, 0, "Great Cow BASIC"
-        GLCDPrint (0, 16, "Anobium 2019")
+        GLCDPrint 0, 0, "GCBASIC"
+        GLCDPrint (0, 16, "Anobium 2023")
     GLCD_Close_PageTransaction
     wait 3 s
     GLCDCLS

@@ -6,7 +6,7 @@
 '''  LED blinks at a rate of approximately 1.0 seconds.
 '''
 '''
-'''Great Cow  BASIC Header block
+'''GCBASIC Header block
 '''
 '''@author  Evan R. Venn
 '''@licence GPL

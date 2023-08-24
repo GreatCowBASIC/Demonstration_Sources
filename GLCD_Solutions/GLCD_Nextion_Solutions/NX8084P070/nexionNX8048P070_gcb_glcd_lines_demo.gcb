@@ -1,6 +1,6 @@
 '''A program  for GCGB and GCB.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program demonstrates the basic GCBASIC GLCD commands plus the Nextion specifics to use Nextion fonts.
+'''This program demonstrates theGCBASIC GCBASIC GLCD commands plus the Nextion specifics to use Nextion fonts.
 '''
 '''The setup is:
 '''     Include the <glcd.h>

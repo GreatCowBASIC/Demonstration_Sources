@@ -86,9 +86,9 @@
   GameState = StartGame
   GameSpeed = StartSpeed
 
-  GLCDPrint ( 14 , 0 , "Great Cow BASIC" )
+  GLCDPrint ( 14 , 0 , "GCBASIC" )
   GLCDPrint ( 0 , 55 , "2.04" )
-  GLCDPrint ( 64 , 55 , "19.04.2017" )
+  GLCDPrint ( 64 , 55 , "19.04.2023" )
 
   do forever
 

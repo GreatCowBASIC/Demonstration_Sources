@@ -1,6 +1,6 @@
 '''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program demonstrates the basic primatives of a Graphical LCD (GLCD)
+'''This program demonstrates theGCBASIC primatives of a Graphical LCD (GLCD)
 '''
 '''
 '''This program uses the Text Mode GLCD - this means the microcontroller does not require a large amount of RAM.
@@ -96,7 +96,7 @@ HI2CMode Master
 #DEFINE GLCD_TYPE_SSD1306_CHARACTER_MODE_ONLY
 
 Dim myString As String * 28
-myString = "Great Cow BASIC 2022"
+myString = "GCBASIC 2023"
 
 GLCDfntDefaultSize = 2
 GLCDPrint(24, 0,"GCBASIC")
