@@ -226,7 +226,7 @@
         
         if switchEvent = 1 then
             // Change lab
-            nextLab
+            nextLab            
         End if     
 
     Loop
@@ -243,15 +243,17 @@ sub HelloWorld
     */
 
     if labState = NOT_RUNNING Then
+        
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": Hello World Lab"
+            HserPrintCRLF
+        #endif
+
         Locate 0,0
         LEDS_OFF
         Print "  Hello World   "
         labState = RUNNING  
         
-        #ifdef USART_BAUD_RATE
-            HserPrint Str(labNumber) + ": Hello World Lab"
-        #endif
-
     end if
 
     if labState = RUNNING Then
@@ -279,6 +281,12 @@ Sub Blink
     #define BLINK_FLAG_COUNTER_MAX  6  // Maximum flag count to create 1.5 seconds delay
 
     if labState = NOT_RUNNING Then
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": Blink Lab"
+            HserPrintCRLF
+        #endif
+
         flagCounter = 0
         Locate 0,0
         LEDS_OFF
@@ -289,10 +297,6 @@ Sub Blink
         TMR1IF = 0
         StartTimer 1
         labState = RUNNING
-
-        #ifdef USART_BAUD_RATE
-            HserPrint Str(labNumber) + ": Blink Lab"
-        #endif
         
     end if    
 
@@ -337,6 +341,12 @@ sub RotateLEDs
 
     Dim LEDState as Byte
     if labState = NOT_RUNNING Then
+        
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": RotateLEDs Lab"
+            HserPrintCRLF
+        #endif
+        
         // Begin with D6 high
         PORTB = PORTB AND 0xF1
         LED_D6 = 1
@@ -345,10 +355,6 @@ sub RotateLEDs
         Print "     Rotate     "
         labState = RUNNING
         
-        #ifdef USART_BAUD_RATE
-            HserPrint Str(labNumber) + ": RotateLEDs Lab"
-        #endif
-
     end if
 
     if labState = RUNNING Then
@@ -401,14 +407,16 @@ Sub ADC
     Dim adcResult as Word
 
     if labState = NOT_RUNNING Then
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": ADC Lab"
+            HserPrintCRLF
+        #endif
+
         CLS
         LEDS_OFF
         Print "      ADC      "
         labState = RUNNING
-
-        #ifdef USART_BAUD_RATE
-            HserPrint Str(labNumber) + ": ADC Lab"
-        #endif
                     
     end if
 
@@ -445,6 +453,12 @@ sub VSR
     Dim LEDState
     Dim adcResult as Word
     if labState = NOT_RUNNING Then
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": VSR Lab"
+            HserPrintCRLF
+        #endif
+
         // Begin with D6 high
         PORTB = PORTB AND 0xF1
         LED_D6 = 1
@@ -452,10 +466,6 @@ sub VSR
         Locate 0,0
         Print "      VSR       "
         labState = RUNNING
-
-        #ifdef USART_BAUD_RATE
-            HserPrint Str(labNumber) + ": VSR Lab"
-        #endif
 
     end if
 
@@ -514,7 +524,12 @@ sub Debounce
     Dim LEDState
     Dim adcResult as Word
     if labState = NOT_RUNNING Then
-        
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": Debounce Lab"
+            HserPrintCRLF
+        #endif
+
         // Begin with D6 high
         PORTB = PORTB AND 0xF1
         LED_D6 = 1
@@ -525,10 +540,6 @@ sub Debounce
         Locate 1,0
         Print "    Press S1    "
         labState = RUNNING                                      
-
-        #ifdef USART_BAUD_RATE
-            HserPrint Str(labNumber) + ": Debounce Lab"
-        #endif
         
     end if
 
@@ -613,6 +624,11 @@ Sub PWM
     Dim adcResult, oldadcResult as Word         // Store ADC values
 
     if labState = NOT_RUNNING Then
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": PWM Lab"
+            HserPrintCRLF
+        #endif
         CLS
         LEDS_OFF
         Print "      PWM      "
@@ -620,10 +636,6 @@ Sub PWM
         Print "Duty Cycle    0%"        
         labState = RUNNING     
         HPWM 1, 40, 0
-
-        #ifdef USART_BAUD_RATE
-            HserPrint Str(labNumber) + ": PWM Lab"
-        #endif
 
     end if
 
@@ -668,6 +680,12 @@ Sub Timer_1
     Dim adcResult as Word
     Dim flagCounter, timeCount, shiftCounter as Byte
     if labState = NOT_RUNNING Then
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": Timer1 Lab"
+            HserPrintCRLF
+        #endif
+
         // Begin with D6 high
         PORTB = PORTB AND 0xF1
         LED_D6 = 1
@@ -685,10 +703,6 @@ Sub Timer_1
         InitTimer1 OSC, PS1_8
         SetTimer 1, 0x0BDC
         StartTimer 1
-
-        #ifdef USART_BAUD_RATE
-            HserPrint Str(labNumber) + ": Timer1 Lab"
-        #endif
 
         labState = RUNNING                                      
     end if
@@ -761,6 +775,12 @@ Sub Interrupts
     Dim rotateCounter, rotateDirection as Bit
 
     if labState = NOT_RUNNING Then
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": Interrupt Lab"
+            HserPrintCRLF
+        #endif
+
         // Begin with D6 high
         PORTB = PORTB AND 0xF1
         LED_D6 = 1
@@ -780,10 +800,6 @@ Sub Interrupts
         // Set up the timer.  This required PreScaler and PostScaler.  See the HELP for explaination.
         InitTimer0 Osc, PRE0_4096 + TMR0_FOSC4 ,  POST0_1
         StartTimer 0
-
-        #ifdef USART_BAUD_RATE
-            HserPrint Str(labNumber) + ": Interrupt Lab"
-        #endif
 
         labState = RUNNING                                      
     end if
@@ -864,14 +880,15 @@ Sub SleepWakeUp
     #define COUNTDOWN_MAX   5           // seconds
 
     if labState = NOT_RUNNING Then
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": SleepWakeUp Lab"
+            HserPrintCRLF
+        #endif
         Locate 0,0
         LEDS_OFF
         LED_D7 = 1
         Print " Sleep/Wake Up  "
-
-        #ifdef USART_BAUD_RATE
-            HserPrint Str(labNumber) + ": SleepWakeUp Lab"
-        #endif
 
         wdtTimer = COUNTDOWN_MAX
         for counterloop = 0 to COUNTDOWN_MAX - 1
@@ -940,6 +957,12 @@ Sub EEPROM
     #define EEPROM_FLAG_COUNTER_MAX  6  // Maximum flag count to create 1.5 seconds delay
 
     if labState = NOT_RUNNING Then
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": EEPROM Lab"
+            HserPrintCRLF
+        #endif
+
         // Use randomize, with the value of ADC as the seed
         Randomize ReadAD( AN0 )
         // Set the address to a random address.  To protect EEProm write usage constraint
@@ -956,10 +979,6 @@ Sub EEPROM
         On Interrupt Timer1Overflow Call Memory_ISR
         labState = RUNNING    
         
-        #ifdef USART_BAUD_RATE
-            HserPrint Str(labNumber) + ": EEPROM Lab"
-        #endif
-
     end if    
 
     if labState = RUNNING Then
@@ -1050,6 +1069,12 @@ Sub GLCD
         Print "     GLCD        "
         Locate 1, 0
         Print "SSD1306 @ 64 Mhz"
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": GLCD Lab"
+            HserPrintCRLF
+        #endif
+
         wait 500 ms
         #INCLUDE <trig2places.h>
 
@@ -1084,10 +1109,6 @@ Sub GLCD
 
         // Setup the voltmeter
         GLCD_Meter_Init
-    
-        #ifdef USART_BAUD_RATE
-            HserPrint Str(labNumber) + ": GLCD Lab"
-        #endif
 
         labState = RUNNING    
     end if    
@@ -1223,7 +1244,7 @@ End Sub
 Sub NVMemory 
 	
     /*
-    This is a psuedo data logger.
+    This is a psuedo data logger.  The ADC read data is saved to NVMemory.
 
     Press the switch to show the ADC reading on the LCD and save it to NVMemory.
     The LCD displays NVMemory on the first line and “0Xnnnn = x” on the second line, where x
@@ -1241,6 +1262,12 @@ Sub NVMemory
     #define NVM_FLAG_COUNTER_MAX  20 // The maximum flag count to create ~3 seconds delay
 
     if labState = NOT_RUNNING Then
+    
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": NVM Memory Lab"
+            HserPrintCRLF
+        #endif
+
         // Make the write event happen, the first time
         flagCounter = 0
         // top of PROGMEM. Should be safe! Nothing should be up there!
@@ -1260,11 +1287,6 @@ Sub NVMemory
         StartTimer 1
         On Interrupt Timer1Overflow Call Memory_ISR      
         labState = RUNNING    
-        
-        #ifdef USART_BAUD_RATE
-            HserPrint Str(labNumber) + ": NVM Memory Lab"
-        #endif
-
     end if    
 
     if labState = RUNNING Then
