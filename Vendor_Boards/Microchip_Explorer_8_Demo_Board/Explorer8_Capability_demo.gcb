@@ -7,7 +7,7 @@
     
     GCBASIC for these devices can be downloaded from the GCBASIC web site at https://sourceforge.net/projects/gcbasic/
 
-    This program comprises 11 demos utilizing the different peripherals and features of 8-bit PIC® MCUs
+    This program comprises 13 demos utilizing the different peripherals and features of 8-bit PIC® MCUs
     while demonstrating the different capabilities of the Explorer 8 Development Board. Each lesson contains
     a brief description of the lab, code snippets, and discussions to make you become easily acquainted with
     the different peripherals and registers of PIC® MCUs. These demos also make use of the PPSTOOL, 
@@ -44,10 +44,11 @@
     #option explicit 
     #config MCLRE = EXTMCLR
 
-    #config WDTCPS = WDTCPS_13      // WDT Period Select bits->Divider ratio 1:262144
-    #config WDTE = SWDTEN           // WDT operating mode->WDT enabled/disabled by SWDTEN bit
-    #config WDTCWS = WDTCWS_7       // WDT Window Select bits->window always open (100%); software control; keyed access not required
-    #config WDTCCS = LFINTOSC       // WDT input clock selector->WDT reference clock is the 31.0 kHz LFINTOSC
+    // Configuration of Watchdog timer.  Used in one of the labs
+        #config WDTCPS = WDTCPS_13      // WDT Period Select bits->Divider ratio 1:262144
+        #config WDTE = SWDTEN           // WDT operating mode->WDT enabled/disabled by SWDTEN bit
+        #config WDTCWS = WDTCWS_7       // WDT Window Select bits->window always open (100%); software control; keyed access not required
+        #config WDTCCS = LFINTOSC       // WDT input clock selector->WDT reference clock is the 31.0 kHz LFINTOSC
 
     // PPS Tool version: 0.0.6.3
         // Generated for 18f67k40
@@ -69,10 +70,6 @@
                     RC5PPS = 0x1A;   //RC5->MSSP1:SDO1;    
                     SSP1DATPPS = 0x14;   //RC4->MSSP1:SDI1;  
                 #endif
-
-
-                Dir LCD_SPI_DO      In
-                Dir LCD_SPI_SCK     In
 
                 'Module: CCP1
                 RC2PPS = 0x0005    'CCP1 > RC2
@@ -157,7 +154,6 @@
         // Ensure SPI_Expander Ports are outputs.  These WILL have been changed during the INIT phase of the chip.
         Dir LCD_SPI_DO      Out: LCD_SPI_DO     = 0
         Dir LCD_SPI_SCK     Out: LCD_SPI_SCK    = 0
-        INITLCD        
 
     // Common macro and constants
         #define LEDS_OFF            LED_D8=0:LED_D7=0:LED_D6=0:LED_D5=0:LED_D4=0:LED_D3=0:LED_D2=0:LED_D1=0
@@ -179,7 +175,8 @@
         Dim LabI2CState as Bit:         LabI2CState = 0
 
     if labNumber = 0 Then
-        
+        // Show messages
+
         #ifdef USART_BAUD_RATE
             HserPrintCRLF
             HserPrint "Welcome to Explorer 8"
@@ -207,7 +204,7 @@
     Do Forever
         // Check button state
         checkButtonS2
-        // Select labnumber
+        // Select labnumber and call sub routine
         Select Case labNumber
             case Lab_HelloWorld:    HelloWorld
             case Lab_Blink:         Blink
@@ -274,7 +271,6 @@ Sub Blink
     LED D8 blinks at a rate of approximately 1.5 seconds. The LCD displays “Blink” on the first line
     while displaying “LED_D8 = ON” and “LED_D8 = OFF” alternately every 1.5 seconds on the second
     line.
-
     */
 
     Dim flagCounter as  Byte
@@ -1055,6 +1051,9 @@ End Sub
 Sub GLCD
 
     /* 
+    The is a graphical LCD ( GLCD) showing a basic voltmeter.  This shows the ADC reading on the GLCD coverted into a voltage. 
+
+    The GLCD uses software I2C.
     */
 
     // This macro resolves the interaction of the SPI Expander interacting with the I2C GLCD.  The Explorer8 board shares the data anc clock lines and therefore there is need to prevent I2C operations until this point.  This macro does this.
@@ -1246,8 +1245,8 @@ Sub NVMemory
     /*
     This is a psuedo data logger.  The ADC read data is saved to NVMemory.
 
-    Press the switch to show the ADC reading on the LCD and save it to NVMemory.
-    The LCD displays NVMemory on the first line and “0Xnnnn = x” on the second line, where x
+    The timer interrupt reads the ADC and then saves it to NVMemory.
+    Then, the LCD reads the NVMemory and displays NVMemory result on the first line and “0Xnnnn = x” on the second line, where x
     corresponds to the saved ADC result in the NVMemory. 
 
     The ADC reads are held in NVRAM. The last 128 are retained.  Use PICKITPLUS to read the PROGMEM!
