@@ -1,0 +1,162 @@
+'''A demonstration program for GC BASIC.
+'''--------------------------------------------------------------------------------
+'''This program converts two ADC channels to two output ADC values where the input the ADCs are of an unkown AD range and the outout AD range is 0 to 255.
+'''The input ADs are read by the standard ADC functions and the output AD values are set via a MCP4161 ( using SPI ).
+'''
+'''The input ADs are read, evaluated for MIN and MAX values, then, scaled to 8 bit values.
+'''
+'''There are serial functions, LED functions also.  But, the core is the AD read and write operation.
+'''
+'''@author    Evan R. Venn
+'''@license   GPL
+'''@version   1.00   
+'''@date      2023-09-05
+'''********************************************************************************
+
+
+#chip LGT8F328P
+    #option Explicit
+    #option Volatile  DIGITAL_6
+    #option Volatile  DIGITAL_7
+
+    // USART Setup
+        #DEFINE USART_BAUD_RATE 19200
+        #DEFINE USART_TX_BLOCKING
+        #DEFINE USART_DELAY OFF
+        
+        #INCLUDE <LGT8F328P.h>
+        #INCLUDE <MCP4XXXDIGITALPOT.H>
+
+
+    // SPI SETUP
+        #DEFINE DIGITALPOT_CS DIGITAL_10
+        #DEFINE DIGITALPOT_SCK DIGITAL_13
+        #DEFINE DIGITALPOT_DO DIGITAL_11
+        #DEFINE DIGITALPOT_DI DIGITAL_12
+
+    // Setup to use hardware SPI
+        #define _MCP4XXXHardwareSPI
+        // Required to initialise the device
+        MCP4XXXInit
+        SPIMode MasterFast, 0
+
+    DIR DIGITAL_8 OUT      // The LED
+    DIR DIGITAL_7 OUT      // The LED
+    DIR DIGITAL_6 OUT      // The LED
+        // Init sequence to show start of microcontroller.
+        Repeat 20 
+            DIGITAL_7 = !DIGITAL_7
+            DIGITAL_6 = !DIGITAL_6
+            wait 100 ms
+        End Repeat
+
+
+    //  Set for clarity only
+    DIR ANALOG_0 IN
+    DIR ANALOG_1 IN
+    
+    Dim Xadc, Yadc as Integer
+    Dim ResX, ResY as Integer
+
+    // #define SHOWCONTROLLERVALUES
+    // #define SHOWACTIONONLED
+    //* Comment out the constant to show calibration results
+        // #define SHOWCALIBRATION      // use this to show the extremes of X and Y ADC to enable the setting of the MINXY and MAXXY constants    
+        Dim MinX, MinY, MaxX, MaxY as Integer: MinX = 0x3FFF: MinY = 0x3FFF: MaxX = 1: MaxY = 1
+        Dim LED_Counter as Word
+
+    //* Controller max - im as constants. To use enable the SHOWCALIBRATION constant
+        // #Define MinX    1700
+        // #Define MinY    1700
+        // #Define MaxX    2720
+        // #Define MaxY    2720
+    
+    // Main do-loop
+    Do
+        //! Flash the LED to show action
+            #ifdef SHOWACTIONONLED
+                If LED_Counter MOD 2047 = 0 then DIGITAL_8 = !DIGITAL_8
+                    LED_Counter++
+            #endif
+        //! Read the joystick values
+            Xadc = ReadAD10( AN1 )
+            Yadc = ReadAD10( AN0 )
+
+        //! Automatic max - min calibration
+            If Xadc > MaxX then 
+                MaxX = Xadc
+                // Show recalibration is happening by flashing LED
+                Repeat 5
+                DIGITAL_8 = !DIGITAL_8
+                End Repeat
+            End If            
+            If Yadc > MaxY then 
+                MaxY = Yadc
+                // Show recalibration is happening by flashing LED
+                Repeat 5
+                DIGITAL_8 = !DIGITAL_8
+                End Repeat
+            End If            
+            If Xadc < MinX then
+                MinX = Xadc
+                // Show recalibration is happening by flashing LED
+                Repeat 5
+                DIGITAL_8 = !DIGITAL_8
+                End Repeat
+            End If            
+            If Yadc < MinY then 
+                MinY = Yadc
+                // Show recalibration is happening by flashing LED
+                Repeat 5
+                DIGITAL_8 = !DIGITAL_8
+                End Repeat
+            End If            
+
+        
+            #ifdef SHOWCALIBRATION  // Show details on serial terminal
+
+                HserPrint XADC
+                HSerSend 9
+                HserPrint YADC
+                HSerSend 9
+                HserPrint MinX
+                HSerPrint " Min "
+                HserPrint MinY
+                HSerSend 9
+                HserPrint MaxX
+                HSerPrint " Max "
+                HserPrint MaxY        
+                
+                HSerSend 9
+            #endif
+
+        //! Scale results to get the correct range for DigitalPot
+            ResX = Scale( Xadc, MinX, MaxX, 0, 255 ) 
+            ResY = Scale( Yadc, MinY, MaxY, 0, 255 ) 
+
+        //! Set the centred LEDs
+            If ABS( ResX - 127) < 10 Then
+                DIGITAL_7 = 1
+            Else
+                DIGITAL_7 = 0
+                End if
+            If ABS( ResY - 127) < 10 Then
+                DIGITAL_6 = 1
+            Else
+                DIGITAL_6 = 0                
+            End if   
+        //! Set the digital post with the value
+            DigitalPotSetWiperPosition ABS(ResX), 0     // Channel 0
+            DigitalPotSetWiperPosition ABS(ResY), 1     // Channel 1
+        //! Show information on serial terminal
+            #if def(SHOWCALIBRATION) OR def(SHOWCONTROLLERVALUES)   // Show current XY value on serial terminal
+                HserPrint leftpad(str(ResX), 4)
+                HserPrint " - "
+                HserPrint leftpad(str(ResY), 4)
+                HserPrintCRLF
+                WAIT 20 MS
+            #endif
+
+    Loop
+
+    
