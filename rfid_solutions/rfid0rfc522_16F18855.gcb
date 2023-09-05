@@ -5,7 +5,7 @@ CARDS
  button 0A 14 6D D9
 
 */
-'#Skiptest
+#SKIPTEST
 #chip mega328p, 16
 #option Explicit
 

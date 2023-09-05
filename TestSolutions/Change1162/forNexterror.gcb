@@ -2,7 +2,7 @@
 
 #chip 16f88
 #option Explicit
-#skiptest
+#SKIPTEST
 dim Loop as BYte
 
 //The error line - a type locks up the compiler - for loop to  = 0 status - 1

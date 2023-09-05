@@ -1,5 +1,5 @@
 'LINE 1810 and 1812
-#Skiptest
+#SKIPTEST
 // // // ----- Configuration
 #chip 18f4520, 32
 

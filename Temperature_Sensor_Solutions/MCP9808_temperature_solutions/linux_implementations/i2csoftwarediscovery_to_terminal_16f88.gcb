@@ -21,7 +21,7 @@
   '#include "displaydevices.h"
   #include "/opt/GCBASIC/demos/i2c_solutions/i2c_discovery/displaydevices.h"
   #include "./softserialLinux.h"
-  #Skiptest
+  #SKIPTEST
 ; ----- Define Hardware settings
   ' Define I2C settings - CHANGE PORTS
  #define I2C_MODE Master
