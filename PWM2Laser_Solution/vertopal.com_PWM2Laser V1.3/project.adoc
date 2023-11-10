@@ -1,0 +1,1731 @@
+= Project
+
+:toc:
+:toclevels: 5
+:imagesdir: ./images
+
+
+== PWM2Laser
+
+May 2022 - November 2023
+
+Author: Fabrice Engel +
+FETFabrice@gmail.com
+
+image:image1.jpeg[image,width=322,height=264]
+
+=== Preface
+
+Intention of this documentation is to be an introduction how to realize
+a small electronic project useful in the CNC community. One of the ideas
+was to show easily in small steps how to create with the CNC portal a
+printed circuit board (PCB) from beginning to the end by using available
+tools on the internet. This project uses a microcontroller, so also
+explanation how to program this small “computers” will be described
+inside this documentation.
+
+I write this documentation not at the end of the project, but during
+each creation steps. I did my best to avoid mistakes, but errors may
+happen. By writing this preface, I just think how I changed a LED with a
+different color, so you will find in schematic different description for
+LED1. This happened, because I had no anymore red LED available on my
+workbench. Lesson learned, check first the material stock...
+
+The project describes a PWM generator used for test and command a laser
+diode module. These laser diode modules available on market require a
+pulse width modulation (PWM) signal for operation. The microcontroller
+will be able, by reading position of a potentiometer and with the
+internal dedicated hardware module to generates the required PWM signal.
+Few security functions will be integrated in the microcontroller
+software.
+
+This documentation is intended to be shared with my CNC community. I
+wrote directly in English to reach more people in the world. I hope this
+contribution will help you in your own CNC adventure.
+
+For any questions, or suggestions, please contact me per email at
+FETFabrice@gmail.com
+
+Wish you good pleasure in the journey of this project.
+
+*This page is intentionally undocumented*
+
+image:image3.jpeg[image,width=642,height=488]
+
+= Project PWM2Laser
+
+May 2022 – November 2023
+
+Dear CNC community, greetings from France. Let me introduce this little
+project called PWM2Laser.
+
+One friend asked me for help for testing a laser diode module he
+received from another friend. Goal is to add the laser module to its CNC
+and engraving wood. I am also user from a CNC, so why not, let me jump
+in the adventure as well.
+
+The laser diode module was already used, and we get it without power
+module or another accessory.
+
+Idea is before to interface the module with a computer and
+https://www.machsupport.com/software/mach3/[MACH3], first test the
+electronic of the laser.
+
+Interfacing with the computer will be next steps of the adventure...
+
+This laser modules requires 12V power distribution and a PWM signal to
+adjust the laser modulation power. +
+I had not directly a PWM generator available (except the computer which
+I not want to use yet).
+
+So, let’s realize a small electronic project based on microcontroller to
+generate the required PWM signal.
+
+This electronic project is now shared with all my CNC community, and
+hopefully helpful for some of you.
+
+This project will require several tools and applications, like:
+
+- PCB design tool
+https://www.autodesk.com/products/eagle/free-download[Autodesk Eagle],
+
+- https://groups.io/g/pcbgcode[pcb-gcode] plugin for CNC gcode creation
+and PCB engraving with CNC,
+
+- https://www.scorchworks.com/Gcoderipper/gcoderipper.html[G-Code
+Ripper] tool to generate auto-leveler correction gcode and obtain good
+PCB quality,
+
+- Microchip https://www.mikroe.com/mikrobasic-pic[MikroE mikroBasic PRO
+for PIC] development tool (basic language for PIC8bits),
+
+(no license required, chosen microcontroller have maximum memory to be
+used with demo version).
+
+- For PWM2Laser version 1.3,
+https://gcbasic.sourceforge.io/Typesetter/index.php/Home[toolchain
+GCBASIC/GCStudio] was used to develop the PIC code.
+
+- PIC programmer like PICkit 2 (see
+http://kair.us/projects/pickitminus/[PICkitminus]), or
+https://www.mikroe.com/mikroprog-pic-dspic-pic32[mikroProg for PIC&#44;
+dsPIC and PIC32] +
+(fully interfaced with MikroE mikroBasic PRO for PIC).
+
+- To debug hardware and microcontroller firmware, an oscilloscope may be
+useful, but not required,
+
+a functional firmware is provided in the project folder.
+
+Other goal of this project is to use a very limited bill of material,
+also not using SMD components but classical through-hole components (I
+have a lot on my bench). This will guaranty that you can easily
+reproduce the electronic module even with less experience.
+
+The PCB can be realized with your CNC. In the project folder, you will
+find all necessary files to use your CNC or even adapt the sources files
+for your needs if you like. Idea was also to explain _how to?_ with a
+CNC.
+
+Now, one constrain is to use a microcontroller programmer. Even if the
+chosen microcontroller is very common, it was decided to program it in
+situ via connector to avoid too much additional components. You can use
+programmers like PICkit 2 or PICkit 3, or any programmer for Microchip
+PIC12F/PIC16F with ICSP connector. Also the microcontroller can be
+programmed outside the module via ZIF support (not very practical if you
+improve the firmware and need to reprogram time to time). With the
+actual global semiconductor shortage, I wish you to find quickly the
+required microcontroller and needed components.
+
+The selected microcontroller is a Microchip PIC12F683I/P, 8 pins, 6 I/O,
+8Mhz, just enough for our needs. 2Kwords program memory, let’s see later
+how much we need for the firmware. Update version 1.2 uses a
+PIC12F1840I/P, and update 1.3 uses a PIC16F18313.
+
+The firmware of the PWM module will have some particular security
+functions like, AutoStop of the PWM signal after 20 secs (or permanent
+run), no signal generation if potentiometer is not in the 0% range by
+start.
+
+The normal function will be PWM generation from 0% to 100% with several
+signal frequencies up to few KHz (selection by push-button for PWM
+frequency).
+
+In general, this laser modules require 12V power with few amps. The
+laser diode modules have a power of few watts (1W to 5W), in fact no
+really know for that from my friend, the sellers from China give very
+high values, but in reality it is not so much. The PWM signal may have a
+frequency of few KiloHertz. Later when the laser module will be
+connected with the computer, we will use a base frequency of 250Hz.
+
+This frequency of 250Hz is very easy to be generated by the computer,
+even if the computer is an older generation with Microsoft Windows XP
+and older processor like Pentium 4.
+
+I am using Windows 7 and
+https://www.machsupport.com/software/mach3/[MACH3] software for CNC
+control. No hardware controller like
+https://www.warp9td.com/index.php[SmoothStepper] is used, only the
+computer and the parallel port. My friend uses similar configuration.
+
+How a laser diode module looks like?
+
+image:image4.png[image,width=291,height=283]
+
+image:image5.png[image,width=377,height=255]
+
+image:image6.png[image,width=625,height=518]
+
+We can read from the table, _Control Method_ is PWM with TTL voltage
+level (0V-5V), following example of laser module will work with
+frequencies up to 30kHz.
+
+On the next page, we will see some PWM signals on an oscilloscope
+screen.
+
+PWM signal near to 25%
+
+image:image7.png[image,width=529,height=334]
+
+PWM signal near to 80%
+
+image:image8.png[image,width=529,height=334]
+
+The PWM signal will be connected to the PWM entry of the laser module
+(e.g. below, max 1kHz PWM):
+
+image:image9.png[image,width=190,height=130]
+
+The provided project folder contains all files and documentation
+necessary for the realization of PWM2Laser in one single compressed Zip
+file.
+
+Unpacked file structure can be also downloaded from following Cloud
+storage source.
+
+Go to https://mega.nz/folder/DxcWCTjY#7FqW5tAA5Tu5wK24QdsTsQ[Link on
+MEGA] (File sharing Cloud platform).
+
+This will be also the internet place for updates (if of course this
+happens).
+
+Following project structure is presented:
+
+image:image11.png[image,width=164,height=135]Most
+important file _PWM2Laser V1.3.pdf_, the document you are actually
+reading.
+
+Folder _Documentations_ contains 12F683/12F1840/16F18313 Data Sheet and
+application notes from Microchip for CCP usage. It contains also a text
+file for all links as well in _pdf_ format providing clickable internet
+links.
+
+Folder _Sources_ contains:
+
+image:image12.png[image,width=642,height=56]
+
+_- Firmware PIC12F683_ contains just one file, _PWM2LaserV1.1.hex_ to be
+programmed into the PIC12F683 microcontroller, _Firmware PIC12F1840_
+another _PWM2LaserV1.2.hex_ to be programmed into one PIC12F1840 and
+_Firmware PIC16F18313_ an other file _PWM2LaserV1.3.hex_ for the model
+PIC16F18313.
+
+Do not take the wrong one for your microcontroller model. See update
+sections for more information.
+
+_- mikroBasic Project_ with the full files structure of the PWM2Laser
+software source code.
+
+- _GCBASIC Project_ contains source code based on toolchain GCStudio, as
+well assembled files.
+
+- _PCB CNC_ with the generated files for the realization by CNC with
+MACH3 controller.
+
+- _PCB schematics_ contains both files for Eagle schematic and PCB of
+PWM2Laser, bill of material as well DXF drawings of the PCB circuit.
+
+- _Test Pad Laser diode module_ contains the drawings for the wood
+support in DXF format as well a picture of the final toolpath and
+pictures from mounted pad with laser module.
+
+And latest folder, the _Tools_ folder contains:
+
+image:image13.png[image,width=232,height=114]
+
+This folder has all tools used for this project, except the Microchip
+PIC Basic IDE, GCStudio & GCBASIC, or MPLAB X which would increase the
+size of the distribution package. Use provided links from
+_Documentations_ folder and download the latest version (mikroBasic
+version 7.6.0 is actual).
+
+Starting next page, we will begin with the schematic description of the
+electronic module.
+
+The electronic schematic our PWM2Laser generator will be as follow:
+
+image:image14.png[image,width=642,height=528]On
+the top, you can see the +5V power line with a 100mA +5V voltage linear
+regulator. A Red led (LED1) indicate presence of +12V. Capacitors
+ensures smooth power voltage. C4 capacitor with 100nF will be used for
+decoupling the microcontroller Microchip PIC12F683I/P or PIC12F1840I/P
+
+An ICSP JP1 connector on the left side give us opportunities to program
+the firmware of the microcontroller directly without removing
+microcontroller from its support. Push-button S1 is for Start and Stop
+generation of PWM signal and push-button S2 allow selection of the PWM
+signal frequencies. The potentiometer connected to an Analog entry pin
+allow to vary the PWM signal from 0% to 100%, so we have a modulation of
+the signal from fully off to full power range to test the laser power.
+
+Red led (LED2) indicate some information, and Blue led (LED3) is for PWM
+signal indication. JP3 is the connector for the laser module. It
+distributes +12V power, GND and PWM signal. Several test points allow to
+connect an oscilloscope or a multimeter. On the right side, we have the
+microcontroller PIC12F683I/P +
+(DIP 8 pins), the model PIC12F1840I/P is fully pin compatible and I do
+not redraw the schematic.
+
+After creation of the schematic, we jump into the creation of the PCB.
+Placements of components are made manually, the actual reached size of
+the first PCB is near 40mm * 48mm. Use large width possible for the
+routing lines. On the end, we will also use a ground plane on the whole
+PCB for signal GND. You can see on the next page, several steps of the
+PCB conception. By finishing the PCB conception, we will use an Eagle
+ULP program, https://groups.io/g/pcbgcode[pcb-gcode] (created by J.J) to
+generate the CNC required compatible MACH3 gcode.
+
+Scorch wrote also an excellent tool we will use for auto-leveler
+options, https://www.scorchworks.com/Gcoderipper/gcoderipper.html[G-Code
+Ripper].
+
+Few straps were necessary, I was not able to realize a single side PCB
+without this additional connection lines on the top of the PCB.
+
+PCB conception requires some attention. I wanted to have the signal
+0V-GND on the edge of all PCB sides. So, it is important to place
+adequately the components with GND connection to the external side of
+the PCB.
+
+image:image15.png[image,width=507,height=604]
+
+We start by routing manually the shortest connections. Some adjustments
+may be necessary, like moving the voltage regulator, or move little the
+power connector. Route also with the largest width possible, here 1mm.
+
+image:image16.png[image,width=190,height=226]
+
+After some iterations (I needed 1h30 to route in a better way the
+several wire connections), you can enlarge as much as possible the width
+of the PCB’s wires. This will make the result of CNC engraving much
+better.
+
+image:image19.png[image,width=299,height=359]
+
+Now it is time to place some documentation marks on the PCB, like + and
+– of power connection, or PWM signal pin, or ICSP pin 1 connection,
+etc...
+
+I am writing this documentation during the steps of project creation.
+Not first create, test and use and document afterwards, but document
+step by step. This mean, at this time, I have no idea if every thing +
+I made will work like imagined. Nice adventure…
+
+Afterimage:image21.png[image,width=582,height=404]
+the PCB conception is completed, next step will be the gcode creation
+with ULP program https://groups.io/g/pcbgcode[pcb-gcode].
+
+ULP pcb-gcode provide a simulation view of the CNC result. The colors
+indicate the number of passes. This plugin creates also the gcode for
+the drills. In my case, I will edit later the file to remove the tool
+change orders and keep just one tool (diameter 0,9mm). On the simulation
+view, the drill holes are represented by a cross X in color blue. As
+bigger the cross X, as bigger is the diameter of the tool.
+
+But I will not use this generated configuration yet, I will first modify
+the shape of the PCB. I like to have some round corners and not this
+sharp 90° square corners.
+
+For that, an export in DXF format will be done, and a modification with
+my favorite CAD/CAM tool will be made. In
+Eagleimage:image22.png[image,width=422,height=340],
+run the ULP program <__dxf.ulp__>:
+
+After export, you will get
+thiimage:image23.png[image,width=330,height=392]s
+view, based on vectors inside the CAD application:
+
+We need to select only the layer _20_ (named _dimension_ in the Eagle
+Board file):
+
+image:image24.png[image,width=346,height=328]
+
+And we see in discontinues pink line the edge of the PCB. With my CAD
+tool, will now change the corners in round shapes, let say with 2,5mm
+radius:
+
+image:image25.png[image,width=573,height=500]
+
+Just need to export the new drawing as DXF from layer 20, and import it
+into Eagle, but first, delete the existing dimension boards vectors in
+the PCB project:
+
+image:image26.png[image,width=229,height=270]
+
+After successful removing, execute following ULP program
+<__import-dxf-v2.1.ulp__>
+
+(it is provided in the _Tools_ folder of the compressed project file):
+
+image:image28.png[image,width=416,height=510]
+
+Select the file previously created with the CAD application, here
+<__PWM2LaserV01 PCB.dxf__>, check target layer _20 Dimension_, check
+also the units and click _OK_.
+
+A script file is generated and ready to be executed, clicking on _Run_:
+
+image:image29.png[image,width=258,height=245]
+
+DXF import was successful, round corners are now in place, and our PCB
+look like more professional, isn't?
+
+Now we can generate the final PCB gcode files. But before, I have no
+idea yet if I not made mistakes, or if the concept like yet is correct.
+Sure, this is based on my experience, and I hope that will work, but, a
+double check is always useful. So, before I continue, I will check
+(again, yep!).
+
+It is important to check if the electrical connections are correctly set
+in the schematic. Or if you have not forget a wire on the PCB, that may
+happen because straps are not so visible. Check also if the GND ground
+plan touch the complete area, not that a zone has no electrical
+connection at all with GND signal. Please check that the width of the
+wire as well the GND ground plan is large enough round laser connector
+to let pass the right amount of current.
+
+image:image31.png[image,width=285,height=226]correct.
+image:image32.png[image,width=199,height=237]Example
+below with +12V signal:
+
+Take the time to double check, may be helpful, and remember, we learn by
+and from mistakes!
+
+By reviewing, I decided to move the PWM signal test point, to be not so
+near to the laser module connector, and resize as well the size of the
+pad which was to big. Additionally, I optimized some connections:
+
+image:image33.png[image,width=327,height=396]
+
+Now, it is time to run the creation of related gcode. Execute command
+<__run pcb-gcode -- setup__>
+
+image:image34.png[image,width=642,height=290]
+
+By clicking _Accept and make my board_ button, the calculation will
+start and preview will be displayed. In the project folder, you will
+find the related gcode files, compatible to the selected postprocessor.
+For me, that is MACH3.
+
+Activating option _Spot drill holes_ will mark the hole to be drill and
+will help more for the positioning of the drilling bit during operation.
+
+Did you noticed that the preview is mirrored?
+
+image:image35.png[image,width=642,height=509]
+
+Remember you this mirrored situation, we need later to correct the PCB
+edges dxf file to take care about this particular result.
+
+Next step will be to use the generated etch file and pass it into a very
+special program,
+https://www.scorchworks.com/Gcoderipper/gcoderipper.html[_G-Code
+Ripper_].
+
+image:image36.png[image,width=621,height=151]
+
+This program created by Scorch (under Python), will allow you to add
+additional commands to realize a compensate Toolpath over the Z axis.
+This is called auto-leveler. If you have already engraved a PCB, maybe
+you experienced bad results. If the table is not very plan, you can
+easily have bad engraving result for the wire. Or too much copper was
+removed, or not enough.
+
+The generated drill file will be modified later to keep only one
+diameter for the bit (0.9mm), and to remove all tool changing commands.
+For the drill, we do not need to compensate the Z axis. Just go deep
+enough. If you board made 1,5mm, then you can drill up to 1,65mm.
+
+Execute the program _G-Code Ripper_ now, and select _Auto Probe_:
+
+image:image37.png[image,width=367,height=278]
+
+Click on File and open the created gcode for PCB engraving:
+
+image:image38.png[image,width=388,height=151]
+
+Select file
+_PW_image:image39.png[image,width=527,height=401]_M2LaserV01.bot.etch.tap_
+and open it, G-Code Ripper will display like:
+
+Some control fields marked in blue need to be reviewed:
+
+- Number of scan points X and Y. For the size of this PCB, I recommend 4
+x 5 points,
+
+- Scale, check that you have 100%,
+
+- Select MACH3 as postprocessor,
+
+- Adjust Probe settings, Probe Z safe = 2.2mm, Probe Depth = -0.5 and
+Probe Feed = 30mm/min,
+
+After changes, click on _Recalculate_, _G-Code Ripper_ will display the
+new parameters:
+
+image:image40.png[image,width=566,height=436]
+
+We see in the preview windows the new probe points with the white cross.
+
+Click now on _Save G-Code File – Probe & Cut_ and save in a new file:
+
+_G-Code Ripper_ added 2 sections inside the original gcode created by
+pcb-gcode, first a Probe sequence to learn the correct high compensation
+for Z axis, then a second one to consider the compensation during the
+engraving operations.
+
+image:image41.png[image,width=194,height=264]
+
+Now, again double check and go to shop for CNC engraving, yeah….
+
+How to fix the PCB on the CNC table? I am using double side adhesive
+tape to fix the PCB on the table.
+
+But my table is not so ready right now to receive an PCB to be
+engraving, see by you self:
+
+image:image44.jpeg[image,width=301,height=226]
+
+Have a lot of holes and removed materiel from previous toolpaths, so I
+will use additional sacrificial plate to fix my PCB to be engraved. This
+plate will be surfaced before being used again for this PWM2Laser
+project.
+
+I am using a 31mm flat mill for this operation. Toolpath job is quite
+fast by using so large diameter of this bit.
+
+Before the surfacing work will start, first center the job and adjust
+origin high of Z on the top of the surface.
+
+image:image46.jpeg[image,width=497,height=377]
+
+Then surfacing job is started.
+
+image:image47.jpeg[image,width=497,height=377]
+
+Ahhh… quality of wood plates! Hole inside, but for today, this is not an
+issue at all.
+
+image:image48.jpeg[image,width=496,height=377]
+
+Will use an old epoxy plate, used already for other projects. This PCB
+have still enough material available for this project PWM2Laser. The
+yellow cable you see is to connect the cable from the probe high Z axis.
+
+You remember that we use an auto-leveler function, and this using
+electrical ground detection to work.
+
+Here my used epoxy plate for the project:
+
+image:image49.jpeg[image,width=497,height=377]
+
+But first remove the old double side adhesive tape!
+
+Not the best work here but, need to be done if I want to use this plate,
+so hop, lets go. After few minutes later intensive boring work, the
+plate is ready, applied with new adhesive double side tape.
+
+image:image50.jpeg[image,width=497,height=377]
+
+To engrave PCB, I am using particular engraving bits. This are
+https://www.sorotec.de/shop/Cutting-Tools/sorotec-tools/Engraving-bits/V-Router-Bit/[solid
+carbide V-Router bits] provided by the German company Sorotec. This
+V-Router bit have a cut angle of 30°
+
+image:image52.png[image,width=436,height=293]
+
+These bits allow to engrave PCBs. Other similar bits exist. Use the best
+one for your result!
+
+Consider also the wearing of this bit. The point is very small and
+subject to be wear quickly.
+
+This bit is very vulnerable. Handle it carefully!
+
+image:image53.png[image,width=498,height=377]
+
+Take care that the copper of the PCB is well connected to the Probe
+entry of your CNC control. If not, you have very high risks to destroy
+your V-Router bit.
+
+Mach3 allows us a preview of the PCB toolpath. After successfully loaded
+PCB gcode file, the preview window contains the expected result.
+
+image:image54.png[image,width=529,height=419]
+
+You can rotate the view with the mouse to see more details:
+
+image:image55.png[image,width=529,height=419]
+
+PCB etching can be started now….
+
+Before the routing itself, the job starts first by measuring the
+flatness of the PCB and store the values of 20 measurement points into a
+file (this is a G-Code Ripper option to memorize in a separated file).
+
+Below the result (file _PWM2LaserV01.savemeasures.txt_ is provided for
+information in the project folder):
+
+image:image56.png[image,width=219,height=301]
+
+First and second columns are the X and Y reference of the measurement
+point, third column is the value for the compensation Z axis. Do not use
+this file for the creation of your PCB, let the measures be renewed, you
+have not the same flatness as mine table & PCB!
+
+So, everything is measured, routing job is started:
+
+image:image58.jpeg[image,width=517,height=415]
+
+Once routing finished, you can replace the 30° V-Bit with a drill bit. I
+will drill all holes with a 0.9mm carbide drill bit. Even the holes with
+bigger diameter will be first drill with the CNC, and later I will drill
+manually the few bigger holes (power connector for instance).
+
+For drilling operation, use carbide drill bits. There sharpness has a
+longer duration than other products like HSS. The holes cutting are much
+better and very clean.
+
+image:image59.jpeg[image,width=520,height=377]
+
+It was necessary to edit the generated drill file and remove all
+sections related to tool change orders:
+
+image:image60.png[image,width=275,height=210]
+
+If you have an automatic tool changer, of course no needs to edit the
+file, take care you loaded the right drill bits on the tools changer
+support.
+
+Drill job is running, 1 second pause is marked by the spindle after full
+drill depth to get a proper hole.
+
+image:image62.jpeg[image,width=491,height=415]
+
+After drilling operation, last job will be the PCB edge cutting. This
+will be done with a flat endmill 1.8mm bit.
+
+Remember the mirrored job for PCB etching, this must be corrected for
+the cutting job. PCB edge drawing must be mirrored cross the axis X0 to
+get the correct vectors values. This can be easily done with a mirror
+function from the CAD application:
+
+image:image63.png[image,width=621,height=377]
+
+Generate the correct toolpath job for your chosen bit diameter. You can
+find in the project folder a MACH3 toolpath file for a 1.8mm endmill
+bit. Run the job on your CNC, PCB is finished. Just remove it from the
+table.
+
+image:image65.jpeg[image,width=295,height=259]
+
+See result
+image:image66.png[image,width=522,height=604]coming
+out from the CNC, not too bad! (removed manually small copper filet on
+borders).
+
+Let complete with the bigger holes drills and final check before
+starting the soldering operations.
+
+Use following picture to help you positioning the components on the PCB:
+
+image:image67.png[image,width=642,height=764]
+
+Start with soldering the 5 straps, then continue with the resistors,
+diodes, dip support, capacitors, regulator.
+
+We always start with the smallest components to terminate with the
+biggest like connectors.
+
+Table BOM (Bill of Material) can be automatically exported from Eagle
+application.
+
+Use the command <__run bom__> in the Eagle schematic window:
+
+[width="100%",cols="15%,17%,20%,18%,30%",]
+|===
+|*Part* |*Value* |*Device* |*Package* |*Description*
+
+|C1 |47µF 25V |CPOL-EUE2.5-7 |E2,5-7 |POLARIZED CAPACITOR, European
+symbol
+
+|C2 |100nF |C-EU050-024X044 |C050-024X044 |CAPACITOR, European symbol
+
+|C3 |100nF |C-EU050-024X044 |C050-024X044 |CAPACITOR, European symbol
+
+|C4 |100nF |C-EU050-024X044 |C050-024X044 |CAPACITOR, European symbol
+
+|D1 |1N4004 |1N4004 |DO41-10 |DIODE
+
+|D2 |1N4004 |1N4004 |DO41-10 |DIODE
+
+|IC1 |7805L |7805L |TO92 |Positive VOLTAGE REGULATOR
+
+|IC2 |PIC12F683P |PIC12F683I/P +
+or PIC12F1840I/P |DIL8 |8-Pin Flash-Based, 8-Bit CMOS Microcontrollers
+
+|JP1 |Pinhead 5 pin |PINHD-1X5 |1X05 |PIN HEADER, ICSP programming
+
+|JP2 |Potentiometer 10k |PINHD-1X3 |1X03 |PIN HEADER
+
+|JP3 |Laser |PINHD-1X3 |1X03 |PIN HEADER
+
+|LED1 |Red |LED3MM |LED3MM |LED replaced with a green LED
+
+|LED2 |Red |LED3MM |LED3MM |LED 3mm red
+
+|LED3 |Blue |LED3MM |LED3MM |LED 3mm blue
+
+|POWER |Connector |MKDSN1,5/2-5,08 |MKDSN1,5/2-5,08 |MKDSN 1,5/ 2-5,08
+connector
+
+|R1 |47k |R-EU_0207/7 |0207/7 |RESISTOR, European symbol
+
+|R2 |47k |R-EU_0207/7 |0207/7 |RESISTOR, European symbol
+
+|R3 |2.2k |R-EU_0207/7 |0207/7 |RESISTOR, European symbol
+
+|R4 |470R |R-EU_0207/7 |0207/7 |RESISTOR, European symbol
+
+|R5 |330R |R-EU_0207/7 |0207/7 |RESISTOR, European symbol
+
+|S1 |Start-Stop |10-XX |B3F-10XX |OMRON SWITCH
+
+|S2 |Frequency |10-XX |B3F-10XX |OMRON SWITCH
+
+|TP1 |TPPAD1-20 |TPPAD1-20 |P1-20 |Test pad – optional
+
+|TP2 |TPPAD1-20 |TPPAD1-20 |P1-20 |Test pad – optional
+
+|TP3 |TPPAD1-20 |TPPAD1-20 |P1-20 |Test pad – optional
+
+|TP4 |TPPAD1-20 |TPPAD1-20 |P1-20 |Test pad – optional
+|===
+
+Collect the components before starting soldering (LED1 red replaced with
+green one):
+
+image:image68.png[image,width=426,height=332]
+
+Once you get all components, you can solder your PCB. Straps and
+smallest components must be soldered first. This is easier to handle. A
+good weld must be shiny. A matte weld may be not good.
+
+image:image69.jpeg[image,width=170,height=189]
+
+Consider the mount way of the 2 diodes and the 3 LED’s, Anode to + and
+Cathode to GND – 0V. If wrong way, they will not light. If you make the
+mistake for the diode protecting the 12V line circuit, then your module
+will not work once applied 12V on power distribution connector.
+
+image:image72.jpeg[image,width=174,height=189]
+
+Before you will place the microcontroller PIC12F683I/P, check first if
+the voltage regulator is working and that you have a voltage of +5V
+between Pin 1 and Pin 8 of the DIP support. By applying a +12V
+distribution on the power connector, green
+leimage:image75.jpeg[image,width=322,height=359]d
+(LED1 initially red in the schematic, now green) must light on.
+
+If the voltage is correct with +5V and your project does not smoke, then
+you can place the microcontroller on its support. First disconnect power
+distribution, take care on the correct position of the microcontroller
+on the DIP8 support, Pin 1 side of both connectors (Laser module and
+Potentiometer, on the left below on picture).
+
+Complete by soldering the cable with the potentiometer. Do not forget
+before to pass the shrink tubes.
+
+image:image76.png[image,width=531,height=510]
+
+Hardware part is so far completed. We can now continue with the software
+part of this project.
+
+I am using https://www.mikroe.com/mikrobasic-pic[MikroE mikroBasic PRO
+for PIC]. The installation file is not provided in the project folder,
+that would increase the
+image:image77.png[image,width=573,height=234]size
+for sharing and downloads. Use provided link file to find it on the
+internet:
+
+I am generally developing on Microchip PIC microcontroller with Basic
+language. Had no really opportunities to learn C/C++ in my experiences,
+maybe in future, but for this project, let use this programming
+language.
+
+By creating the project, configure it like below:
+
+image:image78.png[image,width=479,height=283]
+
+We will use a system clock of 4Mhz to try to reach lower PWM
+frequencies. No idea yet how would be exactly the results, this will be
+a surprise for me. I did not make any calculation! Bad? Yep...
+
+Good documentation requires lot of comments in the source code. I do my
+best to comment each single source code line. This is good for the
+understanding of this project, but also good for me, to remember what +
+I created in the past. I forget a lot of things, and these comments are
+my memories.
+
+On the beginning of the source code, you can find a banner with general
+information about the project, followed by used microcontroller
+PIC12F683 and its pins and ports descriptions. The schematic is not
+necessarily available when developing the source code. That may be a
+good help just by scrolling in the
+image:image79.png[image,width=642,height=378]code.
+
+The banner contains historical information about the programming steps.
+This may be helpful for experience, in my case, this helps me a lot to
+capitalize information. I also like to include a picture of the used
+microcontroller:
+
+image:image80.png[image,width=472,height=321]
+
+After this information banner, we will define the ports. This is done by
+the command _symbol_ which affects names to ports and pins of the
+microcontroller.
+
+image:image81.png[image,width=631,height=151]
+
+I am using naming convention particular rules, O_ for output, I_ for
+input and A_ for analog input. This will always remember you the
+settings, even if it is more obvious for this project.
+
+Few comments about the type and model of microcontroller. I am using
+since few years this family of microcontroller with good results. This
+model PIC12F683 is a simple microcontroller, easy to understand and to
+work with. Also, my shop have a lot of this small ‘bugs’ in its drawers.
+So easy and available, hope would be the same for you. If this model
+would be not available, you can look on a newer model like PIC12F1840.
+But in this case, you will be required to review a little the source
+code, in particular the ports and pins settings.
+
+The package and pins function will be the same, you will still find on
+pin 5 a PWM output.
+
+Next step will be declarations of the variables used. Right now, I will
+first do a break in the creation of the documentation and spend more
+time with the creation of the program. Once I get a running code, I will
+jump again in the documentation. This will avoid me to only jump in and
+out permanently…
+
+...
+
+…...
+
+………..
+
+…………..… After few days and coffees…………....
+
+..………
+
+…...
+
+…
+
+A running project is borne. Let see how it looks like.
+
+Before we jump in the source code, please consider, if you like to go
+deeper in the software section of this project, have always available
+under your hand, the PIC12F683 Data Sheet. This is *the Reference*...
+
+Just below the link to this documentation (which is also available in
+the project folder):
+
+https://ww1.microchip.com/downloads/en/DeviceDoc/41211D_.pdf
+
+image:image82.png[image,width=282,height=366]
+
+Like mentioned before, the banner section of the source code contains
+historical information. I noted the major steps of the software
+development. Take a look first, you will learn how the software was
+created, and the issues I faced during this phase. I will not describe
+all here in this documentation, and the next pages are dedicated to
+explanation how it’s work finally...
+
+By looking the historical section, you will read that I have already
+made changes in the handling of the interrupts and the timer usages
+according first notes beginning at the 1^st^ of May 2022. So, let’s go!
+
+The complete program is composed with several sections:
+
+Banner, Historic, Microcontroller description with ports&pins, Ports
+definitions, Variables and constants definitions, _sub procedure_
+_Interrupt_, followed by several sub procedures including initialization
+steps of microcontroller register, and Main loop.
+
+A microcontroller program has (normally) no stop. Once powered, it will
+run indefinitely. The Main loop is ‘only’ same sections, executed after
+each other’s and restarting again and… You know the next.
+
+Just below the definition section, starting with 2 _const_ which can be
+adapted here and used later in the program during compilation process.
+The compilation transforms Basic language into Assembler.
+
+Assembler is the nearest language to a language what a machine can
+understand, machine code.
+
+image:image84.png[image,width=642,height=353]
+
+Procedure to consider next is the routine defining the microcontroller
+settings. This PIC family contains registers that you set or unset by
+individual bits. To learn more about each individual register, please
+have a look into the Data Sheet of the PIC12F683.
+
+A _sub procedure_ is a part of the program, defined on the beginning and
+which will be call every time it is needed inside the main program. This
+particular procedure is only executed once on the beginning of the main
+program. These settings are just initiated once. The PWM settings will
+be modified according the select frequency. See later in the code.
+
+image:image85.png[image,width=642,height=199]
+
+After this definition sections, we continue with the interrupt routine
+description. The microcontroller is driven by interrupts, this mean,
+events happens and, actions must be taken immediately. In this project,
+interrupt is driven by a counter. _Timer0_ will overflow regularly to
+provide a one second clock. This time clock will be used to activate an
+AutoStop security function.
+
+_Timer0_ will be also useful to provide a function for pushbuttons.
+Short press and long press will be able to be detected just by measuring
+the time of the pressure on the button. An _If_ condition will make the
+next actions possible according to your wishes as user of the electronic
+module.
+
+So, with one timer and one interrupt section, we handle at least 2
+separated functions, clock with 1 second steps and pushbuttons
+management.
+
+Handling with Timer interrupts may be simplified by using a
+https://www.mikroe.com/timer-calculator[Timer Calculator] tool available
+at https://www.mikroe.com/[mikroe.com].
+
+It is enough to indicate your microcontroller settings and tell the
+interrupt period you want. In this project we will count 20 interrupts
+at 50msec to reach 1 second timing. 49.92ms is the nearest possible for
+50ms.
+
+image:image86.png[image,width=438,height=264]
+
+These settings are reproduced in the source code. For debugging purpose
+Blue LED should blink every second and Red LED at every 50ms. This both
+lines in the source code are marked as comments in final program.
+
+image:image87.png[image,width=642,height=199]
+
+See below, the frequencies and period measurements. Not bad at all with
+an internal oscillator:
+
+image:image88.png[image,width=321,height=192]
+
+The 1 second time measurement is necessary to handle our security
+function AutoStop of the PWM signal. Idea is by reaching for instance 30
+seconds, the PWM signal will be forced to 0%, and so let the laser shut
+off.
+
+You see, helping to develop with the support of an oscilloscope can be a
+great advantage. Just let blinking some LEDs, measuring their frequency,
+or period of a generated signal, will allow you to valid your code and
+the selecting settings of the microcontroller.
+
+For next section, the oscilloscope may be also a great help. PWM2Laser
+will allow you to select different frequencies for PWM signal. With the
+tests made during development phase, it was easy to have precises
+frequencies from 250Hz to 8kHz. A state machine routine was created
+where the base frequency was always doubled.
+
+So, we will have following choices by running frequencies (250Hz at
+startup):
+
+250Hz, 500Hz, 1kHz, 2kHz, 4kHz and 8kHz
+
+6 different selection cases are coded inside the black pushbutton
+management routine. Short press will jump from the first selection to
+second, next press from second to third, and so on…. Long press goes
+back to 250Hz base frequency selection. After each press, PWM signal
+will stop, and new press on Start&Stop is required.
+
+See please the black pushbutton section, first part of this _sub
+procedure_ is the detection routine:
+
+image:image90.png[image,width=642,height=124]
+
+Second part is the selection and execution of the frequency state
+machine:
+
+image:image91.png[image,width=642,height=467]
+
+The _select case_ contains the different frequencies settings for the
+CCP module, as well the count steps for no blocking routine of the LED
+blinking sequences. Following diagram page 78 Data Sheet PIC12F683:
+
+image:image92.png[image,width=259,height=314]
+
+Third part of this _sub procedure_ contains the re-initialization of the
+flags for next pushbutton press and the calculation of the Blue LED
+blinking period according PWM period settings.
+
+image:image93.png[image,width=642,height=101]
+
+Next procedure defines the Red pushbutton management. Pretty similar to
+Black pushbutton management but including a routine to block PWM
+activation as long Potentiometer is not at the lowest position. A short
+and long press is also considered, to let activate or not the AutoStop
+function.
+
+First part of the routine is the pushbutton detection program:
+
+image:image94.png[image,width=642,height=129]
+
+Timage:image95.png[image,width=255,height=132]his
+is using command _Button_ provided by mikroBasic PRO language library.
+Do not forget to activate this library in your project:
+
+Next part is the management for Start&Stop pushbutton.
+
+image:image96.png[image,width=642,height=412]
+
+As long the potentiometer position is not set for low or off PWM signal,
+the CCP module is not activated. Once position is correct, then the CCP
+is initialized and activated. Inside this loop alternatively Red and
+Blue LED are blinking to indicate, please place the potentiometer in
+correct position.
+
+With pushbutton shortly pressed, AutoStop is activated, and with a long
+press, AutoStop is deactivated.
+
+After both procedures for pushbutton management, we are ready to see the
+procedure for Potentiometer reading. This routine is very small and use
+a function provided by a library, _ADC_read()_. Some simple calculation
+is done for the CCPR1L value, and another one calculates the average
+value for Blue LED blinking period based on 16 samples of the latest PWM
+values.
+
+image:image97.png[image,width=642,height=90]
+
+That’s it, let’s go to next one, the procedure handling the AutoStop:
+
+image:image98.png[image,width=642,height=125]
+
+This routine check if time run out after a period, _const_ EndTimerValue
+contains 20 seconds and stop PWM.
+
+Next procedure to present is the routine let blinking Red LED and Blue
+LED. This is a no blocking routine, going through is very fast, just
+light or not the LEDs and increase one by one simple counters. Test on
+counters let jump from state On to state Off for both LEDs. We could
+say, this is a software PWM but much slower than the integrated hardware
+PWM module in the CCP (Capture, Compare, PWM modes).
+
+image:image99.png[image,width=642,height=341]
+
+Latest procedure, the variables cleaning. This routine just clear
+variables if they approach the max size. There are defined as word, so
+max up to 65535. I experienced issues and strange reactions of
+microcontrollers, so I just do it like that, and no problems anymore.
+Please send me some messages if you have information how that happen.
+Thank a lot.
+
+image:image100.png[image,width=642,height=147]
+
+That was the section for the _sub-procedure_. Now we jump in the _main_
+section. This section contains 2 major groups. One group to be executed
+only once on the power on of the microcontroller and a second group just
+running in same sequence over and over. No end will be programmed for
+the second group, you need to power off the system.
+
+On the beginning we call the _sub procedure_ InitPIC() to define the
+registers and hardware inputs and outputs.
+
+image:image101.png[image,width=642,height=136]
+
+Followed by the variable’s initialization with first values:
+
+image:image102.png[image,width=642,height=325]
+
+And the initial state of some ports, completed by the activation of
+_Global Interrupts_ and _Timer0_:
+
+image:image103.png[image,width=642,height=99]
+
+Finally, we define the endless loop combining the different sub
+procedures defined previously in a sequence:
+
+image:image104.png[image,width=642,height=215]
+
+We let run these 6 procedures after each other’s, and again... the while
+condition is always true.
+
+The program is completed, we can now continue with compiling the source
+code.
+
+Successfully compilation will tell us this:
+
+image:image105.png[image,width=642,height=159]
+
+The full program (firmware) will take 38% of the ROM and 38% of the RAM.
+No really a goal to reach the same percentage, just nice coincidence.
+
+We have a lot of memory free to add other functions. Imagine what we can
+achieve. If you have any ideas, please let me know, my email address can
+be finding on the first and last page of this documentation.
+
+After successfully compilation, an Assembler view is available, showing
+how the program look like converted from mikroBasic PRO language into
+best understandable language for the Microchip PIC12F683:
+
+image:image106.png[image,width=642,height=348]
+
+Assembler is more difficult to read, but in school, that was the only
+language I learned, yes, years passed…
+
+The IDE (Integrated Development Environment) give you other information.
+For example, on next page, you will see a screen with statistics about
+the project. In my code, no single delay command is used, but we
+discover that some libraries use this waiting do-nothing commands. I am
+not a friend of this instructions but, may be necessary in some cases to
+wait on the treatment of an operation like analog/digital conversion
+which require times. No worries, no more needs here. This listing is
+just for information here.
+
+If some of you have proposals and ideas how to skip the usage of this
+_delay()_ function please let me know, learning is a driven motivation
+for projects.
+
+The statistics view of our project PWM2Laser:
+
+image:image107.png[image,width=642,height=464]
+
+Maths procedures are also integrated, you remember average calculations
+and other formulas are inside the code. The compiler requires these
+routines to solve the programmed code.
+
+Before we can test the program on the electronic board, we need to
+program the PIC12F683. For that, connect your module over the ICSP port
+with the microcontroller programmer. In our example, we will use the
+Microchip PICkit 2 programmer. This is an outdated model but still
+useful and with http://kair.us/projects/pickitminus/[PICkitminus]
+application, still up to date. Traditional standalone
+https://ww1.microchip.com/downloads/en/DeviceDoc/51553E.pdf[PICkit 2
+GUI] can be also used here. Do the same job.
+
+During all the development process, I was using the programmer from
+MikroE, that have the advantage to be fully interfaced with the IDE.
+More information about
+https://www.mikroe.com/mikroprog-pic-dspic-pic32[mikroProg here].
+
+image:image108.png[image,width=377,height=213]
+
+Next pages, you will see PICkit 2 in action with the finalized PWM2Laser
+module…
+
+By connection, ensure Pin 1 ICSP is connected with Pin 1 PICkit 2
+programmer. This pin is identified by a triangle symbol on PICkit 2
+connector. Did you saw the paper support? Most important documentation
+ever…
+
+image:image109.png[image,width=340,height=503]
+
+To program with PICkit 2, select for import the _PWM2LaserV1.hex_ file
+created:
+
+image:image110.png[image,width=476,height=324]
+
+And load it with the PICkit 2 GUI over menu _File/Import Hex_:
+
+image:image111.png[image,width=310,height=377]
+
+Check if the device PIC12F683 (with ID is detected), if not, look in
+_Device Family_ to select the right one. Once selected, and .hex file
+correctly loaded, you can start the _Write_ process by clicking on the
+appropriate button.
+
+PICkit 2 display microcontroller programming successful write sequence:
+
+image:image112.png[image,width=310,height=377]
+
+To test your module (without connection with laser module), you have the
+ability to power from the PICkit 2 programmer with 5V voltage directly
+over the ICSP programming port.
+
+Just adjust voltage to _5V_ in the _VDD PICkit 2_ section and click
+checkbox _On_. Blue lightning LED on the picture below is my dummy laser
+module. It is lightning according PWM ratio.
+
+image:image113.png[image,width=341,height=415]
+
+Read EEPROM content may be useful, in many of my projects, indications
+about program, purpose and version are placed in the EEPROM storage
+place. So, it is easy to know what is programmed on the microcontroller.
+Just read the content and display _EEPROM Data_ windows. Quick and easy.
+
+image:image115.png[image,width=642,height=340]
+
+Now with a transferred firmware in the PIC12F683, you can test the
+application, does a short press on red pushbutton initiate the PWM
+signal? Blue LED will go to fully light as more the PWM percentage is
+increase with potentiometer turning. Do pressures on black pushbutton
+change the frequencies? Red LED should blink faster and faster by
+pressure on black pushbutton.
+
+Try also long pressure on red or black pushbutton (over ½ second)? What
+happen? Like written in the source code? Congratulation, you made it!
+
+If it is running like expected, you can now think to connect the laser
+module to the PWM2Laser module. Before connection, ensure power
+distribution is shut off.
+
+But, if you like, you can first realize with your CNC a test support for
+the laser module. I realized this kind of support in wood on the very
+beginning, when I get the laser module. You will find in the project
+folder, a DXF file with my drawings. Having a support is surer and more
+practical for security, as well protecting eyes with appropriate glasses
+during active laser module. An accident can happen.
+
+The support parts look like:
+
+image:image116.png[image,width=398,height=340]
+
+Once toolpath was calculated (using the same routing bit), simulation
+view can be displayed:
+
+image:image117.png[image,width=372,height=264]
+
+After cutting out with CNC portal, assembly will be achieved with glue:
+
+image:image118.jpeg[image,width=283,height=202]
+
+Next pictures show us laser diode module in test operations:
+
+image:image3.jpeg[image,width=497,height=377]
+
+One word about the 12V power block used here. This power distribution
+has 120W capacity, 10A under 12V. Right now, really too much power
+available. But maybe in a near future, new powerful laser diode modules
+will exist. Always be ready!
+
+If you look the cable connections on the power block you will see a
+cable between GND and -V (0V). VDD voltage is interconnected with Earth
+Ground. CNC electronic and portal have also both signals connected
+together. It is useful for instance by high Z axis measures with probe.
+Probe will be connected to ground / 0V and so electronic will be able to
+detect the edge by voltage level.
+
+image:image121.jpeg[image,width=264,height=252]
+
+On the picture below, laser beam is visible, burn point no really.
+
+image:image123.jpeg[image,width=554,height=377]
+
+The test was successful, the PWM regulation work well, and laser module
+respond well. The laser beam focus on the pictures is not adjust to its
+best high. So, burn points are just unfocused. Have not tested cut
+capacities of this laser module yet, will be for another day.
+
+This test completes my project. PWM2Laser electronic module and software
+are functional and operational.
+
+Other approaches can be taken, this documentation describes one possible
+way. On the next page, you can read my lesson learned, what I could
+(should) do better next time. Yep...
+
+= Lessons learned
+
+Would like to comment some points I missed or could be done better next
+time.
+
+- Miss some test points on the PCB for both LEDs. During software
+development, measures of frequencies and activities was helpful for
+debugging. Just to see if microcontroller execute the right section is a
+good idea. Let activate a LED in some sub procedure is a good debugging
+tool and very visible. We cannot so easily see what happen inside the
+microcontroller. Having a place to attach the oscilloscope probes for
+LEDs and analyzing the signal would be very helpful during conception
+and creation.
+
+- Took not the time to create a better Blue LED blinking section. The
+desire effect by changing PWM period is not exactly what I was
+expecting. If you have some ideas, please contact me.
+
+- I am still using Basic programming language. C and C++ are more used
+in the world of microcontrollers.
+
+If time would be available for me and the projects, I should
+definitively learn this programming language.
+
+- Lucky to have an oscilloscope for development, and debugging purposes.
+This is a really helpful and nice tool, not quite cheap but if you can
+provide one of them, do not hesitate.
+
+image:image124.jpeg[image,width=399,height=264]
+
+- The story with the red LED becoming a green LED just because not
+checking stock before starting the schematic and the references inside
+Eagle. So, yes to avoid this annoying issues, just checking stocks
+before can help.
+
+- The PCB copper thickness is 35µm mean 0,035mm. If you look the
+settings into +
+pcb-gcode, I am using 0,1mm or 100µm for Z depth. The result is not bad
+at all for the etching, but according to resolution of the CNC Z axis,
+0,07mm or 70µm depth, let say double of copper thickness would be fine.
+Yimage:image125.jpeg[image,width=357,height=263]ou
+can see on the PCB picture that the depth used for Z axis may be too
+important.
+
+= Updates to software version 1.1
+
+Some changes were applied in the software version 1.1. Mainly Blue LED
+management was modified to reaching more my expectations. Also,
+additional routine was added inside potentiometer management sections to
+avoid some PWM glitches with unwanted pulsations near 0 position.
+
+Both software version 1.0 and 1.1 are provided in project folder. You
+can easily compare both versions. +
+First information to check is the change log banner:
+
+image:image126.png[image,width=642,height=96]This
+will inform you about the new modifications inside the source code.
+
+If we look inside the Blue LED management routine, you can discover
+changes for low PWM values and for high PWM position. The high value is
+fixed and will not change. This is a constant defined on program
+beginning in declaration sections. The low value will change according
+the PWM percentage. As higher the PWM percentage, as lower this value,
+so, the PWM period will change, increasing the frequency of the Blue LED
+blinking sequence. As lower the PWM value, as lower is the Blue LED
+blinking frequency.
+
+image:image127.png[image,width=642,height=195]
+
+The values of _State_BlueLED_ and _State_BlueLED_Comp_ are established
+inside the potentiometer routine:
+
+image:image128.png[image,width=642,height=170]
+
+_State_BlueLED_Comp_ is necessary to have same blinking timing of the
+Blue LED. It is a non blocking routine, the timing must be the same as
+far we use the PWM resolution as counters. 8 bits and 7 bits resolutions
+are used in this project so, we need to compensate counters according
+the resulting CCP resolution.
+
+You see also inside this routine the adjustment program segment witch
+force the _CCPL_Reference_ equal to 0 near 0% potentiometer position.
+Had some PWM glitches in higher resolution frequency selections and,
+this was a small trick to removed them. Need always time to dig more
+inside the root cause, and have no so much time to figure out. But you
+know, this is again a lesson learned, I should take the time to solve it
+correctly!
+
+= Updates to software version 1.2
+
+With shortage of semiconductors, I decided to review the source code to
+adapt it for Microchip PIC12F1840. Not sure if this model of
+microcontroller is more available than the PIC12F683, but let’s do it.
+
+Source code is based on version 1.1, at that point of time I am not
+considering to add or review functions. But will see if ideas raise up
+during the coding.
+
+The conversion from one model to another one consists to correct the
+ports names, we changing from GPIOs to PORTAs. So GPx become RAx. Need
+to review in some lines of the source code.
+
+Also the registers needed to be reviewed, some of the registers names
+changed, and/or some values from the registers needed to be corrected,
+per instance the Timer2 of the PIC12F1840 provides now an additional
+prescaler value 1:64 which was not existing by the PIC12F683.
+
+Timer2 settings needed also to be adapted. I did not touch the preload
+values of register PR2. So frequencies were just remeasured with the
+oscilloscope and transcript into the source code comments.
+
+In the comments you can find the Data Sheet pages for every register
+settings, also here, the pages were corrected according the PIC12F1840
+documentation.
+
+Project configuration settings were also necessary to review, the new
+microcontroller model offer more possibilities, starting with higher
+internal clock frequency up to 32Mhz, where the PIC12F683 can only go up
+to 8Mhz.
+
+To learn more about the changes, have a look to the change history
+section of the source code:
+
+image:image129.png[image,width=642,height=147]
+
+In the source code itself, comments are also adapted to PIC12F1840
+microcontroller.
+
+image:image130.png[image,width=521,height=357]
+
+= Updates to software version 1.3#
+
+With shortage of semiconductors, and maybe it is still not easy to find
+a Microchip PIC12F1840, I just ordered few PIC16F18313 and decided to
+review the source code to adapt it for this another, hopefully more
+available Microchip PIC microcontroller. Additionally MikroE does not
+updated recently its IDE mikroBasic to support more new microcontrollers
+on the market, so I was looking for a new toolchain needed to work on
+another project using newly microcontroller PIC16F17146, and find the
+platform *GCBASIC* and its IDE *GCStudio*. You can learn more about this
+development tool by following this URL:
+
+https://gcbasic.sourceforge.io/Typesetter/index.php/Home
+
+GCStudio includes the GCBASIC compiler making possible to program a
+Microchip PIC, but also Microchip AVR or LGT 8-bit microcontroller just
+by changing most of the time a compiler directive. You remember, I am
+still not learning C/C++ language, GCBASIC is very near to mikroBasic,
+and the toolchain supports much more Microchip microcontrollers as the
+platform from MikroE. GCBASIC is only for 8 bits microcontrollers. So
+let’s give a try!
+
+GCBASIC do not necessarily contains the same instructions set as
+mikroBasic, as well not the same libraries. To adapt the existing source
+code from 12F1840 or 12F683 to the new microcontroller 16F18313, it will
+be also necessary to rewrite new procedures replacing mikroBasic
+libraries, for example the button library, or maybe other functions used
+in my initial mikroBasic code.
+
+I am not so good in algorithmic, and to help me for some routines, you
+will see in the proposed source code internet links pointing to the
+proposed procedure idea from its respective author. We could mention,
+per instance, the case for the push-button routine.
+https://www.e-tinkers.com/2021/05/the-simplest-button-debounce-solution/[How
+to debounce without any wait instructions?] I do not like to let wait a
+microcontroller, just do nothing…, no! My preference is to have a
+running code without any waiting loop by using instructions like
+_ms_delay()_. It is very useful to create non blocking routine, like the
+blinking led routine.
+
+If I would use mikroBasic for this update 1.3, the registers are the
+first challenges, and in particular the internal oscillator
+configuration. The structure changed and the source code must be
+reviewed. Interrupts register as well need a review. But with GCBASIC,
+configuring a microcontroller is very easy. Use just one directive,
+https://gcbasic.sourceforge.io/help/__chip.html[*#CHIP*] and specify the
+selected microcontroller for the project, that’s it. The complete source
+code will be easily compiled for others microcontroller even if you
+select another family. Starting a project with a PIC and then moving to
+AVR will be highly simplified and make changes much easier for you (and
+for me).
+
+The https://www.youtube.com/@AnobiumTech[YouTube channel from Anobium]
+help me a lot to learn how to use GCBASIC. Evan is one of the team
+member behind the GCBASIC project. His tutorials contribute a lot to
+have a better understanding and learning path. Looking how to do
+something, do it itself and making mistakes is a very effective learning
+process.
+
+To program the microcontroller, I decided to purchase a new programmer.
+As far I want to be able to program in the future AVR microcontrollers,
+a Microchip PICkit 5 was bought. I am using the MPLAB IPE software
+interfaced with GCStudio. See below how to set the programmer into the
+environment.
+
+Use following parameters in the _Command Line Parameters_ of the
+_Programmer Editor_ window:
+
+-TPPK5 -P%chipmodel% -M -F"%filename%" -OL -W
+
+image:image131.png[image,width=377,height=268]
+
+Thank also to Evan (Anobium) for its support during my implementation
+tests of the PICkit 5 into GCStudio. +
+He helped me a lot to find the right settings because of strange
+reactions of the MPLAB IPE environment by programming the
+microcontroller.
+
+Usually I print out the microcontroller datasheet to be better able to
+read the documentation. Right now I have not printed out the PIC16F18313
+datasheet, so I will certainly first adapt the code for PIC12F1840, and
+then use the functionalities of GCBASIC to easily replace the
+microcontroller with the PIC16F18313, remember,
+https://gcbasic.sourceforge.io/help/__chip.html[*#CHIP*] directive on
+the top of the source code. At the time I wrote this chapter, I have not
+really start to review the initial source code, this will be a surprise
+how that will work.
+
+Let’s go to the transition from the source code. The transition of the
+code starts with the taking over of the procedure and the variables,
+because GCBASIC handle most of the registers settings. One technique is
+to compile and check the errors. If some variables are not declared
+correctly, the compiler inform you and you can adjust the source code as
+required.
+
+As example, I just tried to compile during transition of the procedure
+Blinking_Led(), by the way a declaration of a sub procedure is not _Sub
+procedure <name>_, but just _Sub <name>_. You can see below the compiler
+error. Variables used in this procedure are not declared in the source
+code. I need to take them over as well.
+
+I not really copy/paste all the code in one pass, I do it block per
+block and compile in between. Not sure if this is the best solution, but
+this is a method I am using since very long in my projects.
+
+image:image132.png[image,width=476,height=216]
+
+You can see in the compilation errors, an information about an
+Array/Function _INC_. GCBASIC do not recognize the increment command
+_INC(variable name)_ from mikroBasic, but this command must be written
+as follow: +
+_<variable name> += 1_ to add 1 to the variable at each execution. I
+made the changes in the new source code…
+
+The instruction _Const_ to declare a constant value in mikroBasic is
+also not recognized by GCBASIC, we need to use the syntax
+_https://gcbasic.sourceforge.io/help/__define.html[#DEFINE]._ These
+compiler errors are solved step by step, one by one during the multiple
+compilation iterations. By doing that way, this help me to better
+understand and learn this programming language and integrated
+development environment.
+
+Other syntax adaptions were necessary, look into the source code in the
+top comments, you will see what was important to correct. First
+compilation tests by using the PIC12F1840 and hardware tests were
+successful.
+
+image:image133.png[image,width=526,height=185]
+
+Here the comments excerpt about syntax changes between mikroBasic and
+GCBASIC:
+
+image:image134.png[image,width=642,height=123]
+
+Just replacing now the chip model PIC12F1840 with PIC16F18313 was not
+successful. Error on registers name let not use the source code as it
+is. More corrections will be necessary.
+
+image:image135.png[image,width=495,height=123]This
+result was to expect, some registers are not identical between both
+microcontrollers!
+
+Before we move to the next microcontroller, why not check and try if
+some optimizations in the code are possible to win more program ROM
+memory space. If you look the successful compilation screen, you can
+read size of the Program Memory is using 912/4096 words (22,27%). Try to
+reduce the code can be a good option, and certainly can improve the
+number of iterations running instructions code per seconds.
+
+With the support of Evan,
+https://sourceforge.net/p/gcbasic/discussion/579126/thread/d3f224eda9/?limit=25#2919/f8b0/e75f[read
+more here], you will learn different approaches how to optimize the code
+and finally the size of the used memory program steps of the
+microcontroller. We started with 912 words, and right now, at the time I
+write this sentence, we reached 786 words used for ROM. The RAM usage
+was not improved.
+
+image:image136.png[image,width=346,height=93]
+
+In the comments of the source code, you can learn multiple code
+optimization options used:
+
+image:image137.png[image,width=642,height=112]
+
+Starting with reading the GCBASIC documentation
+(https://gcbasic.sourceforge.io/help/[link to GCBASIC HTML documentation
+web page]) is a good approach. You can also use the
+https://gcbasic.sourceforge.io/help/output/pdf/gcbasic.pdf[PDF version
+of the GCBASIC documentation]. Looking on the internet and search for
+similar questions can also help you. Some of the optimizations were
+possible by individual tests of the code. Just try some ideas, compile
+and run can tell you, yes it is working, or not.
+
+For instance, the optimization approach by using the command
+https://gcbasic.sourceforge.io/help/_rotate.html[Rotate] instead of
+division /16 win not only just 5 steps, but let run much faster the
+overall loop of the program. This is visible by measuring the Blue LED
+blinking frequency. Using an oscilloscope for debug is a good solution.
+We saw that already during the previous development stages.
+
+Now, it is time to replace the microcontrollers. Remember, the datasheet
+is the bible for your PIC. The GCBASIC toolchain offer an
+https://www.youtube.com/watch?v=va_yBJ7lv1g[additional tool called
+PICInfo]. This tool give you good summary about capabilities for each
+selected PIC and let you transfer very easily the PIC parameters to the
+source code.
+
+image:image138.png[image,width=308,height=270]
+
+_PICInfo_ offers also a direct link to the selected PIC *DataSheet*
+hosted on Microchip website as well several other nice functionalities.
+Call _PICInfo_ over the _Run task_ command line (or simply press [F4]).
+
+By using the PICkit 5, I just noticed that I made a mistake with the
+ICSP connector and its pin positions. For the lesson learned section,
+remember me to invert the pins 1 to 5 to let connect the PICkit 5 from
+the upper position (by the way, this is the same with PICkit 2 or PICkit
+3 if you take attention to the pictures in the documentation, for
+instance on page 43). I have not really noticed on the beginning of the
+project because I was using the mikroProg programmer, fully interfaced
+with the mikroBasic IDE.
+
+If you take a look in the source code comments, you will see that few
+changes were necessary with registers names, but also in some registers
+values. As far the PWM CCP module is managed by direct settings and not
+with using the GCBASIC integrated functions, the code is less portable
+and requires more attention and tests.
+
+image:image140.png[image,width=418,height=62]
+
+Need also to review all comments with links to the datasheet pages. In
+the comments of the source code, references to the pages describing
+different settings are given between brackets, e.g. below the PWM
+settings of the microcontroller:
+
+image:image141.png[image,width=642,height=68]
+
+The microcontroller PIC16F18313 is a PPS chip, mean the microcontroller
+contains a
+https://microchipdeveloper.com/8bit:pps[[.underline]#P#eripheral
+[.underline]#P#in [.underline]#S#elect] module. The digital output pin
+from CCP1 module generating the PWM signal must be connected with the
+I/O pin RA2 of the PIC16F18313.
+
+GCStudio proposes the configuration _PIC PPS_ tool. The idea is to
+select the CCP1 output and affect it to the I/O port RA2. This action is
+graphically displayed. We could also use manually settings from the
+appropriate registers, but this tool is so easy and create direct
+available code to be copy and paste in the source code.
+
+On next page, you can see the screenshot of the PPS CCP1 output
+configuration for the PWM signal needed for the laser module.
+
+PPS configuration screenshot:
+
+image:image142.png[image,width=449,height=292]
+
+With the button _Copy_ you place the code in interim memory, and _Paste
+[CTRL+V]_ it into the source code:
+
+image:image143.png[image,width=528,height=190]
+
+As far the PWM module work with 10 bits resolution, why not rework the
+source code and use the full range of the potentiometer and the PWM
+resolution module. The ADC module have also a resolution of 10 bits, the
+mapping is more easier, and will reduce the number of calculations
+inside the microcontroller working code. _CCP1CON_ get new register
+values for the correct PWM settings.
+
+The blinking sequence for the Blue LED must be also reviewed, it is
+based on the Potentiometer to PWM calculations. The used constant values
+were defined by making some blinking tests. Also the reference is now
+based on the potentiometer position using always same resolution of 10
+bits, so 1024 values. This will never change, and make the Maths
+identical despite the resulting PWM resolution from the frequency
+selection.
+
+This microcontroller PIC16F18313 needs much more configuration words as
+more basics microcontrollers like PIC12F683, so one of the new
+configuration word is CSWEN. I have not took attention, put it at OFF,
+and so the clock was the double frequency of my supposed settings. You
+can imagine with that settings, every timer took half time as programmed
+in the source code, and I was surprised why suddenly the PWM frequency
+changed from 250 Hz to 500 Hz... I learned again something!
+
+After all these changes and corrections, the code is running as
+expected. The microcontroller PIC16F18313 generates its PWM pulses. The
+conversion from mikroBasic to GCBASIC and the source code porting from
+PIC12F1840 to PIC16F18313 are completed. Nice experience to move
+hardware and software. Thank to the GCBASIC Team and in particular to
+Evan for its very appreciated support!
+
+= PWM2Laser project documentation history
+
+Version 1.0 created May 2022, Initial release of this project
+documentation.
+
+Version 1.1, June 2022, Add undocumented pages to let print the document
+by print company,
+
+Review blue led blinking sequences routine,
+
+Add reducing PWM glitches routine,
+
+Content and text corrections.
+
+Version 1.11, August 2022 Add forgotten screenshots CNC preview PCB
+toolpath,
+
+Minor changes in the documentation text.
+
+Version 1.2, October 2022 Adapt source code in version 1.2 for
+PIC12F1840 microcontroller.
+
+Version 1.3, November 2023 Use new toolchain GCBASIC and PICkit 5 as
+programmer,
+
+Adapt source code in version 1.3 for PIC16F18313 microcontroller,
+
+Optimize GCBASIC code to win program memory space,
+
+Rearrange procedures positions in source code,
+
+Minor changes in sentences inside the complete documentation,
+
+Review some source code comments, add more explanation,
+
+Review the necessary registers used by PIC16F18313,
+
+Reworked Maths for PWM settings and 10 bits resolution,
+
+Reviewed Maths for Blue LED blinking sequences.
+
+image:image2.png[image,width=642,height=617]*This
+page is intentionally undocumented*
+
+= Conclusion
+
+Now is time to write the conclusion. When I decided to create this
+project in a documented way, I not really imagined how deep that bring
+me and how long would be this document. We could certainly write more
+and more for each topic, explain more the process, the content, the
+reason why I took one way or another way. On the end, the solution paths
+I have chosen are not the only ones. We have different ways to reach the
+goal. Also, the tools available on marked, and also free of charges for
+many of them, can be different from my own choices.
+
+Anyway, I just hope that this documentation can help you to learn, to
+reproduce and later with more experience create your own electronic
+projects. I will also enjoy any kind of feedback. Helping each other,
+and we already making progress, we all learn from scratch and sharing
+our experience is a very good way to progress.
+
+This PWM2Laser module was just intended to have a way for test the
+purchased laser module out of the box. Its purpose is not really to be
+mounted on CNC for manually power adjustment. This role will be for the
+CNC control, the interface with computer will be my next project.
+
+This documentation was not really written as a book, but by reviewing
+the content, I asked myself if this was not a “small book” at the end.
+But who knows, maybe one day I will write a real one.
+
+To contact me, please use following email: FETFabrice@gmail.com
+
+Wish you good continuation in the CNC (and electronic) adventure.
+
+Fabrice ENGEL
+
+France – May 2022 - November 2023
