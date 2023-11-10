@@ -13,7 +13,7 @@
 
 Some words ....
 
-  image:ZZer_Schematic_V1.png[image,width=322,height=264]
+  image:ZZero_Schematic_V1.png[image,width=322,height=264]
 
 
 
