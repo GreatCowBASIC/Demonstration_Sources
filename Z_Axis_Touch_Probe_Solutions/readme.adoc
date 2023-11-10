@@ -1,7 +1,4 @@
 
-
-
-
 # Z Axis Touch Probe
 
 :toc:
@@ -21,7 +18,7 @@ Printed Circuit Board PCB ....
 image:ZZero_PCB_V1.png[]
 
 
-Metal probe connected to Active touch probe electronic, Pin Probe_Z
+Metal probe connected to Active touch probe electronic, Pin PROBE_Z ....
 
 image:Metal_probe.jpg[]
 
