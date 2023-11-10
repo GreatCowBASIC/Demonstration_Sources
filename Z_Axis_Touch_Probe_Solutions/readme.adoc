@@ -11,9 +11,19 @@
 *About the Z Axis Touch Probe solution*
 
 
-Some words ....
+Electronic schematic ....
 
-  image:ZZero_Schematic_V1.png[image,width=322,height=264]
+image:ZZero_Schematic_V1.png[]
+
+
+Printed Circuit Board PCB ....
+
+image:ZZero_PCB_V1.png[]
+
+
+Metal probe connected to Active touch probe electronic, Pin Probe_Z
+
+image:Metal_probe.jpg[]
 
 
 
