@@ -7,7 +7,7 @@
 
 
 Some words ....
-  //image::ZZero Schematic V1.png[]
+  image:ZZero Schematic V1.png[image,width=322,height=264]
 
 
 
