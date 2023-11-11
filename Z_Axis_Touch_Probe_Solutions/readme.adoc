@@ -34,7 +34,7 @@ The solution uses a new capability from GCBASIC compiler, look here: +
 
 https://sourceforge.net/p/gcbasic/discussion/579125/thread/e85f19d580/#b06f[New Compiler Capability: Creation of EEPROM reference data directly] +
 
-_Minimum compiler version must be *build 1297* to be able to compile the ZZero source code into Microchip PIC code._
+_Minimum compiler version must be *build 1296* to be able to compile the ZZero source code into Microchip PIC code._
 
 Have a look in the source code !
 
