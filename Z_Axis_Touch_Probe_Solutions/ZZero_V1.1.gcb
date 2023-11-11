@@ -1,0 +1,327 @@
+// GCBASIC Program.
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------
+// Description:  ZZero - Z axis active tool probe
+// 
+// @author     Fabrice Engel - FETFabrice@gmail.com
+// @licence    GPL
+// @version    1.1
+// @date       11 November 2023
+// ************************************************************************************************************************************************************
+
+/* ----- Information
+
+This source code is a conversion from the initial prototype coded with MikroE mikroBasic
+Microchip PIC12F683 was selected, initial project was in year 2014
+This project is proposed as a GCBASIC example
+Not all options developped initialy in the first prototype will be convert into GCBASIC
+The project is an active Z axis tool probe to be interfaced with CNC hardware control
+Initial issue was to have a high voltage level condition as soon the CNC bit touched the probe
+Most of the probes to it by touching ground, the CNC interface detect it
+CNC breakboard card wanted to have a high voltage level and not a 0V condition or TTL level (as far that was my understanding)
+Using a microcontroller to do this offers many other options like using LEDs or sound buzzer to improve human interface
+Principle of the probe is to detect the signal voltage changes by falling edge of the probe signal to the ground
+We are using the interrupt falling edge detection µCTL capability on port INT/GP2
+The spindel is on earth grounded and the probe is on high voltage level 5V
+Once detected, the µCTL set the right port to send the signal to the CNC interface
+During same time, LEDs are activated and sound is generated to inform the user
+My prototype card use also electronical components to protect PIC I/O port -> https://www.digikey.com/en/articles/protecting-inputs-in-digital-electronics
+As far I am using my first prototype card (see pictures in documentation), i will keep the initial µCTL 12F683
+Also not all options will be integrated in this version, so pushbutton will have no function yet in version 1.0
+ATTENTION: this probe does not work if you use Diamond toothed toolbits
+Let us jump into the software conversion ...
+Once version 1.0 completed, create version 1.1 adding functionnality using pushbutton and managing default output level by reading parameter from EEPROM
+Pushbutton routine logic is the implementation described here -> https://www.e-tinkers.com/2021/05/the-simplest-button-debounce-solution/ (very nice approach)
+
+----- Code history
+
+03-11-2023 Initial GCBASIC source code version 1.0
+03-11-2023 Take over main code from mikroBasic source code
+03-11-2023 Conversion completed
+03-11-2023 Compiled code requires Program Memory: 257/2048 words (12,55%), RAM: 20/128 bytes (15,62%)
+04-11-2023 Output signal level to CNC interface can be predefined by default value 0 or 1 (select in constants definition)
+04-11-2023 Reformat source code by using comments instruction sets ( //, /*, //~, //! )
+04-11-2023 Replace For To ... Next loops with Repeat ... End Repeat loops, win 39 memory steps
+04-11-2023 Compiled code requires Program Memory: 218/2048 words (10,64%), RAM: 20/128 bytes (15,62%)
+06-11-2023 Change to source code version 1.1
+06-11-2023 Create pushbutton management routine and SignalCNC_OFF default value readed from EEPROM memory location
+06-11-2023 Pushbutton routine will not use any wait instruction, I prefer if microcontroller is not using waiting loops :)
+07-11-2023 Create non blocking LED control routine (just with counters and no internal loops)
+08-11-2023 Compiled code requires Program Memory: 414/2048 words (20,21%), RAM: 35/128 bytes (27,34%)
+11-11-2023 Review and complete comments to present the source code in a good shape for the GCBASIC Demo folder
+
+*/
+
+
+// ----- Configuration
+
+// EEPROM location 01: SignalCNC_OFF
+// Location 01 can have 2 values, 00 or 01
+// If another value is read then default value will be 00
+
+
+// Microchip µCTL Settings
+
+#CHIP 12F683,8                                                  //! Select µCTL PIC12F683 and set clock to 8 Mhz
+
+// EEProm default values
+
+EEProm VersionData 0x20                                         // Store starting in position 20 the following description test
+      "   ZZero Probe  "                                        // By reading EEPROM content,
+      "  FABRICE ENGEL "                                        // It can be easily see the software version 
+      "   Version 1.1  "                                        // In the microcontroller
+      "  November 2023 "                                        // Usefull if not all memory locations are used for the project
+End EEProm
+
+EEProm EEDataSet1 0x01                                          // Locate EEPROM Data at address position 1
+      0x00                                                      // Default value for signal voltage level
+End EEProm
+
+
+// Device configuration word, see page 84 PIC1F683 Datasheet DS41211D for more information
+
+#CONFIG CPD=OFF                                                 // Data memory code protection is deactivated
+#CONFIG FCMEN=ON                                                // Fail-safe clock monitor is activated
+#CONFIG IESO=OFF                                                // Internal External Switchover is deactivated
+#CONFIG MCLRE=OFF                                               // GP3/MCLR is activated as input pin
+#CONFIG OSC=INTOSCIO                                            // Internal oscillator and all pins as I/O function
+#CONFIG WDTE=ON                                                 // Watchdog timer is enabled
+#CONFIG PWRTE=OFF                                               // Power Up timer is deactivated
+#CONFIG CP=OFF                                                  // Code protection bit is deactivated   
+#CONFIG BOREN=OFF                                               // Brown-out reset is disabled
+
+#OPTION Explicit                                                // Be sure all variables are correctly defined
+
+
+// ----- Define Hardware settings
+
+/*
+Port GP0 Output LED Signalisation Red color
+Port GP1 Output for external LED or other open collector controled item
+Port GP2 Input for Probe
+Port GP3 PushButton for parameter configuration (not used in version 1.0)
+Port GP4 Output for CNC Breakboard card, signalisation that probe is touching ground - remember spindle and CNC tool on ground level (electricaly connected by CNC portal)
+Port GP5 Output for Buzzer (is inverted 0 to beep, 1 for no audible sound)
+*/
+
+#DEFINE Led            GPIO.0                                   // Define GP0 for Led Status
+#DEFINE ELed           GPIO.1                                   // Define GP1 for external LED
+#DEFINE Probe          GPIO.2                                   // Define GP2 for Probe input, use INT on descending edge
+#DEFINE PushButton     GPIO.3                                   // Define GP3 for PushButton
+#DEFINE SignalCNC      GPIO.4                                   // Define GP4 as output for signalisation to CNC (SignalCNC must be 1 to cut) - N_Channel MosFet
+#DEFINE Buzzer         GPIO.5                                   // Define GP5 for Buzzer, 0 will beep
+
+Dir Led                Out                                      // Define GPIO port as Output for LED control
+Dir ELed               Out                                      // Define GPIO port as Output for LED control
+Dir Probe              In                                       // Define GPIO port as Input for probe grounded detection
+Dir PushButton         In                                       // Define GPIO port as Input (is already per default and cannot be changed) for PushButton detection
+Dir SignalCNC          Out                                      // Define GPIO port as Output for signal to CNC interface
+Dir Buzzer             Out                                      // Define GPIO port as Output for Buzzer control
+
+
+// ----- Variables
+
+// Todo: Define your parameters as constants here and compile...
+
+#DEFINE CounterCheckProbe = 7000                                // Limit for Alive signal when Probe = 0
+#DEFINE BeepTime = 20000                                        // Time of the beep if Probe permanently touching ground
+#DEFINE LED_ON = 1000                                           // Define ON time of the LED in the lighting control non blocking routine
+#DEFINE LED_OFF = 25000                                         // Define OFF time of the LED in the lighting control non blocking routine
+
+// Variables definition
+
+Dim OldstateProbe as bit                                        // Variable for status of the Probe
+Dim OldstateLED as bit                                          // Variable for LED Status
+Dim PushButtonState as word                                     // Variable for pushbutton management routine
+Dim OldstatePushButton as bit                                   // Variable for pushbutton state
+Dim Alive as word                                               // Variable for sending KeepAlive signal by LED
+Dim BeepCounter as word                                         // Variable for Beep timed
+Dim SignalCNC_OFF as bit                                        // Default voltage level to CNC interface, if 0, than higher level will send to CNC by touching probe
+
+// Initialise the variables for first start
+
+Call EPReadParameters()                                         // Read defined parameters from EEPROM memory
+SignalCNC = SignalCNC_OFF                                       // Define initial voltage level for the command to CNC interface
+Alive = 0                                                       // Initialize Alive counter
+OldstateProbe = 0                                               // Initialize Oldstate Interrupt flag
+OldstateLED = 1                                                 // Define OldstateLED
+Buzzer = 1                                                      // Buzzer is off at power on (High level for OFF)
+PushButtonState = 0                                             // Define initial value of pushbutton bouncing state
+OldstatePushButton = 0                                          // Define initial value for previous state pushbutton
+
+
+// ----- Interrupts
+
+// Keep routine as shortest as possible, it is good practices
+
+Sub Interrupt()                                                 // No test to Do to detect Interrupt flag, this is the only interrupt source!
+    SignalCNC = Not(SignalCNC_OFF)                              // Activate SignalCNC and send signal to CNC interface
+    OldStateProbe = 1                                           // Activate flag to indicate the Probe is touching ground
+    INTCON.INTF = 0                                             // Clear INT GP2 flag, ready for next detection
+End Sub
+
+
+// ----- Main body of program
+
+
+// Initialise PIC12F683 particular registers, interrupts and watchdog management
+
+Call InitPIC()
+
+// Send 2 bip tones to say hello at power up
+
+Repeat 2                                                        // Run 2 times for saying Hello
+   Repeat 30000                                                 // Say Hello with bip
+      Buzzer = 0                                                // Remember Buzzer will beep with 0
+      Led = 1                                                   // Put LED On
+      Call TestProbe()                                          // Check state of the Probe, must run in all situations
+   End Repeat
+   Repeat 30000                                                 // Second half of the hello sequence
+      Buzzer = 1                                                // Put Buzzer Off
+      Led = 0                                                   // Put LED Off
+      Call TestProbe()                                          // Check state of the Probe
+   End Repeat
+End Repeat
+
+// Check if Probe is already grounded !
+
+Do While Probe = 0                                              // Check if the signal is already grounded
+   SignalCNC = Not(SignalCNC_OFF)                               // Send information to CNC interface
+   Led = 1                                                      // Permanent LEDs ON
+   ELed = 1
+   Buzzer = 0                                                   // And permanent sound if touching on power up
+Loop                                                            // Alert as long condition is true
+
+// Shut indications down and retablish normal situation
+
+SignalCNC = SignalCNC_OFF
+Led = 0
+ELed = 0
+Buzzer = 1
+
+// **************************************************  P R I N C I P A L  &  P E R M A N E N T L Y  L O O P  **************************************************
+
+// Restart sequence from the beginning over and over
+
+Do Forever
+   Call TestProbe()                                             // Check state of the probe
+   Call LEDControl()                                            // Managing LED blinking sequence
+   Call PushButtonControl()                                     // Check pushbutton status and initiate EEPROM parameter storing routine if needed
+   Clrwdt                                                       // Main watchdog clear function, DO NOT REMOVE !
+Loop
+
+// ****************************************************************  E N D  M A I N  L O O P  *****************************************************************
+
+
+// ----- Subroutines
+
+
+// Hardware settings (not configured by GCBASIC)
+
+Sub InitPIC()
+    INTCON =     0b11010000                                     // Enable general Interrupt, activate INTE for GP2 interrupt (page 13)
+    OPTION_REG = 0b10001110                                     // Enable interrupt on falling edge GP2 (page 12), Prescaler to WDT 1/64, PullUp disable
+    WDTCON =     0b00010111                                     // Prescaler 1/65536 Watchdog, enable per software (Page 97)
+End Sub
+
+
+// Read EEPROM defined parameters procedure
+
+Sub EPReadParameters()
+    Dim EPReadParam as Byte                                     // Define local variable to read each memory slot
+    EPRead 1, EPReadParam                                       // Read default parameter from EEPROM memory slot 1 (Voltage level CNC Signal)
+    If EPReadParam = 0x00 Then                                  // Check if value stored in EEPROM can be correct or not
+       SignalCNC_OFF = 0                                        
+     Else 
+       If EPReadParam = 0x01 Then                               // Had programming issues with managing single bits from byte,
+          SignalCNC_OFF = 1                                     // Solved it like that, if someone could advise me ? Thank
+        Else
+          SignalCNC_OFF = 0                                     // If the value is missconfigured, use default value 0 for SignalCNC_OFF
+       End If
+    End If
+End Sub
+
+
+// Probe detection procedure
+
+Sub TestProbe()
+    If OldStateProbe = 1 Then                                   // Interrupt occur, so check if Probe is still touching the ground
+       If Probe = 0 Then
+          If OldStateLED = 1 Then
+             LED = 1
+             OldStateLED = 0
+          End If
+          BeepCounter = BeepCounter + 1                         // If yes send a beep tone
+          If BeepCounter < (BeepTime / 2) Then                  // If permanently grounded send and beep-blanck-beep ...
+             Buzzer = 0
+             Eled = 1                                           // Put ON second Output
+           Else
+             Buzzer = 1
+             Eled = 0                                           // Put OFF second Output
+          End If
+          If BeepCounter > BeepTime Then                        // End of the loop, clear the timer
+             BeepCounter = 0
+          End If
+          If Alive = CounterCheckProbe Then
+             Alive = LED_OFF                                    // Blink faster when Probe = 0
+          End If
+        Else
+          SignalCNC = SignalCNC_OFF                             // Probe is no touching anymore, so shut down the signal to CNC control
+          OldStateProbe = 0                                     // Clear the state flag set by the Interrupt
+          OldStateLED = 1                                       // LED ready to are ON at next Probe touching
+          Buzzer = 1                                            // Buzzer is OFF
+          Eled = 0                                              // Put OFF second led
+          BeepCounter = 0                                       // Clear counter for Buzzer
+          Alive = 0                                             // Clear counter for Led
+       End If
+    End If
+End Sub
+
+
+// Pushbutton management routine, learn more here: https://www.e-tinkers.com/2021/05/the-simplest-button-debounce-solution/ 
+
+Sub PushButtonControl()                                         // PushButton is connected to PullUp resistance
+  PushButtonState = FnLSL(PushButtonState,1)                    // At each run, move the bits to the left
+  PushButtonState = PushButtonState OR PushButton               // Merge bits values history state with actual pushbutton state 
+  PushButtonState = PushButtonState OR 0xfe00                   // Mask the history state to be able to detect a stable state of 0
+  If OldstatePushButton = 0 Then
+      If PushButtonState = 0xff00 Then                          // Falling edge detected
+         OldstatePushButton = 1                                 // Black pushbutton was pressed, set flag to detect raising edge
+      End If
+  End If                                                        // Pushbutton must be pressed and released to be considered
+  If OldstatePushButton = 1 Then
+     If PushButtonState = 0xfe01 Then                           // Detect raising edge, push button was released        
+        SignalCNC_OFF = not(SignalCNC_OFF)                      // Invert actual parameter
+        SignalCNC = SignalCNC_OFF                               // Invert output signal to CNC interface
+        EPWrite 1, SignalCNC_OFF                                // Write new parameter value in EEPROM to be ready next power up
+        Wait 50 ms                                              // Wait to give time before reading EEPROM, this time is required to ensure correct eeprom storage (usually 20 msec)
+        Call EPReadParameters()                                 // Use the new value and be sure
+        Repeat 20000                                            // Let LED ON and Buzzer ON to indicate preassure on the pushbutton
+          Led = 1
+          Buzzer = 0
+        End Repeat
+        Led = 0                                                 // Shuttoff LED and Buzzer, no light and no sound at end
+        Buzzer = 1
+        OldstatePushButton = 0                                  // Clear detection flag
+     End If
+  End If   
+End Sub
+
+
+// LED control routine
+
+Sub LEDControl()
+   Alive += 1                                                   // Add 1 to counter     
+   If Alive < LED_ON Then                                       // Flash of the control led
+      Led = 1                                                   // Put LED ON
+   Else   
+      Led = 0                                                   // Put LED OFF
+      If Alive > LED_OFF Then                                   // Time limit reach of the counter, go back to ON sequence of the LED
+         Alive = 0                                              // Clear to counter and be ready for new LED blinking sequece
+      End If
+   End If
+End Sub
+
+// ----- Lookup Tables
+
+
+
