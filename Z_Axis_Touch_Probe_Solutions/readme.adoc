@@ -42,7 +42,7 @@ image:ZZero_PCB_V1.png[width=512]
 image:Metal_probe.jpg[width=512]
 
 
-*Prototypes are running over the PICKit 2....*
+*Prototypes are running over the PICKit 2 ....*
 
 image:Proto_3_running.jpg[width=512]
 image:Proto_6_running.jpg[width=512]
