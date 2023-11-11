@@ -15,12 +15,17 @@ At that time, I played with microcontrollers, hum, and today, I am still playing
 So the idea was to use these nice small computers to bring a new approach by making the touching probe detection more visible +
 and more audible with LED and Buzzer.
 
-The demonstration file proposed here is a conversion of the prototype created 10 years. The PIC microcontroller code was developed
-initialy with MikroE mikroBasic for PIC, and the demonstration folder proposes now my conversion learning to GCBASIC code.
+The demonstration file proposed here is a conversion of the prototype created 10 years ago. The PIC microcontroller code was developed
+initialy +
+with MikroE mikroBasic for PIC, and the demonstration folder proposes now my conversion learning to GCBASIC code.
 
 The principle of the solution is to use detection voltage level changes, from 5V to 0V using the PIC falling edge detection,
 then generating the adequate interrupt in the code, to quickly send a signal to the CNC interface. The CNC interface is communicating
 with the computer executing MACH3 and managing the probe detection by the correct G code instruction.
+
+CNC spindel is electricaly connected to ground, router bit as well, probe plate is connected to +5V by the protected input circuit.
+A low voltage level, by touching the plate to the ground through the bit and the spindel, initiates the interrupt and
+the signalisation over the CNC interface.
 
 More information about the solution, and how it is working can be read in the proposed source code.
 The used microcontroller is a PIC12F683. Some idea for routines, like the pushbutton management are not from me :)
@@ -32,17 +37,17 @@ Have a look in the source code !
 image:ZZero_Schematic_V1.png[]
 
 
-*Then the Printed Circuit Board PCB, this is already my version 7 ....*
+*Then the Printed Circuit Board PCB, this is already version 6 ....*
 
 image:ZZero_PCB_V1.png[width=512]
 
 
-*Full metal probe connected to the active touch probe electronic, Pin PROBE_Z ....*
+*Full metal probe (with defined high of 20,0mm) connected to the active touch probe electronic, Pin PROBE_Z ....*
 
 image:Metal_probe.jpg[width=512]
 
 
-*Prototypes are running over the PICKit 2 ....*
+*ZZero prototypes are running over the PICKit 2 ....*
 
 image:Proto_3_running.jpg[width=512]
 image:Proto_6_running.jpg[width=512]
