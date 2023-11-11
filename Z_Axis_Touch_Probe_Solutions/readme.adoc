@@ -10,9 +10,13 @@ November 2023
 
 More or less 10 years ago, i needed for my new CNC portal a touching probe to set the origin of the Z axis on the top of the material.
 Several approachs exist, starting with the sheet of paper method, but I was looking for something more motivating.
-At that time, I played with microcontrollers, hum, and I am still playing with microcontrollers today for some projects :)
+
+At that time, I played with microcontrollers, hum, and today, I am still playing with microcontrollers today for some projects :)
 So the idea was to use these nice small computers to bring an new approach by making the touching probe detection more visible
 and more audible with LED and Buzzer.
+
+The demonstration file proposed here are a conversion of the prototype created 10 years. The PIC microcontroller code was developed
+initialy with MikroE mikroBasic for PIC, and the demonstration folder propose now my conversion into GCBASIC code.
 
 
 Electronic schematic ....
