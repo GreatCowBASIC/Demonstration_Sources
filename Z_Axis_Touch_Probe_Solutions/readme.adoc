@@ -34,18 +34,18 @@ image:ZZero_Schematic_V1.png[]
 
 *Then the Printed Circuit Board PCB, this is already my version 7 ....*
 
-image:ZZero_PCB_V1.png[]
+image:ZZero_PCB_V1.png[width=512]
 
 
 *Full metal probe connected to the active touch probe electronic, Pin PROBE_Z ....*
 
-image:Metal_probe.jpg[]
+image:Metal_probe.jpg[width=512]
 
 
 *Prototypes are running over the PICKit 2....*
 
-image:Proto_3_running.jpg[]
-image:Proto_6_running.jpg[]
+image:Proto_3_running.jpg[width=512]
+image:Proto_6_running.jpg[width=512]
 
 All these PCBs were created by the CNC portal, no classical etching but bit routing !
 
@@ -53,13 +53,13 @@ All these PCBs were created by the CNC portal, no classical etching but bit rout
 
 *A friend integrated its own active probe circuit inside the CNC interface ....*
 
-image:18_Zzero_integration.jpg[]
+image:18_Zzero_integration.jpg[width=512]
 
 
 *My next project is a CNC2Laser interface, see the integration of the active probe on the PCB ....* +
-On the top right near the ICSP connector.
+(On the top right near the ICSP connector.)
 
-image:Zzero_integrated_CNC2Laser.jpg[]
+image:Zzero_integrated_CNC2Laser.jpg[width=512]
 
 *Source code Version 1.1 Zzero for PIC12F683*
 [source,basic]
