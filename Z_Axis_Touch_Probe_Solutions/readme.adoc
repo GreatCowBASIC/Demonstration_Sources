@@ -56,8 +56,8 @@ All these PCBs were created by the CNC portal, no classical etching but bit rout
 image:18_Zzero_integration.jpg[width=512]
 
 
-*My next project is a CNC2Laser interface, see the integration of the active probe on the PCB ....* +
-(On the top right near the ICSP connector.)
+*My next project is a CNC2Laser interface, with direct integration of the active probe on the PCB ....* +
+(Look on the top right near the ICSP connector.)
 
 image:Zzero_integrated_CNC2Laser.jpg[width=512]
 
