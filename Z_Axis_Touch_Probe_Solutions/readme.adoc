@@ -8,31 +8,36 @@
 *About the Z Axis Touch Probe solution* + 
 November 2023
 
-More or less 10 years ago, i needed for my new CNC portal a touching probe to set the origin of the Z axis on the top of the material.
+More or less 10 years ago, i needed for my new CNC portal a touching probe to set the origin of the Z axis on the top of the material. +
 Several approachs exist, starting with the sheet of paper method, but I was looking for something more motivating.
 
-At that time, I played with microcontrollers, hum, and today, I am still playing with microcontrollers today for some projects :)
-So the idea was to use these nice small computers to bring an new approach by making the touching probe detection more visible
+At that time, I played with microcontrollers, hum, and today, I am still playing with microcontrollers for some projects :) +
+So the idea was to use these nice small computers to bring a new approach by making the touching probe detection more visible +
 and more audible with LED and Buzzer.
 
-The demonstration file proposed here are a conversion of the prototype created 10 years. The PIC microcontroller code was developed
-initialy with MikroE mikroBasic for PIC, and the demonstration folder propose now my conversion into GCBASIC code.
+The demonstration file proposed here is a conversion of the prototype created 10 years. The PIC microcontroller code was developed
+initialy with MikroE mikroBasic for PIC, and the demonstration folder proposes now my conversion learning to GCBASIC code.
 
-The principle of the solution is to use a detection of voltage level changes, from 5V to 0V using the PIC falling edge detection,
+The principle of the solution is to use detection voltage level changes, from 5V to 0V using the PIC falling edge detection,
 then generating the adequate interrupt in the code, to quickly send a signal to the CNC interface. The CNC interface is communicating
 with the computer executing MACH3 and managing the probe detection by the correct G code instruction.
 
-Electronic schematic ....
+More information about the solution, and how it is working can be read in the proposed source code.
+The used microcontroller is a PIC12F683. Some idea for routines, like the pushbutton management are not from me :)
+
+More in the source code !
+
+*First the electronic schematic ....*
 
 image:ZZero_Schematic_V1.png[]
 
 
-Printed Circuit Board PCB ....
+*Then the Printed Circuit Board PCB, this is already my version 6 ....*
 
 image:ZZero_PCB_V1.png[]
 
 
-Metal probe connected to Active touch probe electronic, Pin PROBE_Z ....
+*Full metal probe connected to the active touch probe electronic, Pin PROBE_Z ....*
 
 image:Metal_probe.jpg[]
 
