@@ -18,6 +18,9 @@ and more audible with LED and Buzzer.
 The demonstration file proposed here are a conversion of the prototype created 10 years. The PIC microcontroller code was developed
 initialy with MikroE mikroBasic for PIC, and the demonstration folder propose now my conversion into GCBASIC code.
 
+The principle of the solution is to use a detection of voltage level changes, from 5V to 0V using the PIC falling edge detection,
+then generating the adequate interrupt in the code, to quickly send a signal to the CNC interface. The CNC interface is communicating
+with the computer executing MACH3 and managing the probe detection by the correct G code instruction.
 
 Electronic schematic ....
 
