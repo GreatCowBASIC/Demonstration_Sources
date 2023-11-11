@@ -30,6 +30,12 @@ the signalisation over the CNC interface.
 More information about the solution, and how it is working can be read in the proposed source code.
 The used microcontroller is a PIC12F683. Some idea for routines, like the pushbutton management are not from me :)
 
+The solution uses a new capability from GCBASIC compiler, look here: +
+
+https://sourceforge.net/p/gcbasic/discussion/579125/thread/e85f19d580/#b06f[New Compiler Capability: Creation of EEPROM reference data directly] +
+
+_Minimum compiler version must be *build 1297* to be able to compile the ZZero source code into Microchip PIC code._
+
 Have a look in the source code !
 
 *First the electronic schematic ....*
