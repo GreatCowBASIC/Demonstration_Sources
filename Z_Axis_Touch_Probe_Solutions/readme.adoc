@@ -25,14 +25,14 @@ with the computer executing MACH3 and managing the probe detection by the correc
 More information about the solution, and how it is working can be read in the proposed source code.
 The used microcontroller is a PIC12F683. Some idea for routines, like the pushbutton management are not from me :)
 
-More in the source code !
+Have a look in the source code !
 
 *First the electronic schematic ....*
 
 image:ZZero_Schematic_V1.png[]
 
 
-*Then the Printed Circuit Board PCB, this is already my version 6 ....*
+*Then the Printed Circuit Board PCB, this is already my version 7 ....*
 
 image:ZZero_PCB_V1.png[]
 
@@ -40,6 +40,28 @@ image:ZZero_PCB_V1.png[]
 *Full metal probe connected to the active touch probe electronic, Pin PROBE_Z ....*
 
 image:Metal_probe.jpg[]
+
+
+*Prototypes are running over the PICKit 2....*
+
+image:Proto_3_running.jpg[]
+image:Proto_6_running.jpg[]
+
+All these PCBs were created by the CNC portal, no classical etching but bit routing !
+
+
+
+*A friend integrated its own active probe circuit inside the CNC interface ....*
+
+image:18_Zzero_integration.jpg[]
+
+
+*My next project is a CNC2Laser interface, see the integration of the active probe on the PCB ....* +
+On the top right near the ICSP connector.
+
+image:Zzero_integrated_CNC2Laser.jpg[]
+
+
 
 
 
