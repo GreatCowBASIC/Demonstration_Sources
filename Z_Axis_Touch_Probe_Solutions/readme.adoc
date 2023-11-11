@@ -72,7 +72,7 @@ image:18_Zzero_integration.jpg[width=512]
 
 image:Zzero_integrated_CNC2Laser.jpg[width=512]
 
-*Source code Version 1.1 Zzero for PIC12F683*
+*Source code Version 1.1 ZZero for PIC12F683*
 [source,basic]
 ----
 // GCBASIC Program.
