@@ -3,33 +3,32 @@
 
 #CHIP 18F16Q41, 4
 #OPTION Explicit
-#SKIPTEST
 
-#ASMRAW #define Display 1280
-#ASMRAW #define Delay1  1281
-#ASMRAW #define Delay2  1282
+#define Display 1280
+#define Delay1  1281
+#define Delay2  1282
 
 
 Start:
 
-#ASMRAW  CLRF TRISC
-#ASMRAW  MOVLW 0x08
-#ASMRAW  MOVWF Display
+ASM  CLRF TRISC
+ASM  MOVLW 0x08
+ASM  MOVWF Display
 
-#ASMRAW  MainLoop:
-#ASMRAW  MOVF Display,w    ;Copy the display to the LEDs
-#ASMRAW  MOVWF PORTC
+ASM  MainLoop:
+ASM  MOVF Display,w    ;Copy the display to the LEDs
+ASM  MOVWF PORTC
 
-#ASMRAW  OndelayLoop:        ;Delay .197S
-#ASMRAW  DECFSZ Delay1,f
-#ASMRAW  GOTO OndelayLoop
+ASM  OndelayLoop:        ;Delay .197S
+ASM  DECFSZ Delay1,f
+ASM  GOTO OndelayLoop
 
-#ASMRAW  DECFSZ Delay2,f
-#ASMRAW  GOTO OndelayLoop
+ASM  DECFSZ Delay2,f
+ASM  GOTO OndelayLoop
 
-#ASMRAW  BCF STATUS,0,ACCESS        ;ensure the carry bit is clear
-#ASMRAW  RRCF  Display,f,ACCESS     ;Rotate Display right
-#ASMRAW  BTFSC STATUS,0,ACCESS      ;Did the bit rotate into the carry?
-#ASMRAW  BSF Display,3              ;yes, put it into bit 3.
+ASM  BCF STATUS,0,ACCESS        ;ensure the carry bit is clear
+ASM  RRCF  Display,f,ACCESS     ;Rotate Display right
+ASM  BTFSC STATUS,0,ACCESS      ;Did the bit rotate into the carry?
+ASM  BSF Display,3              ;yes, put it into bit 3.
 
-#ASMRAW  GOTO MainLoop
+ASM  GOTO MainLoop

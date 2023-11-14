@@ -13,14 +13,28 @@
 '''********************************************************************************
 
 
+#CONFIG CLKOUTEN=OFF
+#CONFIG CP=ON
+#CONFIG CPD=OFF
+#CONFIG FCMEN=ON
+#CONFIG FEXTOSC=OFF
+#CONFIG LVP=OFF
+#CONFIG MCLRE=INTMCLR
+#CONFIG MVECEN=OFF
+#CONFIG WDTE=OFF
+#CONFIG WRTB=OFF
+#CONFIG WRTD=OFF
+#CONFIG WRTSAF=OFF
+#CONFIG XINST=OFF
+
 
 #CHIP 18F06Q20
 #option Explicit
 
-    // Set all output of PORTC to High also so called ON
-    Dir PORTC Out
-    PORTC = 255
-    
-
+    DIR PORTC Out
+    do
+        PORTC = ! PORTC
+        wait 500 ms
+    loop
 
 
