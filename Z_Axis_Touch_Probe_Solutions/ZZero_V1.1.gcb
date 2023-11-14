@@ -10,8 +10,7 @@
 
 /* ----- Information
 
-This source code is a conversion from the initial prototype coded with MikroE mikroBasic
-Microchip PIC12F683 was selected, initial project was in year 2014
+This source code is a conversion from the initial prototype coded with MikroE mikroBasic Microchip PIC12F683 was selected, initial project was in year 2014
 This project is proposed as a GCBASIC example
 Not all options developped initialy in the first prototype will be convert into GCBASIC
 The project is an active Z axis tool probe to be interfaced with CNC hardware control
