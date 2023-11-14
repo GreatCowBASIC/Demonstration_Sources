@@ -12,7 +12,8 @@
 '''********************************************************************************
 
 ; ----- Configuration
-  #chip 16F886, 4
+ #chip 16F877a, 4
+#option Explicit
 
 ; ----- Define Hardware settings
  ' THIS CONFIG OF THE SERIAL PORT TO A PC TERMINAL via a TTL Converter
@@ -22,7 +23,6 @@
  Dir PORTc.7 In
  #define USART_DELAY 5 ms
  #define USART_BLOCKING
- SCKP = 1
 
 ; ----- Variables
   ' No Variables specified in this example. All byte variables are defined upon use.
