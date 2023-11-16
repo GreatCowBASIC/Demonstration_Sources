@@ -73,8 +73,6 @@ image:18_Zzero_integration.jpg[width=512]
 image:Zzero_integrated_CNC2Laser.jpg[width=512]
 
 *Source code Version 1.1 ZZero for PIC12F683*
-[source,basic]
-
 
 &#160;&#160;&#160;&#160;&#160;&#160;link:ZZero_V1.1.gcb[Blue  PCB - LCD Module PDF User Manual]
 
