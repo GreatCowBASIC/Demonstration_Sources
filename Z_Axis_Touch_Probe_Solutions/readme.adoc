@@ -76,5 +76,5 @@ image:Zzero_integrated_CNC2Laser.jpg[width=512]
 [source,basic]
 
 
-&#160;&#160;&#160;&#160;&#160;&#160;link:ZZero_V1.1.gcb[Blue  PCB - LCD Module PDF User Manual, leveloffset=4,indent=4]
+&#160;&#160;&#160;&#160;&#160;&#160;link:ZZero_V1.1.gcb[Blue  PCB - LCD Module PDF User Manual]
 
