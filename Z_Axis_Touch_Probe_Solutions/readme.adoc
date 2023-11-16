@@ -75,6 +75,6 @@ image:Zzero_integrated_CNC2Laser.jpg[width=512]
 *Source code Version 1.1 ZZero for PIC12F683*
 [source,basic]
 
-include::ZZero_V1.1.gcb[leveloffset=4,indent=4]
 
+&#160;&#160;&#160;&#160;&#160;&#160;link:ZZero_V1.1.gcb[Blue  PCB - LCD Module PDF User Manual, leveloffset=4,indent=4]
 
