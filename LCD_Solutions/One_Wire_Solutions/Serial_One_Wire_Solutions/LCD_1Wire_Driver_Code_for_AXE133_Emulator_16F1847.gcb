@@ -62,22 +62,22 @@
   set spare3 off
 
   #define line_length = 16            ; change to 20 for displays with 20 character lines
-  EEPROM 0 ,   "   16f1847 v5   "   ; store msg in the EEPROM memory
-  EEPROM 0x10, "Anobium    @9600"   ; store msg in the EEPROM memory
-  EEPROM 0x20, "Up              "   ; store msg in the EEPROM memory
-  EEPROM 0x30, "Pressed         "   ; store msg in the EEPROM memory
-  EEPROM 0x40, "Down            "   ; store msg in the EEPROM memory
-  EEPROM 0x50, "Released        "   ; store msg in the EEPROM memory
-  EEPROM 0x60, "Button 1 is     "   ; store msg in the EEPROM memory
-  EEPROM 0x70, "Time :          "   ; store msg in the EEPROM memory
-  EEPROM 0x80, "Button 2 is     "   ; store msg in the EEPROM memory
-  EEPROM 0x90, "Used :          "   ; store msg in the EEPROM memory
-  EEPROM 0xA0, "Meter:          "   ; store msg in the EEPROM memory
-  EEPROM 0xB0, "Date :          "   ; store msg in the EEPROM memory
-  EEPROM 0xC0, "Pic Restarts:   "   ; store msg in the EEPROM memory
-  EEPROM 0xD0, "Since:          "   ; store msg in the EEPROM memory
-  EEPROM 0xE0, "Set Clock?      "   ; store msg in the EEPROM memory
-  EEPROM 0xF0, "Set Date?       "   ; store msg in the EEPROM memory
+  LoadEEPROM 0 ,   "   16f1847 v5   "   ; store msg in the EEPROM memory
+  LoadEEPROM 0x10, "Anobium    @9600"   ; store msg in the EEPROM memory
+  LoadEEPROM 0x20, "Up              "   ; store msg in the EEPROM memory
+  LoadEEPROM 0x30, "Pressed         "   ; store msg in the EEPROM memory
+  LoadEEPROM 0x40, "Down            "   ; store msg in the EEPROM memory
+  LoadEEPROM 0x50, "Released        "   ; store msg in the EEPROM memory
+  LoadEEPROM 0x60, "Button 1 is     "   ; store msg in the EEPROM memory
+  LoadEEPROM 0x70, "Time :          "   ; store msg in the EEPROM memory
+  LoadEEPROM 0x80, "Button 2 is     "   ; store msg in the EEPROM memory
+  LoadEEPROM 0x90, "Used :          "   ; store msg in the EEPROM memory
+  LoadEEPROM 0xA0, "Meter:          "   ; store msg in the EEPROM memory
+  LoadEEPROM 0xB0, "Date :          "   ; store msg in the EEPROM memory
+  LoadEEPROM 0xC0, "Pic Restarts:   "   ; store msg in the EEPROM memory
+  LoadEEPROM 0xD0, "Since:          "   ; store msg in the EEPROM memory
+  LoadEEPROM 0xE0, "Set Clock?      "   ; store msg in the EEPROM memory
+  LoadEEPROM 0xF0, "Set Date?       "   ; store msg in the EEPROM memory
 
 
   locate 0,0
@@ -119,7 +119,7 @@
 
 ; ----- Support methods.  Subroutines and Functions
 
-  sub eeprom ( in location as byte, in datastuff as string )
+  sub LoadEEPROM ( in location as byte, in datastuff as string )
       for xloop = 1 to datastuff(0)
           EPWrite location, datastuff(xloop)
           location++

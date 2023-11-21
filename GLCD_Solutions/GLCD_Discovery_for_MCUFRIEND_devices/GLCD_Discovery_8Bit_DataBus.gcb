@@ -606,7 +606,7 @@ sub  GLCDreadID ( out DeviceID as word )
  if ( ( GLCDreadReg16(0xBF) and 0xFF ) = 0x02 ) then
 
       'read next byte
-      GlcdReadData8
+      val8 = GlcdReadData8
       'read next word
       if ( GlcdReadData16 = 0x9481 ) then
         DeviceID = 0x9481
