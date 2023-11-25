@@ -1,0 +1,99 @@
+#CHIP 18F16Q41, 4
+#OPTION Explicit
+#OPTION UserCodeOnly CODESTART:
+
+// #OPTION NoConfig
+
+
+CODESTART:
+
+#ASMRAW[
+
+      StartofRAWASM:
+
+
+      LEDS  EQU     1280
+      DLY1  EQU     1281
+      DLY3  EQU     1282
+
+  //********************************************************************************
+
+      // START OF PROGRAM MEMORY PAGE 0
+      ORG	12
+
+      // CALL INITIALISATION ROUTINES
+      CALL	INITSYS
+
+      CLRF TRISC
+      MOVLW 0x08
+      MOVWF LEDS
+
+      MAINLP:
+            MOVF LEDS,w    //Copy the LEDS to the LEDs
+            MOVWF PORTC
+
+            ONDELAYLP:     //Delay .197S
+            DECFSZ DLY1,f
+            GOTO ONDELAYLP
+
+            DECFSZ DLY3,f
+            GOTO ONDELAYLP
+
+            BCF STATUS,0,ACCESS        //ensure the carry bit is clear
+            RRCF  LEDS,f,ACCESS        //Rotate LEDS right
+            BTFSC STATUS,0,ACCESS      //Did the bit rotate into the carry?
+            BSF LEDS,3                 //yes, put it into bit 3.
+
+      GOTO MAINLP
+
+      INITSYS:
+            MOVLB	0
+            // SETTINGS FOR MICROCONTROLLERS WITH OSCCON1
+            MOVLW	96
+            MOVWF	OSCCON1,BANKED
+            CLRF	OSCCON3,BANKED
+            CLRF	OSCEN,BANKED
+            CLRF	OSCTUNE,BANKED
+            // SETUP OSCCON TYPE 
+            MOVLW	96
+            MOVWF	OSCCON1,BANKED
+            BCF	OSCCON1,3,BANKED
+            BCF	OSCCON1,2,BANKED
+            BCF	OSCCON1,1,BANKED
+            BCF	OSCCON1,0,BANKED
+            MOVLW	2
+            MOVWF	OSCFRQ,BANKED
+            // COMPLETE_THE_CHIP_SETUP_OF_BSR_ADCS_ANSEL_AND_OTHER_KEY_SETUP_REGISTERS_OR_REGISTER_BITS
+            CLRF	TBLPTRU,ACCESS
+            BANKSEL	ADCON0
+            BCF	ADCON0,2,BANKED
+            BCF	ADCON0,7,BANKED
+            BANKSEL	ANSELA
+            CLRF	ANSELA,BANKED
+            CLRF	ANSELB,BANKED
+            CLRF	ANSELC,BANKED
+            BANKSEL	CM2CON0
+            BCF	CM2CON0,7,BANKED
+            BCF	CM1CON0,7,BANKED
+            CLRF	PORTA,ACCESS
+            CLRF	PORTB,ACCESS
+            CLRF	PORTC,ACCESS
+      RETURN
+
+#ASMRAW]
+
+
+      //~Constants
+      #define ON 1
+      #define OFF 0
+      #define TRUE 255
+      #define FALSE 0
+
+      //~Names for symbols
+      #define AND &
+      #define OR |
+      #define XOR #
+      #define NOT !
+      #define MOD %
+
+

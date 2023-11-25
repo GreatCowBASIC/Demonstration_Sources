@@ -1,0 +1,118 @@
+#CHIP 18F16Q41, 4
+#OPTION Explicit
+#OPTION UserCodeOnly CODESTART:
+
+// #OPTION NoConfig
+
+Dim LEDS, DLY1, DLY3 as Byte
+LEDS = 0
+DLY1 = 0
+DLY3 = 0
+
+CODESTART:
+      
+#ASMRAW[
+
+  StartofRAWASM:
+
+  //********************************************************************************
+
+  // START OF PROGRAM MEMORY PAGE 0
+    ORG	12
+
+  // CALL INITIALISATION ROUTINES
+      CALL	INITSYS
+#ASMRAW]      
+      CALL  INITPPS
+      CALL  INITUSART
+#ASMRAW[
+      CLRF TRISC
+      MOVLW 0x08
+      MOVWF LEDS
+
+      MAINLP:
+      MOVF LEDS,w    //Copy the LEDS to the LEDs
+      MOVWF PORTC
+
+      ONDELAYLP:     //Delay .197S
+      DECFSZ DLY1,f
+      GOTO ONDELAYLP
+
+      DECFSZ DLY3,f
+      GOTO ONDELAYLP
+
+      BCF STATUS,0,ACCESS        //ensure the carry bit is clear
+      RRCF  LEDS,f,ACCESS        //Rotate LEDS right
+      BTFSC STATUS,0,ACCESS      //Did the bit rotate into the carry?
+      BSF LEDS,3                 //yes, put it into bit 3.
+#ASMRAW]
+      HSerSend "A"
+#ASMRAW[
+      GOTO MAINLP
+
+      INITSYS:
+      MOVLB	0
+      // SETTINGS FOR MICROCONTROLLERS WITH OSCCON1
+      MOVLW	96
+      MOVWF	OSCCON1,BANKED
+      CLRF	OSCCON3,BANKED
+      CLRF	OSCEN,BANKED
+      CLRF	OSCTUNE,BANKED
+      // SETUP OSCCON TYPE 
+      MOVLW	96
+      MOVWF	OSCCON1,BANKED
+      BCF	OSCCON1,3,BANKED
+      BCF	OSCCON1,2,BANKED
+      BCF	OSCCON1,1,BANKED
+      BCF	OSCCON1,0,BANKED
+      MOVLW	2
+      MOVWF	OSCFRQ,BANKED
+      // COMPLETE_THE_CHIP_SETUP_OF_BSR_ADCS_ANSEL_AND_OTHER_KEY_SETUP_REGISTERS_OR_REGISTER_BITS
+      CLRF	TBLPTRU,ACCESS
+      BANKSEL	ADCON0
+      BCF	ADCON0,2,BANKED
+      BCF	ADCON0,7,BANKED
+      BANKSEL	ANSELA
+      CLRF	ANSELA,BANKED
+      CLRF	ANSELB,BANKED
+      CLRF	ANSELC,BANKED
+      BANKSEL	CM2CON0
+      BCF	CM2CON0,7,BANKED
+      BCF	CM1CON0,7,BANKED
+      CLRF	PORTA,ACCESS
+      CLRF	PORTB,ACCESS
+      CLRF	PORTC,ACCESS
+      RETURN
+
+#ASMRAW]
+
+
+  //~Constants
+  #define ON 1
+  #define OFF 0
+  #define TRUE 255
+  #define FALSE 0
+
+  //~Names for symbols
+  #define AND &
+  #define OR |
+  #define XOR #
+  #define NOT !
+  #define MOD %
+
+
+
+  #DEFINE USART_BAUD_RATE 9600
+  #DEFINE USART_TX_BLOCKING
+  #DEFINE USART_DELAY OFF
+
+  #define PPSToolPart 18F16Q41
+  Sub InitPPS
+
+          'Module: UART pin directions
+          Dir PORTC.6 Out    ' Make TX1 pin an output
+          'Module: UART1
+          RC6PPS = 0x0010    'TX1 > RC6
+
+  End Sub
+
