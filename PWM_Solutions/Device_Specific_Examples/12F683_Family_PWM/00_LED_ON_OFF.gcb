@@ -1,0 +1,13 @@
+
+
+#chip 12F683
+#option explicit
+
+#define led GP2
+dir led out
+
+end
+
+
+
+
