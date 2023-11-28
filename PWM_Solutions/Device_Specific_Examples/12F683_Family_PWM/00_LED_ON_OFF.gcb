@@ -3,8 +3,15 @@
 #chip 12F683
 #option explicit
 
-#define led GP2
-dir led out
+#define LED GP2
+dir LED out
+
+Do
+
+    LED = !LED
+    wait 100 ms
+
+Loop
 
 end
 

@@ -48,6 +48,6 @@
     #define USE_HPWM7 FALSE
     #define USE_HPWM8 FALSE
 
-    #define USE_HPWM_TIMER2 FALSE
+    #define USE_HPWM_TIMER2 TRUE
     #define USE_HPWM_TIMER4 FALSE
     #define USE_HPWM_TIMER6 FALSE
