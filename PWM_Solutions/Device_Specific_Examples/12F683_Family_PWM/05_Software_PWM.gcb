@@ -1,0 +1,47 @@
+/*
+
+PWMOut channel, duty cycle, cycles
+
+`channel` sets the channel that the PWM is to be generated on. 
+This must have been defined previously by setting the constants PWM_Out1, 
+PWM_Out2, PWM_Out3 or PWM_Out4. The maximum number of channels available is 4.
+
+
+`duty cycle` specifies the PWM duty cycle, and ranges from 0 to 255. 255 corresponds to 100%, 127 to 50%, 63 to 25%, and so on.
+
+
+`cycles` is used to set the amount of PWM "pulses" to supply. This is useful for situations in which a pulse of a specific length is required.
+
+See the Help for The formula for the caculation.
+
+*/
+
+#chip 12F683
+#option explicit
+
+#define LED GP2
+dir LED out
+
+'   ----- PWMOut Constants
+'  PWM constant. This is a required constant! and, must be the signal out port 
+'  PWM_OUT1 must exist for PWMOut to work
+#define PWM_OUT1 LED
+
+    
+'   ----- Main body of program commences here.
+    do
+        '  PWMOut channel, duty cycle, cycles
+        '  where channel 1 is PWM_OUT1, channel 2 is PWM_OUT2, 
+        '  channel 3 is PWM_OUT3 and 4 is PWM_OUT4 
+        '  127 equates to 50% duty.
+        '  100 cycles is a purely arbitrary value and this will send 100 pulses
+        PWMOut 1, 127, 10
+
+        wait 10 ms
+
+    loop
+end
+
+
+
+
