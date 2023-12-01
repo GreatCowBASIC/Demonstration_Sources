@@ -6,42 +6,6 @@ This demonstration how use the PWM 10 bit Module but with this method you can ch
 
 You need to ensure the 10bit PWM is valid. See the datasheet.
 
-HPWM CCP is using HPWM command.
-
-
-Fixed Mode PWM	
-        Min: #chip 12f683,8
-            #define PWM_Freq 0.5 'Frequency of PWM in KHz
-            #define PWM_Duty 50 'Duty cycle of PWM (%)
-
-        Max: #chip 12f683,8
-            #define PWM_Freq 15 'Frequency of PWM in KHz
-            #define PWM_Duty 50 'Duty cycle of PWM (%)
-
-        Min: #chip 12f683,4
-            #define PWM_Freq 0.345 'Frequency of PWM in KHz
-            #define PWM_Duty 50 'Duty cycle of PWM (%)
-
-        Max: #chip 12f683,4
-            #define PWM_Freq 7 'Frequency of PWM in KHz
-            #define PWM_Duty 50 'Duty cycle of PWM (%)
-
-        Min:#chip 12f683,2
-            #define PWM_Freq 0.123 'Frequency of PWM in KHz
-            #define PWM_Duty 50 'Duty cycle of PWM (%)
-
-        Max: #chip 12f683,2
-            #define PWM_Freq 3 'Frequency of PWM in KHz
-            #define PWM_Duty 50 'Duty cycle of PWM (%)
-
-        Min: #chip 12f683,1
-            #define PWM_Freq 0.062 'Frequency of PWM in KHz
-            #define PWM_Duty 50 'Duty cycle of PWM (%)
-
-        Max: #chip 12f683,1
-            #define PWM_Freq 1 'Frequency of PWM in KHz
-            #define PWM_Duty 50 'Duty cycle of PWM (%)
-
 */
 '''@author  EvanV
 '''@licence GPL
@@ -57,6 +21,10 @@ Fixed Mode PWM
 
     'Set the direction of the CCP1/PWM port
     DIR GP2 Out
+
+
+    #define PWM_Freq 7.813   // shift the 10 bit value right two bits   'Frequency of PWM in KHz  - 10bit PWM/CCP signal with 1020 increments
+    #define PWM_Duty 50      'Duty cycle of PWM (%)
 
     // Turn on Fixed Mode PWM/CPP1
     PWMON
@@ -74,14 +42,14 @@ do
                 // Set the 10bit value using CCPR1L and CCP1CON register two LSbs DC1B<1:0>
                 DC1B1  = dutyvalue.1
                 DC1B0  = dutyvalue.0
-                CCPR1L = dutyvalue / 4  // shift the 10 bit value right
+                CCPR1L = FnLSR(dutyvalue, 2)  // shift the 10 bit value right two bits
                 wait 1 ms
             next
             for dutyvalue = maxduty to 0 Step -1
                 // Set the 10bit value using CCPR1L and CCP1CON register two LSbs DC1B<1:0>
                 DC1B1  = dutyvalue.1
                 DC1B0  = dutyvalue.0
-                CCPR1L = dutyvalue / 4  // shift the 10 bit value right
+                CCPR1L = FnLSR(dutyvalue, 2)  // shift the 10 bit value right two bits
                 wait 1 ms
             next
                 
