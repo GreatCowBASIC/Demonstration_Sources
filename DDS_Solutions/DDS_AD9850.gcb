@@ -1,0 +1,226 @@
+'--------------------------------------------------------------
+'      freq.generator 0 - 30MHz with DDS AD9850
+'      input using rotary-encoder ALPS EC11 with switch
+'      using a derivated version of encoder-routine
+'
+'     - GreatCowBasic 1.00.00 2023-02-23 (Windows 64 bit) : Build 1218
+'     - hw: see AD9850 data sheet and PIC18F2520 data
+'     - use lcd 16x2 (hd44780 compatible)
+'     - use module hc-sr08 with AD9850 dds and 125MHz or clone
+'       Dec 2023
+'     - Generator may be "calibrated" to +/- 0,15Hz to true frequency
+'--------------------------------------------------------------
+
+'Set chip model: 18F2520, int osc. 32 MHz
+#chip 18F2520, 32
+#config MCLR = OFF            ' reset handled internally
+
+' Hardware controling
+#include "Encoder.h"       ' rotary encoder and switches handling
+#include "AD9850.h"        ' init and serial to AD9850
+' Programs part
+#include "Set_Freq.h"      ' frequency handling
+
+' Port A
+  DIR PORTA OUT      ' all out
+
+' Port B
+  SET INTCON2.7 = 0  ' all weak pullups on Port B ON
+  DIR PORTB 0x0F     ' on output ports, weak pullup is deactivated
+
+' Port C
+  Dir PortC OUT      ' all out
+
+'********************************************************
+' Board specific setup, you may adapt to your board
+
+' Defines (Portnames)
+ #define LCD_IO 4
+ #define LCD_RS     PORTA.1     ;out
+ #define LCD_RW     PORTA.2     ;out
+ #define LCD_Enable PORTA.3     ;out
+ #define LCD_DB4    PORTA.6     ;out
+ #define LCD_DB5    PORTC.0     ;out
+ #define LCD_DB6    PORTC.1     ;out
+ #define LCD_DB7    PORTC.2     ;out
+ #define LCD_SPEED fast
+
+' encoder connections
+ #define ENCODER_SW PortB.0   ' switch     ; Int Pullup
+ #define ENCODER_A  PortB.1   ' clk        ; Int Pullup
+ #define ENCODER_B  PortB.2   ' cw         ; Int Pullup
+ #define MENU_SW    PortB.3   ' menuSwitch ; Int Pullup
+
+' ad9850 connections
+ #define ad9850_fu_ud PortB.4 ' set update clock ; out
+ #define ad9850_w_clk PortB.5 ' word write clock ; out
+ #define ad9850_data  PortC.7 ' data serial out (40 bit) ; out
+ #define ad9850_reset PortC.6 ' DDS reset ; out
+
+' administrative out
+ #define LED PortA.7          ' lit when DDS is active
+
+'*********************************************************
+
+' global variables & types
+DIM freq   as long   ' output frequency
+DIM fMulti as long   ' step width
+DIM oFreq  as Long   ' reminder for freq
+DIM tuning_w as long ' tuning part of tuning word
+DIM f_min  as long   ' minimal frequency
+DIM f_max  as long   ' maximal frequency
+
+DIM dPos as integer  ' cursor position
+DIM oPos as integer  ' reminder cursor position
+
+DIM dMulti     as string * 7 ' stepwidth as text
+DIM mTempStr   as string * 17' universal string
+DIM fixDivisor as string * 9 ' oscillator / 2^32
+DIM dividend   as string * 11' frequency to be calculated
+DIM result     as string * 11' result of division
+
+DIM Loc     as Byte          ' start location for EeProm
+
+DIM version as string * 16   ' version for startup display
+
+'''------------------------------------------
+
+' table for step-values corresponding to cursor position
+' and multipurpose values
+  table steps as long
+    30000000  '  1: maximal frequency
+    1000000   '  2: stepwidth 1MHz
+    1         '  3: minimal frequency
+    100000    '  4: stepwidth 100kHz
+    10000     '  5: stepwidth 10kHz
+    1000      '  6: default stepwidth 1kHz
+    10000000  '  7: 10MHz while compensating deviation of osc.
+    100       '  8: stepwidth 100Hz
+    10        '  9: stepwidth 10Hz
+    1         ' 10: stepwidth 1Hz
+  end table
+
+  Set LED = OFF    ' dds off
+  cls              ' clear display
+
+  version = "demo for AD9850"  ' 2023-12-08
+
+   init9850        ' set AD9850 to serial mode first
+   init_enc        ' get started encoder status
+
+ ' fixDivisor = "029103831"
+   Get_FixDiv      ' writes/ reads fixDivisor to/ from eeProm
+
+'''-------------------------------------------
+' show intro, load default or if available saved values
+  show_version
+
+  All_OFF  ' release all button flags
+
+  do
+
+     fixFreq   ' do Generator fixed frequencies
+
+   ' comes here with menu-button pressed
+
+     If mSwP then   ' go to adjust to true freqency
+
+       ALL_OFF      ' reset switch flags
+       adjust_f     ' adjust frequency
+
+     End If
+
+       ALL_OFF
+
+  loop
+
+sub show_version
+
+  cls
+  LCDCMD 12  'cursor off
+  locate 0, 0
+  print "DDS  1Hz - 30MHz"
+  locate 1, 0
+  print version
+
+  All_Off   ' release all button flags
+
+ ' load Start-values
+   readtable steps, 1, f_Max ' 30 MHz
+   readtable steps, 3, f_Min ' 1Hz
+
+' read last frequency values from eePROM h10 if existing
+  EPRead 16 , eeChr
+
+  if eeChr < 255 Then
+
+    readValues                ' last saved values
+
+  Else                        ' use startup values
+
+    readtable steps, 2, freq  ' 1MHz
+    dPos = 6                  ' startup with 1MHz and 1000 Hz steps
+    new_Step                  ' readtable steps, dMulti, fMulti
+
+  end if
+
+  wait 2 s
+
+  cls
+
+end sub
+
+sub ALL_OFF
+
+  'reset reminder flags
+       rSwP = OFF   ' any switch pressed
+       mSwP = OFF   ' menu switch pressed
+      meSwp = OFF   ' menu switch AND encoder switch simultanous
+
+  'encoder switch pressed
+    eShortP = OFF
+     eLongP = OFF
+    elLongP = OFF
+   eDoubleP = OFF
+
+end sub
+
+sub new_step
+
+ 'get new Step from table "steps" and set strings for display
+     select case dPos
+      case 1
+      'fMulti 10.000.000
+      readTable steps, dPos, fMulti
+      dMulti = " 10 MHz"
+      case 2
+      'fMulti 1.000.000
+      readtable steps,  dPos, fMulti
+      dMulti = "  1 MHz"
+      case 4
+      'fMulti 100.000
+       readtable steps, dPos, fMulti
+      dMulti = "100 kHz"
+      case 5
+      'fMulti 10.000
+      readtable steps, dPos, fMulti
+      dMulti = " 10 kHz"
+      case 6
+      'fMulti 1.000
+      readtable steps, dPos, fMulti
+      dMulti = "  1 kHz"
+      case 8
+      'fMulti 100
+      readtable steps, dPos, fMulti
+      dMulti = "100  Hz"
+      case 9
+      'fMulti 10
+      readtable steps, dPos, fMulti
+      dMulti = " 10  Hz"
+      case 10
+      'fMulti 1
+      readtable steps, dPos, fMulti
+      dMulti = "  1  Hz"
+      end select
+
+end sub
