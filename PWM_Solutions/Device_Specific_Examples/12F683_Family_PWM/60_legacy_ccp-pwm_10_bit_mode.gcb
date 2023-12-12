@@ -45,14 +45,15 @@ do
                 CCPR1L = FnLSR(dutyvalue, 2)  // shift the 10 bit value right two bits
                 wait 1 ms
             next
-            for dutyvalue = maxduty to 0 Step -1
+
+            for dutyvalue = maxduty - 1 to 1 Step -1
                 // Set the 10bit value using CCPR1L and CCP1CON register two LSbs DC1B<1:0>
                 DC1B1  = dutyvalue.1
                 DC1B0  = dutyvalue.0
                 CCPR1L = FnLSR(dutyvalue, 2)  // shift the 10 bit value right two bits
                 wait 1 ms
             next
-                
+
     loop
 
 

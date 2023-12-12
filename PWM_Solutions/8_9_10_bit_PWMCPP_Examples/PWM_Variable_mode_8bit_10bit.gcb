@@ -1,0 +1,27 @@
+
+#chip 12F683, 8
+#option explicit
+
+    #define PWMOut gpio.2
+    dir PWMOut out
+    
+    Dim maxdutyvar, dutyvar as Word
+
+    HPWM( 1, 8, 0 )                                            // initialise the frequency of PWM in KHz at 0% duty    
+    maxdutyvar = HPWM_CCP_MAXDUTYVALUE ( 1 )                   // function get the maxduty value of the specific PMW/CCP channel
+
+    If maxdutyvar < 1024 then
+        do                                                       // now cycle thru the duty
+            For dutyvar = 0 to maxdutyvar
+                HPWM_CCPSetDuty ( 1, dutyvar )
+                wait 10 ms
+            Next
+            wait 10 ms
+            For dutyvar = maxdutyvar  to 0 Step -1
+                HPWM_CCPSetDuty ( 1, dutyvar )
+                wait 10 ms
+            Next   
+            wait 10 ms
+        loop
+    End If
+End

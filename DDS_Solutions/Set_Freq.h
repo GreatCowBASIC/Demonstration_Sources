@@ -1,6 +1,22 @@
+'*********************************************************************
 ' file: Set_freq.h  2023-12-08
-'---------------------------------------------------------------------
+'*********************************************************************
+' contains folowing subs:
+' Sub FixFreq       : Main loop to adjust frequency
+' Sub Set_Steps     : getting step width from table and display string
+' Sub Sel_freq      : tuning the DDS with encoder
+' Sub disp_Freq     : show changed frequency on display
+' Sub readValues    : prime process for loading adjustment values
+' Sub saveValues    : prime process for saving adjustment values
+' Sub WriteEeProm   : writes values to EEProm
+' Sub Limits_Touched: show "reached tuning limits"
 
+'' 2023-12-12
+' Changes in Sel_freq: save frequency sets after extreme long push
+' on encoder button. (>500ms until display blinks) during setting frequency
+' also little corrections without notice.
+'
+'*********************************************************************
 sub fixFreq
 
   rSwP = OFF  'delete all button flags
@@ -17,7 +33,7 @@ sub fixFreq
    ' get steps value
      set_steps(2)    ' max. step position is set to 1MHz
 
-     rSwP = OFF ' flag encoder-sw or menu-switch pressed
+     rSwP = OFF   ' flag encoder-sw or menu-switch pressed
 
    ' directly leave loop if menu button pressed before
      If mSwP then
@@ -26,13 +42,13 @@ sub fixFreq
 
      END IF
 
-   ' change frequency, stay at tuning generator
+   ' else continue to change frequency, stay at tuning generator
      sel_freq
 
  loop until mSwP ' end loop only when menu button pressed
 
- ' save last values
-   saveValues
+  ' save last values
+    saveValues
 
   If mSwP then
 
@@ -176,13 +192,6 @@ sub sel_freq
 
         limits_touched("lo limit reached") ' tell me what's on
 
-        'restore display
-         locate 1,0
-         print "sel step:       "
-         locate 1,9                   'print step width
-         print dMulti
-         locate 0, dPos              ' restore cursor
-
      end if
 
    End if
@@ -196,12 +205,6 @@ sub sel_freq
         freq = oFreq        ' go back to old value
 
         limits_touched("up limit reached") ' tell me what's on
-        'restore display
-         locate 1,0
-         print "sel step:       "
-         locate 1,9                   'print step width
-         print dMulti
-         locate 0, dPos              ' restore cursor
 
      end if
 
@@ -223,12 +226,24 @@ sub sel_freq
 
  loop  ' until button pressed
 
+' to save frequency in between after elLongP
+      If elLongP then
 
+        All_OFF       ' reset all button flags
+        saveValues    ' save frequency sets
+
+       locate 1,0
+        print "frequency  saved"
+        wait 2 s
+
+       ' go back to frequency selection
+         sel_freq
+
+     End If
 
      If MSwP then    ' go to adjust to real frequency
 
        rSwP = OFF    ' all but mSwP are suppressed
-      ' MSwP = ON
 
      end IF          ' encoder switch pressed returns only
 
@@ -370,5 +385,10 @@ sub WriteEeprom ( in loc, in mTempStr as String )
      wait 300 ms
      LCDCURSOR LCDON
      wait 1 s
+   ' restore display
+     locate 1,0
+     print "select frequency"
+
+     locate 0, dPos              ' restore cursor
 
 end sub

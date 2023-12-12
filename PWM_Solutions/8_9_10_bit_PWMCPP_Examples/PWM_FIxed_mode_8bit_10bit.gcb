@@ -1,0 +1,69 @@
+
+#chip 12F683, 8
+#option explicit
+
+
+#define PWMOut gpio.2
+dir PWMOut out
+
+// MX, PR,  PS
+// 208, 52,  1, 8bit
+    // #define PWM_Freq 38      'Frequency of PWM in KHz
+    // #define PWM_Duty 50     'Duty cycle of PWM (%)
+
+// 939, 234,1, 10bit
+    // #define PWM_Freq 8.511   'Frequency of PWM in KHz
+    // #define PWM_Duty 35      'Duty cycle of PWM (%)
+
+// 939, 234,4, 10bit
+    // #define PWM_Freq 2.128   'Frequency of PWM in KHz
+    // #define PWM_Duty 50      'Duty cycle of PWM (%)
+
+// 404,101,1, 9bit
+    // #define PWM_Freq 19.8    'Frequency of PWM in KHz
+    // #define PWM_Duty 10      'Duty cycle of PWM (%)
+
+// 735,183,16, 10bit
+    // #define PWM_Freq 0.68    'Frequency of PWM in KHz
+    // #define PWM_Duty 90      'Duty cycle of PWM (%)    
+
+// 592,148,1, 10bit
+    // #define PWM_Freq 13.5    'Frequency of PWM in KHz
+    // #define PWM_Duty 25      'Duty cycle of PWM (%)
+
+// 999,250,4, 10bit
+    // #define PWM_Freq 2       'Frequency of PWM in KHz  
+    // #define PWM_Duty 50      'Duty cycle of PWM (%)  
+
+// 513, 128, 1, 10Bit
+    // #define PWM_Freq 15.60       'Frequency of PWM in KHz  
+    // #define PWM_Duty 50          'Duty cycle of PWM (%) 
+
+// 509, 127, 1, 9Bit
+    // #define PWM_Freq 16      'Frequency of PWM in KHz  
+    // #define PWM_Duty 50          'Duty cycle of PWM (%) 
+
+// 252, 63, 1, 8Bit
+    // #define PWM_Freq 31.27       'Frequency of PWM in KHz  
+    // #define PWM_Duty 50          'Duty cycle of PWM (%) 
+
+
+    #define SHOWPWMCCPCALCULATIONRESULTS
+    PWMON
+
+    wait 5 s
+
+    Dim dutyvar as Word
+    do
+        For dutyvar = 0 to HPWM_CCP_MAXDUTYVALUE()                         // Uses function to return maximim duty value
+            HPWM_CCPSetDuty ( 1, dutyvar )
+            wait 10 ms
+        Next
+        For dutyvar = PWMCCP1MAXDUTYVALUE -1 to 1 Step -1                  // Uses CONSTANT to provided maximim duty value
+            HPWM_CCPSetDuty ( 1, dutyvar )
+            wait 10 ms
+        Next        
+    loop
+
+    End
+

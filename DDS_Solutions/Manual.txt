@@ -6,7 +6,11 @@ A push to the encoder button switches over to frequency selection by rotating en
 
 Any push to encoder button toggles between selecting step width and selecting frequency.
 
+* A extra long push (>500ms, until display blinks) to the encoder switch during frequency
+  selection saves the actual frequency set (frequency and step width) to the EEPROM.*
+
 A push to M-button goes to compensate the oscillator deviation.
 The correction uses 10MHz output frequency, any step of encoder rotation changes output with steps of 0.343Hz. Steps and applied correction to output frequency are displayed.
 A push to the M-button saves the value to eepprom, a push to the encoder button escapes without changing.
 
+* complemented 2023-12-12 *
