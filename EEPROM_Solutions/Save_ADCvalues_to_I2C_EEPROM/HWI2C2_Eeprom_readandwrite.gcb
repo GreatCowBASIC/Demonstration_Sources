@@ -1,0 +1,169 @@
+/*
+    ROMTEK working program that writes a word and rereads it in eeprom 24lc32a
+    Data 17/12/23 ver.0.00
+    micro:16F876A
+    GCBASIC (1.01.00 2023-11-23 (Windows 64 bit) : Build 1308)
+    description: analogue reading on channel A1 and storage on 24lc32 with button and 4 bit display
+    IMPORTANT!!!!!!!!!!!!!!!!!!!! with the prefix _H the high byte is determined !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!!!!!
+    references https://gcbasic.sourceforge.io/help/_using_variables.html
+    Change the microcontroller, frequency and config to suit your needs.
+*/
+// setup:
+#chip 16F876A, 4 //tipe microcontroller e frequency
+#option explicit //force declaration of variables
+//#config MCLRE_ON
+
+//Required Library to read and write to an EEPROM
+    #include <i2ceeprom.h>
+
+//Defines display lcd 
+    #define LCD_IO 4
+    #define LCD_NO_RW
+    #define LCD_Speed SLOW //!!!!!!!!!!!!! set for lcd 
+    #define LCD_RS PORTB.2
+    #define LCD_Enable PORTB.3
+    #define LCD_DB4 PORTB.4
+    #define LCD_DB5 PORTB.5
+    #define LCD_DB6 PORTB.6
+    #define LCD_DB7 PORTB.7
+//---------------------------------------------------------------------------------------------------------------------
+// ----- Define Hardware settings
+// Define Software I2C settings - CHANGE PORTS
+    #define I2C_MODE Master
+    #define I2C_DATA PORTC.4 //pin 25
+    #define I2C_CLOCK PORTC.3 //pin 24
+    #define I2C_DISABLE_INTERRUPTS ON
+    //Optionally, you can reduce the I2C timings.
+    // #define I2C_BIT_DELAY 0 us
+    // #define I2C_CLOCK_DELAY 1 us
+//---------------------------------------------------------------------------------------------------------------------
+// USART settings
+    #define USART_BAUD_RATE 9600
+    Dir PORTc.6 Out
+    Dir PORTc.7 In
+    #define USART_DELAY OFF
+    #define USART_TX_BLOCKING
+    wait 500 ms
+//---------------------------------------------------------------------------------------------------------------------
+// Read ONE byte from the EEPROM
+    DIM DeviceID as byte
+    DIM EepromAddress, syscounter as word
+    #define EEpromDevice 0xA0 //address divice 24lc32
+    EepromAddress=2000 //address of the external memory cell
+
+/* 
+    address can be chosen from 0 to 64000(approximately) but it depends on the size of the external memory used.
+    remember that the analog value (max1023) occupies 2 memory cells and consequently to store more analog channels you must increase EepromAddress by 2 cells,
+    e.g. store in cell 0 and after EepromAddress= EepromAddress + 2
+    after store the second analog channel (i.e. increment by 2 every time you write and read)
+    */
+//---------------------------------------------------------------------------------------------------------------------
+//Define our array and variables
+    Dim outarray(64)
+    DIM inarray(64)
+    Dim bHi As Byte //byte high
+    Dim bLo As Byte //byte low
+//Define Port Constants 
+    #define p1 PORTc.0 //button
+//Set Port direction
+    Dir p1 In //button
+
+// Define variable per read adconverter
+    Dim ch as Word
+    Dir PORTA.1 In
+    ch=0                    //reset variable
+//----------------
+Do //main cycle
+    main: //do not write here in the label but go to the beginning
+    CLS
+    PRINT "ROMTEK"
+    locate 1,0
+    PRINT "i2cmem-logger"
+    HSerPrintCRLF 1
+    HSerPrint "i2cmem-logger" //version and title
+    wait 2000 ms
+    readmem //I read the storage before turning it off
+    wait 2000 ms
+    rdch: //do not write here in the label but go to the beginning
+    ch=ReadAD10(AN1) //read port analog
+    wait 50 ms //delay
+    CLS
+    PRINT "ch "
+    PRINT ch
+    HSerPrintCRLF 1 //line at the end
+    HSerPrint "ch " //I send the adc value to the serial line
+    HSerPrint ch
+    wait 100 ms
+    if p1=1 Then //if the button is pressed
+        goto wrmem //I jump to store the value
+    Else
+        goto rdch
+    end if
+
+    wrmem: //don't write here in the label but go to the beginning
+    writemem //call sub routine write memory
+    wait 100 ms
+    ptest: //don't write here in the label but go to the beginning
+    if p1=1 then //if the button is pressed
+        wait 100 ms
+        goto rdmem //jump to read stored value
+    end if
+    goto ptest
+
+    rdmem: //don't write here in the label but go to the beginning
+    ch=0 //reset variable
+    readmem //call sub routine read memory
+    wait 100 ms
+    ptest2: //don't write here in the label but go to the beginning
+    if p1=1 then //if the button is pressed
+        goto main //go to main
+    end if
+    goto ptest2
+
+Loop
+end //----end prog----------------
+
+//---------------------------------------------------------------------------------------------------------------------------------------
+
+sub writemem
+    'IMPORTANT!!!!!!!!!!!!!!!!!!!! with the suffix _H the high byte is determined !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!!!!!
+    CLS
+    PRINT "write mem"
+    locate 1,0
+    PRINT "ch "
+    PRINT ch
+    wait 100 ms //delay
+    HSerPrintCRLF 1
+    HSerPrint "write ch "
+    HSerPrint ch
+    bLO=ch //get byte low
+    bHi = ch_H //get byte high with suffix _H
+    outarray(1)=bLo
+    outarray(2)=bHi
+    'write(device,memory page,address,array name,2 bytes used)
+    eeprom_wr_array(EEpromDevice, 64, EepromAddress, outarray(), 2)
+
+    end Sub
+
+sub readmem
+    'IMPORTANT!!!!!!!!!!!!!!!!!!!! with the suffix _H the high byte is determined !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!!!!!
+
+    EepromAddress=2000  //address of the external memory cell
+    //read (device, cell address, array name, 2 bytes used)   
+    eeprom_rd_array(EEpromDevice, EepromAddress, inarray(),2)
+    ch_H=inarray(2)                     //I take the high bytes with suffix _H 
+    ch=ch + inarray(1)                  //I take the low bytes and add them to the high bytes
+    wait  100 ms   
+    CLS
+    PRINT "read mem"
+    locate 1,0
+    PRINT "ch "
+    PRINT ch
+    PRINT " "
+    wait 100 ms          //delay 
+    HSerPrintCRLF 1
+    HSerPrint "read mem   ch "
+    HSerPrint  ch
+    wait  100 ms
+
+    end sub
