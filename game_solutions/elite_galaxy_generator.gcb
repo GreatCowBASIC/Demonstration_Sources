@@ -1,0 +1,174 @@
+'''
+'''
+'''Enjoy.
+'''
+'''
+'''************************************************************************
+
+' ----- Configuration
+#CHIP 16f886
+#option Explicit 
+
+/*
+Seeding for ELITE game.
+
+https://wiki.alioth.net/index.php/Random_number_generator
+
+https://www.bbcelite.com/deep_dives/galaxy_and_system_seeds.html
+
+The seeds for the selected system are stored at QQ15, while the seeds for the current galaxy are in QQ21.
+
+Here's a summary of which bits in which seeds are used to generate the various bits of data in the universe. 
+The routine names where these data are generated are shown on the right.
+
+   s0_hi    s0_lo    s1_hi    s1_lo    s2_hi    s2_lo
+76543210 76543210 76543210 76543210 76543210 76543210
+
+                                       ^^^----------- Species adjective 1 TT25
+                                    ^^^-------------- Species adjective 2 TT25
+      ^^----------------^^--------------------------- Species adjective 3 TT25
+                                          ^^--------- Species type        TT25
+                  ^^^^^^^^--------------^^^^--------- Average radius      TT25
+                             ^^^--------------------- Government type     TT24
+      ^^--------------------------------------------- Prosperity level    TT24
+     ^----------------------------------------------- Economy type        TT24
+                        ^^--------------------------- Tech level          TT24
+                  ^^^^^^^^--------------------------- Galactic x-coord    TT24
+^^^^^^^^--------------------------------------------- Galactic y-coord    TT24
+                                              ^-^---- Long-range dot size TT22
+                                                    ^ Short-range size    TT23
+          ^------------------------------------------ Name length          cpl
+                                       ^^^^^--------- Name token (x4)      cpl
+     ^^^--------------------------------------------- Planet distance    SOLAR
+                       ^^^--------------------------- Sun distance       SOLAR
+                                          ^^--------- Sun x-y offset     SOLAR
+
+76543210 76543210 76543210 76543210 76543210 76543210
+   s0_hi    s0_lo    s1_hi    s1_lo    s2_hi    s2_lo
+
+The seeds for Tibedied are s0 = &5A4A, s1 = &0248 and s2 = &B753, 
+and all 2000 of the unique systems in Elite are derived from this one set of seeds 
+(that's 256 systems in each of the eight galaxies)
+
+*/
+
+' ----- Main body of program commences here.
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
+Dim s0, s1, s2, prevs0, prevs1, prevs2 as Word
+Dim twistcalc, ccount, twistcount as Long
+
+ 
+s0 = 0x5A4A
+s1 = 0x0248
+s2 = 0xB753
+ccount = 0
+twistcount = 0
+
+HSerPrint "Start in Tibedied Galaxy"
+HSerSend 13
+HSerSend 10
+
+Do
+    QQ21  // The twist
+    QQ21  // The twist
+    QQ21  // The twist
+    QQ21  // The twist
+    ccount++
+
+    if s0 = 0x5A4A then
+        If s1 =  0x0248 then
+            if s2 = 0xB753 then
+                if twistcount <> 0 Then 
+                    HSerPrint "Welcome back to Tibedied Galaxy, " 
+                    HserPrint ccount
+                    HserPrint " planets in all galaxies "
+                    HSerSend 13
+                    HSerSend 10
+                    end
+                end if
+            end if
+        end if
+    end if
+    if s0 = 0xB494 then
+        If s1 =  0x0490 then
+            if s2 = 0x6FA6 then
+                if twistcount <> 0 Then 
+                    HSerPrint "Welcome Galaxy 2, " 
+                    HserPrint ccount
+                    HserPrint " planets in all galaxies "
+                    HSerSend 13
+                    HSerSend 10
+                    end
+                end if
+            end if
+        end if
+    end if
+        
+    if ccount.17 = 1 Then  // everything repeats every 131072 times
+        Show
+        Ghy
+        Show
+        HSerSend 13
+        HSerSend 10
+
+        twistcount++
+        ccount = 0
+    End if	
+    
+Loop
+Sub Show
+
+    HserPrint hex(s0_h)
+    HserPrint hex(s0)
+    
+    HSerSend 9
+    HSerPrint hex(s1_h)
+    HserPrint hex(s1)
+    
+    HSerSend 9
+    HSerPrint hex(s2_h)
+    HserPrint hex(s2)
+    HSerSend 13
+    HSerSend 10
+
+    End Sub
+
+Sub QQ21  // The twist
+
+    Dim twistcalc as Long
+
+    twistcalc = s0 + s1 + s2
+
+    // twist
+    s0 = s1
+    s1 = s2
+    twistcalc = [WORD]twistcalc
+    s2 = twistcalc
+
+    End Sub
+
+Sub Ghy
+
+    /*
+    The Ghy routine updates the galaxy seeds to point to the next galaxy. Using a galactic hyperdrive rotates each seed byte to the left, rolling each byte left within itself like this:
+
+    01234567 -> 12345670
+    to get the seeds for the next galaxy. So after 8 galactic jumps, the seeds roll round to those of the first galaxy again.
+    */
+
+    HserPrint "Twist Galaxy"
+    HSerSend 13
+    HSerSend 10
+
+    dim carrynumber as Byte
+
+    carrynumber = s0_h
+    s0 = fnlsl(s0,8) + s1_h
+    s1 = fnlsl(s1,8) + s2_h
+    s2 = fnlsl(s2,8) + carrynumber
+
+    End Sub
