@@ -1,0 +1,112 @@
+/*
+
+    Ring buffer implementation by awaisn@users.sourceforge.net
+
+
+*/
+
+#chip PIC16f1825, 32
+
+ #define USART_BAUD_RATE 9600
+ #define USART_DELAY OFF
+ #define USART_BLOCKING
+
+// Optionally, you can change the serial ports using
+    // See APFCON0 register in the datasheet
+    // Setting to 0 will use the default ports
+    TXCKSEL = 0
+    RXDTSEL = 0
+
+    // Change to suit the serial ports in use
+    Dir PORTC.4 Out
+    Dir PORTC.5 In
+
+
+// This assumes you are using an ANSI compatible terminal.  Use PUTTY.EXE it is very easy to use.
+
+    // Main program
+
+    // Wait for terminal to settle
+    wait 3 s
+
+    // Create the supporting variables
+    Dim next_in As Byte
+    Dim next_out As Byte
+    Dim syncbyte As Byte
+    Dim temppnt As Byte
+
+    // Constants etc required for Buffer Ring
+    #DEFINE BUFFER_SIZE 8
+    #DEFINE bkbhit (next_in <> next_out)
+
+    // Define the Buffer
+    Dim buffer( BUFFER_SIZE - 1 ) 'we will use element 0 in the array as part of out buffer
+
+    // Call init the buffer
+    InitBufferRing
+
+    HSerSend 10
+    HSerSend 13
+    HSerSend 10
+    HSerSend 13
+    HSerPrint "Started: Serial between two devices"
+    HSerSend 10
+    HSerSend 13
+
+
+    // Get character(s) and send back
+    Do
+
+        // Do we have data in the buffer?
+        if bkbhit then
+
+            // Send the next character in the buffer, exposed via the function `bgetc` back the terminal
+            HSerSend bgetc
+
+        end if
+
+    Loop
+
+    // Supporting subroutines
+
+    Sub readUSART
+
+        buffer(next_in) = HSerReceive
+        temppnt = next_in
+        next_in = ( next_in + 1 ) % BUFFER_SIZE
+        If ( next_in = next_out ) Then  // buffer is full!!
+            next_in = temppnt
+        End If
+
+    End Sub
+
+    Function bgetc
+        Dim local_next_out as Byte    // maintain a local copy of the next_out variable to ensure it does not change when an Interrupt happens
+        local_next_out = next_out
+        bgetc = buffer(local_next_out)
+        local_next_out=(local_next_out+1) % BUFFER_SIZE
+        INTOFF
+        next_out = local_next_out
+        INTON
+    End Function
+
+
+
+
+    Sub InitBufferRing
+
+        // Set the buffer to the first address
+        next_in = 0
+        next_out = 0
+        // Interrupt Handler - some have RCIE and some have U1RXIE, so handle
+        #IFDEF BIT( RCIE )
+            On Interrupt UsartRX1Ready Call readUSART
+        #ENDIF
+        #IFDEF BIT( U1RXIE )
+            On Interrupt UART1ReceiveInterrupt Call readUSART
+        #ENDIF
+        #IFDEF AVR
+            On Interrupt UsartRX1Ready Call readUSART
+        #ENDIF
+
+    End Sub
