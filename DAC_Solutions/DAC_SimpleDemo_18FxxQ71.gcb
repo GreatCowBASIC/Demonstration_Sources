@@ -1,0 +1,58 @@
+#chip 18F56Q71
+#option explicit
+
+// ------ Start of main Program
+
+    Dim DACCounter as Byte
+
+    #define SAMPLES 33
+    #define DACPORT PORTA.2
+
+    DIR DACPORT OUT
+
+/* 
+    Even though there are 3 DACs with 2 selectable output pins, once you enable any DAC output on RA2/RB7 then the DAC with the highest priority will appear on one or both of the enabled output pins, with DAC1>DAC2>DAC3.
+    In effect there's only a single DACOUT, and if you want to use the others externally then you have to route them through OPA1 or OPA2.
+    If you enable more than one DAC output keep in mind the output priority since the DAC with the highest priority will appear on the enabled output pin(s). It doesn't necessarily follow how you assign the outputs in the DACxCON0 registers... priority wins.
+    To use all three DACs you could use something like this (regs shown in binary)- */
+
+    DAC1CON = 0b10010000 // DAC1 output RA2
+    DAC2CON = 0b10000000 // DAC2 no assigned output (use OPA1)
+    DAC3CON = 0b10000000 // DAC3 no assigned output (use OPA2)
+    OPA1CON0 = 0b00001000 // EN=0, CPON=0, UG=1
+    OPA1CON1 = 0b00000111 // GSEL=000, RESON=0, NSS=111(Vss)
+    OPA1CON2 = 0b00000101 // NCH=000(NC), PCH=DAC2_OUT (OPA1 output is on RA1)
+    OPA1CON3 = 0b00000000 // FMS=000(NC), INTOE=0, PSS=00(ext in not used)
+    OPA2CON0 = 0b00001000 // EN=0, CPON=0, UG=1
+    OPA2CON1 = 0b00000111 // GSEL=000, RESON=0, NSS=111(Vss)
+    OPA2CON2 = 0b00000110 // NCH=000(NC), PCH=DAC3_OUT (OPA2 output is on RB1)
+    OPA2CON3 = 0b00000000 // FMS=000(NC), INTOE=0, PSS=00(ext in not used)
+
+/*
+    With this, since DAC1 is the highest priority if you enable any of the DACxCON0 OE0 bits for RB7, you'll get DAC1 on that pin. */
+
+    Do
+
+            /* Ramp up and down by reading the table data and setting the DAC register
+                DAC data register, setting output voltage in DAC mode
+                Relationship between DAC output voltage and DALR:
+                VDAO = VREF*(DALR + 1)/256
+                VDAO indicates DAC output analog voltage
+                VREF indicates reference voltagesource, which is set by DAVS of DACON register
+            */
+            for DACCounter = 1 to 33
+                ReadTable SineWaveDAta, DACCounter, DAC1DAT
+            next
+
+    Loop
+
+
+
+
+    // Sine wave sample DAC setting values
+    Table SineWaveData
+            0x80, 0x98, 0xb0, 0xc6, 0xda, 0xea, 0xf5, 0xfd, 0xff 
+            0xfd, 0xf5, 0xea, 0xda, 0xc6, 0xb0, 0x98, 0x80, 0x67 
+            0x4f, 0x39, 0x25, 0x15, 0x0a, 0x02, 0x00, 0x02, 0x0a 
+            0x15, 0x25, 0x39, 0x4f, 0x67, 0x80
+        End Table
