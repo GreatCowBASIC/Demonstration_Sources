@@ -1,7 +1,7 @@
 /*
     A demonstration program for GC BASIC
     --------------------------------------------------------------------------------
-    This program shows toggling an LED attached to a PIC18F06Q20
+    This program shows toggling an LED attached to a PIC18F16Q20
 
     One way to create a delay is to spend time decrementing to a value, but GCBASIC  has timers built in.
 
@@ -36,7 +36,7 @@
 ' ----- Configuration
 
 'Chip Settings.
-#CHIP 18F06Q20
+#CHIP 18F16Q20
 #Option Explicit
 
 

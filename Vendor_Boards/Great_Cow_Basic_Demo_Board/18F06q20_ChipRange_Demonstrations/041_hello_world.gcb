@@ -1,0 +1,67 @@
+/*
+    A demonstration program for GC BASIC
+    --------------------------------------------------------------------------------
+    This program shows the basic operation of a PIC18F16Q20
+
+    Note:
+        To make the PIC operate you will need to connect Pin8 ( VDDIO2 ) to a VDD within specification ( 5v0 or 3v3 )
+        SAF protection config is not operation by design.  The user will have to uncomment the SAF operation config in the chip specific DAT file. And, use PICKit4/5 to program
+
+    @author    Evan R Venn   
+    @license   GPL
+    @version   1.00
+    @date      04-02-2024
+*/
+
+
+#chip 18F16Q20, 64
+#option Explicit
+
+
+'' -------------------PORTA----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---------------------------------
+''-----------------------------------------
+''
+
+'' -------------------PORTB----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---------------------------------
+''-----------------------------------------
+''
+
+'' ------------------PORTC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    LED-LED-LED-LED------------------
+''-----------------------------------------
+''
+
+// *****************************************************************************************************
+    // Main program commences here.. everything before this is setup for the board.
+
+    // Set the a port as an output, we will use only one BIT to connect to the LED
+    Dir PORTC.7 Out
+    Dir PORTC.6 Out
+    Dir PORTC.5 Out
+    Dir PORTC.4 Out
+
+
+    // Set one bit of the port on, where 1 equate to ON
+    // You can try setting portc.1 - another LED, remember you will need a resistor!
+    PORTC.3 = 0
+    PORTC.4 = 1
+
+    Do
+
+        Wait 1 s
+        Rotate PORTC Left
+        IF C = 1 Then PORTC.4 = 1
+        
+
+    Loop
+
+    End
+    
+
+
+

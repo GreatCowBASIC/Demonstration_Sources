@@ -1,0 +1,101 @@
+'''
+''' This demonstration will show how you can determine the chip parameters, we show the ChipNameStr
+'''
+''' This demonstration how you can check your program is intented for a specific Microcontroller
+'''
+'''************************************************************************
+'''@author  EvanV
+'''@licence GPL
+'''@version 1.00
+'''@date    31.11.2022
+' ----- Configuration
+
+' ----- Configuration
+'Chip Settings.
+#CHIP 18F16Q20
+#OPTION Explicit
+
+    #startup InitPPS, 85
+    #define PPSToolPart 18F16Q20
+
+    Sub InitPPS
+
+            'Module: UART pin directions
+            Dir PORTC.4 Out    ' Make TX1 pin an output
+            'Module: UART1
+            RC4PPS = 0x13          'RC4->EUSART1:TX1
+
+    End Sub
+    'Template comment at the end of the config file
+
+
+
+'' -------------------PORTA----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:   -----------------SW----------ADC--
+''-----------------------------------------
+''
+
+'' -------------------PORTB----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ---------------------------------
+''-----------------------------------------
+''
+
+'' ------------------PORTC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    ------------TX-LED--LED-LED LED--
+''-----------------------------------------
+
+
+'Define constants to make things easier. We can reuse these at any time.
+#DEFINE LEDPORT LATC
+
+
+Dir     RC0         Out
+Dir     RC1         Out
+Dir     RC2         Out
+Dir     RC3         Out
+
+#DEFINE POTENTIOMETER PORTA.0
+Dir     POTENTIOMETER In
+#DEFINE SWITCHIN      PORTA.3
+Dir     SWITCHIN      In
+
+'Setup Serial port
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+
+
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+' Now assumes Serial Terminal is operational
+
+
+#DEFINE SYSDEFAULTCONCATSTRING 64
+
+HSerPrintCRLF
+HSerPrint  ChipNameStr + " GCBASIC Demo"
+HSerPrintCRLF
+Wait 1 s
+
+If Trim( UCase( "18F16Q20") )  <> ChipNameStr Then
+    HSerPrint "Wrong Microcontroller program intended for 18F16Q20"
+    HSerPrintCRLF
+    HSerPrint "The Microcontroller is a " + ChipNameStr
+    HSerPrintCRLF
+    Wait While TRUE
+Else
+    HSerPrint "The Microcontroller program intended for the " + ChipNameStr
+    HSerPrintCRLF
+    Wait While TRUE
+End If
+
+
+
+
+
+End
+
+' ----- Support methods.  Subroutines and Functions

@@ -1,10 +1,10 @@
 /*
     A demonstration program for GC BASIC
     --------------------------------------------------------------------------------
-    This program shows toggling an LED attached to a PIC18F06Q20
+    This program shows toggling an LED attached to a PIC18F16Q20
 
     Note:
-        To make the PIC operate you will need to connect Pin8 ( VDDIO2 ) to a VDD within specification ( 5v0 or 3v3 )
+        To make the PIC operate you will need to connect Pin8 ( VDDIO2/VDDIO5 ) to a VDD within specification ( 5v0 or 3v3 ) on specific ports
         SAF protection config is not operation by design.  The user will have to uncomment the SAF operation config in the chip specific DAT file. And, use PICKit4/5 to program
 
     @author    Evan R Venn   
@@ -15,7 +15,7 @@
 */
 
 
-#CHIP 18F06Q20
+#CHIP 18F16Q20
 #option Explicit
 
 // *****************************************************************************************************
