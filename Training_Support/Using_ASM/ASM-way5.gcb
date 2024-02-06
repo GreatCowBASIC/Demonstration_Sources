@@ -1,3 +1,4 @@
+#Skiptest
 #CHIP 18F16Q41, 4
 #OPTION Explicit
 #OPTION UserCodeOnly CODESTART:

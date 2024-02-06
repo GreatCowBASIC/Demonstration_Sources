@@ -51,7 +51,7 @@
   scalefactor = scalefactor / 255
 
 ' Not appropiate for Mono displays
-'  GLCDBackground = ILI9481_BLUE
+'  GLCDBackground = TFT_BLUE
   GLCDCLS
 
   GLCDPrint 0,0, "Scalefactor = "+ str(scalefactor)

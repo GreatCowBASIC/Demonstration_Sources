@@ -48,7 +48,9 @@ dir PWMOut out
     // #define PWM_Duty 50          'Duty cycle of PWM (%) 
 
 
-    #define SHOWPWMCCPCALCULATIONRESULTS
+    // Uncomment SHOWPWMCCPCALCULATIONRESULTS to show PWM calc results.
+    // #define SHOWPWMCCPCALCULATIONRESULTS
+    
     PWMON
 
     wait 5 s

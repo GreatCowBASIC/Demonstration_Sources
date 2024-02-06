@@ -5,6 +5,7 @@
     #option Explicit
 
     #include <glcd.h>
+    #include <glcd_PCD8544.h>
     'For this port we will enable the GLCD methods without the hardware specific driver, set type to 0!
     'We get to use all GLCD commands but we need to do a bit of setup
     #DEFINE GLCD_TYPE 0

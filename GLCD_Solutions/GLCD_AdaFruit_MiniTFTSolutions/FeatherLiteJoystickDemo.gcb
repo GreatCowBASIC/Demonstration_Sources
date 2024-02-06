@@ -41,6 +41,7 @@
 
     HI2CMode Master
 
+    #define GLCD_TYPE GLCD_TYPE_ST7735R_160_80
     #INCLUDE <ADAFruit_mini_colorTFT_joystick_featherwing.h>
     'Pin mappings for ADAFruit_mini_colorTFT_joystick_featherwing - you cannot use hwspi.  Only use software SPI
     #define GLCD_DC         portC.2              'Data/Command select

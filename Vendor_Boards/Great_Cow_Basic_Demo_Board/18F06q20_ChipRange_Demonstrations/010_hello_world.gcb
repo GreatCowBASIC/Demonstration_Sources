@@ -1,6 +1,6 @@
 /*
     A demonstration program for GC BASIC
-    --------------------------------------------------------------------------------
+    -------------------------------------------------rver-------------------------------
     This program shows the basic operation of a PIC18F16Q20
 
     Notes:
@@ -12,7 +12,7 @@
     @license   GPL
     @version   1.00
     @date      04-02-2024
-*/
+    */
 
 
 #chip 18F16Q20, 64

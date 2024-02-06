@@ -10,7 +10,7 @@
 '''
 '''For PIC:  Typically, if you are using a PICKIT2 then select 'Microchip PICKit 2 CLI - Default' will work for you - select and drag this to the top of the dialog area.
 '''
-'''For AVR:  Typically, for an UNO the programmer 'Arduino UNO/328p@115200' will work, select the option from the list of programmers, then, select 'Edit', 
+'''For AVR:  Typically, for an UNO the programmer 'Arduino UNO/328p@115200' will work, select the option from the list of programmers, then, select 'Edit',
 '''   please edit the communication 'Port', select 'OK', and, then select this option again and drag this to the top of the dialog area.
 '''
 '''

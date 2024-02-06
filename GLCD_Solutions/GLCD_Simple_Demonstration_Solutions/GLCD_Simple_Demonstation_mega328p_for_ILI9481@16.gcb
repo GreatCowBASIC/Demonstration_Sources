@@ -69,7 +69,7 @@
     repeat 2
 
             GLCDRotate ( Landscape )
-            GLCDCLS ILI9481_BLUE
+            GLCDCLS TFT_BLUE
 
             GLCDForeground = ILI9481_MAROON
             GLCDfntDefaultsize = 1
@@ -114,7 +114,7 @@
 
 
 
-  GLCDCLS ILI9481_BLUE
+  GLCDCLS TFT_BLUE
   'Set font size.
   GLCDfntDefaultsize = 2
   longNumber = 0 ' max value = 4294967290
@@ -136,7 +136,7 @@
 
       GLCDDrawString (2, 1, "GLCD font")
       GLCDDrawString (2, 25, "size = 3")
-      box 0,0,ILI9481_GLCD_WIDTH-1, deviceSpecific_ILI9481_GLCD_HEIGHT-1, ILI9481_BLUE
+      box 0,0,ILI9481_GLCD_WIDTH-1, deviceSpecific_ILI9481_GLCD_HEIGHT-1, TFT_BLUE
       box ILI9481_GLCD_WIDTH-5, deviceSpecific_ILI9481_GLCD_HEIGHT-5,ILI9481_GLCD_WIDTH-1, deviceSpecific_ILI9481_GLCD_HEIGHT-1, ILI9481_WHITE
 
   End Select
