@@ -18,46 +18,52 @@
 #option Explicit
 
 
-'' -------------------PORTA----------------
-'' Bit#:  -7---6---5---4---3---2---1---0---
-'' IO:    ---------------------------------
-''-----------------------------------------
-''
+// -------------------PORTA----------------
+// Bit#:  -7---6---5---4---3---2---1---0---
+// IO:    ---------------------------------
+//-----------------------------------------
+//
 
-'' -------------------PORTB----------------
-'' Bit#:  -7---6---5---4---3---2---1---0---
-'' IO:    ---------------------------------
-''-----------------------------------------
-''
+// -------------------PORTB----------------
+// Bit#:  -7---6---5---4---3---2---1---0---
+// IO:    ---------------------------------
+//-----------------------------------------
+//
 
-'' ------------------PORTC-----------------
-'' Bit#:  -7---6---5---4---3---2---1---0---
-'' IO:    LED-LED-LED-LED------------------
-''-----------------------------------------
-''
+// ------------------PORTC-----------------
+// Bit#:  -7---6---5---4---3---2---1---0---
+// IO:    LED-LED-LED-LED------------------
+//-----------------------------------------
+//
 
 // *****************************************************************************************************
     // Main program commences here.. everything before this is setup for the board.
 
-    // Set the a port as an output, we will use only one BIT to connect to the LED
-    Dir PORTC.7 Out
-    Dir PORTC.6 Out
-    Dir PORTC.5 Out
-    Dir PORTC.4 Out
+    // Define constants to make things easier. We can reuse these at any time.
+    #DEFINE LEDPORT LATC
+    #DEFINE LEDD7 PORTC.7
+    #DEFINE LEDD6 PORTC.6
+    #DEFINE LEDD5 PORTC.5
+    #DEFINE LEDD4 PORTC.4
+    
+
+    // Set the ports as an output
+    Dir LEDD7 Out
+    Dir LEDD6 Out
+    Dir LEDD5 Out
+    Dir LEDD4 Out
 
 
     // Set one bit of the port on, where 1 equate to ON
     // You can try setting portc.1 - another LED, remember you will need a resistor!
-    PORTC.3 = 0
-    PORTC.4 = 1
+    LEDD4 = 1
 
     Do
 
         Wait 1 s
-        Rotate PORTC Left
-        IF C = 1 Then PORTC.4 = 1
+        Rotate LEDPORT Left
+        IF C = 1 Then LEDD4 = 1
         
-
     Loop
 
     End

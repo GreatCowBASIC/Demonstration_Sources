@@ -1,4 +1,4 @@
-# 16f181xx Demos for Great-Cow-BASIC
+# 18Fx6Q20 Demos for Great-Cow-BASIC
 
 ![A 18F16Q20](medium-PIC18F16Q20-TSSOP-14.png)
 
@@ -7,7 +7,7 @@
 
 This GIT contains the latest demonstrations.
 
-The baseline set of demonstrations was created at version 1.00.xx of the GCBASIC distribution.
+The baseline set of demonstrations was created at version 2024.x.x of the GCBASIC distribution.
 
 Enjoy
 
