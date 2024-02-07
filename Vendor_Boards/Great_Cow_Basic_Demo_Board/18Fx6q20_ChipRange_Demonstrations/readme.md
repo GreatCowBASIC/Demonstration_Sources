@@ -1,6 +1,6 @@
 # 18Fx6Q20 Demos for Great-Cow-BASIC
 
-![A 18F16Q20](PIC18F06Q20.png, 50%)
+![A 18F16Q20, 50%](PIC18F06Q20.png)
 
 
 # Great-Cow-BASIC
