@@ -2,6 +2,8 @@
 
 ![A 18F16Q20, 50%](PIC18F06Q20.png)
 
+<img src="PIC18F06Q20.png" width="50%" />
+
 
 # Great-Cow-BASIC
 
