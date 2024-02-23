@@ -1,0 +1,1883 @@
+
+
+Microchip MPLAB XC8 Assembler V2.46 build 20240104201356 
+D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Great_Cow_Basic_Demo_Board\18Fx6q20_ChipRange_Demonstrations\170_show_i2c_devices_to_serial_t Sat Feb 17 18:52:52 2024
+
+02-17-2024
+     1                           	processor	18F16Q20
+     2                           	pagewidth 180
+     3                           	psect	udata_acs,global,class=COMRAM,space=1,delta=1,lowdata,noexec
+     4                           	psect	udata_bank5,global,class=BANK5,space=1,delta=1,lowdata,noexec
+     5                           	psect	udata_bank6,global,class=BANK6,space=1,delta=1,lowdata,noexec
+     6                           	psect	udata_bank7,global,class=BANK7,space=1,delta=1,lowdata,noexec
+     7                           	psect	udata_bank8,global,class=BANK8,space=1,delta=1,lowdata,noexec
+     8                           	psect	udata_bank9,global,class=BANK9,space=1,delta=1,lowdata,noexec
+     9                           	psect	udata_bank10,global,class=BANK10,space=1,delta=1,lowdata,noexec
+    10                           	psect	udata_bank11,global,class=BANK11,space=1,delta=1,lowdata,noexec
+    11                           	psect	udata_bank12,global,class=BANK12,space=1,delta=1,lowdata,noexec
+    12                           	psect	udata_bank13,global,class=BANK13,space=1,delta=1,lowdata,noexec
+    13                           	psect	udata_bank14,global,class=BANK14,space=1,delta=1,lowdata,noexec
+    14                           	psect	udata_bank15,global,class=BANK15,space=1,delta=1,lowdata,noexec
+    15                           	psect	udata_bank16,global,class=BANK16,space=1,delta=1,noexec
+    16                           	psect	udata_bank17,global,class=BANK17,space=1,delta=1,noexec
+    17                           	psect	udata_bank18,global,class=BANK18,space=1,delta=1,noexec
+    18                           	psect	udata_bank19,global,class=BANK19,space=1,delta=1,noexec
+    19                           	psect	udata_bank20,global,class=BANK20,space=1,delta=1,noexec
+    20                           	psect	udata,global,class=RAM,space=1,delta=1,noexec
+    21                           	psect	code,global,reloc=2,class=CODE,delta=1
+    22                           	psect	data,global,reloc=2,class=CONST,delta=1,noexec
+    23                           	psect	edata,global,class=EEDATA,space=3,delta=1,noexec
+    24                           	psect	RESETVEC,global,abs,delta=1
+    25                           	psect	config,global,abs,ovrld,class=CONFIG,space=4,delta=1,noexec
+    26                           
+    27                           ;'Program compiled by GCBASIC (2024.2.16 (Windows 64 bit) : Build 1337) for Microchip PIC-AS using FreeBASIC 1.07.1/2024-02-15 CRC247
+    28                           ;'  See the GCBASIC forums at http://sourceforge.net/projects/gcbasic/forums,
+    29                           ;'  Check the documentation and Help at http://gcbasic.sourceforge.net/help/,
+    30                           ;'or, email:
+    31                           ;'   evanvennn at users dot sourceforge dot net
+    32                           ;'********************************************************************************
+    33                           ;'Set up the assembler options (Chip type, clock source, other bits and pieces)
+    34                           ;'PROCESSOR   18F16Q20
+    35   000000                     
+    36                           ;' Reverse lookup file(s)
+    37                           ;' C:\Program Files\Microchip\xc8\v2.46\pic\include\proc\pic18f16q20.inc
+    38                           ;' C:\Program Files\Microchip\xc8\v2.46\pic\dat\cfgmap\18f16q20.cfgmap
+    39                           ;' Alternative CONFIG file is to be found at C:\Program Files\Microchip\xc8\vX.YY\pic\dat\cfgdata as per Microchip support ticket #00730936 
+    40                           ;'********************************************************************************
+    41                           ;'Explicit PIC-AS constants to resolve the crazyness of the PIC-AS syntax
+    42                           ;'These are therefore the same as MPASM
+    43                           ;'********************************************************************************
+    44                           ;'Explicit CONFIG
+    45                           ;'Inferred CONFIG
+    46                           ;'********************************************************************************
+    47                           ;' The XC8 xc.inc include file.  This MUST be placed after the CONFIG statements.
+    48   000000                     
+    49                           	psect	edata
+    50   000000                     stk_offset	set	0
+    51   000000                     auto_size	set	0
+    52                           
+    53                           ; stack_auto defines a symbol /name/_offset which equates to the
+    54                           ; stack offset of the auto object in question
+    55   000000                     
+    56                           ; stack_param defines a symbol /name/_offset which equates to the
+    57                           ; stack offset of the parameter object in question
+    58   000000                     
+    59                           ; alloc_stack adjusts the SP to allocate space for auto objects
+    60                           ; it also links in to the btemp symbol so that can be used
+    61   000000                     
+    62                           ; restore_stack adjusts the SP to remove all auto and parameter
+    63                           ; objects from the stack prior to returning from a function
+    64   000000                     
+    65                           ;'********************************************************************************
+    66                           ;'Set aside RAM memory locations for variables. All variables are global.
+    67   000000                     
+    68                           ;'********************************************************************************
+    69                           ;'ALIAS VARIABLES
+    70   000000                     
+    71                           ;'********************************************************************************
+    72                           
+    73                           	psect	RESETVEC
+    74   000000                     RESETVEC:
+    75                           
+    76                           ;'VECTORS
+    77   000000                     	org	0
+    78   000000  EF06  F000         	goto	BASPROGRAMSTART
+    79   000008                     	org	8
+    80   000008  0010               	retfie	
+    81                           
+    82                           ;'********************************************************************************
+    83                           ;'PROGRAM_MEMORY_PAGE: 0
+    84   00000C                     	org	12
+    85   00000C                     BASPROGRAMSTART:
+    86                           	callstack 0
+    87                           
+    88                           ;'CALL INITIALISATION ROUTINES
+    89   00000C  D93E               	rcall	INITSYS
+    90   00000E  D92F               	rcall	INITPPS
+    91   000010  D953               	rcall	INITUSART
+    92   000012  D8F6               	rcall	HI2CINIT
+    93                           
+    94                           ;'START_OF_THE_MAIN_PROGRAM
+    95                           ;'
+    96                           ;'THIS DEMONSTRATION SHOWS THE I2C DEVICES ATTACHED THE MICROCONTROLLER, THIS PROGRAM SUPPORT THE MICROCHIP I2C MODULE.
+    97                           ;'
+    98                           ;'I2C DEVICE REQUIRED A DATA BUS AND A CLOCK BUS, DEVICES ALSO REQUIRED AN INPUT VOLTAGE AND 0V.
+    99                           ;'I2C DATA BUS IS CONNECTED TO PORTA.4
+   100                           ;'I2C CLOCK BUS IS CONNECTED TO PORTA.1
+   101                           ;'SERIAL OUTPUT IS CONNECTED, AS PREVIOUSLY, TO PORTC.4
+   102                           ;'
+   103                           ;'CONNECT YOUR IC2 DEVICES AND SEE THE RESULTS ON THE SERIAL TERMINAL.
+   104                           ;'
+   105                           ;'************************************************************************
+   106                           ;'AUTHOR  EVANV
+   107                           ;'LICENCE GPL
+   108                           ;'VERSION 1.02
+   109                           ;'DATE    04-02-2024
+   110                           ;'
+   111                           ;'----- CONFIGURATION
+   112                           ;'CHIP SETTINGS.
+   113                           ;'PIC PPS TOOL VERSION: 0.0.6.5
+   114                           ;'ADD THIS CODE SEGMENT TO YOUR GCBASIC SOURCE PROGRAM
+   115                           ;'
+   116                           ;'HARDWARE
+   117                           ;'-------------------PORTA----------------
+   118                           ;'BIT#:  -7---6---5---4---3---2---1---0---
+   119                           ;'IO:    -----------------SW---------ADC--
+   120                           ;'-----------------------------------------
+   121                           ;'
+   122                           ;'
+   123                           ;'-------------------PORTB----------------
+   124                           ;'BIT#:  -7---6---5---4---3---2---1---0---
+   125                           ;'IO:    TX--SCL-SDA----------------------
+   126                           ;'----------------------------------------
+   127                           ;'
+   128                           ;'------------------PORTC-----------------
+   129                           ;'BIT#:  -7---6---5---4---3---2---1---0---
+   130                           ;'IO:    LED-LED-LED-LED------------------
+   131                           ;'----------------------------------------
+   132                           ;'
+   133                           ;'DEFINE CONSTANTS TO MAKE THINGS EASIER. WE CAN REUSE THESE AT ANY TIME.
+   134                           ;'SET THE PORTS AS AN OUTPUT
+   135                           ;'DIR LEDD7 OUT
+   136   000014  9E8F               	bcf	1167,7,c
+   137                           
+   138                           ;'DIR LEDD6 OUT
+   139   000016  9C8F               	bcf	1167,6,c
+   140                           
+   141                           ;'DIR LEDD5 OUT
+   142   000018  9A8F               	bcf	1167,5,c
+   143                           
+   144                           ;'DIR LEDD4 OUT
+   145   00001A  988F               	bcf	1167,4,c
+   146                           
+   147                           ;'THIS IS THE PORTA.0 PORT
+   148                           ;'DIR POTENTIOMETER IN
+   149   00001C  808D               	bsf	1165,0,c
+   150                           
+   151                           ;'DIR     SWITCHIN      IN
+   152   00001E  868D               	bsf	1165,3,c
+   153                           
+   154                           ;'DEFINE I2C SETTINGS
+   155                           ;'HI2CMODE (MASTER)
+   156   000020  0E0C               	movlw	12
+   157   000022  6E0F               	movwf	1295,c
+   158   000024  D8EF               	rcall	HI2CMODE
+   159   000026                     SYSDOLOOP_S1:
+   160                           	callstack 0
+   161                           
+   162                           ;'HSERPRINTCRLF
+   163   000026  0E01               	movlw	1
+   164   000028  6E11               	movwf	1297,c
+   165   00002A  0E01               	movlw	1
+   166   00002C  6E02               	movwf	1282,c
+   167   00002E  D90C               	rcall	HSERPRINTCRLF
+   168                           
+   169                           ;'HSERPRINT "HARDWARE I2C"
+   170   000030  EE15 F0F2          	lfsr	1,5362
+   171   000034  0E60               	movlw	low STRINGTABLE1
+   172   000036  6EF6               	movwf	tblptrl,c
+   173   000038  0E05               	movlw	high STRINGTABLE1
+   174   00003A  6EF7               	movwf	tblptrh,c
+   175   00003C  0E00               	movlw	low (STRINGTABLE1 shr (0+16))
+   176   00003E  6EF8               	movwf	tblptru,c
+   177   000040  DA7C               	rcall	SYSREADSTRING
+   178   000042  0EF2               	movlw	242
+   179   000044  6E16               	movwf	1302,c
+   180   000046  0E14               	movlw	20
+   181   000048  6E17               	movwf	1303,c
+   182   00004A  0E01               	movlw	1
+   183   00004C  6E02               	movwf	1282,c
+   184                           
+   185                           ;'USING SYSSTRINGPARAM1*12
+   186   00004E  D8DB               	rcall	HSERPRINT314
+   187                           
+   188                           ;'HSERPRINTCRLF 2
+   189   000050  0E02               	movlw	2
+   190   000052  6E11               	movwf	1297,c
+   191   000054  0E01               	movlw	1
+   192   000056  6E02               	movwf	1282,c
+   193   000058  D8F7               	rcall	HSERPRINTCRLF
+   194                           
+   195                           ;'NOW ASSUMES SERIAL TERMINAL IS OPERATIONAL
+   196                           ;'HSERPRINTCRLF
+   197   00005A  0E01               	movlw	1
+   198   00005C  6E11               	movwf	1297,c
+   199   00005E  0E01               	movlw	1
+   200   000060  6E02               	movwf	1282,c
+   201   000062  D8F2               	rcall	HSERPRINTCRLF
+   202                           
+   203                           ;'HSERPRINT "   "
+   204   000064  EE15 F0F2          	lfsr	1,5362
+   205   000068  0E6E               	movlw	low STRINGTABLE2
+   206   00006A  6EF6               	movwf	tblptrl,c
+   207   00006C  0E05               	movlw	high STRINGTABLE2
+   208   00006E  6EF7               	movwf	tblptrh,c
+   209   000070  0E00               	movlw	low (STRINGTABLE2 shr (0+16))
+   210   000072  6EF8               	movwf	tblptru,c
+   211   000074  DA62               	rcall	SYSREADSTRING
+   212   000076  0EF2               	movlw	242
+   213   000078  6E16               	movwf	1302,c
+   214   00007A  0E14               	movlw	20
+   215   00007C  6E17               	movwf	1303,c
+   216   00007E  0E01               	movlw	1
+   217   000080  6E02               	movwf	1282,c
+   218                           
+   219                           ;'USING SYSSTRINGPARAM1*3
+   220   000082  D8C1               	rcall	HSERPRINT314
+   221                           
+   222                           ;'CREATE A HORIZONTAL ROW OF NUMBERS
+   223                           ;'FOR DEVICEID = 0 TO 15
+   224                           ;'LEGACY METHOD
+   225   000084  6803               	setf	1283,c
+   226   000086                     SYSFORLOOP1:
+   227                           	callstack 0
+   228   000086  2A03               	incf	1283,f,c
+   229                           
+   230                           ;'HSERPRINT HEX(DEVICEID)
+   231   000088  C503 F51D          	movff	1283,1309
+   232   00008C  DA7E               	rcall	FN__HEXPICAS
+   233   00008E  0EEE               	movlw	238
+   234   000090  6E16               	movwf	1302,c
+   235   000092  0E14               	movlw	20
+   236   000094  6E17               	movwf	1303,c
+   237   000096  0E01               	movlw	1
+   238   000098  6E02               	movwf	1282,c
+   239   00009A  D8B5               	rcall	HSERPRINT314
+   240                           
+   241                           ;'HSERPRINT " "
+   242   00009C  EE15 F0F2          	lfsr	1,5362
+   243   0000A0  0E72               	movlw	low STRINGTABLE3
+   244   0000A2  6EF6               	movwf	tblptrl,c
+   245   0000A4  0E05               	movlw	high STRINGTABLE3
+   246   0000A6  6EF7               	movwf	tblptrh,c
+   247   0000A8  0E00               	movlw	low (STRINGTABLE3 shr (0+16))
+   248   0000AA  6EF8               	movwf	tblptru,c
+   249   0000AC  DA46               	rcall	SYSREADSTRING
+   250   0000AE  0EF2               	movlw	242
+   251   0000B0  6E16               	movwf	1302,c
+   252   0000B2  0E14               	movlw	20
+   253   0000B4  6E17               	movwf	1303,c
+   254   0000B6  0E01               	movlw	1
+   255   0000B8  6E02               	movwf	1282,c
+   256                           
+   257                           ;'USING SYSSTRINGPARAM1*1
+   258   0000BA  D8A5               	rcall	HSERPRINT314
+   259                           
+   260                           ;'NEXT
+   261   0000BC  0E0F               	movlw	15
+   262   0000BE  5C03               	subwf	1283,w,c
+   263   0000C0  A0D8               	btfss	status,0,c
+   264   0000C2  D7E1               	bra	SYSFORLOOP1
+   265   0000C4                     SYSFORLOOPEND1:
+   266                           	callstack 0
+   267                           
+   268                           ;'CREATE A VERTICAL COLUMN OF NUMBERS
+   269                           ;'FOR DEVICEID = 0 TO 255
+   270                           ;'LEGACY METHOD
+   271   0000C4  6803               	setf	1283,c
+   272   0000C6                     SYSFORLOOP2:
+   273                           	callstack 0
+   274   0000C6  2A03               	incf	1283,f,c
+   275                           
+   276                           ;'DISPLAYNEWLINE = DEVICEID % 16
+   277   0000C8  C503 F505          	movff	1283,1285
+   278   0000CC  0E10               	movlw	16
+   279   0000CE  6E09               	movwf	1289,c
+   280   0000D0  DA20               	rcall	SYSDIVSUB
+   281   0000D2  C500 F50A          	movff	1280,1290
+   282                           
+   283                           ;'IF DISPLAYNEWLINE = 0 THEN
+   284   0000D6  520A               	movf	1290,f,c
+   285   0000D8  A4D8               	btfss	status,2,c
+   286   0000DA  D023               	bra	ENDIF2
+   287                           
+   288                           ;'HSERPRINTCRLF
+   289   0000DC  0E01               	movlw	1
+   290   0000DE  6E11               	movwf	1297,c
+   291   0000E0  0E01               	movlw	1
+   292   0000E2  6E02               	movwf	1282,c
+   293   0000E4  D8B1               	rcall	HSERPRINTCRLF
+   294                           
+   295                           ;'HSERPRINT HEX(DEVICEID)
+   296   0000E6  C503 F51D          	movff	1283,1309
+   297   0000EA  DA4F               	rcall	FN__HEXPICAS
+   298   0000EC  0EEE               	movlw	238
+   299   0000EE  6E16               	movwf	1302,c
+   300   0000F0  0E14               	movlw	20
+   301   0000F2  6E17               	movwf	1303,c
+   302   0000F4  0E01               	movlw	1
+   303   0000F6  6E02               	movwf	1282,c
+   304   0000F8  D886               	rcall	HSERPRINT314
+   305                           
+   306                           ;'IF DISPLAYNEWLINE > 0 THEN
+   307   0000FA  500A               	movf	1290,w,c
+   308   0000FC  0800               	sublw	0
+   309   0000FE  B0D8               	btfsc	status,0,c
+   310   000100  D010               	bra	ENDIF5
+   311                           
+   312                           ;'HSERPRINT " "
+   313   000102  EE15 F0F2          	lfsr	1,5362
+   314   000106  0E72               	movlw	low STRINGTABLE3
+   315   000108  6EF6               	movwf	tblptrl,c
+   316   00010A  0E05               	movlw	high STRINGTABLE3
+   317   00010C  6EF7               	movwf	tblptrh,c
+   318   00010E  0E00               	movlw	low (STRINGTABLE3 shr (0+16))
+   319   000110  6EF8               	movwf	tblptru,c
+   320   000112  DA13               	rcall	SYSREADSTRING
+   321   000114  0EF2               	movlw	242
+   322   000116  6E16               	movwf	1302,c
+   323   000118  0E14               	movlw	20
+   324   00011A  6E17               	movwf	1303,c
+   325   00011C  0E01               	movlw	1
+   326   00011E  6E02               	movwf	1282,c
+   327                           
+   328                           ;'USING SYSSTRINGPARAM1*1
+   329   000120  D872               	rcall	HSERPRINT314
+   330   000122                     ENDIF5:
+   331                           	callstack 0
+   332   000122                     ENDIF2:
+   333                           	callstack 0
+   334                           
+   335                           ;'HSERPRINT " "
+   336   000122  EE15 F0F2          	lfsr	1,5362
+   337   000126  0E72               	movlw	low STRINGTABLE3
+   338   000128  6EF6               	movwf	tblptrl,c
+   339   00012A  0E05               	movlw	high STRINGTABLE3
+   340   00012C  6EF7               	movwf	tblptrh,c
+   341   00012E  0E00               	movlw	low (STRINGTABLE3 shr (0+16))
+   342   000130  6EF8               	movwf	tblptru,c
+   343   000132  DA03               	rcall	SYSREADSTRING
+   344   000134  0EF2               	movlw	242
+   345   000136  6E16               	movwf	1302,c
+   346   000138  0E14               	movlw	20
+   347   00013A  6E17               	movwf	1303,c
+   348   00013C  0E01               	movlw	1
+   349   00013E  6E02               	movwf	1282,c
+   350                           
+   351                           ;'USING SYSSTRINGPARAM1*1
+   352   000140  D862               	rcall	HSERPRINT314
+   353                           
+   354                           ;'DO AN INITIAL START
+   355                           ;'HI2CSTART
+   356   000142  D96B               	rcall	SI2CSTART
+   357                           
+   358                           ;'SEND ADDRESS
+   359                           ;'HI2CSEND ( DEVICEID )
+   360   000144  C503 F512          	movff	1283,1298
+   361   000148  D8DC               	rcall	SI2CSEND
+   362                           
+   363                           ;'IF HI2CWAITMSSPTIMEOUT <> 255 THEN
+   364   00014A  2810               	incf	1296,w,c
+   365   00014C  B4D8               	btfsc	status,2,c
+   366   00014E  D024               	bra	ELSE3_1
+   367                           
+   368                           ;'DID DEVICE FAIL TO RESPOND?
+   369                           ;'IF HI2CACKPOLLSTATE = FALSE THEN
+   370   000150  520E               	movf	1294,f,c
+   371   000152  A4D8               	btfss	status,2,c
+   372   000154  D00B               	bra	ELSE6_1
+   373                           
+   374                           ;'HSERPRINT   HEX(DEVICEID)
+   375   000156  C503 F51D          	movff	1283,1309
+   376   00015A  DA17               	rcall	FN__HEXPICAS
+   377   00015C  0EEE               	movlw	238
+   378   00015E  6E16               	movwf	1302,c
+   379   000160  0E14               	movlw	20
+   380   000162  6E17               	movwf	1303,c
+   381   000164  0E01               	movlw	1
+   382   000166  6E02               	movwf	1282,c
+   383   000168  D84E               	rcall	HSERPRINT314
+   384                           
+   385                           ;'ELSE
+   386   00016A  D010               	bra	ENDIF6
+   387   00016C                     ELSE6_1:
+   388                           	callstack 0
+   389                           
+   390                           ;'HSERPRINT   "--"
+   391   00016C  EE15 F0F2          	lfsr	1,5362
+   392   000170  0E74               	movlw	low STRINGTABLE4
+   393   000172  6EF6               	movwf	tblptrl,c
+   394   000174  0E05               	movlw	high STRINGTABLE4
+   395   000176  6EF7               	movwf	tblptrh,c
+   396   000178  0E00               	movlw	low (STRINGTABLE4 shr (0+16))
+   397   00017A  6EF8               	movwf	tblptru,c
+   398   00017C  D9DE               	rcall	SYSREADSTRING
+   399   00017E  0EF2               	movlw	242
+   400   000180  6E16               	movwf	1302,c
+   401   000182  0E14               	movlw	20
+   402   000184  6E17               	movwf	1303,c
+   403   000186  0E01               	movlw	1
+   404   000188  6E02               	movwf	1282,c
+   405                           
+   406                           ;'USING SYSSTRINGPARAM1*2
+   407   00018A  D83D               	rcall	HSERPRINT314
+   408   00018C                     ENDIF6:
+   409                           	callstack 0
+   410                           
+   411                           ;'GET THE READ DATATO PREVENT ANY POTENTIAL SLAVE LOCKUP
+   412                           ;'IF DEVICEID.0 = 1 THEN HI2CSEND ( DUMPI2CREAD )
+   413   00018C  A003               	btfss	1283,0,c
+   414   00018E  D003               	bra	ENDIF7
+   415                           
+   416                           ;'IF DEVICEID.0 = 1 THEN HI2CSEND ( DUMPI2CREAD )
+   417   000190  C50B F512          	movff	1291,1298
+   418   000194  D8B6               	rcall	SI2CSEND
+   419   000196                     ENDIF7:
+   420                           	callstack 0
+   421                           
+   422                           ;'ELSE
+   423   000196  D010               	bra	ENDIF3
+   424   000198                     ELSE3_1:
+   425                           	callstack 0
+   426                           
+   427                           ;'HSERPRINT "! "
+   428   000198  EE15 F0F2          	lfsr	1,5362
+   429   00019C  0E78               	movlw	low STRINGTABLE5
+   430   00019E  6EF6               	movwf	tblptrl,c
+   431   0001A0  0E05               	movlw	high STRINGTABLE5
+   432   0001A2  6EF7               	movwf	tblptrh,c
+   433   0001A4  0E00               	movlw	low (STRINGTABLE5 shr (0+16))
+   434   0001A6  6EF8               	movwf	tblptru,c
+   435   0001A8  D9C8               	rcall	SYSREADSTRING
+   436   0001AA  0EF2               	movlw	242
+   437   0001AC  6E16               	movwf	1302,c
+   438   0001AE  0E14               	movlw	20
+   439   0001B0  6E17               	movwf	1303,c
+   440   0001B2  0E01               	movlw	1
+   441   0001B4  6E02               	movwf	1282,c
+   442                           
+   443                           ;'USING SYSSTRINGPARAM1*2
+   444   0001B6  D827               	rcall	HSERPRINT314
+   445   0001B8                     ENDIF3:
+   446                           	callstack 0
+   447                           
+   448                           ;'I2C STOP
+   449                           ;'HI2CSTOP
+   450   0001B8  D935               	rcall	SI2CSTOP
+   451                           
+   452                           ;'NEXT
+   453   0001BA  0EFF               	movlw	255
+   454   0001BC  5C03               	subwf	1283,w,c
+   455   0001BE  A0D8               	btfss	status,0,c
+   456   0001C0  D782               	bra	SYSFORLOOP2
+   457   0001C2                     SYSFORLOOPEND2:
+   458                           	callstack 0
+   459                           
+   460                           ;'HSERPRINTCRLF 2
+   461   0001C2  0E02               	movlw	2
+   462   0001C4  6E11               	movwf	1297,c
+   463   0001C6  0E01               	movlw	1
+   464   0001C8  6E02               	movwf	1282,c
+   465   0001CA  D83E               	rcall	HSERPRINTCRLF
+   466                           
+   467                           ;'HSERPRINT   "END OF SEARCH"
+   468   0001CC  EE15 F0F2          	lfsr	1,5362
+   469   0001D0  0E7C               	movlw	low STRINGTABLE6
+   470   0001D2  6EF6               	movwf	tblptrl,c
+   471   0001D4  0E05               	movlw	high STRINGTABLE6
+   472   0001D6  6EF7               	movwf	tblptrh,c
+   473   0001D8  0E00               	movlw	low (STRINGTABLE6 shr (0+16))
+   474   0001DA  6EF8               	movwf	tblptru,c
+   475   0001DC  D9AE               	rcall	SYSREADSTRING
+   476   0001DE  0EF2               	movlw	242
+   477   0001E0  6E16               	movwf	1302,c
+   478   0001E2  0E14               	movlw	20
+   479   0001E4  6E17               	movwf	1303,c
+   480   0001E6  0E01               	movlw	1
+   481   0001E8  6E02               	movwf	1282,c
+   482                           
+   483                           ;'USING SYSSTRINGPARAM1*13
+   484   0001EA  D80D               	rcall	HSERPRINT314
+   485                           
+   486                           ;'HSERPRINTCRLF 2
+   487   0001EC  0E02               	movlw	2
+   488   0001EE  6E11               	movwf	1297,c
+   489   0001F0  0E01               	movlw	1
+   490   0001F2  6E02               	movwf	1282,c
+   491   0001F4  D829               	rcall	HSERPRINTCRLF
+   492   0001F6                     SYSWAITLOOP1:
+   493                           	callstack 0
+   494   0001F6  B687               	btfsc	1159,3,c
+   495   0001F8  D7FE               	bra	SYSWAITLOOP1
+   496                           
+   497                           ;'LOOP
+   498   0001FA  D715               	bra	SYSDOLOOP_S1
+   499   0001FC                     SYSDOLOOP_E1:
+   500                           	callstack 0
+   501   0001FC                     BASPROGRAMEND:
+   502                           	callstack 0
+   503   0001FC  0003               	sleep	
+   504   0001FE  D7FE               	bra	BASPROGRAMEND
+   505   000200                     HI2CINIT:
+   506                           	callstack 0
+   507                           
+   508                           ;'ASM SHOWDEBUG  THIS METHOD SETS THE VARIABLE `HI2CCURRENTMODE`, AND, IF REQUIRED CALLS THE METHOD `SI2CINIT` TO SET UP NEW MSSP MODULES - AKA K-MO
+      +                          DE FAMILY CHIPS
+   509                           ;'HI2CCURRENTMODE = 0
+   510   000200  6A0F               	clrf	1295,c
+   511                           
+   512                           ;'INITIALISE THE I2C MODULE
+   513                           ;'SI2CINIT
+   514   000202  D067               	bra	SI2CINIT
+   515   000204                     HI2CMODE:
+   516                           	callstack 0
+   517                           
+   518                           ;'ASM SHOWDEBUG  THIS METHOD SETS THE VARIABLE `HI2CCURRENTMODE`, AND, IF REQUIRED, SETS THE SSPCON1.BITS
+   519   000204  0012               	return	
+   520   000206                     HSERPRINT314:
+   521                           	callstack 0
+   522                           
+   523                           ;'PRINTLEN = PRINTDATA(0)
+   524   000206  C516 F4E9          	movff	1302,fsr0l
+   525   00020A  C517 F4EA          	movff	1303,fsr0h
+   526   00020E  C4EF F513          	movff	indf0,1299
+   527                           
+   528                           ;'IF PRINTLEN <> 0 THEN
+   529   000212  5213               	movf	1299,f,c
+   530   000214  B4D8               	btfsc	status,2,c
+   531   000216  D017               	bra	ENDIF11
+   532                           
+   533                           ;'WRITE DATA
+   534                           ;'FOR SYSPRINTTEMP = 1 TO PRINTLEN
+   535   000218  0E01               	movlw	1
+   536   00021A  6E18               	movwf	1304,c
+   537   00021C                     SYSFORLOOP4:
+   538                           	callstack 0
+   539                           
+   540                           ;'HSERSEND(PRINTDATA(SYSPRINTTEMP),COMPORT )
+   541   00021C  5018               	movf	1304,w,c
+   542   00021E  2416               	addwf	1302,w,c
+   543   000220  6EE9               	movwf	fsr0l,c
+   544   000222  0E00               	movlw	0
+   545   000224  2017               	addwfc	1303,w,c
+   546   000226  6EEA               	movwf	fsr0h,c
+   547   000228  C4EF F514          	movff	indf0,1300
+   548   00022C  D81B               	rcall	HSERSEND304
+   549                           
+   550                           ;'NEXT
+   551                           ;'POSITIVE VALUE STEP HANDLER IN FOR-NEXT STATEMENT :#4P 
+   552   00022E  5018               	movf	1304,w,c
+   553   000230  5C13               	subwf	1299,w,c
+   554   000232  6E1B               	movwf	1307,c
+   555   000234  C51B F505          	movff	1307,1285
+   556   000238  6A09               	clrf	1289,c
+   557   00023A  D966               	rcall	SYSCOMPEQUAL
+   558   00023C  1E00               	comf	1280,f,c
+   559   00023E  A000               	btfss	1280,0,c
+   560   000240  D002               	bra	ENDIF12
+   561                           
+   562                           ;'SET LOOPVAR TO LOOPVAR + STEPVALUE WHERE STEPVALUE IS A POSITIVE VALUE
+   563   000242  2A18               	incf	1304,f,c
+   564   000244  D7EB               	bra	SYSFORLOOP4
+   565   000246                     ENDIF12:
+   566                           	callstack 0
+   567   000246                     SYSFORLOOPEND4:
+   568                           	callstack 0
+   569   000246                     ENDIF11:
+   570                           	callstack 0
+   571                           
+   572                           ;'CR
+   573                           ;'ALL USARTS
+   574                           ;'--------------------------
+   575                           ;'SPECIFIC USARTS
+   576                           ;'------------------
+   577   000246  0012               	return	
+   578   000248                     HSERPRINTCRLF:
+   579                           	callstack 0
+   580                           
+   581                           ;'REPEAT HSERPRINTCRLFCOUNT
+   582   000248  C511 F519          	movff	1297,1305
+   583   00024C  5219               	movf	1305,f,c
+   584   00024E  B4D8               	btfsc	status,2,c
+   585   000250  D008               	bra	SYSREPEATLOOPEND1
+   586   000252                     SYSREPEATLOOP1:
+   587                           	callstack 0
+   588                           
+   589                           ;'HSERSEND(13,COMPORT)
+   590   000252  0E0D               	movlw	13
+   591   000254  6E14               	movwf	1300,c
+   592   000256  D806               	rcall	HSERSEND304
+   593                           
+   594                           ;'HSERSEND(10,COMPORT)
+   595   000258  0E0A               	movlw	10
+   596   00025A  6E14               	movwf	1300,c
+   597   00025C  D803               	rcall	HSERSEND304
+   598                           
+   599                           ;'END REPEAT
+   600   00025E  2E19               	decfsz	1305,f,c
+   601   000260  D7F8               	bra	SYSREPEATLOOP1
+   602   000262                     SYSREPEATLOOPEND1:
+   603                           	callstack 0
+   604   000262  0012               	return	
+   605   000264                     HSERSEND304:
+   606                           	callstack 0
+   607   000264                     HSERSENDUSART1HANDLER:
+   608                           	callstack 0
+   609   000264                     SYSWAITLOOP3:
+   610                           	callstack 0
+   611   000264  A26F               	btfss	1135,1,c
+   612   000266  D7FE               	bra	SYSWAITLOOP3
+   613                           
+   614                           ;'TXREG = SERDATA
+   615   000268  C514 F1B1          	movff	1300,433
+   616   00026C  0012               	return	
+   617   00026E                     INITPPS:
+   618                           	callstack 0
+   619                           
+   620                           ;'MODULE: I2C1
+   621                           ;'RB6PPS = 0X001C    // SCL1 > RB6
+   622   00026E  0E1C               	movlw	28
+   623   000270  0103               	banksel	807
+   624   000272  6F27               	movwf	807,b
+   625                           
+   626                           ;'I2C1SCLPPS = 0X000E    // RB6 > SCL1 (BI-DIRECTIONAL)
+   627   000274  0E0E               	movlw	14
+   628   000276  6FAD               	movwf	941,b
+   629                           
+   630                           ;'RB5PPS = 0X001D    // SDA1 > RB5
+   631   000278  0E1D               	movlw	29
+   632   00027A  6F26               	movwf	806,b
+   633                           
+   634                           ;'I2C1SDAPPS = 0X000D    // RB5 > SDA1 (BI-DIRECTIONAL)
+   635   00027C  0E0D               	movlw	13
+   636   00027E  6FAE               	movwf	942,b
+   637                           
+   638                           ;'MODULE: UART PIN DIRECTIONS
+   639                           ;'DIR PORTB.7 OUT    // MAKE TX1 PIN AN OUTPUT
+   640   000280  9E8E               	bcf	1166,7,c
+   641                           
+   642                           ;'MODULE: UART1
+   643                           ;'RB7PPS = 0X0013    // TX1 > RB7
+   644   000282  0E13               	movlw	19
+   645   000284  6F28               	movwf	808,b
+   646   000286  0100               	banksel	0
+   647   000288  0012               	return	
+   648   00028A                     INITSYS:
+   649                           	callstack 0
+   650                           
+   651                           ;'CLEAR BSR
+   652                           ;'MOVLB 0
+   653   00028A  0100               	movlb	0
+   654                           
+   655                           ;'ASM SHOWDEBUG DEFAULT SETTINGS FOR MICROCONTROLLERS WITH _OSCCON1_
+   656                           ;DEFAULT OSCCON1,NOSC HFINTOSC; NDIV 1 - COMMON AS THIS SIMPLY SETS THE HFINTOSC
+   657                           ;'OSCCON1 = 0X60
+   658   00028C  0E60               	movlw	96
+   659   00028E  6F7A               	movwf	122,b
+   660                           
+   661                           ;'DEFAULT VALUE TYPICALLY, CSWHOLD MAY PROCEED; SOSCPWR LOW POWER
+   662                           ;'OSCCON3 = 0X00
+   663   000290  6B7C               	clrf	124,b
+   664                           
+   665                           ;'DEFAULT VALUE TYPICALLY, MFOEN DISABLED; LFOEN DISABLED; ADOEN DISABLED; SOSCEN DISABLED; EXTOEN DISABLED; HFOEN DISABLED
+   666                           ;'OSCEN = 0X00
+   667   000292  6B7E               	clrf	126,b
+   668                           
+   669                           ;'DEFAULT VALUE
+   670                           ;'OSCTUNE = 0X00
+   671   000294  6B7F               	clrf	127,b
+   672                           
+   673                           ;'ASM SHOWDEBUG THE MCU IS A CHIP FAMILY 16
+   674                           ;'SECTION SUPPORTS MANY MCUS, 18FXXK40, 18FXXK42 ETC THAT HAVE NDIV3 BIT
+   675                           ;'ASM SHOWDEBUG OSCCON TYPE IS 101
+   676                           ;'OSCCON1 = 0X60          // SETTING OSCCON1 IMPLIES CLEARING CLEAR NDIV3:0
+   677   000296  0E60               	movlw	96
+   678   000298  6F7A               	movwf	122,b
+   679                           
+   680                           ;'OSCFRQ = 0B00001000  '64MHZ
+   681   00029A  0E08               	movlw	8
+   682   00029C  6F80               	movwf	128,b
+   683                           
+   684                           ;'ASM SHOWDEBUG _COMPLETE_THE_CHIP_SETUP_OF_BSR_ADCS_ANSEL_AND_OTHER_KEY_SETUP_REGISTERS_OR_REGISTER_BITS
+   685                           ;'CLEAR TBLPTRU
+   686                           ;'TBLPTRU = 0
+   687   00029E  6AF8               	clrf	tblptru,c
+   688                           
+   689                           ;'ENSURE ALL PORTS ARE SET FOR DIGITAL I/O AND, TURN OFF A/D
+   690                           ;'SET ADFM OFF
+   691   0002A0  0102               	banksel	559
+   692   0002A2  952F               	bcf	559,2,b
+   693                           
+   694                           ;'SWITCH OFF A/D VAR(ADCON0)
+   695                           ;'SET ADCON0.ADON OFF
+   696   0002A4  9F2F               	bcf	559,7,b
+   697                           
+   698                           ;'ANSELA = 0
+   699   0002A6  0104               	banksel	1046
+   700   0002A8  6B16               	clrf	1046,b
+   701                           
+   702                           ;'ANSELB = 0
+   703   0002AA  6B20               	clrf	1056,b
+   704                           
+   705                           ;'ANSELC = 0
+   706   0002AC  6B2A               	clrf	1066,b
+   707                           
+   708                           ;'TURN OFF ALL PORTS
+   709                           ;'PORTA = 0
+   710   0002AE  6A87               	clrf	1159,c
+   711                           
+   712                           ;'PORTB = 0
+   713   0002B0  6A88               	clrf	1160,c
+   714                           
+   715                           ;'PORTC = 0
+   716   0002B2  6A89               	clrf	1161,c
+   717   0002B4  0100               	banksel	0
+   718   0002B6  0012               	return	
+   719   0002B8                     INITUSART:
+   720                           	callstack 0
+   721                           
+   722                           ;'SET THE DEFAULT VALUE FOR USART HANDLER - REQUIRED WHEN MORE THAN ONE USART
+   723                           ;'COMPORT = 1
+   724   0002B8  0E01               	movlw	1
+   725   0002BA  6E02               	movwf	1282,c
+   726                           
+   727                           ;'PIC USART 1 INIT
+   728                           ;'U1BRGH=SPBRGH_TEMP
+   729   0002BC  0E06               	movlw	6
+   730   0002BE  0101               	banksel	445
+   731   0002C0  6FBD               	movwf	445,b
+   732                           
+   733                           ;'U1BRGL=SPBRGL_TEMP
+   734   0002C2  0E81               	movlw	129
+   735   0002C4  6FBC               	movwf	444,b
+   736                           
+   737                           ;'U1BRGS = BRGS1_SCRIPT
+   738   0002C6  8FB9               	bsf	441,7,b
+   739                           
+   740                           ;'U1TXEN=1   'ENABLE TX1
+   741   0002C8  8BB9               	bsf	441,5,b
+   742                           
+   743                           ;'U1RXEN=1   'ENABLE RX1
+   744   0002CA  89B9               	bsf	441,4,b
+   745                           
+   746                           ;'ON_U1CON1=1 'ENABLE USART1
+   747   0002CC  8FBA               	bsf	442,7,b
+   748   0002CE  0100               	banksel	0
+   749   0002D0  0012               	return	
+   750   0002D2                     SI2CINIT:
+   751                           	callstack 0
+   752                           
+   753                           ;'ASM SHOWDEBUG  THIS METHOD SETS THE MSSP MODULES FOR K-MODE FAMILY CHIPS
+   754                           ;'DIR HI2C_DATA OUT
+   755   0002D2  9A8E               	bcf	1166,5,c
+   756                           
+   757                           ;'DIR HI2C_CLOCK OUT
+   758   0002D4  9C8E               	bcf	1166,6,c
+   759                           
+   760                           ;'I2C1CON1 = I2C1I2C1CON1DEFAULT
+   761   0002D6  0E80               	movlw	128
+   762   0002D8  0101               	banksel	487
+   763   0002DA  6FE7               	movwf	487,b
+   764                           
+   765                           ;'I2C1CON2 = I2C1I2C1CON2DEFAULT
+   766   0002DC  0E21               	movlw	33
+   767   0002DE  6FE8               	movwf	488,b
+   768                           
+   769                           ;'I2C1CLK =  I2C1CLOCKSOURCE
+   770   0002E0  0E03               	movlw	3
+   771   0002E2  6FF9               	movwf	505,b
+   772                           
+   773                           ;'I2C1CON0 = I2C1I2C1CON0DEFAULT
+   774   0002E4  0E84               	movlw	132
+   775   0002E6  6FE6               	movwf	486,b
+   776                           
+   777                           ;'I2C1PIR = 0    ;CLEAR ALL THE ERROR FLAGS
+   778   0002E8  6BEA               	clrf	490,b
+   779                           
+   780                           ;'I2C1ERR = 0
+   781   0002EA  6BEC               	clrf	492,b
+   782                           
+   783                           ;'I2C1CON0.EN=1
+   784   0002EC  8FE6               	bsf	486,7,b
+   785                           
+   786                           ;'COMMENCE I2C PROTOCOL
+   787                           ;'I2C1CON2.ACNT = 0
+   788   0002EE  9FE8               	bcf	488,7,b
+   789                           
+   790                           ;'I2C1CON2.ABD=0
+   791   0002F0  99E8               	bcf	488,4,b
+   792                           
+   793                           ;'I2C1CON0.MDR=1
+   794   0002F2  87E6               	bsf	486,3,b
+   795                           
+   796                           ;'INITIALISE CORRECT STATE OF I2C MODULE. NOT SURE WHY THIS IS NEEDED BUT IT IS. MICROCHIP FAILED TO EXPLAIN WHY THIS IS REQUIRED. BUT, IT IS.
+   797                           ;'SI2CSTART
+   798   0002F4  0100               	banksel	0
+   799   0002F6  D891               	rcall	SI2CSTART
+   800                           
+   801                           ;'SI2CSEND ( 0XFF )
+   802   0002F8  6812               	setf	1298,c
+   803   0002FA  D803               	rcall	SI2CSEND
+   804                           
+   805                           ;'SI2CSTOP
+   806   0002FC  D893               	rcall	SI2CSTOP
+   807                           
+   808                           ;'HI2CCURRENTMODE = 0
+   809   0002FE  6A0F               	clrf	1295,c
+   810   000300  0012               	return	
+   811   000302                     SI2CSEND:
+   812                           	callstack 0
+   813   000302                     SYSSELECT1CASE1:
+   814                           	callstack 0
+   815   000302  0E02               	movlw	2
+   816   000304  5C0D               	subwf	1293,w,c
+   817   000306  A4D8               	btfss	status,2,c
+   818   000308  D01D               	bra	SYSSELECT1CASE2
+   819                           
+   820                           ;'HI2CWAITMSSPTIMEOUT = 0
+   821   00030A  6A10               	clrf	1296,c
+   822   00030C                     SYSDOLOOP_S3:
+   823                           	callstack 0
+   824   00030C  0EFF               	movlw	255
+   825   00030E  5C10               	subwf	1296,w,c
+   826   000310  B0D8               	btfsc	status,0,c
+   827   000312  D012               	bra	SYSDOLOOP_E3
+   828                           
+   829                           ;'HI2CWAITMSSPTIMEOUT++
+   830   000314  2A10               	incf	1296,f,c
+   831                           
+   832                           ;'WAIT FOR THIS EVENT
+   833                           ;'IF I2C1STAT1.TXBE = 1 THEN
+   834   000316  0101               	banksel	485
+   835   000318  ABE5               	btfss	485,5,b
+   836   00031A  D009               	bra	ELSE15_1
+   837                           
+   838                           ;'SET THE BYTE COUNT TO 1, PLACE OUTBYTE IN REGISTER, AND WAIT FOR HARDWARE STATE MACHINE
+   839                           ;'I2C1CNT = 1
+   840   00031C  0E01               	movlw	1
+   841   00031E  6FED               	movwf	493,b
+   842                           
+   843                           ;'I2C1TXB = I2CBYTE
+   844   000320  C512 F1F0          	movff	1298,496
+   845                           
+   846                           ;'SI2CWAIT4ACK
+   847   000324  0100               	banksel	0
+   848   000326  D8A3               	rcall	SI2CWAIT4ACK
+   849                           
+   850                           ;'SI2CWAIT4MDR
+   851   000328  D8BF               	rcall	SI2CWAIT4MDR
+   852                           
+   853                           ;'EXIT SUB
+   854   00032A  0012               	return	
+   855                           
+   856                           ;'ELSE
+   857   00032C  D004               	bra	ENDIF15
+   858   00032E                     ELSE15_1:
+   859                           	callstack 0
+   860                           
+   861                           ;'WAIT 1 US
+   862   00032E  0E05               	movlw	5
+   863   000330  6E00               	movwf	1280,c
+   864   000332                     DELAYUS4:
+   865                           	callstack 0
+   866   000332  2E00               	decfsz	1280,f,c
+   867   000334  D7FE               	bra	DELAYUS4
+   868   000336                     ENDIF15:
+   869                           	callstack 0
+   870                           
+   871                           ;'LOOP
+   872   000336  D7EA               	bra	SYSDOLOOP_S3
+   873   000338                     SYSDOLOOP_E3:
+   874                           	callstack 0
+   875                           
+   876                           ;'IF HI2CWAITMSSPTIMEOUT = 255 THEN HI2C1LASTERROR = HI2C1LASTERROR OR I2C1_TXBE_TIMEOUT
+   877   000338  2810               	incf	1296,w,c
+   878   00033A  A4D8               	btfss	status,2,c
+   879   00033C  D002               	bra	ENDIF16
+   880                           
+   881                           ;'IF HI2CWAITMSSPTIMEOUT = 255 THEN HI2C1LASTERROR = HI2C1LASTERROR OR I2C1_TXBE_TIMEOUT
+   882   00033E  0E02               	movlw	2
+   883   000340  120C               	iorwf	1292,f,c
+   884   000342                     ENDIF16:
+   885                           	callstack 0
+   886                           
+   887                           ;'CASE 1  'A START
+   888   000342  D069               	bra	SYSSELECTEND1
+   889   000344                     SYSSELECT1CASE2:
+   890                           	callstack 0
+   891   000344  040D               	decf	1293,w,c
+   892   000346  A4D8               	btfss	status,2,c
+   893   000348  D03F               	bra	SYSSELECT1CASE3
+   894                           
+   895                           ;'CLEAR THE OUTPUT BUFFERS, SET BYTE COUNT TO ZERO, CLEAR EVENT AND PLACE SLAVE ADDRESS IN REGISTER
+   896                           ;'I2C1STAT1.CLRBF = 1
+   897   00034A  0101               	banksel	485
+   898   00034C  85E5               	bsf	485,2,b
+   899                           
+   900                           ;'I2C1CNT = 0
+   901   00034E  6BED               	clrf	493,b
+   902                           
+   903                           ;'I2C1PIR.SCIF = 0
+   904   000350  91EA               	bcf	490,0,b
+   905                           
+   906                           ;'I2C1ADB1 = I2CBYTE
+   907   000352  C512 F1F2          	movff	1298,498
+   908                           
+   909                           ;'WAIT HI2CITSCLWAITPERIOD US
+   910   000356  0E02               	movlw	2
+   911   000358  6E01               	movwf	1281,c
+   912   00035A                     DELAYUSO5:
+   913                           	callstack 0
+   914   00035A  6A00               	clrf	1280,c
+   915   00035C                     DELAYUS5:
+   916                           	callstack 0
+   917   00035C  2E00               	decfsz	1280,f,c
+   918   00035E  D7FE               	bra	DELAYUS5
+   919   000360  2E01               	decfsz	1281,f,c
+   920   000362  D7FB               	bra	DELAYUSO5
+   921   000364  0E13               	movlw	19
+   922   000366  6E00               	movwf	1280,c
+   923   000368                     DELAYUS6:
+   924                           	callstack 0
+   925   000368  2E00               	decfsz	1280,f,c
+   926   00036A  D7FE               	bra	DELAYUS6
+   927                           
+   928                           ;'SET TO START
+   929                           ;'I2C1CON0.S = 1
+   930   00036C  8BE6               	bsf	486,5,b
+   931                           
+   932                           ;'HI2CWAITMSSPTIMEOUT = 0
+   933   00036E  6A10               	clrf	1296,c
+   934   000370                     SYSDOLOOP_S4:
+   935                           	callstack 0
+   936   000370  0EFF               	movlw	255
+   937   000372  5C10               	subwf	1296,w,c
+   938   000374  B0D8               	btfsc	status,0,c
+   939   000376  D022               	bra	SYSDOLOOP_E4
+   940                           
+   941                           ;'HI2CWAITMSSPTIMEOUT++
+   942   000378  2A10               	incf	1296,f,c
+   943                           
+   944                           ;'WAIT FOR THIS EVENT
+   945                           ;'IF I2C1PIR.SCIF = 1 THEN
+   946   00037A  A1EA               	btfss	490,0,b
+   947   00037C  D013               	bra	ELSE17_1
+   948                           
+   949                           ;'WAIT HI2CITSCLWAITPERIOD US
+   950   00037E  0E02               	movlw	2
+   951   000380  6E01               	movwf	1281,c
+   952   000382                     DELAYUSO7:
+   953                           	callstack 0
+   954   000382  6A00               	clrf	1280,c
+   955   000384                     DELAYUS7:
+   956                           	callstack 0
+   957   000384  2E00               	decfsz	1280,f,c
+   958   000386  D7FE               	bra	DELAYUS7
+   959   000388  2E01               	decfsz	1281,f,c
+   960   00038A  D7FB               	bra	DELAYUSO7
+   961   00038C  0E13               	movlw	19
+   962   00038E  6E00               	movwf	1280,c
+   963   000390                     DELAYUS8:
+   964                           	callstack 0
+   965   000390  2E00               	decfsz	1280,f,c
+   966   000392  D7FE               	bra	DELAYUS8
+   967                           
+   968                           ;'HI2C1STATEMACHINE = 2  'SET ((WDTTMR) and 0FFh), 2, b MACHINE TO SEND ((I2C1STAT0) and 0FFh), 3, b
+   969   000394  0E02               	movlw	2
+   970   000396  6E0D               	movwf	1293,c
+   971                           
+   972                           ;'HI2CACKPOLLSTATE = I2C1CON1.5
+   973   000398  6A0E               	clrf	1294,c
+   974   00039A  BBE7               	btfsc	487,5,b
+   975   00039C  2A0E               	incf	1294,f,c
+   976                           
+   977                           ;'EXIT SUB
+   978   00039E  0100               	banksel	0
+   979   0003A0  0012               	return	
+   980                           
+   981                           ;'ELSE
+   982   0003A2  D00B               	bra	ENDIF17
+   983   0003A4                     ELSE17_1:
+   984                           	callstack 0
+   985                           
+   986                           ;'WAIT HI2CITSCLWAITPERIOD US
+   987   0003A4  0E02               	movlw	2
+   988   0003A6  6E01               	movwf	1281,c
+   989   0003A8                     DELAYUSO9:
+   990                           	callstack 0
+   991   0003A8  6A00               	clrf	1280,c
+   992   0003AA                     DELAYUS9:
+   993                           	callstack 0
+   994   0003AA  2E00               	decfsz	1280,f,c
+   995   0003AC  D7FE               	bra	DELAYUS9
+   996   0003AE  2E01               	decfsz	1281,f,c
+   997   0003B0  D7FB               	bra	DELAYUSO9
+   998   0003B2  0E13               	movlw	19
+   999   0003B4  6E00               	movwf	1280,c
+  1000   0003B6                     DELAYUS10:
+  1001                           	callstack 0
+  1002   0003B6  2E00               	decfsz	1280,f,c
+  1003   0003B8  D7FE               	bra	DELAYUS10
+  1004   0003BA                     ENDIF17:
+  1005                           	callstack 0
+  1006                           
+  1007                           ;'LOOP
+  1008   0003BA  D7DA               	bra	SYSDOLOOP_S4
+  1009   0003BC                     SYSDOLOOP_E4:
+  1010                           	callstack 0
+  1011                           
+  1012                           ;'IF HI2CWAITMSSPTIMEOUT = 255 THEN HI2C1LASTERROR = HI2C1LASTERROR OR I2C1_START_TIMEOUT
+  1013   0003BC  2810               	incf	1296,w,c
+  1014   0003BE  A4D8               	btfss	status,2,c
+  1015   0003C0  D002               	bra	ENDIF18
+  1016                           
+  1017                           ;'IF HI2CWAITMSSPTIMEOUT = 255 THEN HI2C1LASTERROR = HI2C1LASTERROR OR I2C1_START_TIMEOUT
+  1018   0003C2  0E04               	movlw	4
+  1019   0003C4  120C               	iorwf	1292,f,c
+  1020   0003C6                     ENDIF18:
+  1021                           	callstack 0
+  1022                           
+  1023                           ;'CASE 3  'A RESTART
+  1024   0003C6  D027               	bra	SYSSELECTEND1
+  1025   0003C8                     SYSSELECT1CASE3:
+  1026                           	callstack 0
+  1027   0003C8  0E03               	movlw	3
+  1028   0003CA  5C0D               	subwf	1293,w,c
+  1029   0003CC  A4D8               	btfss	status,2,c
+  1030   0003CE  D023               	bra	SYSSELECTEND1
+  1031   0003D0                     SYSWAITLOOP2:
+  1032                           	callstack 0
+  1033   0003D0  0101               	banksel	484
+  1034   0003D2  BBE4               	btfsc	484,5,b
+  1035   0003D4  D7FD               	bra	SYSWAITLOOP2
+  1036                           
+  1037                           ;'SET COUNT TO ZERO, PLACE SLAVE ADDRESS IN REGISTER AND CLEAR EVENT
+  1038                           ;'I2C1CNT = 0
+  1039   0003D6  6BED               	clrf	493,b
+  1040                           
+  1041                           ;'I2C1ADB1 = I2CBYTE
+  1042   0003D8  C512 F1F2          	movff	1298,498
+  1043                           
+  1044                           ;'I2C1PIR.SCIF = 0
+  1045   0003DC  91EA               	bcf	490,0,b
+  1046                           
+  1047                           ;'HI2CWAITMSSPTIMEOUT = 0
+  1048   0003DE  6A10               	clrf	1296,c
+  1049   0003E0                     SYSDOLOOP_S5:
+  1050                           	callstack 0
+  1051   0003E0  0EFF               	movlw	255
+  1052   0003E2  5C10               	subwf	1296,w,c
+  1053   0003E4  B0D8               	btfsc	status,0,c
+  1054   0003E6  D012               	bra	SYSDOLOOP_E5
+  1055                           
+  1056                           ;'HI2CWAITMSSPTIMEOUT++
+  1057   0003E8  2A10               	incf	1296,f,c
+  1058                           
+  1059                           ;'WAIT FOR THIS EVENT
+  1060                           ;'IF I2C1PIR.SCIF = 1 THEN
+  1061   0003EA  A1EA               	btfss	490,0,b
+  1062   0003EC  D008               	bra	ELSE19_1
+  1063                           
+  1064                           ;'HI2C1STATEMACHINE = 2  'SET ((WDTTMR) and 0FFh), 2, b MACHINE TO SEND ((I2C1STAT0) and 0FFh), 3, b
+  1065   0003EE  0E02               	movlw	2
+  1066   0003F0  6E0D               	movwf	1293,c
+  1067                           
+  1068                           ;'HI2CACKPOLLSTATE = I2C1CON1.5
+  1069   0003F2  6A0E               	clrf	1294,c
+  1070   0003F4  BBE7               	btfsc	487,5,b
+  1071   0003F6  2A0E               	incf	1294,f,c
+  1072                           
+  1073                           ;'EXIT SUB
+  1074   0003F8  0100               	banksel	0
+  1075   0003FA  0012               	return	
+  1076                           
+  1077                           ;'ELSE
+  1078   0003FC  D006               	bra	ENDIF19
+  1079   0003FE                     ELSE19_1:
+  1080                           	callstack 0
+  1081                           
+  1082                           ;'SET AS START AND CLEAR RESTART
+  1083                           ;'I2C1CON0.S = 1
+  1084   0003FE  8BE6               	bsf	486,5,b
+  1085                           
+  1086                           ;'I2C1CON0.RSEN=0
+  1087   000400  9DE6               	bcf	486,6,b
+  1088                           
+  1089                           ;'WAIT 1 US
+  1090   000402  0E05               	movlw	5
+  1091   000404  6E00               	movwf	1280,c
+  1092   000406                     DELAYUS11:
+  1093                           	callstack 0
+  1094   000406  2E00               	decfsz	1280,f,c
+  1095   000408  D7FE               	bra	DELAYUS11
+  1096   00040A                     ENDIF19:
+  1097                           	callstack 0
+  1098                           
+  1099                           ;'LOOP
+  1100   00040A  D7EA               	bra	SYSDOLOOP_S5
+  1101   00040C                     SYSDOLOOP_E5:
+  1102                           	callstack 0
+  1103                           
+  1104                           ;'IF HI2CWAITMSSPTIMEOUT = 255 THEN HI2C1LASTERROR = HI2C1LASTERROR OR I2C1_RESTART_TIMEOUT
+  1105   00040C  2810               	incf	1296,w,c
+  1106   00040E  A4D8               	btfss	status,2,c
+  1107   000410  D002               	bra	ENDIF20
+  1108                           
+  1109                           ;'IF HI2CWAITMSSPTIMEOUT = 255 THEN HI2C1LASTERROR = HI2C1LASTERROR OR I2C1_RESTART_TIMEOUT
+  1110   000412  0E08               	movlw	8
+  1111   000414  120C               	iorwf	1292,f,c
+  1112   000416                     ENDIF20:
+  1113                           	callstack 0
+  1114   000416                     SYSSELECTEND1:
+  1115                           	callstack 0
+  1116   000416  0100               	banksel	0
+  1117   000418  0012               	return	
+  1118   00041A                     SI2CSTART:
+  1119                           	callstack 0
+  1120                           
+  1121                           ;'ASM SHOWDEBUG  REDIRECTED FOR K-MODE FAMILY PROBALBY CALLED HI2CSTART
+  1122                           ;'ASM SHOWDEBUG  THIS METHOD SETS THE REGISTERS AND REGISTER BITS TO GENERATE THE I2C  START SIGNAL. MASTER_MODE ONLY.
+  1123                           ;'HI2C1STATEMACHINE = 1
+  1124   00041A  0E01               	movlw	1
+  1125   00041C  6E0D               	movwf	1293,c
+  1126                           
+  1127                           ;'HI2CWAITMSSPTIMEOUT = FALSE
+  1128   00041E  6A10               	clrf	1296,c
+  1129                           
+  1130                           ;'CLEAR THE ERROR STATE VARIABLE
+  1131                           ;'HI2C1LASTERROR = I2C1_GOOD
+  1132   000420  6A0C               	clrf	1292,c
+  1133   000422  0012               	return	
+  1134   000424                     SI2CSTOP:
+  1135                           	callstack 0
+  1136                           
+  1137                           ;'ASM SHOWDEBUG  REDIRECTED FOR K-MODE FAMILY PROBALBY CALLED HI2CSTOP
+  1138                           ;'ASM SHOWDEBUG  THIS METHOD SETS THE REGISTERS AND REGISTER BITS TO GENERATE THE I2C  STOP SIGNAL
+  1139                           ;'WAITS UP TO 254US THEN SET THE ERROR STATE
+  1140                           ;'HI2C1STATEMACHINE = 0
+  1141   000424  6A0D               	clrf	1293,c
+  1142                           
+  1143                           ;'HI2CWAITMSSPTIMEOUT = 0
+  1144   000426  6A10               	clrf	1296,c
+  1145   000428                     SYSDOLOOP_S2:
+  1146                           	callstack 0
+  1147   000428  0EFF               	movlw	255
+  1148   00042A  5C10               	subwf	1296,w,c
+  1149   00042C  B0D8               	btfsc	status,0,c
+  1150   00042E  D018               	bra	SYSDOLOOP_E2
+  1151                           
+  1152                           ;'HI2CWAITMSSPTIMEOUT++
+  1153   000430  2A10               	incf	1296,f,c
+  1154                           
+  1155                           ;'WAIT TILL THIS EVENT
+  1156                           ;'IF I2C1PIR.PCIF = 1 THEN
+  1157   000432  0101               	banksel	490
+  1158   000434  A5EA               	btfss	490,2,b
+  1159   000436  D00F               	bra	ELSE13_1
+  1160                           
+  1161                           ;'SI2CWAIT4STOP
+  1162   000438  0100               	banksel	0
+  1163   00043A  D84E               	rcall	SI2CWAIT4STOP
+  1164                           
+  1165                           ;'TSCL WAIT, PART OF THE SPECIFICIATION OF THE I2C MODULE
+  1166                           ;'WAIT HI2CITSCLWAITPERIOD US
+  1167   00043C  0E02               	movlw	2
+  1168   00043E  6E01               	movwf	1281,c
+  1169   000440                     DELAYUSO1:
+  1170                           	callstack 0
+  1171   000440  6A00               	clrf	1280,c
+  1172   000442                     DELAYUS1:
+  1173                           	callstack 0
+  1174   000442  2E00               	decfsz	1280,f,c
+  1175   000444  D7FE               	bra	DELAYUS1
+  1176   000446  2E01               	decfsz	1281,f,c
+  1177   000448  D7FB               	bra	DELAYUSO1
+  1178   00044A  0E13               	movlw	19
+  1179   00044C  6E00               	movwf	1280,c
+  1180   00044E                     DELAYUS2:
+  1181                           	callstack 0
+  1182   00044E  2E00               	decfsz	1280,f,c
+  1183   000450  D7FE               	bra	DELAYUS2
+  1184                           
+  1185                           ;'EXIT SUB
+  1186   000452  0012               	return	
+  1187                           
+  1188                           ;'ELSE
+  1189   000454  D004               	bra	ENDIF13
+  1190   000456                     ELSE13_1:
+  1191                           	callstack 0
+  1192                           
+  1193                           ;'WAIT 1 US
+  1194   000456  0E05               	movlw	5
+  1195   000458  6E00               	movwf	1280,c
+  1196   00045A                     DELAYUS3:
+  1197                           	callstack 0
+  1198   00045A  2E00               	decfsz	1280,f,c
+  1199   00045C  D7FE               	bra	DELAYUS3
+  1200   00045E                     ENDIF13:
+  1201                           	callstack 0
+  1202                           
+  1203                           ;'LOOP
+  1204   00045E  D7E4               	bra	SYSDOLOOP_S2
+  1205   000460                     SYSDOLOOP_E2:
+  1206                           	callstack 0
+  1207                           
+  1208                           ;'IF HI2CWAITMSSPTIMEOUT = 255 THEN HI2C1LASTERROR = HI2C1LASTERROR OR I2C1_STOP_TIMEOUT
+  1209   000460  2810               	incf	1296,w,c
+  1210   000462  A4D8               	btfss	status,2,c
+  1211   000464  D002               	bra	ENDIF14
+  1212                           
+  1213                           ;'IF HI2CWAITMSSPTIMEOUT = 255 THEN HI2C1LASTERROR = HI2C1LASTERROR OR I2C1_STOP_TIMEOUT
+  1214   000466  0E80               	movlw	128
+  1215   000468  120C               	iorwf	1292,f,c
+  1216   00046A                     ENDIF14:
+  1217                           	callstack 0
+  1218   00046A  0100               	banksel	0
+  1219   00046C  0012               	return	
+  1220   00046E                     SI2CWAIT4ACK:
+  1221                           	callstack 0
+  1222                           
+  1223                           ;'HI2CWAITMSSPTIMEOUT = 0
+  1224   00046E  6A10               	clrf	1296,c
+  1225   000470                     SYSDOLOOP_S6:
+  1226                           	callstack 0
+  1227   000470  0EFF               	movlw	255
+  1228   000472  5C10               	subwf	1296,w,c
+  1229   000474  B0D8               	btfsc	status,0,c
+  1230   000476  D011               	bra	SYSDOLOOP_E6
+  1231                           
+  1232                           ;'HI2CWAITMSSPTIMEOUT++
+  1233   000478  2A10               	incf	1296,f,c
+  1234                           
+  1235                           ;'WAIT FOR THIS EVENT
+  1236                           ;'IF I2C1CON1.ACKSTAT = 0 THEN
+  1237   00047A  0101               	banksel	487
+  1238   00047C  BBE7               	btfsc	487,5,b
+  1239   00047E  D008               	bra	ELSE23_1
+  1240                           
+  1241                           ;'SET STATUS
+  1242                           ;'HI2CACKPOLLSTATE = !I2C1CON1.ACKSTAT
+  1243   000480  6A1B               	clrf	1307,c
+  1244   000482  BBE7               	btfsc	487,5,b
+  1245   000484  2A1B               	incf	1307,f,c
+  1246   000486  1C1B               	comf	1307,w,c
+  1247   000488  6E0E               	movwf	1294,c
+  1248                           
+  1249                           ;'EXIT SUB
+  1250   00048A  0100               	banksel	0
+  1251   00048C  0012               	return	
+  1252                           
+  1253                           ;'ELSE
+  1254   00048E  D004               	bra	ENDIF23
+  1255   000490                     ELSE23_1:
+  1256                           	callstack 0
+  1257                           
+  1258                           ;'WAIT 1 US
+  1259   000490  0E05               	movlw	5
+  1260   000492  6E00               	movwf	1280,c
+  1261   000494                     DELAYUS12:
+  1262                           	callstack 0
+  1263   000494  2E00               	decfsz	1280,f,c
+  1264   000496  D7FE               	bra	DELAYUS12
+  1265   000498                     ENDIF23:
+  1266                           	callstack 0
+  1267                           
+  1268                           ;'LOOP
+  1269   000498  D7EB               	bra	SYSDOLOOP_S6
+  1270   00049A                     SYSDOLOOP_E6:
+  1271                           	callstack 0
+  1272                           
+  1273                           ;'IF HI2CWAITMSSPTIMEOUT = 255 THEN HI2C1LASTERROR = HI2C1LASTERROR OR I2C1_ACK_TIMEOUT
+  1274   00049A  2810               	incf	1296,w,c
+  1275   00049C  A4D8               	btfss	status,2,c
+  1276   00049E  D002               	bra	ENDIF24
+  1277                           
+  1278                           ;'IF HI2CWAITMSSPTIMEOUT = 255 THEN HI2C1LASTERROR = HI2C1LASTERROR OR I2C1_ACK_TIMEOUT
+  1279   0004A0  0E20               	movlw	32
+  1280   0004A2  120C               	iorwf	1292,f,c
+  1281   0004A4                     ENDIF24:
+  1282                           	callstack 0
+  1283                           
+  1284                           ;'HI2CWAITMSSPTIMEOUT IS NOW TRUE = 255
+  1285   0004A4  0100               	banksel	0
+  1286   0004A6  0012               	return	
+  1287   0004A8                     SI2CWAIT4MDR:
+  1288                           	callstack 0
+  1289                           
+  1290                           ;'HI2CWAITMSSPTIMEOUT = 0
+  1291   0004A8  6A10               	clrf	1296,c
+  1292   0004AA                     SYSDOLOOP_S7:
+  1293                           	callstack 0
+  1294   0004AA  0EFF               	movlw	255
+  1295   0004AC  5C10               	subwf	1296,w,c
+  1296   0004AE  B0D8               	btfsc	status,0,c
+  1297   0004B0  D00C               	bra	SYSDOLOOP_E7
+  1298                           
+  1299                           ;'HI2CWAITMSSPTIMEOUT++
+  1300   0004B2  2A10               	incf	1296,f,c
+  1301                           
+  1302                           ;'WAIT FOR THIS EVENT
+  1303                           ;'IF I2C1CON0.MDR = 0 THEN
+  1304   0004B4  0101               	banksel	486
+  1305   0004B6  B7E6               	btfsc	486,3,b
+  1306   0004B8  D003               	bra	ELSE26_1
+  1307                           
+  1308                           ;'EXIT SUB
+  1309   0004BA  0100               	banksel	0
+  1310   0004BC  0012               	return	
+  1311                           
+  1312                           ;'ELSE
+  1313   0004BE  D004               	bra	ENDIF26
+  1314   0004C0                     ELSE26_1:
+  1315                           	callstack 0
+  1316                           
+  1317                           ;'WAIT 1 US
+  1318   0004C0  0E05               	movlw	5
+  1319   0004C2  6E00               	movwf	1280,c
+  1320   0004C4                     DELAYUS13:
+  1321                           	callstack 0
+  1322   0004C4  2E00               	decfsz	1280,f,c
+  1323   0004C6  D7FE               	bra	DELAYUS13
+  1324   0004C8                     ENDIF26:
+  1325                           	callstack 0
+  1326                           
+  1327                           ;'LOOP
+  1328   0004C8  D7F0               	bra	SYSDOLOOP_S7
+  1329   0004CA                     SYSDOLOOP_E7:
+  1330                           	callstack 0
+  1331                           
+  1332                           ;'IF HI2CWAITMSSPTIMEOUT = 255 THEN HI2C1LASTERROR = HI2C1LASTERROR OR I2C1_MDR_TIMEOUT
+  1333   0004CA  2810               	incf	1296,w,c
+  1334   0004CC  A4D8               	btfss	status,2,c
+  1335   0004CE  D002               	bra	ENDIF27
+  1336                           
+  1337                           ;'IF HI2CWAITMSSPTIMEOUT = 255 THEN HI2C1LASTERROR = HI2C1LASTERROR OR I2C1_MDR_TIMEOUT
+  1338   0004D0  0E40               	movlw	64
+  1339   0004D2  120C               	iorwf	1292,f,c
+  1340   0004D4                     ENDIF27:
+  1341                           	callstack 0
+  1342                           
+  1343                           ;'HI2CWAITMSSPTIMEOUT IS NOW TRUE = 255
+  1344   0004D4  0100               	banksel	0
+  1345   0004D6  0012               	return	
+  1346   0004D8                     SI2CWAIT4STOP:
+  1347                           	callstack 0
+  1348                           
+  1349                           ;'HI2CWAITMSSPTIMEOUT = 0
+  1350   0004D8  6A10               	clrf	1296,c
+  1351   0004DA                     SYSDOLOOP_S8:
+  1352                           	callstack 0
+  1353   0004DA  0EFF               	movlw	255
+  1354   0004DC  5C10               	subwf	1296,w,c
+  1355   0004DE  B0D8               	btfsc	status,0,c
+  1356   0004E0  D00C               	bra	SYSDOLOOP_E8
+  1357                           
+  1358                           ;'HI2CWAITMSSPTIMEOUT++
+  1359   0004E2  2A10               	incf	1296,f,c
+  1360                           
+  1361                           ;'WAIT FOR THIS EVENT
+  1362                           ;'IF I2C1PIR.PCIF = 1 THEN
+  1363   0004E4  0101               	banksel	490
+  1364   0004E6  A5EA               	btfss	490,2,b
+  1365   0004E8  D003               	bra	ELSE28_1
+  1366                           
+  1367                           ;'EXIT SUB
+  1368   0004EA  0100               	banksel	0
+  1369   0004EC  0012               	return	
+  1370                           
+  1371                           ;'ELSE
+  1372   0004EE  D004               	bra	ENDIF28
+  1373   0004F0                     ELSE28_1:
+  1374                           	callstack 0
+  1375                           
+  1376                           ;'WAIT 1 US
+  1377   0004F0  0E05               	movlw	5
+  1378   0004F2  6E00               	movwf	1280,c
+  1379   0004F4                     DELAYUS14:
+  1380                           	callstack 0
+  1381   0004F4  2E00               	decfsz	1280,f,c
+  1382   0004F6  D7FE               	bra	DELAYUS14
+  1383   0004F8                     ENDIF28:
+  1384                           	callstack 0
+  1385                           
+  1386                           ;'LOOP
+  1387   0004F8  D7F0               	bra	SYSDOLOOP_S8
+  1388   0004FA                     SYSDOLOOP_E8:
+  1389                           	callstack 0
+  1390                           
+  1391                           ;'IF HI2CWAITMSSPTIMEOUT = 255 THEN HI2C1LASTERROR = HI2C1LASTERROR OR I2C1_STOP_TIMEOUT
+  1392   0004FA  2810               	incf	1296,w,c
+  1393   0004FC  A4D8               	btfss	status,2,c
+  1394   0004FE  D002               	bra	ENDIF29
+  1395                           
+  1396                           ;'IF HI2CWAITMSSPTIMEOUT = 255 THEN HI2C1LASTERROR = HI2C1LASTERROR OR I2C1_STOP_TIMEOUT
+  1397   000500  0E80               	movlw	128
+  1398   000502  120C               	iorwf	1292,f,c
+  1399   000504                     ENDIF29:
+  1400                           	callstack 0
+  1401                           
+  1402                           ;'HI2CWAITMSSPTIMEOUT IS NOW TRUE = 255
+  1403   000504  0100               	banksel	0
+  1404   000506  0012               	return	
+  1405   000508                     SYSCOMPEQUAL:
+  1406                           	callstack 0
+  1407                           
+  1408                           ;'DIM SYSBYTETEMPA, SYSBYTETEMPB, SYSBYTETEMPX AS BYTE
+  1409                           ;'SETF SYSBYTETEMPX
+  1410   000508  6800               	setf	1280,c
+  1411                           
+  1412                           ;'MOVF SYSBYTETEMPB, W
+  1413   00050A  5009               	movf	1289,w,c
+  1414                           
+  1415                           ;'CPFSEQ SYSBYTETEMPA
+  1416   00050C  6205               	cpfseq	1285,c
+  1417                           
+  1418                           ;'CLRF SYSBYTETEMPX
+  1419   00050E  6A00               	clrf	1280,c
+  1420   000510  0012               	return	
+  1421   000512                     SYSDIVSUB:
+  1422                           	callstack 0
+  1423                           
+  1424                           ;'DIM SYSBYTETEMPA AS BYTE
+  1425                           ;'DIM SYSBYTETEMPB AS BYTE
+  1426                           ;'DIM SYSBYTETEMPX AS BYTE
+  1427                           ;'CHECK FOR DIV/0
+  1428                           ;'MOVF SYSBYTETEMPB, F
+  1429   000512  5209               	movf	1289,f,c
+  1430                           
+  1431                           ;BTFSC STATUS,2
+  1432   000514  B4D8               	btfsc	status,2,c
+  1433                           
+  1434                           ;'RETURN
+  1435   000516  0012               	return	
+  1436                           
+  1437                           ;'MAIN CALC ROUTINE
+  1438                           ;'SYSBYTETEMPX = 0
+  1439   000518  6A00               	clrf	1280,c
+  1440                           
+  1441                           ;'SYSDIVLOOP = 8
+  1442   00051A  0E08               	movlw	8
+  1443   00051C  6E04               	movwf	1284,c
+  1444   00051E                     SYSDIV8START:
+  1445                           	callstack 0
+  1446                           
+  1447                           ;BCF STATUS,0
+  1448   00051E  90D8               	bcf	status,0,c
+  1449                           
+  1450                           ;'RLF SYSBYTETEMPA, F
+  1451   000520  3605               	rlcf	1285,f,c
+  1452                           
+  1453                           ;'RLF SYSBYTETEMPX, F
+  1454   000522  3600               	rlcf	1280,f,c
+  1455                           
+  1456                           ;'MOVF SYSBYTETEMPB, W
+  1457   000524  5009               	movf	1289,w,c
+  1458                           
+  1459                           ;'SUBWF SYSBYTETEMPX, F
+  1460   000526  5E00               	subwf	1280,f,c
+  1461                           
+  1462                           ;'BSF SYSBYTETEMPA, 0
+  1463   000528  8005               	bsf	1285,0,c
+  1464                           
+  1465                           ;BTFSC STATUS,0
+  1466   00052A  B0D8               	btfsc	status,0,c
+  1467                           
+  1468                           ;'GOTO DIV8NOTNEG
+  1469   00052C  D003               	bra	DIV8NOTNEG
+  1470                           
+  1471                           ;'BCF SYSBYTETEMPA, 0
+  1472   00052E  9005               	bcf	1285,0,c
+  1473                           
+  1474                           ;'MOVF SYSBYTETEMPB, W
+  1475   000530  5009               	movf	1289,w,c
+  1476                           
+  1477                           ;'ADDWF SYSBYTETEMPX, F
+  1478   000532  2600               	addwf	1280,f,c
+  1479   000534                     DIV8NOTNEG:
+  1480                           	callstack 0
+  1481                           
+  1482                           ;'DECFSZ SYSDIVLOOP, F
+  1483   000534  2E04               	decfsz	1284,f,c
+  1484                           
+  1485                           ;'GOTO SYSDIV8START
+  1486   000536  D7F3               	bra	SYSDIV8START
+  1487   000538  0012               	return	
+  1488   00053A                     SYSREADSTRING:
+  1489                           	callstack 0
+  1490                           
+  1491                           ;'DIM SYSCALCTEMPA AS BYTE
+  1492                           ;'DIM SYSSTRINGLENGTH AS BYTE
+  1493                           ;'CHIPFAMILY 16 SUPPORT
+  1494                           ;'GET LENGTH
+  1495                           ;'TBLRD*+
+  1496   00053A  0009               	tblrd		*+
+  1497                           
+  1498                           ;MOVFF TABLAT,SYSCALCTEMPA
+  1499   00053C  C4F5 F505          	movff	tablat,1285
+  1500                           
+  1501                           ;MOVFF TABLAT,INDF1
+  1502   000540  C4F5 F4E7          	movff	tablat,indf1
+  1503                           
+  1504                           ;'GOTO SYSSTRINGREADCHECK
+  1505   000544  D004               	bra	SYSSTRINGREADCHECK
+  1506   000546                     SYSREADSTRINGPART:
+  1507                           	callstack 0
+  1508                           
+  1509                           ;'TBLRD*+
+  1510   000546  0009               	tblrd		*+
+  1511                           
+  1512                           ;MOVF TABLAT,W
+  1513   000548  50F5               	movf	tablat,w,c
+  1514                           
+  1515                           ;'MOVWF SYSCALCTEMPA
+  1516   00054A  6E05               	movwf	1285,c
+  1517                           
+  1518                           ;'ADDWF SYSSTRINGLENGTH,F
+  1519   00054C  2606               	addwf	1286,f,c
+  1520   00054E                     SYSSTRINGREADCHECK:
+  1521                           	callstack 0
+  1522                           
+  1523                           ;'IF LENGTH IS 0, EXIT
+  1524                           ;'MOVF SYSCALCTEMPA,F
+  1525   00054E  5205               	movf	1285,f,c
+  1526                           
+  1527                           ;BTFSC STATUS,2
+  1528   000550  B4D8               	btfsc	status,2,c
+  1529                           
+  1530                           ;'RETURN
+  1531   000552  0012               	return	
+  1532   000554                     SYSSTRINGREAD:
+  1533                           	callstack 0
+  1534                           
+  1535                           ;'COPY CHAR
+  1536                           ;'TBLRD*+
+  1537   000554  0009               	tblrd		*+
+  1538                           
+  1539                           ;MOVFF TABLAT,PREINC1
+  1540   000556  C4F5 F4E4          	movff	tablat,preinc1
+  1541                           
+  1542                           ;'DECFSZ SYSCALCTEMPA, F
+  1543   00055A  2E05               	decfsz	1285,f,c
+  1544                           
+  1545                           ;'GOTO SYSSTRINGREAD
+  1546   00055C  D7FB               	bra	SYSSTRINGREAD
+  1547   00055E  0012               	return	
+  1548   000560                     SYSSTRINGTABLES:
+  1549                           	callstack 0
+  1550   000560                     STRINGTABLE1:
+  1551                           	callstack 0
+  1552   000560  0C 48 61 72 64 77 61 72 65 20 49 32 43 	db	12,72,97,114,100,119,97,114,101,32,73,50,67
+  1553   00056D  00                 	align	2	;X3
+  1554   00056E                     STRINGTABLE2:
+  1555                           	callstack 0
+  1556   00056E  03 20 20 20        	db	3,32,32,32
+  1557   000572                     	align	2	;X3
+  1558   000572                     STRINGTABLE3:
+  1559                           	callstack 0
+  1560   000572  01 20              	db	1,32
+  1561   000574                     	align	2	;X3
+  1562   000574                     STRINGTABLE4:
+  1563                           	callstack 0
+  1564   000574  02 2D 2D           	db	2,45,45
+  1565   000577  00                 	align	2	;X3
+  1566   000578                     STRINGTABLE5:
+  1567                           	callstack 0
+  1568   000578  02 21 20           	db	2,33,32
+  1569   00057B  00                 	align	2	;X3
+  1570   00057C                     STRINGTABLE6:
+  1571                           	callstack 0
+  1572   00057C  0D 45 6E 64 20 6F 66 20 53 65 61 72 63 68 	db	13,69,110,100,32,111,102,32,83,101,97,114,99,104
+  1573   00058A                     	align	2	;X3
+  1574   00058A                     FN__HEXPICAS:
+  1575                           	callstack 0
+  1576                           
+  1577                           ;'_HEXPICAS(0) = 2
+  1578   00058A  0E02               	movlw	2
+  1579   00058C  0114               	banksel	5358
+  1580   00058E  6FEE               	movwf	5358,b
+  1581                           
+  1582                           ;'DIM SYSSTRINGTEMP AS BYTE
+  1583                           ;'LOW NIBBLE
+  1584                           ;'SYSSTRINGTEMP = SYSVALTEMP AND 0X0F
+  1585   000590  0E0F               	movlw	15
+  1586   000592  141D               	andwf	1309,w,c
+  1587   000594  0105               	banksel	1306
+  1588   000596  6F1A               	movwf	1306,b
+  1589                           
+  1590                           ;'IF SYSSTRINGTEMP > 9 THEN SYSSTRINGTEMP = SYSSTRINGTEMP + 7
+  1591   000598  0809               	sublw	9
+  1592   00059A  B0D8               	btfsc	status,0,c
+  1593   00059C  D002               	bra	ENDIF8
+  1594                           
+  1595                           ;'IF SYSSTRINGTEMP > 9 THEN SYSSTRINGTEMP = SYSSTRINGTEMP + 7
+  1596   00059E  0E07               	movlw	7
+  1597   0005A0  271A               	addwf	1306,f,b
+  1598   0005A2                     ENDIF8:
+  1599                           	callstack 0
+  1600                           
+  1601                           ;'_HEXPICAS(2) = SYSSTRINGTEMP + 48
+  1602   0005A2  0E30               	movlw	48
+  1603   0005A4  251A               	addwf	1306,w,b
+  1604   0005A6  0114               	banksel	5360
+  1605   0005A8  6FF0               	movwf	5360,b
+  1606                           
+  1607                           ;'GET HIGH NIBBLE
+  1608                           ;'FOR SYSSTRINGTEMP = 1 TO 4
+  1609                           ;'LEGACY METHOD
+  1610   0005AA  0105               	banksel	1306
+  1611   0005AC  6B1A               	clrf	1306,b
+  1612   0005AE                     SYSFORLOOP3:
+  1613                           	callstack 0
+  1614   0005AE  2B1A               	incf	1306,f,b
+  1615                           
+  1616                           ;'ROTATE SYSVALTEMP RIGHT
+  1617   0005B0  321D               	rrcf	1309,f,c
+  1618                           
+  1619                           ;'NEXT
+  1620   0005B2  0E04               	movlw	4
+  1621   0005B4  5D1A               	subwf	1306,w,b
+  1622   0005B6  A0D8               	btfss	status,0,c
+  1623   0005B8  D7FA               	bra	SYSFORLOOP3
+  1624   0005BA                     SYSFORLOOPEND3:
+  1625                           	callstack 0
+  1626                           
+  1627                           ;'SYSSTRINGTEMP = SYSVALTEMP AND 0X0F
+  1628   0005BA  0E0F               	movlw	15
+  1629   0005BC  141D               	andwf	1309,w,c
+  1630   0005BE  6F1A               	movwf	1306,b
+  1631                           
+  1632                           ;'IF SYSSTRINGTEMP > 9 THEN SYSSTRINGTEMP = SYSSTRINGTEMP + 7
+  1633   0005C0  0809               	sublw	9
+  1634   0005C2  B0D8               	btfsc	status,0,c
+  1635   0005C4  D002               	bra	ENDIF10
+  1636                           
+  1637                           ;'IF SYSSTRINGTEMP > 9 THEN SYSSTRINGTEMP = SYSSTRINGTEMP + 7
+  1638   0005C6  0E07               	movlw	7
+  1639   0005C8  271A               	addwf	1306,f,b
+  1640   0005CA                     ENDIF10:
+  1641                           	callstack 0
+  1642                           
+  1643                           ;'_HEXPICAS(1) = SYSSTRINGTEMP + 48
+  1644   0005CA  0E30               	movlw	48
+  1645   0005CC  251A               	addwf	1306,w,b
+  1646   0005CE  0114               	banksel	5359
+  1647   0005D0  6FEF               	movwf	5359,b
+  1648   0005D2  0100               	banksel	0
+  1649   0005D4  0012               	return	
+  1650                           
+  1651                           ;'********************************************************************************
+  1652   0005D6                     	align	2	;X2
+  1653                           
+  1654                           	psect	config
+  1655                           
+  1656                           ;Config register CONFIG1 @ 0x300000
+  1657                           ;	External Oscillator Selection
+  1658                           ;	FEXTOSC = OFF, Oscillator not enabled
+  1659                           ;	Reset Oscillator Selection
+  1660                           ;	RSTOSC = HFINTOSC_1MHZ, HFINTOSC with HFFRQ = 4 MHz and CDIV = 4:1
+  1661   300000                     	org	3145728
+  1662   300000  EC                 	db	236
+  1663                           
+  1664                           ;Config register CONFIG2 @ 0x300001
+  1665                           ;	Clock out Enable bit
+  1666                           ;	CLKOUTEN = OFF, CLKOUT function is disabled
+  1667                           ;	PRLOCKED One-Way Set Enable bit
+  1668                           ;	PR1WAY = OFF, PRLOCKED bit can be set and cleared repeatedly
+  1669                           ;	Boot Block enable bit
+  1670                           ;	BBEN = OFF, User PFM code protection disabled
+  1671                           ;	Clock Switch Enable bit
+  1672                           ;	CSWEN = ON, Writing to NOSC and NDIV is allowed
+  1673                           ;	Fail-Safe Clock Monitor Enable bit
+  1674                           ;	FCMEN = ON, Fail-Safe Clock Monitor enabled
+  1675                           ;	Fail-Safe Clock Monitor - Primary XTAL Enable bit
+  1676                           ;	FCMENP = OFF, Fail-Safe Clock Monitor disabled
+  1677                           ;	Fail-Safe Clock Monitor - Secondary XTAL Enable bit
+  1678                           ;	FCMENS = OFF, Fail-Safe Clock Monitor Disabled
+  1679   300001                     	org	3145729
+  1680   300001  3D                 	db	61
+  1681                           
+  1682                           ;Config register CONFIG3 @ 0x300002
+  1683                           ;	MCLR Enable bit
+  1684                           ;	MCLRE = INTMCLR, If LVP = 0, MCLR pin function is port defined function; If LVP =1, RE3 pin fuction is MCLR
+  1685                           ;	Power-up timer selection bits
+  1686                           ;	PWRTS = PWRT_OFF, PWRT is disabled
+  1687                           ;	Multi-vector enable bit
+  1688                           ;	MVECEN = OFF, Interrupt contoller does not use vector table to prioritze interrupts
+  1689                           ;	IVTLOCK bit One-way set enable bit
+  1690                           ;	IVT1WAY = OFF, IVTLOCKED bit can be cleared and set repeatedly
+  1691                           ;	Low Power BOR Enable bit
+  1692                           ;	LPBOREN = OFF, Low-Power BOR disabled
+  1693                           ;	Brown-out Reset Enable bits
+  1694                           ;	BOREN = OFF, Brown-out Reset disabled
+  1695   300002                     	org	3145730
+  1696   300002  26                 	db	38
+  1697                           
+  1698                           ;Config register CONFIG4 @ 0x300003
+  1699                           ;	Brown-out Reset Voltage Selection bits
+  1700                           ;	BORV = VBOR_2P85, Brown-out Reset Voltage (VBOR) set to 2.8V
+  1701                           ;	PPSLOCK bit One-Way Set Enable bit
+  1702                           ;	PPS1WAY = OFF, PPSLOCKED bit can be set and cleared repeatedly (subject to the unlock sequence)
+  1703                           ;	Stack Full/Underflow Reset Enable bit
+  1704                           ;	STVREN = OFF, Stack full/underflow will not cause Reset
+  1705                           ;	Low Voltage Programming Enable bit
+  1706                           ;	LVP = OFF, HV on MCLR/VPP must be used for programming
+  1707                           ;	Debug enable bit
+  1708                           ;	DEBUG = OFF, Backround debugger disabled
+  1709                           ;	Extended Instruction Set Enable bit
+  1710                           ;	XINST = OFF, Extended Instruction Set and Indexed Addressing Mode disabled
+  1711   300003                     	org	3145731
+  1712   300003  C4                 	db	196
+  1713                           
+  1714                           ;Config register CONFIG5 @ 0x300004
+  1715                           ;	WDT Period selection bits
+  1716                           ;	WDTCPS = WDTCPS_0, Divider ratio 1:32
+  1717                           ;	WDT operating mode
+  1718                           ;	WDTE = OFF, WDT Disabled; SEN is ignored
+  1719   300004                     	org	3145732
+  1720   300004  80                 	db	128
+  1721                           
+  1722                           ;Config register CONFIG6 @ 0x300005
+  1723                           ;	WDT Window Select bits
+  1724                           ;	WDTCWS = WDTCWS_0, window delay = 87.5; no software control; keyed access required
+  1725                           ;	WDT input clock selector
+  1726                           ;	WDTCCS = LFINTOSC, WDT reference clock is the 31.0 kHz LFINTOSC (when WDTE != 0b00)
+  1727   300005                     	org	3145733
+  1728   300005  C0                 	db	192
+  1729                           
+  1730                           ;Config register CONFIG7 @ 0x300006
+  1731                           ;	VDDIO2 supply mode bit
+  1732                           ;	VDDIO2MD = STANDARD_RANGE, Standard Operating Range (VDDIO2 >= 1.62V)
+  1733                           ;	VDDIO3 supply mode bit
+  1734                           ;	VDDIO3MD = STANDARD_RANGE, Standard Operating Range (VDDIO3 >= 1.62V)
+  1735   300006                     	org	3145734
+  1736   300006  FF                 	db	255
+  1737                           
+  1738                           ;Config register CONFIG8 @ 0x300007
+  1739                           ;	Boot Block Size Selection bits
+  1740                           ;	BBSIZE = BBSIZE_128, Boot Block size is 128 words
+  1741   300007                     	org	3145735
+  1742   300007  00                 	db	0
+  1743                           
+  1744                           ;Config register CONFIG10 @ 0x300008
+  1745                           ;	Boot Block Write Protection bit
+  1746                           ;	WRTB = OFF, Boot Block is not write-protected
+  1747                           ;	Configuration Register Write Protection bit
+  1748                           ;	WRTC = OFF, Configuration registers are not write-protected
+  1749                           ;	Data EEPROM Write Protection bit
+  1750                           ;	WRTD = OFF, Data EEPROM is not write-protected
+  1751                           ;	Storage Area Flash (SAF) Write Protection bit
+  1752                           ;	WRTSAF = OFF, SAF is not write-protected
+  1753                           ;	Application Block Write Protection bit
+  1754                           ;	WRTAPP = OFF, Application Block is not write-protected
+  1755   300008                     	org	3145736
+  1756   300008  FF                 	db	255
+  1757                           
+  1758                           ;Config register CONFIG11 @ 0x300009
+  1759                           ;	User Program Flash Memory (PFM) Code Protection bit
+  1760                           ;	CP = OFF, User PFM code protection is disabled
+  1761   300009                     	org	3145737
+  1762   300009  FF                 	db	255
+  1763                           
+  1764                           ;Config register CONFIG12 @ 0x30000A
+  1765                           ;	Data EEPROM Code Protection bit
+  1766                           ;	CPD = OFF, Data EEPROM code protection is disabled
+  1767   30000A                     	org	3145738
+  1768   30000A  FF                 	db	255
+  1769                           
+  1770                           ;Config register CONFIG14 @ 0x300018
+  1771                           ;	unspecified, using default values
+  1772                           ;	SAF Lock Enable bit
+  1773                           ;	SAFLOCK = 0x1, unprogrammed default
+  1774   300018                     	org	3145752
+  1775   300018  FF                 	db	255
+  1776                           
+  1777                           ;Config register CONFIG9 @ 0x300019
+  1778                           ;	unspecified, using default values
+  1779                           ;	SAF Block Size Selection bits
+  1780                           ;	SAFSZ = 0xFF, unprogrammed default
+  1781   300019                     	org	3145753
+  1782   300019  FF                 	db	255
+  1783                           tosu	equ	0x4FF
+  1784                           tosh	equ	0x4FE
+  1785                           tosl	equ	0x4FD
+  1786                           stkptr	equ	0x4FC
+  1787                           pclatu	equ	0x4FB
+  1788                           pclath	equ	0x4FA
+  1789                           pcl	equ	0x4F9
+  1790                           tblptru	equ	0x4F8
+  1791                           tblptrh	equ	0x4F7
+  1792                           tblptrl	equ	0x4F6
+  1793                           tablat	equ	0x4F5
+  1794                           prodh	equ	0x4F4
+  1795                           prodl	equ	0x4F3
+  1796                           indf0	equ	0x4EF
+  1797                           postinc0	equ	0x4EE
+  1798                           postdec0	equ	0x4ED
+  1799                           preinc0	equ	0x4EC
+  1800                           plusw0	equ	0x4EB
+  1801                           fsr0h	equ	0x4EA
+  1802                           fsr0l	equ	0x4E9
+  1803                           wreg	equ	0x4E8
+  1804                           indf1	equ	0x4E7
+  1805                           postinc1	equ	0x4E6
+  1806                           postdec1	equ	0x4E5
+  1807                           preinc1	equ	0x4E4
+  1808                           plusw1	equ	0x4E3
+  1809                           fsr1h	equ	0x4E2
+  1810                           fsr1l	equ	0x4E1
+  1811                           bsr	equ	0x4E0
+  1812                           indf2	equ	0x4DF
+  1813                           postinc2	equ	0x4DE
+  1814                           postdec2	equ	0x4DD
+  1815                           preinc2	equ	0x4DC
+  1816                           plusw2	equ	0x4DB
+  1817                           fsr2h	equ	0x4DA
+  1818                           fsr2l	equ	0x4D9
+  1819                           status	equ	0x4D8
+
+
+Microchip Technology PIC18 Macro Assembler V2.46 build 20240104201356 
+Symbol Table                                                                                                                                               Sat Feb 17 18:52:52 2024
+
+             HSERPRINTCRLFCOUNT 0511                             FSR0 04E9                             PIR6 046F                            AFSR0 04E9  
+                          U1BRG 01BC                            INDF0 04EF                            INDF1 04E7                            FSR0H 04EA  
+                          U1TXB 01B1                            OSCEN 007E                            PORTA 0487                            PORTB 0488  
+                          PORTC 0489                            TRISA 048D                            TRISB 048E                            TRISC 048F  
+                         ADCON0 022F                           ENDIF2 0122                           ENDIF3 01B8                           ENDIF5 0122  
+                         ANSELA 0416                           ENDIF6 018C                           ANSELB 0420                           ENDIF7 0196  
+                         ANSELC 042A                           ENDIF8 05A2                           U1CON0 01B9                           U1CON1 01BA  
+                         U1BRGH 01BD                           RB5PPS 0326                           RB6PPS 0327                           RB7PPS 0328  
+                         TABLAT 04F5                     SI2CWAIT4ACK 046E                           OSCFRQ 0080                           TBLPTR 04F6  
+                   SI2CWAIT4MDR 04A8                           STATUS 04D8                       I2C1SDAPPS 03AE                       I2C1SCLPPS 03AD  
+                   HSERPRINT314 0206                    STRINGPOINTER 0515                SYSREADSTRINGPART 0546                          I2C1CLK 01F9  
+                        I2C1CNT 01ED                          I2C1ERR 01EC                          I2C1PIR 01EA                          I2C1TXB 01F0  
+                        I2CBYTE 0512                          AFSR0_H 04EA                          ENDIF10 05CA                          ENDIF11 0246  
+                        ENDIF20 0416                          ENDIF12 0246                          ENDIF13 045E                          ENDIF14 046A  
+                        ENDIF23 0498                          ENDIF15 0336                          ENDIF24 04A4                          ENDIF16 0342  
+                        ENDIF17 03BA                          ENDIF26 04C8                          ENDIF18 03C6                          ENDIF27 04D4  
+                        ENDIF19 040A                          ENDIF28 04F8                          ENDIF29 0504                          ELSE3_1 0198  
+                        ELSE6_1 016C                          COMPORT 0502                          INITPPS 026E                          INITSYS 028A  
+                        OSCCON1 007A                          OSCCON3 007C                          SERDATA 0514                          TBLPTRH 04F7  
+                        PREINC1 04E4                          TBLPTRU 04F8                          OSCTUNE 007F                    SI2CWAIT4STOP 04D8  
+                     DELAYTEMP2 0501                     FN__HEXPICAS 058A                       DIV8NOTNEG 0534                          isa$std 0001  
+                  HSERPRINTCRLF 0248                         I2C1ADB1 01F2                         I2C1CON0 01E6                         I2C1CON1 01E7  
+                       I2C1CON2 01E8                         HI2CINIT 0200                         HI2CMODE 0204                         DELAYUS1 0442  
+                       DELAYUS2 044E                         DELAYUS3 045A                         DELAYUS4 0332                         DELAYUS5 035C  
+                       DELAYUS6 0368                         DELAYUS7 0384                         DELAYUS8 0390                         DELAYUS9 03AA  
+                       DEVICEID 0503                         ELSE13_1 0456                         ELSE23_1 0490                         ELSE15_1 032E  
+                       ELSE17_1 03A4                         ELSE26_1 04C0                         ELSE19_1 03FE                         ELSE28_1 04F0  
+                       SI2CINIT 02D2                         SI2CSEND 0302                         SI2CSTOP 0424                    SYSREADSTRING 053A  
+                       RESETVEC 0000              SYSPRINTDATAHANDLER 0516                         PRINTLEN 0513            SYSPRINTDATAHANDLER_H 0517  
+                  SYSSELECTEND1 0416                         SYSTEMP1 051B                         SYSTEMP2 051C                  SYSSELECT1CASE1 0302  
+                SYSSELECT1CASE2 0344                  SYSSELECT1CASE3 03C8                    SYSWAITTEMPUS 0505                       SYSDIVLOOP 0504  
+                     SYSVALTEMP 051D                    BASPROGRAMEND 01FC                    SYSSTRINGREAD 0554                    SYSSTRINGTEMP 051A  
+                     SYSSTRINGA 0507              HI2CWAITMSSPTIMEOUT 0510                SYSREPEATLOOPEND1 0262                  SYSWAITTEMPUS_H 0506  
+                    DUMPI2CREAD 050B                      HSERSEND304 0264                        I2C1STAT0 01E4                        I2C1STAT1 01E5  
+                   STRINGTABLE1 0560                     STRINGTABLE2 056E                     STRINGTABLE3 0572                     STRINGTABLE4 0574  
+                   STRINGTABLE5 0578                     STRINGTABLE6 057C                   HI2C1LASTERROR 050C                  HI2CCURRENTMODE 050F  
+                 DISPLAYNEWLINE 050A                        DELAYUS10 03B6                        DELAYUS11 0406                        DELAYUS12 0494  
+                      DELAYUS13 04C4                        DELAYUS14 04F4                        DELAYTEMP 0500                        DELAYUSO1 0440  
+                      DELAYUSO5 035A                        DELAYUSO7 0382                        DELAYUSO9 03A8                     SYSCALCTEMPA 0505  
+                 SYSFORLOOPEND1 00C4                   SYSFORLOOPEND2 01C2                   SYSFORLOOPEND3 05BA                   SYSFORLOOPEND4 0246  
+                   SYSDIV8START 051E                     SYSCOMPEQUAL 0508                        SI2CSTART 041A                     SYSDOLOOP_E1 01FC  
+                   SYSDOLOOP_E2 0460                     SYSDOLOOP_E3 0338                     SYSDOLOOP_E4 03BC                     SYSDOLOOP_E5 040C  
+                   SYSDOLOOP_E6 049A                     SYSDOLOOP_E7 04CA                     SYSDOLOOP_E8 04FA                     SYSDOLOOP_S1 0026  
+                   SYSDOLOOP_S2 0428                     SYSDOLOOP_S3 030C                        INITUSART 02B8                     SYSDOLOOP_S4 0370  
+                   SYSDOLOOP_S5 03E0                     SYSDOLOOP_S6 0470                     SYSDOLOOP_S7 04AA                     SYSDOLOOP_S8 04DA  
+             SYSSTRINGREADCHECK 054E                     SYSBYTETEMPA 0505                     SYSBYTETEMPB 0509                     SYSBYTETEMPX 0500  
+          HSERSENDUSART1HANDLER 0264                   SYSREPEATLOOP1 0252                     SYSWAITLOOP1 01F6                     SYSWAITLOOP2 03D0  
+                   SYSWAITLOOP3 0264                   SYSREPEATTEMP1 0519                  BASPROGRAMSTART 000C                     SYSPRINTTEMP 0518  
+                      SYSDIVSUB 0512                  SYSSTRINGLENGTH 0506                  SYSSTRINGPARAM1 14F2                  SYSSTRINGTABLES 0560  
+                   SYSSTRINGA_H 0508                        _HEXPICAS 14EE                 HI2CACKPOLLSTATE 050E                      SYSFORLOOP1 0086  
+                    SYSFORLOOP2 00C6                      SYSFORLOOP3 05AE                      SYSFORLOOP4 021C                        isa$xinst 0000  
+              HI2C1STATEMACHINE 050D                   SYS_HEXPICAS_0 14EE                   SYS_HEXPICAS_1 14EF                   SYS_HEXPICAS_2 14F0  

@@ -1,0 +1,101 @@
+/*
+    This demonstration flashes an LED to show the use of a 16Bit Timer 0
+
+    Timer0 is a counter implemented in the processor. It may be used to count instruction
+    cycles or external events, that occur at or below the instruction cycle rate.
+    In the PIC18, Timer0 can be used as either an 8-bit or 16-bit counter, or timer. The
+    enhanced mid-range core implements only an 8-bit counter.
+
+    This lesson configures Timer0 to count instruction cycles and to set a flag when it rolls
+    over. This frees up the processor to do meaningful work rather than wasting instruction
+    cycles in a timing loop using a 16bit timer.
+    Using a counter provides a convenient method of measuring time or delay loops as it
+    allows the processor to work on other tasks rather than counting instruction cycles.
+
+
+    LEDs should flash  ~1 second.
+*/ 
+
+// Chip Settings 
+//! The timer calculations are based on 16mHz.  
+//! You would need to recalculate the timer values if 16mHz is not used
+#CHIP 18F16Q20, 16
+#OPTION Explicit
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    -----------------SW---------ADC-- 
+    -----------------------------------------
+
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    TX-------------------------------
+    -----------------------------------------
+
+    ------------------PORTC-----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    LED-LED-LED-LED------------------
+    ----------------------------------------
+  */
+
+// Define constants to make things easier. We can reuse these at any time.
+    #DEFINE LEDPORT LATC
+    #DEFINE LEDD7 PORTC.7
+    #DEFINE LEDD6 PORTC.6
+    #DEFINE LEDD5 PORTC.5
+    #DEFINE LEDD4 PORTC.4
+
+// Set the ports as an output
+    Dir LEDD7 Out
+    Dir LEDD6 Out
+    Dir LEDD5 Out
+    Dir LEDD4 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    // This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.3
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          0
+
+//*****************************************************************************************************
+// Main program commences here.. everything before this is setup for the board.
+
+// Initialise the timer.
+    // Firstly tell the compiler to use a 16bit timer for this demonstration
+    #DEFINE TMR0_16BIT
+
+    // For this we need the following for timer0
+    //       Prescaler with the FOSC/4 with no post scaler
+    //          1:64
+    InitTimer0 Osc, PRE0_64 + TMR0_FOSC4 ,  POST0_1
+    //    Start the Timer
+    StartTimer 0
+
+    // Every 1 sec.  0x0bdc is calculated value using a tool like Mr E. Timer Helper
+    SetTimer ( 0 , 3036  )
+
+// Set one bit of the port on, where 1 equate to ON
+    LEDD4 = 1
+
+Do
+
+    // wait for the event
+    Wait While TMR0IF = 0
+
+    // Clearing Timer 0 flag will reset event
+    TMR0IF = 0
+
+    // Rotate the LEDs.  We are only interested in the four LEDs
+    Set C Off
+    Rotate LEDPORT Left
+    IF C = 1 Then LEDD4 = 1
+        
+
+    // Set timer 0 to 1s before the next event occurs.  This value as close as you can get to 1s
+    SetTimer ( 0 , 3036 )
+
+Loop

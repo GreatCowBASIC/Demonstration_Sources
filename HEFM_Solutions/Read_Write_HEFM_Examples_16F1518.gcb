@@ -34,7 +34,7 @@
 
   Dim Rel_Address,DataByte, Index as Byte
   Dim NVM_Address as Long  ' Absolute Address
-  Dim  DataWord, as Word
+  Dim  DataWord as Word
   Dim MyBuffer(HEF_ROWSIZE_BYTES)
   ;
   ; --- Main test Program

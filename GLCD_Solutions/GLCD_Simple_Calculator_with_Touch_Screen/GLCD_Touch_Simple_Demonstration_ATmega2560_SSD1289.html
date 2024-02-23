@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Compilation Report</title>
+</head>
+<body>
+<h1>Compilation Report</h1>
+<p>Compiler Version (YYYY-MM-DD): 2024.2.13 (Windows 64 bit) : Build 1335</p>
+<h2>Compilation time</h2>
+<p> (Compile time: 4.03125 seconds)</p>
+<p> (Assembly time: 0 seconds)</p>
+<p> (Download time: 0 seconds)</p>
+<p> (Total time: 4.03125 seconds)</p>
+<h2>Chip resource usage:</h2>
+<p>Chip Model: MEGA2560</p>
+<p>Program Memory: 11584/131072 words (8.84%)</p>
+<p>RAM: 426/8192 bytes (5.2%)</p>
+<p> OSC: 16Mhz</p>
+<h2>RAM Allocation</h2>
+<table border="1">
+</table>
+<h2>Subroutines</h2>
+<table border="1">
+<tr><th>Name</th><th>Code Size (lines)</th><th>Compiled Size (words)</th><th>Outgoing calls</th></tr>
+<tr><td>Main</td><td>293</td><td>5115</td><td>ADS7843_INIT(4), SYSDIVSUB32(1), SYSMULTSUB32(1), SYSCOPYSTRING(46), SYSREADSTRING(43), SYSCOMPLESSTHAN32(1), SYSCOMPLESSTHAN16(64), Delay_MS(17), Delay_S(1), STR(5), VAL(2), LEN(4), PRINT_SSD1289(15), FILLEDBOX_SSD1289(14), RIGHT(19), ROUNDRECT(32), ADS7843_GETXY(1), CREATEBUTTON(20), GLCDROTATE_SSD1289(1), INITGLCD_SSD1289(125), INITSYS(58)</td></tr>
+<tr><td>LINE</td><td>55</td><td>484</td><td>SYSMULTSUBINT(4), SYSCOMPLESSTHANINT(5), SYSCOMPEQUAL16(2), PSET_SSD1289(4)</td></tr>
+<tr><td>ROUNDRECT</td><td>20</td><td>511</td><td>SYSCOMPLESSTHAN16(4), LINE(4), PSET_SSD1289(8), SWAP(2)</td></tr>
+<tr><td>FILLROUNDRECT</td><td>25</td><td>630</td><td>SYSDIVSUB16(1), SYSCOMPLESSTHAN16(4), SYSCOMPEQUAL16(4), LINE(8), SWAP(2)</td></tr>
+<tr><td>CREATEBUTTON</td><td>12</td><td>232</td><td>SYSDIVSUB16(2), PRINT_SSD1289(1), ROUNDRECT(1), FILLROUNDRECT(1)</td></tr>
+<tr><td>ADS7843_INIT</td><td>13</td><td>38</td><td>ADS7843_SETPRECISION(1)</td></tr>
+<tr><td>ADS7843_WRITE</td><td>14</td><td>50</td><td></td></tr>
+<tr><td>ADS7843_READ</td><td>14</td><td>69</td><td></td></tr>
+<tr><td>ADS7843_GETXY</td><td>52</td><td>531</td><td>SYSDIVSUB16(3), SYSMULTSUB16(3), SYSDIVSUBINT(2), SYSDIVSUB32(4), SYSCOMPLESSTHAN16(2), SWAP(2), ADS7843_READ(2), ADS7843_WRITE(2)</td></tr>
+<tr><td>ADS7843_SETPRECISION</td><td>12</td><td>36</td><td></td></tr>
+<tr><td>SWAP</td><td>4</td><td>7</td><td></td></tr>
+<tr><td>INITSYS</td><td>949</td><td>21</td><td></td></tr>
+<tr><td>SYSCOPYSTRING</td><td>118</td><td>13</td><td></td></tr>
+<tr><td>SYSREADSTRING</td><td>114</td><td>24</td><td></td></tr>
+<tr><td>SYSMULTSUB16</td><td>73</td><td>33</td><td>SYSCOMPLESSTHAN16(1)</td></tr>
+<tr><td>SYSMULTSUBINT</td><td>13</td><td>39</td><td>SYSMULTSUB16(1)</td></tr>
+<tr><td>SYSMULTSUB32</td><td>43</td><td>124</td><td>SYSCOMPLESSTHAN32(1)</td></tr>
+<tr><td>SYSDIVSUB16</td><td>38</td><td>48</td><td>SYSCOMPEQUAL16(1)</td></tr>
+<tr><td>SYSDIVSUBINT</td><td>14</td><td>48</td><td>SYSDIVSUB16(1)</td></tr>
+<tr><td>SYSDIVSUB32</td><td>40</td><td>176</td><td>SYSCOMPEQUAL32(1)</td></tr>
+<tr><td>SYSCOMPEQUAL</td><td>20</td><td>5</td><td></td></tr>
+<tr><td>SYSCOMPEQUAL16</td><td>34</td><td>7</td><td></td></tr>
+<tr><td>SYSCOMPEQUAL32</td><td>52</td><td>11</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHAN</td><td>23</td><td>6</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHAN16</td><td>38</td><td>10</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHAN32</td><td>63</td><td>15</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHANINT</td><td>48</td><td>42</td><td></td></tr>
+<tr><td>LEN</td><td>1</td><td>8</td><td></td></tr>
+<tr><td>STR</td><td>36</td><td>200</td><td>SYSDIVSUB16(4), SYSCOMPLESSTHAN16(4)</td></tr>
+<tr><td>VAL</td><td>15</td><td>90</td><td>SYSMULTSUB16(1), SYSCOMPEQUAL(1)</td></tr>
+<tr><td>RIGHT</td><td>12</td><td>96</td><td>SYSCOMPEQUAL(1)</td></tr>
+<tr><td>SETBUS_SSD1289</td><td>16</td><td>81</td><td></td></tr>
+<tr><td>WRITE_COMMAND_SSD1289</td><td>4</td><td>14</td><td>SETBUS_SSD1289(1)</td></tr>
+<tr><td>WRITE_DATA_SSD1289</td><td>4</td><td>14</td><td>SETBUS_SSD1289(1)</td></tr>
+<tr><td>WRITE_COMMAND_DATA_SSD1289</td><td>2</td><td>4</td><td>WRITE_DATA_SSD1289(1), WRITE_COMMAND_SSD1289(1)</td></tr>
+<tr><td>SET_ADDRESS_SSD1289</td><td>19</td><td>231</td><td>SYSCOMPEQUAL(2), WRITE_COMMAND_SSD1289(1), WRITE_COMMAND_DATA_SSD1289(5), SWAP(3)</td></tr>
+<tr><td>INITGLCD_SSD1289</td><td>108</td><td>773</td><td>Delay_MS(3), GLCDCLS_SSD1289(1), WRITE_COMMAND_SSD1289(1), WRITE_COMMAND_DATA_SSD1289(47)</td></tr>
+<tr><td>GLCDROTATE_SSD1289</td><td>35</td><td>200</td><td>Delay_MS(4), WRITE_COMMAND_DATA_SSD1289(8)</td></tr>
+<tr><td>GLCDCLS_SSD1289</td><td>16</td><td>142</td><td>SYSCOMPLESSTHAN16(2), WRITE_DATA_SSD1289(1), WRITE_COMMAND_SSD1289(1), WRITE_COMMAND_DATA_SSD1289(5)</td></tr>
+<tr><td>FILLEDBOX_SSD1289</td><td>16</td><td>181</td><td>SYSCOMPEQUAL16(2), SYSCOMPLESSTHAN16(2), PSET_SSD1289(1)</td></tr>
+<tr><td>PSET_SSD1289</td><td>7</td><td>57</td><td>SYSCOMPLESSTHAN16(2), WRITE_DATA_SSD1289(1), SET_ADDRESS_SSD1289(1)</td></tr>
+<tr><td>PRINT_SSD1289</td><td>10</td><td>99</td><td>SYSCOMPEQUAL(1), GLCDDRAWCHAR_SSD1289(1)</td></tr>
+<tr><td>GLCDDRAWCHAR_SSD1289</td><td>99</td><td>327</td><td>SYSCOMPEQUAL(2), SYSCOMPLESSTHAN(2), PSET_SSD1289(2)</td></tr>
+<tr><td>Delay_MS</td><td>0</td><td>12</td><td></td></tr>
+<tr><td>Delay_S</td><td>0</td><td>7</td><td>Delay_MS(1)</td></tr>
+<tr><td>SysStringTables</td><td>0</td><td>68</td><td></td></tr>
+<tr><td>GLCDCHARCOL3EXTENDED1</td><td>0</td><td>131</td><td></td></tr>
+<tr><td>GLCDCHARCOL4EXTENDED1</td><td>0</td><td>131</td><td></td></tr>
+<tr><td>GLCDCHARCOL5EXTENDED1</td><td>0</td><td>131</td><td></td></tr>
+<tr><td>GLCDCHARCOL6EXTENDED1</td><td>0</td><td>131</td><td></td></tr>
+<tr><td>GLCDCHARCOL7EXTENDED1</td><td>0</td><td>131</td><td></td></tr>
+</table>
+</body>
+</html>

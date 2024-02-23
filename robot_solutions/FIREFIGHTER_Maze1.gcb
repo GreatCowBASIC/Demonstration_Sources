@@ -1,0 +1,381 @@
+'' FIREFIGHTER CODE: MAZE 1''
+'' 16/12/2022 ''
+'' Antonio Rech Santos and Guhan Iyer ''
+
+' Chip definition
+#CHIP 16F18875
+
+' LCD definitions
+#DEFINE LCD_IO 4
+#DEFINE LCD_RS portd.0
+#DEFINE LCD_RW portd.1
+#DEFINE LCD_ENABLE portd.2
+#DEFINE LCD_DB4 portd.4
+#DEFINE LCD_DB5 portd.5
+#DEFINE LCD_DB6 portd.6
+#DEFINE LCD_DB7 portd.7
+
+' Sensor definitions
+#DEFINE LW porta.0
+#DEFINE FW porta.1
+#DEFINE FS porta.2
+#DEFINE LS porta.3
+
+' Motor/Fan definitions
+#DEFINE RMF portb.0
+#DEFINE RMB portb.1
+#DEFINE LMF portb.3
+#DEFINE LMB portb.2
+#DEFINE FAN portb.4
+
+' Input/Output port direction
+DIR porta IN
+DIR portb OUT
+
+' Variable definitions
+DIM voltage AS BYTE
+DIM distanceFront AS BYTE
+DIM voltageLeft AS BYTE
+DIM distanceLeft AS BYTE
+DIM voltageFlame AS BYTE
+DIM roomCounter AS INTEGER
+DIM xVar AS WORD
+' Intitializing roomCounter
+roomCounter = 0
+
+main:
+
+  gosub followWall
+
+goto main
+
+' Follows the left wall
+sub followWall
+
+  ' Printing values for debugging
+  CLS
+  Locate(0, 1)
+  Print roomCounter
+  Locate(1,1)
+  Print distanceLeft
+  ' Reading sensor values
+  gosub readSensors
+  
+  ' Line Detected
+  if LS = 0 then
+      
+      ' increment Room Counter
+      roomCounter += 1
+      ' Go forwards to not remain on line and further increment counter
+      gosub forwards
+      wait 100 ms
+      ' When the bot leaves room 3
+      if roomCounter = 6 then
+        roomCounter += 1
+        gosub room4
+      end if
+    ' If a flame is detected
+    else if voltageFlame <= 5 then
+
+      gosub outFlame
+    
+
+    '' Conditions to run turning subroutines ''
+
+    else if distanceFront <= 15 then
+
+      gosub turnRightInPlace
+
+    else if distanceLeft >= 20 then
+
+      gosub smoothTurnLeft
+    
+    else if distanceLeft >= 10 then
+
+      gosub farLeft
+  
+    else if distanceLeft <= 8 then
+
+      gosub closeLeft
+ 
+    else
+
+      gosub forwards
+
+  end if
+
+  return
+
+' Subroutine for room 4
+sub room4
+
+  ' Done after leaves room 3, finds wall to line itself up
+  Do Until distanceFront <= 10
+    CLS
+    Locate(0, 1)
+    Print roomCounter
+    Locate(1,1)
+    Print distanceFront
+
+    gosub readSensors
+    gosub smoothTurnLeft
+
+  loop
+
+  ' Stops the bot for consistency
+  gosub stopBot
+  wait 500 ms
+
+  ' Lines itself up to the left wall
+  Do Until distanceFront >= 15
+
+    CLS
+    Locate(0, 1)
+    Print roomCounter
+    Locate(1,1)
+    Print distanceFront
+
+    gosub readSensors
+
+    gosub turnRightInPlace
+
+  loop
+
+  ' Setup to find room 4's wall
+  gosub forwards
+  wait 750 ms
+
+  gosub turnLeftInPlace
+  wait 250 ms
+
+  gosub forwards
+  wait 750 ms
+
+  gosub turnRightInPlace
+  wait 150 ms
+
+  ' Searches for room 4's wall
+  Do Until distanceFront <= 15
+
+    for xVar = 1 To 3
+
+      gosub turnRightInPlace
+
+      CLS
+      Locate(0, 1)
+      Print roomCounter
+      Locate(1,1)
+      Print distanceFront
+
+      gosub readSensors
+      ' If a wall is detected, exit the subroutine
+      if distanceFront <= 15 then
+        goto main
+      end if
+
+      wait 50 ms
+    next
+
+    for xVar = 1 To 5
+
+      gosub forwards
+
+      CLS
+      Locate(0, 1)
+      Print roomCounter
+      Locate(1,1)
+      Print distanceFront
+
+      gosub readSensors
+
+      if distanceFront <= 15 then
+        goto main
+      end if
+
+      wait 50 ms
+    next
+
+
+    for xVar = 1 To 3
+
+      gosub turnLeftInPlace
+
+      CLS
+      Locate(0, 1)
+      Print roomCounter
+      Locate(1,1)
+      Print distanceFront
+
+      gosub readSensors
+
+      if distanceFront <= 15 then
+        goto main
+      end if
+
+      wait 50 ms
+    next
+
+    for xVar = 1 To 5
+
+      gosub forwards
+
+      CLS
+      Locate(0, 1)
+      Print roomCounter
+      Locate(1,1)
+      Print distanceFront
+
+      gosub readSensors
+
+      if distanceFront <= 15 then
+        goto main
+      end if
+
+      wait 50 ms
+
+      next
+
+  loop
+
+return
+
+''SUBROUTINES''
+
+' Reads voltage values off wall detection sensors and linearizes them to compute distance, reads flame sensor voltage for flame detection
+sub readSensors
+
+ voltageLeft = ReadAD(AN0)
+ distanceLeft = (((6787/(voltageLeft-3)))-4)/5
+ voltageFront = ReadAD(AN1)
+ distanceFront = (((6787/(voltageFront-3)))-4)/5
+ voltageFlame = ReadAD(AN2)
+
+return
+
+
+
+' Sets the forward component of both motors to 'high'
+sub forwards
+
+  RMF = 1
+  LMF = 1
+  RMB = 0
+  LMB = 0
+
+return
+
+' Sets the backwards component of both motors to 'high'
+sub backwards
+
+  RMF = 0
+  LMF = 0
+  RMB = 1
+  LMB = 1
+
+return
+  
+' Sets all motors to 'low', stopping motion
+sub stopBot
+
+  RMF = 0
+  LMF = 0
+  RMB = 0
+  LMB = 0
+
+return
+  
+' Sets the right motor forward and left motor backward component to high, and all others to low
+sub turnLeftInPlace
+
+  RMF = 1
+  LMF = 0
+  RMB = 0
+  LMB = 1
+
+return
+  
+' Sets the left motor forward and right motor backward component to high, and all others to low
+sub turnRightInPlace
+
+  RMF = 0
+  LMF = 1
+  RMB = 1
+  LMB = 0
+
+return
+
+' Turn performed when the bot is too close to the left wall. Needed for the bot's reversal procedure in room 3.
+sub closeLeft
+
+  gosub turnRightInPlace
+  wait 1 ms
+  gosub forwards
+  wait 3 ms
+
+return
+  
+' Turn performed when the bot is too far to the left wall. Needed for the bot's reversal procedure in room 3.
+sub farLeft
+
+  gosub turnLeftInPlace
+  wait 1 ms
+  gosub forwards
+  wait 3 ms
+
+return
+
+'  A gradual left turn. 
+sub smoothTurnLeft
+
+  gosub forwards
+  wait 2 ms
+  RMF = 1
+  LMF = 0
+  RMB = 0
+  LMB = 0
+  wait 5 ms
+
+return
+
+'A gradual right turn.
+sub smoothTurnRight
+
+  gosub forwards
+  wait 2 ms
+  RMF = 0
+  LMF = 1
+  RMB = 0
+  LMB = 0
+  wait 5 ms
+
+return
+
+' General subroutine to extinguish the flame
+sub outFlame
+
+  ' Turns the fan ON and approaches the flame
+  FAN = 1
+  gosub forwards
+  wait 400 ms
+  gosub stopBot
+  wait 600 ms
+
+  ' The bot spins from right to left in place, in order to catch the flame in a wide area.
+  gosub turnLeftInPlace
+  wait 300 ms
+
+  For xVar = 1 To 3
+
+    gosub turnRightInPlace
+    wait 600 ms
+    gosub turnLeftInPlace
+    wait 600 ms
+  next
+
+  ' The bot returns to its original position before the fan is put out. 
+  gosub turnRightInPlace
+  wait 300 ms
+
+  FAN = 0
+
+return

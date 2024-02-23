@@ -162,7 +162,7 @@ sub scany(x_1,y_1,x_2,y_2,incr)
 
     Dim x_1,x_2,y_1,y_2 as Word
     Dim ind, del    as word
-    Dim ind1,ind2,  as Word
+    Dim ind1,ind2  as Word
     Dim ycurr       as Word
     if incr=1 then
       del=dely
@@ -183,7 +183,7 @@ sub scanx(x_1,y_1,x_2,y_2,incr)
 
     Dim x_1, x_2, y_1, y_2 as Word
     Dim ind, del   as Word
-    Dim ind1,ind2, as Word
+    Dim ind1,ind2 as Word
     Dim xcurr      as Word
     if incr=1 then
       del=delx

@@ -16,120 +16,132 @@
     @author  EvanV
     @licence GPL
     @version 1.00
-    @date    31.11.2022
+    @date    04-02-2024
 */
 
 // ----- Configuration
 //Chip Settings.
-#CHIP 18F16Q20
+#CHIP 18F16Q20, 4
 #OPTION Explicit
 
-    //-------------------PORTA----------------
-    //Bit#:  -7---6---5---4---3---2---1---0---
-    //IO:   -----------------------------ADC--
-    //-----------------------------------------
 
-    //-------------------PORTB----------------
-    //Bit#:  -7---6---5---4---3---2---1---0---
-    //IO:    ---------------------------------
-    //-----------------------------------------
 
-    //------------------PORTC-----------------
-    //Bit#:  -7---6---5---4---3---2---1---0---
-    //IO:    ---------------LED--LED-LED-LED--
-    //-----------------------------------------
 
-    //Define constants to make things easier. We can reuse these at any time.
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------------------ADC-- 
+    -----------------------------------------
+
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ---------------------------------
+    -----------------------------------------
+
+    ------------------PORTC-----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    LED-LED-LED-LED------------------
+    ----------------------------------------
+*/
+// *****************************************************************************************************
+    // Define constants to make things easier. We can reuse these at any time.
     #DEFINE LEDPORT LATC
+    #DEFINE LEDD7 PORTC.7
+    #DEFINE LEDD6 PORTC.6
+    #DEFINE LEDD5 PORTC.5
+    #DEFINE LEDD4 PORTC.4
+    
 
-    #DEFINE POTENTIOMETER RA0
+    // Set the ports as an output
+    Dir LEDD7 Out
+    Dir LEDD6 Out
+    Dir LEDD5 Out
+    Dir LEDD4 Out
 
-    Dir     RC0         Out
-    Dir     RC1         Out
-    Dir     RC2         Out
-    Dir     RC3         Out
-
+    #DEFINE POTENTIOMETER PORTA.0
     //This is the PORTA.0 port
     Dir     POTENTIOMETER In
 
 // *****************************************************************************************************
 // Main program commences here.. everything before this is setup for the board.
 
-  Dim adcVal As Byte
+    Dim adcVal As Byte
 
-  Do
+    Do
 
-      adcVal =  ReadAD ( ANA0 )
+        adcVal =  ReadAD ( ANA0 )
 
-      Select Case adcVal
-        Case 0 to 49
+        //   Select Case adcVal
+        //     Case 0 to 49
 
-            RC0 = 0
-            RC1 = 0
-            RC2 = 0
-            RC3 = 0
+        //         LEDD4 = 0
+        //         LEDD5 = 0
+        //         LEDD6 = 0
+        //         LEDD7 = 0
 
-        Case 50 to 99
-            RC0 = 1
-            RC1 = 0
-            RC2 = 0
-            RC3 = 0
+        //     Case 50 to 99
+        //         LEDD4 = 1
+        //         LEDD5 = 0
+        //         LEDD6 = 0
+        //         LEDD7 = 0
 
-        Case 100 to 149
-            RC0 = 1
-            RC1 = 1
-            RC2 = 0
-            RC3 = 0
+        //     Case 100 to 149
+        //         LEDD4 = 1
+        //         LEDD5 = 1
+        //         LEDD6 = 0
+        //         LEDD7 = 0
 
-        Case 150 to 200
-            RC0 = 1
-            RC1 = 1
-            RC2 = 1
-            RC3 = 0
+        //     Case 150 to 200
+        //         LEDD4 = 1
+        //         LEDD5 = 1
+        //         LEDD6 = 1
+        //         LEDD7 = 0
 
-        Case Else
-            RC0 = 1
-            RC1 = 1
-            RC2 = 1
-            RC3 = 1
+        //     Case Else
+        //         LEDD4 = 1
+        //         LEDD5 = 1
+        //         LEDD6 = 1
+        //         LEDD7 = 1
 
-      End Select
+        //   End Select
 
-    //  Or, another way
-        /*
-            If adcVal < 49 then
-                    RC1 = 0
-                    RC2 = 0
-                    RC3 = 0
-                    RC4 = 0
+        //  Or, another way
 
+            If adcVal < 50 then
+                    LEDD4 = 0
+                    LEDD5 = 0
+                    LEDD6 = 0
+                    LEDD7 = 0
+                    
             else if adcVal > 49 and adcVal < 100 then
-                    RC1 = 1
-                    RC2 = 0
-                    RC3 = 0
-                    RC4 = 0
+                    LEDD4 = 1
+                    LEDD5 = 0
+                    LEDD6 = 0
+                    LEDD7 = 0
+                    
 
-            else if adcVal > 100 and adcVal < 150 then
-                    RC1 = 1
-                    RC2 = 1
-                    RC3 = 0
-                    RC4 = 0
+            else if adcVal > 99 and adcVal < 150 then
+                    LEDD4 = 1
+                    LEDD5 = 1
+                    LEDD6 = 0
+                    LEDD7 = 0
 
-            else if adcVal > 150 and adcVal < 200 then
-                    RC1 = 1
-                    RC2 = 1
-                    RC3 = 1
-                    RC4 = 0
+            else if adcVal > 149 and adcVal < 200 then
+                    LEDD4 = 1
+                    LEDD5 = 1
+                    LEDD6 = 1
+                    LEDD7 = 0
 
             else if adcVal > 200 then
-                    RC1 = 1
-                    RC2 = 1
-                    RC3 = 1
-                    RC4 = 1
+                    LEDD4 = 1
+                    LEDD5 = 1
+                    LEDD6 = 1
+                    LEDD7 = 1
             End if
-        */
 
-    wait 100 ms
+        wait 100 ms
 
-  Loop
+    Loop
 

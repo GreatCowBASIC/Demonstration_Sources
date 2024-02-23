@@ -4,110 +4,117 @@
 
     Some switches are worse than others.
 
-    When the switch is held down and released, one LED will toggle.
+    When the switch is held down and released, LEDs will toggle.
 
 
     ************************************************************************
     @author  EvanV
     @licence GPL
     @version 1.00
-    @date    31.11.2022
+    @date    04-02-2024
 */
 // ----- Configuration
 //Chip Settings.
-#CHIP 18F16Q20
+#CHIP 18F16Q20, 4
 #OPTION Explicit
 
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:---------------------SW---------ADC-- 
+    -----------------------------------------
 
 
-    // -------------------PORTA----------------
-    // Bit#:  -7---6---5---4---3---2---1---0---
-    // IO:   ------------------SW---------ADC--
-    //-----------------------------------------
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:---------------------------------
+    -----------------------------------------
 
-    // -------------------PORTB----------------
-    // Bit#:  -7---6---5---4---3---2---1---0---
-    // IO:    ---------------------------------
-    //-----------------------------------------
-    // 
+    ------------------PORTC-----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:LED-LED-LED-LED------------------
+    ----------------------------------------
+  */
 
-    // ------------------PORTC-----------------
-    // Bit#:  -7---6---5---4---3---2---1---0---
-    // IO:    ---------------LED--LED-LED LED--
-    //-----------------------------------------
-    // 
-
-
-
-    // Define constants to make things easier. We can reuse these at any time.
+// Define constants to make things easier. We can reuse these at any time.
     #DEFINE LEDPORT LATC
+    #DEFINE LEDD7 PORTC.7
+    #DEFINE LEDD6 PORTC.6
+    #DEFINE LEDD5 PORTC.5
+    #DEFINE LEDD4 PORTC.4
 
-
-    Dir     RC0         Out
-    Dir     RC1         Out
-    Dir     RC2         Out
-    Dir     RC3         Out
+// Set the ports as an output
+    Dir LEDD7 Out
+    Dir LEDD6 Out
+    Dir LEDD5 Out
+    Dir LEDD4 Out
 
     #DEFINE POTENTIOMETER PORTA.0
-    Dir     POTENTIOMETER In
-
+    // This is the PORTA.0 port
+    Dir POTENTIOMETER In
 
     #DEFINE SWITCHIN      PORTA.3
     Dir     SWITCHIN      In
     #DEFINE DOWN          1
 
-    // *****************************************************************************************************
-// Main program commences here.. everything before this is setup for the board.
-// Debouncing a switch
+// *****************************************************************************************************
+    // Main program commences here.. everything before this is setup for the board.
+    // Debouncing a switch
 
-Do Forever
-    Wait 10 ms
+    Do Forever
+        Wait 10 ms
 
-    'keyPressed is a Function that returns the state
-    If  funcKeyPressed() = TRUE Then
+        'keyPressed is a Function that returns the state
+        If  funcKeyPressed() = TRUE Then
 
-        'push button pressed
-        RC0 = !RC0
-        RC1 = !RC1
-        RC2 = !RC2
-        RC3 = !RC3
+            'push button pressed
+            LEDD7 = !LEDD7
+            LEDD6 = !LEDD6
+            LEDD5 = !LEDD5
+            LEDD4 = !LEDD4
 
-    End If
+        End If
 
-Loop
+    Loop
 
 
-
-Function  funcKeyPressed as Bit
-
-    Dim CurrentSwitchState As Bit
-    Dim LastSwitchState As Bit
-
-    wait 1 ms
-
-    If ( SWITCHIN = DOWN ) Then
+    // This is function, it returns the state of the switch
+    Function  funcKeyPressed as Bit
         
-        CurrentSwitchState = TRUE
+        // Define some variables
+        Dim CurrentSwitchState As Bit
+        Dim LastSwitchState As Bit
 
-    Else
+        wait 1 ms
 
-        CurrentSwitchState = FALSE
+        // Is the switch pressed down ?
+        If ( SWITCHIN = DOWN ) Then
+            
+            // Set the state
+            CurrentSwitchState = TRUE
 
-    End If
+        Else
 
-    // This condition ensures the state of the switch has changed
-    If (CurrentSwitchState <> LastSwitchState) Then
+            // So, switch is therefore UP/released
+            CurrentSwitchState = FALSE
 
-        // Set the last state
-        LastSwitchState = CurrentSwitchState
-        // Return the state value - returns either TRUE or FALSE
-        funcKeyPressed =  CurrentSwitchState
+        End If
 
-    Else
+        // This check ensures the state of the switch ....
+        // ensure the switch has changed state
+        If (CurrentSwitchState <> LastSwitchState) Then
 
-        funcKeyPressed = FALSE
+            // Set the last state
+            LastSwitchState = CurrentSwitchState
 
-    End If
+            // Return the state value - returns either TRUE or FALSE
+            funcKeyPressed =  CurrentSwitchState
 
+        Else
+            // Switch is not down
+            funcKeyPressed = FALSE
 
-End Function
+        End If
+
+    End Function

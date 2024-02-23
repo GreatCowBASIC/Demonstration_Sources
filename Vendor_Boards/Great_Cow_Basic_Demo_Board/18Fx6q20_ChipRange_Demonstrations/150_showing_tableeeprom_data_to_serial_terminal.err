@@ -1,0 +1,12 @@
+::: warning: (1311) missing configuration setting for config word 0x300018; using default
+::: warning: (1311) missing configuration setting for config word 0x300019; using default
+
+Psect Usage Map:
+
+ Psect    | Contents                   | Memory Range      | Size
+----------|----------------------------|-------------------|---------------
+ config   | Device configuration words | 300000h - 300019h |    1A bytes  
+----------|----------------------------|-------------------|---------------
+ RESETVEC |                            | 000000h - 38002Bh | 38002C units  
+----------|----------------------------|-------------------|---------------
+

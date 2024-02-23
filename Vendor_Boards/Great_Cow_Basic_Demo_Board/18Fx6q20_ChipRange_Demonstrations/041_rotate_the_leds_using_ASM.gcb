@@ -1,7 +1,7 @@
 
 
 
-#CHIP 18F16Q20, 64
+#CHIP 18F16Q20, 4
 #OPTION Explicit
 
 Dim Display, Delay1, Delay2 as byte

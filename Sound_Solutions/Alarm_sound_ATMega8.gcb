@@ -26,7 +26,7 @@
 ; ----- Main body of program commences here.
     Do
         For cnt = 1500 to 600 step -40
-            Tone cnt, .5
+            Tone cnt, 5
         Next
     Loop
   End

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Compilation Report</title>
+</head>
+<body>
+<h1>Compilation Report</h1>
+<p>Compiler Version (YYYY-MM-DD): 2024.2.16 (Windows 64 bit) : Build 1337</p>
+<h2>Compilation time</h2>
+<p> (Compile time: 3.296875 seconds)</p>
+<p> (Assembly time: 0.9765625 seconds)</p>
+<p> (Download time: 9.007813 seconds)</p>
+<p> (Total time: 13.28125 seconds)</p>
+<h2>Chip resource usage:</h2>
+<p>Chip Model: 18F16Q20</p>
+<p>Program Memory: 4696/32768 words (14.33%)</p>
+<p>RAM: 1368/4096 bytes (32.15%)</p>
+<p> OSC: HFINTOSC_1MHZ, 64Mhz (Internal oscillator)</p>
+<h2>RAM Allocation</h2>
+<table border="1">
+</table>
+<h2>Subroutines</h2>
+<table border="1">
+<tr><th>Name</th><th>Code Size (lines)</th><th>Compiled Size (words)</th><th>Outgoing calls</th></tr>
+<tr><td>Main</td><td>72</td><td>730</td><td>INITGLCD_SSD1306(20), HI2CINIT(9), SYSCOPYSTRING(1), SYSREADSTRING(12), Delay_S(1), FILLEDCIRCLE(1), FILLEDBOX_SSD1306(1), GLCDDRAWCHAR_SSD1306(1), STR(3), PAD(3), _HEXPICAS(4), _LINE(2), CIRCLE(1), GLCDDRAWSTRING(2), GLCDPRINT(1), GLCDCLS_SSD1306(1), BOX(4), GLCDPRINT(14), HI2CMODE(1), INITPPS(12), INITSYS(39)</td></tr>
+<tr><td>INITPPS</td><td>6</td><td>14</td><td></td></tr>
+<tr><td>GLCDPRINT</td><td>19</td><td>77</td><td>SYSCOMPEQUAL(1), GLCDDRAWCHAR_SSD1306(1)</td></tr>
+<tr><td>GLCDPRINT</td><td>22</td><td>164</td><td>SYSDIVSUB32(1), SYSCOMPLESSTHANINT(2), SYSCOMPEQUAL32(1), GLCDDRAWCHAR_SSD1306(1)</td></tr>
+<tr><td>GLCDDRAWSTRING</td><td>13</td><td>60</td><td>SYSCOMPEQUAL(1), GLCDDRAWCHAR_SSD1306(1)</td></tr>
+<tr><td>BOX</td><td>20</td><td>149</td><td>SYSCOMPEQUAL16(2), SYSCOMPLESSTHAN16(2), PSET_SSD1306(4)</td></tr>
+<tr><td>CIRCLE</td><td>20</td><td>218</td><td>SYSMULTSUBINT(1), SYSDIVSUBINT(1), SYSCOMPLESSTHANINT(2), PSET_SSD1306(8)</td></tr>
+<tr><td>FILLEDCIRCLE</td><td>24</td><td>211</td><td>SYSMULTSUBINT(1), SYSCOMPLESSTHANINT(1), _LINE(5)</td></tr>
+<tr><td>_HEXPICAS</td><td>15</td><td>41</td><td></td></tr>
+<tr><td>_LINE</td><td>55</td><td>295</td><td>SYSMULTSUBINT(4), SYSCOMPLESSTHANINT(5), SYSCOMPEQUAL16(2), PSET_SSD1306(4)</td></tr>
+<tr><td>_LINE</td><td>55</td><td>295</td><td>SYSMULTSUBINT(4), SYSCOMPLESSTHANINT(5), SYSCOMPEQUAL16(2), PSET_SSD1306(4)</td></tr>
+<tr><td>INITSYS</td><td>949</td><td>23</td><td></td></tr>
+<tr><td>SYSCOPYSTRING</td><td>118</td><td>18</td><td></td></tr>
+<tr><td>SYSREADSTRING</td><td>114</td><td>21</td><td></td></tr>
+<tr><td>SYSMULTSUB16</td><td>73</td><td>17</td><td></td></tr>
+<tr><td>SYSMULTSUBINT</td><td>13</td><td>30</td><td>SYSMULTSUB16(1)</td></tr>
+<tr><td>SYSDIVSUB16</td><td>38</td><td>56</td><td>SYSCOMPEQUAL16(1)</td></tr>
+<tr><td>SYSDIVSUBINT</td><td>14</td><td>35</td><td>SYSDIVSUB16(1)</td></tr>
+<tr><td>SYSDIVSUB32</td><td>40</td><td>98</td><td>SYSCOMPEQUAL32(1)</td></tr>
+<tr><td>SYSCOMPEQUAL</td><td>20</td><td>5</td><td></td></tr>
+<tr><td>SYSCOMPEQUAL16</td><td>34</td><td>9</td><td></td></tr>
+<tr><td>SYSCOMPEQUAL32</td><td>52</td><td>15</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHAN</td><td>23</td><td>5</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHAN16</td><td>38</td><td>14</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHANINT</td><td>48</td><td>44</td><td></td></tr>
+<tr><td>STR</td><td>36</td><td>192</td><td>SYSDIVSUB16(4), SYSCOMPLESSTHAN16(4)</td></tr>
+<tr><td>PAD</td><td>16</td><td>159</td><td>SYSREADSTRING(1), SYSCOMPEQUAL(3)</td></tr>
+<tr><td>HI2CMODE</td><td>27</td><td>1</td><td></td></tr>
+<tr><td>HI2CINIT</td><td>4</td><td>3</td><td>SI2CINIT(1)</td></tr>
+<tr><td>SI2CINIT</td><td>16</td><td>27</td><td>SI2CSTOP(1), SI2CSEND(1), SI2CSTART(1)</td></tr>
+<tr><td>SI2CSTART</td><td>3</td><td>5</td><td></td></tr>
+<tr><td>SI2CSTOP</td><td>15</td><td>47</td><td>SI2CWAIT4STOP(1)</td></tr>
+<tr><td>SI2CSEND</td><td>62</td><td>174</td><td>SI2CWAIT4MDR(1), SI2CWAIT4ACK(1)</td></tr>
+<tr><td>SI2CWAIT4ACK</td><td>18</td><td>41</td><td></td></tr>
+<tr><td>SI2CWAIT4MDR</td><td>12</td><td>30</td><td></td></tr>
+<tr><td>SI2CWAIT4STOP</td><td>12</td><td>30</td><td></td></tr>
+<tr><td>WRITE_COMMAND_SSD1306</td><td>29</td><td>15</td><td>SI2CSTOP(1), SI2CSEND(3), SI2CSTART(1)</td></tr>
+<tr><td>WRITE_DATA_SSD1306</td><td>29</td><td>16</td><td>SI2CSTOP(1), SI2CSEND(3), SI2CSTART(1)</td></tr>
+<tr><td>INITGLCD_SSD1306</td><td>77</td><td>182</td><td>Delay_MS(2), GLCDCLS_SSD1306(1), WRITE_COMMAND_SSD1306(29), HI2CMODE(1)</td></tr>
+<tr><td>GLCDCLS_SSD1306</td><td>26</td><td>162</td><td>SYSCOMPLESSTHAN16(2), SYSCOMPEQUAL16(1), SI2CSTOP(1), SI2CSEND(3), SI2CSTART(1), CURSOR_POSITION_SSD1306(2)</td></tr>
+<tr><td>GLCDDRAWCHAR_SSD1306</td><td>245</td><td>257</td><td>SYSCOMPEQUAL(2), SYSCOMPLESSTHAN(2), SYSCOMPEQUAL16(1), PSET_SSD1306(3), CURSOR_POSITION_SSD1306(1)</td></tr>
+<tr><td>FILLEDBOX_SSD1306</td><td>17</td><td>73</td><td>SYSCOMPEQUAL(2), PSET_SSD1306(1)</td></tr>
+<tr><td>PSET_SSD1306</td><td>82</td><td>145</td><td>SYSCOMPLESSTHAN16(1), SYSCOMPLESSTHAN(2), WRITE_DATA_SSD1306(1), CURSOR_POSITION_SSD1306(1)</td></tr>
+<tr><td>CURSOR_POSITION_SSD1306</td><td>16</td><td>53</td><td>WRITE_COMMAND_SSD1306(3)</td></tr>
+<tr><td>Delay_MS</td><td>0</td><td>18</td><td></td></tr>
+<tr><td>Delay_S</td><td>0</td><td>10</td><td>Delay_MS(1)</td></tr>
+<tr><td>SysStringTables</td><td>0</td><td>42</td><td></td></tr>
+<tr><td>GLCDCHARCOL3</td><td>0</td><td>74</td><td></td></tr>
+<tr><td>GLCDCHARCOL4</td><td>0</td><td>74</td><td></td></tr>
+<tr><td>GLCDCHARCOL5</td><td>0</td><td>74</td><td></td></tr>
+<tr><td>GLCDCHARCOL6</td><td>0</td><td>74</td><td></td></tr>
+<tr><td>GLCDCHARCOL7</td><td>0</td><td>74</td><td></td></tr>
+</table>
+</body>
+</html>

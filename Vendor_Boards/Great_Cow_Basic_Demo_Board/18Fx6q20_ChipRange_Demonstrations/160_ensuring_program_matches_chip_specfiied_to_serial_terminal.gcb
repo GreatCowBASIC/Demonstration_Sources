@@ -1,0 +1,112 @@
+/*
+ This demonstration will show how you can determine the chip parameters, we show the ChipNameStr
+/*
+    This demonstration how you can check your program is intented for a specific Microcontroller
+
+    ************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.00
+    @date    04-02-2024
+*/
+// ----- Configuration
+
+// ----- Configuration
+//Chip Settings.
+#CHIP 18F16Q20
+#OPTION Explicit
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #define PPSToolPart 18F16Q20
+
+    Sub InitPPS
+            
+            // Module: UART pin directions
+            Dir PORTB.7 Out    // Make TX1 pin an output
+            // Module: UART1
+            RB7PPS = 0x0013    // TX1 > RB7
+        
+        End Sub
+    // Add this code segment to your GCBASIC source program
+
+
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    -----------------SW---------ADC-- 
+    -----------------------------------------
+
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    TX-------------------------------
+    ----------------------------------------
+
+    ------------------PORTC-----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    LED-LED-LED-LED------------------
+    ----------------------------------------
+  */
+
+// Define constants to make things easier. We can reuse these at any time.
+    #DEFINE LEDPORT LATC
+    #DEFINE LEDD7 PORTC.7
+    #DEFINE LEDD6 PORTC.6
+    #DEFINE LEDD5 PORTC.5
+    #DEFINE LEDD4 PORTC.4
+
+// Set the ports as an output
+    Dir LEDD7 Out
+    Dir LEDD6 Out
+    Dir LEDD5 Out
+    Dir LEDD4 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    // This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.3
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          0
+
+//*****************************************************************************************************
+//Main program commences here.. everything before this is setup for the board.
+// Now assumes Serial Terminal is operational
+
+
+#DEFINE SYSDEFAULTCONCATSTRING 64
+
+HSerPrintCRLF
+HSerPrint  ChipNameStr + " GCBASIC Demo"
+HSerPrintCRLF
+Wait 1 s
+
+Dim TargetChip As String 
+TargetChip = "18F16Q20"
+
+If Trim( UCase( TargetChip ) )  <> ChipNameStr Then
+    HSerPrint "Wrong Microcontroller program intended for " + TargetChip
+    HSerPrintCRLF
+    HSerPrint "The Microcontroller is a " + ChipNameStr
+    HSerPrintCRLF
+    Wait While TRUE
+Else
+    HSerPrint "The Microcontroller is correct - program intended for the " + ChipNameStr
+    HSerPrintCRLF
+    Wait While TRUE
+End If
+
+
+
+
+
+End
+
+// ----- Support methods.  Subroutines and Functions

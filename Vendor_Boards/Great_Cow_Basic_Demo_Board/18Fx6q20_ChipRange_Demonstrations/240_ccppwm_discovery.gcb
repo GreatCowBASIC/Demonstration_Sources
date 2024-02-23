@@ -1,0 +1,183 @@
+#CHIP 18F16Q20
+#option Explicit
+
+
+#DEFINE DEVELOPER_PWM_DEBUG
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
+    // PIC PPS Tool version: 0.0.6.5
+
+    #define PPSToolPart 18F16Q20
+
+    Sub InitPPS
+
+            // Module: UART pin directions
+            Dir PORTB.7 Out    ' Make TX1 pin an output
+            // Module: UART1
+            RB7PPS = 0x0013    // TX1 > RB7
+
+            // Module: CCP1
+            RC4PPS = 0x0005    // CCP1 > RC4
+            CCP1PPS = 0x0014    // RC4 > CCP1 (bi-directional)
+            RC5PPS = 0x0005    // CCP1 > RC5
+            CCP1PPS = 0x0015    // RC5 > CCP1 (bi-directional)
+            RC6PPS = 0x0005    // CCP1 > RC6
+            CCP1PPS = 0x0016    // RC6 > CCP1 (bi-directional)
+            RC7PPS = 0x0005    // CCP1 > RC7
+            CCP1PPS = 0x0017    // RC7 > CCP1 (bi-directional)
+        
+            DIR PORTC OUT
+        End Sub
+    // Add this code segment to your GCBASIC source program
+
+    // These variables are in pmw.h used to calc the registers 
+    PWMDuty = 0
+    PWMResolution = 0
+
+                HSerSend 254  // clear terminal
+                wait 100 ms
+                HSerSend 254  // clear terminal
+                wait 100 ms
+                HSerPrintStringCRLF "Hardware CCP/PWM Discovery"
+                
+
+                HSerPrintStringCRLF "Before PWMon"
+                ShowDetails
+                
+    PWMOn       
+                HSerPrintStringCRLF "After PWMon"
+                ShowDetails
+                HSerPrintStringCRLF "If no PWM signal... are the PWM ports set to OUT? Correct PPS?"
+
+                Repeat 10
+                    wait 500 ms
+                    HserSend "."
+                End Repeat
+
+                HserPrintCRLF
+                HSerPrintStringCRLF "PWMOff"
+    PWMoff
+
+                HserPrintCRLF
+                HSerPrintStringCRLF "After PWMoff"
+                ShowDetails
+                
+    HPWM 1, PWM_FREQ, 127  // Equates to 50%            
+    // HPWM_CCPTimerN 1, PWM_FREQ, 127, 2  // Equates to 50% on Timer2
+
+    //! uncomment to add this to the pwm.h section as a test, if no PWM signal    
+    // #define AddHPWMCCPExit1 CCP1CON  = CCPCONCache 
+     
+                HSerPrintStringCRLF pad("", 80, "*")
+                HSerPrintStringCRLF "After `HPWM 1, PWM_FREQ, 127` command"
+
+                HSerPrintStringCRLF "Error CCP1CON set to CCPCONCache value..."
+                HSerPrintStringCRLF "As HPWM used same Frq & Duty as fixed mode PWM, then, CCP1CON should be equal to CCPCONCache"
+                HSerPrintStringCRLF " 1. Has ChipFamilyPWMCCP1CON16Handler been updated for this chip family ?"
+                HSerPrintStringCRLF " 2. Is CCPTMRS0 correct for timer2? Is PWMTimerVariant in DAT file the correct value ?"
+                HSerPrintStringCRLF "     See SETUPTHECORRECTTIMERBITS section in pwm.h"
+                HSerPrintStringCRLF " 3. Examine SETUPCCPPWMREGISTERS section in pwm.h"
+                HserPrintCRLF
+                HSerPrintStringCRLF "If PWM is working.. Then, all is good!"
+
+
+                HSerPrintStringCRLF pad("", 80, "*")
+                ShowDetails
+
+                Do
+                Loop
+
+
+
+
+
+
+
+
+
+
+
+
+Sub ShowDetails
+
+    #IFDEF VAR(PPSLOCK)
+        #startup InitPPS, 85
+    #endif
+
+    HSerPrint "Constants"               : HserPrintCRLF
+        HserPrint "PWM_FREQ:        "
+            HserPrint PWM_FREQ          : HserPrintCRLF
+        HserPrint "PWM_DUTY:        "
+            HserPrint PWM_DUTY          : HserPrintCRLF
+        HserPrint "USE_HPWMCCP1:    "
+            HserPrint USE_HPWMCCP1      : HserPrintCRLF
+        HserPrint "USE_HPWM_TIMER2: "
+            HserPrint USE_HPWM_TIMER2   : HserPrintCRLF
+        #If def(DisableCCPFixedModePWM) 
+            HserPrint "DisableCCPFixedModePWM: "
+                HserPrint DisableCCPFixedModePWM    : HserPrintCRLF
+        #endif
+
+    HserPrintCRLF
+    HserPrint "Registers": HserPrintCRLF
+        PReg("CCP1CON      ", CCP1CON, "CCP Control Register" )
+        PReg("CCPCONCache  ", CCPCONCache, "Cached register used to by PWMon" )
+        
+        PReg("PR2          ", PR2, "Timer Period" )
+        Preg("T2CON        ", T2CON ,"Timer2 control")
+        Preg("T2CLKCON     ", T2CLKCON, "Clock Source Selection" )
+        Preg("CCPR1H       ", CCPR1H, "Duty cycle H" )
+        Preg("CCPR1L       ", CCPR1L, "Duty cycle L")
+        Preg("CCPTMRS0     ", CCPTMRS0, "Timer Selection")
+        
+        
+    HserPrintCRLF
+    HserPrint "Variables": HserPrintCRLF
+        dim _PWMTimerSelected as Byte
+        Preg( "_PWMTimerSelected", _PWMTimerSelected, "Selected Timer")
+        Preg( "PWMDuty          ", PWMDuty, "[WORD] used in calculateDuty() in pwm.h ")
+        Preg( "PWMResolution    ", PWMResolution, "[Word] used in calculateDuty() in pwm.h")
+        
+        
+
+End Sub
+
+Macro PReg ( xstr, xreg , comment )
+
+
+        HSerPrint "  "+xstr+": "
+            HSerPrint ByteToBin(xreg): HSerPrint ", 0x"+Hex(xreg):HSerPrint ", "+ Pad(Str(xreg),10," "  ):HserPrint chr(9)+comment: HserPrintCRLF
+
+
+End Macro
+
+
+
+/* GCBASIC Optimisation file - this will optimise PWM operations by disabling the PWM operations on the PWM channel and Timer that is set to FALSE
+                             to enable PWM and Timer operations set to FALSE
+
+           Optimise CCP/PWM    
+*/
+
+           #DEFINE USE_HPWMCCP1 TRUE
+           #DEFINE USE_HPWMCCP2 FALSE
+           #DEFINE USE_HPWMCCP4 FALSE
+           #DEFINE USE_HPWMCCP5 FALSE
+
+//         Optimise PWM
+           #DEFINE USE_HPWM1 TRUE
+           #DEFINE USE_HPWM2 FALSE
+           #DEFINE USE_HPWM3 FALSE
+           #DEFINE USE_HPWM4 FALSE
+           #DEFINE USE_HPWM5 FALSE
+           #DEFINE USE_HPWM6 FALSE
+           #DEFINE USE_HPWM7 FALSE
+           #DEFINE USE_HPWM8 FALSE
+
+//         Optimise Timers associated with PWM operations
+           #DEFINE USE_HPWM_TIMER2 TRUE
+           #DEFINE USE_HPWM_TIMER4 FALSE
+           #DEFINE USE_HPWM_TIMER6 FALSE

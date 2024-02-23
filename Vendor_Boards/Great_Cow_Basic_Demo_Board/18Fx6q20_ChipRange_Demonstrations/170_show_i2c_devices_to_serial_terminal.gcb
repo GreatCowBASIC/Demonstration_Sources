@@ -1,0 +1,156 @@
+/*
+    This demonstration shows the I2C devices attached the microcontroller, this program support the Microchip I2C module.
+
+    I2C device required a data bus and a clock bus, devices also required an input voltage and 0v.
+    I2C data bus is connected to PortA.4
+    I2C clock bus is connected to PortA.1
+    Serial output is connected, as previously, to PortC.4
+
+    Connect your IC2 devices and see the results on the serial terminal.
+
+    ************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.02
+    @date    04-02-2024
+    */
+// ----- Configuration
+
+'Chip Settings.
+#CHIP 18F16Q20
+#OPTION Explicit
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #define PPSToolPart 18F16Q20
+
+    Sub InitPPS
+            
+            // Module: I2C1
+            RB6PPS = 0x001C    // SCL1 > RB6
+            I2C1SCLPPS = 0x000E    // RB6 > SCL1 (bi-directional)
+            RB5PPS = 0x001D    // SDA1 > RB5
+            I2C1SDAPPS = 0x000D    // RB5 > SDA1 (bi-directional)
+            // Module: UART pin directions
+            Dir PORTB.7 Out    // Make TX1 pin an output
+            // Module: UART1
+            RB7PPS = 0x0013    // TX1 > RB7
+
+        End Sub
+    // Add this code segment to your GCBASIC source program
+
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    -----------------SW---------ADC-- 
+    -----------------------------------------
+
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    TX--SCL-SDA----------------------
+    ----------------------------------------
+
+    ------------------PORTC-----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    LED-LED-LED-LED------------------
+    ----------------------------------------
+  */
+
+// Define constants to make things easier. We can reuse these at any time.
+    #DEFINE LEDPORT LATC
+    #DEFINE LEDD7 PORTC.7
+    #DEFINE LEDD6 PORTC.6
+    #DEFINE LEDD5 PORTC.5
+    #DEFINE LEDD4 PORTC.4
+
+// Set the ports as an output
+    Dir LEDD7 Out
+    Dir LEDD6 Out
+    Dir LEDD5 Out
+    Dir LEDD4 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    // This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.3
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          0
+
+// Define I2C settings
+    #DEFINE HI2C_BAUD_RATE  125
+    #DEFINE HI2C_DATA       PORTB.5
+    #DEFINE HI2C_CLOCK      PORTB.6
+
+    HI2CMode (Master)
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+
+    Dim DeviceID As Byte
+    Dim DISPLAYNEWLINE As Byte
+    Dim HI2CWaitMSSPTimeout As Byte
+    Dim DumpI2CRead as Byte
+
+    Do
+        HSerPrintCRLF
+        HSerPrint "Hardware I2C"
+        HSerPrintCRLF 2
+
+        // Now assumes Serial Terminal is operational
+        HSerPrintCRLF
+        HSerPrint "   "
+        // Create a horizontal row of numbers
+        For DeviceID = 0 To 15
+            HSerPrint Hex(deviceID)
+            HSerPrint " "
+        Next
+
+        'Create a vertical column of numbers
+        For DeviceID = 0 To 255
+            DisplayNewLine = DeviceID % 16
+            If DisplayNewLine = 0 Then
+                HSerPrintCRLF
+                HSerPrint Hex(DeviceID)
+                If DisplayNewLine > 0 Then
+                    HSerPrint " "
+                End If
+            End If
+            HSerPrint " "
+
+            //Do an initial Start
+            HI2CStart
+            // Send address
+            HI2CSend ( DeviceID )
+
+            If HI2CWaitMSSPTimeout <> 255 Then
+
+                'Did device fail to respond?
+            If HI2CAckpollState = FALSE Then
+                    HSerPrint   Hex(DeviceID)
+                Else
+                    HSerPrint   "--"
+                End If
+                // Get the read datato prevent any potential slave lockup
+                If DeviceID.0 = 1 Then HI2CSend ( DumpI2CRead )
+
+            Else
+                HSerPrint "! "
+            End If
+            // I2C Stop
+            HI2CStop
+        Next
+
+        HSerPrintCRLF 2
+        HSerPrint   "End of Search"
+        HSerPrintCRLF 2
+
+        Wait While SwitchIn <> DOWN
+        
+    Loop

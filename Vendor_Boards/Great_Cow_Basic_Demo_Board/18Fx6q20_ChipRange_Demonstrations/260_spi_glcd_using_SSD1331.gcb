@@ -1,3 +1,4 @@
+#SKIPTEST
 '''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''This program is a simple GLCD demonstration of the SPI capabilities using an GLCD SSD1331.

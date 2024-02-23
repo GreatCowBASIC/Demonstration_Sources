@@ -1,0 +1,167 @@
+//! The file used in the tutorial...
+/*
+    This demonstration shows the impact of the time delay to manage the debouncing of a switch.
+    The ADC value creates a delay and LEDs switch between each other when the switch is depressed.
+
+
+    Press the switch to reverse the direction of the LEDs, increase the ADC value to increase the debounce check.
+
+    ************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.00
+    @date    04-02-2024
+    ----- Configuration
+*/
+// Chip Settings.
+#CHIP 18F16Q20
+#OPTION Explicit
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #define PPSToolPart 18F16Q20
+
+    Sub InitPPS
+            
+            // Module: UART pin directions
+            Dir PORTB.7 Out    ' Make TX1 pin an output
+            // Module: UART1
+            RB7PPS = 0x0013    // TX1 > RB7
+        
+        End Sub
+    // Add this code segment to your GCBASIC source program
+
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:---------------------SW---------ADC-- 
+    -----------------------------------------
+
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:----TX-------------------------------
+    ----------------------------------------
+
+    ------------------PORTC-----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:LED-LED-LED-LED------------------
+    ----------------------------------------
+  */
+
+// Define constants to make things easier. We can reuse these at any time.
+    #DEFINE LEDPORT LATC
+    #DEFINE LEDD7 PORTC.7
+    #DEFINE LEDD6 PORTC.6
+    #DEFINE LEDD5 PORTC.5
+    #DEFINE LEDD4 PORTC.4
+
+// Set the ports as an output
+    Dir LEDD7 Out
+    Dir LEDD6 Out
+    Dir LEDD5 Out
+    Dir LEDD4 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    // This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.3
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          0
+
+//*****************************************************************************************************
+//Main program commences here.. everything before this is setup for the board.
+
+    Dim direction As Bit
+    Dim mydelay As Word
+    
+    //  Control Constants 
+        #DEFINE LED_RIGHT 0
+        #DEFINE LED_LEFT  1
+
+//Start from left direction
+    direction = LED_LEFT
+
+//Set the initial LED states - change to suit your configuration
+    LEDD4 = 1
+
+    HSerPrintStringCRLF SOURCEFILE
+
+Do
+
+    //Get a value for the ADC port
+        mydelay = ReadAD( ANA0 )
+        mydelay = scale( mydelay, 0, 255, 1, 1000 )
+        
+        HserPrint mydelay
+        HSerSend 9
+
+    //Set the LEDs
+        If  direction = LED_LEFT  Then
+            HserPrint "L"
+            Set C Off
+            Rotate LEDPORT Left
+            IF C = 1 Then LEDD4 = 1
+        Else
+            HserPrint "R"
+            ' This may seem a strange place of this logic, but, we need ensure ( the 18FXXQ20 ) than PORTC.3 state is protected.
+            ' If the LEDD4 is equal to 1 then the sequence has completed, then set the initial state again, the same operation as the starting LED.
+            Set C Off
+            If LEDD4 = 1 Then
+                LEDD4 = 0
+                Set C On
+            End if
+            ' and shift the contents of LEDPORT
+            Rotate LEDPORT Right
+        End If
+        HSerSend 9
+        HSerPrint Left( ByteToBin( PORTC ), 4 )
+        HserPrintCRLF
+
+    //Wait, and then check the switch has been pressed
+        Wait mydelay ms
+        If  funcKeyPressed() = TRUE Then
+            //  change the direction
+            direction = !direction
+        End If
+
+Loop
+
+// This is function, it returns the state of the switch
+    Function  funcKeyPressed as Bit
+    
+        // Define some variables
+        Dim CurrentSwitchState As Bit
+        Dim LastSwitchState As Bit
+
+        wait 1 ms
+
+        // Is the switch pressed down ?
+        If ( SWITCHIN = DOWN ) Then
+            // Set the state
+            CurrentSwitchState = TRUE
+        Else
+            // So, switch is therefore UP/released
+            CurrentSwitchState = FALSE
+        End If
+
+        // This check ensures the state of the switch ....
+        // ensure the switch has changed state
+        If ( CurrentSwitchState <> LastSwitchState ) AND ( CurrentSwitchState = TRUE ) Then
+            // Return the state value - returns TRUE
+            funcKeyPressed = TRUE
+        Else      
+            // Switch is not down
+            funcKeyPressed = FALSE
+        End If
+
+        LastSwitchState = CurrentSwitchState
+
+    End Function

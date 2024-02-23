@@ -1,4 +1,4 @@
-
+#SKIPTEST
 #CHIP 18F16Q20
 #OPTION Explicit
 

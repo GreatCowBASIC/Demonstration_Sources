@@ -15,7 +15,7 @@
 */
 
 
-#CHIP 18F16Q20
+#CHIP 18F16Q20, 32
 #option Explicit
 
 /*

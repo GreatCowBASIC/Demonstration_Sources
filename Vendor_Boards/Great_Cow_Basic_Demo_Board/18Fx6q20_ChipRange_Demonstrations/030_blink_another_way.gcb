@@ -32,11 +32,11 @@
 '''@author  EvanV
 '''@licence GPL
 '''@version 1.00
-'''@date    31.11.2022
+'''@date    04-02-2024
 ' ----- Configuration
 
 'Chip Settings.
-#CHIP 18F16Q20
+#CHIP 18F16Q20, 16
 #Option Explicit
 
 
@@ -57,7 +57,7 @@
     Bit#:  -7---6---5---4---3---2---1---0---
     IO:    LED-LED-LED-LED------------------
     ----------------------------------------
-*/
+    */
 
 'Define constants to make things easier. We can reuse a constant at any time.
 #DEFINE LEDD7 PORTC.7
