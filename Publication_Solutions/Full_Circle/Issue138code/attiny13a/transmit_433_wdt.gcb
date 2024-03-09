@@ -12,7 +12,7 @@ DIM LDR AS BYTE
 
 SET PortB.0 = 1
 SET PortB.2 = 1
-SET PortB.3 = 1               ‘enable int. pullup @unused PINs, good practice
+SET PortB.3 = 1               'enable int. pullup @unused PINs, good practice
 
 'enable WDT: reset
   INTOFF                      'turn off the interrupts - good practice to do so

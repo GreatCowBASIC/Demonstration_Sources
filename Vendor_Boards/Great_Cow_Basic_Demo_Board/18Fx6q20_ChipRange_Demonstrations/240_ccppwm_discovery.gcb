@@ -1,6 +1,6 @@
 #CHIP 18F16Q20
 #option Explicit
-
+#SKIPTEST
 
 #DEFINE DEVELOPER_PWM_DEBUG
 

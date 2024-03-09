@@ -476,7 +476,7 @@ sub tune_f
 
      ' show changes
       if vDivisor > ovDivisor then
-        vz = 0 is "+"
+        vz = 0 ' id "+"
         dDif = vDivisor - ovDivisor
       else
         vz = 1 ' id "-"

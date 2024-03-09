@@ -1,0 +1,88 @@
+// Chip Settings.
+#CHIP 18F16Q20
+    #OPTION Explicit
+    #OPTION FLOATS 1
+
+        #DEFINE USART_BAUD_RATE 9600
+        #DEFINE USART_TX_BLOCKING
+        #DEFINE USART_DELAY OFF
+
+        // PIC PPS Tool version: 0.0.6.5
+        
+        #startup InitPPS, 85
+        #define PPSToolPart 18F16Q20
+
+        Sub InitPPS
+                
+                // Module: UART pin directions
+                Dir PORTB.7 Out    ' Make TX1 pin an output
+                // Module: UART1
+                RB7PPS =    0x0013    // TX1 > RB7
+            
+            End Sub
+        // Add this code segment to your GCBASIC source program
+
+//*****************************************************************************************************
+
+HserPrintCRLF
+
+HSerPrintStringCRLF "Type to string functions"
+HserPrintCRLF
+
+Dim myByte as Byte: myByte = 127
+HSerPrintStringCRLF "  ByteToString()       " + ByteToString ( myByte )
+HSerPrintStringCRLF "  Str()      Legacy    " + Str ( myByte )
+
+Dim myWord as Word: myWord = 32768
+HSerPrintStringCRLF "  WordToString()       " + WordToString ( myWord )
+HSerPrintStringCRLF "  Str()      Legacy    " + Str ( myWord )
+
+Dim myLong as Long: myLong = 2147483647
+HSerPrintStringCRLF "  LongToString()       " + LongToString ( myLong )
+HSerPrintStringCRLF "  Str32()    Legacy    " + Str32 ( myLong )
+
+Dim myInteger as Integer: myInteger = -16384
+HSerPrintStringCRLF "  IntegerToString()    " + IntegerToString ( myInteger )
+HSerPrintStringCRLF "  StrInteger() Legacy  " + StrInteger ( myInteger )
+
+Dim mySingle as Single: mySingle = 12345.6789
+HSerPrintStringCRLF "  SingleToString()    " + SingleToString ( mySingle )
+
+HserPrintCRLF
+
+// ************************************************************************
+
+HSerPrintStringCRLF "Type to hexidecimal string functions"
+HserPrintCRLF
+
+HSerPrintStringCRLF "  ByteToHex()          0x" + ByteToHex ( myByte )
+HSerPrintStringCRLF "  Hex()      Legacy    0x" + Hex ( myByte )
+
+HSerPrintStringCRLF "  WordToHex()          0x" + WordToHex ( myWord )
+
+HSerPrintStringCRLF "  LongToHex()          0x" + LongToHex ( myLong )
+
+HSerPrintStringCRLF "  IntegerToHex()       0x" + IntegerToHex ( myInteger )
+
+HSerPrintStringCRLF "  SingleToHex()        0x" + SingleToHex ( mySingle )
+
+HserPrintCRLF
+
+// ************************************************************************
+
+HSerPrintStringCRLF "Type to binary string functions"
+HserPrintCRLF
+
+HSerPrintStringCRLF "  ByteToBin()          0b" + ByteToBin ( myByte )
+
+HSerPrintStringCRLF "  WordToBin()          0b" + WordToBin ( myWord )
+
+HSerPrintStringCRLF "  LongToBin()          0b" + LongToBin ( myLong )
+
+HSerPrintStringCRLF "  IntegerToBin()       0b" + IntegerToBin ( myInteger )
+
+HSerPrintStringCRLF "  SingleToBin()        0b" + SingleToBin ( mySingle )
+
+
+Do
+Loop

@@ -6,7 +6,7 @@
 SET PortB.0 = 1
 SET PortB.2 = 1
 SET PortB.3 = 1
-SET PortB.4 = 1 ‘enable int. pullup @unused PINs, good practice
+SET PortB.4 = 1     'enable int. pullup @unused PINs, good practice
 
 'Set initial PIN direction and state:
 DIR LED OUT         'set direction LED to output
