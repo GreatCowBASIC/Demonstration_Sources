@@ -77,7 +77,7 @@ See https://www.h-schmidt.net/FloatConverter/IEEE754.html
 // ---------- Variable definition and main program ---------------------------------
 
 //!  Convert single to a string.
-//!  Note the poorly formatted string
+
 
   dim mySingle as Single
 
