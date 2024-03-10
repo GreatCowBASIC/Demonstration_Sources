@@ -1,0 +1,162 @@
+/*
+
+    Inspect the memory in the simulator to see results.
+
+    Use See https://www.h-schmidt.net/FloatConverter/IEEE754.html
+
+    or    https://babbage.cs.qc.cuny.edu/ieee-754.old/64bit.html
+
+*/
+// Chip Settings
+#CHIP 18F16Q20
+    #OPTION Explicit
+    #OPTION FLOATS 1
+
+    #DEFINE USART_BAUD_RATE 9600
+      #DEFINE USART_TX_BLOCKING
+      #DEFINE USART_DELAY OFF
+
+  // PIC PPS Tool version: 0.0.6.5
+    
+      #startup InitPPS, 85
+      #define PPSToolPart 18F16Q20
+
+      Sub InitPPS
+              
+              // Module: UART pin directions
+              Dir PORTB.7 Out    ' Make TX1 pin an output
+              // Module: UART1
+              RB7PPS =    0x0013    // TX1 > RB7
+          
+          End Sub
+      // Add this code segment to your GCBASIC source program
+
+    /*
+        Hardware
+        -------------------PORTA----------------
+        Bit#:  -7---6---5---4---3---2---1---0---
+        IO:---------------------SW---------ADC-- 
+        -----------------------------------------
+
+
+        -------------------PORTB----------------
+        Bit#:  -7---6---5---4---3---2---1---0---
+        IO:----TX-------------------------------
+        ----------------------------------------
+
+        ------------------PORTC-----------------
+        Bit#:  -7---6---5---4---3---2---1---0---
+        IO:LED-LED-LED-LED------------------
+        ----------------------------------------
+    */
+
+    // Define constants to make things easier. We can reuse these at any time.
+        #DEFINE LEDPORT LATC
+        #DEFINE LEDD7 PORTC.7
+        #DEFINE LEDD6 PORTC.6
+        #DEFINE LEDD5 PORTC.5
+        #DEFINE LEDD4 PORTC.4
+
+    // Set the ports as an output
+        Dir LEDD7 Out
+        Dir LEDD6 Out
+        Dir LEDD5 Out
+        Dir LEDD4 Out
+
+        #DEFINE POTENTIOMETER PORTA.0
+        // This is the PORTA.0 port
+        Dir POTENTIOMETER In
+
+        #DEFINE SWITCHIN      PORTA.3
+        Dir     SWITCHIN      In
+        #DEFINE DOWN          0
+
+// *****************************************************************************************************
+
+    //! Wait 200 ms to permit any remote serial terminal to settle.
+      wait 200 ms
+    //! Clear the terminal
+      HserSend    0x01 
+ 
+// ---------- Constant and variable definition and main program ---------------------------------
+
+
+
+
+// ************************************************************************
+
+//! Lots of tests!!
+//! Maths, timer running, events happening, more maths and show some debug
+
+    //! Uncomment SYSSINGLECALCS_DEBUG to show debug
+    // #DEFINE SYSSINGLECALCS_DEBUG
+
+    Dim myCircumference, myRadius, myPi as Single 
+    Dim myLong As Long
+    
+    #script
+            cPI = 22/7
+    #endscript
+
+    // Initialise the timer and ISR as a test
+        // Firstly tell the compiler to use a 16bit timer for this demonstration
+        #DEFINE TMR0_16BIT
+
+        InitTimer0 Osc, PRE0_256 + TMR0_FOSC4 ,  POST0_1
+        //    Start the Timer
+        StartTimer 0
+
+        // Every ~1 sec.  0x0bdc is calculated value using a tool like Mr E. Timer Helper
+        SetTimer ( 0 , 3036  )
+
+    // Test interupt handling
+        On Interrupt Timer0Overflow Call ISR
+            
+
+
+    HserPrintCRLF   
+
+    HSerPrintStringCRLF "Initial = " + SingleToString ( cPI )
+    HSerPrintStringCRLF "Initial = 0x" + SingleToHex ( cPI )
+    HserPrintCRLF
+
+    Do
+
+        myRadius = 11.5
+        
+        // Single maths are long running, may need to turn interrupt off
+            INTOFF
+        // Constant * Single
+        myCircumference = cPI * myRadius * 2
+            INTON
+
+        HSerPrintStringCRLF "Result  = " + SingleToString ( myCircumference )
+        HSerPrintStringCRLF "Result  = 0x" + SingleToHex ( myCircumference )
+
+        // Single * Single
+        myPi = 3.142857142857143
+        myCircumference = myPi  * myRadius * 2
+        HSerPrintStringCRLF "Result  = " + SingleToString ( myCircumference )
+        HSerPrintStringCRLF "Result  = 0x" + SingleToHex ( myCircumference )
+
+        // Single * Single - zero check
+        myPi = 10.5
+        myRadius = 1000
+        myCircumference = myPi  * myRadius * 2  
+        HSerPrintStringCRLF "Result  = " + SingleToString ( myCircumference )
+        HSerPrintStringCRLF "Result  = 0x" + SingleToHex ( myCircumference )
+
+
+        // Assign Single to Long 
+        myLong = myCircumference 
+        HSerPrintStringCRLF "MyLong  = " + LongToString ( myLong )
+
+        Wait 5 s
+
+    Loop
+
+
+Sub ISR
+    HSerPrintStringCRLF "In ISR"
+    Wait 10 ms
+End Sub
