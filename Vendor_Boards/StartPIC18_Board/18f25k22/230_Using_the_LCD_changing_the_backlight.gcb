@@ -95,7 +95,7 @@ Do Forever
     Locate 0, 0
     Print "GCBASIC"
     Locate 1, 0
-    Print "2023  "
+    Print "2024  "
     Wait 1 s
 
     'Use PWM to vary the backlight

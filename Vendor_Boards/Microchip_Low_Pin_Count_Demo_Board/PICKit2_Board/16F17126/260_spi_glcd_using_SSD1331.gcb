@@ -103,7 +103,7 @@
 
     GLCDPrintStringLN "GCBASIC"
     GLCDPrintStringLN ""
-    GLCDPrintStringLN "2023"
+    GLCDPrintStringLN "2024"
     GLCDPrintStringLN "SSD1331 GLCD"
     GLCDPrintStringLN ""
     GLCDPrintStringLN "by Anobium"

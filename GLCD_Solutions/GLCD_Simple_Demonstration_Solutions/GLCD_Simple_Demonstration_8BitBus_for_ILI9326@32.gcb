@@ -167,7 +167,7 @@ sub ShowCase1
         GLCDDrawString ( 42, ILI9326_GLCD_HEIGHT - 30 , "ILI9326" , TFT_WHITE )
 
         GLCDfntDefaultsize = 1
-        GLCDDrawString ( ILI9326_GLCD_WIDTH - 32, 2 , "2023" , TFT_WHITE )
+        GLCDDrawString ( ILI9326_GLCD_WIDTH - 32, 2 , "2024" , TFT_WHITE )
 
         GLCDDrawString ( ILI9326_GLCD_WIDTH - 66, 10 , "8 bit bus" , TFT_WHITE )
 
@@ -226,7 +226,7 @@ sub ShowCase2
         GLCDDrawString ( 42, ILI9326_GLCD_HEIGHT - 30 , "ILI9326" , TFT_WHITE )
 
         GLCDfntDefaultsize = 1
-        GLCDDrawString ( ILI9326_GLCD_WIDTH - 32, 2 , "2023" , TFT_WHITE )
+        GLCDDrawString ( ILI9326_GLCD_WIDTH - 32, 2 , "2024" , TFT_WHITE )
 
         GLCDDrawString ( ILI9326_GLCD_WIDTH - 66, 10 , "8 bit bus" , TFT_WHITE )
 

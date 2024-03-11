@@ -86,7 +86,7 @@ Wait 1 s
 Locate 0, 0
 Print "GCBASIC"
 Locate 1, 0
-Print "2023  "
+Print "2024  "
 Wait 2 s
 CLS
 

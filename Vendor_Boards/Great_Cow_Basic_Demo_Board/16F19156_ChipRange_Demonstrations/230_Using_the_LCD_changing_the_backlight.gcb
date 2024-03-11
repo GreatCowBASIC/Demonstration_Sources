@@ -106,7 +106,7 @@
      LOCATE 0, 0
      PRINT "GCBASIC"
      LOCATE 1, 0
-     PRINT "2023  "
+     PRINT "2024  "
      WAIT 1 s
 
      LCDBacklight ( On )
@@ -124,7 +124,7 @@
      LOCATE 0, 0
      PRINT "GCBASIC"
      LOCATE 1, 0
-     PRINT "2023  "
+     PRINT "2024  "
      WAIT 1 s
 
      LCDBacklight ( Off )
