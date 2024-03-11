@@ -10,7 +10,7 @@
 // Chip Settings
 #CHIP 18F16Q20
     #OPTION Explicit
-    #OPTION FLOATS 1
+    
 
     #DEFINE USART_BAUD_RATE 9600
       #DEFINE USART_TX_BLOCKING
@@ -80,9 +80,7 @@
  
 // ---------- Constant and variable definition and main program ---------------------------------
 
-
-
-    //! Division test
+//! Division test
 
     Dim myCircumference, myRadius, myPi as Single 
     Dim myLong As Long

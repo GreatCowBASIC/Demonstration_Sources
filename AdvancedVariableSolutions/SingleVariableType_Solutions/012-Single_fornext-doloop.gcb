@@ -10,7 +10,7 @@
 // Chip Settings
 #CHIP 18F16Q20
     #OPTION Explicit
-    #OPTION FLOATS 1
+    
 
     #DEFINE USART_BAUD_RATE 9600
       #DEFINE USART_TX_BLOCKING
@@ -80,9 +80,8 @@
  
 // ---------- Constant and variable definition and main program ---------------------------------
 
-
-    //! Show For next with integer constraint of an integer
-    //! Show Do Loop loop with Single increment
+//! Show For next with integer constraint of an integer
+//! Show Do Loop loop with Single increment
     #script
         Pi = 22/7
     #endscript

@@ -10,7 +10,7 @@
 // Chip Settings
 #CHIP 18F16Q20
     #OPTION Explicit
-    #OPTION FLOATS 1
+    
 
     #DEFINE USART_BAUD_RATE 9600
       #DEFINE USART_TX_BLOCKING
@@ -104,7 +104,7 @@
     HserPrint SingleToString(InitialFloatNumber)
     HserPrintCRLF
 
-    HSerPrintStringCRLF "Now substract that number from 0 (Zero)"
+    HSerPrintStringCRLF "Now subtract that number from 0 (Zero)"
     InitialFloatNumber = 0 - InitialFloatNumber
 
     HserPrint SingleToString(InitialFloatNumber)
@@ -115,4 +115,3 @@
     Do
     Loop
 
-// ******************************************************** 

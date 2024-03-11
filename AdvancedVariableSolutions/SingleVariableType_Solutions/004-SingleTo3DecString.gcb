@@ -10,7 +10,7 @@
 // Chip Settings
 #CHIP 18F16Q20
     #OPTION Explicit
-    #OPTION FLOATS 1
+    
 
     #DEFINE USART_BAUD_RATE 9600
       #DEFINE USART_TX_BLOCKING
@@ -80,9 +80,10 @@
  
 // ---------- Constant and variable definition and main program ---------------------------------
 
-    //!  Convert a constant to a single with three decimal places using a user program
-    //!  This shows the maths capabilities
-    //!  Note the poorly formatted constants, there are tests to ensure the compiler works
+//!  Convert a constant to a single with three decimal places using a user program
+//!  This shows the maths capabilities
+//!  Note the poorly formatted constants, there are tests to ensure the compiler works
+    
     Dim TestSingleNumber as Single
 
     //! Test constants

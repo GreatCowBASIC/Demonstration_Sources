@@ -10,7 +10,7 @@
 // Chip Settings
 #CHIP 18F16Q20
     #OPTION Explicit
-    #OPTION FLOATS 1
+    
 
     #DEFINE USART_BAUD_RATE 9600
       #DEFINE USART_TX_BLOCKING
@@ -80,8 +80,8 @@
  
 // ---------- Constant and variable definition and main program ---------------------------------
 
-    //!Maths and conditional tests
-    //!
+//!Maths and conditional tests
+//!
 
     #script
         Pi = 22/7

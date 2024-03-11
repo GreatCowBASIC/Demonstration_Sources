@@ -10,7 +10,7 @@
 // Chip Settings
 #CHIP 18F16Q20
     #OPTION Explicit
-    #OPTION FLOATS 1
+    
 
     #DEFINE USART_BAUD_RATE 9600
       #DEFINE USART_TX_BLOCKING
@@ -80,7 +80,6 @@
  
 // ---------- Constant and variable definition and main program ---------------------------------
 
-
 //! Conditional Support for Singles
 
     Dim mySingle as Single 
@@ -93,7 +92,7 @@
     HSerPrintStringCRLF SingleToString ( mySingle )
     HserPrintCRLF
 
-    // EQUAL 
+    // Conditional EQUAL 
 
         // Test 05
         If MySingle = -10 Then
@@ -132,7 +131,7 @@
             HserPrint SysByteTempX: HserSend 9
             HSerPrintStringCRLF "MySingle = 12345.6789"
         End If
-less:
+
     // LESS THAN
 
         // Test 20

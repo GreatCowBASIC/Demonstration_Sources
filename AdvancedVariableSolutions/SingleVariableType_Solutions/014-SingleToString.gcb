@@ -1,11 +1,6 @@
-
 /*
 
-    Inspect the memory in the simulator to see results.
-
-    Use See https://www.h-schmidt.net/FloatConverter/IEEE754.html
-
-    or    https://babbage.cs.qc.cuny.edu/ieee-754.old/64bit.html
+See https://www.h-schmidt.net/FloatConverter/IEEE754.html
 
 */
 // Chip Settings
@@ -79,36 +74,54 @@
     //! Clear the terminal
       HserSend    0x01 
  
-// ---------- Constant and variable definition and main program ---------------------------------
+// ---------- Variable definition and main program ---------------------------------
 
-// ! Single MOD test
+//!  Convert constant and variable to single then to a string.
+
+  '---------- misc variable definition ---------------------------------
+  dim Pi as Single
+
+  '---------------------------------------------------------------------
+  wait 200 ms
+
+  HserPrintCRLF
+
+  HSerPrint "1 0.0 '"
+  HSerPrint SingleToString([Single]0.0)
+  HSerPrint "'"
+  HserPrintCRLF
+
+  HSerPrint "2 0.05 '"
+  HSerPrint SingleToString([Single]0.05)
+  HSerPrint "'"
+  HserPrintCRLF
+
+  HSerPrint "3 0.5 '"
+  HSerPrint SingleToString([Single]0.5)
+  HSerPrint "'"
+  HserPrintCRLF
+
+  HSerPrint "4 1.5 '"
+  HSerPrint SingleToString([Single]1.5)
+  HSerPrint "'"
+  HserPrintCRLF
+
+  Pi = 3.14159265
+  HSerPrint "5 3.14159265 '"
+  HSerPrint SingleToString(Pi)
+  HSerPrint "'"
+  HserPrintCRLF
+
+  HSerPrint "6 999999.99999999 '"
+  HSerPrint SingleToString([Single]999999.99999999)
+  HSerPrint "'"
+  HserPrintCRLF
 
 
-    Dim startValue, initialValue, ModValue as Single
-    
- 
-    HserPrintCRLF
-    
-    //? Change these constants
-    ModValue = 2.75
-    initialValue = 456.213142
-    
-    // Set startvalue
-    startValue = initialValue
-    HSerPrint "Start value      = " + ltrim(SingleToString(startValue))
-    HSerPrintStringCRLF " mod " + SingleToString(ModValue)
+  HSerPrint "Done"
 
-    startValue = startValue MOD [single]ModValue
-    HSerPrintStringCRLF "GCBASIC MOD      = " + ltrim(SingleToString(startValue))
 
-    // Reset startvalue
-    startValue = initialValue
-        startValue = startValue / ModValue
-        dim myLong as Long
-        myLong = startValue
-        startValue = startValue - myLong
-        startValue = startValue * ModValue
-    HSerPrintStringCRLF "Long calc method = " + ltrim(SingleToString(startValue))
+  Do
+    'loop forever
+  Loop
 
-    Do
-    Loop

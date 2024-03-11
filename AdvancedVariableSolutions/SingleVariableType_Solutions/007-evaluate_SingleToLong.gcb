@@ -10,7 +10,7 @@
 // Chip Settings
 #CHIP 18F16Q20
     #OPTION Explicit
-    #OPTION FLOATS 1
+    
 
     #DEFINE USART_BAUD_RATE 9600
       #DEFINE USART_TX_BLOCKING
@@ -83,76 +83,76 @@
 // ! Evaluate constants, maths and show results
 // ! Answers should be 199 and the last is 0.0
 
-Dim MySingle,MySingle2 as Single
-Dim MyLong as Long
-Dim MyTMP as Byte
-Dim MyWord as Word
+    Dim MySingle,MySingle2 as Single
+    Dim MyLong as Long
+    Dim MyTMP as Byte
+    Dim MyWord as Word
 
-HSerprintCRLF
+    HSerprintCRLF
 
-MySingle = 100.141
-    HSerPrintStringCRLF "Hex Values"
-    HserPrint "  100.141 = 0x"+SingleToHex ( MySingle )
+    MySingle = 100.141
+        HSerPrintStringCRLF "Hex Values"
+        HserPrint "  100.141 = 0x"+SingleToHex ( MySingle )
 
-HSerprintCRLF
-MySingle = 199.0
-    HserPrint "  199.0 = 0x"+SingleToHex ( MySingle )
-    HserPrintCRLF 2
+    HSerprintCRLF
+    MySingle = 199.0
+        HserPrint "  199.0 = 0x"+SingleToHex ( MySingle )
+        HserPrintCRLF 2
 
-MySingle2 = 0.0
-MySingle = MySingle + MySingle2
-MyLong  = MySingle
-HSerprint  "1 199 = "
-Hserprint MyLong
-HSerprintCRLF
-
-
-MySingle = 100.141
-MySingle2 = 99.65
-MySingle = MySingle + MySingle2
-MyLong  = MySingle
-HSerprint  "2 199 = "
-Hserprint MyLong
-HSerprintCRLF
+    MySingle2 = 0.0
+    MySingle = MySingle + MySingle2
+    MyLong  = MySingle
+    HSerprint  "1 199 = "
+    Hserprint MyLong
+    HSerprintCRLF
 
 
-MySingle = 100.142
-MySingle = MySingle + [single]99.65
-MyLong  = MySingle
-HSerprint  "3 199 = "
-Hserprint MyLong
-HSerprintCRLF 1
-
-MySingle = 100.143
-MySingle = MySingle + [SINGLE]99.650
-MyLong  = MySingle
-HSerprint  "4 199 = "
-Hserprint MyLong
-HSerprintCRLF 1
-
-MySingle = [SINGLE]100.144 + [SINGLE]99.65
-MyLong  = MySingle
-HSerprint  "5 199 = "
-Hserprint MyLong
-HSerprintCRLF 1
-
-MySingle = [SINGLE]100.145 
-MySingle += [SINGLE]99.65
-MyLong  = MySingle
-HSerprint  "6 199 = "
-Hserprint MyLong
-HSerprintCRLF 1
+    MySingle = 100.141
+    MySingle2 = 99.65
+    MySingle = MySingle + MySingle2
+    MyLong  = MySingle
+    HSerprint  "2 199 = "
+    Hserprint MyLong
+    HSerprintCRLF
 
 
-MySingle = 100.146 + 99.651
-MyLong  = MySingle
-HSerprint  "7 199 = "
-Hserprint MyLong
-HSerprintCRLF 1
+    MySingle = 100.142
+    MySingle = MySingle + [single]99.65
+    MyLong  = MySingle
+    HSerprint  "3 199 = "
+    Hserprint MyLong
+    HSerprintCRLF 1
 
-MySingle = 0.0
-MyLong  = MySingle
-HSerprint  "8 0   = "
-Hserprint MyLong
-HSerprintCRLF 1
+    MySingle = 100.143
+    MySingle = MySingle + [SINGLE]99.650
+    MyLong  = MySingle
+    HSerprint  "4 199 = "
+    Hserprint MyLong
+    HSerprintCRLF 1
+
+    MySingle = [SINGLE]100.144 + [SINGLE]99.65
+    MyLong  = MySingle
+    HSerprint  "5 199 = "
+    Hserprint MyLong
+    HSerprintCRLF 1
+
+    MySingle = [SINGLE]100.145 
+    MySingle += [SINGLE]99.65
+    MyLong  = MySingle
+    HSerprint  "6 199 = "
+    Hserprint MyLong
+    HSerprintCRLF 1
+
+
+    MySingle = 100.146 + 99.651
+    MyLong  = MySingle
+    HSerprint  "7 199 = "
+    Hserprint MyLong
+    HSerprintCRLF 1
+
+    MySingle = 0.0
+    MyLong  = MySingle
+    HSerprint  "8 0   = "
+    Hserprint MyLong
+    HSerprintCRLF 1
 

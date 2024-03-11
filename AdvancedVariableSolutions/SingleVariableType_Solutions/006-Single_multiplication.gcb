@@ -10,7 +10,7 @@
 // Chip Settings
 #CHIP 18F16Q20
     #OPTION Explicit
-    #OPTION FLOATS 1
+    
 
     #DEFINE USART_BAUD_RATE 9600
       #DEFINE USART_TX_BLOCKING
@@ -82,36 +82,34 @@
 
 // ! Show some large calculation
 
-Dim TestSingleNumber, ResultNumber as Single
+    Dim TestSingleNumber, ResultNumber as Single
 
-//! Test constant
-    TestSingleNumber = 123.4
+    //? Change this constant
+        TestSingleNumber = 123.4
 
-    HSerPrintCRLF 2
-    HSerPrint "Maths test on " + ChipNameStr
+        HSerPrintCRLF 2
+        HSerPrint "Maths test on " + ChipNameStr
 
-    HSerPrintCRLF 2
+        HSerPrintCRLF 2
 
-    ResultNumber =  TestSingleNumber * 1000
+        ResultNumber =  TestSingleNumber * 1000
 
-    HserPrintCRLF
-    HSerPrintStringCRLF "This function SingleToString() will overflow at 10000000"
-  
-
-    If ResultNumber < 10000000 Then
-        HSerPrintStringCRLF SingleToString(ResultNumber)
-    Else
-        HSerPrintStringCRLF "String Overflow!! Use hex numbering scheme"
-    End If
-    HSerPrintStringCRLF "0x"+SingleToHex(ResultNumber)
-
+        HserPrintCRLF
+        HSerPrintStringCRLF "This function SingleToString() will overflow at 10000000"
     
 
-    HserPrint "Done"
+        If ResultNumber < 10000000 Then
+            HSerPrintStringCRLF SingleToString(ResultNumber)
+        Else
+            HSerPrintStringCRLF "String Overflow!! Use hex numbering scheme"
+        End If
+        HSerPrintStringCRLF "0x"+SingleToHex(ResultNumber)
 
-    Do
-    Loop
+        
 
+        HserPrint "Done"
 
-// ******************************************************** 
+        Do
+        Loop
+
 

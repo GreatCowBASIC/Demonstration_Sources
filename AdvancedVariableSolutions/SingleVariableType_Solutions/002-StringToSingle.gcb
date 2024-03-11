@@ -6,7 +6,7 @@ See https://www.h-schmidt.net/FloatConverter/IEEE754.html
 // Chip Settings
 #CHIP 18F16Q20
     #OPTION Explicit
-    #OPTION FLOATS 1
+    
 
     #DEFINE USART_BAUD_RATE 9600
       #DEFINE USART_TX_BLOCKING
@@ -77,26 +77,26 @@ See https://www.h-schmidt.net/FloatConverter/IEEE754.html
 // ---------- Variable definition and main program ---------------------------------
 
 //!  Convert a string to a single.
-//!  Note the poorly formatted string
+//!  Note the poorly formatted strings
 
-dim StrNum as string * 18
-dim Ans as Single
+    dim StrNum as string * 18
+    dim Ans as Single
 
-HSerPrintCRLF
+    HSerPrintCRLF
 
-StrNum = "  -3.12156987 PI"
-HSerPrintStringCRLF "String   : " +Trim(StrNum)
+    StrNum = "  -3.12156987 PI"
+    HSerPrintStringCRLF "String   : " +Trim(StrNum)
 
-//! Use StringToSingle()
-Ans = StringToSingle(StrNum)
+    //! Use StringToSingle()
+    Ans = StringToSingle(StrNum)
 
-//! User SingleToString()
-HSerPrintStringCRLF "Single   : " +Trim(SingleToString ( Ans ))
+    //! User SingleToString()
+    HSerPrintStringCRLF "Single   : " +Trim(SingleToString ( Ans ))
 
-//! Use SingleToHex()
-HSerPrintStringCRLF "IEEE Hex : 0x" + SingleToHex(Ans)
+    //! Use SingleToHex()
+    HSerPrintStringCRLF "IEEE Hex : 0x" + SingleToHex(Ans)
 
-Do Forever
-	// loop forever
-Loop
+    Do Forever
+        // loop forever
+    Loop
 
