@@ -78,8 +78,7 @@ See https://www.h-schmidt.net/FloatConverter/IEEE754.html
 
 //!  Convert single to a string.
 
-
-  dim mySingle as Single
+Dim mySingle as Single
 
   // -9.9999999 is rounded to -10, use the URL above to see the rounding error, and, how -10 is correct.
   //  https://www.h-schmidt.net/FloatConverter/IEEE754.html
@@ -90,4 +89,3 @@ See https://www.h-schmidt.net/FloatConverter/IEEE754.html
 
   Do forever 
   Loop
-
