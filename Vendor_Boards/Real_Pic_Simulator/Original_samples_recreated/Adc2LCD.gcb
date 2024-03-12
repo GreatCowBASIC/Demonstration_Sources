@@ -38,7 +38,7 @@ Locate 1,0
 Print "Channel 1:"
 
 //! Dimension a single variable
-dim myVOlts as Single
+dim myVolts as Single
 
 Do Forever
 
