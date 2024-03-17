@@ -1,0 +1,34 @@
+
+wait 500 ms
+'---------- misc variable definition ---------------------------------
+Dim SysULongIntTempXX as uLongINT
+Dim mySingle as Single
+Dim SysByte_STS_Err as Byte
+// ************************************************************************
+
+SysByte_STS_Err = 0
+
+HSerPrint "Single hard coded: -396.5325569875"
+HSerSend 13
+
+HSerPrintStringCRLF "---------- StringToSingle --------------"
+
+'mySingle = -0.965325569875
+mySingle = StringToSingle("-396.5325569875")
+
+HSerPrintStringCRLF SingleToHex(mySingle)
+HSerSend 13
+
+HSerPrintStringCRLF "---------- SingleToString --------------"
+
+HSerPrint "   SingleToString: "
+HSerPrintStringCRLF SingleToString(mySingle)
+
+If SysByte_STS_Err.0 = 0 Then   'shows no error since it wasn't
+included in parameters
+  HSerPrint "Error Code: "
+  HSerPrintStringCRLF ByteToBin(SysByte_STS_Err)
+end if
+
+Do
+Loop

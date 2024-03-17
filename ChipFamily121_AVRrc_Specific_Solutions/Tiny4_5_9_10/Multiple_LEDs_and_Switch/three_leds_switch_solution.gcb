@@ -1,0 +1,40 @@
+'''A demonstration program for GCBASIC.
+'''--------------------------------------------------------------------------------
+'''This program controls three LEDs via a switch.
+'''See the photo and the schematic in the same folder as this source program.
+'''
+'''@author    JB   
+'''@license   GPL
+'''@version   1.00   
+'''@date      2024-03-17
+'''********************************************************************************
+
+#chip tiny10, 8
+#option Explicit
+
+/*
+            ------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------SW--LED-LED_LED--
+    IO:    ---------------------------------
+*/
+
+
+// Define ports output state
+dir portb.0 out
+dir portb.1 out
+dir portb.2 out
+
+// Define ports in state
+dir portb.3 in
+
+// Repeat while switch state is Low, else exit loop and enter sleep state 
+Do while portb.3 = 0 
+
+    // PulseOut will set the port as an output, set the state and then delay
+    PulseOut PortB.0, 500 ms
+    PulseOut PortB.1, 500 ms
+    PulseOut PortB.2, 500 ms
+
+Loop
+
