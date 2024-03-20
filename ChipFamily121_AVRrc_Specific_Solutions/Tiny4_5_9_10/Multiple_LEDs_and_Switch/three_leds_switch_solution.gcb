@@ -38,3 +38,4 @@ Do while portb.3 = 0
 
 Loop
 
+// As there is no code after the Loop the chip will be executa chip sleep
