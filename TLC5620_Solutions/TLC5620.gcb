@@ -1,0 +1,168 @@
+'       $formattagcb
+//*     ************************************************************************
+//*     '                          TLC5620 LIBRARY
+'
+//*     GBCasic library for programming the TLC5620 quad DAC.
+'       By JackJames58 (Giacomo Casano)
+'       Four pins of the micro are used to program this DAC.
+'       Initial version: 18/03/2024
+//*     ************************************************************************
+'       -
+'       -
+//!     TLC5620 DAC:
+//!     NAME    PIN   I/O    DESCRIPTION
+'       CLK     7      I     Serial interface clock. The Input digital Data is shifted into the serial
+'       '                    interface register On the falling edge of the clock applied to the CLK terminal.
+'       DACA    12     O     DAC A analog Output
+'       DACB    11     O     DAC B analog Output
+'       DACC    10     O     DAC C analog Output
+'       DACD    9      O     DAC D analog Output
+'       Data    6      I     Serial interface digital Data Input.
+'       '                    The digital code for the DAC is clocked into the serial interface register serially.
+'       '                    Each data bit is clocked into the register on the falling edge of the clock signal.
+'       GND     1      I     Ground Return And reference terminal
+'       LDAC    13     I     Load DAC. When the LDAC signal is High, no DAC Output updates occur when
+'       '                    the input digital data is read into the serial interface.
+'       '                    The DAC outputs are only updated when LDAC is taken from high to low.
+'       LOAD    8      I     Serial Interface load control.
+'       '                    When LDAC is low, the falling edge of the LOAD signal latches the digital data
+'       '                    into the output latch and immediately produces the analog voltage at the DAC
+'       '                    output terminal.
+'       REFA    2      I     Reference voltage Input to DAC A. This voltage defines the Output analog range.
+'       REFB    3      I     Reference voltage Input to DAC B. This voltage defines the Output analog range.
+'       REFC    4      I     Reference voltage Input to DAC C. This voltage defines the Output analog range.
+'       REFD    5      I     Reference voltage Input to DAC D. This voltage defines the Output analog range.
+'       VDD     14     I     Positive supply voltage
+'       -
+'       -
+        
+//*     Range of DAC (Reference and 2*Reference)
+'       DAC_REF:   Reference = R
+'       DAC_REFX2: Reference = REF * 2
+'       -
+        #Define DAC_REF   0   ' 1 * Vref
+        #Define DAC_REFX2 1   ' 2 * Vref
+'       -
+        #Define LSBFIRST 0
+        #Define MSBFIRST 1
+'       -
+//*     Four DAC channels
+        #Define CHANNEL_A 0
+        #Define CHANNEL_B 1
+        #Define CHANNEL_C 2
+        #Define CHANNEL_D 3
+'       -
+//*     These definitions are used to connect the pins of the micro
+//*     to the control inputs of the DAC.
+//*     Must be defined in the main program.
+//*     Example:
+'       #Define DATA_PORTPIN  = PORTA.1
+'       #Define CLOCK_PORTPIN = PORTB.1
+'       #Define LOAD_PORTPIN  = PORTA.2
+'       #Define LDAC_PORTPIN  = PORTB.2
+'       -
+'       -
+'-
+//*     ***********************************************************************
+//!     '                          SUBROUTINES
+//*     ***********************************************************************
+'-
+//*     =======================================================================
+//*     Initialize ports of micro
+//*     -----------------------------------------------------------------------
+Sub TLC5620_Init
+        Dir DATA_PORTPIN Out
+        Dir CLOCK_PORTPIN Out
+        Dir LOAD_PORTPIN Out
+        Dir LDAC_PORTPIN Out
+End Sub
+'       -
+'       -
+//*     =======================================================================
+//*     Programma un canale del DAC.
+//*     In ingresso il numero del canale, il Range e il dato da inviare.
+//*     Program a DAC channel.
+//*     In input the channel number, the Range and the data to be sent.
+//*     -----------------------------------------------------------------------
+Sub TLC5620_Write (In Canale, Range, Dato As byte)
+        Dim Msb As Byte
+        Dim Lsb As Byte
+'       -
+        LDAC_PORTPIN = 1
+        LOAD_PORTPIN = 1
+'       -
+        Msb = FnLSL (Canale & 0x03, 1) | FnLSL (range & 0x01, 0)
+        Lsb = Dato
+'       -
+        ShiftOut (MSBFIRST, Msb)
+        ShiftOut (MSBFIRST, Lsb)
+'       -
+        LOAD_PORTPIN = 0
+        Wait 10 us
+        LOAD_PORTPIN = 1
+        Wait 10 us
+        LDAC_PORTPIN = 0
+        Wait 10 us
+        LDAC_PORTPIN = 1
+End Sub
+'       -
+'       -
+//*     =======================================================================
+//*     Trasmette una serie di bit sequenzialmente su una determinata porta
+//*     Transmits a series of bits sequentially on a given port
+//*     -----------------------------------------------------------------------
+Sub ShiftOut (In BitOrder, Dato As Byte)
+        Dim C_Cnt As Byte
+        Dim Stato As Bit
+'       -
+        For C_Cnt = 0 to 7
+           If BitOrder = LSBFIRST Then
+              Stato = (Dato & FnLSL (1, C_Cnt)) > 0
+           Else
+              Stato = (Dato & FnLSL (1, 7 - C_Cnt)) > 0
+           End If
+           DATA_PORTPIN = Stato
+        Next C_Cnt
+'       -
+        CLOCK_PORTPIN = 1
+        Wait 10 us
+        CLOCK_PORTPIN = 0
+End Sub
+'       -
+'       -
+//!     ***********************************************************************
+//!     '                        EXAMPLE PROGRAM
+//!     ***********************************************************************
+        #Option Explicit          ' Require Explicit declaGPtion of Variables
+'       #Chip 12F629, 4           ' Declare the Target Processor And Speed
+        #Chip 16f628A, 4
+'       -
+        #Define DATA_PORTPIN  PORTA.0
+        #Define CLOCK_PORTPIN PORTA.1
+        #Define LOAD_PORTPIN  PORTA.2
+        #Define LDAC_PORTPIN  PORTA.4
+'       -
+        Dim vOut As Byte  ' Value to DAC
+        Dim Cnt  As Byte  ' Number of DAC
+'       -
+        TRISB = 0
+        TRISA = 0
+        
+        TLC5620_Init
+'       -
+        Do ForEver
+           For Cnt = 0 to 3         ' DAC number
+              For vOut = 0 to 255   ' Value
+                 TLC5620_Write (Cnt, DAC_REF, vOut)
+                 Wait 2 MS
+              Next vOut
+           Next Cnt
+           Wait 1 s
+           For Cnt = 0 to 3                  ' DAC number
+              For vOut = 255 to 0 Step -1    ' Value
+                 TLC5620_Write (Cnt, DAC_REF, vOut)
+                 Wait 2 MS
+              Next vOut
+           Next Cnt
+           Wait 1 s
+        Loop
