@@ -1,15 +1,10 @@
-
 /*
 
-    Inspect the memory in the simulator to see results.
-
-    Use See https://www.h-schmidt.net/FloatConverter/IEEE754.html
-
-    or    https://babbage.cs.qc.cuny.edu/ieee-754.old/64bit.html
+See https://www.h-schmidt.net/FloatConverter/IEEE754.html
 
 */
 // Chip Settings
-#CHIP 18F16Q20
+#CHIP 18F26K20
     #OPTION Explicit
     
 
@@ -17,20 +12,7 @@
       #DEFINE USART_TX_BLOCKING
       #DEFINE USART_DELAY OFF
 
-  // PIC PPS Tool version: 0.0.6.5
-    
-      #startup InitPPS, 85
-      #define PPSToolPart 18F16Q20
 
-      Sub InitPPS
-              
-              // Module: UART pin directions
-              Dir PORTB.7 Out    ' Make TX1 pin an output
-              // Module: UART1
-              RB7PPS =    0x0013    // TX1 > RB7
-          
-          End Sub
-      // Add this code segment to your GCBASIC source program
 
     /*
         Hardware
@@ -79,36 +61,18 @@
     //! Clear the terminal
       HserSend    0x01 
  
-// ---------- Constant and variable definition and main program ---------------------------------
+// ---------- Variable definition and main program ---------------------------------
 
-// ! Single MOD test
+//!  Convert single to a string.
 
+Dim mySingle as Single
 
-    Dim startValue, initialValue, ModValue as Single
-    
- 
-    HserPrintCRLF
-    
-    //? Change these constants
-    ModValue = 2.75
-    initialValue = 456.213142
-    
-    // Set startvalue
-    startValue = initialValue
-    HSerPrint "Start value      = " + ltrim(SingleToString(startValue))
-    HSerPrintStringCRLF " mod " + SingleToString(ModValue)
+  // -9.9999999 is rounded to -10, use the URL above to see the rounding error, and, how -10 is correct.
+  //  https://www.h-schmidt.net/FloatConverter/IEEE754.html
+  mySingle = -9.9999999
 
-    startValue = startValue MOD [single]ModValue
-    HSerPrintStringCRLF "GCBASIC MOD      = " + ltrim(SingleToString(startValue))
+  HSerPrintCRLF
+  HSerPrintStringCRLF SingleToString(mySingle)
 
-    // Reset startvalue
-    startValue = initialValue
-        startValue = startValue / ModValue
-        dim myLong as Long
-        myLong = startValue
-        startValue = startValue - myLong
-        startValue = startValue * ModValue
-    HSerPrintStringCRLF "Long calc method = " + ltrim(SingleToString(startValue))
-
-    Do
-    Loop
+  Do forever 
+  Loop

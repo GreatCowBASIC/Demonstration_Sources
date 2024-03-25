@@ -1,0 +1,118 @@
+/*
+
+    Inspect the memory in the simulator to see results.
+
+    Use See https://www.h-schmidt.net/FloatConverter/IEEE754.html
+
+    or    https://babbage.cs.qc.cuny.edu/ieee-754.old/64bit.html
+
+*/
+// Chip Settings
+#CHIP 18F16Q20
+    #OPTION Explicit
+    
+
+    #DEFINE USART_BAUD_RATE 9600
+      #DEFINE USART_TX_BLOCKING
+      #DEFINE USART_DELAY OFF
+
+  // PIC PPS Tool version: 0.0.6.5
+    
+      #startup InitPPS, 85
+      #define PPSToolPart 18F16Q20
+
+      Sub InitPPS
+              
+              // Module: UART pin directions
+              Dir PORTB.7 Out    ' Make TX1 pin an output
+              // Module: UART1
+              RB7PPS =    0x0013    // TX1 > RB7
+          
+          End Sub
+      // Add this code segment to your GCBASIC source program
+
+    /*
+        Hardware
+        -------------------PORTA----------------
+        Bit#:  -7---6---5---4---3---2---1---0---
+        IO:---------------------SW---------ADC-- 
+        -----------------------------------------
+
+
+        -------------------PORTB----------------
+        Bit#:  -7---6---5---4---3---2---1---0---
+        IO:----TX-------------------------------
+        ----------------------------------------
+
+        ------------------PORTC-----------------
+        Bit#:  -7---6---5---4---3---2---1---0---
+        IO:LED-LED-LED-LED------------------
+        ----------------------------------------
+    */
+
+    // Define constants to make things easier. We can reuse these at any time.
+        #DEFINE LEDPORT LATC
+        #DEFINE LEDD7 PORTC.7
+        #DEFINE LEDD6 PORTC.6
+        #DEFINE LEDD5 PORTC.5
+        #DEFINE LEDD4 PORTC.4
+
+    // Set the ports as an output
+        Dir LEDD7 Out
+        Dir LEDD6 Out
+        Dir LEDD5 Out
+        Dir LEDD4 Out
+
+        #DEFINE POTENTIOMETER PORTA.0
+        // This is the PORTA.0 port
+        Dir POTENTIOMETER In
+
+        #DEFINE SWITCHIN      PORTA.3
+        Dir     SWITCHIN      In
+        #DEFINE DOWN          0
+
+// *****************************************************************************************************
+
+    //! Wait 200 ms to permit any remote serial terminal to settle.
+      wait 200 ms
+    //! Clear the terminal
+      HserSend    0x01 
+ 
+// ---------- Constant and variable definition and main program ---------------------------------
+
+//!Maths and conditional tests
+//!
+
+    #script
+        Pi = 22/7
+    #endscript
+
+    Dim myCircumference, myRadius as Single
+    Dim myDiameter as Single Alias myCircumference_E, myCircumference_U, myCircumference_H, myCircumference
+
+    HserPrintCRLF
+
+    //? Change this constant
+    myRadius = 10.5
+
+    HSerPrintStringCRLF "myRadius = " + ltrim(SingleToString(myRadius))
+
+    myCircumference = myRadius * Pi * 2
+    HSerPrintStringCRLF "myCircumference = " + ltrim(SingleToString(myCircumference))
+
+    If myRadius > 10.5 Then
+        HSerPrintStringCRLF "myRadius greater than 10.5" 
+    Else If myRadius = 10.5 Then
+        HSerPrintStringCRLF "myRadius equals 10.5"
+    Else If  myRadius < 10.5 Then
+        HSerPrintStringCRLF "myRadius less than 10.5" Then
+    End if
+
+    myDiameter = myCircumference / Pi
+    HSerPrintStringCRLF "myDiameter = " + ltrim(SingleToString(myDiameter))
+
+    Do
+    Loop
+
+    End
+

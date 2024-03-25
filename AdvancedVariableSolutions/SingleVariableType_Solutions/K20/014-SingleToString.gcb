@@ -1,14 +1,10 @@
 /*
 
-    Inspect the memory in the simulator to see results.
-
-    Use See https://www.h-schmidt.net/FloatConverter/IEEE754.html
-
-    or    https://babbage.cs.qc.cuny.edu/ieee-754.old/64bit.html
+See https://www.h-schmidt.net/FloatConverter/IEEE754.html
 
 */
 // Chip Settings
-#CHIP 18F16Q20
+#CHIP 18F26K20
     #OPTION Explicit
     
 
@@ -16,20 +12,7 @@
       #DEFINE USART_TX_BLOCKING
       #DEFINE USART_DELAY OFF
 
-  // PIC PPS Tool version: 0.0.6.5
-    
-      #startup InitPPS, 85
-      #define PPSToolPart 18F16Q20
 
-      Sub InitPPS
-              
-              // Module: UART pin directions
-              Dir PORTB.7 Out    ' Make TX1 pin an output
-              // Module: UART1
-              RB7PPS =    0x0013    // TX1 > RB7
-          
-          End Sub
-      // Add this code segment to your GCBASIC source program
 
     /*
         Hardware
@@ -78,28 +61,54 @@
     //! Clear the terminal
       HserSend    0x01 
  
-// ---------- Constant and variable definition and main program ---------------------------------
+// ---------- Variable definition and main program ---------------------------------
 
-//! Division test
+//!  Convert constant and variable to single then to a string.
 
-    Dim myCircumference, myRadius, myPi as Single 
-    Dim myLong As Long
-    
-    #script
-            cPI = 22/7
-    #endscript
+  '---------- misc variable definition ---------------------------------
+  dim Pi as Single
 
-    HserPrintCRLF   
+  '---------------------------------------------------------------------
+  wait 200 ms
 
-    myCircumference = -36.14285278 
-    myRadius = 11.5
-    
-    // Calc
-    myPi = myCircumference / myRadius
+  HserPrintCRLF
 
-    HSerPrintStringCRLF "Result  = " + SingleToString ( myPi )
-    HSerPrintStringCRLF "Result  = 0x" + SingleToHex ( myPi )
+  HSerPrint "1 0.0 '"
+  HSerPrint SingleToString([Single]0.0)
+  HSerPrint "'"
+  HserPrintCRLF
 
-    Do
-    Loop
-    
+  HSerPrint "2 0.05 '"
+  HSerPrint SingleToString([Single]0.05)
+  HSerPrint "'"
+  HserPrintCRLF
+
+  HSerPrint "3 0.5 '"
+  HSerPrint SingleToString([Single]0.5)
+  HSerPrint "'"
+  HserPrintCRLF
+
+  HSerPrint "4 1.5 '"
+  HSerPrint SingleToString([Single]1.5)
+  HSerPrint "'"
+  HserPrintCRLF
+
+  Pi = 3.14159265
+  HSerPrint "5 3.14159265 '"
+  HSerPrint SingleToString(Pi)
+  HSerPrint "'"
+  HserPrintCRLF
+
+  HSerPrint "6 999999.99999999 '"
+  HSerPrint SingleToString([Single]999999.99999999)
+  HSerPrint "'"
+  HserPrintCRLF
+
+
+  HSerPrint "Done"
+
+
+  Do
+    'loop forever
+  Loop
+

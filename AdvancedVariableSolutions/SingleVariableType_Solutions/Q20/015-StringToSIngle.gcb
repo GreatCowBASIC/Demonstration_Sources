@@ -1,10 +1,6 @@
 /*
 
-    Inspect the memory in the simulator to see results.
-
-    Use See https://www.h-schmidt.net/FloatConverter/IEEE754.html
-
-    or    https://babbage.cs.qc.cuny.edu/ieee-754.old/64bit.html
+See https://www.h-schmidt.net/FloatConverter/IEEE754.html
 
 */
 // Chip Settings
@@ -73,43 +69,37 @@
 
 // *****************************************************************************************************
 
-    //! Wait 200 ms to permit any remote serial terminal to settle.
-      wait 200 ms
-    //! Clear the terminal
-      HserSend    0x01 
- 
-// ---------- Constant and variable definition and main program ---------------------------------
+wait 500 ms
+'---------- misc variable definition ---------------------------------
+Dim SysULongIntTempXX as uLongINT
+Dim mySingle as Single
+Dim SysByte_STS_Err as Byte
+// ************************************************************************
 
-//! Show For next with integer constraint of an integer
-//! Show Do Loop loop with Single increment
-    #script
-        Pi = 22/7
-    #endscript
+SysByte_STS_Err = 0
 
-    Dim myCircumference, myRadius as Single
-    Dim myDiameter as Single Alias myCircumference_E, myCircumference_U, myCircumference_H, myCircumference
+HSerPrint "Single hard coded: -396.5325569875"
+HSerSend 13
 
-    HserPrintCRLF
+HSerPrintStringCRLF "---------- StringToSingle --------------"
 
-    //! For next - the step variable type can only be an integer type
-    For MyRadius = 8 to 10.5 step [integer]2
-        myCircumference=myRadius * Pi * 2
-        HSerPrintStringCRLF "1 myRadius = " + ltrim(SingleToString(myRadius))
-        HSerPrintStringCRLF "1 myCircumference = " + ltrim(SingleToString(myCircumference))
-    next
+'mySingle = -0.965325569875
+mySingle = StringToSingle("-396.5325569875")
 
-    HserPrintCRLF
-    
-    //! Do While loop supports same as functionality as a For-Next but supports any increment value
-    MyRadius = 8
-    Do while MyRadius <=10.5
-        myCircumference=myRadius * Pi * 2
-        HSerPrintStringCRLF "2 myRadius = " + ltrim(SingleToString(myRadius))
-        HSerPrintStringCRLF "2 myCircumference = " + ltrim(SingleToString(myCircumference))
-        //! Add the increment value
-        MyRadius += [single]0.5
-    Loop
-        
-    Do
-    Loop
+HSerPrintStringCRLF SingleToHex(mySingle)
+HSerSend 13
 
+HSerPrintStringCRLF "---------- SingleToString --------------"
+
+HSerPrint "   SingleToString: "
+HSerPrintStringCRLF SingleToString(mySingle)
+
+If SysByte_STS_Err.0 = 0 Then   'shows no error since it wasn't included in parameters
+  HSerPrint "Error Code: "
+  HSerPrintStringCRLF ByteToBin(SysByte_STS_Err)
+end if
+
+Do
+Loop
+
+#define SingleToString SingleToString3dp
