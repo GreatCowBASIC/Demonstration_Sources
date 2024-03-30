@@ -13,8 +13,8 @@
     
 
     #DEFINE USART_BAUD_RATE 9600
-      #DEFINE USART_TX_BLOCKING
-      #DEFINE USART_DELAY OFF
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
 
 
 // *****************************************************************************************************

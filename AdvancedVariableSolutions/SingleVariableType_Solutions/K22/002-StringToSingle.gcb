@@ -9,8 +9,8 @@ See https://www.h-schmidt.net/FloatConverter/IEEE754.html
     
 
     #DEFINE USART_BAUD_RATE 9600
-      #DEFINE USART_TX_BLOCKING
-      #DEFINE USART_DELAY OFF
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
 
 
 // *****************************************************************************************************
