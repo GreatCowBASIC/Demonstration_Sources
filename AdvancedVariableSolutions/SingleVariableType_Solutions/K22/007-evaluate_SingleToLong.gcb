@@ -1,0 +1,104 @@
+/*
+
+    Inspect the memory in the simulator to see results.
+
+    Use See https://www.h-schmidt.net/FloatConverter/IEEE754.html
+
+    or    https://babbage.cs.qc.cuny.edu/ieee-754.old/64bit.html
+
+*/
+// Chip Settings
+#CHIP 18F26K22
+    #OPTION Explicit
+    
+
+    #DEFINE USART_BAUD_RATE 9600
+      #DEFINE USART_TX_BLOCKING
+      #DEFINE USART_DELAY OFF
+
+
+// *****************************************************************************************************
+
+    //! Wait 200 ms to permit any remote serial terminal to settle.
+      wait 200 ms
+    //! Clear the terminal
+      HserSend    0x01 
+ 
+// ---------- Constant and variable definition and main program ---------------------------------
+
+// ! Evaluate constants, maths and show results
+// ! Answers should be 199 and the last is 0.0
+
+    Dim MySingle,MySingle2 as Single
+    Dim MyLong as Long
+    Dim MyTMP as Byte
+    Dim MyWord as Word
+
+    HSerprintCRLF
+
+    MySingle = 100.141
+        HSerPrintStringCRLF "Hex Values"
+        HserPrint "  100.141 = 0x"+SingleToHex ( MySingle )
+
+    HSerprintCRLF
+    MySingle = 199.0
+        HserPrint "  199.0 = 0x"+SingleToHex ( MySingle )
+        HserPrintCRLF 2
+
+    MySingle2 = 0.0
+    MySingle = MySingle + MySingle2
+    MyLong  = MySingle
+    HSerprint  "1 199 = "
+    Hserprint MyLong
+    HSerprintCRLF
+
+
+    MySingle = 100.141
+    MySingle2 = 99.65
+    MySingle = MySingle + MySingle2
+    MyLong  = MySingle
+    HSerprint  "2 199 = "
+    Hserprint MyLong
+    HSerprintCRLF
+
+
+    MySingle = 100.142
+    MySingle = MySingle + [single]99.65
+    MyLong  = MySingle
+    HSerprint  "3 199 = "
+    Hserprint MyLong
+    HSerprintCRLF 1
+
+    MySingle = 100.143
+    MySingle = MySingle + [SINGLE]99.650
+    MyLong  = MySingle
+    HSerprint  "4 199 = "
+    Hserprint MyLong
+    HSerprintCRLF 1
+
+    MySingle = [SINGLE]100.144 + [SINGLE]99.65
+    MyLong  = MySingle
+    HSerprint  "5 199 = "
+    Hserprint MyLong
+    HSerprintCRLF 1
+
+    MySingle = [SINGLE]100.145 
+    MySingle += [SINGLE]99.65
+    MyLong  = MySingle
+    HSerprint  "6 199 = "
+    Hserprint MyLong
+    HSerprintCRLF 1
+
+
+    MySingle = 100.146 + 99.651
+    MyLong  = MySingle
+    HSerprint  "7 199 = "
+    Hserprint MyLong
+    HSerprintCRLF 1
+
+    MySingle = 0.0
+    MyLong  = MySingle
+    HSerprint  "8 0   = "
+    Hserprint MyLong
+    HSerprintCRLF 1
+

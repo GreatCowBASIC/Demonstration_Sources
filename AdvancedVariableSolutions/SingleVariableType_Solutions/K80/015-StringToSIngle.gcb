@@ -1,0 +1,90 @@
+/*
+
+See https://www.h-schmidt.net/FloatConverter/IEEE754.html
+
+*/
+// Chip Settings
+#CHIP 18F25K80
+    #OPTION Explicit
+    
+
+    #DEFINE USART_BAUD_RATE 9600
+      #DEFINE USART_TX_BLOCKING
+      #DEFINE USART_DELAY OFF
+
+
+
+    /*
+        Hardware
+        -------------------PORTA----------------
+        Bit#:  -7---6---5---4---3---2---1---0---
+        IO:---------------------SW---------ADC-- 
+        -----------------------------------------
+
+
+        -------------------PORTB----------------
+        Bit#:  -7---6---5---4---3---2---1---0---
+        IO:----TX-------------------------------
+        ----------------------------------------
+
+        ------------------PORTC-----------------
+        Bit#:  -7---6---5---4---3---2---1---0---
+        IO:LED-LED-LED-LED------------------
+        ----------------------------------------
+    */
+
+    // Define constants to make things easier. We can reuse these at any time.
+        #DEFINE LEDPORT LATC
+        #DEFINE LEDD7 PORTC.7
+        #DEFINE LEDD6 PORTC.6
+        #DEFINE LEDD5 PORTC.5
+        #DEFINE LEDD4 PORTC.4
+
+    // Set the ports as an output
+        Dir LEDD7 Out
+        Dir LEDD6 Out
+        Dir LEDD5 Out
+        Dir LEDD4 Out
+
+        #DEFINE POTENTIOMETER PORTA.0
+        // This is the PORTA.0 port
+        Dir POTENTIOMETER In
+
+        #DEFINE SWITCHIN      PORTA.3
+        Dir     SWITCHIN      In
+        #DEFINE DOWN          0
+
+// 
+
+wait 500 ms
+'---------- misc variable definition ---------------------------------
+Dim SysULongIntTempXX as uLongINT
+Dim mySingle as Single
+Dim SysByte_STS_Err as Byte
+// ************************************************************************
+
+SysByte_STS_Err = 0
+
+HSerPrint "Single hard coded: -396.5325569875"
+HSerSend 13
+
+HSerPrintStringCRLF "---------- StringToSingle --------------"
+
+'mySingle = -0.965325569875
+mySingle = StringToSingle("-396.5325569875")
+
+HSerPrintStringCRLF SingleToHex(mySingle)
+HSerSend 13
+
+HSerPrintStringCRLF "---------- SingleToString --------------"
+
+HSerPrint "   SingleToString: "
+HSerPrintStringCRLF SingleToString(mySingle)
+
+If SysByte_STS_Err.0 = 0 Then   'shows no error since it wasn't included in parameters
+  HSerPrint "Error Code: "
+  HSerPrintStringCRLF ByteToBin(SysByte_STS_Err)
+end if
+
+Do
+Loop

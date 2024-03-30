@@ -1,0 +1,215 @@
+/*
+
+    Inspect the memory in the simulator to see results.
+
+    Use See https://www.h-schmidt.net/FloatConverter/IEEE754.html
+
+    or    https://babbage.cs.qc.cuny.edu/ieee-754.old/64bit.html
+
+*/
+// Chip Settings
+#CHIP 18F25K80
+    #OPTION Explicit
+    
+
+    #DEFINE USART_BAUD_RATE 9600
+      #DEFINE USART_TX_BLOCKING
+      #DEFINE USART_DELAY OFF
+
+
+
+    /*
+        Hardware
+        -------------------PORTA----------------
+        Bit#:  -7---6---5---4---3---2---1---0---
+        IO:---------------------SW---------ADC-- 
+        -----------------------------------------
+
+
+        -------------------PORTB----------------
+        Bit#:  -7---6---5---4---3---2---1---0---
+        IO:----TX-------------------------------
+        ----------------------------------------
+
+        ------------------PORTC-----------------
+        Bit#:  -7---6---5---4---3---2---1---0---
+        IO:LED-LED-LED-LED------------------
+        ----------------------------------------
+    */
+
+    // Define constants to make things easier. We can reuse these at any time.
+        #DEFINE LEDPORT LATC
+        #DEFINE LEDD7 PORTC.7
+        #DEFINE LEDD6 PORTC.6
+        #DEFINE LEDD5 PORTC.5
+        #DEFINE LEDD4 PORTC.4
+
+    // Set the ports as an output
+        Dir LEDD7 Out
+        Dir LEDD6 Out
+        Dir LEDD5 Out
+        Dir LEDD4 Out
+
+        #DEFINE POTENTIOMETER PORTA.0
+        // This is the PORTA.0 port
+        Dir POTENTIOMETER In
+
+        #DEFINE SWITCHIN      PORTA.3
+        Dir     SWITCHIN      In
+        #DEFINE DOWN          0
+
+// *****************************************************************************************************
+
+    //! Wait 200 ms to permit any remote serial terminal to settle.
+      wait 200 ms
+    //! Clear the terminal
+      HserSend    0x01 
+ 
+// ---------- Constant and variable definition and main program ---------------------------------
+
+//! Conditional Support for Singles
+
+    Dim mySingle as Single 
+    
+    //? Change this constant
+    mySingle = 33
+
+    HserPrintCRLF 
+    HserPrint "MySingle RAW Value is  "
+    HSerPrintStringCRLF SingleToString ( mySingle )
+    HserPrintCRLF
+
+    // Conditional EQUAL 
+
+        // Test 05
+        If MySingle = -10 Then
+            HserPrint SysByteTempX: HserSend 9
+            HSerPrintStringCRLF "MySingle = -10"
+        End If
+
+
+
+        // Test 10
+        If MySingle = 0 Then
+            HserPrint SysByteTempX: HserSend 9
+            HSerPrintStringCRLF "MySingle = 0"
+        End If
+
+        // Test 11
+        If MySingle = 1 Then
+            HserPrint SysByteTempX: HserSend 9
+            HSerPrintStringCRLF "MySingle = 1"
+        End If
+
+        // Test 12
+        If MySingle = 32 Then
+            HserPrint SysByteTempX: HserSend 9
+            HSerPrintStringCRLF "MySingle = 32"
+        End If
+
+        // Test 13
+        If MySingle = [Single]32 Then
+            HserPrint SysByteTempX: HserSend 9
+            HSerPrintStringCRLF "MySingle = [Single]32"
+        End If
+
+        // Test 14
+        If MySingle = 12345.6789 Then
+            HserPrint SysByteTempX: HserSend 9
+            HSerPrintStringCRLF "MySingle = 12345.6789"
+        End If
+
+    // LESS THAN
+
+        // Test 20
+        If MySingle < [SINGLE]1.0 Then
+            HserPrint SysByteTempX: HserSend 9
+            HSerPrintStringCRLF "MySingle < 1"
+        End If
+
+        // Test 21
+        If MySingle < [SINGLE]32.0 Then
+            HserPrint SysByteTempX: HserSend 9
+            HSerPrintStringCRLF "MySingle < [SINGLE]32"
+        End If
+
+        // Test 22
+        If MySingle < [SINGLE]12345.6789 Then
+            HserPrint SysByteTempX: HserSend 9
+            HSerPrintStringCRLF "MySingle < [SINGLE]12345.6789"
+        End If
+
+    // GREATER THAN
+
+        // Test 30
+        If MySingle > 0 Then
+            HserPrint SysByteTempX: HserSend 9
+            HSerPrintStringCRLF "MySingle > 0"
+        End If
+
+        // Test 31
+        If MySingle > 1 Then
+            HserPrint SysByteTempX: HserSend 9
+            HSerPrintStringCRLF "MySingle > 1"
+        End If
+
+        // Test 31a
+        If MySingle >[Single]1.01 Then
+            HserPrint SysByteTempX: HserSend 9
+            HSerPrintStringCRLF "MySingle > 1.01"
+        End If
+
+
+        // Test 32
+        If MySingle > [SINGLE]20 Then
+            HserPrint SysByteTempX: HserSend 9
+            HSerPrintStringCRLF "mySingle > [SINGLE]20"
+        End If
+
+        // Test 33
+        If MySingle > [SINGLE]29 Then
+            HserPrint SysByteTempX: HserSend 9
+            HSerPrintStringCRLF "MySingle > 29"
+        End If
+
+        // Test 34
+        If MySingle > [SINGLE]32 Then
+            HserPrint SysByteTempX: HserSend 9
+            HSerPrintStringCRLF "MySingle > 32"
+        End If
+
+        // Test 35
+        If MySingle < [SINGLE]40 Then
+            HserPrint SysByteTempX: HserSend 9
+            HSerPrintStringCRLF "MySingle < 40"
+        End If
+
+        // Test 36
+        If MySingle > [SINGLE]12345.6789 Then
+            HserPrint SysByteTempX: HserSend 9
+            HSerPrintStringCRLF "MySingle > 12345.6789"
+        End If
+
+        HserPrintCRLF
+        HserPrint "MySingle RAW Value is  "
+        HSerPrintStringCRLF SingleToString ( mySingle )
+        HserPrintCRLF
+                
+        Dim myLong As Long
+        
+        // Test to ensure conditions are working and casting 
+        If mySingle > 30 AND mySingle < 40 Then 
+
+            Do while mySingle > 20
+                myLong = mySingle
+                HSerPrintStringCRLF  LongToString(myLong)
+                mySingle--        
+            Loop        
+
+        End If
+
+    HSerPrintStringCRLF "END"
+
+    Do
+    Loop
+

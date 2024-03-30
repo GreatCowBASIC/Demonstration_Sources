@@ -1,0 +1,37 @@
+/*
+
+See https://www.h-schmidt.net/FloatConverter/IEEE754.html
+
+*/
+// Chip Settings
+#CHIP 18F26K22, 64
+    #OPTION Explicit
+    
+
+    #DEFINE USART_BAUD_RATE 9600
+      #DEFINE USART_TX_BLOCKING
+      #DEFINE USART_DELAY OFF
+
+// *****************************************************************************************************
+
+    //! Wait 200 ms to permit any remote serial terminal to settle.
+      wait 200 ms
+    //! Clear the terminal
+      HserSend    0x01 
+ 
+// ---------- Variable definition and main program ---------------------------------
+
+//!  Convert single to a string.
+
+Dim mySingle as Single
+
+  // -9.9999999 is rounded to -10, use the URL above to see the rounding error, and, how -10 is correct.
+  //  https://www.h-schmidt.net/FloatConverter/IEEE754.html
+
+  mySingle = -9.9999999
+
+  HSerPrintCRLF
+  HSerPrintStringCRLF SingleToString(mySingle)
+
+  Do forever 
+  Loop

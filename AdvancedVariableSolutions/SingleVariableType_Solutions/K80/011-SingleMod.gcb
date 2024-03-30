@@ -1,0 +1,101 @@
+
+/*
+
+    Inspect the memory in the simulator to see results.
+
+    Use See https://www.h-schmidt.net/FloatConverter/IEEE754.html
+
+    or    https://babbage.cs.qc.cuny.edu/ieee-754.old/64bit.html
+
+*/
+// Chip Settings
+#CHIP 18F25K80
+    #OPTION Explicit
+    
+
+    #DEFINE USART_BAUD_RATE 9600
+      #DEFINE USART_TX_BLOCKING
+      #DEFINE USART_DELAY OFF
+
+
+
+    /*
+        Hardware
+        -------------------PORTA----------------
+        Bit#:  -7---6---5---4---3---2---1---0---
+        IO:---------------------SW---------ADC-- 
+        -----------------------------------------
+
+
+        -------------------PORTB----------------
+        Bit#:  -7---6---5---4---3---2---1---0---
+        IO:----TX-------------------------------
+        ----------------------------------------
+
+        ------------------PORTC-----------------
+        Bit#:  -7---6---5---4---3---2---1---0---
+        IO:LED-LED-LED-LED------------------
+        ----------------------------------------
+    */
+
+    // Define constants to make things easier. We can reuse these at any time.
+        #DEFINE LEDPORT LATC
+        #DEFINE LEDD7 PORTC.7
+        #DEFINE LEDD6 PORTC.6
+        #DEFINE LEDD5 PORTC.5
+        #DEFINE LEDD4 PORTC.4
+
+    // Set the ports as an output
+        Dir LEDD7 Out
+        Dir LEDD6 Out
+        Dir LEDD5 Out
+        Dir LEDD4 Out
+
+        #DEFINE POTENTIOMETER PORTA.0
+        // This is the PORTA.0 port
+        Dir POTENTIOMETER In
+
+        #DEFINE SWITCHIN      PORTA.3
+        Dir     SWITCHIN      In
+        #DEFINE DOWN          0
+
+// *****************************************************************************************************
+
+    //! Wait 200 ms to permit any remote serial terminal to settle.
+      wait 200 ms
+    //! Clear the terminal
+      HserSend    0x01 
+ 
+// ---------- Constant and variable definition and main program ---------------------------------
+
+// ! Single MOD test
+
+
+    Dim startValue, initialValue, ModValue as Single
+    
+ 
+    HserPrintCRLF
+    
+    //? Change these constants
+    ModValue = 2.75
+    initialValue = 456.213142
+    
+    // Set startvalue
+    startValue = initialValue
+    HSerPrint "Start value      = " + ltrim(SingleToString(startValue))
+    HSerPrintStringCRLF " mod " + SingleToString(ModValue)
+
+    startValue = startValue MOD [single]ModValue
+    HSerPrintStringCRLF "GCBASIC MOD      = " + ltrim(SingleToString(startValue))
+
+    // Reset startvalue
+    startValue = initialValue
+        startValue = startValue / ModValue
+        dim myLong as Long
+        myLong = startValue
+        startValue = startValue - myLong
+        startValue = startValue * ModValue
+    HSerPrintStringCRLF "Long calc method = " + ltrim(SingleToString(startValue))
+
+    Do
+    Loop
