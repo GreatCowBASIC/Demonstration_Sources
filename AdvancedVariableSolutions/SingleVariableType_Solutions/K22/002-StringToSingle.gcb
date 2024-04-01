@@ -30,7 +30,7 @@ See https://www.h-schmidt.net/FloatConverter/IEEE754.html
 
     HSerPrintCRLF
 
-    StrNum = "   -3.12156987 PI"
+    StrNum = "   -3.142156987 PI"
     HSerPrintStringCRLF "String   : " + StrNum
 
     //! Use StringToSingle()

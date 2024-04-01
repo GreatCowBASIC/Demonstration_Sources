@@ -35,7 +35,7 @@
     // TestSingleNumber = -127.999992371     
     // TestSingleNumber = 0.1       
     // TestSingleNumber = 1.01      
-    // TestSingleNumber = 0x55    
+    TestSingleNumber = 0x55    
     // TestSingleNumber = 01.1    
     // TestSingleNumber = 01.0100   
     // TestSingleNumber = 1.      
@@ -47,7 +47,8 @@
     // TestSingleNumber = 0001.
     // TestSingleNumber = .
     // TestSingleNumber = 32767.5
-    TestSingleNumber = -32767.5
+    // TestSingleNumber = -32767.5
+    
 
     //! Do some work...
 

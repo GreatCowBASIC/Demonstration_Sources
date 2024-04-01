@@ -1,0 +1,29 @@
+#option explicit
+#chip tiny10
+
+dir portb.0 in
+dir portb.1 out
+dir portb.2 out
+dir portb.3 in
+
+dim Count as word
+dim Latch as Bit
+
+Latch = 0
+
+do
+
+if portb.0 = 0  then ;off
+  Latch = 0
+  portb.2 = 0
+end if
+
+NOP
+
+if portb.0 = 1 OR Latch = 0 then ; **was not working** fixed in build 1377
+  portb.2 = 1
+  Latch = 1
+  portb.3 = !portb.3
+end if
+
+loop
