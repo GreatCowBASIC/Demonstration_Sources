@@ -1,0 +1,73 @@
+/*
+
+See https://www.h-schmidt.net/FloatConverter/IEEE754.html
+
+*/
+// Chip Settings
+#CHIP 16F877A
+    #OPTION Explicit
+    
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
+
+// *****************************************************************************************************
+
+    //! Wait 200 ms to permit any remote serial terminal to settle.
+      wait 200 ms
+    //! Clear the terminal
+      HserSend    0x01 
+ 
+// ---------- Variable definition and main program ---------------------------------
+
+//!  Convert constant and variable to single then to a string.
+
+  '---------- misc variable definition ---------------------------------
+  dim Pi as Single
+
+  '---------------------------------------------------------------------
+  wait 200 ms
+
+  HserPrintCRLF
+
+  HSerPrint "1 0.0 '"
+  HSerPrint SingleToString([Single]0.0)
+  HSerPrint "'"
+  HserPrintCRLF
+
+  HSerPrint "2 0.05 '"
+  HSerPrint SingleToString([Single]0.05)
+  HSerPrint "'"
+  HserPrintCRLF
+
+  HSerPrint "3 0.5 '"
+  HSerPrint SingleToString([Single]0.5)
+  HSerPrint "'"
+  HserPrintCRLF
+
+  HSerPrint "4 1.5 '"
+  HSerPrint SingleToString([Single]1.5)
+  HSerPrint "'"
+  HserPrintCRLF
+
+  Pi = 3.14159265
+  HSerPrint "5 3.14159265 '"
+  HSerPrint SingleToString(Pi)
+  HSerPrint "'"
+  HserPrintCRLF
+
+  HSerPrint "6 999999.99999999 '"
+  HSerPrint SingleToString([Single]999999.99999999)
+  HSerPrint "'"
+  HserPrintCRLF
+
+
+  HSerPrint "Done"
+
+
+  Do
+    'loop forever
+  Loop
+

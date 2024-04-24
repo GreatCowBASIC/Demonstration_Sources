@@ -1,0 +1,63 @@
+/*
+
+    Inspect the memory in the simulator to see results.
+
+    Use See https://www.h-schmidt.net/FloatConverter/IEEE754.html
+
+    or    https://babbage.cs.qc.cuny.edu/ieee-754.old/64bit.html
+
+*/
+// Chip Settings
+#CHIP 16F877A
+    #OPTION Explicit
+    
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
+
+// *****************************************************************************************************
+
+    //! Wait 200 ms to permit any remote serial terminal to settle.
+      wait 200 ms
+    //! Clear the terminal
+      HserSend    0x01 
+ 
+// ---------- Constant and variable definition and main program ---------------------------------
+
+
+//! Show simple maths using subtraction
+
+    Dim TestFloatNumber as Single
+    Dim InitialFloatNumber as Single
+
+//! Clear the terminal
+    HserSend 0x01: Wait 10 ms
+
+
+//! Test vars
+    TestFloatNumber = 3.142
+    InitialFloatNumber = TestFloatNumber
+
+//! Do some work..
+
+    HSerPrintCRLF 2
+    HSerPrint "Maths test on " + ChipNameStr
+
+    HSerPrintCRLF 2
+
+    HserPrint SingleToString(InitialFloatNumber)
+    HserPrintCRLF
+
+    HSerPrintStringCRLF "Now subtract that number from 0 (Zero)"
+    InitialFloatNumber = 0 - InitialFloatNumber
+
+    HserPrint SingleToString(InitialFloatNumber)
+    HserPrintCRLF
+
+    HserPrint "Done"
+
+    Do
+    Loop
+

@@ -1,0 +1,61 @@
+/*
+
+    Inspect the memory in the simulator to see results.
+
+    Use See https://www.h-schmidt.net/FloatConverter/IEEE754.html
+
+    or    https://babbage.cs.qc.cuny.edu/ieee-754.old/64bit.html
+
+*/
+// Chip Settings
+#CHIP 16F877A
+    #OPTION Explicit
+    
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
+
+// *****************************************************************************************************
+
+    //! Wait 200 ms to permit any remote serial terminal to settle.
+      wait 200 ms
+    //! Clear the terminal
+      HserSend    0x01 
+ 
+// ---------- Constant and variable definition and main program ---------------------------------
+
+// ! Show some large calculation
+
+    Dim TestSingleNumber, ResultNumber as Single
+
+    //? Change this constant
+        TestSingleNumber = 123.4
+
+        HSerPrintCRLF 2
+        HSerPrint "Maths test on " + ChipNameStr
+
+        HSerPrintCRLF 2
+
+        ResultNumber =  TestSingleNumber * 1000
+
+        HserPrintCRLF
+        HSerPrintStringCRLF "This function SingleToString() will overflow at 10000000"
+    
+
+        If ResultNumber < 10000000 Then
+            HSerPrintStringCRLF SingleToString(ResultNumber)
+        Else
+            HSerPrintStringCRLF "String Overflow!! Use hex numbering scheme"
+        End If
+        HSerPrintStringCRLF "0x"+SingleToHex(ResultNumber)
+
+        
+
+        HserPrint "Done"
+
+        Do
+        Loop
+
+

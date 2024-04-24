@@ -1,0 +1,76 @@
+'''A demonstration program for GCBASIC.
+// ''--------------------------------------------------------------------------------
+// ''This program Spectral_Sensor_AS726X
+// ''
+// ''
+// ''@author    EvanV   
+// ''@license   GPL
+// ''@version   1.00   
+// ''@date      2024-04-24
+// ''********************************************************************************
+
+#chip 18F26K22
+#option Explicit
+
+#include "AS726X.h"
+
+// ' -------------------PORTA----------------
+// ' Bit#:  -7---6---5---4---3---2---1---0---
+// ' IO:    ---------------------------------
+// '-----------------------------------------
+// '
+
+// ' -------------------PORTB----------------
+// ' Bit#:  -7---6---5---4---3---2---1---0---
+// ' IO:    ---------------------------------
+// '-----------------------------------------
+// '
+
+// ' ------------------PORTC-----------------
+// ' Bit#:  -7---6---5---4---3---2---1---0---
+// ' IO:    ---| TX|---|SDA|CLK|-------------
+// '-----------------------------------------
+// '
+
+
+
+// *****************************************************************************************************
+// Main program commences here.. everything before this is setup for the board.
+
+
+// Setup Serial port
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+
+
+//  Define I2C settings
+#DEFINE HI2C_BAUD_RATE 400
+#DEFINE HI2C_DATA PORTC.4
+#DEFINE HI2C_CLOCK PORTC.3
+// Initialise I2C
+// I2C pins need to be input for SSP module - this is not an option! However, your specific chip ( if a new PIC ) will need these as outputs
+Dir HI2C_DATA In
+Dir HI2C_CLOCK In
+// MASTER
+HI2CMode Master
+
+
+// ----- Main body of program commences here.
+
+    HserPrintCRLF
+    HSerPrintStringCRLF "AS7262 Spectral Sensor"
+    HserPrintCRLF
+
+    // This will not be needed as the library develops
+    AS726X_BEGIN
+
+    HserPrint "AS726XSensorVersion : "
+    HSERPRINTSTRINGCRLF ByteToHex(AS726XSensorVersion)
+    
+    HserPrint "AS726XSensorState   : "
+    HSERPRINTSTRINGCRLF ByteToHex(AS726XSensorState)
+
+    HserPrint "AS726xError         : "
+    HSERPRINTSTRINGCRLF ByteToHex(AS726xError)
+
+    
