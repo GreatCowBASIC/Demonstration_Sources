@@ -9,10 +9,10 @@
 // ''@date      2024-04-24
 // ''********************************************************************************
 
-#chip 18F26K22, 16
+#chip 18F26K22
 #option Explicit
 
-#include "AS726X.h"
+#include <as726x.h>
 
 // ' -------------------PORTA----------------
 // ' Bit#:  -7---6---5---4---3---2---1---0---
@@ -54,8 +54,9 @@ Dir HI2C_CLOCK In
 // MASTER
 HI2CMode Master
 
-// ----- Main body of program commences here.
+// ************************************************* Main body of program commences here.****************************************************
 
+    #DEFINE SHOWSINGLENUMBERS
     HserPrintCRLF
     HSerPrintStringCRLF "AS7262 Spectral Sensor"
     HserPrintCRLF
@@ -79,46 +80,58 @@ HI2CMode Master
 
         AS726X_TakeMeasurementsWithBulb
 
+        Dim ColorChannel as Byte
+        HSerPrintStringCRLF "16Bit color reads"
+        HSerPrintStringCRLF "V	B	G	Y	O	R"
+        For ColorChannel = AS7262_V to AS7262_R Step 2
+            HserPrint AS726x_GetChannel(ColorChannel)
+            HserSend 9
+        Next
+        HserPrintCRLF 2
+
+
         HserPrint "AS726XSensor : 0x"
             HserPrint ByteToHex(AS726XSensorVersion)
 
-        Select Case AS726XSensorVersion
-        
-        Dim myAS7262Value as Single
-        Case SENSORTYPE_AS7262
-            HSerPrintStringCRLF " AS7262"
-            HserPrint "Violet "
-                myAS7262Value = AS726X_GetCalibrated(AS7262_V_CAL)
-                HSerPrintStringCRLF SingleToString( myAS7262Value )
-            HserPrint "Blue   "
-                HSerPrintStringCRLF SingleToString( AS726X_GetCalibrated(AS7262_B_CAL) )
-            HserPrint "Green  "
-                HSerPrintStringCRLF SingleToString( AS726X_GetCalibrated(AS7262_G_CAL) )
-            HserPrint "Yellow "
-                HSerPrintStringCRLF SingleToString( AS726X_GetCalibrated(AS7262_Y_CAL) )
-            HserPrint "Orange "
-                HSerPrintStringCRLF SingleToString( AS726X_GetCalibrated(AS7262_O_CAL) )
-            HserPrint "Red    "
-                HSerPrintStringCRLF SingleToString( AS726X_GetCalibrated(AS7262_R_CAL) )
+        #IFDEF SHOWSINGLENUMBERS
+            Select Case AS726XSensorVersion
+            
+            Dim myAS7262Value as Single
+            Case SENSORTYPE_AS7262
+                HSerPrintStringCRLF " AS7262"
+                HserPrint "Violet "
+                    myAS7262Value = AS726X_GetCalibrated(AS7262_V_CAL)
+                    HSerPrintStringCRLF SingleToString( myAS7262Value )
+                HserPrint "Blue   "
+                    HSerPrintStringCRLF SingleToString( AS726X_GetCalibrated(AS7262_B_CAL) )
+                HserPrint "Green  "
+                    HSerPrintStringCRLF SingleToString( AS726X_GetCalibrated(AS7262_G_CAL) )
+                HserPrint "Yellow "
+                    HSerPrintStringCRLF SingleToString( AS726X_GetCalibrated(AS7262_Y_CAL) )
+                HserPrint "Orange "
+                    HSerPrintStringCRLF SingleToString( AS726X_GetCalibrated(AS7262_O_CAL) )
+                HserPrint "Red    "
+                    HSerPrintStringCRLF SingleToString( AS726X_GetCalibrated(AS7262_R_CAL) )
 
-        Case SENSORTYPE_AS7263
-            HSerPrintStringCRLF " AS7263"
+            Case SENSORTYPE_AS7263
+                HSerPrintStringCRLF " AS7263"
 
-            HserPrint "AS7263_W_CAL "
-                HSerPrintStringCRLF SingleToString( AS726X_GetCalibrated(AS7263_W_CAL) )
-            HserPrint "AS7263_V_CAL   "
-                HSerPrintStringCRLF SingleToString( AS726X_GetCalibrated(AS7263_V_CAL) )
-            HserPrint "AS7263_U_CAL  "
-                HSerPrintStringCRLF SingleToString( AS726X_GetCalibrated(AS7263_U_CAL) )
-            HserPrint "AS7263_T_CAL"
-                HSerPrintStringCRLF SingleToString( AS726X_GetCalibrated(AS7263_T_CAL) )
-            HserPrint "AS7263_S_CAL"
-                HSerPrintStringCRLF SingleToString( AS726X_GetCalibrated(AS7263_S_CAL) )
-            HserPrint "AS7263_R_CAL"
-                HSerPrintStringCRLF SingleToString( AS726X_GetCalibrated(AS7263_R_CAL) )            
-        Case Else
-            HSerPrintStringCRLF " Unknown Sensor"
-        End Select
+                HserPrint "AS7263_W_CAL "
+                    HSerPrintStringCRLF SingleToString( AS726X_GetCalibrated(AS7263_W_CAL) )
+                HserPrint "AS7263_V_CAL   "
+                    HSerPrintStringCRLF SingleToString( AS726X_GetCalibrated(AS7263_V_CAL) )
+                HserPrint "AS7263_U_CAL  "
+                    HSerPrintStringCRLF SingleToString( AS726X_GetCalibrated(AS7263_U_CAL) )
+                HserPrint "AS7263_T_CAL"
+                    HSerPrintStringCRLF SingleToString( AS726X_GetCalibrated(AS7263_T_CAL) )
+                HserPrint "AS7263_S_CAL"
+                    HSerPrintStringCRLF SingleToString( AS726X_GetCalibrated(AS7263_S_CAL) )
+                HserPrint "AS7263_R_CAL"
+                    HSerPrintStringCRLF SingleToString( AS726X_GetCalibrated(AS7263_R_CAL) )            
+            Case Else
+                HSerPrintStringCRLF " Unknown Sensor"
+            End Select
+        #ENDIF
 
         Hserprint "Temperature "
             Dim temperatureF as Single
@@ -129,24 +142,27 @@ HI2CMode Master
             Hserprint temperatureC  // this is byte 
             HserPrint "c: "
 
-            // Now convert to F to formatted string
-            temperatureFString = ""
-            // This is a ByteToSingle conversion then a conversion`
-            temperatureF = ( [Single]temperatureC * 1.8 ) + 32
+            #IFDEF SHOWSINGLENUMBERS
+                // Now convert to F to formatted string
+                temperatureFString = ""
+                // This is a ByteToSingle conversion then a conversion`
+                temperatureF = ( [Single]temperatureC * 1.8 ) + 32
 
-            temperatureFString = SingleToString(temperatureF)
-            // temperatureFString = ltrim(temperatureFString)
-            // Search for decimal point and set the string length, saves ~200 words, and ~50 bytes of RAM over instr()        
-                for decpoint = 1 to 16
-                    if  temperatureFString(decpoint) = "." then 
-                        temperatureFString(0) = decpoint - 1        
-                        exit for
-                    end if
-                next
-            // Optional...
-                // temperatureFString = mid( temperatureFString, 1, instr( temperatureFString, ".") -1 )
-            HserPrint temperatureFString
-            HserPrint "f "
+                temperatureFString = SingleToString(temperatureF)
+                // temperatureFString = ltrim(temperatureFString)
+                // Search for decimal point and set the string length, saves ~200 words, and ~50 bytes of RAM over instr()        
+                    for decpoint = 1 to 16
+                        if  temperatureFString(decpoint) = "." then 
+                            temperatureFString(0) = decpoint - 1        
+                            exit for
+                        end if
+                    next
+                // Optional...
+                    // temperatureFString = mid( temperatureFString, 1, instr( temperatureFString, ".") -1 )
+                HserPrint temperatureFString
+                HserPrint "f "
+            #ENDIF
+
             HserPrintCRLF
         
         wait 1 s
