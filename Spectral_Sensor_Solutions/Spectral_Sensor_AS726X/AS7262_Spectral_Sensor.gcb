@@ -54,9 +54,12 @@ Dir HI2C_CLOCK In
 // MASTER
 HI2CMode Master
 
+//This is not required as this is the default.  Here for clarity only.
+#DEFINE AS726X_ADDRESS 0x92  
+
 // ************************************************* Main body of program commences here.****************************************************
 
-    #DEFINE SHOWSINGLENUMBERS
+    // #DEFINE SHOWSINGLENUMBERS
     HserPrintCRLF
     HSerPrintStringCRLF "AS7262 Spectral Sensor"
     HserPrintCRLF
@@ -134,7 +137,6 @@ HI2CMode Master
         #ENDIF
 
         Hserprint "Temperature "
-            Dim temperatureF as Single
             Dim temperatureC, decpoint as Byte
             Dim temperatureFString as String * 24
             
@@ -143,6 +145,8 @@ HI2CMode Master
             HserPrint "c: "
 
             #IFDEF SHOWSINGLENUMBERS
+                Dim temperatureF as Single
+
                 // Now convert to F to formatted string
                 temperatureFString = ""
                 // This is a ByteToSingle conversion then a conversion`
