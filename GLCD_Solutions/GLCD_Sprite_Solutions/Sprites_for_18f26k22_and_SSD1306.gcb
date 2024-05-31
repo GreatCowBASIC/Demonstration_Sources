@@ -36,13 +36,13 @@
 '*******************************************************************************************
     'Select the sprite and the user delay
     #define spritechoice 2
-    #define spritedelay 4 ms  '4ms is limit of user visual perception
+    #define spritedelay 5 ms  '4ms is limit of user visual perception
 
 '*******************************************************************************************
     'Draw initial screen
     Box 0,0,127,63
     GLCDPrint ( 1, 36, "GCBASIC")
-    GLCDPrint ( 1, 46, "GLCD Library 2023")
+    GLCDPrint ( 1, 46, "GLCD Library 2024")
     GLCDPrint ( 1, 54, "Sprite Support")
     wait 1 s
     GLCDCLS
