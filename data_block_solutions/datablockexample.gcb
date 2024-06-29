@@ -1,0 +1,148 @@
+'''A demonstration program for GCBASIC.
+'''--------------------------------------------------------------------------------
+'''This program is an example of DATA BLOCKs
+'''
+'''
+'''@author    EvanV   
+'''@license   GPL
+'''@version   1.00   
+'''@date      2024-06-29
+'''********************************************************************************
+
+
+#chip 16F877A
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
+DATA DBLOCK0
+     0x00
+     0x01
+     0x02
+     0x03
+     4
+     5
+     6
+     7
+     8
+     9
+     10
+     11
+     12
+     13
+     14
+     15
+     16
+     17
+     18
+     19
+     20
+END DATA
+
+DATA DBLOCK1 as Byte
+"Upon the vast canvas of the cosmos, stars are born from the whispers of time, their incandescent light piercing the eternal night to guide wayfarers and dreamers alike. In the quietude of space, planets dance in celestial harmony, orbiting their radiant suns in an ageless ballet choreographed by the forces of gravity. Here on Earth, the mountains stand as sentinels of eons past, their peaks reaching for the heavens as if to touch the very essence of creation. Rivers carve their paths with patient artistry, sculpting the landscape with each meandering turn and nurturing life in their fertile embrace. Forests breathe life into the air, their leaves whispering secrets of the natural world in a language understood by all who listen with their hearts. Oceans, vast and mysterious, cradle the origins of existence within their depths, their waves a symphony composed by the moon's gentle pull. Humanity, a tapestry woven from cou11ntless threads of culture and history, finds unity in diversity, each individual a unique story unfolding in the grand narrative of life. Our collective journey is one of discovery and wonder, a quest to unravel the mysteries that bind us to this universe and to each other. As we gaze upon the night sky, we are reminded of our place within this grand design, a single planet among billions, yet home to a spirit of exploration that knows no bounds. May we cherish this world and its myriad wonders, safeguarding its beauty for generations yet to come."
+"Upon the vast canvas of the cosmos, stars are born from the whispers of time, their incandescent light piercing the eternal night to guide wayfarers and dreamers alike. In the quietude of space, planets dance in celestial harmony, orbiting their radiant suns in an ageless ballet choreographed by the forces of gravity. Here on Earth, the mountains"
+"12345\&013\&010\&013\&010"
+0xFF
+0x3fff
+END DATA
+
+DATA DBLOCK2 as Byte
+"2Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse fermentum, erat vel rutrum consequat, neque neque luctus nunc, sit amet tempus nisi nibh id massa. Aliquam erat volutpat. Suspendisse suscipit tortor et tortor mattis, sed sagittis nisi imperdiet. Etiam gravida pellentesque quam, ut dapibus nunc dignissim non. Sed condimentum, mi sit amet fermentum dictum, arcu mi mollis ex, mattis vehicula felis neque quis ligula. Sed interdum feugiat nulla, quis commodo lacus vulputate ut. Cras purus arcu, pulvinar at massa vel, viverra dictum dui. Ut tortor metus, congue feugiat ante ut, scelerisque eleifend quam."
+
+"Cras dignissim sem lacus, volutpat fermentum elit auctor non. Donec tempor nibh nisi, eu euismod leo lobortis id. Ut in est ac nunc mollis suscipit a quis tortor. Integer dictum sodales nibh, ac pretium tortor tristique sed. Sed elementum, lacus in dictum porta, nunc lacus blandit nunc, et tincidunt erat eros ut eros. Duis rhoncus enim non laoreet auctor. Aenean id congue nibh, fermentum eleifend risus."
+
+"Aenean consectetur rutrum neque a sagittis. Nullam egestas lectus ut mauris dignissim, nec vestibulum leo dignissim. Ut a felis ut purus laoreet ultrices. Proin sed purus quis dolor hendrerit consectetur congue quis nulla. Suspendisse quis pretium libe1ro. Duis fermentum, dolor ut euismod commodo, eros nibh pharetra quam, semper varius augue elit nec metus. Mauris condimentum enim quis dolor lacinia, nec varius lorem tempus. Pellentesque accumsan neque ex, non consectetur odio vehicula vel. Donec blandit et tellus gravida egestas. Suspendisse potenti. Cras scelerisque in velit at vestibulum. Nam ac ex ultricies enim ultrices tincidunt. Nam massa arcu, dignissim ac lacus eu, finibus fringilla urna. Duis tortor orci, varius ut suscipit eu, pretium nec turpis."
+
+"Nullam lacinia malesuada felis, non aliquet metus venenatis et. Vivamus in tincidunt lacus. Pellentesque sit amet odio eu ante vulputate viverra vitae eu tortor. Etiam pretium pellentesque dolor, a fermentum magna cursus a. Phasellus vitae velit odio."
+"\&013\&010\&013\&010"
+0xFF
+END DATA
+
+
+DATA DBLOCK3 as BYTE
+"123456789"
+"4Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse fermentum, erat vel rutrum consequat, neque neque luctus nunc, sit amet tempus nisi nibh id massa. Aliquam erat volutpat. Suspendisse suscipit tortor et tortor mattis, sed sagittis nisi imperdiet. Etiam gravida pellentesque quam, ut dapibus nunc dignissim non. Sed condimentum, mi sit amet fermentum dictum, arcu mi mollis ex, mattis vehicula felis neque quis ligula. Sed interdum feugiat nulla, quis commodo lacus vulputate ut. Cras purus arcu, pulvinar at massa vel, viverra dictum dui. Ut tortor metus, congue feugiat ante ut, scelerisque eleifend quam."
+
+"Cras dignissim sem lacus, volutpat fermentum elit auctor non. Donec tempor nibh nisi, eu euismod leo lobortis id. Ut in est ac nunc mollis suscipit a quis tortor. Integer dictum sodales nibh, ac pretium tortor tristique sed. Sed elementum, lacus in dictum porta, nunc lacus blandit nunc, et tincidunt erat eros ut eros. Duis rhoncus enim non laoreet auctor. Aenean id congue nibh, fermentum eleifend risus."
+"\&013\&010\&013\&010"
+0xFF
+END DATA
+
+DATA DBLOCK4 as BYTE
+"123456789A"
+"5Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse fermentum, erat vel rutrum consequat, neque neque luctus nunc, sit amet tempus nisi nibh id massa. Aliquam erat volutpat. Suspendisse suscipit tortor et tortor mattis, sed sagittis nisi imperdiet. Etiam gravida pellentesque quam, ut dapibus nunc dignissim non. Sed condimentum, mi sit amet fermentum dictum, arcu mi mollis ex, mattis vehicula felis neque quis ligula. Sed interdum feugiat nulla, quis commodo lacus vulputate ut. Cras purus arcu, pulvinar at massa vel, viverra dictum dui. Ut tortor metus, congue feugiat ante ut, scelerisque eleifend quam."
+"Cras dignissim sem lacus, volutpat fermentum elit auctor non. Donec tempor nibh nisi, eu euismod leo lobortis id."
+"01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+"123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789ATerminate"
+"\&013\&010\&013\&010"
+0xFF
+END DATA
+
+DATA DBLOCK5 as Byte
+"5Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse fermentum, erat vel rutrum consequat, neque neque luctus nunc, sit amet tempus nisi nibh id massa. Aliquam erat volutpat. Suspendisse suscipit tortor et tortor mattis, sed sagittis nisi imperdiet. Etiam gravida pellentesque quam, ut dapibus nunc dignissim non. Sed condimentum, mi sit amet fermentum dictum, arcu mi mollis ex, mattis vehicula felis neque quis ligula. Sed interdum feugiat nulla, quis commodo lacus vulputate ut. Cras purus arcu, pulvinar at massa vel, viverra dictum dui. Ut tortor metus, congue feugiat ante ut, scelerisque eleifend quam."
+
+"Cras dignissim sem lacus, volutpat fermentum elit auctor non. Donec tempor nibh nisi, eu euismod leo lobortis id. Ut in est ac nunc mollis suscipit a quis tortor. Integer dictum sodales nibh, ac pretium tortor tristique sed. Sed elementum, lacus in dictum porta, nunc lacus blandit nunc, et tincidunt erat eros ut eros. Duis rhoncus enim non laoreet auctor. Aenean id congue nibh, fermentum eleifend risus."
+
+"Aenean consectetur rutrum neque a sagittis. Nullam egestas lectus ut mauris dignissim, nec vestibulum leo dignissim. Ut a felis ut purus laoreet ultrices. Proin sed purus quis dolor hendrerit consectetur congue quis nulla. Suspendisse quis pretium libe1ro. Duis fermentum, dolor ut euismod commodo, eros nibh pharetra quam, semper varius augue elit nec metus. Mauris condimentum enim quis dolor lacinia, nec varius lorem tempus. Pellentesque accumsan neque ex, non consectetur odio vehicula vel. Donec blandit et tellus gravida egestas. Suspendisse potenti. Cras scelerisque in velit at vestibulum. Nam ac ex ultricies enim ultrices tincidunt. Nam massa arcu, dignissim ac lacus eu, finibus fringilla urna. Duis tortor orci, varius ut suscipit eu, pretium nec turpis."
+
+"Nullam lacinia malesuada felis."
+0x00
+END DATA
+
+
+Dim DataOffset, value as Word
+DataOffset = 0
+
+Do 
+     ProgramRead (@DBLOCK1 + DataOffset, value)
+     If [BYTE]Value = 0xFF Then 
+          Exit Do
+     End if
+     HSerSend value
+     DataOffset++
+Loop 
+DataOffset = 0
+Do 
+     ProgramRead (@DBLOCK2 + DataOffset, value)
+     If [BYTE]Value = 0xFF Then 
+          Exit Do
+     End if
+     HSerSend value
+     DataOffset++
+Loop 
+DataOffset = 0
+Do 
+     ProgramRead (@DBLOCK3 + DataOffset, value)
+     If [BYTE]Value = 0xFF Then 
+          Exit Do
+     End if
+     HSerSend value
+     DataOffset++
+Loop 
+DataOffset = 0
+Do 
+     ProgramRead (@DBLOCK4 + DataOffset, value)
+     If [BYTE]Value = 0xFF Then 
+          Exit Do
+     End if
+     HSerSend value
+     DataOffset++
+Loop 
+DataOffset = 0
+Do 
+     ProgramRead (@DBLOCK5 + DataOffset, value)
+     If [BYTE]Value = 0xFF Then 
+          Exit Do
+     End if
+     HSerSend value
+     DataOffset++
+Loop 
+
+
+HSerPrintCRLF 
+HSerPrintStringCRLF "End"
+
+Do
+Loop

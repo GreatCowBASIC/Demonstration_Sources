@@ -1,0 +1,89 @@
+'''A demonstration program for GCBASIC.
+'''--------------------------------------------------------------------------------
+'''This program to show a long number with a comma delimiter at the 1000 make
+'''
+'''
+'''@author    EvanV   
+'''@license   GPL
+'''@version   1.00   
+'''@date      2024-06-26
+'''********************************************************************************
+
+#chip PIC16F877a
+#option explicit
+
+    // Setup LCD Parameters
+    #DEFINE LCD_IO 4
+    #DEFINE LCD_NO_RW
+    // FAST IS OK ON 16f877a
+    #DEFINE LCD_SPEED OPTIMAL 
+
+    // Change as necessary
+    #DEFINE LCD_RS PortB.4
+    #DEFINE LCD_Enable PortB.5
+    #DEFINE LCD_DB4 PortB.0
+    #DEFINE LCD_DB5 PortB.1
+    #DEFINE LCD_DB6 PortB.2
+    #DEFINE LCD_DB7 PortB.3
+
+
+
+; ----- Variables
+    dim bytevar as Byte
+    dim wordvar as Word
+    dim longvar as long
+
+    bytevar = 0
+    wordvar = 0
+    longvar = 0
+
+    ; ----- Main body of program commences here.
+
+    Longvar = StringToLong( "4294967295" )
+    Print LongVar
+    Locate 1,0
+    Dim LCDXPos, LCDYPos as Byte 
+    LCDXPos = 19
+    LCDYPos = 1
+
+    // Show range of values on LCD
+    For LongVar = 0 to 0XFFFFFFFF
+        FormatCommaNumberToString( LongVar, LCDXPos, LCDYPos )
+        LongVar += Random
+    Next
+    
+    
+    end
+
+
+    //  max number 4294967295
+    Sub FormatCommaNumberToString ( in _invalue as Long, in _LCDXPos, in _LCDYPos ) 
+
+        Dim _tempString as String
+        // Assing long number as a string
+        _tempString = LongToString( _invalue )
+        
+        Dim _stringindex, _pointer, _pointvalue as Byte
+        _pointer = 0
+
+        For _stringindex = len(_tempString) to 1 Step -1
+
+            // Send delimiter to LCD when pointer is third character
+            If _pointer MOD 3 = 0  AND len(_tempString) <> _pointer and _stringindex <> len(_tempString) then 
+                Locate _LCDYPos, _LCDXPos
+                Print  ","
+                // Decrement LCD x pointer
+                _LCDXPos--
+            End If
+            
+            // Send character
+            Locate _LCDYPos, _LCDXPos
+            Print CHR(_tempString(_stringindex))
+            // Decrement LCD x pointer
+            _LCDXPos--
+            // increment pointer value
+            _pointer++
+
+        Next
+
+    End Sub

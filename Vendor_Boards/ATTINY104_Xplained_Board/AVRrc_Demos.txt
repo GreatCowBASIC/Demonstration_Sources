@@ -1,0 +1,3 @@
+Use "ATMEL mEDBG using TPI" to program via the USB port.
+
+This programmer will use %atmelATPROGRAMdir%\ATprogram.exe.  ATMEL tools were installed in 2019 and therefore should be updated, if required.
