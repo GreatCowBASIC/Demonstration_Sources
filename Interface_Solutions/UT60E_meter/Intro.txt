@@ -1,0 +1,4 @@
+UT60E meter sends out RS232 data to serial port
+
+
+http://www.postcogito.org/Kiko/UtSixtyEDecoder.html
