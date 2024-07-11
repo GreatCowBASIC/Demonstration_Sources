@@ -4,7 +4,7 @@ A demonstration program for GCBASIC.
 This program is a simple GLCD demonstration of the KS0108 GLCD capabilities.
 This program draws a sine wave as defined by Manfred Mornhinweg <manfred AT ludens.cl>
 
-Creating a sine wave is hard, and accuracy isn't terribly important, when you have only 64 pixels to select from in this demo.
+Creating a sine wave is not hard from a data point of view, and accuracy isn't terribly important, when you have only 64 pixels to select from in this demo.
 
 The wave tables starts from the first value after the starting-point zero. It properly includes the peak value just one time (although the neighboring 3 values to each side are the same, due to lack of resolution on that screen), and that makes the data set end exactly on the zero crossing (zero value).
 
