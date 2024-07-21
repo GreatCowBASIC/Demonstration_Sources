@@ -1,0 +1,56 @@
+/*
+This demo sets the LED on and off.
+The key test program is the the PORT with a NOT operates as expected.
+The GCBASIC generated ASM can also be compiled in Microchip STUDIO 7.x then debugged, programmed etc.
+
+Enjoy
+
+        ------------PORTA---------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ---------------------------------
+    IO:    ---------------------------------
+
+        ------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    --------LED--SW------------------
+    IO:    --------------------------==-----
+
+        ------------PORTC----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ---------------------------------
+    IO:    ---------------------------------
+*/
+
+
+
+#CHIP Tiny416
+#option Explicit
+
+#DEFINE OUTPORT PORTB
+#DEFINE LEDBIT 32
+
+
+// GPIO Basic Functionality 
+    DIR PORTB Out
+
+    // Use the contstants
+    OUTPORT = LEDBIT
+
+    Repeat 3    
+
+        OUTPORT = 0
+        Wait 500 ms
+        OUTPORT = LEDBIT
+        Wait 500 ms
+        
+    End Repeat
+
+    // The program is testing the port.bit assignment using a logical NOT statement
+    // 40 ( this program ) is a WHOLE port on and off using logical NOT
+    Do
+        OUTPORT = !OUTPORT
+        Wait 100 ms
+        OUTPORT = !OUTPORT
+        Wait 250 ms
+    Loop
+
