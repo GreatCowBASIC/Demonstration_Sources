@@ -1,0 +1,69 @@
+        /*
+        This demo sets the LED on and off at a timed frequency.  
+            - There are two sets of LEDs pulse.
+            - The first to show the chip has booted
+            - The second to show that this chip is operating as expected.
+
+        The demo ensure the frequency is set, the stack is initialised and the SFRs are operated correctly.
+
+        The key tests
+            - is the the DIR 
+            - is OUT / IN operate as expected using explicit assignments
+            - frequency operates as expected
+            - program uses explicit port assignments ONLY. 
+
+        Enjoy
+
+        Resources:  
+            Migration-from-megaAVR-to-AVR-DxMCU-Fam-DS00003731A.pdf
+            Migration from the megaAVR® to AVR® Dx Microcontroller Families.pdf
+            ATtiny3216-17-DataSheet-DS40002205A.pdf
+
+                    ------------PORTA---------------
+            Bit#:  -7---6---5---4---3---2---1---0---
+            IO:    ---------------------------------
+            IO:    ---------------------------------
+
+                ------------PORTB----------------
+            Bit#:  -7---6---5---4---3---2---1---0---
+            IO:    ---------------------------------
+            IO:    --------------------------==-----
+
+                ------------PORTC----------------
+            Bit#:  -7---6---5---4---3---2---1---0---
+            IO:    SW--LED--------------------------
+            IO:    ---------------------------------
+        */
+
+
+        #CHIP AVR128DA48
+        #option Explicit
+
+        #DEFINE OUTPORT PORTC
+        #DEFINE LEDBIT 64
+
+
+        // GPIO Basic Functionality 
+            DIR PORTC Out
+
+            // Use the contstants
+            OUTPORT = LEDBIT
+
+            Repeat 3    
+
+                OUTPORT = 0
+                Wait 500 ms
+                OUTPORT = LEDBIT
+                Wait 500 ms
+                
+
+            End Repeat
+
+            Do
+
+                OUTPORT = 0
+                Wait 50 ms
+                OUTPORT = LEDBIT
+                Wait 450 ms
+                
+            Loop

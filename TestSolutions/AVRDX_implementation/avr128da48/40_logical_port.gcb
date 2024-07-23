@@ -1,0 +1,58 @@
+/*
+This demo sets the LED on and off.
+The key test program is the the PORT with a NOT operates as expected.
+The GCBASIC generated ASM can also be compiled in Microchip STUDIO 7.x then debugged, programmed etc.
+
+Enjoy
+
+        Resources:  
+            Migration-from-megaAVR-to-AVR-DxMCU-Fam-DS00003731A.pdf
+            Migration from the megaAVR® to AVR® Dx Microcontroller Families.pdf
+            ATtiny3216-17-DataSheet-DS40002205A.pdf
+
+                    ------------PORTA---------------
+            Bit#:  -7---6---5---4---3---2---1---0---
+            IO:    ---------------------------------
+            IO:    ---------------------------------
+
+                ------------PORTB----------------
+            Bit#:  -7---6---5---4---3---2---1---0---
+            IO:    ---------------------------------
+            IO:    --------------------------==-----
+
+                ------------PORTC----------------
+            Bit#:  -7---6---5---4---3---2---1---0---
+            IO:    SW--LED--------------------------
+            IO:    ---------------------------------
+        */
+
+
+        #CHIP AVR128DA48
+        #option Explicit
+
+        #DEFINE OUTPORT PORTC
+        #DEFINE INPORT PORTC
+        #DEFINE LEDBIT  64
+
+        // GPIO Basic Functionality 
+            DIR OUTPORT Out
+            
+            // This code should work as this was tested in 10_basic.. test program
+            Repeat 3    
+
+                OUTPORT = 0
+                Wait 500 ms
+                OUTPORT = LEDBIT
+                Wait 500 ms
+                
+            End Repeat
+
+            // The program is testing the port.bit assignment using a logical NOT statement
+            // 40 ( this program ) is a WHOLE port on and off using logical NOT
+            Do
+                OUTPORT = !OUTPORT
+                Wait 100 ms
+                OUTPORT = !OUTPORT
+                Wait 250 ms
+            Loop
+
