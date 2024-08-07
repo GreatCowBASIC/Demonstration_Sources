@@ -54,7 +54,7 @@ Enjoy
     #DEFINE SWITCH  PORTC.4
 
     Dim state, oldstate, flashstate as Bit
-    oldstate = SWITCH
+    oldstate = !SWITCH
     flashstate = -1
 
     // The program is testing the port.bit assignment

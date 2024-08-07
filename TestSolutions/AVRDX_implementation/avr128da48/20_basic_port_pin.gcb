@@ -8,7 +8,7 @@ Enjoy
         Resources:  
             Migration-from-megaAVR-to-AVR-DxMCU-Fam-DS00003731A.pdf
             Migration from the megaAVR® to AVR® Dx Microcontroller Families.pdf
-            ATtiny3216-17-DataSheet-DS40002205A.pdf
+            AVR128DA28-32-48-64-DataSheet-DS40002183B.pdf
 
                     ------------PORTA---------------
             Bit#:  -7---6---5---4---3---2---1---0---
@@ -28,12 +28,11 @@ Enjoy
 
 
 
-        #CHIP AVR128DA48
+    #CHIP AVR128DA48
     #option Explicit
 
     #DEFINE OUTPORT PORTC
     #DEFINE LEDBIT 64
-
 
     // GPIO Basic Functionality 
         DIR PORTC Out

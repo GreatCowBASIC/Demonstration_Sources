@@ -52,7 +52,7 @@ The GCBASIC generated ASM can also be compiled in Microchip STUDIO 7.x then debu
     #DEFINE SWITCH  PORTB.4
 
     Dim state, oldstate, flashstate as Bit
-    oldstate = SWITCH
+    oldstate = !SWITCH
     flashstate = -1
 
     // The program is testing the port.bit assignment
