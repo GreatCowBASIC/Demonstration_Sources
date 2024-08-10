@@ -44,11 +44,11 @@ sub Upd_DDS(mDS as Bit)
     If mDS = ON then
 
       ' calculate tuning word
-        dividend = Str32(freq)
+        dividend = LongtoString(freq)
 
       ' result of division as string
         result = float_div(dividend)
-        tuning_w = Val32(result)
+        tuning_w = Str32(result)
 
     End if
 
@@ -290,14 +290,14 @@ Dim temp_count_div   As Byte
   ' first part from dividend, 1 more digit length than divisor
   ' is used for dividing through fixDivisor (Hz/Bit)
    temp_len_divisor = len_divisor + 1
-   divisor = val32(str_divisor)
+   divisor = Str32(str_divisor)
 
   ' starting division with first digits from dividend
   ' one digit longer than divisor
      str_temp_dividend = left(dividend,temp_len_divisor)
 
   ' convert string to long
-     temp_dividend = Val32(str_temp_dividend)
+     temp_dividend = Str32(str_temp_dividend)
 
   ' do the division
      int_result = temp_dividend / divisor
@@ -323,13 +323,13 @@ Dim temp_count_div   As Byte
        temp_dividend = temp_dividend - temp_result
 
      ' get next digit from dividend and add it to dividend
-       str_temp_dividend = Str32 (temp_dividend)
+       str_temp_dividend = LongtoString (temp_dividend)
 
      ' get next digit from dividend
        str_temp_dividend = str_temp_dividend + Mid(dividend, temp_count_div, 1)
 
      ' new dividend's value
-       temp_dividend = Val32(str_temp_dividend)
+       temp_dividend = Str32(str_temp_dividend)
 
        int_result = temp_dividend /  divisor
        temp_result = int_result * divisor
@@ -438,7 +438,7 @@ sub tune_f
    loc = 0
 
 'divisor from string to number
-   vDivisor = val32(fixDivisor)
+   vDivisor = Str32(fixDivisor)
   ovDivisor = vDivisor
 
 ' now change divisor by turning encoder
@@ -472,7 +472,7 @@ sub tune_f
 
      if delta <> 0 then ' value has changed
 
-      fixDivisor = "0" + str32(vDivisor)
+      fixDivisor = "0" + LongtoString(vDivisor)
 
      ' show changes
       if vDivisor > ovDivisor then
@@ -528,7 +528,7 @@ sub tune_f
           If mSwP then
 
            ' save new value of fixDivisor to eeProm
-             mTempStr = str32(vDivisor)
+             mTempStr = LongtoString(vDivisor)
              WriteEeprom ( loc, mTempStr )
              cls
              print "  DDS is tuned  "
@@ -566,7 +566,7 @@ mTempStr = ""
 nTempStr = ""
 
 dFreq = dDif * 343
-mTempStr = str32(dFreq)
+mTempStr = LongtoString(dFreq)
 
 ' now construct output string to Display as
 ' "0.0" "0.###" or "#.###"

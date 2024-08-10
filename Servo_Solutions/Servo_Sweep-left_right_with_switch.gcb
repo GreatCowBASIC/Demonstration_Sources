@@ -15,7 +15,7 @@
 '''@date    17/6/2019
 
 
-#CHIP 16F886,16
+#CHIP 16F886
 #OPTION EXPLICIT
 
 

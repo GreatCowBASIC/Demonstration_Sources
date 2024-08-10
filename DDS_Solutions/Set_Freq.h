@@ -307,10 +307,10 @@ sub readValues
     select case vv
 
       case 2
-      freq=VAL32(mTempStr)   'last used frequency as number
+      freq=Str32(mTempStr)   'last used frequency as number
 
       case 3
-      fMulti=Val32(mTempStr) 'last used step width as number
+      fMulti=Str32(mTempStr) 'last used step width as number
 
       case 4
       dMulti = mTempStr      'last used step width as text to display

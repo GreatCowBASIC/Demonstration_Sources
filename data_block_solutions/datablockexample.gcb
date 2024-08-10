@@ -86,8 +86,6 @@ DATA DBLOCK5 as Byte
 "Cras dignissim sem lacus, volutpat fermentum elit auctor non. Donec tempor nibh nisi, eu euismod leo lobortis id. Ut in est ac nunc mollis suscipit a quis tortor. Integer dictum sodales nibh, ac pretium tortor tristique sed. Sed elementum, lacus in dictum porta, nunc lacus blandit nunc, et tincidunt erat eros ut eros. Duis rhoncus enim non laoreet auctor. Aenean id congue nibh, fermentum eleifend risus."
 
 "Aenean consectetur rutrum neque a sagittis. Nullam egestas lectus ut mauris dignissim, nec vestibulum leo dignissim. Ut a felis ut purus laoreet ultrices. Proin sed purus quis dolor hendrerit consectetur congue quis nulla. Suspendisse quis pretium libe1ro. Duis fermentum, dolor ut euismod commodo, eros nibh pharetra quam, semper varius augue elit nec metus. Mauris condimentum enim quis dolor lacinia, nec varius lorem tempus. Pellentesque accumsan neque ex, non consectetur odio vehicula vel. Donec blandit et tellus gravida egestas. Suspendisse potenti. Cras scelerisque in velit at vestibulum. Nam ac ex ultricies enim ultrices tincidunt. Nam massa arcu, dignissim ac lacus eu, finibus fringilla urna. Duis tortor orci, varius ut suscipit eu, pretium nec turpis."
-
-"Nullam lacinia malesuada felis."
 0xFF
 END DATA
 

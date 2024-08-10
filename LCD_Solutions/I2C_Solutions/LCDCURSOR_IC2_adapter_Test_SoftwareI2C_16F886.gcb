@@ -15,7 +15,7 @@
 
 ; ----- Configuration
 
-  #chip 16f886, 16
+  #chip 16F886
 
   ; ----- Define Hardware settings
   ' Define I2C settings - CHANGE PORTS

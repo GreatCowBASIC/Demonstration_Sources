@@ -13,7 +13,7 @@
 
 ; ----- Configuration
 
- #chip 16F886, 16
+ #chip 16F886
 
 
  ; or

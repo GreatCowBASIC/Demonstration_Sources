@@ -135,12 +135,12 @@ sub sendCommand( value)
   set TM1638_STB on
 end sub
 
-sub sendData(data)
+sub sendData( _data )
 
     for yy = 1 to 8
         set TM1638_CLK off
         wait 5 us
-        if data & 1 = 1 then
+        if _data & 1 = 1 then
             set TM1638_DIO on
         else
             set TM1638_DIO off
@@ -148,7 +148,7 @@ sub sendData(data)
         wait 5 us
         set TM1638_CLK on
         wait 5 us
-        data = FnLSR(data, 1)
+        _data = FnLSR( _data , 1)
     next yy
 
 end sub

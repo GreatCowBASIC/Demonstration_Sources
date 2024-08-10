@@ -12,14 +12,14 @@
 '''********************************************************************************
 
 ; ----- Configuration
-#chip 16F886, 16
+#chip 16F886
 #option Explicit
 
 ; ----- Include library
 #include <softserial.h>
 
 ; ----- Config Serial UART :
-#define SER1_BAUD 115200   ; baudrate must be defined
+#define SER1_BAUD 57600    ; baudrate must be defined
 #define SER1_DATABITS 8    ; databits optional (default = 8)
 #define SER1_STOPBITS 1    ; stopbits optional (default = 1)
 #define SER1_INVERT Off    ; inverted polarity optional (default = Off)

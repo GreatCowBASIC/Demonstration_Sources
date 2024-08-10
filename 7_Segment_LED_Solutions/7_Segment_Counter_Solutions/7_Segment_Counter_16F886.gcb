@@ -11,7 +11,7 @@
 
 ; ----- Configuration
 
-#CHIP 16F886, 16
+#CHIP 16F886
 #OPTION Explicit
 
 

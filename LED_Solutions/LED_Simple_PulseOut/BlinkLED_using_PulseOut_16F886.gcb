@@ -10,7 +10,7 @@
 '''********************************************************************************
 
 ; ----- Configuration
-  #chip 16F886, 16
+  #chip 16F886
 ;                                      ; no config. assumes defaults
 
 ; #include                                    ; no solution specifc includes, default includes are always included

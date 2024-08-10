@@ -1,0 +1,1870 @@
+/*
+    A demonstration program for GCGB and GCB.
+    --------------------------------------------------------------------------------
+
+    The program us designed for Microchip’s PICDEM 2 Plus Development Board. d. The PICDEM 2 Plus Demonstration Board is a simple board
+    which demonstrates the capabilities of the 18, 28 and 40-pin PIC16 and PIC18 devices.
+
+    GCBASIC for these devices can be downloaded from the GCBASIC web site at https://sourceforge.net/projects/gcbasic/
+
+    This program comprises 18 demos utilizing the different peripherals and features of 8-bit PIC® MCUs
+    while demonstrating the different capabilities of the PICDEM 2 Plus Demonstration Board. Each lesson contains
+    a brief description of the lab, code snippets, and discussions to make you become easily acquainted with
+    the different peripherals and registers of PIC® MCUs. These demos also make use of the PPSTOOL, 
+    an easy-to-use tool that you can use to generate codes for a more efficient use of the CPU and memory resources. 
+    All labs are written in GCBASIC language and are compatible with the latest GCBASIC compilers.
+
+    Demos
+
+    The demo in this program are presented in the same order as they appear on the programmed labs.
+    You can navigate through each lab by pressing the S2 button.
+
+    • Lesson 1: Hello World (Turn On an LED)
+    • Lesson 2: Blink
+    • Lesson 3: Rotate (Moving the Light Across LEDs)
+    • Lesson 4: Analog-to-Digital Conversion (ADC)
+    • Lesson 5: Variable Speed Rotate
+    • Lesson 6: Debounce
+    • Lesson 7: Pulse-Width Modulation (PWM)
+    • Lesson 8: Timer1
+    • Lesson 9: Interrupts
+    • Lesson 10: Sleep/Wakeup
+    • Lesson 11: EEPROM Memory Operations
+    • Lesson 12: LCD Operations
+    • Lesson 13: NVM Memory Operations
+    • Lesson 14: I2C Discovery
+    • Lesson 15: I2CTemperature     
+    • Lesson 16: I2CEEPROM      
+    • Lesson 17: CLOCK - basic tick-tock 
+    • Lesson 18: Buzzer        
+
+
+                I/O FEATURES AND EQUIVALENT PORT CONNECTIONS
+            Feature                PIC Device (by pin count)       
+                                18-pin      28-pin      40-pin
+            LEDs (D2-D5)        RB3:RB0     RB3:RB0     RB3:RB0 
+            USART               SW Only     RC6:RC7     RC6:RC7
+            Master Reset        (S1) MCLR   (S1) MCLR   (S1) MCLR
+            User-defined        (S2) RA4    (S2) RA4    (S2) RA4
+            User-defined        (S3) RB0    (S3) RB0    (S3) RB0
+            Potentiometer       (R16) RA0   (R16) RA0   (R16) RA0
+            LCD1                N/A         N/A         RA3:RA1 RA3:RA1 and RD3:RD0
+            EEPROM (Ux)         N/A         RC3/RC4     RC3/RC4
+            Buzzer (P1)         N/A         RC2         RC2
+            ICD Connector (J5)  RB6:RB7     RB6:RB7     RB6:RB7
+            Temp sensor (Ux)    N/A         RC3:RC4     RC3:RC4
+            Crystal OSC           <--- (Y1) OSC1 and OSC2 -->
+            External OSC          <------ (Y2) OSC1 -------->
+            Legend: N/A - feature not available for this device
+
+
+*/
+'''@author    Evan R. Venn   
+'''@license   GPL
+'''@version   1.00   
+'''@date      2024-08-10
+'''********************************************************************************
+
+
+#chip 18F47Q10
+    #option explicit 
+    #config MCLRE = EXTMCLR
+
+
+    // Configuration of Watchdog timer.  Used in one of the labs
+        #config WDTCPS = WDTCPS_13      // WDT Period Select bits->Divider ratio 1:262144
+        #config WDTE = SWDTEN           // WDT operating mode->WDT enabled/disabled by SWDTEN bit
+        #config WDTCWS = WDTCWS_7       // WDT Window Select bits->window always open (100%); software control; keyed access not required
+        #config WDTCCS = LFINTOSC       // WDT input clock selector->WDT reference clock is the 31.0 kHz LFINTOSC
+
+
+        #startup LCDInitOM16214, 81     // The parameter 81 will ensure the LCD power up is after the microcontroller is initialised.
+        Sub LCDInitOM16214
+            // Turn the power on to the LCD and wait 40 ms. This is a hardware requirement.
+            #define LCD_PWR PORTD.7
+            DIR     LCD_PWR OUT
+                    LCD_PWR = 1
+                    wait 40 ms
+
+            // Call the PPS routine
+            InitPPS
+
+        End Sub      
+
+
+        Sub InitPPS
+
+                // Module: CCP1
+                    // See code inline for PPS
+
+                // Module: EUSART1
+                    RX1PPS = 0x17   //RC7->EUSART1:RX1
+                    RC6PPS = 0x09   //RC6->EUSART1:TX1
+
+                // Module: I2C
+                    SSP1CLKPPS = 0x13   //RC3->MSSP1:SCL1
+                    RC3PPS = 0x0F       //RC3->MSSP1:SCL1
+                    SSP1DATPPS = 0x14   //RC4->MSSP1:SDA1
+                    RC4PPS = 0x10       //RC4->MSSP1:SDA1
+
+            End Sub
+
+    // Constants - Serial support
+        #define USART_BAUD_RATE 9600
+        #define USART_TX_BLOCKING
+        #define USART_DELAY OFF
+
+// -------Lab Constants
+        #define     Lab_HelloWorld      1
+        #define     Lab_Blink           2
+        #define     Lab_RotateLEDs      3
+        #define     Lab_ADC             4
+        #define     Lab_VSR             5
+        #define     Lab_Debounce        6
+        #define     Lab_PWM             7
+        #define     Lab_Timer_1         8
+        #define     Lab_Interrupts      9
+        #define     Lab_SleepWakeUp     10
+        #define     Lab_EEPROM          11
+        #define     Lab_LCD             12
+        #define     Lab_NVMemory        13
+        #define     Lab_I2CDiscovery    14
+        #define     Lab_I2CTemperature  15
+        #define     Lab_I2CEEPROM       16
+        #define     Lab_CLOCK           17
+        #define     Lab_Buzzer          18
+        
+        
+
+// ----- Main body of program commences here.
+
+        // Setup LCD Parameters
+        #define LCD_IO 4
+        #define LCD_Speed FAST
+        #define LCD_WIDTH 16                //specified lcd width for this device only.  20 is the default width
+
+        // Define LCD Hardware settings - these are specific to the board
+        #define LCD_RS PORTD.4
+        #define LCD_RW PORTD.5
+        #define LCD_Enable PORTD.6
+
+        #define LCD_DB4 PORTD.0
+        #define LCD_DB5 PORTD.1
+        #define LCD_DB6 PORTD.2
+        #define LCD_DB7 PORTD.3
+
+
+
+    // Hardware configuration  - these are specific to the board
+        #define SWITCH_S3_PORT      PORTB.0
+        #define SWITCH_S2_PORT      PORTA.4
+
+        #define LED_D2              PORTB.0
+        #define LED_D3              PORTB.1
+        #define LED_D4              PORTB.2
+        #define LED_D5              PORTB.3
+        
+        Dir SWITCH_S3_PORT  In
+        Dir SWITCH_S2_PORT  In
+
+        Dir LED_D2          Out
+        Dir LED_D3          Out
+        Dir LED_D4          Out
+        Dir LED_D5          Out
+        
+
+    // Common macro and constants
+        #define LEDS_OFF            LED_D5=0:LED_D4=0:LED_D3=0:LED_D2=0
+        #define PRESSED             1
+        #define NOT_PRESSED         0
+        #define RUNNING             1
+        #define NOT_RUNNING         0
+        #define RIGHTDIRECTION      1
+        #define LEFTDIRECTION       0        
+        #define MAX_LABS            18
+
+
+    // Variable Definitions
+        Dim labNumber as Byte:          labNumber   = 0               
+        Dim switchEvent as Byte:        switchEvent = 0
+        Dim labState as Byte:           labState = NOT_RUNNING
+        Dim btnState as Byte:           btnState = NOT_PRESSED
+        Dim activeLedNum as Byte
+        Dim LabI2CState as Bit:         LabI2CState = 0
+
+    if labNumber = 0 Then
+        // Show messages
+
+        #ifdef USART_BAUD_RATE
+            HserPrintCRLF
+            HserPrint "Welcome to PICDEM 2 Plus"
+            HserPrintCRLF
+            HserPrint "GCBASIC - Anobium   2024"
+            HserPrintCRLF
+        #endif
+
+        Print "    Welcome     "
+        Locate 1,0
+        Print "to PICDEM 2 Plus"
+        wait 1 s
+        CLS
+        Print "    GCBASIC     "
+        Locate 1,0
+        Print " Anobium   2024 "
+        wait 5 s
+        CLS
+        Print "    Welcome     "
+        Locate 1,0
+        Print "to PICDEM 2 Plus"
+
+    end if
+
+    Do Forever
+        // Check button state
+        checkButtonS2
+        // Select labnumber and call sub routine
+        Select Case labNumber
+            case Lab_HelloWorld:        HelloWorld
+            case Lab_Blink:             Blink
+            case Lab_RotateLEDs:        RotateLEDs
+            case Lab_ADC:               ADC
+            case Lab_VSR:               VSR
+            case Lab_Debounce:          Debounce
+            case Lab_PWM:               PWM
+            case Lab_Timer_1:           Timer_1
+            case Lab_Interrupts:        Interrupts
+            case Lab_SleepWakeUp:       SleepWakeUp
+            case Lab_EEPROM:            EEPROM
+            case Lab_LCD:               LCD 
+            case Lab_NVMemory:          NVMemory
+            case Lab_I2CDiscovery:      I2CDiscovery 
+            case Lab_I2CTemperature:    I2CTemperature
+            case Lab_I2CEEPROM:         I2CEEPROM
+            case Lab_CLOCK:             Clock
+            case Lab_Buzzer:            Buzzer
+        End Select
+        
+        if switchEvent = 1 then
+            // Change lab
+            nextLab            
+        End if     
+
+    Loop
+
+sub HelloWorld
+    
+    /*
+    The LEDs are connected to the microcontroller input-output pins (I/O). First, the I/O pin must be
+    configured as an output. When one of these pins is driven high, the LED will turn on. The
+    two logic levels ‘1’ (high) and ‘0’ (low) are derived from the power pins of the MCU. ‘1’ is equivalent
+    to the device’s power pin (VDD) and ‘0’ to the source (VSS). VDD may vary depending upon the
+    supply requirements of the specific device used but VSS is always connected to ground and is equal
+    to ‘0’.
+    */
+
+    if labState = NOT_RUNNING Then
+        
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": Hello World Lab"
+            HserPrintCRLF
+        #endif
+
+        Locate 0,0
+        LEDS_OFF
+        Print "  Hello World   "
+        labState = RUNNING  
+        
+    end if
+
+    if labState = RUNNING Then
+        LED_D5 = 1
+        Locate 1,0
+        Print "  LED_D5 = ON   "
+    end if
+
+    if switchEvent = 1 Then
+        labState = NOT_RUNNING
+    End If
+
+End Sub
+
+Sub Blink
+
+    /*
+    LED D8 blinks at a rate of approximately 1.5 seconds. The LCD displays “Blink” on the first line
+    while displaying “LED_D5 = ON” and “LED_D5 = OFF” alternately every 1.5 seconds on the second
+    line.
+    */
+
+    Dim flagCounter as  Byte
+    #define BLINK_FLAG_COUNTER_MAX  6  // Maximum flag count to create 1.5 seconds delay
+
+    if labState = NOT_RUNNING Then
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": Blink Lab"
+            HserPrintCRLF
+        #endif
+
+        flagCounter = 0
+        Locate 0,0
+        LEDS_OFF
+        Print "     Blink      "
+        InitTimer1 OSC , PS1_4
+        Settimer 1, 0x0BDC
+        TMR1IE = 0
+        TMR1IF = 0
+        StartTimer 1
+        labState = RUNNING
+        
+    end if    
+
+    if labState = RUNNING Then
+        if  LED_D5 = 1 Then
+            Locate 1,0
+            Print "  LED_D5 = ON   "   
+        else
+            Locate 1,0
+            Print "  LED_D5 = OFF   "
+        end if
+        
+        wait while TMR1IF = 0
+
+        StopTimer 1
+        Settimer 1, 0x0BDC
+        StartTimer 1
+        // Clear the interrupt flag
+        TMR1IF = 0
+
+        flagCounter++
+        if flagCounter = BLINK_FLAG_COUNTER_MAX Then      
+            LED_D5 = !LED_D5
+            flagCounter = 0
+        end if      
+    end if
+
+    if switchEvent = 1 Then
+        StopTimer 1
+        labState = NOT_RUNNING
+    End If
+
+End Sub
+
+sub RotateLEDs
+        
+    /*
+    LEDs D2, D3, D4 and D5 light up in turn every 500 milliseconds. Once D5 is lit, D2 lights up and the
+    pattern repeats. The LCD displays “Rotate” on the first line and “LED_Dx = ON” on the second line,
+    where x indicates which LED is currently lit
+    */
+
+    Dim LEDState as Byte
+    if labState = NOT_RUNNING Then
+        
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": RotateLEDs Lab"
+            HserPrintCRLF
+        #endif
+        
+        // Begin with LED_D2 high
+        PORTB = ( PORTB AND 0xF0 ) OR 0x01
+        LED_D2 = 1
+        activeLedNum = 1
+        Locate 0,0
+        Print "     Rotate     "
+        labState = RUNNING
+        
+    end if
+
+    if labState = RUNNING Then
+        // Use delay to keep LED ON for 0.5s, or, fast exit if button pushed
+        repeat 10 
+            wait 50 ms
+            checkButtonS2
+            if switchEvent = 1 Then
+                Exit Repeat
+            End If
+        end repeat 
+
+        // Rotate LEDs: Get the bits with the LEDs
+        LEDState = PORTB AND 0x0F
+        Set C Off
+        Rotate LEDState Left
+        // Set the bits with the LEDs leaving the upper bits as-was.
+        LATB = ( PORTB AND 0xF0 ) OR LEDState
+    
+        activeLedNum++       
+        // If the last LED (D5) is lit, go back to the first LED (D2)
+        if activeLedNum > 4 then
+            LED_D2 = 1
+            activeLedNum = 1
+        end if
+
+        // Display which LED is ON on the LCD
+        Locate 1, 0 
+        Print "  LED_D  = ON   "
+        Locate 1,7
+        // Show the correct LED number
+        Print activeLedNum + 1
+
+    end if
+
+    if switchEvent = 1 Then
+        labState = NOT_RUNNING
+    End If
+
+End Sub
+
+Sub ADC
+
+    /*
+    The top three MSBs of the ADC are displayed on the LEDs. Rotate the potentiometer to change
+    the display. The LCD displays “ADC” on the first line and “ADC Result = x” on the second line where
+    x shows the current ADC conversion.
+    */
+
+    Dim adcResult as Word
+
+    if labState = NOT_RUNNING Then
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": ADC Lab"
+            HserPrintCRLF
+        #endif
+
+        CLS
+        LEDS_OFF
+        Print "      ADC      "
+        labState = RUNNING
+                    
+    end if
+
+    if labState = RUNNING Then
+        // Get the top 3 MSBs and display these on the LEDs
+        adcResult = ReadAD10 ( AN0 )
+        
+        // Display the ADC result on the LCD
+        Locate 0,0
+        Print " ADC Result =   "
+        Locate 1,10
+        Print leftpad( str(adcResult), 4, " " )
+
+        //Now show on LEDS
+        //Get the top 3 MSBs (Shift LEFT), then *2 ( Shift Right) and display these on the LEDs
+        adcResult = (FnLSR ( adcResult, 7)) * 2
+        PortB = ( PortB and 0xF1) OR adcResult
+
+        wait 100 ms
+
+    end if
+
+    if switchEvent = 1 Then
+        labState = NOT_RUNNING
+    end If
+
+End Sub
+
+sub VSR
+    
+    /*
+    Rotate the potentiometer R15 counterclockwise to see the LEDs shift faster. The LCD displays
+    “VSR” on the first line and “Delay = xxx ms” on the second line, where xxx indicates the time interval
+    between LED shifts.
+    */
+
+    Dim LEDState
+    Dim adcResult as Word
+    if labState = NOT_RUNNING Then
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": VSR Lab"
+            HserPrintCRLF
+        #endif
+
+       // Begin with LED_D2 high
+        PORTB = ( PORTB AND 0xF0 ) OR 0x01
+        LED_D2 = 1
+        activeLedNum = 1
+        Locate 0,0
+        Print "      VSR       "
+        labState = RUNNING
+
+    end if
+
+    if labState = RUNNING Then
+
+        adcResult = ReadAD ( AN0 )
+        adcResult = Scale ( adcResult, 0, 255,1, 50)
+
+        // Use delay to keep D2 ON for 0.5s, or, fast exit if button pushed
+        repeat 10 
+            wait adcresult ms
+            checkButtonS2
+            if switchEvent = 1 Then
+                Exit Repeat
+            End If
+        end repeat 
+
+        // Rotate LEDs: Get the bits with the LEDs
+        LEDState = PORTB AND 0x0F
+        Set C Off
+        Rotate LEDState Left
+        // Set the bits with the LEDs leaving the upper bits as-was.
+        LATB = ( PORTB AND 0xF0 ) OR LEDState
+    
+        activeLedNum++       
+        // If the last LED (D5) is lit, go back to the first LED (D2)
+        if activeLedNum > 4 then
+            LED_D2 = 1
+            activeLedNum = 1
+        end if
+
+        // Display value ON on the LCD
+        Locate 1, 0 
+        Print " Delay =     ms "
+        Locate 1,9
+        Print Pad( str(adcresult), 3, " " )
+
+    end if
+
+    if switchEvent = 1 Then
+        labState = NOT_RUNNING
+    End If
+
+End Sub
+
+sub Debounce
+
+    /*
+    LEDs D3, D4 and D5 light up in turn on every S1 button press. Once D3 is lit and S1 is pressed,
+    D4 lights up and the pattern repeats. Holding the button moves the light continuously across the
+    LEDs. The LCD displays “Debounce” on the first line and “LED_Dx = ON” on the second line, where
+    x indicates which LED is currently lit.
+    */
+
+    Dim LEDState
+    Dim adcResult as Word
+    if labState = NOT_RUNNING Then
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": Debounce Lab"
+            HserPrintCRLF
+        #endif
+
+       // Begin with LED_D2 high
+        PORTB = ( PORTB AND 0xF0 ) OR 0x02
+        LED_D3 = 1
+        activeLedNum = 2
+
+        CLS
+        Print "    Debounce    "
+        Locate 1,0
+        Print "    Press S3    "
+        labState = RUNNING                                      
+        
+    end if
+
+    if labState = RUNNING Then
+
+        if checkButtonS3 = 0 Then
+            // Debounce by delaying
+            wait 100 ms
+
+            // If S3 is still pressed, shift the light to the next LED to the right
+            if checkButtonS3 = 0 Then
+
+                // Rotate LEDs: Get the bits with the LEDs
+                LEDState = PORTB AND 0x0E
+                Set C Off
+                Rotate LEDState Left
+                // Set the bits with the LEDs leaving the upper bits as-was.
+                LATB = ( PORTB AND 0xF1 ) OR LEDState
+            
+                activeLedNum++       
+                // If the last LED (D5) is lit, go back to the first LED (D2)
+                if activeLedNum > 4 then
+                    LED_D3 = 1
+                    activeLedNum = 2
+                end if
+
+                // Display which LED is ON on the LCD
+                Locate 1, 0 
+                Print "  LED_D  = ON   "
+                Locate 1,7
+                Print activeLedNum + 1
+            end if
+        end if
+    end if
+
+    if switchEvent = 1 Then
+        labState = NOT_RUNNING
+    End If
+
+End Sub
+
+Sub PWM
+    /*
+    Rotating the potentiometer R25 will adjust the brightness of attached LEDs. The LCD displays “PWM” on
+    the first line and “Duty Cycle = xx%” on the second line, where xx corresponds to the PWM duty
+    cycle.
+    */
+
+
+    /* GCODE Optimisation file - this will optimise PWM operations by disabling the PWM operations on the PWM channel and Timer that is set to FALSE
+                                    to enable PWM and Timer operations set to FALSE
+
+                Optimise CCP/PWM    
+        */
+                #DEFINE USE_HPWMCCP1 TRUE
+                #DEFINE USE_HPWMCCP2 FALSE
+                #DEFINE USE_HPWMCCP4 FALSE
+                #DEFINE USE_HPWMCCP5 FALSE
+
+        //         Optimise PWM
+                #DEFINE USE_HPWM1 FALSE
+                #DEFINE USE_HPWM2 FALSE
+                #DEFINE USE_HPWM3 FALSE
+                #DEFINE USE_HPWM4 FALSE
+                #DEFINE USE_HPWM5 FALSE
+                #DEFINE USE_HPWM6 FALSE
+                #DEFINE USE_HPWM7 FALSE
+                #DEFINE USE_HPWM8 FALSE
+
+        //         Optimise Timers associated with PWM operations
+                #DEFINE USE_HPWM_TIMER2 TRUE
+                #DEFINE USE_HPWM_TIMER4 FALSE
+                #DEFINE USE_HPWM_TIMER6 FALSE
+
+
+        // 
+            
+            // Module: CCP1
+            RB0PPS = 0x0005    // CCP1 > RB0
+            CCP1PPS = 0x0008    // RB0 > CCP1 (bi-directional)
+            RB1PPS = 0x0005    // CCP1 > RB1
+            CCP1PPS = 0x0009    // RB1 > CCP1 (bi-directional)
+            RB2PPS = 0x0005    // CCP1 > RB2
+            CCP1PPS = 0x000A    // RB2 > CCP1 (bi-directional)
+            RB3PPS = 0x0005    // CCP1 > RB3
+            CCP1PPS = 0x000B    // RB3 > CCP1 (bi-directional)
+        
+    Dim adcResult, oldadcResult as Word         // Store ADC values
+
+    if labState = NOT_RUNNING Then
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": PWM Lab"
+            HserPrintCRLF
+        #endif
+        CLS
+        LEDS_OFF
+        Print "      PWM      "
+        Locate 1,0
+        Print "Duty Cycle    0%"        
+        labState = RUNNING     
+        HPWM 1, 40, 0
+
+    end if
+
+    if labState = RUNNING Then
+        adcResult = ReadAD ( AN0 )
+        //Only update if the ADC changes.. stops LCD flashing as the ADC has to change by a value of 2 or greater.
+        if ABS( adcResult- oldadcResult ) > 1 then 
+            HPWM 1, 40, adcResult
+            oldadcResult = adcResult
+            // Display the result on the LCD
+            Locate 1,0
+            Print "Duty Cycle     %"
+            Locate 1,12
+            Print leftpad( str(adcResult*100/255), 3, " " )
+        end if
+    end if
+
+    if switchEvent = 1 Then
+        labState = NOT_RUNNING
+        HPWMOff
+        // Module: CCP1 clear down
+        RB0PPS  = 0
+        CCP1PPS = 0
+        RB1PPS  = 0
+        CCP1PPS = 0
+        RB2PPS  = 0
+        CCP1PPS = 0
+        RB3PPS  = 0
+        CCP1PPS = 0
+    end If
+
+End Sub
+
+Sub Timer_1
+
+    /*
+    LEDs D2, D4 and D5 light in turn every 500 milliseconds. Once D5 is lit, D2 lights up and the pattern
+    repeats. The LCD displays “TIMER1” on the first line and “Time = xxx secs” on the second line
+    where xxx indicates a value between 0 and 100 corresponding to the time since TIMER1 started
+    incrementing. A 1-second increment is equivalent to two LED shifts. When the display reaches 100,
+    it will reset to 0 and the counting goes on.
+    */
+
+
+    #define FLAG_COUNTER_MAX    4       // 0.5 seconds delay
+    #define SHIFT_COUNTER_MAX   8       // 1 second delay
+    #define TIME_COUNT_MIN      0       // seconds
+    #define TIME_COUNT_MAX      100     // seconds
+
+    Dim LEDState
+    Dim adcResult as Word
+    Dim flagCounter, timeCount, shiftCounter as Byte
+    if labState = NOT_RUNNING Then
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": Timer1 Lab"
+            HserPrintCRLF
+        #endif
+
+       // Begin with LED_D2 high
+        PORTB = ( PORTB AND 0xF0 ) OR 0x01
+        LED_D2 = 1
+        activeLedNum = 1
+        Locate 0,0
+        Print "    Timer 1    "
+        Locate 1,0
+        Print "  Start Timer   "
+
+        flagCounter = 0
+        timeCount = 0
+        shiftCounter = 0
+        
+        wait 100 ms
+        InitTimer1 OSC, PS1_8
+        SetTimer 1, 0x0BDC
+        StartTimer 1
+
+        labState = RUNNING                                      
+    end if
+
+    if labState = RUNNING Then
+
+        // check if  overflow has occurred by checking the TMRIF bit
+        if TMR1IF = 1 then 
+            // Clear the  event flag
+            TMR1IF = 0
+            flagCounter++
+        End If
+
+        // If the second overflow occurs (0.5s delay)
+        if flagCounter = FLAG_COUNTER_MAX Then
+
+            // Rotate LEDs: Get the bits with the LEDs
+            LEDState = PORTB AND 0x0F
+            Set C Off
+            Rotate LEDState Left
+            // Set the bits with the LEDs leaving the upper bits as-was.
+            LATB = ( PORTB AND 0xF0 ) OR LEDState
+        
+            activeLedNum++       
+            // If the last LED (D5) is lit, go back to the first LED (D2)
+            if activeLedNum > 4 then
+                LED_D2 = 1
+                activeLedNum = 1
+            end if
+
+            flagCounter = 0
+            shiftCounter++
+
+        End If
+
+        if shiftCounter = SHIFT_COUNTER_MAX Then
+            // Display value ON on the LCD
+            Locate 1, 0 
+            Print "Time =     secs"
+            Locate 1,7
+            Print LeftPad( str(timeCount), 3, " " )
+            
+            shiftCounter = 0
+            timeCount++
+
+        end if
+
+        if timeCount > TIME_COUNT_MAX Then
+            timeCount = TIME_COUNT_MIN
+        end if                              
+
+    end if
+
+    if switchEvent = 1 Then
+        StopTimer 1
+        labState = NOT_RUNNING
+    End If
+
+End Sub
+
+Sub Interrupts
+
+    /*
+    Light on LEDs D2, D3, D4 and D5 rotate at a constant speed and pressing switch S3 reverses the
+    direction of rotation. The LCD displays “Interrupt” on the first line and “Direction = x” on the second
+    line, where x can either be “Left” or “Right” depending upon the direction of rotation.
+    */
+
+    Dim LEDState
+    Dim rotateDirection as Bit
+
+    if labState = NOT_RUNNING Then
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": Interrupt Lab"
+            HserPrintCRLF
+        #endif
+
+        // Begin with D4 high
+        PORTB = PORTB AND 0xF1
+        LED_D4 = 1
+        activeLedNum = 2
+        rotateDirection = RIGHTDIRECTION
+
+        Locate 0,0        
+        Print "   Interrupt    "
+        Locate 1,0
+        Print "Direction: Right"
+
+        // Set up interrupt handlers
+        On Interrupt Timer0Overflow Call Lab_Timer0_ISR
+
+        // Set up the timer.  This required PreScaler and PostScaler.  See the HELP for explaination.
+        InitTimer0 Osc, PRE0_4096 + TMR0_FOSC4 ,  POST0_1
+        StartTimer 0
+
+        labState = RUNNING                                      
+    end if
+
+    if labState = RUNNING Then
+
+        if checkButtonS3 = 0 Then
+            // Change direction
+
+            rotateDirection = !rotateDirection
+            if rotateDirection = RIGHTDIRECTION then
+                Locate 1,0
+                Print "Direction: Right"
+            else 
+                Locate 1,0
+                Print "Direction: Left "
+            end if
+            
+            StopTimer 0
+            LED_D3 = 0
+            LED_D4 = 0
+            LED_D5 = 0
+            wait while checkButtonS3 = 0
+            StartTimer 0
+
+        end If
+    end if
+
+    if switchEvent = 1 Then
+        On Interrupt Timer0Overflow Ignore
+        StopTimer 0
+        labState = NOT_RUNNING
+    End If
+
+End Sub
+
+sub Lab_Timer0_ISR
+    /*
+    Supporting ISR routine, see the assiociated lab
+    */
+    if rotateDirection = RIGHTDIRECTION Then
+        LED_D3 = !LED_D3
+    else 
+        LED_D5 = !LED_D5
+    End If
+
+End Sub
+
+Sub SleepWakeUp
+
+    /*
+    Upon entering this lab, a countdown timer will be displayed on the LCD and the device will be put
+    into Sleep after 5 seconds. The device will then wake up after 8 seconds and the LCD will display
+    “I’m now awake!” on the second line.
+
+    This uses the CONFIGuration of the microcontroller to control the Watch Dog Timer ( WDT).
+    */
+
+    Dim wdtTimer, counterloop as Byte
+    Dim OSCState as Byte Alias counterloop
+    #define COUNTDOWN_MAX   5           // seconds
+
+    if labState = NOT_RUNNING Then
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": SleepWakeUp Lab"
+            HserPrintCRLF
+        #endif
+        Locate 0,0
+        LEDS_OFF
+
+        //Turn LED on
+        LED_D5 = 1
+
+        Print " Sleep/Wake Up  "
+
+        wdtTimer = COUNTDOWN_MAX
+        for counterloop = 0 to COUNTDOWN_MAX - 1
+            Locate 1,0
+            Print " Sleeping in    "
+            Locate 1,13
+            Print wdtTimer
+            wdtTimer--
+            // Permits exiting by pressing S2
+            Repeat 100   // wait 1 s 100ms * 10
+                wait 10 ms
+                checkButtonS2
+                if switchEvent = 1 Then
+                        Locate 1,0
+                        Print "             "
+                    Exit Sub
+                End If
+            End Repeat            
+        next
+
+        Locate 1,0
+        Print "Wait for 8 secs "
+        // WDR enable
+        SWDTEN = 1        
+        // Switch back to external clock after sleeping
+        OSCState = OSCCON1
+
+        SLEEP
+
+        //  Restore operational state
+        OSCFIF = 0
+        OSCCON1 = OSCState
+        
+        labState = RUNNING                                      
+    end if    
+
+    if labState = RUNNING Then
+        // Wait for 8s for the WDT time-out; and the LED will toggle
+        LED_D5 = 0
+        
+        Locate 1,0
+        Print " I'm now awake! "
+
+        //Disable WDT
+        SWDTEN = 0         
+    end if
+
+    if switchEvent = 1 Then
+        labState = NOT_RUNNING
+    End If
+
+
+End Sub
+
+Sub EEPROM
+
+    /*
+    Press the switch to show the ADC reading on the LCD and save it to the on-chip Data EEPROM.
+    The LCD displays “EEPROM” on the first line and “Value = x” on the second line, where x
+    corresponds to the saved ADC result in the EEPROM. 
+    */
+
+    Dim flagCounter, adcResult, eeprom_address as  Byte
+
+    #define EEPROM_FLAG_COUNTER_MAX  6  // Maximum flag count to create 1.5 seconds delay
+
+    if labState = NOT_RUNNING Then
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": EEPROM Lab"
+            HserPrintCRLF
+        #endif
+
+        // Use randomize, with the value of ADC as the seed
+        Randomize ReadAD( AN0 )
+        // Set the address to a random address.  To protect EEProm write usage constraint
+        eeprom_address = Random
+
+        flagCounter = 0
+        CLS
+        LEDS_OFF
+        Print "     EEPROM        "
+        InitTimer1 FOSC4 , PS1_4
+        Settimer 1, 0x0BDC
+        TMR1IF = 0
+        StartTimer 1
+        On Interrupt Timer1Overflow Call Memory_ISR
+        labState = RUNNING    
+        
+    end if    
+
+    if labState = RUNNING Then
+
+        If flagCounter = 0 Then
+
+            // The interrupt write, so, we read from here.
+            EPRead ( eeprom_address, adcResult )
+            locate 0,0
+            Print " ADC Result =   "
+            locate 1,0
+            Print "EEPROM @"
+            Print hex(eeprom_address)
+            Locate 1,11
+            Print leftpad( str(adcResult), 4, " " )
+
+            //Now show on LEDS
+            //Get the top MSBs (Shift LEFT) and display these on the LEDs
+            adcResult = (FnLSR ( adcResult, 4))
+            PortB = ( PortB and 0xF0) OR adcResult 
+
+        end if
+    end if
+
+    if switchEvent = 1 Then
+        On Interrupt Timer1Overflow Ignore
+        StopTimer 1
+        labState = NOT_RUNNING
+    End If
+
+End Sub
+
+Sub Memory_ISR
+
+    // (Re)DIMension nvaddress as Long as this is declared within the subroutine constraint
+    Dim nvmaddress as Long
+    /*
+    Supporting ISR routine, see the assiociated lab
+    */
+
+    flagCounter++
+
+    Select Case labNumber
+
+    Case Lab_EEPROM:
+
+        if flagCounter = EEPROM_FLAG_COUNTER_MAX Then
+            // Toggle the LED and write the ADC value to EEPROM
+            LED_D5 = !LED_D5
+            EPWrite (  eeprom_address, ReadAD(AN0) )
+            flagCounter = 0
+        end if
+
+    Case Lab_NVMemory:
+
+        if flagCounter = NVM_FLAG_COUNTER_MAX Then
+            // Toggle the LED and write the ADC value to NVMemory
+            LED_D5 = !LED_D5
+
+            // The PFM write needs to complete without the interrupts
+            // Ensure the address and the data is passed as LONG and WORD respectively
+            PFMWrite (  [Long]nvmaddress, [WORD]ReadAD10(AN0) )
+            
+            flagCounter = 0
+        end if
+    
+    Case Lab_CLOCK:
+
+        TMR1H  = 0x82
+        TMR1L  = 0x00
+        
+
+        If TicCount = 60 then
+            If ClockState Then
+                Locate 1,0
+                Print "Tick    "
+                #ifdef USART_BAUD_RATE
+                    HserPrint "    Tick "
+                #endif            
+            Else
+                Locate 1,0
+                Print "Tock    "
+                #ifdef USART_BAUD_RATE
+                    HserPrint "    Tock "
+                #endif            
+            End If
+            ClockState = !ClockState
+            TicCount = 0
+        Else
+            TicCount++
+        End if
+
+        Locate 1,5
+        Print TicCount
+
+        #ifdef USART_BAUD_RATE
+            HserPrint TicCount
+            HserPrintCRLF
+        #endif  
+
+    End Select        
+
+    // Clear the interrupt flag
+    TMR1IF = 0
+    // Reset the timer
+    StopTimer 1
+    Settimer 1, 0x0BDC
+    StartTimer 1
+
+End Sub
+
+Sub LCD
+
+    /* 
+    This shows the GCBASIC capabilities of using the LCD. 
+    */
+
+    if labState = NOT_RUNNING Then
+
+        CLS
+        LEDS_OFF
+        Print "     LCD        "
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": LCD Lab"
+            HserPrintCRLF
+        #endif
+
+        // Set up interrupt to exit this routine
+        On Interrupt PortChange Call ButtonPressedISR
+        IOCAP = 0x10
+        IOCAN = 0x10
+
+        labState = RUNNING    
+    end if    
+
+    Do while labState = RUNNING
+        CLS
+        
+        if switchEvent = 1 Then  
+            Exit Do 
+        End If
+        PRINT "START TEST"
+        locate 1,0
+        PRINT "DISPLAY ON"
+        wait 3 s
+        
+        if switchEvent = 1 Then 
+            Exit Do 
+        End If
+
+        CLS
+        Locate 0,0
+        Print "Cursor ON"
+        Locate 1,0
+        LCDcursor CursorOn
+        
+        if switchEvent = 1 Then 
+            Exit Do 
+        End If
+        wait 3 S
+
+        CLS
+        LCDcursor CursorOFF
+        locate 0,0
+        Print "Cursor OFF"
+        
+        if switchEvent = 1 Then 
+            Exit Do 
+        End If
+        wait 3 s
+
+        CLS
+        Locate 0,0
+        Print "FLASH ON"
+        Locate 1,0
+        LCDcursor FLASHON
+        
+        if switchEvent = 1 Then 
+            Exit Do 
+        End If
+        wait 3 s
+        CLS
+        locate 0,0
+        Print "FLASH OFF"
+        LCDCURSOR FLASHOFF
+        
+        if switchEvent = 1 Then 
+            Exit Do 
+        End If
+        wait 3 s
+
+        Locate 0,0
+        Print "CURSR & FLSH ON"
+        locate 1,0
+        LCDCURSOR CURSORON
+        LCDCURSOR FLASHON
+        
+        if switchEvent = 1 Then 
+            Exit Do 
+        End If
+        Wait 3 sec
+
+        Locate 0,0
+        Print "CURSR & FLSH OFF"
+        locate 1,0
+        LCDCURSOR CursorOFF
+        LCDCURSOR FLASHOFF
+        
+        if switchEvent = 1 Then 
+            Exit Do 
+        End If 
+        Wait 3 sec
+
+        CLS
+        Locate 0,4
+        PRINT "Flashing"
+        Locate 1,4
+        Print "Display"
+        wait 500 ms
+
+        repeat 10
+            LCDCURSOR LCDOFF
+            wait 500 ms
+            LCDCURSOR LCDON
+            wait 500 ms
+            
+            if switchEvent = 1 Then  
+                Exit Do 
+            End If
+        end repeat
+
+        CLS
+        Locate 0,0
+        Print "DISPLAY OFF"
+        Locate 1,0
+        Print "FOR 5 SEC"
+        Wait 2 s
+
+        if switchEvent = 1 Then 
+            Exit Do 
+        End If 
+        LCDCURSOR LCDOFF
+        if switchEvent = 1 Then 
+            Exit Do 
+        End If 
+        WAIT 5 s
+
+        CLS
+        Locate 0,0
+        LCDCURSOR LCDON
+        Print "END TEST"
+
+        if switchEvent = 1 Then 
+            Exit Do 
+        End If
+        Wait 2 s 
+
+    Loop
+
+    if switchEvent = 1 Then
+        labState = NOT_RUNNING
+    End If
+
+
+End Sub
+
+Sub ButtonPressedISR
+    // A positive or negative edge was detected on the RA4 pin
+    IF IOCAF4 = 1 And switchEvent = 0 Then
+        IOCAF4 = 0
+        switchEvent = 1
+        On Interrupt PortChange Ignore
+    End If
+End Sub
+
+Sub NVMemory 
+	
+    /*
+    This is a psuedo data logger.  The ADC read data is saved to NVMemory.
+
+    The timer interrupt reads the ADC and then saves it to NVMemory.
+    Then, the LCD reads the NVMemory and displays NVMemory result on the first line and “0Xnnnn = x” on the second line, where x
+    corresponds to the saved ADC result in the NVMemory. 
+
+    The ADC reads are held in NVRAM. The last 128 are retained.  Use PICKITPLUS to read the PROGMEM!
+    */
+
+    Dim flagCounter as Byte
+    Dim PFMadcResult as  Word
+
+    // (Re)DIMension nvaddress as Long as this is declared within the subroutine constraint
+    Dim nvmaddress as Long
+
+    #define NVM_FLAG_COUNTER_MAX  20 // The maximum flag count to create ~3 seconds delay
+
+    if labState = NOT_RUNNING Then
+    
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": NVM Memory Lab"
+            HserPrintCRLF
+        #endif
+
+        // Make the write event happen, the first time
+        flagCounter = 0
+        // top of PROGMEM. Should be safe! Nothing should be up there!
+        nvmaddress = ( CHIPWORDS * 2 ) - CHIPWRITEFLASHBLOCKSIZE
+
+        CLS
+        LEDS_OFF
+        Print "   NVMemory     "
+        Wait 1 s
+
+        // Call ISR set first value.  This will populate the first word in PROGMEM
+        Memory_ISR
+
+        // Now setup interrupt
+        InitTimer1 FOSC4 , PS1_4
+        Settimer 1, 0x0BDC
+        TMR1IF = 0
+        StartTimer 1
+        On Interrupt Timer1Overflow Call Memory_ISR      
+        labState = RUNNING    
+    end if    
+
+    if labState = RUNNING Then
+
+        If flagCounter = 0 Then
+            flagCounter = 1
+            // It is time to read and show the memory results
+            PFMadcResult = PFMReadWord( nvmaddress )
+            locate 0,0
+            Print " NVM Result =   "
+            locate 1,0
+            Print "0x"
+            Print Hex( nvmaddress_u )
+            Print Hex( nvmaddress_h )
+            Print Hex( nvmaddress )
+
+            Locate 1,10
+            Print "0x"
+            Print hex(PFMadcResult_h)
+            Print hex(PFMadcResult)
+
+            // Increment and manage the PROGMEM address to save the data.            
+            // We are writing WORD values, so increment by 2
+            nvmaddress = nvmaddress + 2
+            If nvmaddress = ( CHIPWORDS * 2 ) then nvmaddress = ( CHIPWORDS * 2 ) - CHIPWRITEFLASHBLOCKSIZE
+
+            //Now show on LEDS
+            //Get the top 3 MSBs (Shift LEFT), then *2 ( Shift Right) and display these on the LEDs
+            PFMadcResult = (FnLSR ( PFMadcResult, 7))
+            PortB = ( PortB and 0xF0) OR PFMadcResult 
+
+        end if
+        
+    end if
+
+    if switchEvent = 1 Then
+        On Interrupt Timer1Overflow Ignore
+        StopTimer 1
+        labState = NOT_RUNNING
+    End If
+
+
+End Sub
+
+Sub I2CDiscovery
+
+    /*
+    This shows the I2C devices connected to the microcontroller.
+
+    The display is shown on the serial terminal only.
+    */
+
+    if labState = NOT_RUNNING Then
+
+        ' Define I2C settings
+        #DEFINE HI2C_BAUD_RATE 400
+        #DEFINE HI2C_DATA PORTC.4
+        #DEFINE HI2C_CLOCK PORTC.3
+        'Initialise I2C
+        'I2C pins need to be input for SSP module - this is not an option
+        Dir HI2C_DATA In
+        Dir HI2C_CLOCK In
+        'MASTER
+        HI2CMode Master
+
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": I2C Discovery"
+            HserPrintCRLF
+        #endif
+
+        Locate 0,0
+        LEDS_OFF
+        Print "HW I2C Discovery"
+        Locate 1,0
+        Print " See terminal"
+        labState = RUNNING
+
+        // Set up interrupt to exit this routine
+        On Interrupt PortChange Call ButtonPressedISR
+        IOCAP = 0x10
+        IOCAN = 0x10
+
+        
+    end if
+
+    if labState = RUNNING Then
+
+        ' Now assumes Serial Terminal is operational
+        Dim DeviceID As Byte
+        Dim DISPLAYNEWLINE As Byte
+
+        #ifdef USART_BAUD_RATE
+
+            HSerPrintCRLF
+            HSerPrint "Hardware I2C "
+            HSerPrintCRLF 2
+
+            ' Now assumes Serial Terminal is operational
+            HSerPrintCRLF
+            HSerPrint "   "
+            'Create a horizontal row of numbers
+            For DeviceID = 0 To 15
+                HSerPrint Hex(deviceID)
+                HSerPrint " "
+            Next
+
+            'Create a vertical column of numbers
+            For DeviceID = 0 To 255
+                DisplayNewLine = DeviceID % 16
+                If DisplayNewLine = 0 Then
+                    HSerPrintCRLF
+                    HSerPrint Hex(DeviceID)
+                    If DisplayNewLine > 0 Then
+                        HSerPrint " "
+                    End If
+                End If
+                HSerPrint " "
+
+                'Do an initial Start
+                HI2CStart
+                If HI2CWaitMSSPTimeout <> TRUE Then
+
+                    'Send to address to device
+                    HI2CSend ( deviceID )
+
+                    'Did device fail to respond?
+                    If HI2CAckpollState = FALSE Then
+                        HI2CSend ( 0 )
+                        HSerPrint   Hex(deviceID)
+                    Else
+                        HSerPrint "--"
+                    End If
+
+                    'Do a stop.
+                    HI2CStop
+                Else
+                    HSerPrint "! "
+                End If
+
+            Next
+
+            HSerPrintCRLF 2
+            HSerPrint   "End of Search"
+            HSerPrintCRLF 2
+        #endif
+
+    end if
+
+    if switchEvent = 1 Then
+        labState = NOT_RUNNING
+    End If
+
+
+End Sub
+
+
+Sub I2CTemperature
+
+    // This routine is called to get current temperature reading
+    //            		from the TC74 on the PICDEM 2 Plus board and return the value
+    //            		to the caller as 2 BCD nibbles.
+    // In temperature data registers, each unit value represents one degree (Celsius). The value is in 2’s
+    // complement binary format such that a reading of 0000
+    // 0000b corresponds to 0°C. 
+
+    // This routine only supports positive temperatures.  You would need to add a 2's compliment routine.
+
+    if labState = NOT_RUNNING Then
+
+        ' Define I2C settings
+        #DEFINE HI2C_BAUD_RATE 400
+        #DEFINE HI2C_DATA PORTC.4
+        #DEFINE HI2C_CLOCK PORTC.3
+        'Initialise I2C
+        'I2C pins need to be input for SSP module - this is not an option
+        Dir HI2C_DATA In
+        Dir HI2C_CLOCK In
+        'MASTER
+        HI2CMode Master
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": I2C Temperature"
+            HserPrintCRLF
+        #endif
+
+        CLS
+        Locate 0,0
+        LEDS_OFF
+        Print "Temperature"
+        labState = RUNNING
+
+        // Set up interrupt to exit this routine
+        On Interrupt PortChange Call ButtonPressedISR
+        IOCAP = 0x10
+        IOCAN = 0x10
+
+        // Setup temperature sensor address
+        #DEFINE I2CTEMPSENSOR 0x9A      
+        Dim temperatureVal as Byte
+        
+
+        'Create an array to store the character until it is copied
+        Dim CharArray(8)
+
+        'Set the array to hold the character
+        'Binary has been used to improve the readability of the code, but is not essential
+        CharArray(1) = b'00001100'
+        CharArray(2) = b'00010010'
+        CharArray(3) = b'00001100'
+        CharArray(4) = b'00000000'
+        CharArray(5) = b'00000000'
+        CharArray(6) = b'00000000'
+        CharArray(7) = b'00000000'
+        CharArray(8) = b'00000000'
+
+        'Copy the character from the array to the LCD
+        LCDCreateChar 0, CharArray()
+
+    end if
+
+    if labState = RUNNING Then
+
+        HI2CStart
+        HI2CSend I2CTEMPSENSOR
+        HI2CSend 0                      // RTR 00h Read Temperature (TEMP)
+        HI2CReStart
+        HI2CSend I2CTEMPSENSOR + 1
+        HI2CReceive ( temperatureVal, NACK )
+        HI2CStop
+        
+        Locate 1,0
+        Print temperatureVal
+        LCDWriteChar 0
+        Print "C"
+
+    end if
+
+    if switchEvent = 1 Then
+        On Interrupt PortChange Ignore
+        labState = NOT_RUNNING
+    End If
+
+End Sub
+
+
+Sub I2CEEPROM
+
+    /*
+    This shows how to read and write and validate that the external I2C EEPROM device is capable of storing data.
+
+    This is uses the I2C bus.
+
+    The demo writes a array to the external I2C EEPROM device, then, the array elements are set to a specific value, then
+    the array is repopulated with the external I2C EEPROM device data - the array is then validated. 
+    */
+
+    if labState = NOT_RUNNING Then
+
+        // Define I2C settings
+        #DEFINE HI2C_BAUD_RATE 400
+        #DEFINE HI2C_DATA PORTC.4
+        #DEFINE HI2C_CLOCK PORTC.3
+        // Initialise I2C
+        // I2C pins need to be input for SSP module - this is not an option
+        Dir HI2C_DATA In
+        Dir HI2C_CLOCK In
+        // MASTER
+        HI2CMode Master
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": I2C EEPROM"
+            HserPrintCRLF
+        #endif
+
+        CLS
+        Locate 0,0
+        LEDS_OFF
+        Print "I2C EEPROM"
+        labState = RUNNING
+
+        // ----- Define Hardware settings
+
+        // You must check the 'eepDev' address 0x0A - 0xAF are typical.
+        // You must check the 'EEpromPageSize'. 16, 32 or 64 are typical.
+        // You must check the 'eepAddr' type. Byte or Word is valid. This is device specific.
+        // 
+        // A 24LC16B uses 0x0A (thro to 0xAF), EEpromPageSize = 16 and eepAddr as Byte
+        // A 24LC256 uses 0x0A (thro to 0xAF), EEpromPageSize = 64 and eepAddr as Word
+
+        #include <i2ceeprom.h>
+
+        #define eepDev 0xA0               // external I2C EEPROM device address
+        #define EEpromPageSize 64         
+
+        // ----- Variables
+        Dim XLOOP as Byte
+
+        Dim eepAddr as Word               // Change this type Byte or Word.
+                                            // This IS EEPROM device specific. Smaller device with 16 byte page size are typically requird 'Dim eepAddr as byte'
+                                            // Large devices will required 'Dim eepAddr as word'
+
+        Dim datarray( EEpromPageSize )
+        Dim datastring as String * 16
+        Dim dataerror as Bit
+        dataerror = FALSE
+
+        switchEvent = 0
+
+    end if
+
+    if labState = RUNNING Then
+
+        ArrayOps:
+        // Write an Array
+            // Populate the initial array, the array is 10 elements long
+            datarray = 1,2,3,4,5,6,7,8,9,10
+
+            #ifdef USART_BAUD_RATE
+                HSerPrint "    Initial Array"
+                HSerPrintCRLF
+                HSerPrint "        -:"
+            #endif
+
+            for xloop = 1 to 10
+                #ifdef USART_BAUD_RATE
+                    HSerPrint datarray(xloop)
+                    if xloop < 10 then HSerPrint ","
+                #endif
+
+            next
+            #ifdef USART_BAUD_RATE
+                HSerPrintCRLF 2
+            #endif
+
+            // set EEProm start address for saving the array
+            eepAddr = 0
+            // write array
+            eeprom_wr_array( eepDev, EEpromPageSize, eepAddr , datarray(), 10 )
+
+            // populate the array with 127 as test to see if the operation populates correctly.
+            #ifdef USART_BAUD_RATE
+                HSerPrint "    Repopulate Array with #127 to ensure the EEPROM results are read correctly"
+                HSerPrintCRLF
+                HSerPrint "        -:"
+            #endif
+
+            for xloop = 1 to 10
+                datarray(xloop) = 127
+                #ifdef USART_BAUD_RATE
+                    HSerPrint datarray(xloop)
+                    if xloop < 10 then HSerPrint ","
+                #endif
+
+            next
+
+            #ifdef USART_BAUD_RATE
+                HSerPrintCRLF 2
+            #endif
+
+            // set EEProm start address for reading the array
+            eepAddr = 0
+            eeprom_rd_array( eepDev, eepAddr , datarray(), 10 )
+
+            #ifdef USART_BAUD_RATE
+                HSerPrint "    Read Array from EEProm results"
+                HSerPrintCRLF
+                HSerPrint "        -:"
+            #endif
+
+            // show results
+            for xloop = 1 to 10
+
+                #ifdef USART_BAUD_RATE
+                    HSerPrint datarray(xloop)
+                    If xloop < 10 then HSerPrint ","
+                #endif
+
+                If datarray(xloop) <> xloop Then
+                    dataerror = TRUE
+                End if
+            
+            next
+
+            #ifdef USART_BAUD_RATE
+                HSerPrintCRLF 2
+                HSerPrint "    End of array operations"
+                HSerPrintCRLF 3
+            #endif
+
+            Locate 1,0
+            If dataerror = TRUE Then
+                Print "EEPROM read error"
+            Else
+                Print "EEPROM read OK"
+            End If
+            
+            checkButtonS2
+            Wait 2 s
+
+    end if
+
+    if switchEvent = 1 Then
+        labState = NOT_RUNNING
+    End If
+
+End Sub
+
+
+Sub CLOCK
+
+    /*
+    A very simple clock function.  This uses the 32.768Hz external clock source.  
+
+    This can be developed into a full clock solution.
+    */
+
+    if labState = NOT_RUNNING Then
+
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": CLOCK"
+            HserPrintCRLF
+        #endif
+
+        CLS
+        Locate 0,0
+        LEDS_OFF
+        Print "CLOCK RUNNING"
+        labState = RUNNING
+
+        Dim ClockState as Bit
+            ClockState = !ClockState
+        Dim TicCount as Byte
+            TicCount = 0
+        SOSCEN = 1
+        SOSCPWR = 1
+        TMR1H  = 0x80
+        Starttimer 1
+        On Interrupt Timer1Overflow Call Memory_ISR
+
+    end if
+
+    if labState = RUNNING Then
+
+    end if
+
+    if switchEvent = 1 Then
+        SOSCEN = 0
+        labState = NOT_RUNNING
+    End If
+
+End Sub
+
+sub Buzzer
+
+    /*
+    The demo shows how to send psuedo music to the buzzer.  Enjoy.
+    */
+    
+    if labState = NOT_RUNNING Then
+        
+        #ifdef USART_BAUD_RATE
+            HserPrint Str(labNumber) + ": Buzzer"
+            HserPrintCRLF
+        #endif
+
+        CLS
+        LEDS_OFF
+        Print "  Buzzer   "
+        labState = RUNNING  
+
+        // Include the sound library
+        #include <songplay.h>
+        #define SOUNDOUT PORTC.2
+        Dir SOUNDOUT Out
+        Dim SoundPlayRTTTLDataString as String
+    
+    end if
+
+    if labState = RUNNING Then
+        SoundPlayRTTTLDataString = "Thegood,:d=4,o=6,b=63:32c,32f,32c,32f,c,8g_5,8a_5,f5,8p,32c,32f,32c,32f,c,8g_5,8a_5,d_"
+        PlayRTTTL(SoundPlayRTTTLDataString)
+        checkButtonS2HeldDown
+    end if
+
+    if switchEvent = 1 Then
+        labState = NOT_RUNNING
+    End If
+
+End Sub
+
+Function checkButtonS3 as Bit
+
+        // Toggle the port to Input/High to cater for the attached LED and the Switch - this action is specific to this board where the S3 is also tied to the LED2.
+        // This action sets the port in a state where the S3 switch state can read.
+        // Typically not required
+        // DIR SWITCH_S3_PORT OUT
+        // SWITCH_S3_PORT = 1
+        DIR SWITCH_S3_PORT IN
+        SWITCH_S3_PORT = 1
+        // Set weak pullup
+        WPUB0 = 1    
+        
+        
+        // The Switch is normally tied to VDD ...when it is pressed, the switch port is connected to GND
+        // Return the value
+        checkButtonS3 = SWITCH_S3_PORT
+
+        // unSet weak pullup
+        WPUB0 = 0
+        // set DIR
+        DIR SWITCH_S3_PORT OUT   
+
+
+End Function
+
+Sub checkButtonS2
+
+    if btnState = NOT_PRESSED Then
+        if SWITCH_S2_PORT = 0 Then  
+            wait 100 ms
+            btnState = PRESSED
+        end If
+    else if SWITCH_S2_PORT = 1 Then
+            btnState = NOT_PRESSED
+            switchEvent = 1                                                   
+    end if
+
+End Sub
+
+Sub checkButtonS2HeldDown
+
+    if SWITCH_S2_PORT = 0 Then
+        switchEvent = 1                                                 
+    end if
+
+End Sub
+
+Sub nextLab
+    
+    switchEvent = 0
+    labNumber++                                                        
+
+    if labNumber > MAX_LABS then labNumber = 1
+    
+End Sub
+

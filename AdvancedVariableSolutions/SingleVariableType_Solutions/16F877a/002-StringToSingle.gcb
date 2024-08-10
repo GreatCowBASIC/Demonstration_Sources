@@ -37,7 +37,7 @@ See https://www.h-schmidt.net/FloatConverter/IEEE754.html
     Ans = StringToSingle(StrNum)
 
     //! User SingleToString()
-    HSerPrintStringCRLF "Single   : " +Trim(SingleToString ( Ans ))
+    HSerPrintStringCRLF "Single   : " +SingleToString ( Ans )
 
     //! Use SingleToHex()
     HSerPrintStringCRLF "IEEE Hex : 0x" + SingleToHex(Ans)

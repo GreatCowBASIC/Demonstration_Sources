@@ -39,7 +39,7 @@
         #DEFINE LEDBIT 32
 
 
-        // GPIO Basic Functionality 
+            // GPIO Basic Functionality 
             DIR PORTB Out
 
             // Use the contstants

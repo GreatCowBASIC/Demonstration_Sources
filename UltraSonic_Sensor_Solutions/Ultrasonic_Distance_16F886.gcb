@@ -11,7 +11,7 @@
 
 
 ; ----- Configuration
-  #chip 16F886, 16
+  #chip 16F886
   ;Include files (Libraries)
   #include <srf04.h>
 
