@@ -1,0 +1,58 @@
+/*
+This demo sets the LED on and off.
+The key test program is the the PORT.PIN operates as expected.
+The GCBASIC generated ASM can also be compiled in Microchip STUDIO 7.x then debugged, programmed etc.
+
+Enjoy
+
+    ------------PORTA---------------
+Bit#:  -7---6---5---4---3---2---1---0---
+IO:    ---------------------------------
+IO:    ---------------------------------
+
+    ------------PortF----------------
+Bit#:  -7---6---5---4---3---2---1---0---
+IO:    -----SW-LED----------------------
+IO:    --------------------------==-----
+
+    ------------PORTC----------------
+Bit#:  -7---6---5---4---3---2---1---0---
+IO:    ---------------------------------
+IO:    ---------------------------------
+*/
+
+
+
+#CHIP mega4809
+#option Explicit
+
+#DEFINE OUTPORT PortF
+#DEFINE LEDBIT 32
+
+
+// GPIO Basic Functionality 
+DIR PortF Out
+
+// Use the contstants
+OUTPORT = LEDBIT
+
+Repeat 3    
+
+    OUTPORT = 0
+    Wait 500 ms
+    OUTPORT = LEDBIT
+    Wait 500 ms
+    
+End Repeat
+
+// The program is testing the port.bit assignment
+// 20 ( this program ) is a single port on and off assignment test
+Do
+
+    OUTPORT.5 = 1
+    Wait 200 ms
+    OUTPORT.5 = 0
+    Wait 2 s
+    
+Loop
+
