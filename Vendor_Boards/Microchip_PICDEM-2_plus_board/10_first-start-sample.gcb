@@ -1,0 +1,106 @@
+'''An example program for GCBASIC.
+'''------------------------------------------------------------------------
+'''This program blinks the onboard LED of a microcontroller - simple - the demonstration should work across many microcontrollers.
+'''
+'''This sample file can be adapted to any of the supported microcontrollers by simply changing the #chip definition - do this by changing to your chip. Other common chips are shown.
+'''
+'''To make your programmer or your bootloader work, simply do the following.
+'''
+'''From within this IDE, press function_key F4, then select  'Edit Programmer Preferences'.   This will show you the 'Programmer Preferences', select the 'Programmer' tab.
+'''
+'''For PIC:  Typically, if you are using a PICKIT2 then select 'Microchip PICKit 2 CLI - Default' will work for you - select and drag this to the top of the dialog area.
+'''
+'''For AVR:  Typically, for an UNO the programmer 'Arduino UNO/328p@115200' will work, select the option from the list of programmers, then, select 'Edit', 
+'''   please edit the communication 'Port', select 'OK', and, then select this option again and drag this to the top of the dialog area.
+'''
+'''
+'''For further adventures with GCBASIC .... Select F4 and then "view Demos" for 1000's of sample programs.
+'''
+'''
+'''Enjoy.
+'''
+'''
+'''************************************************************************
+
+' ----- Configuration
+'Make into a comment to use the AVR chipset
+#CHIP 16F15376
+'  #chip mega328p         'Uncomment to simply use the AVR chipset
+'  #chip LGT8F328P        'Uncomment to simply use the LGT chipset
+
+#option explicit
+
+#CONFIG CLKOUTEN=OFF
+#CONFIG CP=OFF
+#CONFIG FEXTOSC=OFF
+#CONFIG FCMEN=ON
+#CONFIG LVP=OFF
+#CONFIG MCLRE=ON
+#CONFIG RSTOSC=HFINT32
+#CONFIG WDTE=OFF
+#CONFIG WRTB=OFF
+#CONFIG WRTSAF=OFF
+
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #define PPSToolPart 16F15376
+
+    Sub InitPPS
+            
+            // Module: EUSART1
+            RC6PPS = 0x000F    // TX1 > RC6
+        
+        End Sub
+    // Add this code segment to your GCBASIC source program
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
+
+
+; ----- Constants
+  #define KEYPAD_ROW_1 portb.7
+  #define KEYPAD_ROW_2 portb.6
+  #define KEYPAD_ROW_3 portb.5
+  #define KEYPAD_ROW_4 portb.4
+  #define KEYPAD_COL_1 portb.3
+  #define KEYPAD_COL_2 portb.2
+  #define KEYPAD_COL_3 portb.1
+  #define KEYPAD_COL_4 portb.0
+
+
+DIR PORTC.2 IN
+DIR PORTA.4 IN
+
+Dim Direction As Bit
+Dim Temp as Byte
+' ----- Main body of program commences here.
+Do Forever
+
+
+      'Get key
+      Temp = KeypadData
+      'If a key is pressed, then display it
+      If Temp <> KEY_NONE Then
+         HSerPrint Temp
+         HserPrintCRLF
+         'Wait until key is released
+         wait while KeypadData <> KEY_NONE
+      End If
+
+    // Dir PORTB Out
+    If Direction = 0 Then
+        PortB++    
+    Else
+        PortB--
+    End IF
+    
+    wait scale ( ReadAD ( AN0 ), 0, 255, 1, 1000 ) ms
+
+    If PORTA.4 = 0 and Direction = 0 then Direction = 1
+    If PORTC.2 = 0  and Direction = 1 then Direction = 0
+
+
+Loop
