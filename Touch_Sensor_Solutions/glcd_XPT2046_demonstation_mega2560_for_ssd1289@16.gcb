@@ -16,8 +16,7 @@
 '''@date    30.12.2018
 '''********************************************************************************
 
-    'Chip Settings
-    #chip mega2560, 16
+        #chip mega2560, 16
     #option explicit
 
     'Include files

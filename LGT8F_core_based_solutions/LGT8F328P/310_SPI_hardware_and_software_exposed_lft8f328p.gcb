@@ -9,7 +9,6 @@
 '''************************************************************************
 
 ' ----- Configuration
-    #chip LGT8F328P, 1
     #option explicit
 
     #include <LGT8F328P.h>

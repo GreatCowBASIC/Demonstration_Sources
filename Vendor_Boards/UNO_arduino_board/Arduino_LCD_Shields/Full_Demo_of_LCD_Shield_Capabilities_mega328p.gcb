@@ -17,7 +17,6 @@
 
 ; ----- Configuration
   'Chip model
-  #chip mega328p, 16
   #option explicit
   #include <uno_mega328p.h>
 
@@ -65,7 +64,7 @@
 
   print "GCBASIC"
   Locate 1,0
-  print "Anobium Feb 2023"
+  print "Anobium Feb 2024"
   wait 2 s
   cls
 

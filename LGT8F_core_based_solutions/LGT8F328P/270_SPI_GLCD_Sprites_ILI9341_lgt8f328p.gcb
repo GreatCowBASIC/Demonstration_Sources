@@ -6,10 +6,6 @@
 '''
 
 
-
-
-
-    #chip LGT8F328P
     #option explicit
     #include <glcd.h>
     #include <LGT8F328P.h>

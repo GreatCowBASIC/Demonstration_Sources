@@ -1,6 +1,5 @@
     ;ILI9341 sprite demo
 
-    #chip mega328p, 16
     #option explicit
     #include <glcd.h>
     #include <uno_mega328p.h >

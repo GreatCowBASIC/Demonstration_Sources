@@ -21,7 +21,6 @@
 
 
 '************* ADAPT PROCESS TO SUIT YOUR NEEDS ***********************
-  #chip mega328p, 16
   #include <uno_mega328p.h >
 
 '  #chip mega2560, 16

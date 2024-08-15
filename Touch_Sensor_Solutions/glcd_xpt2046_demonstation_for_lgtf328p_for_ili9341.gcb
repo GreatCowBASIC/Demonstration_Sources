@@ -15,9 +15,6 @@
 '''@version 1.2
 '''@date    03/11/2020
 '''********************************************************************************
-
-    'Chip Settings.
-    #chip LGT8F328P
     #option explicit
 
     #include <glcd.h>

@@ -21,12 +21,11 @@
 '''********************************************************************************
 
   'Chip Settings.
-  #chip LGT8F328P
   #option explicit
   #option ReserveHighProg 1024   'To prevent overwriting of Bootloader
 
     #include <glcd.h>
-    #include <UNO_mega328p.h >
+    #include <LGT8F328P.h >
 
     #DEFINE GLCD_TYPE GLCD_TYPE_ILI9341
 

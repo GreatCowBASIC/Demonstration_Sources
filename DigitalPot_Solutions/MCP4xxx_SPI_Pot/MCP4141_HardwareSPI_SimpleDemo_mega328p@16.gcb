@@ -27,7 +27,6 @@
 '''********************************************************************************
 
 ; ----- Configuration
-  #CHIP MEGA328P, 16
   #OPTION EXPLICIT
   #INCLUDE <UNO_MEGA328P.H>
   #INCLUDE <MCP4XXXDIGITALPOT.H>

@@ -25,7 +25,6 @@
 '******************************************
 '#include "setup_16f1503.h"
 
-'Chip settings
   '#chip 16f1825, 1
     #chip 16f1503, 8 '' 8Mhz
 
@@ -48,7 +47,6 @@ TRISc = 0xFF
 
 
 
-'Chip settings
 ''Turn off Comparators
 'CM1CON0 = $0
 'CM1CON1 = $0

@@ -15,11 +15,10 @@
 '''********************************************************************************
 
   'Chip Settings.
-  #chip LGT8F328P
   #option explicit
 
     #include <glcd.h>
-    #include <UNO_mega328p.h >
+    #include <LGT8F328P.h >
 
     #define GLCD_TYPE GLCD_TYPE_ILI9341
 

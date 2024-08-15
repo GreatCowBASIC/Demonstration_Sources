@@ -15,8 +15,7 @@
 '''@date    08/11/16
 '''********************************************************************************
 
-  'Chip Settings
-#chip 18f45k80, 16
+  #chip 18f45k80, 16
 #config MCLRE=on
 #option Explicit
 #include <glcd.h>

@@ -17,11 +17,11 @@
 '''********************************************************************************
 
   'Chip Settings.
-  #chip mega328p, 16
+  #include <uno_mega328p.h >
   #option explicit
 
     #include <glcd.h>
-    #include <uno_mega328p.h >
+    
 
     #define GLCD_TYPE GLCD_TYPE_ILI9341
 

@@ -25,8 +25,6 @@ Serial -> COM4 @ 115,200 -- RHSback
 
 */
 
-
-#chip mega328p,16             '
 #include <Uno_mega328p.h>     '
 #Define USELEGACYFORNEXT      '
 #option explicit              '

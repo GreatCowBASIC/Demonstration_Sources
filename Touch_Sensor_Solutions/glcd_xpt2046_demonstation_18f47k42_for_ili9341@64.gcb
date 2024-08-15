@@ -15,8 +15,7 @@
 '''@date    29/03/19
 '''********************************************************************************
 
-  'Chip Settings
-    #chip 18f47k42, 64
+      #chip 18f47k42, 64
      #config MCLRE=on
     #option Explicit
     #include <glcd.h>

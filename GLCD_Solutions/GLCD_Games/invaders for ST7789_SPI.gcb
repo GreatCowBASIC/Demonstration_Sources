@@ -1,6 +1,5 @@
 ;ST7789 Arduino UNO game demo
 ;buttons pulled low
-#chip LGT8F328P
 #include <LGT8F328P.h>
 #option explicit
 #include <glcd.h>

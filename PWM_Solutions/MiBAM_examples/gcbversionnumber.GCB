@@ -1,7 +1,7 @@
 'GCBASIC Date Stamp Converter v1.07
         Function GCBBuildStr as string * 5 
-            GCBBuildStr="3"
+            GCBBuildStr="4"
         End Function 
         Function GCBBuildTimeStr as string * 19 
-            GCBBuildTimeStr="08-10-2024 17:18:11"
+            GCBBuildTimeStr="08-15-2024 18:33:35"
         End Function 

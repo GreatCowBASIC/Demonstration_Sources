@@ -16,8 +16,7 @@
 '''@date    23.08.2018
 '''*************************************************************************
 
-    'Chip Settings
-    #chip 16f1825, 16
+        #chip 16f1825, 16
 
     'Set the direction all the ports out - just for ease.
     DIR porta Out

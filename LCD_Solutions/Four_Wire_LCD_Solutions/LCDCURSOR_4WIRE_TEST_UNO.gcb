@@ -11,7 +11,6 @@
 '''********************************************************************************
 
 ; ----- Configuration
-  #chip mega328p, 16
   #option explicit
   #include <uno_mega328p.h>
 

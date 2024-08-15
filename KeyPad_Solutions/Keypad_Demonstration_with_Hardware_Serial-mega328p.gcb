@@ -20,7 +20,6 @@
 
 ; ----- Configuration
 
-  #chip mega328p, 16
   #include <uno_mega328p.h>
 
 ; ----- Constants

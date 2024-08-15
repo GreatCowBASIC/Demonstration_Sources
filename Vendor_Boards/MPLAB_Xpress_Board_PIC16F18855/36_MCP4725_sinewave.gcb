@@ -18,7 +18,6 @@
 
 
 ' ----- Configuration
-'Chip Settings
 #CHIP 16f18855,32
 #OPTION Explicit
 

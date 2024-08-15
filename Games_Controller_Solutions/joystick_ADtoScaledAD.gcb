@@ -14,7 +14,7 @@
 '''********************************************************************************
 
 
-#chip LGT8F328P
+#INCLUDE <LGT8F328P.h>
     #option Explicit
     #option Volatile  DIGITAL_6
     #option Volatile  DIGITAL_7
@@ -24,7 +24,6 @@
         #DEFINE USART_TX_BLOCKING
         #DEFINE USART_DELAY OFF
         
-        #INCLUDE <LGT8F328P.h>
         #INCLUDE <MCP4XXXDIGITALPOT.H>
 
 

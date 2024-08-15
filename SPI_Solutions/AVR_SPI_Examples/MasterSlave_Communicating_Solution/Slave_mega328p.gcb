@@ -14,8 +14,6 @@ This program is for an UNO received SPI data from a SPI Master and shows on the 
 You need to connect the Gnd/0V; Data/Chip Select/Clock lines as listed below.
 */
 
-
-#CHIP mega328p, 16
 #OPTION EXPLICIT
 
 #DEFINE USART_BAUD_RATE 9600

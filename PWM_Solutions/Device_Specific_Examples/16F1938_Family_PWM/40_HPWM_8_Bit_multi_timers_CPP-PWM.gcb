@@ -14,8 +14,7 @@
 '''@date    23.08.2018
 '''*************************************************************************
 
-    'Chip Settings
-    #chip 16f1938, 16
+        #chip 16f1938, 16
 
     'Set the direction of the CCP1/PWM port
     DIR portc.2 Out

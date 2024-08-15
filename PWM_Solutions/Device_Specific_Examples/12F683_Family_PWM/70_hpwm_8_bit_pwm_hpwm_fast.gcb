@@ -11,8 +11,7 @@
 '''@date    01.12.2023
 '''*************************************************************************
 
-    'Chip Settings
-    #chip 12F683
+        #chip 12F683
 
     'Set the direction of the CCP1/PWM port
     DIR GP2 Out

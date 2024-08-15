@@ -15,8 +15,7 @@ You need to ensure the 10bit PWM is valid. See the datasheet.
 
 
 
-    'Chip Settings
-    #chip 12F683, 8
+        #chip 12F683, 8
     #option Explicit 
 
     'Set the direction of the CCP1/PWM port

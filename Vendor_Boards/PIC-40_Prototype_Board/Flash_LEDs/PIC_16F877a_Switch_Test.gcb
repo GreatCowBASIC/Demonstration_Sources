@@ -22,7 +22,6 @@
 '    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-'Chip settings
 ' Select the chip and the chip speed
 #CHIP 16F877a, 20
 
