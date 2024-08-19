@@ -1,0 +1,174 @@
+'''A program  for GCGB and GCB ......
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''This program is a GCBASIC demostration for the GCBlib USB Library
+'''It shows all the GCBASIC ways of interaction whit the PC.
+'''
+'''Uses a PIC 18F14K50 whit a i2c LCD display (and a USB cable to the PC)
+'''Needs usb.h library update from 18/08/2024
+'''
+'''@author     Angel Mier
+'''@licence    GPL
+'''@version    1.00
+'''@date       19/08/2024
+'''********************************************************************************
+
+;-----includes
+#include <usb.h>
+
+; ----- Configuration
+#chip 18F14k50, 48
+
+// ;configuration flag 48 MHZ
+#config OSC = HS
+#config PLLEN = on
+
+
+#option explicit
+
+
+'USB callback handlers
+#define USB_SETUP_HANDLER           USB_Com_CallBack
+'optional callback handlers for error and descriptor call.
+#define USB_ERROR_HANDLER           USB_Error_CallBack
+#define USB_DESCRIPTOR_HANDLER      USB_Descriptor_CallBack
+
+
+
+#define HI2C_BAUD_RATE 400
+#define HI2C_DATA PORTB.4
+#define HI2C_CLOCK PORTB.6
+
+Dir HI2C_DATA in
+Dir HI2C_CLOCK in
+HI2CMode Master
+
+#define LCD_IO 10
+#define LCD_I2C_Address_1 0x4E '0x7E
+#define LCD_SPEED OPTIMAL
+#define LCD_WIDTH 16
+#define LCD_Backlight_On_State  1
+#define LCD_Backlight_Off_State 0
+
+
+//Variables 
+'Byte Array, current item, and received data lenght
+dim data(3) as Byte
+dim datan as Integer
+dim datal as Integer
+'set current item to 0 so array read can start
+datan=0
+
+dir portc.0 out
+
+
+LCDBacklight(on)
+cls
+PRINT "Waiting Command"
+
+
+do Forever
+
+loop
+
+
+
+
+
+; ----- Support methods.  Subroutines and Functions
+'Handler for Application commands
+sub USB_Com_CallBack
+
+  Select Case USBRequest
+  'a simple command send, just say hello
+    case 100
+      cls
+      print "Hello World!"
+
+    'we get a poll so send the status of portc.0
+    Case 101
+      cls
+      print "GetStatus c0"
+      USBBufferWrite(PORTc.0)
+
+    'a bit command we get a 1 or a 0
+    Case 102
+      cls
+      if USBTempBuffer(2) then
+      print "Light On"
+      LCDBacklight(on)
+      else
+      print "Light Off"
+      LCDBacklight(off)
+      end if
+
+    'we get a byte 0 to 255 so print it on the LCD
+    Case 103
+      cls
+      print USBTempBuffer(2)
+
+    'This is a little bit tricky, we get a byte array, so...
+    Case 104
+      'if current item = 0, is the first packet and we are ready to receive
+      if datan = 0 then
+        'our first byte send from the PC is the lenght of the array so we know how many times we are going to receive data
+        datal=USBTempBuffer(2)
+        'we are ready to receive the array lets start whit the item 1
+        datan = 1
+      else
+        'we already received the length so we are receiving bytes, store the byte in the corresponding array item
+        '(actualy this is a loop commanded by the PC because we are receiving continuos commands and bytes)
+        data(datan)=USBTempBuffer(2)
+        datan += 1
+        'so lets check if we ended receiving the array, if so, lets reset the item number to 0 to get ready in the case of another future byte array send
+        if datan = datal +1 then
+          datan=0
+          'ok, you have your array, so do something whit it
+
+          cls
+          print data(1)
+          print data(2)
+          print data(3)
+
+        end if
+      end if
+
+    'lets send an array to the PC, easy
+    case 105
+      USBBufferWrite(10)
+      USBBufferWrite(20)
+      USBBufferWrite(30)
+      cls
+      print "SndArray10 20 30"
+
+    'every 10 secons we receive a keep alive command (255) and send it back to the PC
+    '(dont use the command 255 this is reserved for the keep alive, you can use 0 to 254, and dont modify this)
+    Case USBDeviceKeepAlive
+      USBBufferWrite( USBDeviceKeepAlive )
+
+      'you dont need this, its only to change the portc.0 led as we recive the keep alive
+      PORTc.0 = !PORTc.0
+
+    'Handle unknown or other requests
+    Case Else
+      if USBTempBuffer(1) <> 0 then
+        cls
+        print "Unknoun: "
+        print USBTempBuffer(1)
+      end if
+
+
+  End Select
+
+end sub
+
+sub USB_Error_CallBack
+  'UEIR
+
+end sub
+
+sub USB_Descriptor_CallBack
+  'USBDescType
+  cls
+  Print "Desc: "
+  Print USBDescType
+end sub
