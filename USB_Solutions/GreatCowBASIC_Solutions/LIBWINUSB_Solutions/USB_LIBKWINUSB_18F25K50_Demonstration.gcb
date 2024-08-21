@@ -27,9 +27,14 @@
 '''********************************************************************************
 
 ' ----- Configuration
-    #chip 18F25K50, 48
+    #chip 18F14K50, 48
     #include <usb.h>
     #option Explicit
+
+    // ;configuration flag 48 MHZ
+    #config OSC = HS
+    #config PLLEN = on
+    #config MCLRE = ON 
 
 
     ' ----- Constants for the usb.h

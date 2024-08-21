@@ -1,0 +1,224 @@
+'''A program  for GCGB and GCB.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''
+'''Demonstration of the GCBASIC capabilities for LibK/WinUSB library
+'''
+'''Connect the 18f25K50 to the USB
+'''  D- to portc.4
+'''  D+ to portc.5
+'''  Cap between port.c3 and 0V
+'''  You can provide supply voltage via the USB, or, you can provide local voltage.
+'''
+''' LEDs to ports c.7, b.5 and b.4 via suitable resistors.  They are KeepAlive LED and two LEDs for remote control
+''' POTS to ports a.0, a.1, a.3 and a.3,  you will read those remotely
+''' A serial terminal at 115200bps can be connected to portc.6
+'''
+''' Use the Windows application to control!
+'''
+'''
+'''
+'''
+'''This program is the very first program for GCBASIC USB
+'''
+'''@author     EvanV
+'''@licence    GPL
+'''@version    1.0
+'''@date       20/08/2024
+'''********************************************************************************
+
+' ----- Configuration
+    #chip 18F14K50, 48
+    #include <usb.h>
+    #option Explicit
+
+    // ;configuration flag 48 MHZ
+    #config OSC = HS
+    #config PLLEN = ON
+    #config MCLRE = OFF 
+
+
+    ' ----- Constants for the usb.h
+    'Define a name - 30 chars max long
+    #define USB_PRODUCT_NAME  "GCBASIC USB " + CHIPNAMESTR
+
+    // These are defined in the library
+      // #define USB_VID 0x1209      'Should not be changed unless you have your own Vendor Identity - this VID is allocate to GCBASIC Lib/WinUSB Solutions.
+      // #define USB_PID 0x2006      'Should not be changed unless you have your own Vendor Identity - this PID is allocate to GCBASIC Lib/WinUSB Solutions.
+      // #define USB_REV 0x0000      'You MUST obtain a REV number from https://github.com/Anobium/GreatCowBASICpidcodes1209_2006 to develop your own Open Source USB solutions
+
+    ' ------ Version Control - optional
+
+    #include "gcbversionnumber.cnt"
+    'Include the GCBVersionNumber.cnt to increment versionString and create the build time string called GCBBuildTimeStr.
+    ' versionString a string is created automatically.
+    ' GCBBuildTimeStr is a string that is also created automatically.
+    ' use "GCBVersionNumber.cnt" as this will create a local copy of the versionString tracker.
+    ' if you use <GCBVersionNumber.cnt> this is a system wide versionString tracker.
+
+    dim versionString as string * 40
+    versionString = "Build"+GCBBuildStr
+    versionString = versionString + "@"+GCBBuildTimeStr
+
+    #IF SCRIPT_USART_USAGE_CHECK > 0
+      HSerPrint "USB CGB  "
+      HSerPrint versionString
+      HSerPrintCRLF
+    #ENDIF
+
+    ' ------ End of Version Control
+
+
+    'Constants that match the codes in the PC application - these are numeric messages
+
+    #define USBDeviceReadPortb5LEDStatus  130
+    #define USBDeviceSetPortb5StatusOn    131
+    #define USBDeviceSetPortb5StatusOff   132
+    #define USBDeviceReadADCValues        133
+
+    #define USBDeviceReadPortb4LEDStatus  134
+    #define USBDeviceSetPortb4StatusOn    135
+    #define USBDeviceSetPortb4StatusOff   136
+
+    #Define USBDEVICEREADREDLEDSTATUS     130
+    #Define USBDEVICESETREDLEDON          131
+    #Define USBDEVICESETREDLEDOFF         132
+
+    #Define USBDEVICEREADYELLOWLEDSTATUS   133
+    #Define USBDEVICESETYELLOWLEDON        134
+    #Define USBDEVICESETYELLOWLEDOFF       135
+
+    #Define USBDEVICEREADGREENLEDSTATUS   136
+    #Define USBDEVICESETGREENLEDON        137
+    #Define USBDEVICESETGREENLEDOFF       138
+
+    #Define USBDEVICERPORTSTATUS          140
+
+    'Define USB specific callback handlers
+
+    'MANDATED to handle your solution
+    #define USB_SETUP_HANDLER           SetupHandler_CallBack
+    'optional callback handlers for error and descriptor call.
+    #define USB_ERROR_HANDLER           ErrorHandler_CallBack
+    #define USB_DESCRIPTOR_HANDLER      DescriptorHandler_CallBack
+
+    ' ------ Port assignments
+
+        #Define KEEPALIVELED  PORTC.0
+
+        #Define REDLED        PORTC.1
+        #Define REDLED_LAT    LATC.1
+
+        #Define YELLOWLED     PORTC.2
+        #Define YELLOWLED_LAT LATC.2
+
+        #Define GREENLED      PORTC.3
+        #Define GREENLED_LAT  LATC.3
+
+        Dir KEEPALIVELED      OUT
+        Dir REDLED            OUT
+        Dir YELLOWLED         OUT
+        Dir GREENLED          OUT
+
+        #Define INPUT1        PORTA.2       'IO5
+        #Define INPUT2        PORTA.3       'IO6
+        #Define INPUT3        PORTA.4       'IO7
+        #Define INPUT4        PORTA.5       'IO8
+
+        Dir INPUT1            IN
+        Dir INPUT2            IN
+        Dir INPUT3            IN
+        Dir INPUT4            IN
+
+        // ----- Main body of program commences here
+        Do
+              'Do nothing just wait for the USB Interrupt
+              'Do not sleep the MCU!!
+        Loop
+
+        end
+
+
+        ' ----- Support methods.  User call backs
+        Sub ErrorHandler_CallBack
+          #IF SCRIPT_USART_USAGE_CHECK > 0
+              HSerPrint "Error: "
+              HSerPrint Hex(UEIR)
+              HSerPrintCRLF
+          #ENDIF
+        End Sub
+
+        ' The real handler - where the work is done
+        Sub SetupHandler_CallBack
+
+              Select Case USBRequest
+
+              'Red LED handler
+                    'Response to control request: Transfer USBDEVICEREADREDLEDSTATUS, send status of port
+                    Case USBDEVICEREADREDLEDSTATUS
+                      USBBufferWrite( REDLED_LAT )
+
+                    'Response to control request: Transfer USBDEVICESETREDLEDON, turn on LED
+                    Case USBDEVICESETREDLEDON
+                      Set REDLED On
+
+                    'Response to control request: Transfer USBDEVICESETREDLEDOFF, turn off LED
+                    Case USBDEVICESETREDLEDOFF
+                      Set REDLED Off
+
+              'Yellow LED handler
+                    'Response to control request: Transfer USBDEVICEREADYELLOWLEDSTATUS, send status of port
+                    Case USBDEVICEREADYELLOWLEDSTATUS
+                      USBBufferWrite( YELLOWLED_LAT )
+
+                    'Response to control request: Transfer USBDEVICESETYELLOWLEDON, turn on LED
+                    Case USBDEVICESETYELLOWLEDON
+                      Set YELLOWLED On
+
+                    'Response to control request: Transfer USBDEVICESETYELLOWLEDOFF, turn off LED
+                    Case USBDEVICESETYELLOWLEDOFF
+                      Set YELLOWLED Off
+
+              'Green LED handler
+                    'Response to control request: Transfer USBDEVICEREADGREENLEDSTATUS, send status of port
+                    Case USBDEVICEREADGREENLEDSTATUS
+                      USBBufferWrite( GREENLED_LAT )
+
+                    'Response to control request: Transfer USBDEVICESETGREENLEDON, turn on LED
+                    Case USBDEVICESETGREENLEDON
+                      Set GREENLED On
+
+                    'Response to control request: Transfer USBDEVICESETGREENLEDOFF, turn off LED
+                    Case USBDEVICESETGREENLEDOFF
+                      Set GREENLED Off
+
+
+                    Case USBDEVICERPORTSTATUS
+
+                      USBBufferWrite( INPUT1 )
+                      USBBufferWrite( INPUT2 )
+                      USBBufferWrite( INPUT3 )
+                      USBBufferWrite( INPUT4 )
+
+                'Response to control request: Transfer 255, keep alive
+                Case USBDEVICEKEEPALIVE
+                  USBBufferWrite( USBDEVICEKEEPALIVE )
+                  KEEPALIVELED = !KEEPALIVELED
+
+                'Handle the others via the serial port as we do not know what they are
+                Case Else
+                  #IF SCRIPT_USART_USAGE_CHECK > 0
+                      HSerPrint "Req "
+                      HSerPrint USBTempBuffer(1)
+                      HSerPrintCRLF
+                  #ENDIF
+              End Select
+
+        End Sub
+
+        Sub DescriptorHandler_Callback
+            #IF SCRIPT_USART_USAGE_CHECK > 0
+                HSerPrint "Desc: "
+                HSerPrint USBDescType
+                HSerPrintCRLF
+            #ENDIF
+        End Sub

@@ -21,7 +21,7 @@
 // ;configuration flag 48 MHZ
 #config OSC = HS
 #config PLLEN = on
-
+#config MCLRE = ON 
 
 #option explicit
 
