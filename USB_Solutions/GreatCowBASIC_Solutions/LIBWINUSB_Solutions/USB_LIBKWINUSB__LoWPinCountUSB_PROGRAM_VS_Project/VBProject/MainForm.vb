@@ -35,7 +35,7 @@ Imports System.Timers
 
 
 
-Partial Public Class MainForm
+Public Partial Class MainForm
 
 
     'Constants for communication to PIC - must match the constants in the PIC program.
