@@ -33,7 +33,7 @@ setup:
  
 do32kULP:
 	 	ldi tmp2, CPU_CCP_IOREG_gc
-	 	ldi tmp, CLKCTRL_CLKSEL_OSCULP32K_gc|CLKCTRL_CLKOUT_bm ;  OSCULP32K   CLKOUT
+	 	ldi tmp, CLKCTRL_CLKSEL_OSCULP32K_gc
 	 	out CPU_CCP, tmp2                    ; Change Protection     
 	 	sts CLKCTRL_MCLKCTRLA,tmp		
 		    
