@@ -1,0 +1,4 @@
+Some or most of the delay loops in this ASM code are made with "AVR Delay Loop Calculator", a webpage originally created by Bret Mulvey now located at: 
+
+http://darcy.rsgc.on.ca/ACES/TEI4M/AVRdelay.html
+

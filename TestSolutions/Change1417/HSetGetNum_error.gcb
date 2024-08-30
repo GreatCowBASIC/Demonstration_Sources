@@ -1,0 +1,600 @@
+/*
+
+This was submitted to forum.
+
+HSerGetNum() cause an `Error: Out of registers. Please break up any complex calculations`
+
+Root cause of error was the use of an array to cache the serial characters.
+Line 438 - search for hsergetnum
+
+27/8/24 Rewrite of function resolved.
+
+See https://sourceforge.net/p/gcbasic/discussion/596084/thread/c1d128b098/?limit=25#b099
+
+*/
+#chip mega328p, 16
+
+//библиотека датчика температуры DS18B20
+#include <DS18B20.h>
+// библиотека USART
+//#include <SoftSerial.h>
+
+
+
+//конфиг датчика DS18B20
+#define DQ PortC.3 // порт датчика температуры DS18B20
+
+//конфиг i2c
+#define I2C_MODE Master
+#define I2C_DATA PORTC.4
+#define I2C_CLOCK PORTC.5
+#define I2C_DISABLE_INTERRUPTS ON
+
+//конфиг LCD
+#define LCD_IO 10
+#define LCD_I2C_Address 0x4E // адрес дисплея
+
+//инвертируем сигнал вкл подсветки
+#define LCD_Backlight_On_State  1
+#define LCD_Backlight_Off_State 0
+
+//настройка USART
+#define USART_BAUD_RATE 9600 //скорость USART
+#define USART_BLOCKING
+#define SerInPort PORTd.0    //usart1 in
+#define SerOutPort PORTd.1    //usart1 out
+Dir SerOutPort Out
+Dir SerInPort In
+
+//назначаем порты выходов
+#define BP_OFF PB0 //выход "блок питания отключен" включение единицей (ON)
+#define CH_ON PB1 // выход "зарядное устройство включено" включение единицей (ON)
+#define PC PD2 // выход "кнопка завершения работы компьютера" включение единицей (ON)
+#define Vent PD3 //выход "вкл вентилятора" включение единицей (ON)
+
+//назначаем порты входов
+#define Sb_Sost PD4 // вход "кнопка сброса времени отключений" при нажатии единица (ON)
+#define Bckl PD5 //вход "кнопка включения подсветки" при нажатии единица (ON)
+
+// выводы ADC
+#define V_BP ADC6 //вход для измерения напряжения блока питания
+#define V_BAT ADC7 //вход для измерения напряжения аккумулятора
+
+
+// конфиг портов
+dir BP_OFF out
+dir CH_ON out
+dir PC out
+dir Vent Out
+dir Sb_Sost in
+dir Bckl in
+
+// первоначальные установки
+BP_OFF=Off //блок питания включен
+CH_ON=Off // зарядка отключена
+PC=Off // кнопка выключения ПК не нажата
+Vent= Off // вентилятор выключен
+//Bckl=0 // кнопка включения подсветки не нажата
+
+
+// переменные
+Dim SBack As Bit //переменная состояния подсветки
+SBack=1 //установка 1 в состояния подсветки, т.к. при включении подсветка включена
+DIM SostPC AS Bit //переменная состояния компьютера
+//DIM VrOtkl_MS AS Integer
+//VrOtkl_MS=0
+DIM VrOtkl_S AS Byte
+VrOtkl_S=0
+DIM VrOtkl_M AS Byte
+VrOtkl_M=0
+DIM VrOtkl_H AS Byte
+VrOtkl_H=0
+DIM KolOtkl AS Byte
+KolOtkl=0
+DIM KolOtklP AS Byte
+KolOtklP=1
+Dim myString as String
+Dim myNum As Word
+Dim Loc as Word
+
+
+//переменные для измерения AN0 (напряжение блока питания)
+Dim EpAd (20) as Byte // массив 20 байт
+
+//читаем байты массива из EEPROM MCU
+EPRead 1, EpAd (1)
+EPRead 2, EpAd (2)
+EPRead 3, EpAd (3)
+EPRead 4, EpAd (4)
+EPRead 5, EpAd (5)
+EPRead 6, EpAd (6)
+EPRead 7, EpAd (7)
+EPRead 8, EpAd (8)
+EPRead 9, EpAd (9)
+EPRead 10, EpAd (10)
+EPRead 11, EpAd (11)
+EPRead 12, EpAd (12)
+EPRead 13, EpAd (13)
+EPRead 14, EpAd (14)
+EPRead 15, EpAd (15)
+EPRead 16, EpAd (16)
+EPRead 17, EpAd (17)
+EPRead 18, EpAd (18)
+EPRead 19, EpAd (19)
+EPRead 20, EpAd (20)
+
+// переменные хранящиеся в EPPROM
+DIM Xmin AS Word alias EpAd(1), EpAd(2)
+DIM Xmax AS Word alias EpAd(3), EpAd(4)
+DIM Ymin AS Word alias EpAd(5), EpAd(6)
+DIM Ymax AS Word alias EpAd(7), EpAd(8)
+DIM TempVentOn as Byte alias EpAd(9) // температура включения вентилятора
+DIM TempVentOff as Byte alias EpAd(10) // температура выключения вентилятора
+DIM V_BatMax as Word alias EpAd(11), EpAd(12) // напряжение батареи для отключения зарядки
+DIM V_BatMin as Word alias EpAd(13), EpAd(14) // напряжение батареи для включения зарядки
+DIM V_PC_Off as Word alias EpAd(15), EpAd(16) // напряжение АКБ для выключения ПК
+DIM V_PC_On as Word alias EpAd(17), EpAd(18) // напряжение АКБ для включения ПК
+DIM V_BP_Off as Word alias EpAd(19), EpAd(20) // минимальное напряжение блока питания
+
+If Sb_Sost=1 Then Call Config // если при включении нажата кнопка сброса времени отключения переходим в Config
+
+CLS
+Locate 0,0
+Print "Xmin-"
+Print Xmin
+Locate 0,10
+Print "Xmax-"
+Print Xmax
+Locate 1,0
+Print "Ymin-"
+Print Ymin
+Locate 1,10
+Print "Ymax-"
+Print Ymax
+Locate 2,0
+Print "VentOn-"
+Print TempVentOn
+Locate 2,10
+Print "VentOf-"
+Print TempVentOff
+Locate 3,0
+Print "BatMax-"
+Print V_BatMax
+Locate 3,10
+Print "BatMin-"
+Print V_BatMin
+Wait 5 s
+CLS
+Print "V_PC_Off-"
+Print V_PC_Off
+Locate 1,0
+Print "V_PC_On-"
+Print V_PC_On
+Locate 2,0
+Print "V_BP_Off-"
+Print V_BP_Off
+Wait 3 s
+
+
+DIM Xx AS Long
+DIM Yy AS Long
+DIM OutVal AS Integer //Выходная переменная (Целые)
+DIM DECM AS Integer // Выходная переменная (Десятые)
+
+// Xmin=0
+// Xmax=10230
+// Ymin=0
+// Ymax=565
+
+//переменные для измерения AN1 (напряжение блока АКБ)
+//DIM X1min AS Long
+//DIM X1max AS Long
+//DIM Y1min AS Long
+//DIM Y1max AS Long
+DIM Xx1 AS Long
+DIM Yy1 AS Long
+DIM OutVal1 AS Integer //Выходная переменная (Целые)
+DIM DECM1 AS Integer // Выходная переменная (Десятые)
+
+//X1min=0
+//X1max=10230
+//Y1min=0
+//Y1max=550
+
+
+//очистка дисплея и включение подсветки
+
+LCDBacklight ON //вкл подсветку
+
+
+CLS // очистка экрана и установка курсора 0,0
+Locate 0,2
+PRINT "Blok:"
+Locate 1,2
+PRINT "Batt:"
+Locate 0,14
+Print "PC-"
+Locate 2,0
+Print "Temp:"
+Locate 2,12
+Print "Otkl:"
+Locate 3,0
+Print "Vr. otkl:"
+
+
+
+Do Forever
+//условия включения подсветки
+If Bckl=ON AND SBack=1 Then // если подсветка включена, по нажатию кнопки выключаем
+Call B_Off
+End If
+
+If Bckl=ON AND SBack=0 Then // если подсветка выключена, по нажатию кнопки включаем
+Call B_On
+End If
+
+//измерение напряжения блока питания на AN0
+Xx=ReadAD10 (V_BP)
+Xx=Xx*10
+
+Yy=(Ymin*(Xmax-Xx)+Ymax*(Xx-Xmin))/(Xmax-Xmin)
+OutVal=Yy
+
+DECM=OutVal%10
+OutVal=(OutVal-DECM)/10
+DECM=ABS (DECM)
+
+//Включаем BP_OFF если напряжение блока питания ниже 18.2 вольт
+If Yy>=V_BP_Off Then
+SET BP_OFF=OFF
+Locate 1,0
+PRINT " "
+Locate 0,0
+PRINT "+"
+//возврат слогаемого количества отключений на  1
+KolOtklP=1
+StopTimer 1
+
+Else
+
+SET BP_OFF=ON
+Locate 0,0
+PRINT " "
+Locate 1,0
+Print "+"
+
+//старт таймера и вызов подпрограммы MSec
+//InitTimer1 Osc, PRE1_8 // Инициализация и старт таймера
+//StartTimer 1 //старт таймера 1
+Inittimer1  OSC, PS_256
+Starttimer 1
+Settimer 1, 3035  ;Preload Timer
+On Interrupt Timer1Overflow Call MSec //вызов Sub MSec при переполнении таймера
+
+//увеличиваем на 1 количество отключений
+KolOtkl=KolOtkl+KolOtklP
+KolOtklP=0
+End If
+
+//вывод количества отключений питания
+Locate 2,18
+Print KolOtkl
+
+Locate 3,10
+Print VrOtkl_H
+Print "h "
+Print VrOtkl_M
+Print "m "
+Print VrOtkl_S
+Print "s "
+
+//Сброс времени работы от АКБ
+If Sb_Sost=1 Then 
+KolOtkl=0
+VrOtkl_H=0
+VrOtkl_M=0
+VrOtkl_S=0
+End If
+
+//вывод на дисплей напряжения блока питания
+Locate 0,8
+PRINT OutVal
+PRINT "."
+PRINT DECM
+PRINT "v "
+
+//измерение напряжение АКБ на AN1 
+Xx1=ReadAD10 (V_BAT)
+Xx1=Xx1*10
+
+Yy1=(Ymin*(Xmax-Xx1)+Ymax*(Xx1-Xmin))/(Xmax-Xmin)
+OutVal1=Yy1
+
+DECM1=OutVal1%10
+OutVal1=(OutVal1-DECM1)/10
+DECM1=ABS (DECM1)
+
+//вывод на дисплей напряжения АКБ
+Locate 1,8
+PRINT OutVal1
+PRINT "."
+PRINT DECM1
+PRINT "v"
+
+
+//Включаем CH_ON если напряжение АКБ ниже установленного BatMin и заряд отключен (зарядка)
+If Yy1<=V_BatMin AND CH_ON=OFF Then
+SET CH_ON=ON
+Locate 1,14
+PRINT "Charge"
+End If
+
+// отключаем CH_ON если напряжение АКБ выше установленного BatMax
+If Yy1>=V_BatMax Then
+SET CH_ON=OFF
+Locate 1,14
+PRINT "      "
+End If
+
+//Выключаем PC если напряжение АКБ ниже V_PC_Off (выключаем ПК), пишем в SostPC 1 -компьютер выключен
+If Yy1<=V_PC_Off AND SostPC<1 AND BP_OFF=ON Then
+WAIT 1 s
+SET PC=ON
+WAIT 1000 ms
+SET PC=OFF
+SET SostPC=1
+End If
+//Включаем PC если появилось напряжение в сети или АКБ заряжен более V_PC_On (включаем ПК), пишем в SostPC 0 -компьютер включен
+If Yy1>=V_PC_On AND SostPC=1 OR BP_OFF=OFF AND SostPC=1 Then
+WAIT 1000 ms
+SET PC=ON
+WAIT 1 s
+SET PC=OFF
+SET SostPC=0
+End If
+
+IF SostPC=0 THEN
+Locate 0,17
+PRINT "ON "
+ELSE
+Locate 0,17
+PRINT "OFF"
+End If
+
+//измерение температуры на AN2 (DS18B20)
+ReadDigitalTemp
+//DSdata = ReadTemp
+Locate 2,6
+PRINT DSint
+//Print DSdata
+PRINT chr(223)+"C"
+// включаем и выключаем вентилятор
+If DSint >= TempVentOn Then Set Vent ON
+If DSint <= TempVentOff Then Set Vent OFF
+Wait 100 ms
+
+
+Loop
+
+Sub MSec
+//VrOtkl_MS=VrOtkl_MS+1
+
+//сброс милисекунд на 0 и добавление одной секунды
+//if VrOtkl_MS=200 Then
+VrOtkl_S=VrOtkl_S+1
+Settimer 1, 3200  ;Preload Timer
+//VrOtkl_MS=0
+//End If
+//сброс секунд на 0 и добавление одной минуты
+if VrOtkl_S=60 Then
+VrOtkl_M=VrOtkl_M+1
+VrOtkl_S=0
+End If
+//сброс минут на 0 и добавление одного часа 
+if VrOtkl_M=60 Then
+VrOtkl_H=VrOtkl_H+1
+VrOtkl_M=0
+End If
+End Sub
+
+Sub B_Off //подпрограмма выключения подсветки
+LCDBacklight OFF
+SBack=0
+Wait 1 s
+End Sub
+
+Sub B_On //подпрограмма включения подсветки
+LCDBacklight ON
+SBack=1
+Wait 1 s
+End Sub
+
+Sub Config //подпрограмма настройки
+CLS
+Locate 0,0
+Print "Podkluchites cherez"
+Locate 1,0
+Print "Bluetooth k HC-06"
+Locate 2,0
+Print "PIN 1234 i otpravte"
+Locate 3,0
+Print "v BT Terminal- 1"
+
+
+//HSerPrint "AT"
+//HSerSend(13)
+// CLS
+// Print "Status Bluetooth: "
+// Print  myString
+// Wait 3 s
+HSerGetString myString //ждем команду от Bluetooth
+
+CLS
+
+HSerPrint "Vvedite Xmin (0-10240) DEFAULT (0), ustanovleno-"
+HserPrint Xmin
+HSerPrintCRLF
+//HSerSend(13)
+Wait 100 ms
+HSerGetNum myNum
+Xmin=myNum
+//HSerGetString  myString
+//Xmin=StringToWord (myString)
+EPWrite 1, EpAd (1)
+EPWrite 2, EpAd (2)
+HSerPrint Xmin
+HSerPrintCRLF
+Wait 100 ms
+Print "Xmin="
+Print Xmin
+
+HSerPrint "Vvedite Xmax (0-10240) DEFAULT (10240) ustanovleno-"
+HSerPrint Xmax
+HSerPrintCRLF
+Wait 100 ms
+HSerGetString myString
+Xmax=StringToWord (myString)
+EPWrite 3, EpAd (3)
+EPWrite 4, EpAd (4)
+HSerPrint Xmax
+HSerPrintCRLF
+Wait 100 ms
+Locate 0,9
+Print "Xmax="
+Print Xmax
+
+HSerPrint "Vvedite znachenie Ymin DEFAULT (0) ustanovleno-"
+HSerPrint Ymin
+HSerPrintCRLF
+Wait 100 ms
+HSerGetString myString 
+Ymin=StringToWord (myString)
+EPWrite 5, EpAd (5)
+EPWrite 6, EpAd (6)
+HSerPrint Ymin
+HSerPrintCRLF
+Wait 100 ms
+Locate 1,0
+Print "Ymin="
+Print Ymin
+
+HSerPrint "Vvedite znachenie Ymax DEFAULT (555) ustanovleno-"
+HSerPrint Ymax
+HSerPrintCRLF
+Wait 100 ms
+HSerGetString myString 
+Ymax=StringToWord (myString)
+EPWrite 7, EpAd (7)
+EPWrite 8, EpAd (8)
+HSerPrint Ymax
+HSerPrintCRLF
+Wait 100 ms
+Locate 1,9
+Print "Ymax="
+Print Ymax
+
+HSerPrint "Vvedite temperaturu vklucheniya ventilyatora DEFAULT (60) ustanovleno-"
+HSerPrint TempVentOn
+HSerPrintCRLF
+Wait 100 ms
+HSerGetString myString 
+TempVentOn=StringToWord (myString)
+EPWrite 9, EpAd (9)
+HSerPrint TempVentOn
+HSerPrintCRLF
+Wait 100 ms
+Locate 2,0
+Print "VentOn="
+Print TempVentOn
+
+HSerPrint "Vvedite temperaturu viklucheniya ventilyatora DEFAULT (50) ustanovleno-"
+HSerPrint TempVentOff
+HSerPrintCRLF
+Wait 100 ms
+HSerGetString myString 
+TempVentOff=StringToWord (myString)
+EPWrite 10, EpAd (10)
+HSerPrint TempVentOff
+HSerPrintCRLF
+Wait 100 ms
+Locate 2,10
+Print "VentOff="
+Print TempVentOff
+
+HSerPrint "Vvedite napryajenie otklucheniya zaryadki AKB bez zapyatoy DEFAULT (vvedite 222 dly 22.2v) ustanovleno-"
+HSerPrint V_BatMax
+HSerPrintCRLF
+Wait 100 ms
+HSerGetString myString 
+V_BatMax=StringToWord (myString)
+EPWrite 11, EpAd (11)
+EPWrite 12, EpAd (12)
+HSerPrint V_BatMax
+HSerPrintCRLF
+Wait 100 ms
+Locate 3,0
+Print "BatMax="
+Print V_BatMax
+
+HSerPrint "Vvedite napryajenie vklucheniya zaryadki AKB bez zapyatoy (vvedite 200 dly 20.0v) ustanovleno-"
+HSerPrint V_BatMin
+HSerPrintCRLF
+Wait 100 ms
+HSerGetString myString 
+V_BatMin=StringToWord (myString)
+EPWrite 13, EpAd (13)
+EPWrite 14, EpAd (14)
+HSerPrint V_BatMin
+HSerPrintCRLF
+Wait 100 ms
+Locate 3,10
+Print "BatMin="
+Print V_BatMin
+
+HSerPrint "Vvedite napryajenie otklucheniya PC bez zapyatoy (vvedite 182 dlya 18.2v) ustanovleno-"
+HSerPrint V_PC_Off
+HSerPrintCRLF
+Wait 100 ms
+HSerGetString myString 
+V_PC_Off=StringToWord (myString)
+EPWrite 15, EpAd (15)
+EPWrite 16, EpAd (16)
+HSerPrint V_PC_Off
+HSerPrintCRLF
+Wait 100 ms
+CLS
+Print "V_PC_Off="
+Print V_PC_Off
+
+HSerPrint "Vvedite napryajenie vklucheniya PC bez zapyatoy (vvedite 202 dlya 20.2v) ustanovleno-"
+HSerPrint V_PC_On
+HSerPrintCRLF
+Wait 100 ms
+HSerGetString myString 
+V_PC_On=StringToWord (myString)
+EPWrite 17, EpAd (17)
+EPWrite 18, EpAd (18)
+HSerPrint V_PC_On
+HSerPrintCRLF
+Wait 100 ms
+Locate 1,0
+Print "V_PC_On="
+Print V_PC_On
+
+HSerPrint "Vvedite minimalnoe napryajenie bloka pitaniya bez zapyatoy (vvedite 185 dlya 18.5v) ustanovleno-"
+HSerPrint V_BP_Off
+HSerPrintCRLF
+Wait 100 ms
+HSerGetString myString 
+V_BP_Off=StringToWord (myString)
+EPWrite 19, EpAd (19)
+EPWrite 20, EpAd (20)
+HSerPrint V_BP_Off
+HSerPrintCRLF
+Wait 100 ms
+Locate 2,0
+Print "V_BP_Off="
+Print V_BP_Off
+
+Wait 10 s
+End Sub

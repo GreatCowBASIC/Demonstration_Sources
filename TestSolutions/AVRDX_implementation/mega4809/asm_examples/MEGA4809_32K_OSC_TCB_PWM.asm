@@ -9,11 +9,9 @@
 ; Disables prescaler and sets PA7 as clock out
 ; Checks that the 32kosc is stable before continuing ;   
 ; ALSO works in 20Mhz mode
-; 
-;* Looks like the PWM overrides the regular pin function so setting to output makes no difference. interesting
 ;
 ; this program puts the chip in 32K internal ULP mode 
-; of course, the pwm freq is lower.
+; using TCB0 for 8 bit PWM. 
 ; 
 .def zero = r2
 .def one = r3
@@ -33,16 +31,18 @@ setup:
  
 do32kULP:
 	 	ldi tmp2, CPU_CCP_IOREG_gc
-	 	ldi tmp, CLKCTRL_CLKSEL_OSCULP32K_gc|CLKCTRL_CLKOUT_bm ;  OSCULP32K   CLKOUT
+	 	ldi tmp, CLKCTRL_CLKSEL_OSCULP32K_gc ;  OSCULP32K    
 	 	out CPU_CCP, tmp2                    ; Change Protection     
 	 	sts CLKCTRL_MCLKCTRLA,tmp		
 		    
 		
-spot:  	                           ; check for osc32 functioning
+spot:  	                                ; check for osc32 functioning
 	 	lds tmp,CLKCTRL_MCLKSTATUS
-	 	sbrs tmp,CLKCTRL_OSC32KS_bp	 	
+	 	sbrs tmp,CLKCTRL_OSC32KS_bp	 	; skip if good
 	 	rjmp spot
 
+
+TCBsetup:
 	ldi tmp, LOW(TCB_CMP_EXAMPLE_VALUE)
 	sts TCB0_CCMP, tmp
 
