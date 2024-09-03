@@ -39,6 +39,10 @@ Connect the programming cable as follows:
     DAT   - PORTB.7 (Top right hand pin looking from the top)
     CLK   - PORTB.6 (Second from top right looking from the top)
 
+image::programming.png[graphic,align="center",25%]
+
+
+
 *Demonstrations*
 
 The demonstrations show how to use the following:
