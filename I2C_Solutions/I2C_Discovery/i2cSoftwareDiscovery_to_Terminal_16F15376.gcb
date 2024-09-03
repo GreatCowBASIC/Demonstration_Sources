@@ -1,0 +1,115 @@
+/*
+    A demonstration program for GCBASIC.
+    --------------------------------------------------------------------------------------------------------------------------------
+    This program searches for I2C devices and display their adresses to the attached PC terminal.
+    This program uses the software implementation of I2C for the Microchip microprocessors.
+    The hardware serial connections are shown in the program.
+    @author  EvanV
+    @licence GPL
+    @version 1.0a
+    @date    03.09.2024
+
+    Example output showing a device on addresses A0 and A1
+
+        Software I2C
+
+            00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 
+        00:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        10:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        20:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        30:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        40:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        50:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        60:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        70:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        80:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        90:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        A0:  A0 A1 -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        B0:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        C0:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        D0:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        E0:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        F0:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+        End of Search
+
+
+*/
+; ----- Configuration
+#CHIP 16F15376
+#option explicit
+
+    // Serial Setup Constants and the PPS
+        #DEFINE USART_BAUD_RATE 9600
+        #DEFINE USART_TX_BLOCKING
+        #DEFINE USART_DELAY OFF
+
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #DEFINE PPSToolPart 16F15376
+
+    Sub InitPPS
+            
+            // Module: EUSART1
+            RC6PPS = 0x000F    // TX1 > RC6
+        
+        End Sub
+
+    // I2C settings - set the software ports using the constants
+    #DEFINE I2C_MODE Master
+    #DEFINE I2C_DATA PORTC.4
+    #DEFINE I2C_CLOCK PORTC.3
+    #DEFINE I2C_DISABLE_INTERRUPTS ON
+
+    // Variables
+    Dim DISPLAYNEWLINE as Byte
+
+    //  Main body of program commences here.
+        // Now assumes Serial Terminal is operational
+        dim DeviceID as byte
+
+        //  HSerPrintCRLF
+        //  dim myMessage as String * 12
+        //  myMessage = "Software I2C"
+        //  HSerPrint myMessage
+        //  HSerPrintCRLF 2
+
+        Do 
+            HSerPrintCRLF
+            HSerPrint "Software I2C"
+            HSerPrintCRLF 2
+
+            HSerPrint "     "
+            for DeviceID = 0 to 15
+                HSerPrint hex(deviceID)
+                HSerPrint " "
+            next
+            for DeviceID = 0 to 255
+                DisplayNewLine = DeviceID % 16
+                if DisplayNewLine = 0 Then
+                HSerPrintCRLF
+                HserPrint hex(DeviceID)
+                HSerPrint ": "
+                end if
+                HSerPrint " "
+                I2CStart
+                I2CSend ( deviceID )
+
+                if I2CSendState = True  then
+                HSerPrint   hex(deviceID)
+                else
+                HSerPrint "--"
+                end if
+                I2CSend ( 0 )
+                I2CStop
+
+            Next
+            HSerPrintCRLF 2
+            HSerPrint   "End of Search"
+            HSerPrintCRLF 2
+
+            Wait 5 s
+        Loop
+        END
+

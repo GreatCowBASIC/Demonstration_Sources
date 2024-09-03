@@ -1,0 +1,30 @@
+/*
+
+    This tutorial program can be-programmed into the sample device.
+    
+    The tutorial program functions as follows. Pressing the switch S2 causes the
+    LEDs to binary count up to FFh (255 decimal). Past FFh (all LEDs on), the
+    count rolls over to zero (all LEDs off). The program may be reset by pressing
+    the switch S1.
+    To change the direction of the binary count press S3.
+
+*/
+#CHIP 16F15376
+#option explicit
+#CONFIG MCLRE=ON
+
+// Variable definition
+Dim Direction as Bit
+
+    Do 
+        If Direction = 0 Then
+            PortB++    
+        Else
+            PortB--
+        End IF
+
+        wait scale ( ReadAD ( AN0 ), 0, 255, 1, 1000 ) ms
+
+        If PORTA.4 = 0 and Direction = 0 then Direction = 1
+        If PORTC.2 = 0  and Direction = 1 then Direction = 0
+    Loop

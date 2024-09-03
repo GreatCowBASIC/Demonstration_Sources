@@ -1,0 +1,107 @@
+/*
+    This program dumps the 128 bytes of the external I2C EEPROM to the LCD.
+
+    You can validate the EEPROM contents...
+
+*/
+
+#CHIP 16F15376
+#option explicit
+
+    // Include the library needed
+    #include <i2ceeprom.h>
+
+    // LCD Setup Constants and connection settings 
+        #DEFINE LCD_IO 8 
+        #DEFINE LCD_RS PORTA.1 
+        #DEFINE LCD_Enable PORTA.3
+        #DEFINE LCD_RW PORTA.2
+        #DEFINE LCD_DATA_PORT PORTD
+
+    // Keypad Setup Constants
+        #DEFINE KEYPAD_ROW_1 portb.7
+        #DEFINE KEYPAD_ROW_2 portb.6
+        #DEFINE KEYPAD_ROW_3 portb.5
+        #DEFINE KEYPAD_ROW_4 portb.4
+        #DEFINE KEYPAD_COL_1 portb.3
+        #DEFINE KEYPAD_COL_2 portb.2
+        #DEFINE KEYPAD_COL_3 portb.1
+        #DEFINE KEYPAD_COL_4 portb.0
+
+    // Setup the Switches as constants and set the DIRection
+        #DEFINE SW2_RA4 PORTA.4
+        #DEFINE SW3_RC2 PORTC.2
+        #DEFINE SW1_RE3 PORTE.3
+
+        DIR SW2_RA4 IN
+        DIR SW3_RC2 IN
+        DIR SW1_RE3 IN
+
+
+    // Serial Setup Constants and the PPS
+        #DEFINE USART_BAUD_RATE 9600
+        #DEFINE USART_TX_BLOCKING
+        #DEFINE USART_DELAY OFF
+
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #DEFINE PPSToolPart 16F15376
+
+    Sub InitPPS
+            
+            // Module: EUSART1
+            RC6PPS = 0x000F    // TX1 > RC6
+        
+        End Sub
+        // Add this code segment to your GCBASIC source program
+
+    // I2C settings - set the software ports using the constants
+    #DEFINE I2C_MODE Master
+    #DEFINE I2C_DATA PORTC.4
+    #DEFINE I2C_CLOCK PORTC.3
+    #DEFINE I2C_DISABLE_INTERRUPTS ON
+
+    ; ----- Define Hardware settings
+    #define EEPDEV 0xA0               'Change this ADDRESS to suit
+    #define EEPROMPAGESIZE 8          'Change to the EEPROM page size
+                                        'This IS EEPROM device specific
+
+
+// Main body of program commences here.
+
+    Dim eepAddr as Word               'For this specific EEPROM used a Word.
+                                        'This IS EEPROM device specific. 
+        eepAddr = 0                     //  Location in EEPROM to save password
+    Dim passcodeArrayEE ( 128 )
+    Dim ccount as Byte
+
+    Print "GCBASIC 2024"
+    Locate 1,0
+    Print "PICDEM-2 DEMO BOARD"
+    Wait 3 s
+    CLS
+    Print "To operate keypad remove J6 jumper"
+            repeat 2
+                LCDCURSOR LCDOFF
+                wait 500 ms
+                LCDCURSOR LCDON
+                wait 500 ms
+                If !SW2_RA4 or !SW3_RC2 or !SW1_RE3 Then Exit Repeat
+            end repeat
+
+    CLS
+    Print "Dump EEPROM"
+    Wait 3 s
+
+    CLS
+    // Read the array from EEProm
+    eepAddr = 0
+    eeprom_rd_array( EEPDEV, eepAddr , passcodeArrayEE(), 128 )
+
+    For ccount = 1 to 128
+        Print HEX(passcodeArrayEE(ccount))
+        wait 200 ms
+    Next
+    
+    End
