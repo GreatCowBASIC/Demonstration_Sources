@@ -1,0 +1,205 @@
+/*
+
+    This program enable the setting of a passcode of 4 numbers ( entered via the keypad) to be saved on the external I2C EEPROM
+
+*/
+; ----- Configuration
+#CHIP 16F15376
+#option explicit
+
+    // Include the library needed
+    #include <i2ceeprom.h>
+
+    // LCD Setup Constants and connection settings 
+        #DEFINE LCD_IO 8 
+        #DEFINE LCD_RS PORTA.1 
+        #DEFINE LCD_Enable PORTA.3
+        #DEFINE LCD_RW PORTA.2
+        #DEFINE LCD_DATA_PORT PORTD
+
+    // Keypad Setup Constants
+        #DEFINE KEYPAD_ROW_1 portb.7
+        #DEFINE KEYPAD_ROW_2 portb.6
+        #DEFINE KEYPAD_ROW_3 portb.5
+        #DEFINE KEYPAD_ROW_4 portb.4
+        #DEFINE KEYPAD_COL_1 portb.3
+        #DEFINE KEYPAD_COL_2 portb.2
+        #DEFINE KEYPAD_COL_3 portb.1
+        #DEFINE KEYPAD_COL_4 portb.0
+
+    // Serial Setup Constants and the PPS
+        #DEFINE USART_BAUD_RATE 9600
+        #DEFINE USART_TX_BLOCKING
+        #DEFINE USART_DELAY OFF
+
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #DEFINE PPSToolPart 16F15376
+
+    Sub InitPPS
+            
+            // Module: EUSART1
+            RC6PPS = 0x000F    // TX1 > RC6
+        
+        End Sub
+
+    // I2C settings - set the software ports using the constants
+    #DEFINE I2C_MODE Master
+    #DEFINE I2C_DATA PORTC.4
+    #DEFINE I2C_CLOCK PORTC.3
+    #DEFINE I2C_DISABLE_INTERRUPTS ON
+
+    // DEFINE EEPROM Hardware settings
+    #DEFINE EEPDEV 0xA0               // Change this ADDRESS to suit
+    #DEFINE EEPROMPAGESIZE 8          // Change to the EEPROM page size
+                                            // This IS EEPROM device specific
+
+    // Variables
+        Dim firstPassword, secondPassword as String
+        Dim passcodeArray ( 4 )
+        Dim passcodeArrayEE ( 4 )
+        Dim verified as Bit 
+        Dim ccount, temp, xloop as Byte
+            verified = FALSE  
+        Dim eepAddr as Word                 // For this specific EEPROM used a Word.
+                                            // This IS EEPROM device specific. 
+        eepAddr = 0                         //  Location in EEPROM to save password
+
+
+// Main body of program commences here.
+
+    wait 1 s
+
+    // Show whether you have selected harware or software I2C
+    HSerPrintCRLF 2
+    HSerPrint "Set passcode to EEPROM"
+    Print "Set passcode to EEPROM"
+    HserPrintCRLF 2
+    Wait 4 s
+
+    // Dump any keypad
+    Do While KeypadData <> KEY_NONE
+    Loop
+
+    Do While !verified
+    
+        HserPrint "Enter passcode on KeyPad, 4 presses: "
+        CLS
+        Print "Enter passcode on KeyPad, 4 presses"
+
+        ccount = 1
+        Do While ccount < 5
+                // Get key value from keypad
+            Temp = KeypadData
+            // If a key is pressed, then display it
+            If Temp <> KEY_NONE Then
+
+                passcodeArray( ccount) = Temp
+
+                // Send to Serial
+                HSerPrint Temp
+                
+                // Send to LCD
+                Locate 1, 0
+                Print "Key Pressed :"
+                Locate 1, ccount + 13
+                Print Temp
+
+                // Wait until key is released
+                wait while KeypadData <> KEY_NONE
+
+                ccount++
+
+            End If
+        Loop
+        HserPrintCRLF
+        CLS
+
+        HserPrint "Verify passcode on KeyPad, 4 presses: "
+        CLS
+        Print "Verify passcode on KeyPad, 4 presses"
+
+        // The array is now populated - now verify
+        
+        verified = TRUE
+        ccount = 1
+        Do While ccount < 5
+                // Get key value from keypad
+            Temp = KeypadData
+            // If a key is pressed, then display it
+            If Temp <> KEY_NONE Then
+
+                If  passcodeArray( ccount) <> Temp Then
+                    verified = FALSE
+                End if
+
+                // Send to Serial
+                HSerPrint Temp
+
+                // Send to LCD
+                Locate 1, 0
+                Print "Key Pressed :"
+                Locate 1, ccount + 13
+                Print Temp
+
+                // Wait until key is released
+                wait while KeypadData <> KEY_NONE
+                ccount++    
+            End If
+        Loop
+        HserPrintCRLF
+
+        If !verified Then
+            HSerPrintStringCRLF "Passcode does not match"
+            CLS
+            Print "Passcode does not match"
+            Wait 4 s
+        End If
+
+    Loop
+
+    // set EEProm start address for saving the array
+    eepAddr = 0
+    // write array
+    HSerPrint "Write passcode to i2C device"
+    HSerPrintCRLF 2
+
+    CLS
+    Print "Write passcode to i2C device"
+    
+    eeprom_wr_array( EEPDEV, EEPROMPAGESIZE, eepAddr , passcodeArray(), 4 )
+    wait 1 s
+
+    // set EEProm start address for reading the array
+    eepAddr = 0
+    HSerPrint "Verify passcode write to I2C device"
+    HSerPrintCRLF 2        
+
+    Locate 1,0
+    Print "Verify passcode write to I2C device"
+
+    eeprom_rd_array( EEPDEV, eepAddr , passcodeArrayEE(), 4 )
+
+    // show results
+    verified = TRUE
+    for xloop = 1 to 4
+        If passcodeArray(xloop) <> passcodeArrayEE(xloop) Then
+            verified = FALSE
+        End If    
+    next
+    wait 1 s
+    
+    CLS
+    HSerPrintCRLF 2
+    If verified Then 
+        HSerPrint "EEPROM Passcode verified"
+        Print "EEPROM Passcode verified"
+    Else
+        HSerPrint "EEPROM Passcode not the saved correctly"
+        Print "EEPROM Passcode not the saved correctly"
+    End If
+    HSerPrintCRLF 2
+
+    end
+

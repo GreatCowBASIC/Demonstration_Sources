@@ -9,26 +9,94 @@ HELP:
      Remainder of report is the user program or libaries code remaining post conditional processing
 *********************************************************************************************************************************
 
-              CODE/Constant:     Line 41 LCD_IO                                  	8                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM-2_plus_board\10_first-start-sample.gcb
-              CODE/Constant:     Line 42 LCD_RS                                  	PORTA.1                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM-2_plus_board\10_first-start-sample.gcb
-              CODE/Constant:     Line 43 LCD_ENABLE                              	PORTA.3                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM-2_plus_board\10_first-start-sample.gcb
-              CODE/Constant:     Line 44 LCD_RW                                  	PORTA.2                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM-2_plus_board\10_first-start-sample.gcb
-              CODE/Constant:     Line 45 LCD_DATA_PORT                           	PORTD                           	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM-2_plus_board\10_first-start-sample.gcb
-              CODE/Constant:     Line 48 KEYPAD_ROW_1                            	PORTB.7                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM-2_plus_board\10_first-start-sample.gcb
-              CODE/Constant:     Line 49 KEYPAD_ROW_2                            	PORTB.6                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM-2_plus_board\10_first-start-sample.gcb
-              CODE/Constant:     Line 50 KEYPAD_ROW_3                            	PORTB.5                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM-2_plus_board\10_first-start-sample.gcb
-              CODE/Constant:     Line 51 KEYPAD_ROW_4                            	PORTB.4                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM-2_plus_board\10_first-start-sample.gcb
-              CODE/Constant:     Line 52 KEYPAD_COL_1                            	PORTB.3                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM-2_plus_board\10_first-start-sample.gcb
-              CODE/Constant:     Line 53 KEYPAD_COL_2                            	PORTB.2                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM-2_plus_board\10_first-start-sample.gcb
-              CODE/Constant:     Line 54 KEYPAD_COL_3                            	PORTB.1                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM-2_plus_board\10_first-start-sample.gcb
-              CODE/Constant:     Line 55 KEYPAD_COL_4                            	PORTB.0                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM-2_plus_board\10_first-start-sample.gcb
-              CODE/Constant:     Line 58 SW2_RA4                                 	PORTA.4                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM-2_plus_board\10_first-start-sample.gcb
-              CODE/Constant:     Line 59 SW3_RC2                                 	PORTC.2                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM-2_plus_board\10_first-start-sample.gcb
-              CODE/Constant:     Line 60 SW1_RE3                                 	PORTE.3                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM-2_plus_board\10_first-start-sample.gcb
-              CODE/Constant:     Line 68 USART_BAUD_RATE                         	9600                            	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM-2_plus_board\10_first-start-sample.gcb
-              CODE/Constant:     Line 69 USART_TX_BLOCKING                       	                                	
-              CODE/Constant:     Line 70 USART_DELAY                             	OFF                             	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM-2_plus_board\10_first-start-sample.gcb
-              CODE/Constant:     Line 75 PPSTOOLPART                             	16F15376                        	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM-2_plus_board\10_first-start-sample.gcb
+              CODE/Constant:     Line 84 LCD_PWR                                 	PORTD.7                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 113 USART_BAUD_RATE                         	9600                            	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 114 USART_TX_BLOCKING                       	                                	
+              CODE/Constant:     Line 115 USART_DELAY                             	OFF                             	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 118 LAB_HELLOWORLD                          	1                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 119 LAB_BLINK                               	2                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 120 LAB_ROTATELEDS                          	3                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 121 LAB_ADC                                 	4                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 122 LAB_VSR                                 	5                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 123 LAB_DEBOUNCE                            	6                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 124 LAB_PWM                                 	7                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 125 LAB_TIMER_1                             	8                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 126 LAB_INTERRUPTS                          	9                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 127 LAB_SLEEPWAKEUP                         	10                              	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 128 LAB_EEPROM                              	11                              	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 129 LAB_LCD                                 	12                              	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 130 LAB_NVMEMORY                            	13                              	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 131 LAB_I2CDISCOVERY                        	14                              	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 132 LAB_I2CTEMPERATURE                      	15                              	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 133 LAB_I2CEEPROM                           	16                              	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 134 LAB_CLOCK                               	17                              	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 135 LAB_BUZZER                              	18                              	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 142 LCD_IO                                  	4                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 143 LCD_SPEED                               	FAST                            	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 144 LCD_WIDTH                               	16                              	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 147 LCD_RS                                  	PORTD.4                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 148 LCD_RW                                  	PORTD.5                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 149 LCD_ENABLE                              	PORTD.6                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 151 LCD_DB4                                 	PORTD.0                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 152 LCD_DB5                                 	PORTD.1                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 153 LCD_DB6                                 	PORTD.2                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 154 LCD_DB7                                 	PORTD.3                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 159 SWITCH_S3_PORT                          	PORTB.0                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 160 SWITCH_S2_PORT                          	PORTA.4                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 162 LED_D2                                  	PORTB.0                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 163 LED_D3                                  	PORTB.1                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 164 LED_D4                                  	PORTB.2                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 165 LED_D5                                  	PORTB.3                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 177 LEDS_OFF                                	LED_D5=0:LED_D4=0:LED_D3=0:LED_D	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 178 PRESSED                                 	1                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 179 NOT_PRESSED                             	0                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 180 RUNNING                                 	1                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 181 NOT_RUNNING                             	0                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 182 RIGHTDIRECTION                          	1                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 183 LEFTDIRECTION                           	0                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 184 MAX_LABS                                	18                              	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 300 BLINK_FLAG_COUNTER_MAX                  	6                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 618 USE_HPWMCCP1                            	TRUE                            	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 619 USE_HPWMCCP2                            	FALSE                           	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 620 USE_HPWMCCP4                            	FALSE                           	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 621 USE_HPWMCCP5                            	FALSE                           	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 624 USE_HPWM1                               	FALSE                           	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 625 USE_HPWM2                               	FALSE                           	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 626 USE_HPWM3                               	FALSE                           	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 627 USE_HPWM4                               	FALSE                           	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 628 USE_HPWM5                               	FALSE                           	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 629 USE_HPWM6                               	FALSE                           	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 630 USE_HPWM7                               	FALSE                           	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 631 USE_HPWM8                               	FALSE                           	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 634 USE_HPWM_TIMER2                         	TRUE                            	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 635 USE_HPWM_TIMER4                         	FALSE                           	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 636 USE_HPWM_TIMER6                         	FALSE                           	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 710 FLAG_COUNTER_MAX                        	4                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 711 SHIFT_COUNTER_MAX                       	8                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 712 TIME_COUNT_MIN                          	0                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 713 TIME_COUNT_MAX                          	100                             	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 897 COUNTDOWN_MAX                           	5                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 976 EEPROM_FLAG_COUNTER_MAX                 	6                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 1295 NVM_FLAG_COUNTER_MAX                    	20                              	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 1379 HI2C_BAUD_RATE                          	400                             	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 1380 HI2C_DATA                               	PORTC.4                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 1381 HI2C_CLOCK                              	PORTC.3                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              SCRIPT/CurrentValue: Line 1495 HI2C_BAUD_RATE                          	400                             	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              SCRIPT/CurrentValue: Line 1496 HI2C_DATA                               	PORTC.4                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              SCRIPT/CurrentValue: Line 1497 HI2C_CLOCK                              	PORTC.3                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 1522 I2CTEMPSENSOR                           	154                             	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              SCRIPT/CurrentValue: Line 1584 HI2C_BAUD_RATE                          	400                             	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              SCRIPT/CurrentValue: Line 1585 HI2C_DATA                               	PORTC.4                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              SCRIPT/CurrentValue: Line 1586 HI2C_CLOCK                              	PORTC.3                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 1616 EEPDEV                                  	160                             	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 1617 EEPROMPAGESIZE                          	64                              	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 1797 SOUNDOUT                                	PORTC.2                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM_2_plus_board\20_Capability_demo.gcb
+              CODE/Constant:     Line 202 EEPROM_WR_STRING                        	EEPROM_WR_ARRAY                 	C:\GCstudio\gcbasic\include\i2ceeprom.h
+              CODE/Constant:     Line 318 EEPROM_RD_STRING                        	EEPROM_RD_ARRAY                 	C:\GCstudio\gcbasic\include\i2ceeprom.h
+              CODE/Constant:     Line 31 SOUND_CMD_NONE                          	0                               	C:\GCstudio\gcbasic\include\songplay.h
+              CODE/Constant:     Line 33 SOUND_NOTE_NORMAL                       	0                               	C:\GCstudio\gcbasic\include\songplay.h
+              CODE/Constant:     Line 34 SOUND_NOTE_SHARP                        	1                               	C:\GCstudio\gcbasic\include\songplay.h
+              CODE/Constant:     Line 35 SOUND_NOTE_FLAT                         	2                               	C:\GCstudio\gcbasic\include\songplay.h
               CODE/Constant:     Line 5 HEX                                     	_HEXPICAS                       	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\picas.h
               CODE/Constant:     Line 450 FORMAT_LEFT                             	0                               	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\a-d.h
               CODE/Constant:     Line 451 FORMAT_RIGHT                            	255                             	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\a-d.h
@@ -347,7 +415,7 @@ HELP:
               CODE/Constant:     Line 70 KEY_STAR                                	14                              	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\keypad.h
               CODE/Constant:     Line 71 KEY_HASH                                	15                              	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\keypad.h
               CODE/Constant:     Line 72 KEY_NONE                                	255                             	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\keypad.h
-              CODE/Constant:     Line 32 RANDSTART                               	27773                           	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\random.h
+              CODE/Constant:     Line 32 RANDSTART                               	31958                           	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\random.h
               CODE/Constant:     Line 122 BYTETOSTRING                            	STR                             	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\string.h
               CODE/Constant:     Line 123 WORDTOSTRING                            	STR                             	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\string.h
               CODE/Constant:     Line 175 LONGTOSTRING                            	STR32                           	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\string.h
@@ -531,22 +599,7 @@ HELP:
               SCRIPT/AddConstant:   Line 176 PWM_FREQ                                38                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
               SCRIPT/AddConstant:   Line 179 PWM_DUTY                                50                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
               SCRIPT/AddConstant:   Line 182 PWMMODULE                               255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 185 USE_HPWMCCP1                            255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 188 USE_HPWMCCP2                            255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
               SCRIPT/AddConstant:   Line 191 USE_HPWMCCP3                            255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 194 USE_HPWMCCP4                            255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 197 USE_HPWMCCP5                            255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 200 USE_HPWM1                               255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 203 USE_HPWM2                               255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 206 USE_HPWM3                               255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 209 USE_HPWM4                               255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 212 USE_HPWM5                               255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 215 USE_HPWM6                               255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 218 USE_HPWM7                               255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 221 USE_HPWM8                               255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 224 USE_HPWM_TIMER2                         255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 227 USE_HPWM_TIMER4                         255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 230 USE_HPWM_TIMER6                         255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
               SCRIPT/AddConstant:   Line 233 AVRTC0                                  255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
               SCRIPT/AddConstant:   Line 236 AVRCHAN2                                255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
               SCRIPT/AddConstant:   Line 247 _V9081PATCH                             1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
@@ -554,21 +607,16 @@ HELP:
               SCRIPT/AddConstant:   Line 80 EPWRITE                                 NVMADR_EPWRITE                          C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\eeprom.h
               SCRIPT/AddConstant:   Line 81 EPREAD                                  NVMADR_EPREAD                           C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\eeprom.h
               SCRIPT/AddConstant:   Line 83 SYSEPREAD                               NVMADR_EPREAD                           C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\eeprom.h
-              SCRIPT/AddConstant:   Line 235 LCD_DB4                                 SYSLCDTEMP.0                            C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
-              SCRIPT/AddConstant:   Line 238 LCD_DB5                                 SYSLCDTEMP.0                            C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
-              SCRIPT/AddConstant:   Line 241 LCD_DB6                                 SYSLCDTEMP.0                            C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
-              SCRIPT/AddConstant:   Line 244 LCD_DB7                                 SYSLCDTEMP.0                            C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
-              SCRIPT/AddConstant:   Line 259 LCD_SPEED                               SLOW                                    C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
               SCRIPT/AddConstant:   Line 264 OPTIMAL                                 0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
               SCRIPT/AddConstant:   Line 265 FAST                                    50                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
               SCRIPT/AddConstant:   Line 266 MEDIUM                                  66                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
               SCRIPT/AddConstant:   Line 267 SLOW                                    100                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
-              SCRIPT/AddConstant:   Line 320 __LCD_PERIOD                            100                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
-              SCRIPT/AddConstant:   Line 321 __LCD_DELAYS                            3                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
-              SCRIPT/AddConstant:   Line 322 __LCD_INSTRUCTIONS                      44                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
-              SCRIPT/AddConstant:   Line 332 __LCD_CALC                              91                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
-              SCRIPT/AddConstant:   Line 339 SCRIPT_LCD_POSTWRITEDELAY               91 US                                   C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
-              SCRIPT/AddConstant:   Line 340 SCRIPT_LCD_BF                           PORTD.7                                 C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
+              SCRIPT/AddConstant:   Line 293 __LCD_PERIOD                            50                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
+              SCRIPT/AddConstant:   Line 294 __LCD_DELAYS                            5                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
+              SCRIPT/AddConstant:   Line 295 __LCD_INSTRUCTIONS                      74                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
+              SCRIPT/AddConstant:   Line 305 __LCD_CALC                              40                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
+              SCRIPT/AddConstant:   Line 312 SCRIPT_LCD_POSTWRITEDELAY               40 US                                   C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
+              SCRIPT/AddConstant:   Line 314 SCRIPT_LCD_BF                           PORTD.3                                 C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
               SCRIPT/AddConstant:   Line 301 USE_TIMER0                              255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
               SCRIPT/AddConstant:   Line 304 USE_TIMER1                              255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
               SCRIPT/AddConstant:   Line 307 USE_TIMER2                              255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
@@ -585,6 +633,7 @@ HELP:
               SCRIPT/AddConstant:   Line 342 CLOCKSOURCETYPETYPE                     0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
               SCRIPT/AddConstant:   Line 344 CLOCKSOURCETYPETYPE                     1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
               SCRIPT/AddConstant:   Line 347 CLOCKSOURCETYPETYPE                     1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
+              SCRIPT/AddConstant:   Line 350 CLOCKSOURCETYPETYPE                     1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
               SCRIPT/AddConstant:   Line 362 OSC                                     1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
               SCRIPT/AddConstant:   Line 363 EXT                                     0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
               SCRIPT/AddConstant:   Line 364 EXTOSC                                  6                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
@@ -609,14 +658,22 @@ HELP:
               SCRIPT/AddConstant:   Line 718 PS2_32                                  5                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
               SCRIPT/AddConstant:   Line 719 PS2_64                                  6                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
               SCRIPT/AddConstant:   Line 720 PS2_128                                 7                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
-              SCRIPT/AddConstant:   Line 754 PS4_1                                   0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
-              SCRIPT/AddConstant:   Line 755 PS4_4                                   1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
-              SCRIPT/AddConstant:   Line 756 PS4_16                                  2                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
-              SCRIPT/AddConstant:   Line 757 PS4_64                                  3                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
-              SCRIPT/AddConstant:   Line 780 PS6_1                                   0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
-              SCRIPT/AddConstant:   Line 781 PS6_4                                   1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
-              SCRIPT/AddConstant:   Line 782 PS6_16                                  2                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
-              SCRIPT/AddConstant:   Line 783 PS6_64                                  3                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
+              SCRIPT/AddConstant:   Line 741 PS4_1                                   0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
+              SCRIPT/AddConstant:   Line 742 PS4_2                                   1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
+              SCRIPT/AddConstant:   Line 743 PS4_4                                   2                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
+              SCRIPT/AddConstant:   Line 744 PS4_8                                   3                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
+              SCRIPT/AddConstant:   Line 745 PS4_16                                  4                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
+              SCRIPT/AddConstant:   Line 746 PS4_32                                  5                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
+              SCRIPT/AddConstant:   Line 747 PS4_64                                  6                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
+              SCRIPT/AddConstant:   Line 748 PS4_128                                 7                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
+              SCRIPT/AddConstant:   Line 767 PS6_1                                   0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
+              SCRIPT/AddConstant:   Line 768 PS6_2                                   1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
+              SCRIPT/AddConstant:   Line 769 PS6_4                                   2                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
+              SCRIPT/AddConstant:   Line 770 PS6_8                                   3                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
+              SCRIPT/AddConstant:   Line 771 PS6_16                                  4                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
+              SCRIPT/AddConstant:   Line 772 PS6_32                                  5                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
+              SCRIPT/AddConstant:   Line 773 PS6_64                                  6                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
+              SCRIPT/AddConstant:   Line 774 PS6_128                                 7                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
               SCRIPT/AddConstant:   Line 806 PS8_1                                   0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
               SCRIPT/AddConstant:   Line 807 PS8_4                                   1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
               SCRIPT/AddConstant:   Line 808 PS8_16                                  2                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
@@ -627,15 +684,18 @@ HELP:
               SCRIPT/AddConstant:   Line 159 SYS_CLOCK_INT_PLL_USED                  255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\system.h
               SCRIPT/AddConstant:   Line 94 USERSPECIFIEDHWSPIMODE                  0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 101 HWSPIMODESCRIPT                         13                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
+              SCRIPT/AddConstant:   Line 104 HWSPIMODESCRIPT                         12                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 106 USERSPECIFIEDHWSPIMODE                  1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 110 USERHASDEFINETHESPI_BAUD_RATE           0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
-              SCRIPT/AddConstant:   Line 115 SPI_BAUD_RATE                           8000                                    C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
+              SCRIPT/AddConstant:   Line 115 SPI_BAUD_RATE                           16000                                   C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 120 SPI1DELAY_SCRIPT                        1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 122 SPI1DELAY_SCRIPT                        30                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 126 SPI1DELAY_SCRIPT                        20                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 130 SPI1DELAY_SCRIPT                        10                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 134 SPI1DELAY_SCRIPT                        8                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 138 SPI1DELAY_SCRIPT                        4                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
+              SCRIPT/AddConstant:   Line 142 SPI1DELAY_SCRIPT                        2                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
+              SCRIPT/AddConstant:   Line 146 SPI1DELAY_SCRIPT                        1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 150 SPIBAUDRATE_SCRIPT                      3                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 153 SPIBAUDRATE_SCRIPT_MASTER               9                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 156 SPIBAUDRATE_SCRIPT_MASTERSLOW           33                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
@@ -649,6 +709,8 @@ HELP:
               CHECKSYSVARDEF:       DEF(USART_BAUD_RATE) OR DEF(USART1_BAUD_RATE): Additional EQUAL condition: 1=1 OR 0=1
               SCRIPT/AddConstant:   Line 234 SCRIPT_USART_USAGE_CHECK                1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
               SCRIPT/AddConstant:   Line 253 SCRIPT_DEFAULT_COMPORT                  1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
+              SCRIPT/AddConstant:   Line 283 TXREG                                   TX1REG                                  C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
+              SCRIPT/AddConstant:   Line 284 RCREG                                   RC1REG                                  C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
               SCRIPT/AddConstant:   Line 288 CANBUSCHIP_SCRIPT                       0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
               SCRIPT/AddConstant:   Line 301 SPBRGH                                  SP1BRGH                                 C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
               SCRIPT/AddConstant:   Line 305 SPBRGL                                  SP1BRGL                                 C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
@@ -660,13 +722,14 @@ HELP:
               SCRIPT/AddConstant:   Line 327 TXEN2                                   TX2STA_TXEN                             C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
               SCRIPT/AddConstant:   Line 390 SYNC                                    SYNC_TX1STA                             C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
               SCRIPT/AddConstant:   Line 394 USARTHASDATASET                         0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
-              SCRIPT/AddConstant:   Line 403 USARTHASDATA                            RC1IF = On                              C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
+              SCRIPT/AddConstant:   Line 397 USARTHASDATA                            RCIF = On                               C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
+              SCRIPT/AddConstant:   Line 398 USARTHASDATASET                         1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
               SCRIPT/AddConstant:   Line 408 USART2HASDATA                           RC2IF = On                              C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
-              SCRIPT/AddConstant:   Line 449 SPBRG_TEMP                              832.3332                                C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
+              SCRIPT/AddConstant:   Line 449 SPBRG_TEMP                              1665.667                                C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
               SCRIPT/AddConstant:   Line 450 BRGH_TEMP                               1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
               SCRIPT/AddConstant:   Line 451 BRG16_TEMP                              1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
-              SCRIPT/AddConstant:   Line 516 SPBRGL_TEMP                             64                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
-              SCRIPT/AddConstant:   Line 517 SPBRGH_TEMP                             3                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
+              SCRIPT/AddConstant:   Line 516 SPBRGL_TEMP                             129                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
+              SCRIPT/AddConstant:   Line 517 SPBRGH_TEMP                             6                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
               SCRIPT/AddConstant:   Line 1141 SCRIPT_SET_DEFAULTUSART1RETURNVALUE     0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
               SCRIPT/AddConstant:   Line 1142 SCRIPT_SET_DEFAULTUSART2RETURNVALUE     0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
               SCRIPT/AddConstant:   Line 1143 SCRIPT_SET_DEFAULTUSART3RETURNVALUE     0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
@@ -677,7 +740,8 @@ HELP:
               SCRIPT/AddConstant:   Line 168 I2C_BIT_DELAY                           2 US                                    C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\i2c.h
               SCRIPT/AddConstant:   Line 173 I2C_CLOCK_DELAY                         1 US                                    C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\i2c.h
               SCRIPT/AddConstant:   Line 177 I2C_END_DELAY                           1 US                                    C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\i2c.h
-              SCRIPT/AddConstant:   Line 126 HI2C_BAUD_RATE                          100                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwi2c.h
+              SCRIPT/AddConstant:   Line 131 HI2C_BAUD_TEMP                          0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwi2c.h
+              SCRIPT/AddConstant:   Line 134 HI2C_BAUD_TEMP                          39                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwi2c.h
               SCRIPT/AddConstant:   Line 240 SSPCON1                                 SSP1CON1                                C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwi2c.h
               SCRIPT/AddConstant:   Line 241 SSPSTAT                                 SSP1STAT                                C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwi2c.h
               SCRIPT/AddConstant:   Line 242 SSPBUF                                  SSP1BUF                                 C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwi2c.h
@@ -703,23 +767,14 @@ HELP:
               SCRIPT/AddConstant:   Line 233 USE_HPWM16_11                           255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
               SCRIPT/AddConstant:   Line 236 USE_HPWM16_12                           255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
               SCRIPT/AddConstant:   Line 35 CHIPHEFMEMWORDS                         0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hef.h
-              SCRIPT/AddConstant:   Line 36 CHIPSAFMEMWORDS                         128                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hef.h
+              SCRIPT/AddConstant:   Line 36 CHIPSAFMEMWORDS                         0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hef.h
               SCRIPT/AddConstant:   Line 42 HAS_HEFSAF                              0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hef.h
               SCRIPT/AddConstant:   Line 43 HEF_ROWSIZE_BYTES                       2                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hef.h
               SCRIPT/AddConstant:   Line 44 HEF_ROWSIZE_WORDS                       2                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hef.h
               SCRIPT/AddConstant:   Line 45 HEF_START_ADDR                          32                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hef.h
               SCRIPT/AddConstant:   Line 46 HEF_NUM_BLOCKS                          0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hef.h
-              SCRIPT/AddConstant:   Line 49 HAS_HEFSAF                              255                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hef.h
-              SCRIPT/AddConstant:   Line 56 HEF_ROWSIZE_WORDS                       32                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hef.h
-              SCRIPT/AddConstant:   Line 57 HEF_ROWSIZE_BYTES                       32                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hef.h
-              SCRIPT/AddConstant:   Line 67 HEF_WORDS                               128                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hef.h
-              SCRIPT/AddConstant:   Line 68 HEF_BYTES                               128                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hef.h
-              SCRIPT/AddConstant:   Line 69 HEF_START_ADDR                          16256                                   C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hef.h
-              SCRIPT/AddConstant:   Line 70 HEF_NUM_BLOCKS                          4                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hef.h
-              SCRIPT/AddConstant:   Line 75 HEF_BLOCK0_ADDR                         16256                                   C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hef.h
-              SCRIPT/AddConstant:   Line 76 HEF_BLOCK1_ADDR                         16288                                   C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hef.h
-              SCRIPT/AddConstant:   Line 77 HEF_BLOCK2_ADDR                         16320                                   C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hef.h
-              SCRIPT/AddConstant:   Line 78 HEF_BLOCK3_ADDR                         16352                                   C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hef.h
+              SCRIPT/AddConstant:   Line 122 CHIPERASEROWSIZEWORDS                   128                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hef.h
+              SCRIPT/AddConstant:   Line 123 SAF_ROWSIZE_BYTES                       128                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hef.h
               SCRIPT/AddConstant:   Line 274 CCP1M0                                  CCP1MODE0                               C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
               SCRIPT/AddConstant:   Line 275 CCP1M1                                  CCP1MODE1                               C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
               SCRIPT/AddConstant:   Line 276 CCP1M2                                  CCP1MODE2                               C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
@@ -740,31 +795,32 @@ HELP:
               SCRIPT/AddConstant:   Line 295 CCP5M1                                  CCP5MODE1                               C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
               SCRIPT/AddConstant:   Line 296 CCP5M2                                  CCP5MODE2                               C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
               SCRIPT/AddConstant:   Line 297 CCP5M3                                  CCP5MODE3                               C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 322 PR2_CPP_PWM_TEMP                        210                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 324 PWMCCP1MAXDUTYVALUE                     210                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 326 PR2_CPP_PWM_TEMP_10BIT_POTENTIALLY      842                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 328 PWMCCP1MAXDUTYVALUE                     842                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 322 PR2_CPP_PWM_TEMP                        421                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 324 PWMCCP1MAXDUTYVALUE                     421                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 326 PR2_CPP_PWM_TEMP_10BIT_POTENTIALLY      1684                                    C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
               SCRIPT/AddConstant:   Line 331 TXPR                                    1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 347 PRXPERIODREGISTER                       210                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 348 TIMERXPRESCALESELECTVALUE               1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 333 PR2_CPP_PWM_TEMP                        105                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 334 TXPR                                    4                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 347 PRXPERIODREGISTER                       105                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 348 TIMERXPRESCALESELECTVALUE               4                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
               CHECKSYSVARDEF:       DEF(DEVELOPER_PWM_DEBUG) OR DEF(SHOWPWMCCPCALCULATIONRESULTS): Additional EQUAL condition: 0=1 OR 0=1
-              SCRIPT/AddConstant:   Line 369 DUTYCYCLE                               422                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 370 DUTYCYCLEH                              105                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 371 DUTYCYCLEL                              2                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 379 PWMOSC1                                 8000                                    C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 380 PWMOSC4                                 2000                                    C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 381 PWMOSC16                                500                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 369 DUTYCYCLE                               212                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 370 DUTYCYCLEH                              53                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 371 DUTYCYCLEL                              0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 379 PWMOSC1                                 16000                                   C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 380 PWMOSC4                                 4000                                    C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 381 PWMOSC16                                1000                                    C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
               SCRIPT/AddConstant:   Line 2249 _V9081PATCH                             2                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 258 HPWM16F_PRPS_REQ                        842.1053                                C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
-              SCRIPT/AddConstant:   Line 261 HPWM16F_DCY                             421.0526                                C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
+              SCRIPT/AddConstant:   Line 258 HPWM16F_PRPS_REQ                        1684.211                                C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
+              SCRIPT/AddConstant:   Line 261 HPWM16F_DCY                             842.1055                                C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
               SCRIPT/AddConstant:   Line 262 HPWM16F_DCH_SCRIPT                      0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
               SCRIPT/AddConstant:   Line 263 HPWM16F_DCL_SCRIPT                      0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
               SCRIPT/AddConstant:   Line 264 HPWM16F_PRH_SCRIPT                      0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
               SCRIPT/AddConstant:   Line 265 HPWM16F_PRL_SCRIPT                      0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
-              SCRIPT/AddConstant:   Line 268 HPWM16F_DCH_SCRIPT                      1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
-              SCRIPT/AddConstant:   Line 269 HPWM16F_DCL_SCRIPT                      165                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
-              SCRIPT/AddConstant:   Line 270 HPWM16F_PRH_SCRIPT                      3                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
-              SCRIPT/AddConstant:   Line 271 HPWM16F_PRL_SCRIPT                      74                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
+              SCRIPT/AddConstant:   Line 268 HPWM16F_DCH_SCRIPT                      3                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
+              SCRIPT/AddConstant:   Line 269 HPWM16F_DCL_SCRIPT                      74                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
+              SCRIPT/AddConstant:   Line 270 HPWM16F_PRH_SCRIPT                      6                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
+              SCRIPT/AddConstant:   Line 271 HPWM16F_PRL_SCRIPT                      148                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
               SCRIPT/AddConstant:   Line 290 HPWM16F_PRPS_REQ                        0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
               SCRIPT/AddConstant:   Line 293 HPWM16F_DCY                             0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
               SCRIPT/AddConstant:   Line 294 HPWM16_1_HPWM16F_DCH_SCRIPT             0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
@@ -885,9 +941,17 @@ HELP:
               SCRIPT/AddConstant:   Line 511 HPWM16_12_HPWM16F_DCL_SCRIPT            0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
               SCRIPT/AddConstant:   Line 512 HPWM16_12_HPWM16F_PRH_SCRIPT            0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
               SCRIPT/AddConstant:   Line 513 HPWM16_12_HPWM16F_PRL_SCRIPT            0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
-              IFDEF/AddConstant:    Line 31  SOUNDOUT                                             SYSTEMP.0                                 C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\sound.h
-              30: #IFNDEF SOUNDOUT
-              31: #DEFINE SOUNDOUT SYSTEMP.0
+              198: #IFDEF USART_BAUD_RATE
+              ;HserPrintCRLF
+              199: HSERPRINTCRLF
+              ;HserPrint "Welcome to PICDEM 2 Plus"
+              200: HSERPRINT ;STRING1;
+              ;HserPrintCRLF
+              201: HSERPRINTCRLF
+              ;HserPrint "GCBASIC - Anobium   2024"
+              202: HSERPRINT ;STRING2;
+              ;HserPrintCRLF
+              203: HSERPRINTCRLF
               IFDEF/AddConstant:    Line 35  SOUNDOUT2                                            SYSTEMP.0                                 C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\sound.h
               34: #IFNDEF SOUNDOUT2
               35: #DEFINE SOUNDOUT2 SYSTEMP.0
@@ -918,12 +982,12 @@ HELP:
               IFDEF/AddConstant:    Line 0  LCD_CB                                                SYSLCDTEMP.0                              C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
               158: #IFNDEF LCD_CB
               0: #DEFINE LCD_CB SYSLCDTEMP.0
+              IFDEF/AddConstant:    Line 0  LCD_DATA_PORT                                         SYSLCDTEMP                                C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
+              163: #IFNDEF LCD_DATA_PORT
+              0: #DEFINE LCD_DATA_PORT SYSLCDTEMP
               IFDEF/AddConstant:    Line 0  LCD_RSTEMP                                            SYSLCDTEMP.2                              C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
               168: #IFNDEF LCD_RSTEMP
               0: #DEFINE LCD_RSTEMP SYSLCDTEMP.2
-              IFDEF/AddConstant:    Line 0  LCD_WIDTH                                             20                                        C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
-              173: #IFNDEF LCD_WIDTH
-              0: #DEFINE LCD_WIDTH 20
               IFDEF/AddConstant:    Line 0  LCD_WRITE_DELAY                                       2 US                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
               178: #IFNDEF LCD_WRITE_DELAY
               0: #DEFINE LCD_WRITE_DELAY 2 US
@@ -943,6 +1007,14 @@ HELP:
               181: DIM TIMER1 ALIAS TMR1H,TMR1L AS WORD
               184: #IFDEF VAR(TMR2)
               185: DIM TIMER2 ALIAS TMR2 AS BYTE
+              188: #IFDEF VAR(TMR3H)
+              189: DIM TIMER3 ALIAS TMR3H,TMR3L AS WORD
+              192: #IFDEF VAR(TMR4)
+              193: DIM TIMER4 ALIAS TMR4 AS BYTE
+              196: #IFDEF VAR(TMR5H)
+              197: DIM TIMER5 ALIAS TMR5H,TMR5L AS WORD
+              200: #IFDEF VAR(TMR6)
+              201: DIM TIMER6 ALIAS TMR6 AS BYTE
               IFDEF/AddConstant:    Line 674  PS0_2                                               0                                         C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
               IFDEF/AddConstant:    Line 675  PS0_4                                               1                                         C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
               IFDEF/AddConstant:    Line 676  PS0_8                                               2                                         C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
@@ -996,418 +1068,737 @@ HELP:
               96: DIM HPWM16_3_DUTY_REGWORD ALIAS PWM3DCH,PWM3DCL AS WORD
               98: #IFDEF VAR(PWM4DCH)
               99: DIM HPWM16_4_DUTY_REGWORD ALIAS PWM4DCH,PWM4DCL AS WORD
-              101: #IFDEF VAR(PWM5DCH)
-              102: DIM HPWM16_5_DUTY_REGWORD ALIAS PWM5DCH,PWM5DCL AS WORD
-              104: #IFDEF VAR(PWM6DCH)
-              105: DIM HPWM16_6_DUTY_REGWORD ALIAS PWM6DCH,PWM6DCL AS WORD
-              IFDEF/AddConstant:    Line 57  SAF_ROWSIZE_BYTES                                    HEF_ROWSIZE_BYTES                         C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\saf.h
-              IFDEF/AddConstant:    Line 58  SAF_ROWSIZE_WORDS                                    HEF_ROWSIZE_WORDS                         C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\saf.h
-              IFDEF/AddConstant:    Line 59  SAF_START_ADDR                                       HEF_START_ADDR                            C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\saf.h
-              IFDEF/AddConstant:    Line 60  SAF_WORDS                                            HEF_WORDS                                 C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\saf.h
-              IFDEF/AddConstant:    Line 61  SAF_BYTES                                            HEF_BYTES                                 C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\saf.h
-              IFDEF/AddConstant:    Line 0  SAF_NUM_BLOCKS                                        HEF_NUM_BLOCKS                            C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\saf.h
-              IFDEF/AddConstant:    Line 0  SAF_BLOCK0_ADDR                                       HEF_BLOCK0_ADDR                           C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\saf.h
-              IFDEF/AddConstant:    Line 0  SAF_BLOCK1_ADDR                                       HEF_BLOCK1_ADDR                           C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\saf.h
-              IFDEF/AddConstant:    Line 0  SAF_BLOCK2_ADDR                                       HEF_BLOCK2_ADDR                           C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\saf.h
-              IFDEF/AddConstant:    Line 0  SAF_BLOCK3_ADDR                                       HEF_BLOCK3_ADDR                           C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\saf.h
-              44: #IFDEF HAS_HEFSAF TRUE
-              57: #DEFINE SAF_ROWSIZE_BYTES HEF_ROWSIZE_BYTES
-              58: #DEFINE SAF_ROWSIZE_WORDS HEF_ROWSIZE_WORDS
-              59: #DEFINE SAF_START_ADDR HEF_START_ADDR
-              60: #DEFINE SAF_WORDS HEF_WORDS
-              61: #DEFINE SAF_BYTES HEF_BYTES
-              0: #DEFINE SAF_NUM_BLOCKS HEF_NUM_BLOCKS
-              0: #DEFINE SAF_BLOCK0_ADDR HEF_BLOCK0_ADDR
-              0: #DEFINE SAF_BLOCK1_ADDR HEF_BLOCK1_ADDR
-              0: #DEFINE SAF_BLOCK2_ADDR HEF_BLOCK2_ADDR
-              0: #DEFINE SAF_BLOCK3_ADDR HEF_BLOCK3_ADDR
-              82: #IFDEF CHIPFAMILY 15
-              83: #IFDEF HAS_HEFSAF TRUE
-              87: DIM _HEF_BUFFER(HEF_ROWSIZE_BYTES)
-              83: #IFDEF HAS_HEFSAF TRUE
-              87: DIM _HEF_BUFFER(HEF_ROWSIZE_BYTES)
-IFDEF/SAF_ROWSIZE_BYTES     HEF_ROWSIZE_BYTES           23
-IFDEF/SAF_ROWSIZE_WORDS     HEF_ROWSIZE_WORDS           23
-IFDEF/SAF_START_ADDR        HEF_START_ADDR              23
-IFDEF/SAF_WORDS             HEF_WORDS     23
-IFDEF/SAF_BYTES             HEF_BYTES     23
-IFDEF/SAF_NUM_BLOCKS        HEF_NUM_BLOCKS              23
-IFDEF/SAF_BLOCK0_ADDR       HEF_BLOCK0_ADDR             23
-IFDEF/SAF_BLOCK1_ADDR       HEF_BLOCK1_ADDR             23
-IFDEF/SAF_BLOCK2_ADDR       HEF_BLOCK2_ADDR             23
-IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
-              130: #IFDEF HAS_HEFSAF TRUE
-              142: #DEFINE SAF_ROWSIZE_BYTES HEF_ROWSIZE_BYTES
-              143: #DEFINE SAF_ROWSIZE_WORDS HEF_ROWSIZE_WORDS
-              144: #DEFINE SAF_START_ADDR HEF_START_ADDR
-              145: #DEFINE SAF_WORDS HEF_WORDS
-              146: #DEFINE SAF_BYTES HEF_BYTES
-              0: #DEFINE SAF_NUM_BLOCKS HEF_NUM_BLOCKS
-              0: #DEFINE SAF_BLOCK0_ADDR HEF_BLOCK0_ADDR
-              0: #DEFINE SAF_BLOCK1_ADDR HEF_BLOCK1_ADDR
-              0: #DEFINE SAF_BLOCK2_ADDR HEF_BLOCK2_ADDR
-              0: #DEFINE SAF_BLOCK3_ADDR HEF_BLOCK3_ADDR
-              166: #IFDEF CHIPFAMILY 15
-              167: #IFDEF HAS_HEFSAF TRUE
-              171: DIM _HEF_BUFFER(HEF_ROWSIZE_BYTES)
-              167: #IFDEF HAS_HEFSAF TRUE
-              171: DIM _HEF_BUFFER(HEF_ROWSIZE_BYTES)
+              77: #IFDEF CHIPFAMILY 16
+              78: DIM _HEF_ABS_ADDR AS LONG
+              79: DIM _HEF_BUFFER(HEF_ROWSIZE_BYTES)
+              161: #IFDEF CHIPFAMILY 16
+              162: DIM _HEF_ABS_ADDR AS LONG
+              163: DIM _HEF_BUFFER(HEF_ROWSIZE_BYTES)
+              267: #IFDEF USART_BAUD_RATE
+              ;HserPrint Str(labNumber) + ": Hello World Lab"
+              268: HSERPRINT STR(LABNUMBER) + ;STRING7;
+              ;HserPrintCRLF
+              269: HSERPRINTCRLF
+              304: #IFDEF USART_BAUD_RATE
+              ;HserPrint Str(labNumber) + ": Blink Lab"
+              305: HSERPRINT STR(LABNUMBER) + ;STRING10;
+              ;HserPrintCRLF
+              306: HSERPRINTCRLF
+              364: #IFDEF USART_BAUD_RATE
+              ;HserPrint Str(labNumber) + ": RotateLEDs Lab"
+              365: HSERPRINT STR(LABNUMBER) + ;STRING13;
+              ;HserPrintCRLF
+              366: HSERPRINTCRLF
+              430: #IFDEF USART_BAUD_RATE
+              ;HserPrint Str(labNumber) + ": ADC Lab"
+              431: HSERPRINT STR(LABNUMBER) + ;STRING16;
+              ;HserPrintCRLF
+              432: HSERPRINTCRLF
+              479: #IFDEF USART_BAUD_RATE
+              ;HserPrint Str(labNumber) + ": VSR Lab"
+              480: HSERPRINT STR(LABNUMBER) + ;STRING20;
+              ;HserPrintCRLF
+              481: HSERPRINTCRLF
+              549: #IFDEF USART_BAUD_RATE
+              ;HserPrint Str(labNumber) + ": Debounce Lab"
+              550: HSERPRINT STR(LABNUMBER) + ;STRING23;
+              ;HserPrintCRLF
+              551: HSERPRINTCRLF
+              655: #IFDEF USART_BAUD_RATE
+              ;HserPrint Str(labNumber) + ": PWM Lab"
+              656: HSERPRINT STR(LABNUMBER) + ;STRING26;
+              ;HserPrintCRLF
+              657: HSERPRINTCRLF
+              720: #IFDEF USART_BAUD_RATE
+              ;HserPrint Str(labNumber) + ": Timer1 Lab"
+              721: HSERPRINT STR(LABNUMBER) + ;STRING30;
+              ;HserPrintCRLF
+              722: HSERPRINTCRLF
+              815: #IFDEF USART_BAUD_RATE
+              ;HserPrint Str(labNumber) + ": Interrupt Lab"
+              816: HSERPRINT STR(LABNUMBER) + ;STRING34;
+              ;HserPrintCRLF
+              817: HSERPRINTCRLF
+              901: #IFDEF USART_BAUD_RATE
+              ;HserPrint Str(labNumber) + ": SleepWakeUp Lab"
+              902: HSERPRINT STR(LABNUMBER) + ;STRING38;
+              ;HserPrintCRLF
+              903: HSERPRINTCRLF
+              980: #IFDEF USART_BAUD_RATE
+              ;HserPrint Str(labNumber) + ": EEPROM Lab"
+              981: HSERPRINT STR(LABNUMBER) + ;STRING44;
+              ;HserPrintCRLF
+              982: HSERPRINTCRLF
+              1077: #IFDEF USART_BAUD_RATE
+              ;HserPrint "    Tick "
+              1078: HSERPRINT ;STRING48;
+              1083: #IFDEF USART_BAUD_RATE
+              ;HserPrint "    Tock "
+              1084: HSERPRINT ;STRING50;
+              1096: #IFDEF USART_BAUD_RATE
+              ;HserPrint TicCount
+              1097: HSERPRINT TICCOUNT
+              ;HserPrintCRLF
+              1098: HSERPRINTCRLF
+              1124: #IFDEF USART_BAUD_RATE
+              ;HserPrint Str(labNumber) + ": LCD Lab"
+              1125: HSERPRINT STR(LABNUMBER) + ;STRING52;
+              ;HserPrintCRLF
+              1126: HSERPRINTCRLF
+              1299: #IFDEF USART_BAUD_RATE
+              ;HserPrint Str(labNumber) + ": NVM Memory Lab"
+              1300: HSERPRINT STR(LABNUMBER) + ;STRING66;
+              ;HserPrintCRLF
+              1301: HSERPRINTCRLF
+              1390: #IFDEF USART_BAUD_RATE
+              ;HserPrint Str(labNumber) + ": I2C Discovery"
+              1391: HSERPRINT STR(LABNUMBER) + ;STRING70;
+              ;HserPrintCRLF
+              1392: HSERPRINTCRLF
+              1416: #IFDEF USART_BAUD_RATE
+              ;HSerPrintCRLF
+              1418: HSERPRINTCRLF
+              ;HSerPrint "Hardware I2C "
+              1419: HSERPRINT ;STRING73;
+              ;HSerPrintCRLF 2
+              1420: HSERPRINTCRLF 2
+              ;Now assumes Serial Terminal is operational
+              ;HSerPrintCRLF
+              1423: HSERPRINTCRLF
+              ;HSerPrint "   "
+              1424: HSERPRINT ;STRING74;
+              ;Create a horizontal row of numbers
+              ;For DeviceID = 0 To 15
+              1426: FOR DEVICEID = 0 TO 15
+              ;HSerPrint Hex(deviceID)
+              1427: HSERPRINT HEX(DEVICEID)
+              ;HSerPrint " "
+              1428: HSERPRINT ;STRING19;
+              ;Next
+              1429: NEXT
+              ;Create a vertical column of numbers
+              ;For DeviceID = 0 To 255
+              1432: FOR DEVICEID = 0 TO 255
+              ;DisplayNewLine = DeviceID % 16
+              1433: DISPLAYNEWLINE = DEVICEID % 16
+              ;If DisplayNewLine = 0 Then
+              1434: IF DISPLAYNEWLINE = 0 THEN
+              ;HSerPrintCRLF
+              1435: HSERPRINTCRLF
+              ;HSerPrint Hex(DeviceID)
+              1436: HSERPRINT HEX(DEVICEID)
+              ;If DisplayNewLine > 0 Then
+              1437: IF DISPLAYNEWLINE > 0 THEN
+              ;HSerPrint " "
+              1438: HSERPRINT ;STRING19;
+              ;End If
+              1439: END IF
+              ;End If
+              1440: END IF
+              ;HSerPrint " "
+              1441: HSERPRINT ;STRING19;
+              ;Do an initial Start
+              ;HI2CStart
+              1444: HI2CSTART
+              ;If HI2CWaitMSSPTimeout <> TRUE Then
+              1445: IF HI2CWAITMSSPTIMEOUT ~ TRUE THEN
+              ;Send to address to device
+              ;HI2CSend ( deviceID )
+              1448: HI2CSEND ( DEVICEID )
+              ;Did device fail to respond?
+              ;If HI2CAckpollState = FALSE Then
+              1451: IF HI2CACKPOLLSTATE = FALSE THEN
+              ;HI2CSend ( 0 )
+              1452: HI2CSEND ( 0 )
+              ;HSerPrint   Hex(deviceID)
+              1453: HSERPRINT HEX(DEVICEID)
+              ;Else
+              1454: ELSE
+              ;HSerPrint "--"
+              1455: HSERPRINT ;STRING75;
+              ;End If
+              1456: END IF
+              ;Do a stop.
+              ;HI2CStop
+              1459: HI2CSTOP
+              ;Else
+              1460: ELSE
+              ;HSerPrint "! "
+              1461: HSERPRINT ;STRING76;
+              ;End If
+              1462: END IF
+              ;Next
+              1464: NEXT
+              ;HSerPrintCRLF 2
+              1466: HSERPRINTCRLF 2
+              ;HSerPrint   "End of Search"
+              1467: HSERPRINT ;STRING77;
+              ;HSerPrintCRLF 2
+              1468: HSERPRINTCRLF 2
+              1505: #IFDEF USART_BAUD_RATE
+              ;HserPrint Str(labNumber) + ": I2C Temperature"
+              1506: HSERPRINT STR(LABNUMBER) + ;STRING78;
+              ;HserPrintCRLF
+              1507: HSERPRINTCRLF
+              1594: #IFDEF USART_BAUD_RATE
+              ;HserPrint Str(labNumber) + ": I2C EEPROM"
+              1595: HSERPRINT STR(LABNUMBER) + ;STRING81;
+              ;HserPrintCRLF
+              1596: HSERPRINTCRLF
+              1642: #IFDEF USART_BAUD_RATE
+              ;HSerPrint "    Initial Array"
+              1643: HSERPRINT ;STRING83;
+              ;HSerPrintCRLF
+              1644: HSERPRINTCRLF
+              ;HSerPrint "        -:"
+              1645: HSERPRINT ;STRING84;
+              1649: #IFDEF USART_BAUD_RATE
+              ;HSerPrint datarray(xloop)
+              1650: HSERPRINT DATARRAY(XLOOP)
+              ;if xloop < 10 then HSerPrint ","
+              1651: IF XLOOP < 10 THEN
+              ;if xloop < 10 then HSerPrint ","
+              1651: HSERPRINT ;STRING85;
+              ;if xloop < 10 then HSerPrint ","
+              1651: END IF
+              1655: #IFDEF USART_BAUD_RATE
+              ;HSerPrintCRLF 2
+              1656: HSERPRINTCRLF 2
+              1665: #IFDEF USART_BAUD_RATE
+              ;HSerPrint "    Repopulate Array with #127 to ensure the EEPROM results are read correctly"
+              1666: HSERPRINT ;STRING86;
+              ;HSerPrintCRLF
+              1667: HSERPRINTCRLF
+              ;HSerPrint "        -:"
+              1668: HSERPRINT ;STRING84;
+              1673: #IFDEF USART_BAUD_RATE
+              ;HSerPrint datarray(xloop)
+              1674: HSERPRINT DATARRAY(XLOOP)
+              ;if xloop < 10 then HSerPrint ","
+              1675: IF XLOOP < 10 THEN
+              ;if xloop < 10 then HSerPrint ","
+              1675: HSERPRINT ;STRING85;
+              ;if xloop < 10 then HSerPrint ","
+              1675: END IF
+              1680: #IFDEF USART_BAUD_RATE
+              ;HSerPrintCRLF 2
+              1681: HSERPRINTCRLF 2
+              1688: #IFDEF USART_BAUD_RATE
+              ;HSerPrint "    Read Array from EEProm results"
+              1689: HSERPRINT ;STRING87;
+              ;HSerPrintCRLF
+              1690: HSERPRINTCRLF
+              ;HSerPrint "        -:"
+              1691: HSERPRINT ;STRING84;
+              1697: #IFDEF USART_BAUD_RATE
+              ;HSerPrint datarray(xloop)
+              1698: HSERPRINT DATARRAY(XLOOP)
+              ;If xloop < 10 then HSerPrint ","
+              1699: IF XLOOP < 10 THEN
+              ;If xloop < 10 then HSerPrint ","
+              1699: HSERPRINT ;STRING85;
+              ;If xloop < 10 then HSerPrint ","
+              1699: END IF
+              1708: #IFDEF USART_BAUD_RATE
+              ;HSerPrintCRLF 2
+              1709: HSERPRINTCRLF 2
+              ;HSerPrint "    End of array operations"
+              1710: HSERPRINT ;STRING88;
+              ;HSerPrintCRLF 3
+              1711: HSERPRINTCRLF 3
+              1743: #IFDEF USART_BAUD_RATE
+              ;HserPrint Str(labNumber) + ": CLOCK"
+              1744: HSERPRINT STR(LABNUMBER) + ;STRING91;
+              ;HserPrintCRLF
+              1745: HSERPRINTCRLF
+              1785: #IFDEF USART_BAUD_RATE
+              ;HserPrint Str(labNumber) + ": Buzzer"
+              1786: HSERPRINT STR(LABNUMBER) + ;STRING93;
+              ;HserPrintCRLF
+              1787: HSERPRINTCRLF
+              93: #IFDEF HI2C_DATA
+              ;do
+              94: DO
+              ;HI2CReStart                            ;generate a start signal
+              95: HI2CRESTART
+              ;HI2CSend(eepDev)                       ;indicate a write
+              96: HI2CSEND(EEPDEV)
+              ;loop While HI2CAckPollState
+              97: LOOP WHILE HI2CACKPOLLSTATE
+              ;HI2CSend(eepAddr_H)                    ;send address as two bytes
+              98: HI2CSEND(EEPADDR_H)
+              ;HI2CSend(eepAddr)
+              99: HI2CSEND(EEPADDR)
+              ;HI2CSend(eepromVal)                    ;then the value
+              100: HI2CSEND(EEPROMVAL)
+              ;HI2CStop
+              101: HI2CSTOP
+              120: #IFDEF HI2C_DATA
+              ;do
+              121: DO
+              ;HI2CReStart                              ;generate a start signal
+              122: HI2CRESTART
+              ;HI2CSend(eepDev)                       ;indicate a write
+              123: HI2CSEND(EEPDEV)
+              ;loop While HI2CAckPollState
+              124: LOOP WHILE HI2CACKPOLLSTATE
+              ;HI2CSend(eepAddr)
+              125: HI2CSEND(EEPADDR)
+              ;HI2CSend(eepromVal)                    ;then the value
+              126: HI2CSEND(EEPROMVAL)
+              ;HI2CStop
+              127: HI2CSTOP
+              148: #IFDEF HI2C_DATA
+              ;do
+              149: DO
+              ;HI2CReStart                              ;generate a start signal
+              150: HI2CRESTART
+              ;HI2CSend(eepDev)                       ;indicate a write
+              151: HI2CSEND(EEPDEV)
+              ;loop While HI2CAckPollState
+              152: LOOP WHILE HI2CACKPOLLSTATE
+              ;HI2CSend(eepAddr_H)                    ;send address as two bytes
+              153: HI2CSEND(EEPADDR_H)
+              ;HI2CSend(eepAddr)
+              154: HI2CSEND(EEPADDR)
+              ;HI2CReStart
+              155: HI2CRESTART
+              ;HI2CSend(eepDev + 1)                   ;set the read flag
+              156: HI2CSEND(EEPDEV + 1)
+              ;HI2CReceive(eepromVal, NACK)           ;read one byte and conclude
+              157: HI2CRECEIVE(EEPROMVAL, NACK)
+              ;HI2CStop
+              158: HI2CSTOP
+              178: #IFDEF HI2C_DATA
+              ;do
+              179: DO
+              ;HI2CReStart                              ;generate a start signal
+              180: HI2CRESTART
+              ;HI2CSend(eepDev)                       ;indicate a write
+              181: HI2CSEND(EEPDEV)
+              ;loop While HI2CAckPollState
+              182: LOOP WHILE HI2CACKPOLLSTATE
+              ;HI2CSend(eepAddr)
+              183: HI2CSEND(EEPADDR)
+              ;HI2CReStart
+              184: HI2CRESTART
+              ;HI2CSend(eepDev + 1)                   ;set the read flag
+              185: HI2CSEND(EEPDEV + 1)
+              ;HI2CReceive(eepromVal, NACK)           ;read one byte and conclude
+              186: HI2CRECEIVE(EEPROMVAL, NACK)
+              ;HI2CStop
+              187: HI2CSTOP
+              207: #IFDEF HI2C_DATA
+              ;do
+              209: DO
+              ;HI2CReStart                              ;generate a start signal
+              210: HI2CRESTART
+              ;HI2CSend(eepDev)                       ;indicate a write
+              211: HI2CSEND(EEPDEV)
+              ;loop While HI2CAckPollState
+              212: LOOP WHILE HI2CACKPOLLSTATE
+              ;HI2CSend(eepAddr_H)                    ;and the start address
+              213: HI2CSEND(EEPADDR_H)
+              ;HI2CSend(eepAddr)                      ;as two bytes
+              214: HI2CSEND(EEPADDR)
+              ;for eep_i = 1 to eepLen
+              216: FOR EEP_I = 1 TO EEPLEN
+              ;HI2CSend(eepArray(eep_i))            ;write next byte from array
+              217: HI2CSEND(EEPARRAY(EEP_I))
+              ;eepAddr++                           ;prep for next one
+              218: EEPADDR++
+              ;CalcNextPage = eepAddr mod eepPageSize  ; calculate next page
+              219: CALCNEXTPAGE = EEPADDR MOD EEPPAGESIZE
+              ;if CalcNextPage = 0 then ;end of page
+              220: IF CALCNEXTPAGE = 0 THEN
+              ;HI2CStop                           ;so, lock in place
+              221: HI2CSTOP
+              ;do
+              222: DO
+              ;HI2CReStart                              ;generate a start signal
+              223: HI2CRESTART
+              ;HI2CSend(eepDev)                         ;indicate a write
+              224: HI2CSEND(EEPDEV)
+              ;loop While HI2CAckPollState
+              225: LOOP WHILE HI2CACKPOLLSTATE
+              ;HI2CSend(eepAddr_H)                ;send next page address
+              226: HI2CSEND(EEPADDR_H)
+              ;HI2CSend(eepAddr)
+              227: HI2CSEND(EEPADDR)
+              ;end if
+              228: END IF
+              ;next
+              229: NEXT
+              ;HI2CStop
+              231: HI2CSTOP
+              265: #IFDEF HI2C_DATA
+              ;do
+              267: DO
+              ;HI2CReStart                              ;generate a start signal
+              268: HI2CRESTART
+              ;HI2CSend(eepDev)                       ;indicate a write
+              269: HI2CSEND(EEPDEV)
+              ;loop While HI2CAckPollState
+              270: LOOP WHILE HI2CACKPOLLSTATE
+              ;HI2CSend(eepAddr)                      ;as one byte
+              271: HI2CSEND(EEPADDR)
+              ;for eep_i = 1 to eepLen
+              273: FOR EEP_I = 1 TO EEPLEN
+              ;HI2CSend(eepArray(eep_i))            ;write next byte from array
+              274: HI2CSEND(EEPARRAY(EEP_I))
+              ;eepAddr++                           ;prep for next one
+              275: EEPADDR++
+              ;CalcNextPage = eepAddr mod eepPageSize
+              276: CALCNEXTPAGE = EEPADDR MOD EEPPAGESIZE
+              ;if CalcNextPage  = 0 then                    ;end of page
+              277: IF CALCNEXTPAGE = 0 THEN
+              ;HI2CStop                           ;so, lock in place
+              278: HI2CSTOP
+              ;do
+              279: DO
+              ;HI2CReStart                              ;generate a start signal
+              280: HI2CRESTART
+              ;HI2CSend(eepDev)                       ;indicate a write
+              281: HI2CSEND(EEPDEV)
+              ;loop While HI2CAckPollState
+              282: LOOP WHILE HI2CACKPOLLSTATE
+              ;HI2CSend(eepAddr)
+              283: HI2CSEND(EEPADDR)
+              ;end if
+              284: END IF
+              ;next
+              285: NEXT
+              ;HI2CStop
+              287: HI2CSTOP
+              322: #IFDEF HI2C_DATA
+              ;do
+              323: DO
+              ;HI2CReStart                              ;generate a start signal
+              324: HI2CRESTART
+              ;HI2CSend(eepDev)                       ;indicate a write
+              325: HI2CSEND(EEPDEV)
+              ;loop While HI2CAckPollState
+              326: LOOP WHILE HI2CACKPOLLSTATE
+              ;HI2CSend(eepAddr_H)                    ;as two bytes
+              327: HI2CSEND(EEPADDR_H)
+              ;HI2CSend(eepAddr)
+              328: HI2CSEND(EEPADDR)
+              ;HI2CReStart
+              329: HI2CRESTART
+              ;HI2CSend(eepDev + 1)                   ;indicate a read
+              330: HI2CSEND(EEPDEV + 1)
+              ;eep_i = 0                             ;loop consecutively
+              332: EEP_I = 0
+              ;do while (eep_i < eepLen)             ;these many bytes
+              333: DO WHILE (EEP_I < EEPLEN)
+              ;eep_j = eep_i + 1                   ;arrays begin at 1 not 0
+              334: EEP_J = EEP_I + 1
+              ;if (eep_i  < (eepLen - 1)) then
+              335: IF (EEP_I < (EEPLEN - 1)) THEN
+              ;HI2CReceive(eepArray(eep_j), ACK)  ;more data to get
+              336: HI2CRECEIVE(EEPARRAY(EEP_J), ACK)
+              ;else
+              337: ELSE
+              ;HI2CReceive(eepArray(eep_j), NACK ) ;send NACK on last byte
+              338: HI2CRECEIVE(EEPARRAY(EEP_J), NACK )
+              ;end if
+              339: END IF
+              ;eep_i++                             ;get set for next
+              340: EEP_I++
+              ;loop
+              341: LOOP
+              ;HI2CStop
+              342: HI2CSTOP
+              371: #IFDEF HI2C_DATA
+              ;do
+              372: DO
+              ;HI2CReStart                              ;generate a start signal
+              373: HI2CRESTART
+              ;HI2CSend(eepDev)                       ;indicate a write
+              374: HI2CSEND(EEPDEV)
+              ;loop While HI2CAckPollState
+              375: LOOP WHILE HI2CACKPOLLSTATE
+              ;HI2CSend(eepAddr)
+              376: HI2CSEND(EEPADDR)
+              ;HI2CReStart
+              377: HI2CRESTART
+              ;HI2CSend(eepDev + 1)                   ;indicate a read
+              378: HI2CSEND(EEPDEV + 1)
+              ;eep_i = 0                             ;loop consecutively
+              380: EEP_I = 0
+              ;do while (eep_i < eepLen)             ;these many bytes
+              381: DO WHILE (EEP_I < EEPLEN)
+              ;eep_j = eep_i + 1                   ;arrays begin at 1 not 0
+              382: EEP_J = EEP_I + 1
+              ;if (eep_i  < (eepLen - 1)) then
+              383: IF (EEP_I < (EEPLEN - 1)) THEN
+              ;HI2CReceive(eepArray(eep_j), ACK)  ;more data to get
+              384: HI2CRECEIVE(EEPARRAY(EEP_J), ACK)
+              ;else
+              385: ELSE
+              ;HI2CReceive(eepArray(eep_j), NACK ) ;send NACK on last byte
+              386: HI2CRECEIVE(EEPARRAY(EEP_J), NACK )
+              ;end if
+              387: END IF
+              ;eep_i++                             ;get set for next
+              388: EEP_I++
+              ;loop
+              389: LOOP
+              ;HI2CStop
+              390: HI2CSTOP
               579: #IFDEF PIC
               581: #IFDEF DEBUGADC_H
               ;NOP 'Start of LLReadAD macro @DebugADC_H
               582: NOP
-              585: #IFDEF NOVAR(ADCON3)
-              587: #IFDEF DEBUGADC_H
-              ;NOP '@NoVar(ADCON3)@DebugADC_H
-              588: NOP
-              591: #IFDEF NOVAR(ANSEL)
-              592: #IFDEF NOVAR(ANSEL0)
-              ;Handle devices with no ANSEL0 AND no ANSEL
-              594: #IFDEF NOVAR(ANSELA)
-              595: #IFDEF NOVAR(ANSELB)
-              597: #IFDEF NOBIT(PCFG4)
-              598: #IFDEF NOVAR(ADCON2)
-              599: #IFDEF NOBIT(ANS0)
-              ;Example: 16F877A
-              601: #IFDEF BIT(PCFG3)
-              ;SET PCFG3 OFF
-              602: SET PCFG3 OFF
-              592: #IFDEF NOVAR(ANSEL0)
-              ;Handle devices with no ANSEL0 AND no ANSEL
-              594: #IFDEF NOVAR(ANSELA)
-              595: #IFDEF NOVAR(ANSELB)
-              597: #IFDEF NOBIT(PCFG4)
-              598: #IFDEF NOVAR(ADCON2)
-              599: #IFDEF NOBIT(ANS0)
-              ;Example: 16F877A
-              601: #IFDEF BIT(PCFG3)
-              ;SET PCFG3 OFF
-              602: SET PCFG3 OFF
-              646: #IFDEF VAR(ANSELA)
-              ;Code for devices with ANSELA/ANSELB/ANSELE registers
-              ;Select Case ADReadPort ' #IFDEF Var(ANSELA). ANSELA exists @DebugADC_H
-              648: SELECT CASE ADREADPORT
-              650: #IF CHIPPINS = 14 OR CHIPPINS = 8
-              652: #IFDEF DEBUGADC_H
-              ;NOP 'ChipPins = 14  Or ChipPins = 8 @DebugADC_H
-              653: NOP
-              905: #IF CHIPPINS = 28 OR CHIPPINS = 40
-              907: #IFNDEF BIT(CHS5)
-              ;#ifNdef Bit(CHS5) ChipPins = 28  Or ChipPins = 40 @DebugADC_H
-              909: #IFDEF DEBUGADC_H
-              ;NOP 'ChipPins = 28  Or ChipPins = 40 @DebugADC_H
-              910: NOP
-              1042: #IFDEF BIT(CHS5)
-              ;#ifdef Bit(CHS5) ChipPins = 28  Or ChipPins = 40 @DebugADC_H
-              1044: #IFDEF DEBUGADC_H
-              ;NOP 'ChipPins = 28  Or ChipPins = 40 @DebugADC_H
-              1045: NOP
-              1048: #IFDEF USE_AD0 TRUE
+              1437: #IFDEF VAR(ADCON3)
+              1439: #IFDEF DEBUGADC_H
+              ;Var(ADCON3). Configure ANSELA/B/C/D. @DebugADC_H
+              ;NOP
+              1441: NOP
+              1445: #IFNDEF VAR(ADCHS)
+              ;Select Case ADReadPort
+              1446: SELECT CASE ADREADPORT
+              1447: #IFDEF DEBUGADC_H
+              ;NOP 'Set ANSEL Bits. @DebugADC_H
+              1448: NOP
+              1451: #IFDEF USE_ADA0 TRUE
               ;Case 0: Set ANSELA.0 On
-              1049: CASE 0
+              1452: CASE 0
               ;Case 0: Set ANSELA.0 On
-              1049: SET ANSELA.0 ON
-              1051: #IFDEF USE_AD1 TRUE
+              1452: SET ANSELA.0 ON
+              1454: #IFDEF USE_ADA1 TRUE
               ;Case 1: Set ANSELA.1 On
-              1052: CASE 1
+              1455: CASE 1
               ;Case 1: Set ANSELA.1 On
-              1052: SET ANSELA.1 ON
-              1054: #IFDEF USE_AD2 TRUE
+              1455: SET ANSELA.1 ON
+              1457: #IFDEF USE_ADA2 TRUE
               ;Case 2: Set ANSELA.2 On
-              1055: CASE 2
+              1458: CASE 2
               ;Case 2: Set ANSELA.2 On
-              1055: SET ANSELA.2 ON
-              1057: #IFDEF USE_AD3 TRUE
+              1458: SET ANSELA.2 ON
+              1460: #IFDEF USE_ADA3 TRUE
               ;Case 3: Set ANSELA.3 On
-              1058: CASE 3
+              1461: CASE 3
               ;Case 3: Set ANSELA.3 On
-              1058: SET ANSELA.3 ON
-              1060: #IFDEF USE_AD4 TRUE
-              ;Case 4: Set ANSELA.4 On
-              1061: CASE 4
-              ;Case 4: Set ANSELA.4 On
-              1061: SET ANSELA.4 ON
-              1063: #IFDEF USE_AD5 TRUE
+              1461: SET ANSELA.3 ON
+              1463: #IFDEF USE_ADA4 TRUE
+              ;Case 4: Set ANSELA.4 ON
+              1464: CASE 4
+              ;Case 4: Set ANSELA.4 ON
+              1464: SET ANSELA.4 ON
+              1466: #IFDEF USE_ADA5 TRUE
               ;Case 5: Set ANSELA.5 On
-              1064: CASE 5
+              1467: CASE 5
               ;Case 5: Set ANSELA.5 On
-              1064: SET ANSELA.5 ON
-              1066: #IFDEF USE_AD6 TRUE
+              1467: SET ANSELA.5 ON
+              1469: #IFDEF USE_ADA6 TRUE
               ;Case 6: Set ANSELA.6 On
-              1067: CASE 6
+              1470: CASE 6
               ;Case 6: Set ANSELA.6 On
-              1067: SET ANSELA.6 ON
-              1069: #IFDEF USE_AD7 TRUE
+              1470: SET ANSELA.6 ON
+              1472: #IFDEF USE_ADA7 TRUE
               ;Case 7: Set ANSELA.7 On
-              1070: CASE 7
+              1473: CASE 7
               ;Case 7: Set ANSELA.7 On
-              1070: SET ANSELA.7 ON
-              1073: #IFDEF VAR(ANSELB)
-              1075: #IFDEF DEBUGADC_H
-              ;NOP '#IFDEF Var(ANSELB). ANSELB exists @DebugADC_H
-              1076: NOP
-              1079: #IFDEF USE_AD8 TRUE
+              1473: SET ANSELA.7 ON
+              1476: #IFDEF USE_ADB0 TRUE
               ;Case 8: Set ANSELB.0 On
-              1080: CASE 8
+              1477: CASE 8
               ;Case 8: Set ANSELB.0 On
-              1080: SET ANSELB.0 ON
-              1083: #IFDEF USE_AD9 TRUE
+              1477: SET ANSELB.0 ON
+              1479: #IFDEF USE_ADB1 TRUE
               ;Case 9: Set ANSELB.1 On
-              1084: CASE 9
+              1480: CASE 9
               ;Case 9: Set ANSELB.1 On
-              1084: SET ANSELB.1 ON
-              1087: #IFDEF USE_AD10 TRUE
+              1480: SET ANSELB.1 ON
+              1482: #IFDEF USE_ADB2 TRUE
               ;Case 10: Set ANSELB.2 On
-              1088: CASE 10
+              1483: CASE 10
               ;Case 10: Set ANSELB.2 On
-              1088: SET ANSELB.2 ON
-              1091: #IFDEF USE_AD11 TRUE
+              1483: SET ANSELB.2 ON
+              1485: #IFDEF USE_ADB3 TRUE
               ;Case 11: Set ANSELB.3 On
-              1092: CASE 11
+              1486: CASE 11
               ;Case 11: Set ANSELB.3 On
-              1092: SET ANSELB.3 ON
-              1095: #IFDEF USE_AD12 TRUE
+              1486: SET ANSELB.3 ON
+              1488: #IFDEF USE_ADB4 TRUE
               ;Case 12: Set ANSELB.4 On
-              1096: CASE 12
+              1489: CASE 12
               ;Case 12: Set ANSELB.4 On
-              1096: SET ANSELB.4 ON
-              1099: #IFDEF USE_AD13 TRUE
+              1489: SET ANSELB.4 ON
+              1491: #IFDEF USE_ADB5 TRUE
               ;Case 13: Set ANSELB.5 On
-              1100: CASE 13
+              1492: CASE 13
               ;Case 13: Set ANSELB.5 On
-              1100: SET ANSELB.5 ON
-              1103: #IFDEF USE_AD14 TRUE
+              1492: SET ANSELB.5 ON
+              1494: #IFDEF USE_ADB6 TRUE
               ;Case 14: Set ANSELB.6 On
-              1104: CASE 14
+              1495: CASE 14
               ;Case 14: Set ANSELB.6 On
-              1104: SET ANSELB.6 ON
-              1107: #IFDEF USE_AD15 TRUE
+              1495: SET ANSELB.6 ON
+              1497: #IFDEF USE_ADB7 TRUE
               ;Case 15: Set ANSELB.7 On
-              1108: CASE 15
+              1498: CASE 15
               ;Case 15: Set ANSELB.7 On
-              1108: SET ANSELB.7 ON
-              1114: #IFDEF VAR(ANSELC)
-              1116: #IFDEF DEBUGADC_H
-              ;NOP '#IFDEF Var(ANSELC). ANSELC exists @DebugADC_H
-              1117: NOP
-              1121: #IFDEF USE_AD16 TRUE
+              1498: SET ANSELB.7 ON
+              1501: #IFDEF USE_ADC0 TRUE
               ;Case 16: Set ANSELC.0 On
-              1122: CASE 16
+              1502: CASE 16
               ;Case 16: Set ANSELC.0 On
-              1122: SET ANSELC.0 ON
-              1124: #IFDEF USE_AD17 TRUE
+              1502: SET ANSELC.0 ON
+              1504: #IFDEF USE_ADC1 TRUE
               ;Case 17: Set ANSELC.1 On
-              1125: CASE 17
+              1505: CASE 17
               ;Case 17: Set ANSELC.1 On
-              1125: SET ANSELC.1 ON
-              1127: #IFDEF USE_AD18 TRUE
+              1505: SET ANSELC.1 ON
+              1507: #IFDEF USE_ADC2 TRUE
               ;Case 18: Set ANSELC.2 On
-              1128: CASE 18
+              1508: CASE 18
               ;Case 18: Set ANSELC.2 On
-              1128: SET ANSELC.2 ON
-              1130: #IFDEF USE_AD19 TRUE
+              1508: SET ANSELC.2 ON
+              1510: #IFDEF USE_ADC3 TRUE
               ;Case 19: Set ANSELC.3 On
-              1131: CASE 19
+              1511: CASE 19
               ;Case 19: Set ANSELC.3 On
-              1131: SET ANSELC.3 ON
-              1133: #IFDEF USE_AD20 TRUE
+              1511: SET ANSELC.3 ON
+              1513: #IFDEF USE_ADC4 TRUE
               ;Case 20: Set ANSELC.4 On
-              1134: CASE 20
+              1514: CASE 20
               ;Case 20: Set ANSELC.4 On
-              1134: SET ANSELC.4 ON
-              1136: #IFDEF USE_AD21 TRUE
+              1514: SET ANSELC.4 ON
+              1516: #IFDEF USE_ADC5 TRUE
               ;Case 21: Set ANSELC.5 On
-              1137: CASE 21
+              1517: CASE 21
               ;Case 21: Set ANSELC.5 On
-              1137: SET ANSELC.5 ON
-              1139: #IFDEF USE_AD22 TRUE
+              1517: SET ANSELC.5 ON
+              1519: #IFDEF USE_ADC6 TRUE
               ;Case 22: Set ANSELC.6 On
-              1140: CASE 22
+              1520: CASE 22
               ;Case 22: Set ANSELC.6 On
-              1140: SET ANSELC.6 ON
-              1142: #IFDEF USE_AD23 TRUE
+              1520: SET ANSELC.6 ON
+              1522: #IFDEF USE_ADC7 TRUE
               ;Case 23: Set ANSELC.7 On
-              1143: CASE 23
+              1523: CASE 23
               ;Case 23: Set ANSELC.7 On
-              1143: SET ANSELC.7 ON
-              1147: #IFDEF VAR(ANSELD)
-              1149: #IFDEF DEBUGADC_H
-              ;NOP '#IFDEF Var(ANSELD). ANSELD exists @DebugADC_H
-              1150: NOP
-              1153: #IFDEF USE_AD24 TRUE
+              1523: SET ANSELC.7 ON
+              1526: #IFDEF VAR(ANSELD)
+              1528: #IFDEF USE_ADD0 TRUE
               ;Case 24: Set ANSELD.0 On
-              1154: CASE 24
+              1529: CASE 24
               ;Case 24: Set ANSELD.0 On
-              1154: SET ANSELD.0 ON
-              1156: #IFDEF USE_AD25 TRUE
+              1529: SET ANSELD.0 ON
+              1528: #IFDEF USE_ADD0 TRUE
+              ;Case 24: Set ANSELD.0 On
+              1529: CASE 24
+              ;Case 24: Set ANSELD.0 On
+              1529: SET ANSELD.0 ON
+              1531: #IFDEF USE_ADD1 TRUE
               ;Case 25: Set ANSELD.1 On
-              1157: CASE 25
+              1532: CASE 25
               ;Case 25: Set ANSELD.1 On
-              1157: SET ANSELD.1 ON
-              1159: #IFDEF USE_AD26 TRUE
+              1532: SET ANSELD.1 ON
+              1534: #IFDEF USE_ADD2 TRUE
               ;Case 26: Set ANSELD.2 On
-              1160: CASE 26
+              1535: CASE 26
               ;Case 26: Set ANSELD.2 On
-              1160: SET ANSELD.2 ON
-              1162: #IFDEF USE_AD27 TRUE
+              1535: SET ANSELD.2 ON
+              1537: #IFDEF USE_ADD3 TRUE
               ;Case 27: Set ANSELD.3 On
-              1163: CASE 27
+              1538: CASE 27
               ;Case 27: Set ANSELD.3 On
-              1163: SET ANSELD.3 ON
-              1165: #IFDEF USE_AD28 TRUE
+              1538: SET ANSELD.3 ON
+              1540: #IFDEF USE_ADD4 TRUE
               ;Case 28: Set ANSELD.4 On
-              1166: CASE 28
+              1541: CASE 28
               ;Case 28: Set ANSELD.4 On
-              1166: SET ANSELD.4 ON
-              1168: #IFDEF USE_AD29 TRUE
+              1541: SET ANSELD.4 ON
+              1543: #IFDEF USE_ADD5 TRUE
               ;Case 29: Set ANSELD.5 On
-              1169: CASE 29
+              1544: CASE 29
               ;Case 29: Set ANSELD.5 On
-              1169: SET ANSELD.5 ON
-              1171: #IFDEF USE_AD30 TRUE
+              1544: SET ANSELD.5 ON
+              1546: #IFDEF USE_ADD6 TRUE
               ;Case 30: Set ANSELD.6 On
-              1172: CASE 30
+              1547: CASE 30
               ;Case 30: Set ANSELD.6 On
-              1172: SET ANSELD.6 ON
-              1174: #IFDEF USE_AD31 TRUE
+              1547: SET ANSELD.6 ON
+              1549: #IFDEF USE_ADD7 TRUE
               ;Case 31: Set ANSELD.7 On
-              1175: CASE 31
+              1550: CASE 31
               ;Case 31: Set ANSELD.7 On
-              1175: SET ANSELD.7 ON
-              1179: #IFDEF VAR(ANSELE)
-              1181: #IFDEF DEBUGADC_H
-              ;NOP '#IFDEF Var(ANSELE). ANSELE exists @DebugADC_H
-              1182: NOP
-              1184: #IFDEF USE_AD32 TRUE
+              1550: SET ANSELD.7 ON
+              1554: #IFDEF VAR(ANSELE)
+              1556: #IFDEF USE_AD32 TRUE
               ;Case 32: Set ANSELE.0 On
-              1185: CASE 32
+              1557: CASE 32
               ;Case 32: Set ANSELE.0 On
-              1185: SET ANSELE.0 ON
-              1187: #IFDEF USE_AD33 TRUE
+              1557: SET ANSELE.0 ON
+              1556: #IFDEF USE_AD32 TRUE
+              ;Case 32: Set ANSELE.0 On
+              1557: CASE 32
+              ;Case 32: Set ANSELE.0 On
+              1557: SET ANSELE.0 ON
+              1559: #IFDEF USE_AD33 TRUE
               ;Case 33: Set ANSELE.1 On
-              1188: CASE 33
+              1560: CASE 33
               ;Case 33: Set ANSELE.1 On
-              1188: SET ANSELE.1 ON
-              1190: #IFDEF USE_AD34 TRUE
+              1560: SET ANSELE.1 ON
+              1562: #IFDEF USE_AD34 TRUE
               ;Case 34: Set ANSELE.2 On
-              1191: CASE 34
+              1563: CASE 34
               ;Case 34: Set ANSELE.2 On
-              1191: SET ANSELE.2 ON
-              1290: #IFDEF BIT(ADCS0)
-              1292: #IFDEF DEBUGADC_H
+              1563: SET ANSELE.2 ON
+              1658: #IFDEF VAR(ADCLK)
+              ;Configure AD clock defaults
+              ;Set ADCS off 'Clock source = FOSC/ADCLK
+              1661: SET ADCS OFF
+              ;ADCLK = 1 ' default to FOSC/2
+              1662: ADCLK = 1
+              ;Conversion Clock Speed
+              1665: #IFDEF ADSPEED HIGHSPEED
+              ;Set ADCS OFF   ' ADCON0.4
+              1666: SET ADCS OFF
+              ;ADCLK = 1      ' FOSC/2
+              1667: ADCLK = 1
+              1670: #IFDEF ADSPEED MEDIUMSPEED
+              ;SET ADCS OFF  'ADCON0.4
+              1671: SET ADCS OFF
+              ;ADCLK = 15    'FOSC/16
+              1672: ADCLK = 15
+              1682: #IFNDEF ADCLK
+              1684: #IF CHIPFAMILY = 16
+              ;Configure AD clock defaults fpr older 18F that do not have ADCLK
+              1687: #IFDEF DEBUGADC_H
               ;NOP '#IFDEF Bit(ADCS0). Set conversion clock @DebugADC_H
-              1293: NOP
-              1309: #IFDEF ADSPEED MEDIUMSPEED
-              1310: #IFDEF DEBUGADC_H
+              1688: NOP
+              1684: #IF CHIPFAMILY = 16
+              ;Configure AD clock defaults fpr older 18F that do not have ADCLK
+              1687: #IFDEF DEBUGADC_H
+              ;NOP '#IFDEF Bit(ADCS0). Set conversion clock @DebugADC_H
+              1688: NOP
+              1704: #IFDEF ADSPEED MEDIUMSPEED
+              1705: #IFDEF DEBUGADC_H
               ;NOP 'ADSpeed MediumSpeed @DebugADC_H  'set to  FOSC/8
-              1311: NOP
-              1313: #IFDEF BIT(ADCS2)
+              1706: NOP
+              1708: #IFDEF BIT(ADCS2)
               ;SET ADCS2 OFF
-              1314: SET ADCS2 OFF
-              1343: #IFDEF BIT(CHS0)
-              1345: #IFDEF DEBUGADC_H
-              ;NOP '#IFDEF Bit(CHS0). Clear channels bits. @DebugADC_H
-              1346: NOP
-              1351: #IFDEF BIT(CHS2)
-              ;SET CHS2 OFF
-              1352: SET CHS2 OFF
-              1353: #IFDEF BIT(CHS3)
-              ;SET CHS3 OFF
-              1354: SET CHS3 OFF
-              1355: #IFDEF BIT(CHS4)
-              ;SET CHS4 OFF
-              1356: SET CHS4 OFF
-              1357: #IFDEF BIT(CHS5)
-              ;SET CHS5 OFF
-              1358: SET CHS5 OFF
-              1353: #IFDEF BIT(CHS3)
-              ;SET CHS3 OFF
-              1354: SET CHS3 OFF
-              1355: #IFDEF BIT(CHS4)
-              ;SET CHS4 OFF
-              1356: SET CHS4 OFF
-              1357: #IFDEF BIT(CHS5)
-              ;SET CHS5 OFF
-              1358: SET CHS5 OFF
-              1355: #IFDEF BIT(CHS4)
-              ;SET CHS4 OFF
-              1356: SET CHS4 OFF
-              1357: #IFDEF BIT(CHS5)
-              ;SET CHS5 OFF
-              1358: SET CHS5 OFF
-              1357: #IFDEF BIT(CHS5)
-              ;SET CHS5 OFF
-              1358: SET CHS5 OFF
-              1369: #IFDEF BIT(CHS2)
-              ;IF ADReadPort.2 On Then Set CHS2 On
-              1370: IF ADREADPORT.2 ON THEN
-              ;IF ADReadPort.2 On Then Set CHS2 On
-              1370: SET CHS2 ON
-              ;IF ADReadPort.2 On Then Set CHS2 On
-              1370: END IF
-              1371: #IFDEF BIT(CHS3)
-              ;If ADReadPort.3 On Then Set CHS3 On
-              1372: IF ADREADPORT.3 ON THEN
-              ;If ADReadPort.3 On Then Set CHS3 On
-              1372: SET CHS3 ON
-              ;If ADReadPort.3 On Then Set CHS3 On
-              1372: END IF
-              1373: #IFDEF BIT(CHS4)
-              ;If ADReadPort.4 On Then Set CHS4 On
-              1374: IF ADREADPORT.4 ON THEN
-              ;If ADReadPort.4 On Then Set CHS4 On
-              1374: SET CHS4 ON
-              ;If ADReadPort.4 On Then Set CHS4 On
-              1374: END IF
-              1375: #IFDEF BIT(CHS5)
-              ;If ADReadPort.5 On Then Set CHS5 On
-              1376: IF ADREADPORT.5 ON THEN
-              ;If ADReadPort.5 On Then Set CHS5 On
-              1376: SET CHS5 ON
-              ;If ADReadPort.5 On Then Set CHS5 On
-              1376: END IF
-              1371: #IFDEF BIT(CHS3)
-              ;If ADReadPort.3 On Then Set CHS3 On
-              1372: IF ADREADPORT.3 ON THEN
-              ;If ADReadPort.3 On Then Set CHS3 On
-              1372: SET CHS3 ON
-              ;If ADReadPort.3 On Then Set CHS3 On
-              1372: END IF
-              1373: #IFDEF BIT(CHS4)
-              ;If ADReadPort.4 On Then Set CHS4 On
-              1374: IF ADREADPORT.4 ON THEN
-              ;If ADReadPort.4 On Then Set CHS4 On
-              1374: SET CHS4 ON
-              ;If ADReadPort.4 On Then Set CHS4 On
-              1374: END IF
-              1375: #IFDEF BIT(CHS5)
-              ;If ADReadPort.5 On Then Set CHS5 On
-              1376: IF ADREADPORT.5 ON THEN
-              ;If ADReadPort.5 On Then Set CHS5 On
-              1376: SET CHS5 ON
-              ;If ADReadPort.5 On Then Set CHS5 On
-              1376: END IF
-              1373: #IFDEF BIT(CHS4)
-              ;If ADReadPort.4 On Then Set CHS4 On
-              1374: IF ADREADPORT.4 ON THEN
-              ;If ADReadPort.4 On Then Set CHS4 On
-              1374: SET CHS4 ON
-              ;If ADReadPort.4 On Then Set CHS4 On
-              1374: END IF
-              1375: #IFDEF BIT(CHS5)
-              ;If ADReadPort.5 On Then Set CHS5 On
-              1376: IF ADREADPORT.5 ON THEN
-              ;If ADReadPort.5 On Then Set CHS5 On
-              1376: SET CHS5 ON
-              ;If ADReadPort.5 On Then Set CHS5 On
-              1376: END IF
-              1375: #IFDEF BIT(CHS5)
-              ;If ADReadPort.5 On Then Set CHS5 On
-              1376: IF ADREADPORT.5 ON THEN
-              ;If ADReadPort.5 On Then Set CHS5 On
-              1376: SET CHS5 ON
-              ;If ADReadPort.5 On Then Set CHS5 On
-              1376: END IF
+              1709: SET ADCS2 OFF
+              1762: #IFDEF BIT(ADFM)
+              ;Set ADFM ON
+              1763: SET ADFM ON
+              1766: #IFDEF BIT(ADFM0)
+              ;Set ADFM0 ON
+              1767: SET ADFM0 ON
+              1772: #IFDEF BIT(ADFM)
+              ;Set ADFM OFF
+              1773: SET ADFM OFF
+              1776: #IFDEF BIT(ADFM0)
+              ;Set ADFM0 OFF
+              1777: SET ADFM0 OFF
+              1786: #IFDEF NOVAR(ADCHS)
+              ;Select Channel
+              ;ADPCH = ADReadPort  'Configure AD read Channel
+              1788: ADPCH = ADREADPORT
               1828: #IFDEF BIT(GO_NOT_DONE)
               ;Read A/D @1
               ;SET GO_NOT_DONE ON
@@ -1457,6 +1848,11 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               2112: #IFDEF BIT(ADFM)
               ;SET ADFM OFF
               2113: SET ADFM OFF
+              2117: #IFDEF VAR(ADPCH)
+              ;for 16F1885x and possibly future others
+              2120: #IFDEF DEBUGADC_H
+              ;NOP '#IFDEF VAR(ADPCH). @DebugADC_H
+              2121: NOP
               2131: #IFNDEF BIT(CHSN0)
               2132: #IFDEF BIT(ADIC)
               ;SetNegativeChannelSelectbits
@@ -1485,6 +1881,9 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               2236: #IFDEF DEBUGADC_H
               ;NOP '#IFDEF Bit(ADFM). Setting ADFM in READAD() @DebugADC_H
               2237: NOP
+              2264: #IFDEF VAR(ADPCH)
+              ;ADPCH = ADReadPort
+              2265: ADPCH = ADREADPORT
               2281: #IFDEF PIC
               2284: #IFDEF BIT(ADIC)
               ;IF ADN_PORT = TRUE then
@@ -1557,6 +1956,10 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               2399: #IFDEF DEBUGADC_H
               ;NOP '#IFDEF Bit(ADFM). Setting ADFM @DebugADC_H
               2400: NOP
+              2406: #IFDEF VAR(ADPCH)
+              2408: #IFDEF DEBUGADC_H
+              ;NOP '#IFDEF VAR(ADPCH). Setting ADPCH @DebugADC_H
+              2409: NOP
               2419: #IFNDEF BIT(CHSN0)
               2420: #IFDEF BIT(ADIC)
               ;ADCON0.ADIC = 0
@@ -1596,6 +1999,10 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               2511: SETNEGATIVECHANNELSELECTBITS
               ;END IF
               2512: END IF
+              2516: #IFDEF VAR(ADPCH)
+              2517: #IFDEF DEBUGADC_H
+              ;NOP  '#IFDEF VAR(ADPCH). @DebugADC_H
+              2518: NOP
               2534: #IFDEF PIC
               ;Write output
               2536: #IFDEF NOVAR(ADRESL)
@@ -1627,6 +2034,10 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               2600: #IFDEF DEBUGADC_H
               ;NOP '#IFDEF Bit(ADFM). Setting ADFM @DebugADC_H
               2601: NOP
+              2617: #IFDEF VAR(ADPCH)
+              2618: #IFDEF DEBUGADC_H
+              ;NOP '#IFDEF VAR(ADPCH). Set ???? @DebugADC_H
+              2619: NOP
               2629: #IFNDEF BIT(CHSN0)
               2630: #IFDEF BIT(ADIC)
               ;SetNegativeChannelSelectbits
@@ -1668,6 +2079,10 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               2710: SETNEGATIVECHANNELSELECTBITS
               ;END IF
               2711: END IF
+              2723: #IFDEF VAR(ADPCH)
+              2724: #IFDEF DEBUGADC_H
+              ;NOP '#IFDEF VAR(ADPCH). Set ???? @DebugADC_H
+              2725: NOP
               2740: #IFDEF PIC
               ;Write output
               2742: #IFDEF NOVAR(ADRESL)
@@ -1693,10 +2108,15 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               2783: #IFDEF BIT(PCFG3)
               ;SET PCFG3 OFF
               2784: SET PCFG3 OFF
-              2782: #IFDEF NOVAR(ADCON2)
-              2783: #IFDEF BIT(PCFG3)
-              ;SET PCFG3 OFF
-              2784: SET PCFG3 OFF
+              2790: #IFDEF VAR(ADCON2)
+              ;SET PCFG3 ON
+              2791: SET PCFG3 ON
+              ;SET PCFG2 ON
+              2792: SET PCFG2 ON
+              ;SET PCFG1 ON
+              2793: SET PCFG1 ON
+              ;SET PCFG0 ON
+              2794: SET PCFG0 ON
               2825: #IFNDEF BIT(CHSN3)
               2826: #IFDEF BIT( ADIC )
               ;ADNCH = ADN_PORT
@@ -1741,12 +2161,23 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               2900: #IFDEF DEBUGADC_H
               ;NOP ' #IFDEF Bit(CHSN0) So, set all three CHSN2:0 to 0, so, we get ADC Negative reference – selected by ADNREF. @DebugADC_H
               2901: NOP
+              2939: #IFDEF VAR(ADREF)
+              ;Found VAR ADREF
+              ;ADREF.0 = 1     'ADREF<1:0>
+              2941: ADREF.0 = 1
+              ;ADREF.1 = 1     'ADREF<1:0>
+              2942: ADREF.1 = 1
               2951: #IFDEF BIT(ADPREF1)
               ;Found BIT ADPREF1 and therefore ADPREF0
               ;ADPREF1 = 1
               2953: ADPREF1 = 1
               ;ADPREF0 = 1
               2954: ADPREF0 = 1
+              2965: #IFDEF VAR(ADREF)
+              ;ADREF.0 = 0     'ADPREF<1:0>
+              2966: ADREF.0 = 0
+              ;ADREF.1 = 0     'ADPREF<1:0>
+              2967: ADREF.1 = 0
               2975: #IFDEF BIT(ADPREF1)
               ;Found BIT ADPREF1 and therefore ADPREF0
               ;ADPREF1 = 0
@@ -1801,19 +2232,19 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               410: SET T2CON.T2CKPS0 OFF
               ;SET T2CON.T2CKPS1 OFF
               411: SET T2CON.T2CKPS1 OFF
-              408: #IFDEF TXPR 1
-              409: #IFNDEF BIT(T2CKPS2)
-              ;SET T2CON.T2CKPS0 OFF
-              410: SET T2CON.T2CKPS0 OFF
+              419: #IFDEF TXPR 4
+              420: #IFNDEF BIT(T2CKPS2)
+              ;SET T2CON.T2CKPS0 ON
+              421: SET T2CON.T2CKPS0 ON
               ;SET T2CON.T2CKPS1 OFF
-              411: SET T2CON.T2CKPS1 OFF
-              413: #IFDEF BIT(T2CKPS2)
+              422: SET T2CON.T2CKPS1 OFF
+              424: #IFDEF BIT(T2CKPS2)
               ;SET T2CON.T2CKPS0 OFF
-              414: SET T2CON.T2CKPS0 OFF
-              ;SET T2CON.T2CKPS1 OFF
-              415: SET T2CON.T2CKPS1 OFF
+              425: SET T2CON.T2CKPS0 OFF
+              ;SET T2CON.T2CKPS1 ON
+              426: SET T2CON.T2CKPS1 ON
               ;SET T2CON.T2CKPS2 OFF
-              416: SET T2CON.T2CKPS2 OFF
+              427: SET T2CON.T2CKPS2 OFF
               457: #IFNDEF ONEOF(PWM_TIMER2_FREQ,PWM_TIMER2_FREQ,PWM_TIMER2_FREQ)
               459: #IFDEF BIT(CCP1FMT)
               ;CCPCONCache.CCP1FMT = 1
@@ -1837,12 +2268,12 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               463: [CANSKIP]T2CLKCON = 1
               ;[canskip]CCPCONCache.en = 1
               464: [CANSKIP]CCPCONCACHE.EN = 1
-              493: #IFDEF DUTYCYCLEL 2
-              494: #IFDEF BIT(CCP1X)
+              469: #IFDEF DUTYCYCLEL 0
+              470: #IFDEF BIT(CCP1X)
               ;SET CCPCONCache.CCP1Y OFF
-              495: SET CCPCONCACHE.CCP1Y OFF
-              ;SET CCPCONCache.CCP1X ON
-              496: SET CCPCONCACHE.CCP1X ON
+              471: SET CCPCONCACHE.CCP1Y OFF
+              ;SET CCPCONCache.CCP1X OFF
+              472: SET CCPCONCACHE.CCP1X OFF
               2302: #IFDEF USE_HPWMCCP1 TRUE
               2303: #IFDEF VAR(CCP1CON)
               ;if PWMChannel =1 then              'is it this channel?
@@ -1875,38 +2306,6 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               2330: CCPR1H = DUTYCYCLEH
               ;CCPR1L = DutyCycleL * 64
               2331: CCPR1L = DUTYCYCLEL * 64
-              2339: #IFDEF USE_HPWMCCP2 TRUE
-              2340: #IFDEF VAR(CCP2CON)
-              ;if PWMChannel =2 then
-              2341: IF PWMCHANNEL =2 THEN
-              2343: #IFDEF PWM_2_CLOCK_SOURCE
-              2344: #IFDEF VAR(CCPR2L)
-              2345: #IFNDEF BIT(CCP2FMT)
-              ;CCP2CON = CCP2CON OR 0x0C  'Set PWM mode
-              2346: CCP2CON = CCP2CON OR 12
-              ;CCPR2L = Script_PWM2_DutyCycleH
-              2347: CCPR2L = SCRIPT_PWM2_DUTYCYCLEH
-              2340: #IFDEF VAR(CCP2CON)
-              ;if PWMChannel =2 then
-              2341: IF PWMCHANNEL =2 THEN
-              2343: #IFDEF PWM_2_CLOCK_SOURCE
-              2344: #IFDEF VAR(CCPR2L)
-              2345: #IFNDEF BIT(CCP2FMT)
-              ;CCP2CON = CCP2CON OR 0x0C  'Set PWM mode
-              2346: CCP2CON = CCP2CON OR 12
-              ;CCPR2L = Script_PWM2_DutyCycleH
-              2347: CCPR2L = SCRIPT_PWM2_DUTYCYCLEH
-              2358: #IFNDEF PWM_2_CLOCK_SOURCE
-              ;CCP2CON = CCPCONCache
-              2359: CCP2CON = CCPCONCACHE
-              2360: #IFNDEF BIT(CCP2FMT)
-              ;CCPR2L = DutyCycleH
-              2361: CCPR2L = DUTYCYCLEH
-              2363: #IFDEF BIT(CCP2FMT)
-              ;CCPR2H = DutyCycleH
-              2364: CCPR2H = DUTYCYCLEH
-              ;CCPR2L = DutyCycleL * 64
-              2365: CCPR2L = DUTYCYCLEL * 64
               2373: #IFDEF USE_HPWMCCP3 TRUE
               2374: #IFDEF VAR(CCP3CON)
               ;if PWMChannel =3 then
@@ -1918,28 +2317,6 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               2380: CCP3CON = CCP3CON OR 12
               ;CCPR3L = Script_PWM3_DutyCycleH
               2381: CCPR3L = SCRIPT_PWM3_DUTYCYCLEH
-              2407: #IFDEF USE_HPWMCCP4 TRUE
-              2408: #IFDEF VAR(CCP4CON)
-              ;if PWMChannel =4 then
-              2409: IF PWMCHANNEL =4 THEN
-              2411: #IFDEF PWM_4_CLOCK_SOURCE
-              2412: #IFDEF VAR(CCPR4L)
-              2413: #IFNDEF BIT(CCP4FMT)
-              ;CCP4CON = CCP4CON OR 0x0C  'Set PWM mode
-              2414: CCP4CON = CCP4CON OR 12
-              ;CCPR4L = Script_PWM4_DutyCycleH
-              2415: CCPR4L = SCRIPT_PWM4_DUTYCYCLEH
-              2441: #IFDEF USE_HPWMCCP5 TRUE
-              2442: #IFDEF VAR(CCP5CON)
-              ;if PWMChannel =5 then
-              2443: IF PWMCHANNEL =5 THEN
-              2445: #IFDEF PWM_5_CLOCK_SOURCE
-              2446: #IFDEF VAR(CCPR5L)
-              2447: #IFNDEF BIT(CCP5FMT)
-              ;CCP5CON = CCP5CON OR 0x0C  'Set PWM mode
-              2448: CCP5CON = CCP5CON OR 12
-              ;CCPR5L = Script_PWM5_DutyCycleH
-              2449: CCPR5L = SCRIPT_PWM5_DUTYCYCLEH
               2504: #IFDEF BIT(PWM3EN)
               ;Case 3
               2505: CASE 3
@@ -1958,24 +2335,6 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               2519: #IFDEF BIT(PWM4OE)
               ;PWM4OE = 1
               2520: PWM4OE = 1
-              2524: #IFDEF BIT(PWM5EN)
-              ;Case 5
-              2525: CASE 5
-              ;Set PWM5EN On
-              2526: SET PWM5EN ON
-              ;Enable PWM output enable bit on chips
-              2529: #IFDEF BIT(PWM5OE)
-              ;PWM5OE = 1
-              2530: PWM5OE = 1
-              2534: #IFDEF BIT(PWM6EN)
-              ;Case 6
-              2535: CASE 6
-              ;Set PWM6EN On
-              2536: SET PWM6EN ON
-              ;Enable PWM output enable bit on chips
-              2539: #IFDEF BIT(PWM6OE)
-              ;PWM6OE = 1
-              2540: PWM6OE = 1
               2589: #IFDEF USE_HPWMCCP1 TRUE
               2590: #IFDEF VAR(CCP1CON)
               ;if PWMChannel =1 then
@@ -1991,21 +2350,6 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               2592: CCP1CON = 0
               ;end if
               2593: END IF
-              2597: #IFDEF USE_HPWMCCP2 TRUE
-              2598: #IFDEF VAR(CCP2CON)
-              ;if PWMChannel =2 then
-              2599: IF PWMCHANNEL =2 THEN
-              ;CCP2CON = 0
-              2600: CCP2CON = 0
-              ;end if
-              2601: END IF
-              2598: #IFDEF VAR(CCP2CON)
-              ;if PWMChannel =2 then
-              2599: IF PWMCHANNEL =2 THEN
-              ;CCP2CON = 0
-              2600: CCP2CON = 0
-              ;end if
-              2601: END IF
               2604: #IFDEF USE_HPWMCCP3 TRUE
               2605: #IFDEF VAR(CCP3CON)
               ;if PWMChannel =3 then
@@ -2014,22 +2358,6 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               2607: CCP3CON = 0
               ;end if
               2608: END IF
-              2611: #IFDEF USE_HPWMCCP4 TRUE
-              2612: #IFDEF VAR(CCP4CON)
-              ;if PWMChannel =4 then
-              2613: IF PWMCHANNEL =4 THEN
-              ;CCP4CON = 0
-              2614: CCP4CON = 0
-              ;end if
-              2615: END IF
-              2618: #IFDEF USE_HPWMCCP5 TRUE
-              2619: #IFDEF VAR(CCP5CON)
-              ;if PWMChannel =5 then
-              2620: IF PWMCHANNEL =5 THEN
-              ;CCP5CON = 0
-              2621: CCP5CON = 0
-              ;end if
-              2622: END IF
               2701: #IFDEF BIT(PWM3EN)
               ;Case 3
               2702: CASE 3
@@ -2048,24 +2376,6 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               2716: #IFDEF BIT(PWM4OE)
               ;PWM4OE = 0
               2717: PWM4OE = 0
-              2721: #IFDEF BIT(PWM5EN)
-              ;Case 5
-              2722: CASE 5
-              ;Set PWM5EN Off
-              2723: SET PWM5EN OFF
-              ;Disable PWM output enable bit
-              2726: #IFDEF BIT(PWM5OE)
-              ;PWM5OE = 0
-              2727: PWM5OE = 0
-              2731: #IFDEF BIT(PWM6EN)
-              ;Case 6
-              2732: CASE 6
-              ;Set PWM6EN Off
-              2733: SET PWM6EN OFF
-              ;Disable PWM output enable bit
-              2736: #IFDEF BIT(PWM6OE)
-              ;PWM6OE = 0
-              2737: PWM6OE = 0
               2774: #IFDEF USE_HPWM_TIMER2 TRUE
               ;Case 2
               2775: CASE 2
@@ -2073,22 +2383,6 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               2776: HPWM (PWMCHANNEL, PWMFREQ, PWMDUTY )
               ;TMR2ON= 1
               2777: TMR2ON= 1
-              2780: #IFDEF USE_HPWM_TIMER4 TRUE
-              2781: #IFDEF VAR(T4CON)
-              ;case 4
-              2782: CASE 4
-              ;HPWM (PWMChannel, PWMFreq, PWMDuty )
-              2783: HPWM (PWMCHANNEL, PWMFREQ, PWMDUTY )
-              ;TMR4ON= 1
-              2784: TMR4ON= 1
-              2788: #IFDEF USE_HPWM_TIMER6 TRUE
-              2789: #IFDEF VAR(T4CON)
-              ;case 6
-              2790: CASE 6
-              ;HPWM (PWMChannel, PWMFreq, PWMDuty )
-              2791: HPWM (PWMCHANNEL, PWMFREQ, PWMDUTY )
-              ;TMR6ON= 1
-              2792: TMR6ON= 1
               2884: #IFDEF USE_HPWM_TIMER2 TRUE
               ;case 2:
               2885: CASE 2
@@ -2173,81 +2467,9 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               2917: T2CLKCON.T2CS2 = 0
               ;T2CLKCON.T2CS3 = 0
               2918: T2CLKCON.T2CS3 = 0
-              2931: #IFDEF USE_HPWM_TIMER4 TRUE
-              2932: #IFDEF VAR(T4CON)
-              ;case 4:
-              2933: CASE 4
-              ;PR4 = PRx_Temp
-              2934: PR4 = PRX_TEMP
-              ;Set the Bits for the Prescaler
-              ;Setup Timerx by clearing the Prescaler bits - it is set next....
-              2937: #IFDEF BIT(T4CKPS4)
-              ;SET T4CKPS0 OFF
-              2938: SET T4CKPS0 OFF
-              ;SET T4CKPS1 OFF
-              2939: SET T4CKPS1 OFF
-              ;SET T4CKPS4 OFF
-              2940: SET T4CKPS4 OFF
-              ;Set Prescaler bits T4CON@1
-              ;if Tx_PR = 4  then SET T4CKPS1 ON
-              2942: IF TX_PR = 4 THEN
-              ;if Tx_PR = 4  then SET T4CKPS1 ON
-              2942: SET T4CKPS1 ON
-              ;if Tx_PR = 4  then SET T4CKPS1 ON
-              2942: END IF
-              ;if Tx_PR = 16 then SET T4CKPS4 ON
-              2943: IF TX_PR = 16 THEN
-              ;if Tx_PR = 16 then SET T4CKPS4 ON
-              2943: SET T4CKPS4 ON
-              ;if Tx_PR = 16 then SET T4CKPS4 ON
-              2943: END IF
-              ;if Tx_PR = 64 then SET T4CKPS4 ON: SET T4CKPS1 ON
-              2944: IF TX_PR = 64 THEN
-              ;if Tx_PR = 64 then SET T4CKPS4 ON: SET T4CKPS1 ON
-              2944: SET T4CKPS4 ON
-              ;if Tx_PR = 64 then SET T4CKPS4 ON: SET T4CKPS1 ON
-              2944: SET T4CKPS1 ON
-              ;if Tx_PR = 64 then SET T4CKPS4 ON: SET T4CKPS1 ON
-              2944: END IF
-              2982: #IFDEF USE_HPWM_TIMER6 TRUE
-              2983: #IFDEF VAR(T6CON)
-              ;case 6:
-              2984: CASE 6
-              ;PR6 = PRx_Temp
-              2985: PR6 = PRX_TEMP
-              ;Set the Bits for the Prescaler
-              ;Setup Timerx by clearing the Prescaler bits - it is set next....
-              2988: #IFDEF BIT(T6CKPS6)
-              ;SET T6CKPS0 OFF
-              2989: SET T6CKPS0 OFF
-              ;SET T6CKPS1 OFF
-              2990: SET T6CKPS1 OFF
-              ;SET T6CKPS6 OFF
-              2991: SET T6CKPS6 OFF
-              ;Set Prescaler bits T6CON @1
-              ;if Tx_PR = 4  then SET T6CKPS1 ON
-              2993: IF TX_PR = 4 THEN
-              ;if Tx_PR = 4  then SET T6CKPS1 ON
-              2993: SET T6CKPS1 ON
-              ;if Tx_PR = 4  then SET T6CKPS1 ON
-              2993: END IF
-              ;if Tx_PR = 16 then SET T6CKPS6 ON
-              2994: IF TX_PR = 16 THEN
-              ;if Tx_PR = 16 then SET T6CKPS6 ON
-              2994: SET T6CKPS6 ON
-              ;if Tx_PR = 16 then SET T6CKPS6 ON
-              2994: END IF
-              ;if Tx_PR = 64 then SET T6CKPS6 ON: SET T6CKPS1 ON
-              2995: IF TX_PR = 64 THEN
-              ;if Tx_PR = 64 then SET T6CKPS6 ON: SET T6CKPS1 ON
-              2995: SET T6CKPS6 ON
-              ;if Tx_PR = 64 then SET T6CKPS6 ON: SET T6CKPS1 ON
-              2995: SET T6CKPS1 ON
-              ;if Tx_PR = 64 then SET T6CKPS6 ON: SET T6CKPS1 ON
-              2995: END IF
-              3062: #IFNDEF CHIPPWMTIMERVARIANT
-              ;TimerSelectionBits =  (_PWMTimerSelected / 2 )-1
-              3063: TIMERSELECTIONBITS = (_PWMTIMERSELECTED / 2 )-1
+              3054: #IF CHIPPWMTIMERVARIANT = 2
+              ;TimerSelectionBits =  (_PWMTimerSelected / 2 )
+              3055: TIMERSELECTIONBITS = (_PWMTIMERSELECTED / 2 )
               3069: #IFDEF USE_HPWMCCP1 TRUE
               3071: #IFDEF VAR(CCP1CON)
               ;Only process this section when CCP1CON exists
@@ -2259,6 +2481,8 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               3074: #IFDEF ADDHPWMCCPSETUP1
               ;AddHPWMCCPSetup1
               3075: ADDHPWMCCPSETUP1
+              3098: #IF CHIPFAMILY = 16
+              3099: CHIPFAMILYPWMCCP1CON16HANDLER:
               3135: #IFDEF VAR(CCP2CON)
               ;Devices with more than one CCP
               3137: #IFDEF USE_HPWMCCP1 TRUE
@@ -2291,74 +2515,24 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               3169: #IFDEF BIT(CCP1EN)
               ;SET CCP1EN ON
               3170: SET CCP1EN ON
+              3173: #IFDEF BIT(CCP1CON_EN)
+              ;SET CCP1CON_EN ON
+              3174: SET CCP1CON_EN ON
               3177: #IFDEF BIT(CCP1FMT)
               ;SET CCP1FMT ON
               3178: SET CCP1FMT ON
-              3195: #IFDEF USE_HPWMCCP2 TRUE
-              3197: #IFDEF ADDHPWMCCPSETUP2
-              ;AddHPWMCCPSetup2
-              3198: ADDHPWMCCPSETUP2
-              3201: #IFDEF VAR(CCP2CON)
-              ;if PWMChannel = 2 then
-              3203: IF PWMCHANNEL = 2 THEN
-              3205: #IFNDEF BIT(CCP2FMT)
-              ;PRx_Temp = PWMDuty * ( PRx_Temp + 2)  'Correction
-              3206: PRX_TEMP = PWMDUTY * ( PRX_TEMP + 2)
-              ;CCPR2L = PRx_Temp_H
-              3207: CCPR2L = PRX_TEMP_H
-              ;If PWMDuty = 0 Then CCPR2L = 0  ' Assure OFF at Zero
-              3208: IF PWMDUTY = 0 THEN
-              ;If PWMDuty = 0 Then CCPR2L = 0  ' Assure OFF at Zero
-              3208: CCPR2L = 0
-              ;If PWMDuty = 0 Then CCPR2L = 0  ' Assure OFF at Zero
-              3208: END IF
-              ;SET CCP2M3 ON
-              3209: SET CCP2M3 ON
-              ;SET CCP2M2 ON
-              3210: SET CCP2M2 ON
-              ;SET CCP2M1 OFF
-              3211: SET CCP2M1 OFF
-              ;SET CCP2M0 OFF
-              3212: SET CCP2M0 OFF
-              3215: #IFDEF BIT(CCP2FMT)
-              ;calculateDuty 'Sets PRx_Temp  to the duty value for bits 15-8 and 7-6
-              3216: CALCULATEDUTY
-              ;CCPR2H = PRx_Temp_H
-              3217: CCPR2H = PRX_TEMP_H
-              ;CCPR2L = PRx_Temp
-              3218: CCPR2L = PRX_TEMP
-              ;SET CCP2M3 ON
-              3219: SET CCP2M3 ON
-              ;SET CCP2M2 ON
-              3220: SET CCP2M2 ON
-              ;SET CCP2M1 ON
-              3221: SET CCP2M1 ON
-              ;SET CCP2M0 ON
-              3222: SET CCP2M0 ON
-              3224: #IFDEF BIT(CCP2EN)
-              ;SET CCP2EN ON
-              3225: SET CCP2EN ON
-              3224: #IFDEF BIT(CCP2EN)
-              ;SET CCP2EN ON
-              3225: SET CCP2EN ON
-              3228: #IFDEF BIT(CCP2CON_EN)
-              ;SET CCP2CON_EN ON
-              3229: SET CCP2CON_EN ON
-              3232: #IFDEF BIT(CCP2FMT)
-              ;SET CCP2FMT ON
-              3233: SET CCP2FMT ON
+              3182: #IFDEF BIT(C1TSEL0)
+              ;C1TSEL0 = TimerSelectionBits.0
+              3183: C1TSEL0 = TIMERSELECTIONBITS.0
+              ;C1TSEL1 = TimerSelectionBits.1
+              3184: C1TSEL1 = TIMERSELECTIONBITS.1
               3253: #IFDEF USE_HPWMCCP3 TRUE
               3255: #IFDEF ADDHPWMCCPSETUP3
               ;AddHPWMCCPSetup3
               3256: ADDHPWMCCPSETUP3
-              3310: #IFDEF USE_HPWMCCP4 TRUE
-              3312: #IFDEF ADDHPWMCCPSETUP4
-              ;AddHPWMCCPSetup4
-              3313: ADDHPWMCCPSETUP4
-              3367: #IFDEF USE_HPWMCCP5 TRUE
-              3369: #IFDEF ADDHPWMCCPSETUP5
-              ;AddHPWMCCPSetup5
-              3370: ADDHPWMCCPSETUP5
+              3439: #IFDEF CHIPPWMTIMERVARIANT
+              ;Dim TimerSelectionBits as byte
+              3440: DIM TIMERSELECTIONBITS AS BYTE
               3490: #IFDEF USE_HPWM_TIMER2 TRUE
               ;case 2 'Select timer2 as the driver for PWM
               3491: CASE 2
@@ -2435,267 +2609,9 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               3534: SET T2CKPS1 ON
               ;if Tx_PR = 64 then SET T2CKPS2 ON: SET T2CKPS1 ON
               3534: END IF
-              3553: #IFDEF USE_HPWM_TIMER4 TRUE
-              3554: #IFDEF VAR(T4CON)
-              ;case 4
-              3555: CASE 4
-              ;Set PR4
-              ;PR4 = PRx_Temp  'This is required in the next sction of code, and as will not know which timer has been selected
-              3557: PR4 = PRX_TEMP
-              ;Set Clock Source, if required
-              3560: #IFDEF VAR(T4CLKCON)
-              3561: #IFNDEF CHIPTIMERXCLOCKSOURCESVARIANT
-              ;Set to FOSC/4 for backward compatibility@4c where CS<3:0> = 0001 = Fosc/4
-              ;T4CLKCON.T4CS0 = 1
-              3563: T4CLKCON.T4CS0 = 1
-              ;T4CLKCON.T4CS1 = 0
-              3564: T4CLKCON.T4CS1 = 0
-              ;T4CLKCON.T4CS2 = 0
-              3565: T4CLKCON.T4CS2 = 0
-              ;T4CLKCON.T4CS3 = 0
-              3566: T4CLKCON.T4CS3 = 0
-              3616: #IFDEF USE_HPWM_TIMER6 TRUE
-              3618: #IFDEF VAR(T6CON)
-              ;case 6
-              3619: CASE 6
-              ;Set PR6
-              ;PR6 = PRx_Temp  'This is required in the next sction of code, and will not know which timer has been selected
-              3622: PR6 = PRX_TEMP
-              ;Set Clock Source, if required
-              3625: #IFDEF VAR(T6CLKCON)
-              3626: #IFNDEF CHIPTIMERXCLOCKSOURCESVARIANT
-              ;Set to FOSC/4 for backward compatibility@6c where CS<3:0> = 0001 = Fosc/4
-              ;T6CLKCON.T6CS0 = 1
-              3628: T6CLKCON.T6CS0 = 1
-              ;T6CLKCON.T6CS1 = 0
-              3629: T6CLKCON.T6CS1 = 0
-              ;T6CLKCON.T6CS2 = 0
-              3630: T6CLKCON.T6CS2 = 0
-              ;T6CLKCON.T6CS3 = 0
-              3631: T6CLKCON.T6CS3 = 0
               3704: #IFNDEF HPWM_FAST
               ;PRx_Temp_Cache = PRx_Temp
               3705: PRX_TEMP_CACHE = PRX_TEMP
-              3709: #IFDEF USE_HPWM1 TRUE
-              3711: #IFDEF ADDHPWMSETUP1
-              ;AddHPWMSetup1
-              3712: ADDHPWMSETUP1
-              3774: #IFDEF USE_HPWM2 TRUE
-              3776: #IFDEF ADDHPWMSETUP2
-              ;AddHPWMSetup2
-              3777: ADDHPWMSETUP2
-              3839: #IFDEF USE_HPWM3 TRUE
-              3841: #IFDEF ADDHPWMSETUP3
-              ;AddHPWMSetup3
-              3842: ADDHPWMSETUP3
-              3845: #IF VAR(PWM3DCH)
-              ;if PWMChannel = 3 then  'in section USE_HPWM3
-              3847: IF PWMCHANNEL = 3 THEN
-              ;calculates duty, assisgns duty to  bits 15-8 and 7-6 of PMWxDH(H&L) and links this PWM to the correct timer
-              ;calculateDuty 'Sets PRx_Temp  to the duty value for bits 15-8 and 7-6
-              3849: CALCULATEDUTY
-              ;PWM3DCH = PRx_Temp_H
-              3850: PWM3DCH = PRX_TEMP_H
-              ;PWM3DCL = PRx_Temp
-              3851: PWM3DCL = PRX_TEMP
-              ;Select timer by updating CCPTMRS register
-              3854: #IF CHIPPWMTIMERVARIANT = 1
-              ;TimerSelectionBits =  (_PWMTimerSelected / 2 )-1 'This is a ChipPWMTimerVariant chip.  Move the timer bits to the left by one bit to cater for different addressing
-              3855: TIMERSELECTIONBITS = (_PWMTIMERSELECTED / 2 )-1
-              ;SetWith ( P3TSEL0, TimerSelectionBits.0 )
-              3857: SETWITH ( P3TSEL0, TIMERSELECTIONBITS.0 )
-              ;SetWith ( P3TSEL1, TimerSelectionBits.1 )
-              3858: SETWITH ( P3TSEL1, TIMERSELECTIONBITS.1 )
-              3878: #IFNDEF CHIPPWMTIMERVARIANT
-              3880: #IFDEF BIT(P3TSEL0)
-              ;SetWith ( P3TSEL0, _PWMTimerSelected.1 )
-              3881: SETWITH ( P3TSEL0, _PWMTIMERSELECTED.1 )
-              ;SetWith ( P3TSEL1, _PWMTimerSelected.2 )
-              3882: SETWITH ( P3TSEL1, _PWMTIMERSELECTED.2 )
-              3891: #IFDEF BIT(PWM3EN)
-              ;Start PMW3
-              ;Set PWM3EN On
-              3893: SET PWM3EN ON
-              3907: #IFDEF USE_HPWM4 TRUE
-              3909: #IFDEF ADDHPWMSETUP4
-              ;AddHPWMSetup4
-              3910: ADDHPWMSETUP4
-              3913: #IF VAR(PWM4DCH)
-              ;if PWMChannel = 4 then  'in section USE_HPWM4
-              3915: IF PWMCHANNEL = 4 THEN
-              ;calculates duty, assisgns duty to  bits 15-8 and 7-6 of PMWxDH(H&L) and links this PWM to the correct timer
-              ;calculateDuty 'Sets PRx_Temp  to the duty value for bits 15-8 and 7-6
-              3917: CALCULATEDUTY
-              ;PWM4DCH = PRx_Temp_H
-              3918: PWM4DCH = PRX_TEMP_H
-              ;PWM4DCL = PRx_Temp
-              3919: PWM4DCL = PRX_TEMP
-              ;Select timer by updating CCPTMRS1 register
-              3922: #IF CHIPPWMTIMERVARIANT = 1
-              ;TimerSelectionBits =  (_PWMTimerSelected / 2 )-1 'This is a ChipPWMTimerVariant chip.  Move the timer bits to the left by one bit to cater for different addressing
-              3923: TIMERSELECTIONBITS = (_PWMTIMERSELECTED / 2 )-1
-              ;SetWith ( P4TSEL0, TimerSelectionBits.0 )
-              3925: SETWITH ( P4TSEL0, TIMERSELECTIONBITS.0 )
-              ;SetWith ( P4TSEL1, TimerSelectionBits.1 )
-              3926: SETWITH ( P4TSEL1, TIMERSELECTIONBITS.1 )
-              3945: #IFNDEF CHIPPWMTIMERVARIANT
-              3946: #IFDEF BIT(P4TSEL0)
-              ;SetWith ( P4TSEL0, _PWMTimerSelected.1 )
-              3947: SETWITH ( P4TSEL0, _PWMTIMERSELECTED.1 )
-              ;SetWith ( P4TSEL1, _PWMTimerSelected.2 )
-              3948: SETWITH ( P4TSEL1, _PWMTIMERSELECTED.2 )
-              3956: #IFDEF BIT(PWM4EN)
-              ;Start PMW4
-              ;Set PWM4EN On
-              3958: SET PWM4EN ON
-              3972: #IFDEF USE_HPWM5 TRUE
-              3974: #IFDEF ADDHPWMSETUP5
-              ;AddHPWMSetup5
-              3975: ADDHPWMSETUP5
-              3978: #IF VAR(PWM5DCH)
-              ;if PWMChannel = 5 then  'in section USE_HPWM5
-              3980: IF PWMCHANNEL = 5 THEN
-              ;calculates duty, assisgns duty to  bits 15-8 and 7-6 of PMWxDH(H&L) and links this PWM to the correct timer
-              ;calculateDuty 'Sets PRx_Temp  to the duty value for bits 15-8 and 7-6
-              3982: CALCULATEDUTY
-              ;PWM5DCH = PRx_Temp_H
-              3983: PWM5DCH = PRX_TEMP_H
-              ;PWM5DCL = PRx_Temp
-              3984: PWM5DCL = PRX_TEMP
-              ;Select timer by updating CCPTMRS1 register
-              3987: #IFDEF BIT(P5TSEL0)
-              ;SetWith ( P5TSEL0, _PWMTimerSelected.1 )
-              3988: SETWITH ( P5TSEL0, _PWMTIMERSELECTED.1 )
-              ;SetWith ( P5TSEL1, _PWMTimerSelected.2 )
-              3989: SETWITH ( P5TSEL1, _PWMTIMERSELECTED.2 )
-              3996: #IFDEF BIT(PWM5EN)
-              ;Start PMW5
-              ;Set PWM5EN On
-              3998: SET PWM5EN ON
-              4012: #IFDEF USE_HPWM6 TRUE
-              4014: #IFDEF ADDHPWMSETUP6
-              ;AddHPWMSetup6
-              4015: ADDHPWMSETUP6
-              4018: #IF VAR(PWM6DCH)
-              ;if PWMChannel = 6 then  'in section USE_HPWM6
-              4020: IF PWMCHANNEL = 6 THEN
-              ;calculates duty, assisgns duty to  bits 15-8 and 7-6 of PMWxDH(H&L) and links this PWM to the correct timer
-              ;calculateDuty 'Sets PRx_Temp  to the duty value for bits 15-8 and 7-6
-              4022: CALCULATEDUTY
-              ;PWM6DCH = PRx_Temp_H
-              4023: PWM6DCH = PRX_TEMP_H
-              ;PWM6DCL = PRx_Temp
-              4024: PWM6DCL = PRX_TEMP
-              ;Select timer by updating CCPTMRS1 register
-              4026: #IFDEF BIT(P6TSEL0)
-              ;SetWith ( P6TSEL0, _PWMTimerSelected.1 )
-              4027: SETWITH ( P6TSEL0, _PWMTIMERSELECTED.1 )
-              ;SetWith ( P6TSEL1, _PWMTimerSelected.2 )
-              4028: SETWITH ( P6TSEL1, _PWMTIMERSELECTED.2 )
-              4035: #IFDEF BIT(PWM6EN)
-              ;Start PMW6
-              ;Set PWM6EN On
-              4037: SET PWM6EN ON
-              4052: #IFDEF USE_HPWM7 TRUE
-              4054: #IFDEF ADDHPWMSETUP7
-              ;AddHPWMSetup7
-              4055: ADDHPWMSETUP7
-              4092: #IFDEF USE_HPWM8 TRUE
-              4094: #IFDEF ADDHPWMSETUP8
-              ;AddHPWMSetup8
-              4095: ADDHPWMSETUP8
-              4149: #IFDEF USE_HPWM1 TRUE
-              4150: PWMUPDATE_HARDWAREMODEPWM1:
-              4152: #IF VAR(PWM1DCH)
-              ;if PWMChannel = 1 then  'in section USE_HPWM1
-              4154: IF PWMCHANNEL = 1 THEN
-              4156: #IFDEF ADDHPWMUPDATE1
-              ;AddHPWMUpdate1
-              4157: ADDHPWMUPDATE1
-              4185: #IFDEF USE_HPWM2 TRUE
-              4186: PWMUPDATE_HARDWAREMODEPWM2:
-              4188: #IF VAR(PWM2DCH)
-              ;if PWMChannel = 2 then  'in section USE_HPWM2
-              4190: IF PWMCHANNEL = 2 THEN
-              4192: #IFDEF ADDHPWMUPDATE2
-              ;AddHPWMUpdate2
-              4193: ADDHPWMUPDATE2
-              4220: #IFDEF USE_HPWM3 TRUE
-              4221: PWMUPDATE_HARDWAREMODEPWM3:
-              4223: #IF VAR(PWM3DCH)
-              ;if PWMChannel = 3 then  'in section USE_HPWM3
-              4225: IF PWMCHANNEL = 3 THEN
-              4227: #IFDEF ADDHPWMUPDATE3
-              ;AddHPWMUpdate3
-              4228: ADDHPWMUPDATE3
-              4223: #IF VAR(PWM3DCH)
-              ;if PWMChannel = 3 then  'in section USE_HPWM3
-              4225: IF PWMCHANNEL = 3 THEN
-              4227: #IFDEF ADDHPWMUPDATE3
-              ;AddHPWMUpdate3
-              4228: ADDHPWMUPDATE3
-              4241: #IFDEF BIT(PWM3EN)
-              ;Set PWM3EN On
-              4242: SET PWM3EN ON
-              4255: #IFDEF USE_HPWM4 TRUE
-              4256: PWMUPDATE_HARDWAREMODEPWM4:
-              4258: #IF VAR(PWM4DCH)
-              ;if PWMChannel = 4 then  'in section USE_HPWM4
-              4260: IF PWMCHANNEL = 4 THEN
-              4262: #IFDEF ADDHPWMUPDATE4
-              ;AddHPWMUpdate4
-              4263: ADDHPWMUPDATE4
-              4258: #IF VAR(PWM4DCH)
-              ;if PWMChannel = 4 then  'in section USE_HPWM4
-              4260: IF PWMCHANNEL = 4 THEN
-              4262: #IFDEF ADDHPWMUPDATE4
-              ;AddHPWMUpdate4
-              4263: ADDHPWMUPDATE4
-              4275: #IFDEF BIT(PWM4EN)
-              ;Set PWM4EN On
-              4276: SET PWM4EN ON
-              4289: #IFDEF USE_HPWM5 TRUE
-              4290: PWMUPDATE_HARDWAREMODEPWM5:
-              4292: #IF VAR(PWM5DCH)
-              ;if PWMChannel = 5 then  'in section USE_HPWM5
-              4294: IF PWMCHANNEL = 5 THEN
-              4296: #IFDEF ADDHPWMUPDATE5
-              ;AddHPWMUpdate5
-              4297: ADDHPWMUPDATE5
-              4292: #IF VAR(PWM5DCH)
-              ;if PWMChannel = 5 then  'in section USE_HPWM5
-              4294: IF PWMCHANNEL = 5 THEN
-              4296: #IFDEF ADDHPWMUPDATE5
-              ;AddHPWMUpdate5
-              4297: ADDHPWMUPDATE5
-              4309: #IFDEF BIT(PWM5EN)
-              ;Set PWM5EN On
-              4310: SET PWM5EN ON
-              4323: #IFDEF USE_HPWM6 TRUE
-              4324: PWMUPDATE_HARDWAREMODEPWM6:
-              4326: #IF VAR(PWM6DCH)
-              4328: #IFDEF ADDHPWMUPDATE6
-              ;AddHPWMUpdate6
-              4329: ADDHPWMUPDATE6
-              4326: #IF VAR(PWM6DCH)
-              4328: #IFDEF ADDHPWMUPDATE6
-              ;AddHPWMUpdate6
-              4329: ADDHPWMUPDATE6
-              4342: #IFDEF BIT(PWM6EN)
-              ;Set PWM6EN On
-              4343: SET PWM6EN ON
-              4356: #IFDEF USE_HPWM7 TRUE
-              4357: PWMUPDATE_HARDWAREMODEPWM7:
-              4359: #IF VAR(PWM7DCH)
-              4361: #IFDEF ADDHPWMUPDATE7
-              ;AddHPWMUpdate7
-              4362: ADDHPWMUPDATE7
-              4390: #IFDEF USE_HPWM8 TRUE
-              4391: PWMUPDATE_HARDWAREMODEPWM8:
-              4393: #IF VAR(PWM8DCH)
-              4395: #IFDEF ADDHPWMUPDATE8
-              ;AddHPWMUpdate8
-              4396: ADDHPWMUPDATE8
               4427: #IFDEF USE_HPWMCCP1 TRUE
               4428: PWMUPDATE_HARDWAREMODEPWMCCP1:
               4429: #IFDEF VAR(CCPR1L)
@@ -2734,28 +2650,6 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               4458: CCPR1H = PRX_TEMP_H
               ;CCPR1L = PRx_Temp
               4459: CCPR1L = PRX_TEMP
-              4474: #IFDEF USE_HPWMCCP2 TRUE
-              4475: PWMUPDATE_HARDWAREMODEPWMCCP2:
-              4477: #IFDEF VAR(CCPR2L)
-              ;if PWMChannel = 2 then  'in section USE_HPWMCCP2
-              4480: IF PWMCHANNEL = 2 THEN
-              4482: #IFDEF ADDHPWMCCPSETUP2
-              ;AddHPWMCCPSetup2
-              4483: ADDHPWMCCPSETUP2
-              4477: #IFDEF VAR(CCPR2L)
-              ;if PWMChannel = 2 then  'in section USE_HPWMCCP2
-              4480: IF PWMCHANNEL = 2 THEN
-              4482: #IFDEF ADDHPWMCCPSETUP2
-              ;AddHPWMCCPSetup2
-              4483: ADDHPWMCCPSETUP2
-              4494: #IFDEF BIT(CCP2FMT)
-              ;ifdef BIT(CCP2FMT) Testing this bit is to identify the use of CCPR2H and CCPR2L for PWM
-              ;calculateDuty 'Sets PRx_Temp  to the duty value for bits 15-8 and 7-6
-              4496: CALCULATEDUTY
-              ;CCPR2H = PRx_Temp_H
-              4497: CCPR2H = PRX_TEMP_H
-              ;CCPR2L = PRx_Temp
-              4498: CCPR2L = PRX_TEMP
               4511: #IFDEF USE_HPWMCCP3 TRUE
               4512: PWMUPDATE_HARDWAREMODEPWMCCP3:
               4514: #IFDEF VAR(CCPR3L)
@@ -2764,22 +2658,6 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               4518: #IFDEF ADDHPWMCCPSETUP3
               ;AddHPWMCCPSetup3
               4519: ADDHPWMCCPSETUP3
-              4548: #IFDEF USE_HPWMCCP4 TRUE
-              4549: PWMUPDATE_HARDWAREMODEPWMCCP4:
-              4551: #IFDEF VAR(CCPR4L)
-              ;if PWMChannel = 4 then  'in section USE_HPWMCCP4
-              4553: IF PWMCHANNEL = 4 THEN
-              4555: #IFDEF ADDHPWMCCPSETUP4
-              ;AddHPWMCCPSetup4
-              4556: ADDHPWMCCPSETUP4
-              4584: #IFDEF USE_HPWMCCP5 TRUE
-              4585: PWMUPDATE_HARDWAREMODEPWMCCP5:
-              4587: #IFDEF VAR(CCPR5L)
-              ;if PWMChannel = 5 then  'in section USE_HPWMCCP5
-              4589: IF PWMCHANNEL = 5 THEN
-              4591: #IFDEF ADDHPWMCCPSETUP5
-              ;AddHPWMCCPSetup5
-              4592: ADDHPWMCCPSETUP5
               4654: #IFDEF USE_HPWMCCP1 TRUE AND VAR(CCP1CON)
               ;Case 1:
               4655: CASE 1
@@ -2931,9 +2809,6 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               94: #IFNDEF VAR(EEADRH)
               ;Dim EEAddress Alias EEADR  'erv
               95: DIM EEADDRESS ALIAS EEADR
-              114: #IFDEF BIT(CFGS)
-              ;Set CFGS OFF
-              115: SET CFGS OFF
               189: #IFDEF PIC
               ;Variable alias
               192: #IFNDEF VAR(EEADRH)
@@ -2942,9 +2817,6 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               192: #IFNDEF VAR(EEADRH)
               ;Dim EEAddress Alias EEADR
               193: DIM EEADDRESS ALIAS EEADR
-              209: #IFDEF BIT(CFGS)
-              ;Set CFGS OFF
-              210: SET CFGS OFF
               257: #IFDEF PIC
               ;Variable alias
               259: #IFNDEF VAR(EEADRH)
@@ -2953,67 +2825,95 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               259: #IFNDEF VAR(EEADRH)
               ;Dim EEAddress Alias EEADR
               260: DIM EEADDRESS ALIAS EEADR
-              276: #IFDEF BIT(CFGS)
-              ;Set CFGS OFF
-              277: SET CFGS OFF
-              325: #IFDEF BIT(NVMREGS)
-              ;ALL 16F NVMREGS Devices Except 18FxxK40/K42
-              ;SysEEPromAddress = SysEEAddress + 0x7000
-              327: SYSEEPROMADDRESS = SYSEEADDRESS + 28672
-              ;NVMADRH =SysEEPromAddress_h
-              328: NVMADRH =SYSEEPROMADDRESS_H
-              ;NVMADRL =SysEEPromAddress
-              329: NVMADRL =SYSEEPROMADDRESS
-              ;NVMDATL = EEData
-              330: NVMDATL = EEDATA
-              ;NVMREGS = 1
-              331: NVMREGS = 1
-              413: #IF BIT(FREE)
-              ;FREE =0b'0'
-              414: FREE =0
-              416: #IF BIT(WREN)
-              ;WREN= 0b'1'
-              417: WREN= 1
-              428: #IFNDEF VAR(CHIPMEMORYLOCK)
-              ;NVMCON2 = 0x55
-              429: NVMCON2 = 85
-              ;NVMCON2 = 0xAA
-              430: NVMCON2 = 170
+              346: #IFDEF VAR(NVMADRU)
+              ;Dim  NVMCON1_0_State, NVMCON1_1_State, NVMCON1_2_State as bit
+              348: DIM NVMCON1_0_STATE, NVMCON1_1_STATE, NVMCON1_2_STATE AS BIT
+              ;NVMCON1_0_State = NVMCON1.0
+              349: NVMCON1_0_STATE = NVMCON1.0
+              ;NVMCON1_1_State = NVMCON1.1
+              350: NVMCON1_1_STATE = NVMCON1.1
+              ;NVMCON1_2_State = NVMCON1.2
+              351: NVMCON1_2_STATE = NVMCON1.2
+              353: #IF CHIPSUBFAMILY = CHIPFAMILY18FXXQ83
+              ;Select DATA EE section (0x380000 - 0x3803FF) for ChipFamily18FxxQ83
+              ;NVMADRU = 0x38
+              355: NVMADRU = 56
+              ;Set the NVMCMD control bits for DFM Byte Read operation
+              ;NVMCON1 = NVMCON1 and 0XF8 or 0x03' set bits ,1 and0
+              357: NVMCON1 = NVMCON1 AND 248 OR 3
+              393: #IF CHIPSUBFAMILY = CHIPFAMILY18FXXQ10
+              ;Select DATA EE section (0x310000- 0x3103FF) for ChipFamily18FxxQ10
+              ;NVMADRU = 0x31
+              395: NVMADRU = 49
+              419: #IF BIT(NVMEN)
+              ;NVMEN=0b'1'
+              420: NVMEN=1
+              433: #IFDEF VAR(CHIPMEMORYLOCK)
+              ;ChipMemorylock = 0x55
+              434: CHIPMEMORYLOCK = 85
+              ;ChipMemorylock = 0xAA
+              435: CHIPMEMORYLOCK = 170
+              437: #IF BIT(GO_NVMCON0)
+              ;GO_NVMCON0 =1
+              438: GO_NVMCON0 =1
+              ;wait while GO_NVMCON0 = 1
+              439: WAIT WHILE GO_NVMCON0 = 1
+              ;NVMCON1 = NVMCON1 and 0XF8
+              440: NVMCON1 = NVMCON1 AND 248
               445: #IF BIT(WR)
               ;WR = 1
               446: WR = 1
               454: #IF BIT(WR)
               ;wait while WR = 1
               455: WAIT WHILE WR = 1
-              458: #IF BIT(WREN)
-              ;WREN= 0b'0'
-              459: WREN= 0
-              500: #IFDEF BIT(NVMREGS)
-              ;Dim SysEEPromAddress As Word
-              501: DIM SYSEEPROMADDRESS AS WORD
-              ;SysEEPromAddress = SysEEAddress + 0x7000
-              502: SYSEEPROMADDRESS = SYSEEADDRESS + 28672
-              ;NVMADRH = SysEEPromAddress_h
-              503: NVMADRH = SYSEEPROMADDRESS_H
-              ;NVMADRL = SysEEPromAddress
-              504: NVMADRL = SYSEEPROMADDRESS
-              ;NVMREGS = 1
-              505: NVMREGS = 1
+              461: #IF BIT(NVMEN)
+              ;NVMEN=0b'0'
+              462: NVMEN=0
+              475: #IFDEF VAR(NVMADRU)
+              ;NVMCON1.0 = NVMCON1_0_State
+              476: NVMCON1.0 = NVMCON1_0_STATE
+              ;NVMCON1.1 = NVMCON1_1_State
+              477: NVMCON1.1 = NVMCON1_1_STATE
+              ;NVMCON1.2 = NVMCON1_2_State
+              478: NVMCON1.2 = NVMCON1_2_STATE
+              532: #IFDEF VAR(NVMADRU)
+              534: #IF CHIPSUBFAMILY = CHIPFAMILY18FXXQ83
+              ;Select DATA EE section (0x380000 - 0x3803FF) for ChipFamily18FxxQ83
+              ;NVMADRU = 0x38
+              536: NVMADRU = 56
+              ;NVMADRH =SysEEAddress_h
+              537: NVMADRH =SYSEEADDRESS_H
+              ;NVMADRL =SysEEAddress
+              538: NVMADRL =SYSEEADDRESS
+              ;Set the NVMCMD control bits for DFM Byte Read operation by clearing NVMCMD[2:0] NVM Command bits
+              ;NVMCON1 = 0
+              540: NVMCON1 = 0
+              ;GO_NVMCON0 = 1
+              541: GO_NVMCON0 = 1
+              595: #IF CHIPSUBFAMILY = CHIPFAMILY18FXXQ10
+              ;Select DATA EE section (0x310000- 0x3103FF) for ChipFamily18FxxQ10
+              ;NVMADRU = 0x31
+              597: NVMADRU = 49
+              ;NVMADRH =SysEEAddress_h
+              598: NVMADRH =SYSEEADDRESS_H
+              ;NVMADRL =SysEEAddress
+              599: NVMADRL =SYSEEADDRESS
               ;RD = 1
-              506: RD = 1
-              ;NOP     ' NOPs may be required for latency at high frequencies
-              507: NOP
+              600: RD = 1
+              ;NOP     ' NOPs added for latency at high frequencies
+              601: NOP
               ;NOP
-              508: NOP
+              602: NOP
               ;NOP
-              509: NOP
+              603: NOP
               ;NOP
-              510: NOP
-              ;EEDataValue = NVMDATL
-              511: EEDATAVALUE = NVMDATL
+              604: NOP
               64: #IFDEF PIC
               ;Dim SysCallAdr As Word Alias SysWordTempX_H, SysWordTempX
               65: DIM SYSCALLADR AS WORD ALIAS SYSWORDTEMPX_H, SYSWORDTEMPX
+              66: #IFDEF VAR(PCLATU)
+              ;PCLATU = 0
+              67: PCLATU = 0
               66: #IFDEF VAR(PCLATU)
               ;PCLATU = 0
               67: PCLATU = 0
@@ -3076,27 +2976,27 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               456: #IFDEF DISP_SEL_1
               ;Set DISP_SEL_1 On
               457: SET DISP_SEL_1 ON
-              594: #IFDEF LCD_SPEED SLOW
-              ;`LCD_Speed is SLOW`
+              588: #IFDEF LCD_SPEED FAST
+              ;`LCD_Speed is FAST`
               602: #IFDEF LCD_IO 4,8,10,12
               603: #IFDEF LCD_BACKLIGHT
               ;Dir LCD_Backlight OUT
               604: DIR LCD_BACKLIGHT OUT
               ;Set LCD_Backlight OFF
               605: SET LCD_BACKLIGHT OFF
-              833: #IFDEF LCD_IO 8
+              701: #IFDEF LCD_IO 4
               ;Wait 50 ms
-              835: WAIT 50 MS
-              837: #IFNDEF LCD_NO_RW
+              703: WAIT 50 MS
+              705: #IFNDEF LCD_NO_RW
               ;Dir LCD_RW OUT
-              838: DIR LCD_RW OUT
+              706: DIR LCD_RW OUT
               ;Set LCD_RW OFF
-              839: SET LCD_RW OFF
-              837: #IFNDEF LCD_NO_RW
+              707: SET LCD_RW OFF
+              705: #IFNDEF LCD_NO_RW
               ;Dir LCD_RW OUT
-              838: DIR LCD_RW OUT
+              706: DIR LCD_RW OUT
               ;Set LCD_RW OFF
-              839: SET LCD_RW OFF
+              707: SET LCD_RW OFF
               1097: #IFNDEF LCD_NO_RW
               1098: #IFDEF LCD_IO 1, 2, 2_74XX174, 2_74XX164
               ;LCDReady = TRUE
@@ -3184,31 +3084,37 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               1131: LCDTEMPRWCOUNT++
               ;Loop While SysLCDTemp.7 <> 0
               1132: LOOP WHILE SYSLCDTEMP.7 ~ 0
-              1136: #IFDEF LCD_IO 8
+              1119: #IFDEF LCD_IO 4
               ;LCDTEMPRWCount = 0
-              1137: LCDTEMPRWCOUNT = 0
+              1120: LCDTEMPRWCOUNT = 0
               ;Do
-              1138: DO
-              ;Wait 1 us
-              1139: WAIT 1 US
+              1121: DO
+              ;wait 1 us
+              1122: WAIT 1 US
               ;Set LCD_Enable ON
-              1140: SET LCD_ENABLE ON
-              ;Wait 1 us
-              1141: WAIT 1 US
+              1123: SET LCD_ENABLE ON
+              ;wait 1 us
+              1124: WAIT 1 US
               ;SysLCDTemp.7 = SCRIPT_LCD_BF
-              1142: SYSLCDTEMP.7 = SCRIPT_LCD_BF
+              1125: SYSLCDTEMP.7 = SCRIPT_LCD_BF
               ;Set LCD_Enable OFF
-              1143: SET LCD_ENABLE OFF
+              1126: SET LCD_ENABLE OFF
+              ;Wait 1 us
+              1127: WAIT 1 US
+              ;PulseOut LCD_Enable, 1 us
+              1128: PULSEOUT LCD_ENABLE, 1 US
+              ;Wait 1 us
+              1129: WAIT 1 US
               ;if LCDTEMPRWCount = 255 Then SysLCDTemp.7 = 0
-              1144: IF LCDTEMPRWCOUNT = 255 THEN
+              1130: IF LCDTEMPRWCOUNT = 255 THEN
               ;if LCDTEMPRWCount = 255 Then SysLCDTemp.7 = 0
-              1144: SYSLCDTEMP.7 = 0
+              1130: SYSLCDTEMP.7 = 0
               ;if LCDTEMPRWCount = 255 Then SysLCDTemp.7 = 0
-              1144: END IF
+              1130: END IF
               ;LCDTEMPRWCount++
-              1145: LCDTEMPRWCOUNT++
+              1131: LCDTEMPRWCOUNT++
               ;Loop While SysLCDTemp.7 <> 0
-              1147: LOOP WHILE SYSLCDTEMP.7 ~ 0
+              1132: LOOP WHILE SYSLCDTEMP.7 ~ 0
               1163: #IFNDEF LCD_NO_RW
               1164: #IFDEF LCD_IO 4,8
               ;CheckBusyFlag         'WaitForReady
@@ -3220,21 +3126,37 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               1165: CHECKBUSYFLAG
               ;set LCD_RW OFF
               1166: SET LCD_RW OFF
-              1265: #IFDEF LCD_IO 8
-              ;Set data port to output
-              ;DIR LCD_DATA_PORT out
-              1268: DIR LCD_DATA_PORT OUT
-              ;write the data
-              ;LCD_DATA_PORT = LCDByte
-              1271: LCD_DATA_PORT = LCDBYTE
-              ;Wait 1 us
-              1272: WAIT 1 US
-              ;PulseOut LCD_enable, 1 us
-              1274: PULSEOUT LCD_ENABLE, 1 US
-              ;LCD_DATA_PORT = 0
-              1276: LCD_DATA_PORT = 0
-              ;Wait SCRIPT_LCD_POSTWRITEDELAY
-              1278: WAIT SCRIPT_LCD_POSTWRITEDELAY
+              1204: #IFDEF LCD_IO 4
+              ;Dim Temp as Byte
+              ;Pins must be outputs if returning from WaitForReady, or after LCDReadByte or GET subs
+              ;DIR LCD_DB4 OUT
+              1208: DIR LCD_DB4 OUT
+              ;DIR LCD_DB5 OUT
+              1209: DIR LCD_DB5 OUT
+              ;DIR LCD_DB6 OUT
+              1210: DIR LCD_DB6 OUT
+              ;DIR LCD_DB7 OUT
+              1211: DIR LCD_DB7 OUT
+              ;Write upper nibble to output pins
+              ;set LCD_DB4 OFF
+              ;set LCD_DB5 OFF
+              ;set LCD_DB6 OFF
+              ;set LCD_DB7 OFF
+              ;if LCDByte.7 ON THEN SET LCD_DB7 ON
+              ;if LCDByte.6 ON THEN SET LCD_DB6 ON
+              ;if LCDByte.5 ON THEN SET LCD_DB5 ON
+              ;if LCDByte.4 ON THEN SET LCD_DB4 ON
+              ;LCD_DB7 = LCDByte.7
+              1222: LCD_DB7 = LCDBYTE.7
+              ;LCD_DB6 = LCDByte.6
+              1223: LCD_DB6 = LCDBYTE.6
+              ;LCD_DB5 = LCDByte.5
+              1224: LCD_DB5 = LCDBYTE.5
+              ;LCD_DB4 = LCDByte.4
+              1225: LCD_DB4 = LCDBYTE.4
+              1228: #IFDEF LCD_VFD_DELAY
+              ;Wait LCD_VFD_DELAY
+              1229: WAIT LCD_VFD_DELAY
               1609: #IFNDEF LCD_NO_RW
               ;set LCD_RW ON 'Read mode
               1611: SET LCD_RW ON
@@ -3316,19 +3238,82 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               1638: SET LCD_ENABLE OFF
               ;Wait 5 us
               1639: WAIT 5 US
-              1642: #IFDEF LCD_IO 8
-              ;DIR LCD_DATA_PORT 255
-              1643: DIR LCD_DATA_PORT 255
+              1614: #IFDEF LCD_IO 4
+              ;Set pins to input
+              ;DIR LCD_DB4 IN
+              1616: DIR LCD_DB4 IN
+              ;DIR LCD_DB5 IN
+              1617: DIR LCD_DB5 IN
+              ;DIR LCD_DB6 IN
+              1618: DIR LCD_DB6 IN
+              ;DIR LCD_DB7 IN
+              1619: DIR LCD_DB7 IN
+              ;Read upper nibble from input pins
               ;SET LCD_Enable ON
-              1644: SET LCD_ENABLE ON
-              ;Wait LCD_Write_Delay
-              1645: WAIT LCD_WRITE_DELAY
-              ;LCDReadByte = LCD_DATA_PORT
-              1646: LCDREADBYTE = LCD_DATA_PORT
+              1622: SET LCD_ENABLE ON
+              ;Wait LCD_Write_Delay     '2 us
+              1623: WAIT LCD_WRITE_DELAY
+              ;if LCD_DB7 ON then SET LCDReadByte.7 ON
+              1624: IF LCD_DB7 ON THEN
+              ;if LCD_DB7 ON then SET LCDReadByte.7 ON
+              1624: SET LCDREADBYTE.7 ON
+              ;if LCD_DB7 ON then SET LCDReadByte.7 ON
+              1624: END IF
+              ;if LCD_DB6 ON THEN SET LCDReadByte.6 ON
+              1625: IF LCD_DB6 ON THEN
+              ;if LCD_DB6 ON THEN SET LCDReadByte.6 ON
+              1625: SET LCDREADBYTE.6 ON
+              ;if LCD_DB6 ON THEN SET LCDReadByte.6 ON
+              1625: END IF
+              ;if LCD_DB5 ON then SET LCDReadByte.5 ON
+              1626: IF LCD_DB5 ON THEN
+              ;if LCD_DB5 ON then SET LCDReadByte.5 ON
+              1626: SET LCDREADBYTE.5 ON
+              ;if LCD_DB5 ON then SET LCDReadByte.5 ON
+              1626: END IF
+              ;if LCD_DB4 ON THEN SET LCDReadByte.4 ON
+              1627: IF LCD_DB4 ON THEN
+              ;if LCD_DB4 ON THEN SET LCDReadByte.4 ON
+              1627: SET LCDREADBYTE.4 ON
+              ;if LCD_DB4 ON THEN SET LCDReadByte.4 ON
+              1627: END IF
               ;SET LCD_Enable OFF
-              1647: SET LCD_ENABLE OFF
+              1628: SET LCD_ENABLE OFF
               ;Wait 5 us
-              1648: WAIT 5 US
+              1629: WAIT 5 US
+              ;Read lower nibble from input pins
+              ;SET LCD_Enable ON
+              1632: SET LCD_ENABLE ON
+              ;Wait LCD_Write_Delay
+              1633: WAIT LCD_WRITE_DELAY
+              ;if LCD_DB7 ON then SET LCDReadByte.3 ON
+              1634: IF LCD_DB7 ON THEN
+              ;if LCD_DB7 ON then SET LCDReadByte.3 ON
+              1634: SET LCDREADBYTE.3 ON
+              ;if LCD_DB7 ON then SET LCDReadByte.3 ON
+              1634: END IF
+              ;if LCD_DB6 ON THEN SET LCDReadByte.2 ON
+              1635: IF LCD_DB6 ON THEN
+              ;if LCD_DB6 ON THEN SET LCDReadByte.2 ON
+              1635: SET LCDREADBYTE.2 ON
+              ;if LCD_DB6 ON THEN SET LCDReadByte.2 ON
+              1635: END IF
+              ;if LCD_DB5 ON then SET LCDReadByte.1 ON
+              1636: IF LCD_DB5 ON THEN
+              ;if LCD_DB5 ON then SET LCDReadByte.1 ON
+              1636: SET LCDREADBYTE.1 ON
+              ;if LCD_DB5 ON then SET LCDReadByte.1 ON
+              1636: END IF
+              ;if LCD_DB4 ON THEN SET LCDReadByte.0 ON
+              1637: IF LCD_DB4 ON THEN
+              ;if LCD_DB4 ON THEN SET LCDReadByte.0 ON
+              1637: SET LCDREADBYTE.0 ON
+              ;if LCD_DB4 ON THEN SET LCDReadByte.0 ON
+              1637: END IF
+              ;SET LCD_Enable OFF
+              1638: SET LCD_ENABLE OFF
+              ;Wait 5 us
+              1639: WAIT 5 US
               1681: #IFDEF LCD_IO 4,8,10,12
               1682: #IFNDEF LCD_NO_RW
               ;Set LCD_RS Off
@@ -3515,7 +3500,21 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               857: SET TMR3ON ON
               ;IF TMRNumber = 3 then Set TMR3ON on
               857: END IF
+              856: #IFDEF BIT(TMR3ON)
+              ;IF TMRNumber = 3 then Set TMR3ON on
+              857: IF TMRNUMBER = 3 THEN
+              ;IF TMRNumber = 3 then Set TMR3ON on
+              857: SET TMR3ON ON
+              ;IF TMRNumber = 3 then Set TMR3ON on
+              857: END IF
               861: #IFDEF USE_TIMER4 TRUE
+              862: #IFDEF BIT(TMR4ON)
+              ;IF TMRNumber = 4 then Set TMR4ON on
+              863: IF TMRNUMBER = 4 THEN
+              ;IF TMRNumber = 4 then Set TMR4ON on
+              863: SET TMR4ON ON
+              ;IF TMRNumber = 4 then Set TMR4ON on
+              863: END IF
               862: #IFDEF BIT(TMR4ON)
               ;IF TMRNumber = 4 then Set TMR4ON on
               863: IF TMRNUMBER = 4 THEN
@@ -3531,7 +3530,21 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               869: SET TMR5ON ON
               ;IF TMRNumber = 5 then Set TMR5ON on
               869: END IF
+              868: #IFDEF BIT(TMR5ON)
+              ;IF TMRNumber = 5 then Set TMR5ON on
+              869: IF TMRNUMBER = 5 THEN
+              ;IF TMRNumber = 5 then Set TMR5ON on
+              869: SET TMR5ON ON
+              ;IF TMRNumber = 5 then Set TMR5ON on
+              869: END IF
               873: #IFDEF USE_TIMER6 TRUE
+              874: #IFDEF BIT(TMR6ON)
+              ;IF TMRNumber = 6 then Set TMR6ON on
+              875: IF TMRNUMBER = 6 THEN
+              ;IF TMRNumber = 6 then Set TMR6ON on
+              875: SET TMR6ON ON
+              ;IF TMRNumber = 6 then Set TMR6ON on
+              875: END IF
               874: #IFDEF BIT(TMR6ON)
               ;IF TMRNumber = 6 then Set TMR6ON on
               875: IF TMRNUMBER = 6 THEN
@@ -3649,7 +3662,23 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               1035: TMR3L = 0
               ;End If
               1036: END IF
+              1032: #IFDEF VAR(T3CON)
+              ;If TMRNumber = 3 then
+              1033: IF TMRNUMBER = 3 THEN
+              ;TMR3H = 0
+              1034: TMR3H = 0
+              ;TMR3L = 0
+              1035: TMR3L = 0
+              ;End If
+              1036: END IF
               1040: #IFDEF USE_TIMER4 TRUE
+              1041: #IFDEF VAR(T4CON)
+              ;If TMRNumber = 4 Then TMR4 = 0
+              1042: IF TMRNUMBER = 4 THEN
+              ;If TMRNumber = 4 Then TMR4 = 0
+              1042: TMR4 = 0
+              ;If TMRNumber = 4 Then TMR4 = 0
+              1042: END IF
               1041: #IFDEF VAR(T4CON)
               ;If TMRNumber = 4 Then TMR4 = 0
               1042: IF TMRNUMBER = 4 THEN
@@ -3667,7 +3696,23 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               1050: TMR5L = 0
               ;End If
               1051: END IF
+              1047: #IFDEF VAR(T5CON)
+              ;If TMRNumber = 5 then
+              1048: IF TMRNUMBER = 5 THEN
+              ;TMR5H = 0
+              1049: TMR5H = 0
+              ;TMR5L = 0
+              1050: TMR5L = 0
+              ;End If
+              1051: END IF
               1055: #IFDEF USE_TIMER6 TRUE
+              1056: #IFDEF VAR(T6CON)
+              ;If TMRNumber = 6 Then TMR6 = 0
+              1057: IF TMRNUMBER = 6 THEN
+              ;If TMRNumber = 6 Then TMR6 = 0
+              1057: TMR6 = 0
+              ;If TMRNumber = 6 Then TMR6 = 0
+              1057: END IF
               1056: #IFDEF VAR(T6CON)
               ;If TMRNumber = 6 Then TMR6 = 0
               1057: IF TMRNUMBER = 6 THEN
@@ -3824,7 +3869,23 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               1247: TMR3L = TMRVALUE
               ;End If
               1248: END IF
+              1244: #IFDEF VAR(T3CON)
+              ;If TMRNumber = 3 then
+              1245: IF TMRNUMBER = 3 THEN
+              ;TMR3H = TMRValue_H
+              1246: TMR3H = TMRVALUE_H
+              ;TMR3L = TMRValue
+              1247: TMR3L = TMRVALUE
+              ;End If
+              1248: END IF
               1252: #IFDEF USE_TIMER4 TRUE
+              1253: #IFDEF VAR(T4CON)
+              ;If TMRNumber = 4 Then
+              1254: IF TMRNUMBER = 4 THEN
+              ;TMR4 = TMRValue
+              1255: TMR4 = TMRVALUE
+              ;End If
+              1256: END IF
               1253: #IFDEF VAR(T4CON)
               ;If TMRNumber = 4 Then
               1254: IF TMRNUMBER = 4 THEN
@@ -3842,7 +3903,23 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               1264: TMR5L = TMRVALUE
               ;End If
               1265: END IF
+              1261: #IFDEF VAR(T5CON)
+              ;If TMRNumber = 5 then
+              1262: IF TMRNUMBER = 5 THEN
+              ;TMR5H = TMRValue_H
+              1263: TMR5H = TMRVALUE_H
+              ;TMR5L = TMRValue
+              1264: TMR5L = TMRVALUE
+              ;End If
+              1265: END IF
               1269: #IFDEF USE_TIMER6 TRUE
+              1270: #IFDEF VAR(T6CON)
+              ;If TMRNumber = 6 Then
+              1271: IF TMRNUMBER = 6 THEN
+              ;TMR6 = TMRValue
+              1272: TMR6 = TMRVALUE
+              ;End If
+              1273: END IF
               1270: #IFDEF VAR(T6CON)
               ;If TMRNumber = 6 Then
               1271: IF TMRNUMBER = 6 THEN
@@ -3950,7 +4027,21 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               1395: SET TMR3ON OFF
               ;If TMRNumber = 3 Then Set TMR3ON OFF
               1395: END IF
+              1394: #IFDEF BIT(TMR3ON)
+              ;If TMRNumber = 3 Then Set TMR3ON OFF
+              1395: IF TMRNUMBER = 3 THEN
+              ;If TMRNumber = 3 Then Set TMR3ON OFF
+              1395: SET TMR3ON OFF
+              ;If TMRNumber = 3 Then Set TMR3ON OFF
+              1395: END IF
               1399: #IFDEF USE_TIMER4 TRUE
+              1400: #IFDEF BIT(TMR4ON)
+              ;If TMRNumber = 4 Then Set TMR4ON OFF
+              1401: IF TMRNUMBER = 4 THEN
+              ;If TMRNumber = 4 Then Set TMR4ON OFF
+              1401: SET TMR4ON OFF
+              ;If TMRNumber = 4 Then Set TMR4ON OFF
+              1401: END IF
               1400: #IFDEF BIT(TMR4ON)
               ;If TMRNumber = 4 Then Set TMR4ON OFF
               1401: IF TMRNUMBER = 4 THEN
@@ -3966,7 +4057,21 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               1407: SET TMR5ON OFF
               ;If TMRNumber = 5 Then Set TMR5ON OFF
               1407: END IF
+              1406: #IFDEF BIT(TMR5ON)
+              ;If TMRNumber = 5 Then Set TMR5ON OFF
+              1407: IF TMRNUMBER = 5 THEN
+              ;If TMRNumber = 5 Then Set TMR5ON OFF
+              1407: SET TMR5ON OFF
+              ;If TMRNumber = 5 Then Set TMR5ON OFF
+              1407: END IF
               1411: #IFDEF USE_TIMER6 TRUE
+              1412: #IFDEF BIT(TMR6ON)
+              ;If TMRNumber = 6 Then Set TMR6ON OFF
+              1413: IF TMRNUMBER = 6 THEN
+              ;If TMRNumber = 6 Then Set TMR6ON OFF
+              1413: SET TMR6ON OFF
+              ;If TMRNumber = 6 Then Set TMR6ON OFF
+              1413: END IF
               1412: #IFDEF BIT(TMR6ON)
               ;If TMRNumber = 6 Then Set TMR6ON OFF
               1413: IF TMRNUMBER = 6 THEN
@@ -4464,8 +4569,123 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               2024: #IFDEF BIT(TMR1CS)
               ;Set TMRPres.1 OFF
               2025: SET TMRPRES.1 OFF
+              2003: #IFDEF VAR(T3CON)
+              2005: #IF NOVAR(T3CLK)
+              ;Test for valid Pres parameter
+              ;uses less memory than multiple boulean "AND"
+              ;If TMRPres <> 0 then
+              2009: IF TMRPRES ~ 0 THEN
+              ;IF TMRPres <> 16 then
+              2010: IF TMRPRES ~ 16 THEN
+              ;IF TMRPres <> 32 then
+              2011: IF TMRPRES ~ 32 THEN
+              ;IF TMRPres <> 48 then
+              2012: IF TMRPRES ~ 48 THEN
+              ;TMRPres = 0
+              2013: TMRPRES = 0
+              ;END IF
+              2014: END IF
+              ;END IF
+              2015: END IF
+              ;END IF
+              2016: END IF
+              ;END IF
+              2017: END IF
+              ;Re-Using TMRPres as TxCON Temp Register
+              ;IF TMR3ON = 1 then Set TMRPres.0 ON  'The timer running/ Dont Stop !
+              2020: IF TMR3ON = 1 THEN
+              ;IF TMR3ON = 1 then Set TMRPres.0 ON  'The timer running/ Dont Stop !
+              2020: SET TMRPRES.0 ON
+              ;IF TMR3ON = 1 then Set TMRPres.0 ON  'The timer running/ Dont Stop !
+              2020: END IF
+              ;Select Case uses too much memory - changed
+              ;IF TMRSource = OSC then
+              2023: IF TMRSOURCE = OSC THEN
+              2024: #IFDEF BIT(TMR1CS)
+              ;Set TMRPres.1 OFF
+              2025: SET TMRPRES.1 OFF
+              2083: #IFDEF VAR(T3CLK)
+              ;If TMRPres <> 0 then
+              2085: IF TMRPRES ~ 0 THEN
+              ;IF TMRPres <> 16 then
+              2086: IF TMRPRES ~ 16 THEN
+              ;IF TMRPres <> 32 then
+              2087: IF TMRPRES ~ 32 THEN
+              ;IF TMRPres <> 48 then
+              2088: IF TMRPRES ~ 48 THEN
+              ;TMRPres = 0
+              2089: TMRPRES = 0
+              ;END IF
+              2090: END IF
+              ;END IF
+              2091: END IF
+              ;END IF
+              2092: END IF
+              ;END IF
+              2093: END IF
+              ;IF TMR3ON = 1 then Set TMRPres.0 ON  'The timer running/ Dont Stop !
+              2095: IF TMR3ON = 1 THEN
+              ;IF TMR3ON = 1 then Set TMRPres.0 ON  'The timer running/ Dont Stop !
+              2095: SET TMRPRES.0 ON
+              ;IF TMR3ON = 1 then Set TMRPres.0 ON  'The timer running/ Dont Stop !
+              2095: END IF
+              ;IF TMRSource > 15 OR TMRSource <0 then TRMSource = 0  'failsafe
+              2097: IF TMRSOURCE > 15 OR TMRSOURCE <0 THEN
+              ;IF TMRSource > 15 OR TMRSource <0 then TRMSource = 0  'failsafe
+              2097: TRMSOURCE = 0
+              ;IF TMRSource > 15 OR TMRSource <0 then TRMSource = 0  'failsafe
+              2097: END IF
+              ;T3CLK = TMRSource
+              2099: T3CLK = TMRSOURCE
+              ;T3CON = TMRPres
+              2100: T3CON = TMRPRES
               2128: #IFDEF PIC
               2130: #IFDEF VAR(T4CON)
+              2132: #IFDEF BIT(T4CKPS2)
+              ;Enhanced Chips with 1:128 prescale and TxCLKCON Register
+              ;IF TMRPres > 7 then  TMRPres = 0 'failsafe
+              2135: IF TMRPRES > 7 THEN
+              ;IF TMRPres > 7 then  TMRPres = 0 'failsafe
+              2135: TMRPRES = 0
+              ;IF TMRPres > 7 then  TMRPres = 0 'failsafe
+              2135: END IF
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2136: IF TMRPOST > 15 THEN
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2136: TMRPOST = 0
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2136: END IF
+              ;T4CLKCON = TMRSOurce
+              2138: T4CLKCON = TMRSOURCE
+              ;TMRPres = (TMRPres * 16) + TMRPost
+              2139: TMRPRES = (TMRPRES * 16) + TMRPOST
+              ;TMRPres.7 = T4CON.7  'Dont change Enable/RUN state
+              2140: TMRPRES.7 = T4CON.7
+              ;T4CON =  TMRPres
+              2141: T4CON = TMRPRES
+              2130: #IFDEF VAR(T4CON)
+              2132: #IFDEF BIT(T4CKPS2)
+              ;Enhanced Chips with 1:128 prescale and TxCLKCON Register
+              ;IF TMRPres > 7 then  TMRPres = 0 'failsafe
+              2135: IF TMRPRES > 7 THEN
+              ;IF TMRPres > 7 then  TMRPres = 0 'failsafe
+              2135: TMRPRES = 0
+              ;IF TMRPres > 7 then  TMRPres = 0 'failsafe
+              2135: END IF
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2136: IF TMRPOST > 15 THEN
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2136: TMRPOST = 0
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2136: END IF
+              ;T4CLKCON = TMRSOurce
+              2138: T4CLKCON = TMRSOURCE
+              ;TMRPres = (TMRPres * 16) + TMRPost
+              2139: TMRPRES = (TMRPRES * 16) + TMRPOST
+              ;TMRPres.7 = T4CON.7  'Dont change Enable/RUN state
+              2140: TMRPRES.7 = T4CON.7
+              ;T4CON =  TMRPres
+              2141: T4CON = TMRPRES
               2132: #IFDEF BIT(T4CKPS2)
               ;Enhanced Chips with 1:128 prescale and TxCLKCON Register
               ;IF TMRPres > 7 then  TMRPres = 0 'failsafe
@@ -4521,6 +4741,60 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               ;Write the control register
               ;T4CON = TMRPres
               2173: T4CON = TMRPRES
+              2154: #IFDEF VAR(T4CON)
+              2156: #IFDEF NOBIT(T4CKPS2)
+              ;Valid Prescales are   0 - 3
+              ;IF TMRPres > 3 then  TMRPres = 0 'failsafe
+              2160: IF TMRPRES > 3 THEN
+              ;IF TMRPres > 3 then  TMRPres = 0 'failsafe
+              2160: TMRPRES = 0
+              ;IF TMRPres > 3 then  TMRPres = 0 'failsafe
+              2160: END IF
+              ;Valid PostScales are  0 - 15
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2162: IF TMRPOST > 15 THEN
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2162: TMRPOST = 0
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2162: END IF
+              ;Start Building a Temporary Variable
+              ;Re-Using tmrpres as TxCON shadow register
+              ;
+              ;Alternative Method to Previous inline ASM Method
+              ;(Saves 3 byte of Memory)
+              ;TMRPres = TMRPres OR (TMRPost * 8)
+              2169: TMRPRES = TMRPRES OR (TMRPOST * 8)
+              ;If TMR4ON = ON then SET TMRPres.2 ON
+              2170: IF TMR4ON = ON THEN
+              ;If TMR4ON = ON then SET TMRPres.2 ON
+              2170: SET TMRPRES.2 ON
+              ;If TMR4ON = ON then SET TMRPres.2 ON
+              2170: END IF
+              ;Write the control register
+              ;T4CON = TMRPres
+              2173: T4CON = TMRPRES
+              2177: #IFDEF BIT(T4CKPS2)
+              ;Enhanced Chips with 1:128 prescale and T2CLKCON Register
+              ;IF TMRPres > 7 then  TMRPres = 0 'failsafe
+              2180: IF TMRPRES > 7 THEN
+              ;IF TMRPres > 7 then  TMRPres = 0 'failsafe
+              2180: TMRPRES = 0
+              ;IF TMRPres > 7 then  TMRPres = 0 'failsafe
+              2180: END IF
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2181: IF TMRPOST > 15 THEN
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2181: TMRPOST = 0
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2181: END IF
+              ;T4CLKCON = 1  'CLK Source  = FOSC/4
+              2183: T4CLKCON = 1
+              ;TMRPres = (TMRPres * 16) + TMRPost
+              2184: TMRPRES = (TMRPRES * 16) + TMRPOST
+              ;TMRPres.7 = T4CON.7  'Dont change Enable/RUN state
+              2185: TMRPRES.7 = T4CON.7
+              ;T4CON =  TMRPres
+              2186: T4CON = TMRPRES
               2203: #IFDEF PIC
               ;Pwr On Reset State of TxCON for 1/3/5/7 is "0"
               ;TXCON Timer REGISTER for 1/3/5/7 are NOT the Same on ALL PICS
@@ -4562,8 +4836,123 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               2232: #IFDEF BIT(TMR5CS)
               ;Set TMRPres.1 OFF
               2233: SET TMRPRES.1 OFF
+              2211: #IFDEF VAR(T5CON)
+              2213: #IF NOVAR(T5CLK)
+              ;Test for valid Pres parameter
+              ;uses less memory than multiple boulean "AND"
+              ;If TMRPres <> 0 then
+              2217: IF TMRPRES ~ 0 THEN
+              ;IF TMRPres <> 16 then
+              2218: IF TMRPRES ~ 16 THEN
+              ;IF TMRPres <> 32 then
+              2219: IF TMRPRES ~ 32 THEN
+              ;IF TMRPres <> 48 then
+              2220: IF TMRPRES ~ 48 THEN
+              ;TMRPres = 0
+              2221: TMRPRES = 0
+              ;END IF
+              2222: END IF
+              ;END IF
+              2223: END IF
+              ;END IF
+              2224: END IF
+              ;END IF
+              2225: END IF
+              ;Re-Using TMRPres as TxCON Temp Register
+              ;IF TMR5ON = 1 then Set TMRPres.0 ON  'The timer running/ Dont Stop !
+              2228: IF TMR5ON = 1 THEN
+              ;IF TMR5ON = 1 then Set TMRPres.0 ON  'The timer running/ Dont Stop !
+              2228: SET TMRPRES.0 ON
+              ;IF TMR5ON = 1 then Set TMRPres.0 ON  'The timer running/ Dont Stop !
+              2228: END IF
+              ;Select Case uses too much memory - changed
+              ;IF TMRSource = OSC then
+              2231: IF TMRSOURCE = OSC THEN
+              2232: #IFDEF BIT(TMR5CS)
+              ;Set TMRPres.1 OFF
+              2233: SET TMRPRES.1 OFF
+              2291: #IFDEF VAR(T5CLK)
+              ;If TMRPres <> 0 then
+              2293: IF TMRPRES ~ 0 THEN
+              ;IF TMRPres <> 16 then
+              2294: IF TMRPRES ~ 16 THEN
+              ;IF TMRPres <> 32 then
+              2295: IF TMRPRES ~ 32 THEN
+              ;IF TMRPres <> 48 then
+              2296: IF TMRPRES ~ 48 THEN
+              ;TMRPres = 0
+              2297: TMRPRES = 0
+              ;END IF
+              2298: END IF
+              ;END IF
+              2299: END IF
+              ;END IF
+              2300: END IF
+              ;END IF
+              2301: END IF
+              ;IF TMR5ON = 1 then Set TMRPres.0 ON  'The timer running/ Dont Stop !
+              2303: IF TMR5ON = 1 THEN
+              ;IF TMR5ON = 1 then Set TMRPres.0 ON  'The timer running/ Dont Stop !
+              2303: SET TMRPRES.0 ON
+              ;IF TMR5ON = 1 then Set TMRPres.0 ON  'The timer running/ Dont Stop !
+              2303: END IF
+              ;IF TMRSource > 15 OR TMRSource <0 then TRMSource = 0  'failsafe
+              2305: IF TMRSOURCE > 15 OR TMRSOURCE <0 THEN
+              ;IF TMRSource > 15 OR TMRSource <0 then TRMSource = 0  'failsafe
+              2305: TRMSOURCE = 0
+              ;IF TMRSource > 15 OR TMRSource <0 then TRMSource = 0  'failsafe
+              2305: END IF
+              ;T5CLK = TMRSource
+              2307: T5CLK = TMRSOURCE
+              ;T5CON = TMRPres
+              2308: T5CON = TMRPRES
               2337: #IFDEF PIC
               2339: #IFDEF VAR(T6CON)
+              2341: #IFDEF BIT(T6CKPS2)
+              ;Enhanced Chips with 1:128 prescale and TxCLKCON Register
+              ;IF TMRPres > 7 then  TMRPres = 0 'failsafe
+              2344: IF TMRPRES > 7 THEN
+              ;IF TMRPres > 7 then  TMRPres = 0 'failsafe
+              2344: TMRPRES = 0
+              ;IF TMRPres > 7 then  TMRPres = 0 'failsafe
+              2344: END IF
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2345: IF TMRPOST > 15 THEN
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2345: TMRPOST = 0
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2345: END IF
+              ;T6CLKCON = TMRSOurce
+              2347: T6CLKCON = TMRSOURCE
+              ;TMRPres = (TMRPres * 16) + TMRPost
+              2348: TMRPRES = (TMRPRES * 16) + TMRPOST
+              ;TMRPres.7 = T6CON.7  'Dont change Enable/RUN state
+              2349: TMRPRES.7 = T6CON.7
+              ;T6CON =  TMRPres
+              2350: T6CON = TMRPRES
+              2339: #IFDEF VAR(T6CON)
+              2341: #IFDEF BIT(T6CKPS2)
+              ;Enhanced Chips with 1:128 prescale and TxCLKCON Register
+              ;IF TMRPres > 7 then  TMRPres = 0 'failsafe
+              2344: IF TMRPRES > 7 THEN
+              ;IF TMRPres > 7 then  TMRPres = 0 'failsafe
+              2344: TMRPRES = 0
+              ;IF TMRPres > 7 then  TMRPres = 0 'failsafe
+              2344: END IF
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2345: IF TMRPOST > 15 THEN
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2345: TMRPOST = 0
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2345: END IF
+              ;T6CLKCON = TMRSOurce
+              2347: T6CLKCON = TMRSOURCE
+              ;TMRPres = (TMRPres * 16) + TMRPost
+              2348: TMRPRES = (TMRPRES * 16) + TMRPOST
+              ;TMRPres.7 = T6CON.7  'Dont change Enable/RUN state
+              2349: TMRPRES.7 = T6CON.7
+              ;T6CON =  TMRPres
+              2350: T6CON = TMRPRES
               2341: #IFDEF BIT(T6CKPS2)
               ;Enhanced Chips with 1:128 prescale and TxCLKCON Register
               ;IF TMRPres > 7 then  TMRPres = 0 'failsafe
@@ -4619,6 +5008,60 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               ;Write the control register
               ;T6CON = TMRPres
               2383: T6CON = TMRPRES
+              2364: #IFDEF VAR(T6CON)
+              2366: #IFDEF NOBIT(T6CKPS2)
+              ;Valid Prescales are   0 - 3
+              ;IF TMRPres > 3 then  TMRPres = 0 'failsafe
+              2370: IF TMRPRES > 3 THEN
+              ;IF TMRPres > 3 then  TMRPres = 0 'failsafe
+              2370: TMRPRES = 0
+              ;IF TMRPres > 3 then  TMRPres = 0 'failsafe
+              2370: END IF
+              ;Valid PostScales are  0 - 15
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2372: IF TMRPOST > 15 THEN
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2372: TMRPOST = 0
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2372: END IF
+              ;Start Building a Temporary Variable
+              ;Re-Using tmrpres as TxCON shadow register
+              ;
+              ;Alternative Method to Previous inline ASM Method
+              ;(Saves 3 byte of Memory)
+              ;TMRPres = TMRPres OR (TMRPost * 8)
+              2379: TMRPRES = TMRPRES OR (TMRPOST * 8)
+              ;If TMR6ON = ON then SET TMRPres.2 ON
+              2380: IF TMR6ON = ON THEN
+              ;If TMR6ON = ON then SET TMRPres.2 ON
+              2380: SET TMRPRES.2 ON
+              ;If TMR6ON = ON then SET TMRPres.2 ON
+              2380: END IF
+              ;Write the control register
+              ;T6CON = TMRPres
+              2383: T6CON = TMRPRES
+              2387: #IFDEF BIT(T6CKPS2)
+              ;Enhanced Chips with 1:128 prescale and T2CLKCON Register
+              ;IF TMRPres > 7 then  TMRPres = 0 'failsafe
+              2390: IF TMRPRES > 7 THEN
+              ;IF TMRPres > 7 then  TMRPres = 0 'failsafe
+              2390: TMRPRES = 0
+              ;IF TMRPres > 7 then  TMRPres = 0 'failsafe
+              2390: END IF
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2391: IF TMRPOST > 15 THEN
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2391: TMRPOST = 0
+              ;IF TMRPost > 15 then  TMRPost = 0 'failsafe
+              2391: END IF
+              ;T6CLKCON = 1  'CLK Source  = FOSC/4
+              2393: T6CLKCON = 1
+              ;TMRPres = (TMRPres * 16) + TMRPost
+              2394: TMRPRES = (TMRPRES * 16) + TMRPOST
+              ;TMRPres.7 = T6CON.7  'Dont change Enable/RUN state
+              2395: TMRPRES.7 = T6CON.7
+              ;T6CON =  TMRPres
+              2396: T6CON = TMRPRES
               2410: #IFDEF PIC
               ;Pwr On Reset State of TxCON for 1/3/5/7 is "0"
               ;TXCON Timer REGISTER for 1/3/5/7 are NOT the Same on ALL PICS
@@ -4660,6 +5103,41 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               2439: #IFDEF BIT(TMR7CS)
               ;Set TMRPres.1 OFF
               2440: SET TMRPRES.1 OFF
+              2485: #IFDEF VAR(T3CLK)
+              ;If TMRPres <> 0 then
+              2487: IF TMRPRES ~ 0 THEN
+              ;IF TMRPres <> 16 then
+              2488: IF TMRPRES ~ 16 THEN
+              ;IF TMRPres <> 32 then
+              2489: IF TMRPRES ~ 32 THEN
+              ;IF TMRPres <> 48 then
+              2490: IF TMRPRES ~ 48 THEN
+              ;TMRPres = 0
+              2491: TMRPRES = 0
+              ;END IF
+              2492: END IF
+              ;END IF
+              2493: END IF
+              ;END IF
+              2494: END IF
+              ;END IF
+              2495: END IF
+              ;IF TMR7ON = 1 then Set TMRPres.0 ON  'The timer running/ Dont Stop !
+              2497: IF TMR7ON = 1 THEN
+              ;IF TMR7ON = 1 then Set TMRPres.0 ON  'The timer running/ Dont Stop !
+              2497: SET TMRPRES.0 ON
+              ;IF TMR7ON = 1 then Set TMRPres.0 ON  'The timer running/ Dont Stop !
+              2497: END IF
+              ;IF TMRSource > 15 OR TMRSource <0 then TRMSource = 0  'failsafe
+              2499: IF TMRSOURCE > 15 OR TMRSOURCE <0 THEN
+              ;IF TMRSource > 15 OR TMRSource <0 then TRMSource = 0  'failsafe
+              2499: TRMSOURCE = 0
+              ;IF TMRSource > 15 OR TMRSource <0 then TRMSource = 0  'failsafe
+              2499: END IF
+              ;T7CLK = TMRSource
+              2501: T7CLK = TMRSOURCE
+              ;T7CON = TMRPres
+              2502: T7CON = TMRPRES
               2523: #IFDEF PIC
               2525: #IFDEF VAR(T8CON)
               2527: #IFDEF BIT(T8CKPS2)
@@ -4777,6 +5255,15 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               191: #IFDEF PIC
               193: #IFNDEF CHIPUSINGINTOSC
               ;_For_selected_frequency_-_the_external_oscillator_has_been_selected_by_compiler ChipMHz
+              208: #IFDEF CHIPFAMILY 16
+              209: #IFDEF VAR(BSR)
+              ;Clear BSR on ChipFamily16 MCUs
+              ;MOVLB 0
+              211: MOVLB 0
+              209: #IFDEF VAR(BSR)
+              ;Clear BSR on ChipFamily16 MCUs
+              ;MOVLB 0
+              211: MOVLB 0
               215: #IFDEF PIC
               216: #IFDEF VAR(OSCCAL)
               ;This loads the saved calibration data from the last flash memory location at POR or any time the chip is reset.
@@ -4825,36 +5312,33 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               ;Default OSCCON1 typically, NOSC HFINTOSC; NDIV 1 - Common as this simply sets the HFINTOSC
               ;OSCCON1 = 0x60
               246: OSCCON1 = 96
-              350: #IFNDEF CHIPFAMILY 16
-              ;The MCU is a chip family ChipFamily
-              ;OSCCON type is 102
-              355: #IFDEF CHIPMHZ 32
-              356: #IFDEF VAR(OSCSTAT)
-              358: #IF CHIPSUBFAMILY=15002
-              ;Set OSCFRQ values for MCUs with OSCSTAT... the 16F171xx MCU family
-              ;OSCFRQ = 0b00000101
-              360: OSCFRQ = 5
-              355: #IFDEF CHIPMHZ 32
-              356: #IFDEF VAR(OSCSTAT)
-              358: #IF CHIPSUBFAMILY=15002
-              ;Set OSCFRQ values for MCUs with OSCSTAT... the 16F171xx MCU family
-              ;OSCFRQ = 0b00000101
-              360: OSCFRQ = 5
-              356: #IFDEF VAR(OSCSTAT)
-              358: #IF CHIPSUBFAMILY=15002
-              ;Set OSCFRQ values for MCUs with OSCSTAT... the 16F171xx MCU family
-              ;OSCFRQ = 0b00000101
-              360: OSCFRQ = 5
-              361: #IFNOT CHIPSUBFAMILY=15002
-              362: #IF CHIPSUBFAMILY=15004
-              ;OSCFRQ = 0b00000101
-              363: OSCFRQ = 5
-              364: #IFNOT CHIPSUBFAMILY=15004
-              ;Set OSCFRQ values for MCUs with OSCSTAT... the 16F188xx MCU family - the default case
-              ;OSCFRQ = 0b00000110
-              366: OSCFRQ = 6
+              267: #IFDEF CHIPFAMILY 16
+              ;The MCU is a chip family 16
+              270: #IFDEF BIT(NDIV3)
+              ;Section supports many MCUs, 18FxxK40, 18FxxK42 etc that have NDIV3 bit
+              ;OSCCON type is 101
+              ;OSCCON1 = 0x60          // Setting OSCCON1 implies clearing Clear NDIV3:0
+              276: OSCCON1 = 96
+              278: #IFDEF CHIPMHZ 64
+              ;OSCFRQ = 0b00001000  '64mhz
+              279: OSCFRQ = 8
+              270: #IFDEF BIT(NDIV3)
+              ;Section supports many MCUs, 18FxxK40, 18FxxK42 etc that have NDIV3 bit
+              ;OSCCON type is 101
+              ;OSCCON1 = 0x60          // Setting OSCCON1 implies clearing Clear NDIV3:0
+              276: OSCCON1 = 96
+              278: #IFDEF CHIPMHZ 64
+              ;OSCFRQ = 0b00001000  '64mhz
+              279: OSCFRQ = 8
+              278: #IFDEF CHIPMHZ 64
+              ;OSCFRQ = 0b00001000  '64mhz
+              279: OSCFRQ = 8
               1004: #IFDEF PIC
               ;_Complete_the_chip_setup_of_BSR_ADCs_ANSEL_and_other_key_setup_registers_or_register_bits
+              1008: #IFDEF VAR(TBLPTRU)
+              ;Clear TBLPTRU on MCUs with this bit as this must be zero
+              ;TBLPTRU = 0
+              1010: TBLPTRU = 0
               1014: #IF VAR(ADCON0) OR VAR(ADCON)
               ;Ensure all ports are set for digital I/O and, turn off A/D
               1016: #IFDEF BIT(ADFM)
@@ -4924,130 +5408,109 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               1427: #IFDEF VAR(PORTE)
               ;PORTE = 0
               1428: PORTE = 0
-              1793: #IFDEF CHIPFAMILY 15
-              ;Get and copy length
-              ;movf INDF0, W
-              1795: MOVF INDF0, W
-              ;movwf SysCalcTempA
-              1796: MOVWF SYSCALCTEMPA
-              ;movwf INDF1
-              1797: MOVWF INDF1
+              1826: #IFDEF CHIPFAMILY 16
+              ;Get and copy length for ChipFamily 16 support
+              ;movff INDF0, SysCalcTempA
+              1829: MOVFF INDF0, SYSCALCTEMPA
+              ;movff SysCalcTempA, INDF1
+              1830: MOVFF SYSCALCTEMPA, INDF1
               ;goto SysCopyStringCheck
-              1799: GOTO SYSCOPYSTRINGCHECK
+              1832: GOTO SYSCOPYSTRINGCHECK
               ;When appending, add length to counter
-              1802: SYSCOPYSTRINGPART:
+              1835: SYSCOPYSTRINGPART:
               ;movf INDF0, W
-              1803: MOVF INDF0, W
+              1836: MOVF INDF0, W
               ;movwf SysCalcTempA
-              1804: MOVWF SYSCALCTEMPA
+              1837: MOVWF SYSCALCTEMPA
               ;addwf SysStringLength, F
-              1805: ADDWF SYSSTRINGLENGTH, F
-              1807: SYSCOPYSTRINGCHECK:
+              1838: ADDWF SYSSTRINGLENGTH, F
+              1840: SYSCOPYSTRINGCHECK:
               ;Exit if length = 0
               ;movf SysCalcTempA,F
-              1809: MOVF SYSCALCTEMPA,F
+              1842: MOVF SYSCALCTEMPA,F
               ;btfsc STATUS,Z
-              1810: BTFSC STATUS,Z
+              1843: BTFSC STATUS,Z
               ;return
-              1811: RETURN
-              1813: SYSSTRINGCOPY:
-              ;Increment pointers
-              ;addfsr 0, 1
-              1815: ADDFSR 0, 1
-              ;addfsr 1, 1
-              1816: ADDFSR 1, 1
+              1844: RETURN
+              1846: SYSSTRINGCOPY:
               ;Copy character
-              ;movf INDF0, W
-              1819: MOVF INDF0, W
-              ;movwf INDF1
-              1820: MOVWF INDF1
+              ;movff PREINC0, PREINC1
+              1848: MOVFF PREINC0, PREINC1
               ;decfsz SysCalcTempA, F
-              1822: DECFSZ SYSCALCTEMPA, F
+              1850: DECFSZ SYSCALCTEMPA, F
               ;goto SysStringCopy
-              1823: GOTO SYSSTRINGCOPY
-              1967: #IFDEF CHIPFAMILY 15
+              1851: GOTO SYSSTRINGCOPY
+              2003: #IFDEF CHIPFAMILY 16
+              ;ChipFamily 16 support
               ;Get length
-              ;call SysStringTables
-              1970: CALL SYSSTRINGTABLES
-              ;movwf SysCalcTempA
-              1971: MOVWF SYSCALCTEMPA
-              ;movwf INDF1
-              1972: MOVWF INDF1
+              ;TBLRD*+
+              2006: TBLRD*+
+              ;movff TABLAT,SysCalcTempA
+              2007: MOVFF TABLAT,SYSCALCTEMPA
+              ;movff TABLAT,INDF1
+              2008: MOVFF TABLAT,INDF1
               ;goto SysStringReadCheck
-              1974: GOTO SYSSTRINGREADCHECK
-              1975: SYSREADSTRINGPART:
-              ;Get length
-              ;call SysStringTables
-              1978: CALL SYSSTRINGTABLES
+              2009: GOTO SYSSTRINGREADCHECK
+              2011: SYSREADSTRINGPART:
+              ;TBLRD*+
+              2012: TBLRD*+
+              ;movf TABLAT, W
+              2013: MOVF TABLAT, W
               ;movwf SysCalcTempA
-              1979: MOVWF SYSCALCTEMPA
+              2014: MOVWF SYSCALCTEMPA
               ;addwf SysStringLength,F
-              1980: ADDWF SYSSTRINGLENGTH,F
+              2015: ADDWF SYSSTRINGLENGTH,F
               ;Check length
-              1983: SYSSTRINGREADCHECK:
+              2018: SYSSTRINGREADCHECK:
               ;If length is 0, exit
               ;movf SysCalcTempA,F
-              1985: MOVF SYSCALCTEMPA,F
+              2020: MOVF SYSCALCTEMPA,F
               ;btfsc STATUS,Z
-              1986: BTFSC STATUS,Z
+              2021: BTFSC STATUS,Z
               ;return
-              1987: RETURN
+              2022: RETURN
               ;Copy
-              1990: SYSSTRINGREAD:
-              ;Get char
-              ;call SysStringTables
-              1992: CALL SYSSTRINGTABLES
-              ;Set char
-              ;addfsr 1,1
-              1995: ADDFSR 1,1
-              ;movwf INDF1
-              1996: MOVWF INDF1
+              2025: SYSSTRINGREAD:
+              ;Copy char
+              ;TBLRD*+
+              2028: TBLRD*+
+              ;movff TABLAT,PREINC1
+              2029: MOVFF TABLAT,PREINC1
               ;decfsz SysCalcTempA, F
-              1998: DECFSZ SYSCALCTEMPA, F
+              2031: DECFSZ SYSCALCTEMPA, F
               ;goto SysStringRead
-              1999: GOTO SYSSTRINGREAD
-              2189: #IFDEF CHIPFAMILY 15
+              2032: GOTO SYSSTRINGREAD
+              2221: #IFDEF CHIPFAMILY 16
               ;Check length matches
               ;movf INDF0, W
-              2191: MOVF INDF0, W
-              ;movwf SysByteTempA
-              2192: MOVWF SYSBYTETEMPA
-              ;subwf INDF1, W
-              2193: SUBWF INDF1, W
-              ;btfss STATUS, Z
-              2194: BTFSS STATUS, Z
+              2224: MOVF INDF0, W
+              ;cpfseq POSTINC1
+              2225: CPFSEQ POSTINC1
               ;return
-              2195: RETURN
+              2226: RETURN
               ;Check if empty
-              ;movf SysByteTempA, F
-              2197: MOVF SYSBYTETEMPA, F
-              ;btfsc STATUS, Z
-              2198: BTFSC STATUS, Z
-              ;goto SCEStrTrue
-              2199: GOTO SCESTRTRUE
+              ;movf INDF0, F
+              2228: MOVF INDF0, F
+              ;bz SCEStrTrue
+              2229: BZ SCESTRTRUE
               ;Check each char, exit if not equal
-              2202: SYSSTRINGCOMP:
-              ;Move to next char
-              ;addfsr 0, 1
-              2205: ADDFSR 0, 1
-              ;addfsr 1, 1
-              2206: ADDFSR 1, 1
+              ;movff POSTINC0, SysByteTempA
+              2232: MOVFF POSTINC0, SYSBYTETEMPA
+              2233: SYSSTRINGCOMP:
               ;Compare, exit if <>
-              ;movf INDF0, W
-              2209: MOVF INDF0, W
-              ;subwf INDF1, W
-              2210: SUBWF INDF1, W
-              ;btfss STATUS, Z
-              2211: BTFSS STATUS, Z
+              ;movf POSTINC0, W
+              2236: MOVF POSTINC0, W
+              ;cpfseq POSTINC1
+              2237: CPFSEQ POSTINC1
               ;return
-              2212: RETURN
+              2238: RETURN
               ;decfsz SysByteTempA, F
-              2214: DECFSZ SYSBYTETEMPA, F
+              2240: DECFSZ SYSBYTETEMPA, F
               ;goto SysStringComp
-              2215: GOTO SYSSTRINGCOMP
-              2217: SCESTRTRUE:
-              ;comf SysByteTempX, F
-              2218: COMF SYSBYTETEMPX, F
+              2241: GOTO SYSSTRINGCOMP
+              2243: SCESTRTRUE:
+              ;setf SysByteTempX
+              2244: SETF SYSBYTETEMPX
               2869: #IFDEF PIC
               2870: #IFDEF CHIPFAMILY 12, 14, 15
               ;clrf SysByteTempX
@@ -5073,30 +5536,13 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               2881: BTFSS STATUS, Z
               ;goto MUL8LOOP
               2882: GOTO MUL8LOOP
-              2870: #IFDEF CHIPFAMILY 12, 14, 15
-              ;clrf SysByteTempX
-              2871: CLRF SYSBYTETEMPX
-              2872: MUL8LOOP:
+              2885: #IFDEF CHIPFAMILY 16
               ;movf SysByteTempA, W
-              2873: MOVF SYSBYTETEMPA, W
-              ;btfsc SysByteTempB, 0
-              2874: BTFSC SYSBYTETEMPB, 0
-              ;addwf SysByteTempX, F
-              2875: ADDWF SYSBYTETEMPX, F
-              ;bcf STATUS, C
-              2876: BCF STATUS, C
-              ;rrf SysByteTempB, F
-              2877: RRF SYSBYTETEMPB, F
-              ;bcf STATUS, C
-              2878: BCF STATUS, C
-              ;rlf SysByteTempA, F
-              2879: RLF SYSBYTETEMPA, F
-              ;movf SysByteTempB, F
-              2880: MOVF SYSBYTETEMPB, F
-              ;btfss STATUS, Z
-              2881: BTFSS STATUS, Z
-              ;goto MUL8LOOP
-              2882: GOTO MUL8LOOP
+              2886: MOVF SYSBYTETEMPA, W
+              ;mulwf SysByteTempB
+              2887: MULWF SYSBYTETEMPB
+              ;movff PRODL,SysByteTempX
+              2888: MOVFF PRODL,SYSBYTETEMPX
               2917: #IFDEF PIC
               2918: #IFDEF CHIPFAMILY 12, 14, 15
               ;dim SysDivMultA as word
@@ -5134,42 +5580,39 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               2933: END IF
               ;SysWordTempX = SysDivMultX
               2935: SYSWORDTEMPX = SYSDIVMULTX
-              2918: #IFDEF CHIPFAMILY 12, 14, 15
-              ;dim SysDivMultA as word
-              2919: DIM SYSDIVMULTA AS WORD
-              ;dim SysDivMultB as word
-              2920: DIM SYSDIVMULTB AS WORD
-              ;dim SysDivMultX as word
-              2921: DIM SYSDIVMULTX AS WORD
-              ;SysDivMultA = SysWordTempA
-              2923: SYSDIVMULTA = SYSWORDTEMPA
-              ;SysDivMultB = SysWordTempB
-              2924: SYSDIVMULTB = SYSWORDTEMPB
-              ;SysDivMultX = 0
-              2925: SYSDIVMULTX = 0
-              2927: MUL16LOOP:
-              ;IF SysDivMultB.0 ON then SysDivMultX += SysDivMultA
-              2928: IF SYSDIVMULTB.0 ON THEN
-              ;IF SysDivMultB.0 ON then SysDivMultX += SysDivMultA
-              2928: SYSDIVMULTX += SYSDIVMULTA
-              ;IF SysDivMultB.0 ON then SysDivMultX += SysDivMultA
-              2928: END IF
-              ;set STATUS.C OFF
-              2929: SET STATUS.C OFF
-              ;rotate SysDivMultB right
-              2930: ROTATE SYSDIVMULTB RIGHT
-              ;set STATUS.C off
-              2931: SET STATUS.C OFF
-              ;rotate SysDivMultA left
-              2932: ROTATE SYSDIVMULTA LEFT
-              ;if SysDivMultB > 0 then goto MUL16LOOP
-              2933: IF SYSDIVMULTB > 0 THEN
-              ;if SysDivMultB > 0 then goto MUL16LOOP
-              2933: GOTO MUL16LOOP
-              ;if SysDivMultB > 0 then goto MUL16LOOP
-              2933: END IF
-              ;SysWordTempX = SysDivMultX
-              2935: SYSWORDTEMPX = SYSDIVMULTX
+              2938: #IFDEF CHIPFAMILY 16
+              ;X = LowA * LowB
+              ;movf SysWordTempA, W
+              2940: MOVF SYSWORDTEMPA, W
+              ;mulwf SysWordTempB
+              2941: MULWF SYSWORDTEMPB
+              ;movff PRODL, SysWordTempX
+              2942: MOVFF PRODL, SYSWORDTEMPX
+              ;movff PRODH, SysWordTempX_H
+              2943: MOVFF PRODH, SYSWORDTEMPX_H
+              ;HighX += LowA * HighB
+              ;movf SysWordTempA, W
+              2946: MOVF SYSWORDTEMPA, W
+              ;mulwf SysWordTempB_H
+              2947: MULWF SYSWORDTEMPB_H
+              ;movf PRODL, W
+              2948: MOVF PRODL, W
+              ;addwf SysWordTempX_H, F
+              2949: ADDWF SYSWORDTEMPX_H, F
+              ;HighX += HighA * LowB
+              ;movf SysWordTempA_H, W
+              2952: MOVF SYSWORDTEMPA_H, W
+              ;mulwf SysWordTempB
+              2953: MULWF SYSWORDTEMPB
+              ;movf PRODL, W
+              2954: MOVF PRODL, W
+              ;addwf SysWordTempX_H, F
+              2955: ADDWF SYSWORDTEMPX_H, F
+              ;PRODL = HighA * HighB
+              ;movf SysWordTempA_H, F
+              2958: MOVF SYSWORDTEMPA_H, F
+              ;mulwf SysWordTempB_H
+              2959: MULWF SYSWORDTEMPB_H
               3034: #IFDEF PIC
               ;Can't use normal SysDivMult variables for 32 bit, they overlap with
               ;SysLongTemp variables
@@ -5912,213 +6355,171 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               3945: CLRF _EXP
               ;RETLW 0
               3946: RETLW 0
-              4054: #IFDEF CHIPFAMILY 12,14,15
-              ;clrf SysByteTempX
-              4055: CLRF SYSBYTETEMPX
-              ;movf SysByteTempA, W
-              4056: MOVF SYSBYTETEMPA, W
-              ;subwf SysByteTempB, W
-              4057: SUBWF SYSBYTETEMPB, W
-              ;btfsc STATUS, Z
-              4058: BTFSC STATUS, Z
-              ;comf SysByteTempX,F
-              4059: COMF SYSBYTETEMPX,F
-              4083: #IFDEF CHIPFAMILY 12,14,15
-              ;clrf SysByteTempX
-              4084: CLRF SYSBYTETEMPX
-              ;Test low, exit if false
-              ;movf SysWordTempA, W
-              4087: MOVF SYSWORDTEMPA, W
-              ;subwf SysWordTempB, W
-              4088: SUBWF SYSWORDTEMPB, W
-              ;btfss STATUS, Z
-              4089: BTFSS STATUS, Z
-              ;return
-              4090: RETURN
-              ;Test high, exit if false
-              ;movf SysWordTempA_H, W
-              4093: MOVF SYSWORDTEMPA_H, W
-              ;subwf SysWordTempB_H, W
-              4094: SUBWF SYSWORDTEMPB_H, W
-              ;btfss STATUS, Z
-              4095: BTFSS STATUS, Z
-              ;return
-              4096: RETURN
-              ;comf SysByteTempX,F
-              4098: COMF SYSBYTETEMPX,F
-              4137: #IFDEF CHIPFAMILY 12,14,15
-              ;clrf SysByteTempX
-              4138: CLRF SYSBYTETEMPX
-              ;Test low, exit if false
-              ;movf SysLongTempA, W
-              4141: MOVF SYSLONGTEMPA, W
-              ;subwf SysLongTempB, W
-              4142: SUBWF SYSLONGTEMPB, W
-              ;btfss STATUS, Z
-              4143: BTFSS STATUS, Z
-              ;return
-              4144: RETURN
-              ;Test high, exit if false
-              ;movf SysLongTempA_H, W
-              4147: MOVF SYSLONGTEMPA_H, W
-              ;subwf SysLongTempB_H, W
-              4148: SUBWF SYSLONGTEMPB_H, W
-              ;btfss STATUS, Z
-              4149: BTFSS STATUS, Z
-              ;return
-              4150: RETURN
-              ;Test upper, exit if false
-              ;movf SysLongTempA_U, W
-              4153: MOVF SYSLONGTEMPA_U, W
-              ;subwf SysLongTempB_U, W
-              4154: SUBWF SYSLONGTEMPB_U, W
-              ;btfss STATUS, Z
-              4155: BTFSS STATUS, Z
-              ;return
-              4156: RETURN
-              ;Test exp, exit if false
-              ;movf SysLongTempA_E, W
-              4159: MOVF SYSLONGTEMPA_E, W
-              ;subwf SysLongTempB_E, W
-              4160: SUBWF SYSLONGTEMPB_E, W
-              ;btfss STATUS, Z
-              4161: BTFSS STATUS, Z
-              ;return
-              4162: RETURN
-              ;comf SysByteTempX,F
-              4164: COMF SYSBYTETEMPX,F
-              4219: #IFDEF CHIPFAMILY 12,14,15
-              ;ChipFamily 12,14,15
-              ;clrf SYSBYTETEMPX
-              4221: CLRF SYSBYTETEMPX
-              ;Test low, exit if false
-              ;movf SysSingleTempA, W
-              4224: MOVF SYSSINGLETEMPA, W
-              ;subwf SysSingleTempB, W
-              4225: SUBWF SYSSINGLETEMPB, W
-              ;btfss STATUS, Z
-              4226: BTFSS STATUS, Z
-              ;return
-              4227: RETURN
-              ;Test high, exit if false
-              ;movf SysSingleTempA_H, W
-              4230: MOVF SYSSINGLETEMPA_H, W
-              ;subwf SysSingleTempB_H, W
-              4231: SUBWF SYSSINGLETEMPB_H, W
-              ;btfss STATUS, Z
-              4232: BTFSS STATUS, Z
-              ;return
-              4233: RETURN
-              ;Test upper, exit if false
-              ;movf SysSingleTempA_U, W
-              4236: MOVF SYSSINGLETEMPA_U, W
-              ;subwf SysSingleTempB_U, W
-              4237: SUBWF SYSSINGLETEMPB_U, W
-              ;btfss STATUS, Z
-              4238: BTFSS STATUS, Z
-              ;return
-              4239: RETURN
-              ;Test exp, exit if false
-              ;movf SysSingleTempA_E, W
-              4242: MOVF SYSSINGLETEMPA_E, W
-              ;subwf SysSingleTempB_E, W
-              4243: SUBWF SYSSINGLETEMPB_E, W
-              ;btfss STATUS, Z
-              4244: BTFSS STATUS, Z
-              ;return
-              4245: RETURN
-              ;comf SYSBYTETEMPX,F
-              4247: COMF SYSBYTETEMPX,F
-              4304: #IFDEF CHIPFAMILY 12,14,15
-              ;clrf SysByteTempX
-              4305: CLRF SYSBYTETEMPX
-              ;Test low, exit if false
-              ;movf SysULongIntTempA, W
-              4308: MOVF SYSULONGINTTEMPA, W
-              ;subwf SysULongIntTempB, W
-              4309: SUBWF SYSULONGINTTEMPB, W
-              ;btfss STATUS, Z
-              4310: BTFSS STATUS, Z
-              ;return
-              4311: RETURN
-              ;Test high, exit if false
-              ;movf SysULongIntTempA_H, W
-              4314: MOVF SYSULONGINTTEMPA_H, W
-              ;subwf SysULongIntTempB_H, W
-              4315: SUBWF SYSULONGINTTEMPB_H, W
-              ;btfss STATUS, Z
-              4316: BTFSS STATUS, Z
-              ;return
-              4317: RETURN
-              ;Test upper, exit if false
-              ;movf SysULongIntTempA_U, W
-              4320: MOVF SYSULONGINTTEMPA_U, W
-              ;subwf SysULongIntTempB_U, W
-              4321: SUBWF SYSULONGINTTEMPB_U, W
-              ;btfss STATUS, Z
-              4322: BTFSS STATUS, Z
-              ;return
-              4323: RETURN
-              ;Test exp, exit if false
-              ;movf SysULongIntTempA_E, W
-              4326: MOVF SYSULONGINTTEMPA_E, W
-              ;subwf SysULongIntTempB_E, W
-              4327: SUBWF SYSULONGINTTEMPB_E, W
-              ;btfss STATUS, Z
-              4328: BTFSS STATUS, Z
-              ;return
-              4329: RETURN
-              ;Test A, exit if false
-              ;movf SysULongIntTempA_A, W
-              4332: MOVF SYSULONGINTTEMPA_A, W
-              ;subwf SysULongIntTempB_A, W
-              4333: SUBWF SYSULONGINTTEMPB_A, W
-              ;btfss STATUS, Z
-              4334: BTFSS STATUS, Z
-              ;return
-              4335: RETURN
-              ;Test B, exit if false
-              ;movf SysULongIntTempA_B, W
-              4338: MOVF SYSULONGINTTEMPA_B, W
-              ;subwf SysULongIntTempB_B, W
-              4339: SUBWF SYSULONGINTTEMPB_B, W
-              ;btfss STATUS, Z
-              4340: BTFSS STATUS, Z
-              ;return
-              4341: RETURN
-              ;Test C, exit if false
-              ;movf SysULongIntTempA_C, W
-              4344: MOVF SYSULONGINTTEMPA_C, W
-              ;subwf SysULongIntTempB_C, W
-              4345: SUBWF SYSULONGINTTEMPB_C, W
-              ;btfss STATUS, Z
-              4346: BTFSS STATUS, Z
-              ;return
-              4347: RETURN
-              ;Test D, exit if false
-              ;movf SysULongIntTempA_D, W
-              4350: MOVF SYSULONGINTTEMPA_D, W
-              ;subwf SysULongIntTempB_D, W
-              4351: SUBWF SYSULONGINTTEMPB_D, W
-              ;btfss STATUS, Z
-              4352: BTFSS STATUS, Z
-              ;return
-              4353: RETURN
-              ;comf SysByteTempX,F
-              4355: COMF SYSBYTETEMPX,F
-              4444: #IFDEF CHIPFAMILY 12,14,15
-              ;clrf SysByteTempX
-              4445: CLRF SYSBYTETEMPX
-              ;bsf STATUS, C
-              4446: BSF STATUS, C
+              4062: #IFDEF CHIPFAMILY 16
+              ;setf SysByteTempX
+              4063: SETF SYSBYTETEMPX
               ;movf SysByteTempB, W
-              4447: MOVF SYSBYTETEMPB, W
-              ;subwf SysByteTempA, W
-              4448: SUBWF SYSBYTETEMPA, W
-              ;btfss STATUS, C
-              4449: BTFSS STATUS, C
-              ;comf SysByteTempX,F
-              4450: COMF SYSBYTETEMPX,F
+              4064: MOVF SYSBYTETEMPB, W
+              ;cpfseq SysByteTempA
+              4065: CPFSEQ SYSBYTETEMPA
+              ;clrf SysByteTempX
+              4066: CLRF SYSBYTETEMPX
+              4101: #IFDEF CHIPFAMILY 16
+              ;clrf SysByteTempX
+              4102: CLRF SYSBYTETEMPX
+              ;Test low, exit if false
+              ;movf SysWordTempB, W
+              4105: MOVF SYSWORDTEMPB, W
+              ;cpfseq SysWordTempA
+              4106: CPFSEQ SYSWORDTEMPA
+              ;return
+              4107: RETURN
+              ;Test high, exit if false
+              ;movf SysWordTempB_H, W
+              4110: MOVF SYSWORDTEMPB_H, W
+              ;cpfseq SysWordTempA_H
+              4111: CPFSEQ SYSWORDTEMPA_H
+              ;return
+              4112: RETURN
+              ;setf SysByteTempX
+              4114: SETF SYSBYTETEMPX
+              4167: #IFDEF CHIPFAMILY 16
+              ;clrf SysByteTempX
+              4168: CLRF SYSBYTETEMPX
+              ;Test low, exit if false
+              ;movf SysLongTempB, W
+              4171: MOVF SYSLONGTEMPB, W
+              ;cpfseq SysLongTempA
+              4172: CPFSEQ SYSLONGTEMPA
+              ;return
+              4173: RETURN
+              ;Test high, exit if false
+              ;movf SysLongTempB_H, W
+              4176: MOVF SYSLONGTEMPB_H, W
+              ;cpfseq SysLongTempA_H
+              4177: CPFSEQ SYSLONGTEMPA_H
+              ;return
+              4178: RETURN
+              ;Test upper, exit if false
+              ;movf SysLongTempB_U, W
+              4181: MOVF SYSLONGTEMPB_U, W
+              ;cpfseq SysLongTempA_U
+              4182: CPFSEQ SYSLONGTEMPA_U
+              ;return
+              4183: RETURN
+              ;Test exp, exit if false
+              ;movf SysLongTempB_E, W
+              4186: MOVF SYSLONGTEMPB_E, W
+              ;cpfseq SysLongTempA_E
+              4187: CPFSEQ SYSLONGTEMPA_E
+              ;return
+              4188: RETURN
+              ;setf SysByteTempX
+              4190: SETF SYSBYTETEMPX
+              4250: #IFDEF CHIPFAMILY 16
+              ;ChipFamily 16
+              ;clrf SYSBYTETEMPX
+              4252: CLRF SYSBYTETEMPX
+              ;Test low, exit if false
+              ;movf SysSingleTempB, W
+              4255: MOVF SYSSINGLETEMPB, W
+              ;cpfseq SysSingleTempA
+              4256: CPFSEQ SYSSINGLETEMPA
+              ;return
+              4257: RETURN
+              ;Test high, exit if false
+              ;movf SysSingleTempB_H, W
+              4260: MOVF SYSSINGLETEMPB_H, W
+              ;cpfseq SysSingleTempA_H
+              4261: CPFSEQ SYSSINGLETEMPA_H
+              ;return
+              4262: RETURN
+              ;Test upper, exit if false
+              ;movf SysSingleTempB_U, W
+              4265: MOVF SYSSINGLETEMPB_U, W
+              ;cpfseq SysSingleTempA_U
+              4266: CPFSEQ SYSSINGLETEMPA_U
+              ;return
+              4267: RETURN
+              ;Test exp, exit if false
+              ;movf SysSingleTempB_E, W
+              4270: MOVF SYSSINGLETEMPB_E, W
+              ;cpfseq SysSingleTempA_E
+              4271: CPFSEQ SYSSINGLETEMPA_E
+              ;return
+              4272: RETURN
+              ;setf SYSBYTETEMPX
+              4274: SETF SYSBYTETEMPX
+              4358: #IFDEF CHIPFAMILY 16
+              ;clrf SysByteTempX
+              4359: CLRF SYSBYTETEMPX
+              ;Test low, exit if false
+              ;movf SysULongIntTempB, W
+              4362: MOVF SYSULONGINTTEMPB, W
+              ;cpfseq SysULongIntTempA
+              4363: CPFSEQ SYSULONGINTTEMPA
+              ;return
+              4364: RETURN
+              ;Test high, exit if false
+              ;movf SysULongIntTempB_H, W
+              4367: MOVF SYSULONGINTTEMPB_H, W
+              ;cpfseq SysULongIntTempA_H
+              4368: CPFSEQ SYSULONGINTTEMPA_H
+              ;return
+              4369: RETURN
+              ;Test upper, exit if false
+              ;movf SysULongIntTempB_U, W
+              4372: MOVF SYSULONGINTTEMPB_U, W
+              ;cpfseq SysULongIntTempA_U
+              4373: CPFSEQ SYSULONGINTTEMPA_U
+              ;return
+              4374: RETURN
+              ;Test exp, exit if false
+              ;movf SysULongIntTempB_E, W
+              4377: MOVF SYSULONGINTTEMPB_E, W
+              ;cpfseq SysULongIntTempA_E
+              4378: CPFSEQ SYSULONGINTTEMPA_E
+              ;return
+              4379: RETURN
+              ;Test A, exit if false
+              ;movf SysULongIntTempB_A, W
+              4382: MOVF SYSULONGINTTEMPB_A, W
+              ;cpfseq SysULongIntTempA_A
+              4383: CPFSEQ SYSULONGINTTEMPA_A
+              ;return
+              4384: RETURN
+              ;Test B, exit if false
+              ;movf SysULongIntTempB_B, W
+              4387: MOVF SYSULONGINTTEMPB_B, W
+              ;cpfseq SysULongIntTempA_B
+              4388: CPFSEQ SYSULONGINTTEMPA_B
+              ;return
+              4389: RETURN
+              ;Test C, exit if false
+              ;movf SysULongIntTempB_C, W
+              4392: MOVF SYSULONGINTTEMPB_C, W
+              ;cpfseq SysULongIntTempA_C
+              4393: CPFSEQ SYSULONGINTTEMPA_C
+              ;return
+              4394: RETURN
+              ;Test D, exit if false
+              ;movf SysULongIntTempB_D, W
+              4397: MOVF SYSULONGINTTEMPB_D, W
+              ;cpfseq SysULongIntTempA_D
+              4398: CPFSEQ SYSULONGINTTEMPA_D
+              ;return
+              4399: RETURN
+              ;setf SysByteTempX
+              4401: SETF SYSBYTETEMPX
+              4453: #IFDEF CHIPFAMILY 16
+              ;setf SysByteTempX
+              4454: SETF SYSBYTETEMPX
+              ;movf SysByteTempB, W
+              4455: MOVF SYSBYTETEMPB, W
+              ;cpfslt SysByteTempA
+              4456: CPFSLT SYSBYTETEMPA
+              ;clrf SysByteTempX
+              4457: CLRF SYSBYTETEMPX
               4472: #IFDEF PIC
               ;dim SysWordTempA as word
               4473: DIM SYSWORDTEMPA AS WORD
@@ -6147,11 +6548,9 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               4489: BTFSS STATUS,C
               ;goto SCLT16True
               4490: GOTO SCLT16TRUE
-              4488: #IFDEF CHIPFAMILY 12,14,15
-              ;btfss STATUS,C
-              4489: BTFSS STATUS,C
-              ;goto SCLT16True
-              4490: GOTO SCLT16TRUE
+              4492: #IFDEF CHIPFAMILY 16
+              ;bnc SCLT16True
+              4493: BNC SCLT16TRUE
               4530: #IFDEF PIC
               ;dim SysLongTempA as long
               4531: DIM SYSLONGTEMPA AS LONG
@@ -6176,21 +6575,15 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               4544: BTFSS STATUS,Z
               ;goto SCLT32True
               4545: GOTO SCLT32TRUE
-              4543: #IFDEF CHIPFAMILY 12,14,15
-              ;btfss STATUS,Z
-              4544: BTFSS STATUS,Z
-              ;goto SCLT32True
-              4545: GOTO SCLT32TRUE
-              4557: #IFDEF CHIPFAMILY 12,14,15
-              ;btfss STATUS,Z
-              4558: BTFSS STATUS,Z
-              ;goto SCLT32True
-              4559: GOTO SCLT32TRUE
-              4571: #IFDEF CHIPFAMILY 12,14,15
-              ;btfss STATUS,Z
-              4572: BTFSS STATUS,Z
-              ;goto SCLT32True
-              4573: GOTO SCLT32TRUE
+              4547: #IFDEF CHIPFAMILY 16
+              ;bnz SCLT32True
+              4548: BNZ SCLT32TRUE
+              4561: #IFDEF CHIPFAMILY 16
+              ;bnz SCLT32True
+              4562: BNZ SCLT32TRUE
+              4575: #IFDEF CHIPFAMILY 16
+              ;bnz SCLT32True
+              4576: BNZ SCLT32TRUE
               4677: #IFDEF PIC
               ;https://ww1.microchip.com/downloads/en/AppNotes/00660.pdf
               ;Variables for the Microchip AppNote
@@ -6345,41 +6738,27 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               4774: BTFSS STATUS,Z
               ;goto SCLT64True
               4775: GOTO SCLT64TRUE
-              4773: #IFDEF CHIPFAMILY 12,14,15
-              ;btfss STATUS,Z
-              4774: BTFSS STATUS,Z
-              ;goto SCLT64True
-              4775: GOTO SCLT64TRUE
-              4787: #IFDEF CHIPFAMILY 12,14,15
-              ;btfss STATUS,Z
-              4788: BTFSS STATUS,Z
-              ;goto SCLT64True
-              4789: GOTO SCLT64TRUE
-              4801: #IFDEF CHIPFAMILY 12,14,15
-              ;btfss STATUS,Z
-              4802: BTFSS STATUS,Z
-              ;goto SCLT64True
-              4803: GOTO SCLT64TRUE
-              4815: #IFDEF CHIPFAMILY 12,14,15
-              ;btfss STATUS,Z
-              4816: BTFSS STATUS,Z
-              ;goto SCLT64True
-              4817: GOTO SCLT64TRUE
-              4829: #IFDEF CHIPFAMILY 12,14,15
-              ;btfss STATUS,Z
-              4830: BTFSS STATUS,Z
-              ;goto SCLT64True
-              4831: GOTO SCLT64TRUE
-              4843: #IFDEF CHIPFAMILY 12,14,15
-              ;btfss STATUS,Z
-              4844: BTFSS STATUS,Z
-              ;goto SCLT64True
-              4845: GOTO SCLT64TRUE
-              4857: #IFDEF CHIPFAMILY 12,14,15
-              ;btfss STATUS,Z
-              4858: BTFSS STATUS,Z
-              ;goto SCLT644True
-              4859: GOTO SCLT644TRUE
+              4777: #IFDEF CHIPFAMILY 16
+              ;bnz SCLT64True
+              4778: BNZ SCLT64TRUE
+              4791: #IFDEF CHIPFAMILY 16
+              ;bnz SCLT64True
+              4792: BNZ SCLT64TRUE
+              4805: #IFDEF CHIPFAMILY 16
+              ;bnz SCLT64True
+              4806: BNZ SCLT64TRUE
+              4819: #IFDEF CHIPFAMILY 16
+              ;bnz SCLT64True
+              4820: BNZ SCLT64TRUE
+              4833: #IFDEF CHIPFAMILY 16
+              ;bnz SCLT64True
+              4834: BNZ SCLT64TRUE
+              4847: #IFDEF CHIPFAMILY 16
+              ;bnz SCLT64True
+              4848: BNZ SCLT64TRUE
+              4861: #IFDEF CHIPFAMILY 16
+              ;bnz SCLT64True
+              4862: BNZ SCLT64TRUE
               4937: #IFDEF PIC
               ;Test High, exit if more
               ;movf SysIntegerTempA_H,W
@@ -6400,11 +6779,9 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               4949: BTFSS STATUS,C
               ;goto SCLTIntTrue
               4950: GOTO SCLTINTTRUE
-              4948: #IFDEF CHIPFAMILY 12,14,15
-              ;btfss STATUS,C
-              4949: BTFSS STATUS,C
-              ;goto SCLTIntTrue
-              4950: GOTO SCLTINTTRUE
+              4952: #IFDEF CHIPFAMILY 16
+              ;bnc SCLTIntTrue
+              4953: BNC SCLTINTTRUE
               4993: #IFDEF PIC
               ;Dim SysByteTempA, SysByteTempX As Byte
               4994: DIM SYSBYTETEMPA, SYSBYTETEMPX AS BYTE
@@ -6422,50 +6799,50 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               5002: #IFDEF CHIPFAMILY 12, 14
               ;incf FSR, F
               5003: INCF FSR, F
-              5005: #IFDEF CHIPFAMILY 15
-              ;addfsr 0, 1
-              5006: ADDFSR 0, 1
+              5008: #IFDEF CHIPFAMILY 16
+              ;swapf POSTINC0, W
+              5009: SWAPF POSTINC0, W
               5019: #IFDEF CHIPFAMILY 15, 16
               ;movf INDF0, W
               5020: MOVF INDF0, W
-              5078: #IFDEF CHIPFAMILY 15
+              5101: #IFDEF CHIPFAMILY 16
               ;Dim SysByteTempA, SysByteTempX As Byte
-              5079: DIM SYSBYTETEMPA, SYSBYTETEMPX AS BYTE
+              5102: DIM SYSBYTETEMPA, SYSBYTETEMPX AS BYTE
               ;incf SysByteTempX, F
-              5081: INCF SYSBYTETEMPX, F
+              5104: INCF SYSBYTETEMPX, F
               ;clrf SysByteTempA
-              5082: CLRF SYSBYTETEMPA
+              5105: CLRF SYSBYTETEMPA
               ;bsf STATUS,C
-              5083: BSF STATUS,C
-              5084: SYSSETBITLOOP:
-              ;rlf SysByteTempA, F
-              5085: RLF SYSBYTETEMPA, F
+              5106: BSF STATUS,C
+              5107: SYSSETBITLOOP:
+              ;rlcf SysByteTempA, F
+              5108: RLCF SYSBYTETEMPA, F
               ;btfsc STATUS,C
-              5086: BTFSC STATUS,C
-              ;addfsr 0, 1
-              5087: ADDFSR 0, 1
+              5109: BTFSC STATUS,C
+              ;swapf POSTINC0, W
+              5110: SWAPF POSTINC0, W
               ;btfsc STATUS,C
-              5088: BTFSC STATUS,C
-              ;rlf SysByteTempA, F
-              5089: RLF SYSBYTETEMPA, F
+              5111: BTFSC STATUS,C
+              ;rlcf SysByteTempA, F
+              5112: RLCF SYSBYTETEMPA, F
               ;decfsz SysByteTempX, F
-              5090: DECFSZ SYSBYTETEMPX, F
+              5113: DECFSZ SYSBYTETEMPX, F
               ;goto SysSetBitLoop
-              5091: GOTO SYSSETBITLOOP
+              5114: GOTO SYSSETBITLOOP
               ;If SysByteTempB.0 Then
-              5092: IF SYSBYTETEMPB.0 THEN
+              5116: IF SYSBYTETEMPB.0 THEN
               ;movf SysByteTempA, W
-              5093: MOVF SYSBYTETEMPA, W
+              5117: MOVF SYSBYTETEMPA, W
               ;iorwf INDF0, F
-              5094: IORWF INDF0, F
+              5118: IORWF INDF0, F
               ;Else
-              5095: ELSE
+              5119: ELSE
               ;comf SysByteTempA, W
-              5096: COMF SYSBYTETEMPA, W
+              5120: COMF SYSBYTETEMPA, W
               ;andwf INDF0, F
-              5097: ANDWF INDF0, F
+              5121: ANDWF INDF0, F
               ;End If
-              5098: END IF
+              5122: END IF
               5160: #IFDEF PIC
               5162: #IF VAR(EEADRH)
               ;Dim EEAddress As Word Alias EEADRH, EEADR
@@ -6477,15 +6854,6 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               5167: DIM EEADDRESS AS WORD ALIAS PMADRH, PMADRL
               ;Dim EEDataWord As Word Alias PMDATH, PMDATL
               5168: DIM EEDATAWORD AS WORD ALIAS PMDATH, PMDATL
-              5183: #IFDEF BIT(CFGS)
-              ;Set CFGS OFF
-              5184: SET CFGS OFF
-              5188: #IFDEF BIT(WREN)
-              ;SET WREN ON
-              5189: SET WREN ON
-              5191: #IFDEF BIT(FREE)
-              ;SET FREE OFF
-              5192: SET FREE OFF
               5200: #IFNOT VAR(EEADRH)
               5201: #IF VAR(PMCON2)
               ;PMCON2 = 0x55
@@ -6500,9 +6868,6 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               5216: #IFDEF BIT(WR)
               ;SET WR ON
               5217: SET WR ON
-              5223: #IFDEF BIT(WREN)
-              ;SET WREN OFF
-              5224: SET WREN OFF
               5254: #IF NOBIT(NVMCMD0)
               5255: #IF VAR(EEADRH)
               ;Dim EEAddress As Word Alias EEADRH, EEADR
@@ -6514,20 +6879,9 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               5260: DIM EEADDRESS AS WORD ALIAS PMADRH, PMADRL
               ;Dim EEDataWord As Word Alias PMDATH, PMDATL
               5261: DIM EEDATAWORD AS WORD ALIAS PMDATH, PMDATL
-              5275: #IFDEF BIT(NVMREGS)
-              ;NVMREGSState = NVMREGS
-              5276: NVMREGSSTATE = NVMREGS
-              ;NVMREGS = 0
-              5277: NVMREGS = 0
-              5281: #IFDEF BIT(CFGS)
-              ;Set CFGS ON
-              5282: SET CFGS ON
               5286: #IFDEF BIT(RD)
               ;SET RD ON
               5287: SET RD ON
-              5291: #IFDEF BIT(NVMREGS)
-              ;NVMREGS = NVMREGSState
-              5292: NVMREGS = NVMREGSSTATE
               5323: #IF NOBIT(NVMCMD0)
               5324: #IF VAR(EEADRH)
               ;Dim EEAddress As Word Alias EEADRH, EEADR
@@ -6539,37 +6893,73 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               5329: DIM EEADDRESS AS WORD ALIAS PMADRH, PMADRL
               ;Dim EEDataWord As Word Alias PMDATH, PMDATL
               5330: DIM EEDATAWORD AS WORD ALIAS PMDATH, PMDATL
-              5344: #IFDEF BIT(NVMREGS)
-              ;NVMREGSState = NVMREGS
-              5345: NVMREGSSTATE = NVMREGS
-              ;NVMREGS = 0
-              5346: NVMREGS = 0
-              5350: #IFDEF BIT(CFGS)
-              ;Set CFGS OFF
-              5351: SET CFGS OFF
               5355: #IFDEF BIT(RD)
               ;SET RD ON
               5356: SET RD ON
-              5360: #IFDEF BIT(NVMREGS)
-              ;NVMREGS = NVMREGSState
-              5361: NVMREGS = NVMREGSSTATE
               5374: #IF VAR(PMADRH)
               ;Dim EEAddress As Word Alias PMADRH, PMADRL
               5375: DIM EEADDRESS AS WORD ALIAS PMADRH, PMADRL
-              5386: #IFDEF BIT(CFGS)
-              ;Set CFGS OFF
-              5387: SET CFGS OFF
-              5391: #IFDEF BIT(FREE)
-              ;SET FREE ON
-              5392: SET FREE ON
               5399: #IF VAR(PMADRH)
               ;PMCON2 = 0x55
               5400: PMCON2 = 85
               ;PMCON2 = 0xAA
               5401: PMCON2 = 170
-              5407: #IFDEF BIT(FREE)
-              ;SET FREE OFF
-              5408: SET FREE OFF
+              5419: #IFDEF CHIPFAMILY 16
+              ;Dim _dummy as byte
+              5420: DIM _DUMMY AS BYTE
+              ;Dim _TFM_ABS_ADDR as Long Alias _dummy, TBLPTRU, TBLPTRH, TBLPTRL
+              5421: DIM _TFM_ABS_ADDR AS LONG ALIAS _DUMMY, TBLPTRU, TBLPTRH, TBLPTRL
+              ;TBLRD*+
+              5422: TBLRD*+
+              ;PFMRead = TABLAT
+              5423: PFMREAD = TABLAT
+              5430: #IFDEF CHIPFAMILY 16
+              ;Dim _dummy as byte
+              5431: DIM _DUMMY AS BYTE
+              ;Dim _TFM_ABS_ADDR as Long Alias _dummy, TBLPTRU, TBLPTRH, TBLPTRL
+              5432: DIM _TFM_ABS_ADDR AS LONG ALIAS _DUMMY, TBLPTRU, TBLPTRH, TBLPTRL
+              ;TBLRD*+
+              5433: TBLRD*+
+              ;PFMReadWord = TABLAT
+              5434: PFMREADWORD = TABLAT
+              ;TBLRD*+
+              5435: TBLRD*+
+              ;PFMReadWord_h = TABLAT
+              5436: PFMREADWORD_H = TABLAT
+              5444: #IFDEF CHIPFAMILY 16
+              ;Dim _dummy as byte
+              5445: DIM _DUMMY AS BYTE
+              ;Dim _TFM_ABS_ADDR as Long Alias _dummy, TBLPTRU, TBLPTRH, TBLPTRL
+              5446: DIM _TFM_ABS_ADDR AS LONG ALIAS _DUMMY, TBLPTRU, TBLPTRH, TBLPTRL
+              ;TBLRD*+
+              5447: TBLRD*+
+              ;_PFM_DataByte = TABLAT
+              5448: _PFM_DATABYTE = TABLAT
+              5455: #IFDEF CHIPFAMILY 16
+              ;Dim _dummy as byte
+              5456: DIM _DUMMY AS BYTE
+              ;Dim _TFM_ABS_ADDR as Long Alias _dummy, TBLPTRU, TBLPTRH, TBLPTRL
+              5457: DIM _TFM_ABS_ADDR AS LONG ALIAS _DUMMY, TBLPTRU, TBLPTRH, TBLPTRL
+              ;TBLRD*+
+              5458: TBLRD*+
+              ;_PFM_DataByte = TABLAT
+              5459: _PFM_DATABYTE = TABLAT
+              ;TBLRD*+
+              5460: TBLRD*+
+              ;_PFM_DataByte_h = TABLAT
+              5461: _PFM_DATABYTE_H = TABLAT
+              5544: #IF BIT(SECRD)
+              ;18FxxQ10 type
+              ;NVMEN = 1
+              5546: NVMEN = 1
+              ;ChipMemorylock = 0xBB
+              5547: CHIPMEMORYLOCK = 187
+              ;ChipMemorylock = 0x44
+              5548: CHIPMEMORYLOCK = 68
+              5557: #IF BIT(SECRD)
+              ;18FxxQ10 type
+              ;NVMEN = 0
+              5559: NVMEN = 0
               5598: #IFNOT CHIPSUBFAMILY=16104
               5599: #IF BIT(SECER)
               ;18FxxQ10 type
@@ -6577,15 +6967,18 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               5603: NVMEN = 1
               ;NVMCON1.6  = 1
               5604: NVMCON1.6 = 1
-              5605: #IFNOT BIT(SECER)
-              ;NVMCON1 = NVMCON1 and 0XF8 or 0x06
-              5606: NVMCON1 = NVMCON1 AND 248 OR 6
-              5617: #IFNOT BIT(SECRD)
-              ;Unlock
-              ;ChipMemorylock = 0x55
-              5619: CHIPMEMORYLOCK = 85
-              ;ChipMemorylock = 0xAA
-              5620: CHIPMEMORYLOCK = 170
+              5599: #IF BIT(SECER)
+              ;18FxxQ10 type
+              ;NVMEN = 1
+              5603: NVMEN = 1
+              ;NVMCON1.6  = 1
+              5604: NVMCON1.6 = 1
+              5613: #IF BIT(SECRD)
+              ;18FxxQ10 type
+              ;ChipMemorylock = 0xBB
+              5615: CHIPMEMORYLOCK = 187
+              ;ChipMemorylock = 0x44
+              5616: CHIPMEMORYLOCK = 68
               5655: #IFNOT CHIPSUBFAMILY=16104
               5656: #IF BIT(SECER)
               ;Unlock
@@ -6596,13 +6989,23 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               ;18FxxQ10 type
               ;NVMCON1.5 = 1
               5662: NVMCON1.5 = 1
-              5663: #IFNOT BIT(SECER)
-              ;NVMCON1 = NVMCON1 and 0XF8 or 0x05
-              5664: NVMCON1 = NVMCON1 AND 248 OR 5
-              5692: #IF NOBIT(SECER)
-              ;Set the NVMCMD control bits for Word Read operation to avoid accidental writes
-              ;NVMCON1 = NVMCON1 and 0XF8
-              5694: NVMCON1 = NVMCON1 AND 248
+              5656: #IF BIT(SECER)
+              ;Unlock
+              ;ChipMemorylock = 0xDD
+              5658: CHIPMEMORYLOCK = 221
+              ;ChipMemorylock = 0x22
+              5659: CHIPMEMORYLOCK = 34
+              ;18FxxQ10 type
+              ;NVMCON1.5 = 1
+              5662: NVMCON1.5 = 1
+              5685: #IF BIT(SECER)
+              ;18FxxQ10 type
+              ;NVMCON1.WR = 1
+              5687: NVMCON1.WR = 1
+              ;wait while NVMCON1.WR = 1
+              5688: WAIT WHILE NVMCON1.WR = 1
+              ;NVMEN = 0
+              5689: NVMEN = 0
               190: #IFDEF PIC
               191: #IFNDEF VAR(SSPCON1)
               192: #IFDEF VAR(SSPCON)
@@ -6767,6 +7170,10 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               ;Handle 18F chips
               ;SPIRxData = SSPBUF
               727: SPIRXDATA = SSPBUF
+              725: #IF CHIPFAMILY = 16
+              ;Handle 18F chips
+              ;SPIRxData = SSPBUF
+              727: SPIRXDATA = SSPBUF
               780: #IF CHIPFAMILY ~ 122
               ;Do
               781: DO
@@ -6788,30 +7195,6 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               ;Same for master and slave
               ;Wait While SPSR.SPIF = Off
               793: WAIT WHILE SPSR.SPIF = OFF
-              88: #IFDEF KEYPAD_ROW_1
-              ;Dir KEYPAD_ROW_1 Out
-              89: DIR KEYPAD_ROW_1 OUT
-              91: #IFDEF KEYPAD_ROW_2
-              ;Dir KEYPAD_ROW_2 Out
-              92: DIR KEYPAD_ROW_2 OUT
-              94: #IFDEF KEYPAD_ROW_3
-              ;Dir KEYPAD_ROW_3 Out
-              95: DIR KEYPAD_ROW_3 OUT
-              97: #IFDEF KEYPAD_ROW_4
-              ;Dir KEYPAD_ROW_4 Out
-              98: DIR KEYPAD_ROW_4 OUT
-              100: #IFDEF KEYPAD_COL_1
-              ;Dir KEYPAD_COL_1 In
-              101: DIR KEYPAD_COL_1 IN
-              103: #IFDEF KEYPAD_COL_2
-              ;Dir KEYPAD_COL_2 In
-              104: DIR KEYPAD_COL_2 IN
-              106: #IFDEF KEYPAD_COL_3
-              ;Dir KEYPAD_COL_3 In
-              107: DIR KEYPAD_COL_3 IN
-              109: #IFDEF KEYPAD_COL_4
-              ;Dir KEYPAD_COL_4 In
-              110: DIR KEYPAD_COL_4 IN
               159: #IFNDEF KEYPADPORT
               160: #IFDEF KEYPAD_ROW_1
               161: #IFDEF KEYPAD_PULLDOWN
@@ -6821,348 +7204,47 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               164: #IFDEF KEYPAD_ROW_1
               ;Set KEYPAD_ROW_1 Off
               165: SET KEYPAD_ROW_1 OFF
-              160: #IFDEF KEYPAD_ROW_1
-              161: #IFDEF KEYPAD_PULLDOWN
-              ;for KeyReadColumn = 1 to 4
-              162: FOR KEYREADCOLUMN = 1 TO 4
-              ;Set all rows off
-              164: #IFDEF KEYPAD_ROW_1
-              ;Set KEYPAD_ROW_1 Off
-              165: SET KEYPAD_ROW_1 OFF
-              210: #IFNDEF KEYPAD_PULLDOWN
-              ;for KeyReadColumn = 1 to 4
-              211: FOR KEYREADCOLUMN = 1 TO 4
-              ;Set all rows off
-              213: #IFDEF KEYPAD_ROW_1
-              ;Set KEYPAD_ROW_1 On
-              214: SET KEYPAD_ROW_1 ON
-              213: #IFDEF KEYPAD_ROW_1
-              ;Set KEYPAD_ROW_1 On
-              214: SET KEYPAD_ROW_1 ON
-              216: #IFDEF KEYPAD_ROW_2
-              ;Set KEYPAD_ROW_2 On
-              217: SET KEYPAD_ROW_2 ON
-              219: #IFDEF KEYPAD_ROW_3
-              ;Set KEYPAD_ROW_3 On
-              220: SET KEYPAD_ROW_3 ON
-              222: #IFDEF KEYPAD_ROW_4
-              ;Set KEYPAD_ROW_4 On
-              223: SET KEYPAD_ROW_4 ON
-              226: #IFDEF KEYPAD_ROW_1
-              ;If KeyReadColumn = 1 Then Set KEYPAD_ROW_1 Off
-              227: IF KEYREADCOLUMN = 1 THEN
-              ;If KeyReadColumn = 1 Then Set KEYPAD_ROW_1 Off
-              227: SET KEYPAD_ROW_1 OFF
-              ;If KeyReadColumn = 1 Then Set KEYPAD_ROW_1 Off
-              227: END IF
-              229: #IFDEF KEYPAD_ROW_2
-              ;If KeyReadColumn = 2 Then Set KEYPAD_ROW_2 Off
-              230: IF KEYREADCOLUMN = 2 THEN
-              ;If KeyReadColumn = 2 Then Set KEYPAD_ROW_2 Off
-              230: SET KEYPAD_ROW_2 OFF
-              ;If KeyReadColumn = 2 Then Set KEYPAD_ROW_2 Off
-              230: END IF
-              232: #IFDEF KEYPAD_ROW_3
-              ;If KeyReadColumn = 3 Then Set KEYPAD_ROW_3 Off
-              233: IF KEYREADCOLUMN = 3 THEN
-              ;If KeyReadColumn = 3 Then Set KEYPAD_ROW_3 Off
-              233: SET KEYPAD_ROW_3 OFF
-              ;If KeyReadColumn = 3 Then Set KEYPAD_ROW_3 Off
-              233: END IF
-              235: #IFDEF KEYPAD_ROW_4
-              ;If KeyReadColumn = 4 Then Set KEYPAD_ROW_4 Off
-              236: IF KEYREADCOLUMN = 4 THEN
-              ;If KeyReadColumn = 4 Then Set KEYPAD_ROW_4 Off
-              236: SET KEYPAD_ROW_4 OFF
-              ;If KeyReadColumn = 4 Then Set KEYPAD_ROW_4 Off
-              236: END IF
-              243: #IFDEF KEYPAD_COL_1
-              ;if KEYPAD_COL_1 = Off then Set KeypadRaw.3 On
-              244: IF KEYPAD_COL_1 = OFF THEN
-              ;if KEYPAD_COL_1 = Off then Set KeypadRaw.3 On
-              244: SET KEYPADRAW.3 ON
-              ;if KEYPAD_COL_1 = Off then Set KeypadRaw.3 On
-              244: END IF
-              246: #IFDEF KEYPAD_COL_2
-              ;if KEYPAD_COL_2 = Off then Set KeypadRaw.2 On
-              247: IF KEYPAD_COL_2 = OFF THEN
-              ;if KEYPAD_COL_2 = Off then Set KeypadRaw.2 On
-              247: SET KEYPADRAW.2 ON
-              ;if KEYPAD_COL_2 = Off then Set KeypadRaw.2 On
-              247: END IF
-              249: #IFDEF KEYPAD_COL_3
-              ;if KEYPAD_COL_3 = Off then Set KeypadRaw.1 On
-              250: IF KEYPAD_COL_3 = OFF THEN
-              ;if KEYPAD_COL_3 = Off then Set KeypadRaw.1 On
-              250: SET KEYPADRAW.1 ON
-              ;if KEYPAD_COL_3 = Off then Set KeypadRaw.1 On
-              250: END IF
-              252: #IFDEF KEYPAD_COL_4
-              ;if KEYPAD_COL_4 = Off then Set KeypadRaw.0 On
-              253: IF KEYPAD_COL_4 = OFF THEN
-              ;if KEYPAD_COL_4 = Off then Set KeypadRaw.0 On
-              253: SET KEYPADRAW.0 ON
-              ;if KEYPAD_COL_4 = Off then Set KeypadRaw.0 On
-              253: END IF
-              680: #IFDEF CHIPFAMILY 12,14,15
-              ;SysByteTempX = False
-              682: SYSBYTETEMPX = FALSE
-              ;If [BYTE]SysULongInt_STS_Num = 0 Then    // Check all is ZERO
-              683: IF [BYTE]SYSULONGINT_STS_NUM = 0 THEN
-              ;If SysULongInt_STS_Num_H = 0 Then
-              684: IF SYSULONGINT_STS_NUM_H = 0 THEN
-              ;If SysULongInt_STS_Num_U = 0 Then
-              685: IF SYSULONGINT_STS_NUM_U = 0 THEN
-              ;If SysULongInt_STS_Num_E = 0 Then
-              686: IF SYSULONGINT_STS_NUM_E = 0 THEN
-              ;If SysULongInt_STS_Num_A = 0 Then
-              687: IF SYSULONGINT_STS_NUM_A = 0 THEN
-              ;If SysULongInt_STS_Num_B = 0 Then
-              688: IF SYSULONGINT_STS_NUM_B = 0 THEN
-              ;If SysULongInt_STS_Num_C = 0 Then
-              689: IF SYSULONGINT_STS_NUM_C = 0 THEN
-              ;If SysULongInt_STS_Num_D = 0 Then
-              690: IF SYSULONGINT_STS_NUM_D = 0 THEN
-              ;SysByteTempX = True
-              691: SYSBYTETEMPX = TRUE
-              ;End if
-              692: END IF
-              ;End if
-              693: END IF
-              ;End if
-              694: END IF
-              ;End if
-              695: END IF
-              ;End if
-              696: END IF
-              ;End if
-              697: END IF
-              ;End if
-              698: END IF
-              ;End if
-              699: END IF
-              739: #IFDEF CHIPFAMILY 12,14,15
-              ;SysByteTempX = False
-              741: SYSBYTETEMPX = FALSE
-              ;If [BYTE]SysULongInt_STS_Num = 0 Then    // ERV check all are ZERO
-              742: IF [BYTE]SYSULONGINT_STS_NUM = 0 THEN
-              ;If SysULongInt_STS_Num_H = 0 Then
-              743: IF SYSULONGINT_STS_NUM_H = 0 THEN
-              ;If SysULongInt_STS_Num_U = 0 Then
-              744: IF SYSULONGINT_STS_NUM_U = 0 THEN
-              ;If SysULongInt_STS_Num_E = 0 Then
-              745: IF SYSULONGINT_STS_NUM_E = 0 THEN
-              ;If SysULongInt_STS_Num_A = 0 Then
-              746: IF SYSULONGINT_STS_NUM_A = 0 THEN
-              ;If SysULongInt_STS_Num_B = 0 Then
-              747: IF SYSULONGINT_STS_NUM_B = 0 THEN
-              ;If SysULongInt_STS_Num_C = 0 Then
-              748: IF SYSULONGINT_STS_NUM_C = 0 THEN
-              ;If SysULongInt_STS_Num_D = 0 Then
-              749: IF SYSULONGINT_STS_NUM_D = 0 THEN
-              ;SysByteTempX = True
-              750: SYSBYTETEMPX = TRUE
-              ;End if
-              751: END IF
-              ;End if
-              752: END IF
-              ;End if
-              753: END IF
-              ;End if
-              754: END IF
-              ;End if
-              755: END IF
-              ;End if
-              756: END IF
-              ;End if
-              757: END IF
-              ;End if
-              758: END IF
-              783: #IFDEF CHIPFAMILY 12,14,15
-              ;SysByteTempX = False
-              786: SYSBYTETEMPX = FALSE
-              ;If [BYTE]SysULongInt_STS_Num = 1 Then  // ERV is the correct - just check this byte ?
-              787: IF [BYTE]SYSULONGINT_STS_NUM = 1 THEN
-              ;If SysULongInt_STS_Num_H = 0 Then
-              788: IF SYSULONGINT_STS_NUM_H = 0 THEN
-              ;If SysULongInt_STS_Num_U = 0 Then
-              789: IF SYSULONGINT_STS_NUM_U = 0 THEN
-              ;If SysULongInt_STS_Num_E = 0 Then
-              790: IF SYSULONGINT_STS_NUM_E = 0 THEN
-              ;If SysULongInt_STS_Num_A = 0 Then
-              791: IF SYSULONGINT_STS_NUM_A = 0 THEN
-              ;If SysULongInt_STS_Num_B = 0 Then
-              792: IF SYSULONGINT_STS_NUM_B = 0 THEN
-              ;If SysULongInt_STS_Num_C = 0 Then
-              793: IF SYSULONGINT_STS_NUM_C = 0 THEN
-              ;If SysULongInt_STS_Num_D = 0 Then
-              794: IF SYSULONGINT_STS_NUM_D = 0 THEN
-              ;SysByteTempX = True
-              795: SYSBYTETEMPX = TRUE
-              ;End if
-              796: END IF
-              ;End if
-              797: END IF
-              ;End if
-              798: END IF
-              ;End if
-              799: END IF
-              ;End if
-              800: END IF
-              ;End if
-              801: END IF
-              ;End if
-              802: END IF
-              ;End if
-              803: END IF
-              1487: #IFDEF CHIPFAMILY 12,14,15
-              ;SysByteTempX = False
-              1489: SYSBYTETEMPX = FALSE
-              ;If [BYTE]SysULongIntTempA = 0 Then    // Check all is ZERO
-              1490: IF [BYTE]SYSULONGINTTEMPA = 0 THEN
-              ;If SysULongIntTempA_H = 0 Then
-              1491: IF SYSULONGINTTEMPA_H = 0 THEN
-              ;If SysULongIntTempA_U = 0 Then
-              1492: IF SYSULONGINTTEMPA_U = 0 THEN
-              ;If SysULongIntTempA_E = 0 Then
-              1493: IF SYSULONGINTTEMPA_E = 0 THEN
-              ;If SysULongIntTempA_A = 0 Then
-              1494: IF SYSULONGINTTEMPA_A = 0 THEN
-              ;If SysULongIntTempA_B = 0 Then
-              1495: IF SYSULONGINTTEMPA_B = 0 THEN
-              ;If SysULongIntTempA_C = 0 Then
-              1496: IF SYSULONGINTTEMPA_C = 0 THEN
-              ;If SysULongIntTempA_D = 0 Then
-              1497: IF SYSULONGINTTEMPA_D = 0 THEN
-              ;SysByteTempX = True
-              1498: SYSBYTETEMPX = TRUE
-              ;End if
-              1499: END IF
-              ;End if
-              1500: END IF
-              ;End if
-              1501: END IF
-              ;End if
-              1502: END IF
-              ;End if
-              1503: END IF
-              ;End if
-              1504: END IF
-              ;End if
-              1505: END IF
-              ;End if
-              1506: END IF
-              1520: #IFDEF CHIPFAMILY 12,14,15
-              ;SysByteTempX = False
-              1522: SYSBYTETEMPX = FALSE
-              ;If [BYTE]SysULongIntTempA = 0 Then    // Check all is ZERO
-              1523: IF [BYTE]SYSULONGINTTEMPA = 0 THEN
-              ;If SysULongIntTempA_H = 0 Then
-              1524: IF SYSULONGINTTEMPA_H = 0 THEN
-              ;If SysULongIntTempA_U = 0 Then
-              1525: IF SYSULONGINTTEMPA_U = 0 THEN
-              ;If SysULongIntTempA_E = 0 Then
-              1526: IF SYSULONGINTTEMPA_E = 0 THEN
-              ;If SysULongIntTempA_A = 0 Then
-              1527: IF SYSULONGINTTEMPA_A = 0 THEN
-              ;If SysULongIntTempA_B = 0 Then
-              1528: IF SYSULONGINTTEMPA_B = 0 THEN
-              ;If SysULongIntTempA_C = 0 Then
-              1529: IF SYSULONGINTTEMPA_C = 0 THEN
-              ;If SysULongIntTempA_D = 0 Then
-              1530: IF SYSULONGINTTEMPA_D = 0 THEN
-              ;SysByteTempX = True
-              1531: SYSBYTETEMPX = TRUE
-              ;End if
-              1532: END IF
-              ;End if
-              1533: END IF
-              ;End if
-              1534: END IF
-              ;End if
-              1535: END IF
-              ;End if
-              1536: END IF
-              ;End if
-              1537: END IF
-              ;End if
-              1538: END IF
-              ;End if
-              1539: END IF
-              1563: #IFDEF CHIPFAMILY 12,14,15
-              ;SysByteTempX = False
-              1565: SYSBYTETEMPX = FALSE
-              ;If [BYTE]SysULongIntTempA = 0 Then    // Check all is ZERO
-              1566: IF [BYTE]SYSULONGINTTEMPA = 0 THEN
-              ;If SysULongIntTempA_H = 0 Then
-              1567: IF SYSULONGINTTEMPA_H = 0 THEN
-              ;If SysULongIntTempA_U = 0 Then
-              1568: IF SYSULONGINTTEMPA_U = 0 THEN
-              ;If SysULongIntTempA_E = 0 Then
-              1569: IF SYSULONGINTTEMPA_E = 0 THEN
-              ;If SysULongIntTempA_A = 0 Then
-              1570: IF SYSULONGINTTEMPA_A = 0 THEN
-              ;If SysULongIntTempA_B = 0 Then
-              1571: IF SYSULONGINTTEMPA_B = 0 THEN
-              ;If SysULongIntTempA_C = 0 Then
-              1572: IF SYSULONGINTTEMPA_C = 0 THEN
-              ;If SysULongIntTempA_D = 0 Then
-              1573: IF SYSULONGINTTEMPA_D = 0 THEN
-              ;SysByteTempX = True
-              1574: SYSBYTETEMPX = TRUE
-              ;End if
-              1575: END IF
-              ;End if
-              1576: END IF
-              ;End if
-              1577: END IF
-              ;End if
-              1578: END IF
-              ;End if
-              1579: END IF
-              ;End if
-              1580: END IF
-              ;End if
-              1581: END IF
-              ;End if
-              1582: END IF
-              1604: #IFDEF CHIPFAMILY 12,14,15
-              ;SysByteTempX = False
-              1606: SYSBYTETEMPX = FALSE
-              ;If [BYTE]SysULongIntTempA = 0 Then    // Check all is ZERO
-              1607: IF [BYTE]SYSULONGINTTEMPA = 0 THEN
-              ;If SysULongIntTempA_H = 0 Then
-              1608: IF SYSULONGINTTEMPA_H = 0 THEN
-              ;If SysULongIntTempA_U = 0 Then
-              1609: IF SYSULONGINTTEMPA_U = 0 THEN
-              ;If SysULongIntTempA_E = 0 Then
-              1610: IF SYSULONGINTTEMPA_E = 0 THEN
-              ;If SysULongIntTempA_A = 0 Then
-              1611: IF SYSULONGINTTEMPA_A = 0 THEN
-              ;If SysULongIntTempA_B = 0 Then
-              1612: IF SYSULONGINTTEMPA_B = 0 THEN
-              ;If SysULongIntTempA_C = 0 Then
-              1613: IF SYSULONGINTTEMPA_C = 0 THEN
-              ;If SysULongIntTempA_D = 0 Then
-              1614: IF SYSULONGINTTEMPA_D = 0 THEN
-              ;SysByteTempX = True
-              1615: SYSBYTETEMPX = TRUE
-              ;End if
-              1616: END IF
-              ;End if
-              1617: END IF
-              ;End if
-              1618: END IF
-              ;End if
-              1619: END IF
-              ;End if
-              1620: END IF
-              ;End if
-              1621: END IF
-              ;End if
-              1622: END IF
-              ;End if
-              1623: END IF
+              700: #IFNDEF CHIPFAMILY 12,14,15
+              ;SysULongIntTempA = SysULongInt_STS_Num
+              701: SYSULONGINTTEMPA = SYSULONGINT_STS_NUM
+              ;SysULongIntTempB = 0
+              702: SYSULONGINTTEMPB = 0
+              ;SysCompEqual64
+              703: SYSCOMPEQUAL64
+              759: #IFNDEF CHIPFAMILY 12,14,15
+              ;	SysULongIntTempA = SysULongInt_STS_Num
+              760: SYSULONGINTTEMPA = SYSULONGINT_STS_NUM
+              ;SysULongIntTempB = 0
+              761: SYSULONGINTTEMPB = 0
+              ;SysCompEqual64
+              762: SYSCOMPEQUAL64
+              804: #IFNDEF CHIPFAMILY 12,14,15
+              ;SysULongIntTempA = SysULongInt_STS_Num     // ERV move to #ELSE once Clint as approved
+              805: SYSULONGINTTEMPA = SYSULONGINT_STS_NUM
+              ;SysULongIntTempB = 1
+              806: SYSULONGINTTEMPB = 1
+              ;SysCompEqual64
+              807: SYSCOMPEQUAL64
+              1507: #IFNDEF CHIPFAMILY 12,14,15
+              ;SysULongIntTempB = 0
+              1508: SYSULONGINTTEMPB = 0
+              ;SysCompEqual64
+              1509: SYSCOMPEQUAL64
+              1540: #IFNDEF CHIPFAMILY 12,14,15
+              ;SysULongIntTempB = 0
+              1541: SYSULONGINTTEMPB = 0
+              ;SysCompEqual64
+              1542: SYSCOMPEQUAL64
+              1583: #IFNDEF CHIPFAMILY 12,14,15
+              ;SysULongIntTempB = 0
+              1584: SYSULONGINTTEMPB = 0
+              ;SysCompEqual64
+              1585: SYSCOMPEQUAL64
+              1624: #IFNDEF CHIPFAMILY 12,14,15
+              ;SysULongIntTempB = 0
+              1625: SYSULONGINTTEMPB = 0
+              ;SysCompEqual64
+              1626: SYSCOMPEQUAL64
               1221: #IFDEF PIC
               1223: #IF CHIPUSART > 1
               ;Set the default value for USART handler - required when more than one USART
@@ -7234,6 +7316,10 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               1851: #IFDEF BIT(PCFG6)
               ;PCFG6 = 1
               1852: PCFG6 = 1
+              1850: #IFDEF CHIPFAMILY 16
+              1851: #IFDEF BIT(PCFG6)
+              ;PCFG6 = 1
+              1852: PCFG6 = 1
               1861: #IFDEF USART_TX_BLOCKING
               ;USART_TX_BLOCKING
               1864: #IF CANBUSCHIP_SCRIPT = TRUE
@@ -7267,6 +7353,10 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               1974: #IFDEF BIT(PCFG6)
               ;PCFG6 = 1
               1975: PCFG6 = 1
+              1973: #IFDEF CHIPFAMILY 16
+              1974: #IFDEF BIT(PCFG6)
+              ;PCFG6 = 1
+              1975: PCFG6 = 1
               1988: #IFDEF USART_TX_BLOCKING
               ;USART_TX_BLOCKING
               1990: #IFDEF BIT(TXIF)
@@ -7291,6 +7381,10 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               2039: WAIT USART_DELAY
               2573: #IFDEF PIC
               2575: HSERRECEIVE1HANDLER:
+              2578: #IFDEF CHIPFAMILY 16
+              2579: #IFDEF BIT(PCFG6)
+              ;PCFG6 = 1
+              2580: PCFG6 = 1
               2578: #IFDEF CHIPFAMILY 16
               2579: #IFDEF BIT(PCFG6)
               ;PCFG6 = 1
@@ -7542,11 +7636,12 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               326: SET SEN ON
               ;HI2CWaitMSSP
               327: HI2CWAITMSSP
-              325: #IFDEF BIT(SEN)
-              ;Set SEN On
-              326: SET SEN ON
+              330: #IFDEF BIT(SEN_SSP1CON2)
+              ;for device with SEN_SSP1CON2 and therefore devices including the 18FxxK40
+              ;Set SEN_SSP1CON2 On
+              332: SET SEN_SSP1CON2 ON
               ;HI2CWaitMSSP
-              327: HI2CWAITMSSP
+              333: HI2CWAITMSSP
               342: #IFDEF PIC
               ;Wait Until SSPSTAT.S = On
               343: WAIT UNTIL SSPSTAT.S = ON
@@ -7883,11 +7978,11 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               178: SET SSP2CON2_SEN ON
               ;HI2C2WaitMSSP
               179: HI2C2WAITMSSP
-              177: #IFDEF BIT(SSP2CON2_SEN)
-              ;Set SSP2CON2_SEN On
-              178: SET SSP2CON2_SEN ON
+              182: #IFDEF BIT(SEN_SSP2CON2)
+              ;Set SEN_SSP2CON2 On
+              183: SET SEN_SSP2CON2 ON
               ;HI2C2WaitMSSP
-              179: HI2C2WAITMSSP
+              184: HI2C2WAITMSSP
               191: #IFDEF PIC
               ;Wait Until SSP2STAT_S = On
               192: WAIT UNTIL SSP2STAT_S = ON
@@ -8063,36 +8158,6 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               590: PWM4LD = 1
               ;PWM4CON = 0b11000000
               591: PWM4CON = 192
-              595: #IFDEF VAR(PWM5CON)
-              596: #IFDEF USE_HPWM16_5 TRUE
-              ;Case 5
-              597: CASE 5
-              ;PWM5LD = 1
-              598: PWM5LD = 1
-              ;PWM5CON = 0b11000000
-              599: PWM5CON = 192
-              596: #IFDEF USE_HPWM16_5 TRUE
-              ;Case 5
-              597: CASE 5
-              ;PWM5LD = 1
-              598: PWM5LD = 1
-              ;PWM5CON = 0b11000000
-              599: PWM5CON = 192
-              603: #IFDEF VAR(PWM6CON)
-              604: #IFDEF USE_HPWM16_6 TRUE
-              ;Case 6
-              605: CASE 6
-              ;PWM6LD = 1
-              606: PWM6LD = 1
-              ;PWM6CON = 0b11000000
-              607: PWM6CON = 192
-              604: #IFDEF USE_HPWM16_6 TRUE
-              ;Case 6
-              605: CASE 6
-              ;PWM6LD = 1
-              606: PWM6LD = 1
-              ;PWM6CON = 0b11000000
-              607: PWM6CON = 192
               698: #IFDEF VAR(PWM3CON)
               699: #IFDEF USE_HPWM16_3 TRUE
               ;Case 3
@@ -8147,60 +8212,6 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               715: PWM4PRL = HPWM16_PRPS_REQ
               ;PWM4PRH = HPWM16_PRPS_Req_H
               716: PWM4PRH = HPWM16_PRPS_REQ_H
-              720: #IFDEF VAR(PWM5CON)
-              721: #IFDEF USE_HPWM16_5 TRUE
-              ;Case 5
-              722: CASE 5
-              ;PWM5PS0 = HPWM16_PS.0
-              723: PWM5PS0 = HPWM16_PS.0
-              ;PWM5PS1 = HPWM16_PS.1
-              724: PWM5PS1 = HPWM16_PS.1
-              ;PWM5PS2 = HPWM16_PS.2
-              725: PWM5PS2 = HPWM16_PS.2
-              ;PWM5PRL = HPWM16_PRPS_Req
-              726: PWM5PRL = HPWM16_PRPS_REQ
-              ;PWM5PRH = HPWM16_PRPS_Req_H
-              727: PWM5PRH = HPWM16_PRPS_REQ_H
-              721: #IFDEF USE_HPWM16_5 TRUE
-              ;Case 5
-              722: CASE 5
-              ;PWM5PS0 = HPWM16_PS.0
-              723: PWM5PS0 = HPWM16_PS.0
-              ;PWM5PS1 = HPWM16_PS.1
-              724: PWM5PS1 = HPWM16_PS.1
-              ;PWM5PS2 = HPWM16_PS.2
-              725: PWM5PS2 = HPWM16_PS.2
-              ;PWM5PRL = HPWM16_PRPS_Req
-              726: PWM5PRL = HPWM16_PRPS_REQ
-              ;PWM5PRH = HPWM16_PRPS_Req_H
-              727: PWM5PRH = HPWM16_PRPS_REQ_H
-              731: #IFDEF VAR(PWM6CON)
-              732: #IFDEF USE_HPWM16_6 TRUE
-              ;Case 6
-              733: CASE 6
-              ;PWM6PS0 = HPWM16_PS.0
-              734: PWM6PS0 = HPWM16_PS.0
-              ;PWM6PS1 = HPWM16_PS.1
-              735: PWM6PS1 = HPWM16_PS.1
-              ;PWM6PS2 = HPWM16_PS.2
-              736: PWM6PS2 = HPWM16_PS.2
-              ;PWM6PRL = HPWM16_PRPS_Req
-              737: PWM6PRL = HPWM16_PRPS_REQ
-              ;PWM6PRH = HPWM16_PRPS_Req_H
-              738: PWM6PRH = HPWM16_PRPS_REQ_H
-              732: #IFDEF USE_HPWM16_6 TRUE
-              ;Case 6
-              733: CASE 6
-              ;PWM6PS0 = HPWM16_PS.0
-              734: PWM6PS0 = HPWM16_PS.0
-              ;PWM6PS1 = HPWM16_PS.1
-              735: PWM6PS1 = HPWM16_PS.1
-              ;PWM6PS2 = HPWM16_PS.2
-              736: PWM6PS2 = HPWM16_PS.2
-              ;PWM6PRL = HPWM16_PRPS_Req
-              737: PWM6PRL = HPWM16_PRPS_REQ
-              ;PWM6PRH = HPWM16_PRPS_Req_H
-              738: PWM6PRH = HPWM16_PRPS_REQ_H
               857: #IFDEF VAR(PWM3CON)
               858: #IFDEF USE_HPWM16_3 TRUE
               ;Case 3
@@ -8247,52 +8258,6 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               871: PWM4DCL = HPWM16_DCY
               ;PWM4DCH = HPWM16_DCy_H
               872: PWM4DCH = HPWM16_DCY_H
-              875: #IFDEF VAR(PWM5CON)
-              876: #IFDEF USE_HPWM16_5 TRUE
-              ;Case 5
-              877: CASE 5
-              ;PWM5PHH = 0x00
-              878: PWM5PHH = 0
-              ;PWM5PHL = 0x00
-              879: PWM5PHL = 0
-              ;PWM5DCL = HPWM16_DCy
-              880: PWM5DCL = HPWM16_DCY
-              ;PWM5DCH = HPWM16_DCy_H
-              881: PWM5DCH = HPWM16_DCY_H
-              876: #IFDEF USE_HPWM16_5 TRUE
-              ;Case 5
-              877: CASE 5
-              ;PWM5PHH = 0x00
-              878: PWM5PHH = 0
-              ;PWM5PHL = 0x00
-              879: PWM5PHL = 0
-              ;PWM5DCL = HPWM16_DCy
-              880: PWM5DCL = HPWM16_DCY
-              ;PWM5DCH = HPWM16_DCy_H
-              881: PWM5DCH = HPWM16_DCY_H
-              884: #IFDEF VAR(PWM6CON)
-              885: #IFDEF USE_HPWM16_6 TRUE
-              ;Case 6
-              886: CASE 6
-              ;PWM6PHH = 0x00
-              887: PWM6PHH = 0
-              ;PWM6PHL = 0x00
-              888: PWM6PHL = 0
-              ;PWM6DCL = HPWM16_DCy
-              889: PWM6DCL = HPWM16_DCY
-              ;PWM6DCH = HPWM16_DCy_H
-              890: PWM6DCH = HPWM16_DCY_H
-              885: #IFDEF USE_HPWM16_6 TRUE
-              ;Case 6
-              886: CASE 6
-              ;PWM6PHH = 0x00
-              887: PWM6PHH = 0
-              ;PWM6PHL = 0x00
-              888: PWM6PHL = 0
-              ;PWM6DCL = HPWM16_DCy
-              889: PWM6DCL = HPWM16_DCY
-              ;PWM6DCH = HPWM16_DCy_H
-              890: PWM6DCH = HPWM16_DCY_H
               1009: #IFDEF VAR(PWM3CON)
               1010: #IFDEF USE_HPWM16_3 TRUE
               ;Case 3
@@ -8395,108 +8360,6 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               1038: PWM4LD = 1
               ;PWM4CON = 0b11000000
               1039: PWM4CON = 192
-              1043: #IFDEF VAR(PWM5CON)
-              1044: #IFDEF USE_HPWM16_5 TRUE
-              ;Case 5
-              1045: CASE 5
-              ;PWM5PS0 = 0x00            'prescale is always 1 (0x00)
-              1046: PWM5PS0 = 0
-              ;PWM5PS1 = 0x00
-              1047: PWM5PS1 = 0
-              ;PWM5PS2 = 0x00
-              1048: PWM5PS2 = 0
-              ;PWM5PRL = HPWM16_5_HPWM16F_PRL_Script     'frequency
-              1049: PWM5PRL = HPWM16_5_HPWM16F_PRL_SCRIPT
-              ;PWM5PRH = HPWM16_5_HPWM16F_PRH_Script
-              1050: PWM5PRH = HPWM16_5_HPWM16F_PRH_SCRIPT
-              ;PWM5PHH = 0x00            'phase count is always zero
-              1051: PWM5PHH = 0
-              ;PWM5PHL = 0x00
-              1052: PWM5PHL = 0
-              ;PWM5DCL = HPWM16_5_HPWM16F_DCL_Script     'duty cycle
-              1053: PWM5DCL = HPWM16_5_HPWM16F_DCL_SCRIPT
-              ;PWM5DCH = HPWM16_5_HPWM16F_DCH_Script
-              1054: PWM5DCH = HPWM16_5_HPWM16F_DCH_SCRIPT
-              ;PWM5LD = 1
-              1055: PWM5LD = 1
-              ;PWM5CON = 0b11000000
-              1056: PWM5CON = 192
-              1044: #IFDEF USE_HPWM16_5 TRUE
-              ;Case 5
-              1045: CASE 5
-              ;PWM5PS0 = 0x00            'prescale is always 1 (0x00)
-              1046: PWM5PS0 = 0
-              ;PWM5PS1 = 0x00
-              1047: PWM5PS1 = 0
-              ;PWM5PS2 = 0x00
-              1048: PWM5PS2 = 0
-              ;PWM5PRL = HPWM16_5_HPWM16F_PRL_Script     'frequency
-              1049: PWM5PRL = HPWM16_5_HPWM16F_PRL_SCRIPT
-              ;PWM5PRH = HPWM16_5_HPWM16F_PRH_Script
-              1050: PWM5PRH = HPWM16_5_HPWM16F_PRH_SCRIPT
-              ;PWM5PHH = 0x00            'phase count is always zero
-              1051: PWM5PHH = 0
-              ;PWM5PHL = 0x00
-              1052: PWM5PHL = 0
-              ;PWM5DCL = HPWM16_5_HPWM16F_DCL_Script     'duty cycle
-              1053: PWM5DCL = HPWM16_5_HPWM16F_DCL_SCRIPT
-              ;PWM5DCH = HPWM16_5_HPWM16F_DCH_Script
-              1054: PWM5DCH = HPWM16_5_HPWM16F_DCH_SCRIPT
-              ;PWM5LD = 1
-              1055: PWM5LD = 1
-              ;PWM5CON = 0b11000000
-              1056: PWM5CON = 192
-              1060: #IFDEF VAR(PWM6CON)
-              1061: #IFDEF USE_HPWM16_6 TRUE
-              ;Case 6
-              1062: CASE 6
-              ;PWM6PS0 = 0x00            'prescale is always 1 (0x00)
-              1063: PWM6PS0 = 0
-              ;PWM6PS1 = 0x00
-              1064: PWM6PS1 = 0
-              ;PWM6PS2 = 0x00
-              1065: PWM6PS2 = 0
-              ;PWM6PRL = HPWM16_6_HPWM16F_PRL_Script     'frequency
-              1066: PWM6PRL = HPWM16_6_HPWM16F_PRL_SCRIPT
-              ;PWM6PRH = HPWM16_6_HPWM16F_PRH_Script
-              1067: PWM6PRH = HPWM16_6_HPWM16F_PRH_SCRIPT
-              ;PWM6PHH = 0x00            'phase count is always zero
-              1068: PWM6PHH = 0
-              ;PWM6PHL = 0x00
-              1069: PWM6PHL = 0
-              ;PWM6DCL = HPWM16_6_HPWM16F_DCL_Script     'duty cycle
-              1070: PWM6DCL = HPWM16_6_HPWM16F_DCL_SCRIPT
-              ;PWM6DCH = HPWM16_6_HPWM16F_DCH_Script
-              1071: PWM6DCH = HPWM16_6_HPWM16F_DCH_SCRIPT
-              ;PWM6LD = 1
-              1072: PWM6LD = 1
-              ;PWM6CON = 0b11000000
-              1073: PWM6CON = 192
-              1061: #IFDEF USE_HPWM16_6 TRUE
-              ;Case 6
-              1062: CASE 6
-              ;PWM6PS0 = 0x00            'prescale is always 1 (0x00)
-              1063: PWM6PS0 = 0
-              ;PWM6PS1 = 0x00
-              1064: PWM6PS1 = 0
-              ;PWM6PS2 = 0x00
-              1065: PWM6PS2 = 0
-              ;PWM6PRL = HPWM16_6_HPWM16F_PRL_Script     'frequency
-              1066: PWM6PRL = HPWM16_6_HPWM16F_PRL_SCRIPT
-              ;PWM6PRH = HPWM16_6_HPWM16F_PRH_Script
-              1067: PWM6PRH = HPWM16_6_HPWM16F_PRH_SCRIPT
-              ;PWM6PHH = 0x00            'phase count is always zero
-              1068: PWM6PHH = 0
-              ;PWM6PHL = 0x00
-              1069: PWM6PHL = 0
-              ;PWM6DCL = HPWM16_6_HPWM16F_DCL_Script     'duty cycle
-              1070: PWM6DCL = HPWM16_6_HPWM16F_DCL_SCRIPT
-              ;PWM6DCH = HPWM16_6_HPWM16F_DCH_Script
-              1071: PWM6DCH = HPWM16_6_HPWM16F_DCH_SCRIPT
-              ;PWM6LD = 1
-              1072: PWM6LD = 1
-              ;PWM6CON = 0b11000000
-              1073: PWM6CON = 192
               1201: #IFDEF VAR(PWM3CON)
               1202: #IFDEF USE_HPWM16_3 TRUE
               ;Case 3
@@ -8519,935 +8382,6 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               1210: CASE 4
               ;PWM4EN = 0
               1211: PWM4EN = 0
-              1215: #IFDEF VAR(PWM5CON)
-              1216: #IFDEF USE_HPWM16_5 TRUE
-              ;Case 5
-              1217: CASE 5
-              ;PWM5EN = 0
-              1218: PWM5EN = 0
-              1216: #IFDEF USE_HPWM16_5 TRUE
-              ;Case 5
-              1217: CASE 5
-              ;PWM5EN = 0
-              1218: PWM5EN = 0
-              1222: #IFDEF VAR(PWM6CON)
-              1223: #IFDEF USE_HPWM16_6 TRUE
-              ;Case 6
-              1224: CASE 6
-              ;PWM6EN = 0
-              1225: PWM6EN = 0
-              1223: #IFDEF USE_HPWM16_6 TRUE
-              ;Case 6
-              1224: CASE 6
-              ;PWM6EN = 0
-              1225: PWM6EN = 0
-              97: #IFDEF HAS_HEFSAF TRUE
-              99: #IFDEF CHIPFAMILY 16
-              100: #IF BIT(REG0)
-              ;NVMCON1.REG0 = 0 ; point to Program Flash Memory
-              101: NVMCON1.REG0 = 0
-              ;NVMCON1.REG1 = 1 ; access Program Flash Memory
-              102: NVMCON1.REG1 = 1
-              122: #IFDEF CHIPFAMILY 15
-              ;Dim _HEF_ABS_ADDR Alias _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL as Long
-              124: DIM _HEF_ABS_ADDR ALIAS _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL AS LONG
-              ;_HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              126: _HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              ;NVMCON1.NVMREGS = 0    'Select the Flash address space
-              128: NVMCON1.NVMREGS = 0
-              ;NVMCON1.RD = 1         'Read control bit on
-              129: NVMCON1.RD = 1
-              ;NOP
-              130: NOP
-              ;NOP
-              131: NOP
-              ;SAFRead = NVMDATL
-              132: SAFREAD = NVMDATL
-              141: #IFDEF HAS_HEFSAF TRUE
-              143: #IFDEF CHIPFAMILY 16
-              145: #IF BIT(REG0)
-              ;NVMCON1.REG0 = 0 ; point to Program Flash Memory
-              146: NVMCON1.REG0 = 0
-              ;NVMCON1.REG1 = 1 ; access Program Flash Memory
-              147: NVMCON1.REG1 = 1
-              168: #IFDEF CHIPFAMILY 15
-              ;Dim _HEF_ABS_ADDR Alias _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL as Long
-              170: DIM _HEF_ABS_ADDR ALIAS _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL AS LONG
-              ;_HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR2
-              172: _HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR2
-              ;NVMCON1.NVMREGS = 0
-              174: NVMCON1.NVMREGS = 0
-              ;NVMCON1.RD = 1
-              175: NVMCON1.RD = 1
-              ;NOP
-              176: NOP
-              ;NOP
-              177: NOP
-              ;SAFReadword = NVMDATL
-              179: SAFREADWORD = NVMDATL
-              ;_HEF_ABS_ADDR++  'Next HEF Aaddress
-              180: _HEF_ABS_ADDR++
-              ;NVMCON1.RD = 1
-              181: NVMCON1.RD = 1
-              ;NOP
-              182: NOP
-              ;NOP
-              183: NOP
-              ;HEFReadWord_H = NVMDATL
-              184: HEFREADWORD_H = NVMDATL
-              194: #IFDEF HAS_HEFSAF TRUE
-              196: #IFDEF CHIPFAMILY 16
-              197: #IF BIT(REG0)
-              ;NVMCON1.REG0 = 0 ; point to Program Flash Memory
-              198: NVMCON1.REG0 = 0
-              ;NVMCON1.REG1 = 1 ; access Program Flash Memory
-              199: NVMCON1.REG1 = 1
-              218: #IFDEF CHIPFAMILY 15
-              ;Returns in _HEF_HEF_DataOut the byte value stored in SAFM
-              ;at relative location [_HEF_Address] with 0 being the first HEFM location
-              ;_HEF_Address is generally be comprised between 0 and 127
-              ;The syntax is similar to the EPRead subroutine
-              ;Dim _HEF_ABS_ADDR Alias _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL as Long
-              224: DIM _HEF_ABS_ADDR ALIAS _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL AS LONG
-              ;_HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              226: _HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              ;NVMCON1.NVMREGS = 0    'Select the Flash address space
-              228: NVMCON1.NVMREGS = 0
-              ;NVMCON1.RD = 1         'Read control bit on
-              229: NVMCON1.RD = 1
-              ;NOP
-              230: NOP
-              ;NOP
-              231: NOP
-              ;_HEF_DataByte = NVMDATL
-              232: _HEF_DATABYTE = NVMDATL
-              243: #IFDEF HAS_HEFSAF TRUE
-              245: #IFDEF CHIPFAMILY 16
-              246: #IF BIT(REG0)
-              ;NVMCON1.REG0 = 0 ; point to Program Flash Memory
-              247: NVMCON1.REG0 = 0
-              ;NVMCON1.REG1 = 1 ; access Program Flash Memory
-              248: NVMCON1.REG1 = 1
-              269: #IFDEF CHIPFAMILY 15
-              ;Returns in _HEF_HEF_DataOut the byte value stored in SAFM
-              ;at relative location [_HEF_Address] with 0 being the first HEFM location
-              ;_HEF_Address is generally be comprised between 0 and 127
-              ;The syntax is similar to the EPRead subroutine
-              ;Dim _HEF_ABS_ADDR Alias _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL as Long
-              275: DIM _HEF_ABS_ADDR ALIAS _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL AS LONG
-              ;_HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              277: _HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              ;NVMCON1.NVMREGS = 0    'Select the Flash address space
-              279: NVMCON1.NVMREGS = 0
-              ;NVMCON1.RD = 1         'Read control bit on
-              280: NVMCON1.RD = 1
-              ;NOP
-              281: NOP
-              ;NOP
-              282: NOP
-              ;_HEF_DataWord = NVMDATL
-              283: _HEF_DATAWORD = NVMDATL
-              ;_HEF_DataWord_H = NVMDATH
-              284: _HEF_DATAWORD_H = NVMDATH
-              296: #IFDEF HAS_HEFSAF TRUE
-              298: #IFDEF CHIPFAMILY 16
-              300: #IF BIT(REG0)
-              ;NVMCON1.REG0 = 0 ; point to Program Flash Memory
-              301: NVMCON1.REG0 = 0
-              ;NVMCON1.REG1 = 1 ; access Program Flash Memory
-              302: NVMCON1.REG1 = 1
-              322: #IFDEF CHIPFAMILY 15
-              ;Dim _HEF_ABS_ADDR Alias _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL as Long
-              324: DIM _HEF_ABS_ADDR ALIAS _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL AS LONG
-              ;_HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              326: _HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              ;NVMCON1.NVMREGS = 0
-              328: NVMCON1.NVMREGS = 0
-              ;NVMCON1.RD = 1
-              329: NVMCON1.RD = 1
-              ;NOP
-              330: NOP
-              ;NOP
-              331: NOP
-              ;_HEF_DataWord = NVMDATL
-              332: _HEF_DATAWORD = NVMDATL
-              ;_HEF_ABS_ADDR++  'Next HEF Aaddress
-              334: _HEF_ABS_ADDR++
-              ;NVMCON1.RD = 1
-              335: NVMCON1.RD = 1
-              ;NOP
-              336: NOP
-              ;NOP
-              337: NOP
-              ;_HEF_DataWord_H = NVMDATL
-              338: _HEF_DATAWORD_H = NVMDATL
-              347: #IFDEF HAS_HEFSAF TRUE
-              ;Dim _HEF_Count as Word
-              349: DIM _HEF_COUNT AS WORD
-              ;This subroutine returns in _HEF_Buffer array the [_HEF_Count] byte values
-              ;stored in SAF given its row/block #
-              354: #IFDEF CHIPFAMILY 16
-              ;Reads a row of SAF Data and puts it into a array/buffer
-              ;for later use
-              ;_HEF_ABS_ADDR =  HEF_START_ADDR + (_HEF_BlockNum * HEF_ROWSIZE_BYTES)
-              358: _HEF_ABS_ADDR = HEF_START_ADDR + (_HEF_BLOCKNUM * HEF_ROWSIZE_BYTES)
-              360: #IF BIT(REG0)
-              ;NVMCON1.REG0 = 0 ; point to Program Flash Memory
-              361: NVMCON1.REG0 = 0
-              ;NVMCON1.REG1 = 1 ; access Program Flash Memory
-              362: NVMCON1.REG1 = 1
-              ;TBLPTRU = _HEF_ABS_ADDR_U
-              363: TBLPTRU = _HEF_ABS_ADDR_U
-              ;TBLPTRH = _HEF_ABS_ADDR_H
-              364: TBLPTRH = _HEF_ABS_ADDR_H
-              ;TBLPTRL = _HEF_ABS_ADDR
-              365: TBLPTRL = _HEF_ABS_ADDR
-              ;for  _HEF_Index = 1 to _HEF_Count -1
-              367: FOR _HEF_INDEX = 1 TO _HEF_COUNT -1
-              ;TBLRD*+ ; read into TABLAT and increment
-              368: TBLRD*+
-              ;_HEF_Buffer(_HEF_Index) = TABLAT
-              369: _HEF_BUFFER(_HEF_INDEX) = TABLAT
-              ;next
-              370: NEXT
-              ;Get last byte
-              ;TBLRD*
-              372: TBLRD*
-              ;_HEF_Buffer(_HEF_Index+1) = TABLAT
-              373: _HEF_BUFFER(_HEF_INDEX+1) = TABLAT
-              409: #IFDEF CHIPFAMILY 15
-              ;Dim _HEF_ABS_ADDR Alias _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL as Long
-              411: DIM _HEF_ABS_ADDR ALIAS _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL AS LONG
-              ;Obtain absolute address of HEFlash row
-              ;_HEF_ABS_ADDR =  HEF_START_ADDR + (_HEF_BlockNum * HEF_ROWSIZE_BYTES)
-              414: _HEF_ABS_ADDR = HEF_START_ADDR + (_HEF_BLOCKNUM * HEF_ROWSIZE_BYTES)
-              ;NVMCON1.NVMREGS  = 0       'Select the Flash address space
-              416: NVMCON1.NVMREGS = 0
-              ;for _HEF_Index  = 1 to _HEF_Count -1
-              418: FOR _HEF_INDEX = 1 TO _HEF_COUNT -1
-              ;NVMCON1.RD = 1         'Read control bit on
-              419: NVMCON1.RD = 1
-              ;NOP
-              420: NOP
-              ;NOP
-              421: NOP
-              ;_HEF_Buffer(_HEF_Index) = NVMDATL
-              422: _HEF_BUFFER(_HEF_INDEX) = NVMDATL
-              ;_HEF_ABS_ADDR++
-              423: _HEF_ABS_ADDR++
-              ;next
-              424: NEXT
-              ;get last byte
-              ;NVMCON1.RD = 1         'Read control bit on
-              426: NVMCON1.RD = 1
-              ;NOP
-              427: NOP
-              ;NOP
-              428: NOP
-              ;_HEF_Buffer(_HEF_Index+1) = NVMDATL
-              429: _HEF_BUFFER(_HEF_INDEX+1) = NVMDATL
-              438: #IFDEF HAS_HEFSAF TRUE
-              440: #IFDEF CHIPFAMILY 16
-              ;_HEF_ABS_ADDR = HEF_START_ADDR + (HEF_ROWSIZE_BYTES * _HEF_BlockNum)
-              441: _HEF_ABS_ADDR = HEF_START_ADDR + (HEF_ROWSIZE_BYTES * _HEF_BLOCKNUM)
-              ;_GIE_SAVE = INTCON0.GIE  'Save interrupt setting
-              443: _GIE_SAVE = INTCON0.GIE
-              ;INTCON0.GIE = 0 'Disable interrupts
-              444: INTCON0.GIE = 0
-              448: #IF BIT(REG0)
-              ;TBLPTRU = _HEF_ABS_ADDR_U
-              449: TBLPTRU = _HEF_ABS_ADDR_U
-              ;TBLPTRH = _HEF_ABS_ADDR_H
-              450: TBLPTRH = _HEF_ABS_ADDR_H
-              ;TBLPTRL = _HEF_ABS_ADDR
-              451: TBLPTRL = _HEF_ABS_ADDR
-              ;NVMCON1 = 0
-              453: NVMCON1 = 0
-              ;NVMCON1.REG0 = 0 ; point to Program Flash Memory
-              454: NVMCON1.REG0 = 0
-              ;NVMCON1.REG1 = 1 ; access Program Flash Memory
-              455: NVMCON1.REG1 = 1
-              523: #IFDEF CHIPFAMILY 15
-              ;Dim _HEF_ABS_ADDR Alias _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL as Long
-              525: DIM _HEF_ABS_ADDR ALIAS _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL AS LONG
-              ;_HEF_ABS_ADDR = HEF_START_ADDR + (HEF_ROWSIZE_BYTES * _HEF_BlockNum)
-              527: _HEF_ABS_ADDR = HEF_START_ADDR + (HEF_ROWSIZE_BYTES * _HEF_BLOCKNUM)
-              ;NVMCON1 = 0
-              529: NVMCON1 = 0
-              ;NVMCON1.NVMREGS = 0
-              530: NVMCON1.NVMREGS = 0
-              ;NVMCON1.FREE = 1
-              531: NVMCON1.FREE = 1
-              ;NVMCON1.WREN = 1
-              532: NVMCON1.WREN = 1
-              ;_GIE_Save = INTCON.GIE   'Save interrupt setting
-              534: _GIE_SAVE = INTCON.GIE
-              ;INTCON.GIE = 0 'Disable Interrupts
-              535: INTCON.GIE = 0
-              ;unlock Sequence
-              ;NVMCON2 = 0x55
-              538: NVMCON2 = 85
-              ;NVMCON2 = 0xAA
-              539: NVMCON2 = 170
-              ;NVMCON1.WR = 1            'Write takes place here
-              540: NVMCON1.WR = 1
-              ;NOP
-              541: NOP
-              ;NOP
-              542: NOP
-              ;NVMCON1.WREN = 0           'Disable Flash Memory write/erase
-              544: NVMCON1.WREN = 0
-              ;INTCON.GIE = _GIE_SAVE    ' Restore saved interrupt setting
-              545: INTCON.GIE = _GIE_SAVE
-              556: #IFDEF HAS_HEFSAF TRUE
-              ;Dim _HEF_Count as Word
-              558: DIM _HEF_COUNT AS WORD
-              560: #IFDEF CHIPFAMILY 16
-              ;Calculate Base Address of NVM Erase Block for Chipfamily16
-              ;_HEF_ABS_ADDR =  HEF_START_ADDR + (_HEF_BlockNum * HEF_ROWSIZE_BYTES)   '130816
-              563: _HEF_ABS_ADDR = HEF_START_ADDR + (_HEF_BLOCKNUM * HEF_ROWSIZE_BYTES)
-              ;Erase the entire row - Call sub
-              ;SAFEraseBlock (_HEF_BlockNum)
-              566: SAFERASEBLOCK (_HEF_BLOCKNUM)
-              ;_GIE_SAVE = INTCON0.GIE    'Save interrupt
-              568: _GIE_SAVE = INTCON0.GIE
-              ;INTCON0.GIE = 0           'disable interrupts
-              569: INTCON0.GIE = 0
-              571: #IF BIT(REG0)
-              ;TBLPTRU = _HEF_ABS_ADDR_U
-              572: TBLPTRU = _HEF_ABS_ADDR_U
-              ;TBLPTRH = _HEF_ABS_ADDR_H
-              573: TBLPTRH = _HEF_ABS_ADDR_H
-              ;TBLPTRL = _HEF_ABS_ADDR
-              574: TBLPTRL = _HEF_ABS_ADDR
-              ;NVMCON1.REG0 = 0 ; point to Program Flash Memory
-              575: NVMCON1.REG0 = 0
-              ;NVMCON1.REG1 = 1 ; access Program Flash Memory
-              576: NVMCON1.REG1 = 1
-              ;NVMCON1.FREE = 0           'Next operation will be a write
-              577: NVMCON1.FREE = 0
-              ;NVMCON1.WREN = 1           ''Enable Flash Memory write/erase
-              578: NVMCON1.WREN = 1
-              ;Fill the latches with data
-              ;For _HEF_Index = 1 to _HEF_Count -1
-              580: FOR _HEF_INDEX = 1 TO _HEF_COUNT -1
-              ;TABLAT = _HEF_Buffer(_HEF_Index)
-              581: TABLAT = _HEF_BUFFER(_HEF_INDEX)
-              ;TBLWT*+
-              582: TBLWT*+
-              ;Next
-              583: NEXT
-              ;last byte
-              ;TABLAT =  _HEF_Buffer(_HEF_Index +1)
-              585: TABLAT = _HEF_BUFFER(_HEF_INDEX +1)
-              ;TBLWT*
-              586: TBLWT*
-              663: #IFDEF CHIPFAMILY 15
-              ;Calculate Base Address of NVM Erase Block for Chipfamily16
-              ;Dim _HEF_ABS_ADDR Alias _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL as Long
-              665: DIM _HEF_ABS_ADDR ALIAS _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL AS LONG
-              ;Calculate Base Address of NVM Erase Block
-              ;_HEF_ABS_ADDR =  HEF_Block0_Addr + (_HEF_BlockNum * HEF_ROWSIZE_BYTES)
-              668: _HEF_ABS_ADDR = HEF_BLOCK0_ADDR + (_HEF_BLOCKNUM * HEF_ROWSIZE_BYTES)
-              ;Erase the entire row
-              ;SAFEraseBlock (_HEF_BlockNum)
-              671: SAFERASEBLOCK (_HEF_BLOCKNUM)
-              ;NVMCON1.CFGS = 0           'Select the Flash address space
-              673: NVMCON1.CFGS = 0
-              ;NVMCON1.FREE = 0           'Next operation will be a write
-              674: NVMCON1.FREE = 0
-              ;NVMCON1.WREN = 1           'Enable Flash Memory write/erase
-              675: NVMCON1.WREN = 1
-              ;NVMDATH = 0x3F  'Erase State Defaults
-              677: NVMDATH = 63
-              ;NVMDATL = 0xFF
-              678: NVMDATL = 255
-              ;_GIE_SAVE = INTCON.GIE    'Save initial GIE state
-              680: _GIE_SAVE = INTCON.GIE
-              ;INTCON.GIE = 0 'Disable INterrupts
-              681: INTCON.GIE = 0
-              ;Fill the latches with data no write
-              ;NVMCON1.LWLO = 1          '1=latch 0=write row
-              684: NVMCON1.LWLO = 1
-              ;for _HEF_Index = 1 to _HEF_Count -1
-              686: FOR _HEF_INDEX = 1 TO _HEF_COUNT -1
-              ;Load data in latches without writing
-              ;NVMDATL = _HEF_Buffer(_HEF_Index)  'Only write Lower Byte!
-              688: NVMDATL = _HEF_BUFFER(_HEF_INDEX)
-              ;NVMCON2 = 0x55
-              690: NVMCON2 = 85
-              ;NVMCON2 = 0xAA
-              691: NVMCON2 = 170
-              ;NVMCON1.WR = 1
-              692: NVMCON1.WR = 1
-              ;NOP
-              693: NOP
-              ;NOP
-              694: NOP
-              ;_HEF_ABS_ADDR++
-              695: _HEF_ABS_ADDR++
-              ;Next
-              696: NEXT
-              ;last byte
-              ;NVMDATL =  _HEF_Buffer(_HEF_Index + 1)
-              699: NVMDATL = _HEF_BUFFER(_HEF_INDEX + 1)
-              ;NVMCON1.LWLO = 0  'write latches
-              700: NVMCON1.LWLO = 0
-              ;unlock
-              ;NVMCON2 = 0x55
-              703: NVMCON2 = 85
-              ;NVMCON2 = 0xAA
-              704: NVMCON2 = 170
-              ;NVMCON1.WR = 1 'Write !
-              705: NVMCON1.WR = 1
-              ;NOP
-              706: NOP
-              ;NOP
-              707: NOP
-              ;NVMCON1.WREN = 0           'Disable Flash Memory write/erase
-              709: NVMCON1.WREN = 0
-              ;INTCON.GIE = _GIE_SAVE    ' Restore initial GIE state
-              710: INTCON.GIE = _GIE_SAVE
-              719: #IFDEF HAS_HEFSAF TRUE
-              ;Writes a single byte of data [_HEF_HEF_DataOut] in SAFM
-              ;at relative location [_HEF_Address] between 0 and 127
-              ;
-              ;The syntax is similar to the EPWrite subroutine
-              ;The existing data in the row of [_HEF_Address] is preserved
-              ;Calculate block number
-              ;_HEF_BlockNum = _HEF_REL_ADDR / HEF_ROWSIZE_BYTES
-              729: _HEF_BLOCKNUM = _HEF_REL_ADDR / HEF_ROWSIZE_BYTES
-              ;Calculate offset in block/row
-              ;_HEF_Offset = _HEF_REL_Addr % HEF_ROWSIZE_BYTES
-              732: _HEF_OFFSET = _HEF_REL_ADDR % HEF_ROWSIZE_BYTES
-              ;Save data previously stored in row#
-              ;SAFReadBlock(_HEF_BlockNum, _HEF_Buffer(), HEF_ROWSIZE_BYTES)
-              735: SAFREADBLOCK(_HEF_BLOCKNUM, _HEF_BUFFER(), HEF_ROWSIZE_BYTES)
-              ;Update buffer with DataValue at offset
-              ;_HEF_Buffer(_HEF_Offset + 1) =  _HEF_DataByte
-              738: _HEF_BUFFER(_HEF_OFFSET + 1) = _HEF_DATABYTE
-              ;Write back the updated row buffer to  HEFM
-              ;SAFwriteBlock(_HEF_BlockNum, _HEF_Buffer(), HEF_ROWSIZE_BYTES)
-              741: SAFWRITEBLOCK(_HEF_BLOCKNUM, _HEF_BUFFER(), HEF_ROWSIZE_BYTES)
-              749: #IFDEF HAS_HEFSAF TRUE
-              ;Writes a single WORD to 18F SAF Memory
-              ;at relative locations [_HEF_REL_ADDR]
-              ;where each address is an even number.
-              ;
-              ;Existing data in the row of [_HEF_REL_ADDR] is preserved
-              ;Calculate block number
-              ;_HEF_BlockNum = _HEF_REL_ADDR / HEF_ROWSIZE_BYTES
-              758: _HEF_BLOCKNUM = _HEF_REL_ADDR / HEF_ROWSIZE_BYTES
-              ;Calculate offset in block/row
-              ;_HEF_Offset = _HEF_REL_ADDR % HEF_ROWSIZE_BYTES
-              761: _HEF_OFFSET = _HEF_REL_ADDR % HEF_ROWSIZE_BYTES
-              ;Save data previously stored in row#
-              ;SAFReadBlock(_HEF_BlockNum, _HEF_Buffer(), HEF_ROWSIZE_BYTES)
-              764: SAFREADBLOCK(_HEF_BLOCKNUM, _HEF_BUFFER(), HEF_ROWSIZE_BYTES)
-              ;Update buffer with DataValue at offset
-              ;_HEF_Buffer(_HEF_Offset + 1) = _HEF_DataWord
-              767: _HEF_BUFFER(_HEF_OFFSET + 1) = _HEF_DATAWORD
-              ;_HEF_Buffer(_HEF_Offset + 2) = _HEF_DataWord_H
-              768: _HEF_BUFFER(_HEF_OFFSET + 2) = _HEF_DATAWORD_H
-              ;Write back the updated row buffer to  HEFM
-              ;SAFwriteBlock(_HEF_BlockNum, _HEF_Buffer(), HEF_ROWSIZE_BYTES)
-              772: SAFWRITEBLOCK(_HEF_BLOCKNUM, _HEF_BUFFER(), HEF_ROWSIZE_BYTES)
-              181: #IFDEF HAS_HEFSAF TRUE
-              183: #IFDEF CHIPFAMILY 16
-              ;NVMCON1.REG0 = 0 ; point to Program Flash Memory
-              184: NVMCON1.REG0 = 0
-              ;NVMCON1.REG1 = 1 ; access Program Flash Memory
-              185: NVMCON1.REG1 = 1
-              ;_HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              187: _HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              ;TBLPTRU = _HEF_ABS_ADDR_U
-              189: TBLPTRU = _HEF_ABS_ADDR_U
-              ;TBLPTRH = _HEF_ABS_ADDR_H
-              190: TBLPTRH = _HEF_ABS_ADDR_H
-              ;TBLPTRL = _HEF_ABS_ADDR
-              191: TBLPTRL = _HEF_ABS_ADDR
-              ;TBLRD*+
-              193: TBLRD*+
-              ;HEFRead = TABLAT
-              194: HEFREAD = TABLAT
-              198: #IFDEF CHIPFAMILY 15
-              ;Dim _HEF_ABS_ADDR Alias _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL as Long
-              200: DIM _HEF_ABS_ADDR ALIAS _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL AS LONG
-              ;_HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              202: _HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              ;NVMCON1.NVMREGS = 0    'Select the Flash address space
-              204: NVMCON1.NVMREGS = 0
-              ;NVMCON1.RD = 1         'Read control bit on
-              205: NVMCON1.RD = 1
-              ;NOP
-              206: NOP
-              ;NOP
-              207: NOP
-              ;HEFRead = NVMDATL
-              208: HEFREAD = NVMDATL
-              217: #IFDEF HAS_HEFSAF TRUE
-              219: #IFDEF CHIPFAMILY 16
-              ;NVMCON1.REG0 = 0 ; point to Program Flash Memory
-              221: NVMCON1.REG0 = 0
-              ;NVMCON1.REG1 = 1 ; access Program Flash Memory
-              222: NVMCON1.REG1 = 1
-              ;_HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR2
-              224: _HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR2
-              ;TBLPTRU = _HEF_ABS_ADDR_U
-              226: TBLPTRU = _HEF_ABS_ADDR_U
-              ;TBLPTRH = _HEF_ABS_ADDR_H
-              227: TBLPTRH = _HEF_ABS_ADDR_H
-              ;TBLPTRL = _HEF_ABS_ADDR
-              228: TBLPTRL = _HEF_ABS_ADDR
-              ;TBLRD*+
-              230: TBLRD*+
-              ;HEFReadWord = TABLAT
-              231: HEFREADWORD = TABLAT
-              ;TBLRD*
-              232: TBLRD*
-              ;HEFReadWord_H = TABLAT
-              233: HEFREADWORD_H = TABLAT
-              236: #IFDEF CHIPFAMILY 15
-              ;Dim _HEF_ABS_ADDR Alias _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL as Long
-              238: DIM _HEF_ABS_ADDR ALIAS _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL AS LONG
-              ;_HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR2
-              240: _HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR2
-              ;NVMCON1.NVMREGS = 0
-              242: NVMCON1.NVMREGS = 0
-              ;NVMCON1.RD = 1
-              243: NVMCON1.RD = 1
-              ;NOP
-              244: NOP
-              ;NOP
-              245: NOP
-              ;HEFReadword = NVMDATL
-              247: HEFREADWORD = NVMDATL
-              ;_HEF_ABS_ADDR++  'Next HEF Aaddress
-              248: _HEF_ABS_ADDR++
-              ;NVMCON1.RD = 1
-              249: NVMCON1.RD = 1
-              ;NOP
-              250: NOP
-              ;NOP
-              251: NOP
-              ;HEFReadWord_H = NVMDATL
-              252: HEFREADWORD_H = NVMDATL
-              262: #IFDEF HAS_HEFSAF TRUE
-              264: #IFDEF CHIPFAMILY 16
-              ;NVMCON1.REG0 = 0 ; point to Program Flash Memory
-              265: NVMCON1.REG0 = 0
-              ;NVMCON1.REG1 = 1 ; access Program Flash Memory
-              266: NVMCON1.REG1 = 1
-              ;_HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              268: _HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              ;TBLPTRU = _HEF_ABS_ADDR_U
-              270: TBLPTRU = _HEF_ABS_ADDR_U
-              ;TBLPTRH = _HEF_ABS_ADDR_H
-              271: TBLPTRH = _HEF_ABS_ADDR_H
-              ;TBLPTRL = _HEF_ABS_ADDR
-              272: TBLPTRL = _HEF_ABS_ADDR
-              ;TBLRD*
-              274: TBLRD*
-              ;_HEF_DataByte = TABLAT
-              275: _HEF_DATABYTE = TABLAT
-              279: #IFDEF CHIPFAMILY 15
-              ;Returns in _HEF_HEF_DataOut the byte value stored in HEFM
-              ;at relative location [_HEF_Address] with 0 being the first HEFM location
-              ;_HEF_Address is generally be comprised between 0 and 127
-              ;The syntax is similar to the EPRead subroutine
-              ;Dim _HEF_ABS_ADDR Alias _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL as Long
-              285: DIM _HEF_ABS_ADDR ALIAS _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL AS LONG
-              ;_HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              287: _HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              ;NVMCON1.NVMREGS = 0    'Select the Flash address space
-              289: NVMCON1.NVMREGS = 0
-              ;NVMCON1.RD = 1         'Read control bit on
-              290: NVMCON1.RD = 1
-              ;NOP
-              291: NOP
-              ;NOP
-              292: NOP
-              ;_HEF_DataByte = NVMDATL
-              293: _HEF_DATABYTE = NVMDATL
-              304: #IFDEF HAS_HEFSAF TRUE
-              306: #IFDEF CHIPFAMILY 16
-              ;NVMCON1.REG0 = 0 ; point to Program Flash Memory
-              307: NVMCON1.REG0 = 0
-              ;NVMCON1.REG1 = 1 ; access Program Flash Memory
-              308: NVMCON1.REG1 = 1
-              ;_HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              310: _HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              ;TBLPTRU = _HEF_ABS_ADDR_U
-              312: TBLPTRU = _HEF_ABS_ADDR_U
-              ;TBLPTRH = _HEF_ABS_ADDR_H
-              313: TBLPTRH = _HEF_ABS_ADDR_H
-              ;TBLPTRL = _HEF_ABS_ADDR
-              314: TBLPTRL = _HEF_ABS_ADDR
-              ;TBLRD*
-              316: TBLRD*
-              ;_HEF_DataWord = TABLAT '14-bit word not the same as HEFreadWord
-              317: _HEF_DATAWORD = TABLAT
-              322: #IFDEF CHIPFAMILY 15
-              ;Returns in _HEF_HEF_DataOut the byte value stored in HEFM
-              ;at relative location [_HEF_Address] with 0 being the first HEFM location
-              ;_HEF_Address is generally be comprised between 0 and 127
-              ;The syntax is similar to the EPRead subroutine
-              ;Dim _HEF_ABS_ADDR Alias _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL as Long
-              328: DIM _HEF_ABS_ADDR ALIAS _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL AS LONG
-              ;_HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              330: _HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              ;NVMCON1.NVMREGS = 0    'Select the Flash address space
-              332: NVMCON1.NVMREGS = 0
-              ;NVMCON1.RD = 1         'Read control bit on
-              333: NVMCON1.RD = 1
-              ;NOP
-              334: NOP
-              ;NOP
-              335: NOP
-              ;_HEF_DataWord = NVMDATL
-              336: _HEF_DATAWORD = NVMDATL
-              ;_HEF_DataWord_H = NVMDATH
-              337: _HEF_DATAWORD_H = NVMDATH
-              349: #IFDEF HAS_HEFSAF TRUE
-              351: #IFDEF CHIPFAMILY 16
-              ;NVMCON1.REG0 = 0 ; point to Program Flash Memory
-              353: NVMCON1.REG0 = 0
-              ;NVMCON1.REG1 = 1 ; access Program Flash Memory
-              354: NVMCON1.REG1 = 1
-              ;_HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              356: _HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              ;TBLPTRU = _HEF_ABS_ADDR_U
-              358: TBLPTRU = _HEF_ABS_ADDR_U
-              ;TBLPTRH = _HEF_ABS_ADDR_H
-              359: TBLPTRH = _HEF_ABS_ADDR_H
-              ;TBLPTRL = _HEF_ABS_ADDR
-              360: TBLPTRL = _HEF_ABS_ADDR
-              ;TBLRD*+
-              362: TBLRD*+
-              ;_HEF_DataWord = TABLAT
-              363: _HEF_DATAWORD = TABLAT
-              ;TBLRD*
-              364: TBLRD*
-              ;_HEF_DataWord_H = TABLAT
-              365: _HEF_DATAWORD_H = TABLAT
-              368: #IFDEF CHIPFAMILY 15
-              ;Dim _HEF_ABS_ADDR Alias _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL as Long
-              370: DIM _HEF_ABS_ADDR ALIAS _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL AS LONG
-              ;_HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              372: _HEF_ABS_ADDR = HEF_START_ADDR + _HEF_REL_ADDR
-              ;NVMCON1.NVMREGS = 0
-              374: NVMCON1.NVMREGS = 0
-              ;NVMCON1.RD = 1
-              375: NVMCON1.RD = 1
-              ;NOP
-              376: NOP
-              ;NOP
-              377: NOP
-              ;_HEF_DataWord = NVMDATL
-              378: _HEF_DATAWORD = NVMDATL
-              ;_HEF_ABS_ADDR++  'Next HEF Aaddress
-              380: _HEF_ABS_ADDR++
-              ;NVMCON1.RD = 1
-              381: NVMCON1.RD = 1
-              ;NOP
-              382: NOP
-              ;NOP
-              383: NOP
-              ;_HEF_DataWord_H = NVMDATL
-              384: _HEF_DATAWORD_H = NVMDATL
-              393: #IFDEF HAS_HEFSAF TRUE
-              ;This subroutine returns in _HEF_Buffer array the [_HEF_Count] byte values
-              ;stored in HEF given its row/block #
-              398: #IFDEF CHIPFAMILY 16
-              ;Reads a row of SAF Data and puts it into a array/buffer
-              ;for later use
-              ;NVMCON1.REG0 = 0 ; point to Program Flash Memory
-              402: NVMCON1.REG0 = 0
-              ;NVMCON1.REG1 = 1 ; access Program Flash Memory
-              403: NVMCON1.REG1 = 1
-              ;_HEF_ABS_ADDR =  HEF_START_ADDR + (_HEF_BlockNum * HEF_ROWSIZE_BYTES)
-              405: _HEF_ABS_ADDR = HEF_START_ADDR + (_HEF_BLOCKNUM * HEF_ROWSIZE_BYTES)
-              ;TBLPTRU = _HEF_ABS_ADDR_U
-              407: TBLPTRU = _HEF_ABS_ADDR_U
-              ;TBLPTRH = _HEF_ABS_ADDR_H
-              408: TBLPTRH = _HEF_ABS_ADDR_H
-              ;TBLPTRL = _HEF_ABS_ADDR
-              409: TBLPTRL = _HEF_ABS_ADDR
-              ;for  _HEF_Index = 1 to _HEF_Count -1
-              411: FOR _HEF_INDEX = 1 TO _HEF_COUNT -1
-              ;TBLRD*+ ; read into TABLAT and increment
-              412: TBLRD*+
-              ;_HEF_Buffer(_HEF_Index) = TABLAT
-              413: _HEF_BUFFER(_HEF_INDEX) = TABLAT
-              ;next
-              414: NEXT
-              ;Get last byte
-              ;TBLRD*
-              416: TBLRD*
-              ;_HEF_Buffer(_HEF_Index+1) = TABLAT
-              417: _HEF_BUFFER(_HEF_INDEX+1) = TABLAT
-              420: #IFDEF CHIPFAMILY 15
-              ;Dim _HEF_ABS_ADDR Alias _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL as Long
-              422: DIM _HEF_ABS_ADDR ALIAS _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL AS LONG
-              ;Obtain absolute address of HEFlash row
-              ;_HEF_ABS_ADDR =  HEF_START_ADDR + (_HEF_BlockNum * HEF_ROWSIZE_BYTES)
-              425: _HEF_ABS_ADDR = HEF_START_ADDR + (_HEF_BLOCKNUM * HEF_ROWSIZE_BYTES)
-              ;NVMCON1.NVMREGS  = 0       'Select the Flash address space
-              427: NVMCON1.NVMREGS = 0
-              ;for _HEF_Index  = 1 to _HEF_Count -1
-              429: FOR _HEF_INDEX = 1 TO _HEF_COUNT -1
-              ;NVMCON1.RD = 1         'Read control bit on
-              430: NVMCON1.RD = 1
-              ;NOP
-              431: NOP
-              ;NOP
-              432: NOP
-              ;_HEF_Buffer(_HEF_Index) = NVMDATL
-              433: _HEF_BUFFER(_HEF_INDEX) = NVMDATL
-              ;_HEF_ABS_ADDR++
-              434: _HEF_ABS_ADDR++
-              ;next
-              435: NEXT
-              ;get last byte
-              ;NVMCON1.RD = 1         'Read control bit on
-              437: NVMCON1.RD = 1
-              ;NOP
-              438: NOP
-              ;NOP
-              439: NOP
-              ;_HEF_Buffer(_HEF_Index+1) = NVMDATL
-              440: _HEF_BUFFER(_HEF_INDEX+1) = NVMDATL
-              449: #IFDEF HAS_HEFSAF TRUE
-              451: #IFDEF CHIPFAMILY 16
-              ;_HEF_ABS_ADDR = HEF_START_ADDR + (HEF_ROWSIZE_BYTES * _HEF_BlockNum)
-              453: _HEF_ABS_ADDR = HEF_START_ADDR + (HEF_ROWSIZE_BYTES * _HEF_BLOCKNUM)
-              ;NVMCON1 = 0
-              455: NVMCON1 = 0
-              ;NVMCON1.REG0 = 0           'Select the Flash address space
-              456: NVMCON1.REG0 = 0
-              ;NVMCON1.Reg1 = 1
-              457: NVMCON1.REG1 = 1
-              ;NVMCON1.FREE = 1           'Next operation will be erase
-              458: NVMCON1.FREE = 1
-              ;NVMCON1.WREN = 1           'Enable Flash Memory write/erase
-              459: NVMCON1.WREN = 1
-              ;TBLPTRU = _HEF_ABS_ADDR_U
-              461: TBLPTRU = _HEF_ABS_ADDR_U
-              ;TBLPTRH = _HEF_ABS_ADDR_H
-              462: TBLPTRH = _HEF_ABS_ADDR_H
-              ;TBLPTRL = _HEF_ABS_ADDR
-              463: TBLPTRL = _HEF_ABS_ADDR
-              ;_GIE_SAVE = INTCON0.GIE  'Save interrupt setting
-              465: _GIE_SAVE = INTCON0.GIE
-              ;INTCON0.GIE = 0 'Disable interrupts
-              466: INTCON0.GIE = 0
-              ;unlock Sequence
-              ;NVMCON2 = 0x55
-              469: NVMCON2 = 85
-              ;NVMCON2 = 0xAA
-              470: NVMCON2 = 170
-              ;NVMCON1.WR = 1            'Write takes place here
-              471: NVMCON1.WR = 1
-              ;NOP
-              472: NOP
-              ;NOP
-              473: NOP
-              ;NVMCON1.WREN = 0           'Disable Flash Memory write/erase
-              475: NVMCON1.WREN = 0
-              ;INTCON0.GIE = _GIE_SAVE    ' Restore saved interrupt setting
-              476: INTCON0.GIE = _GIE_SAVE
-              479: #IFDEF CHIPFAMILY 15
-              ;Dim _HEF_ABS_ADDR Alias _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL as Long
-              481: DIM _HEF_ABS_ADDR ALIAS _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL AS LONG
-              ;_HEF_ABS_ADDR = HEF_START_ADDR + (HEF_ROWSIZE_BYTES * _HEF_BlockNum)
-              483: _HEF_ABS_ADDR = HEF_START_ADDR + (HEF_ROWSIZE_BYTES * _HEF_BLOCKNUM)
-              ;NVMCON1 = 0
-              485: NVMCON1 = 0
-              ;NVMCON1.NVMREGS = 0
-              486: NVMCON1.NVMREGS = 0
-              ;NVMCON1.FREE = 1
-              487: NVMCON1.FREE = 1
-              ;NVMCON1.WREN = 1
-              488: NVMCON1.WREN = 1
-              ;_GIE_Save = INTCON.GIE   'Save interrupt setting
-              490: _GIE_SAVE = INTCON.GIE
-              ;INTCON.GIE = 0 'Disable Interrupts
-              491: INTCON.GIE = 0
-              ;unlock Sequence
-              ;NVMCON2 = 0x55
-              494: NVMCON2 = 85
-              ;NVMCON2 = 0xAA
-              495: NVMCON2 = 170
-              ;NVMCON1.WR = 1            'Write takes place here
-              496: NVMCON1.WR = 1
-              ;NOP
-              497: NOP
-              ;NOP
-              498: NOP
-              ;NVMCON1.WREN = 0           'Disable Flash Memory write/erase
-              500: NVMCON1.WREN = 0
-              ;INTCON.GIE = _GIE_SAVE    ' Restore saved interrupt setting
-              501: INTCON.GIE = _GIE_SAVE
-              512: #IFDEF HAS_HEFSAF TRUE
-              514: #IFDEF CHIPFAMILY 16
-              ;Calculate Base Address of NVM Erase Block
-              ;_HEF_ABS_ADDR =  HEF_START_ADDR + (_HEF_BlockNum * HEF_ROWSIZE_BYTES)
-              517: _HEF_ABS_ADDR = HEF_START_ADDR + (_HEF_BLOCKNUM * HEF_ROWSIZE_BYTES)
-              ;TBLPTRU = _HEF_ABS_ADDR_U
-              519: TBLPTRU = _HEF_ABS_ADDR_U
-              ;TBLPTRH = _HEF_ABS_ADDR_H
-              520: TBLPTRH = _HEF_ABS_ADDR_H
-              ;TBLPTRL = _HEF_ABS_ADDR
-              521: TBLPTRL = _HEF_ABS_ADDR
-              ;Erase the entire row - Call sub
-              ;HEFEraseBlock (_HEF_BlockNum)
-              524: HEFERASEBLOCK (_HEF_BLOCKNUM)
-              ;NVMCON1.REG0 = 0     ; point to Program Flash Memory
-              526: NVMCON1.REG0 = 0
-              ;NVMCON1.REG1 = 1     ; access Program Flash Memory
-              527: NVMCON1.REG1 = 1
-              ;NVMCON1.FREE = 0     ; Next operation will be a write
-              528: NVMCON1.FREE = 0
-              ;NVMCON1.WREN = 1     ; Enable Flash Memory write/erase
-              529: NVMCON1.WREN = 1
-              ;_GIE_SAVE = INTCON0.GIE    'Save interrupt
-              531: _GIE_SAVE = INTCON0.GIE
-              ;INTCON0.GIE = 0           'disable interrupts
-              532: INTCON0.GIE = 0
-              ;Fill the latches with data
-              ;For _HEF_Index = 1 to _HEF_Count -1
-              535: FOR _HEF_INDEX = 1 TO _HEF_COUNT -1
-              ;TABLAT = _HEF_Buffer(_HEF_Index)
-              536: TABLAT = _HEF_BUFFER(_HEF_INDEX)
-              ;TBLWT*+
-              537: TBLWT*+
-              ;Next
-              538: NEXT
-              ;last byte
-              ;TABLAT =  _HEF_Buffer(_HEF_Index +1)
-              540: TABLAT = _HEF_BUFFER(_HEF_INDEX +1)
-              ;TBLWT*
-              541: TBLWT*
-              ;unlock sequence
-              ;NVMCON2 = 0x55
-              544: NVMCON2 = 85
-              ;NVMCON2 = 0xAA
-              545: NVMCON2 = 170
-              ;NVMCON1.WR = 1             ; Write takes place here
-              546: NVMCON1.WR = 1
-              ;NVMCON1.WREN = 0           ;Disable Flash Memory write/erase
-              548: NVMCON1.WREN = 0
-              ;INTCON0.GIE = _GIE_SAVE     'restore saved interrupt
-              549: INTCON0.GIE = _GIE_SAVE
-              553: #IFDEF CHIPFAMILY 15
-              ;Dim _HEF_ABS_ADDR Alias _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL as Long
-              555: DIM _HEF_ABS_ADDR ALIAS _HEF_DUMMY,_HEF_DUMMY, NVMADRH, NVMADRL AS LONG
-              ;Calculate Base Address of NVM Erase Block
-              ;_HEF_ABS_ADDR =  HEF_Block0_Addr + (_HEF_BlockNum * HEF_ROWSIZE_BYTES)
-              558: _HEF_ABS_ADDR = HEF_BLOCK0_ADDR + (_HEF_BLOCKNUM * HEF_ROWSIZE_BYTES)
-              ;Erase the entire row
-              ;HEFEraseBlock (_HEF_BlockNum)
-              561: HEFERASEBLOCK (_HEF_BLOCKNUM)
-              ;NVMCON1.CFGS = 0           'Select the Flash address space
-              563: NVMCON1.CFGS = 0
-              ;NVMCON1.FREE = 0           'Next operation will be a write
-              564: NVMCON1.FREE = 0
-              ;NVMCON1.WREN = 1           'Enable Flash Memory write/erase
-              565: NVMCON1.WREN = 1
-              ;NVMDATH = 0x3F  'Erase State Defaults
-              567: NVMDATH = 63
-              ;NVMDATL = 0xFF
-              568: NVMDATL = 255
-              ;_GIE_SAVE = INTCON.GIE    'Save initial GIE state
-              570: _GIE_SAVE = INTCON.GIE
-              ;INTCON.GIE = 0 'Disable INterrupts
-              571: INTCON.GIE = 0
-              ;Fill the latches with data no write
-              ;NVMCON1.LWLO = 1          '1=latch 0=write row
-              574: NVMCON1.LWLO = 1
-              ;for _HEF_Index = 1 to _HEF_Count -1
-              576: FOR _HEF_INDEX = 1 TO _HEF_COUNT -1
-              ;Load data in latches without writing
-              ;NVMDATL = _HEF_Buffer(_HEF_Index)  'Only write Lower Byte!
-              578: NVMDATL = _HEF_BUFFER(_HEF_INDEX)
-              ;NVMCON2 = 0x55
-              580: NVMCON2 = 85
-              ;NVMCON2 = 0xAA
-              581: NVMCON2 = 170
-              ;NVMCON1.WR = 1
-              582: NVMCON1.WR = 1
-              ;NOP
-              583: NOP
-              ;NOP
-              584: NOP
-              ;_HEF_ABS_ADDR++
-              585: _HEF_ABS_ADDR++
-              ;Next
-              586: NEXT
-              ;last byte
-              ;NVMDATL =  _HEF_Buffer(_HEF_Index + 1)
-              589: NVMDATL = _HEF_BUFFER(_HEF_INDEX + 1)
-              ;NVMCON1.LWLO = 0  'write latches
-              590: NVMCON1.LWLO = 0
-              ;unlock
-              ;NVMCON2 = 0x55
-              593: NVMCON2 = 85
-              ;NVMCON2 = 0xAA
-              594: NVMCON2 = 170
-              ;NVMCON1.WR = 1 'Write !
-              595: NVMCON1.WR = 1
-              ;NOP
-              596: NOP
-              ;NOP
-              597: NOP
-              ;NVMCON1.WREN = 0           'Disable Flash Memory write/erase
-              599: NVMCON1.WREN = 0
-              ;INTCON.GIE = _GIE_SAVE    ' Restore initial GIE state
-              600: INTCON.GIE = _GIE_SAVE
-              609: #IFDEF HAS_HEFSAF TRUE
-              ;Writes a single byte of data [_HEF_HEF_DataOut] in HEFM
-              ;at relative location [_HEF_Address] between 0 and 127
-              ;
-              ;The syntax is similar to the EPWrite subroutine
-              ;The existing data in the row of [_HEF_Address] is preserved
-              ;Calculate block number
-              ;_HEF_BlockNum = _HEF_REL_ADDR / HEF_ROWSIZE_BYTES
-              619: _HEF_BLOCKNUM = _HEF_REL_ADDR / HEF_ROWSIZE_BYTES
-              ;Calculate offset in block/row
-              ;_HEF_Offset = _HEF_REL_Addr % HEF_ROWSIZE_BYTES
-              622: _HEF_OFFSET = _HEF_REL_ADDR % HEF_ROWSIZE_BYTES
-              ;Save data previously stored in row#
-              ;HEFReadBlock(_HEF_BlockNum, _HEF_Buffer(), HEF_ROWSIZE_BYTES)
-              625: HEFREADBLOCK(_HEF_BLOCKNUM, _HEF_BUFFER(), HEF_ROWSIZE_BYTES)
-              ;Update buffer with DataValue at offset
-              ;_HEF_Buffer(_HEF_Offset + 1) =  _HEF_DataByte
-              628: _HEF_BUFFER(_HEF_OFFSET + 1) = _HEF_DATABYTE
-              ;Write back the updated row buffer to  HEFM
-              ;HEFwriteBlock(_HEF_BlockNum, _HEF_Buffer(), HEF_ROWSIZE_BYTES)
-              631: HEFWRITEBLOCK(_HEF_BLOCKNUM, _HEF_BUFFER(), HEF_ROWSIZE_BYTES)
-              639: #IFDEF HAS_HEFSAF TRUE
-              ;Writes a single WORD to 18F SAF Memory
-              ;at relative locations [_HEF_REL_ADDR]
-              ;where each address is an even number.
-              ;
-              ;Existing data in the row of [_HEF_REL_ADDR] is preserved
-              ;Calculate block number
-              ;_HEF_BlockNum = _HEF_REL_ADDR / HEF_ROWSIZE_BYTES
-              648: _HEF_BLOCKNUM = _HEF_REL_ADDR / HEF_ROWSIZE_BYTES
-              ;Calculate offset in block/row
-              ;_HEF_Offset = _HEF_REL_ADDR % HEF_ROWSIZE_BYTES
-              651: _HEF_OFFSET = _HEF_REL_ADDR % HEF_ROWSIZE_BYTES
-              ;Save data previously stored in row#
-              ;HEFReadBlock(_HEF_BlockNum, _HEF_Buffer(), HEF_ROWSIZE_BYTES)
-              654: HEFREADBLOCK(_HEF_BLOCKNUM, _HEF_BUFFER(), HEF_ROWSIZE_BYTES)
-              ;Update buffer with DataValue at offset
-              ;_HEF_Buffer(_HEF_Offset + 1) = _HEF_DataWord
-              657: _HEF_BUFFER(_HEF_OFFSET + 1) = _HEF_DATAWORD
-              ;_HEF_Buffer(_HEF_Offset + 2) = _HEF_DataWord_H
-              658: _HEF_BUFFER(_HEF_OFFSET + 2) = _HEF_DATAWORD_H
-              ;Write back the updated row buffer to  HEFM
-              ;HEFwriteBlock(_HEF_BlockNum, _HEF_Buffer(), HEF_ROWSIZE_BYTES)
-              662: HEFWRITEBLOCK(_HEF_BLOCKNUM, _HEF_BUFFER(), HEF_ROWSIZE_BYTES)
               158: #IF SPISRAM_CAPACITY > 65536
               ;Large device therefore need to send third byte address
               ;SendData_SPISRAM ( eepAddr_u )
@@ -9533,9 +8467,7 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :ADC7                                                  7
               FINAL/CONSTANT :ADC8                                                  8
               FINAL/CONSTANT :ADC9                                                  9
-              FINAL/CONSTANT :ADFM0                                                 ADFM
               FINAL/CONSTANT :ADFRM0                                                ADFM
-              FINAL/CONSTANT :ADGO                                                  GONDONE
               FINAL/CONSTANT :ADSPEED                                               128
               FINAL/CONSTANT :AD_ACQUISITION_TIME_SELECT_BITS                       4
               FINAL/CONSTANT :AD_DELAY                                              2 10US
@@ -9637,6 +8569,7 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :AVR_EXT_TMR_5_RE                                      7
               FINAL/CONSTANT :AVR_I2C_RESTART                                       16
               FINAL/CONSTANT :AVR_I2C_START                                         8
+              FINAL/CONSTANT :BLINK_FLAG_COUNTER_MAX                                6
               FINAL/CONSTANT :BRG16_TEMP                                            1
               FINAL/CONSTANT :BRGH_TEMP                                             1
               FINAL/CONSTANT :BYTETOHEX                                             _HEXPICAS
@@ -9646,10 +8579,14 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :CCP1M1                                                CCP1MODE1
               FINAL/CONSTANT :CCP1M2                                                CCP1MODE2
               FINAL/CONSTANT :CCP1M3                                                CCP1MODE3
+              FINAL/CONSTANT :CCP1TSEL0                                             C1TSEL0
+              FINAL/CONSTANT :CCP1TSEL1                                             C1TSEL1
               FINAL/CONSTANT :CCP2M0                                                CCP2MODE0
               FINAL/CONSTANT :CCP2M1                                                CCP2MODE1
               FINAL/CONSTANT :CCP2M2                                                CCP2MODE2
               FINAL/CONSTANT :CCP2M3                                                CCP2MODE3
+              FINAL/CONSTANT :CCP2TSEL0                                             C2TSEL0
+              FINAL/CONSTANT :CCP2TSEL1                                             C2TSEL1
               FINAL/CONSTANT :CCP3M0                                                CCP3MODE0
               FINAL/CONSTANT :CCP3M1                                                CCP3MODE1
               FINAL/CONSTANT :CCP3M2                                                CCP3MODE2
@@ -9665,73 +8602,23 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :CDOM                                                  5
               FINAL/CONSTANT :CEXPBIAS                                              127
               FINAL/CONSTANT :CFDZ                                                  3
-              FINAL/CONSTANT :CFGS                                                  NVMREGS
               FINAL/CONSTANT :CFOV                                                  1
               FINAL/CONSTANT :CFUN                                                  2
               FINAL/CONSTANT :CHECKDIVZERO                                          255
-              FINAL/CONSTANT :CHIP31KCONFIG                                         LFINT
+              FINAL/CONSTANT :CHIP31KCONFIG                                         4
               FINAL/CONSTANT :CHIP31KREGISTER                                       OSCCON1
-              FINAL/CONSTANT :CHIP31KSUPPORT                                        lfint,osccon1,80
+              FINAL/CONSTANT :CHIP31KSUPPORT                                        4,osccon1,80
               FINAL/CONSTANT :CHIP31KVALUE                                          80
               FINAL/CONSTANT :CHIPADC                                               35
               FINAL/CONSTANT :CHIPADCCONSTANTS                                      an{a..g}{0..7} usage:0..ang7
-              FINAL/CONSTANT :CHIPBANK_0_END                                        127
-              FINAL/CONSTANT :CHIPBANK_0_START                                      32
-              FINAL/CONSTANT :CHIPBANK_10_END                                       1391
-              FINAL/CONSTANT :CHIPBANK_10_START                                     1312
-              FINAL/CONSTANT :CHIPBANK_11_END                                       1519
-              FINAL/CONSTANT :CHIPBANK_11_START                                     1440
-              FINAL/CONSTANT :CHIPBANK_12_END                                       1647
-              FINAL/CONSTANT :CHIPBANK_12_START                                     1568
-              FINAL/CONSTANT :CHIPBANK_13_END                                       1775
-              FINAL/CONSTANT :CHIPBANK_13_START                                     1696
-              FINAL/CONSTANT :CHIPBANK_14_END                                       1903
-              FINAL/CONSTANT :CHIPBANK_14_START                                     1824
-              FINAL/CONSTANT :CHIPBANK_15_END                                       2031
-              FINAL/CONSTANT :CHIPBANK_15_START                                     1952
-              FINAL/CONSTANT :CHIPBANK_16_END                                       2159
-              FINAL/CONSTANT :CHIPBANK_16_START                                     2080
-              FINAL/CONSTANT :CHIPBANK_17_END                                       2287
-              FINAL/CONSTANT :CHIPBANK_17_START                                     2208
-              FINAL/CONSTANT :CHIPBANK_18_END                                       2415
-              FINAL/CONSTANT :CHIPBANK_18_START                                     2336
-              FINAL/CONSTANT :CHIPBANK_19_END                                       2543
-              FINAL/CONSTANT :CHIPBANK_19_START                                     2464
-              FINAL/CONSTANT :CHIPBANK_1_END                                        239
-              FINAL/CONSTANT :CHIPBANK_1_START                                      160
-              FINAL/CONSTANT :CHIPBANK_20_END                                       2671
-              FINAL/CONSTANT :CHIPBANK_20_START                                     2592
-              FINAL/CONSTANT :CHIPBANK_21_END                                       2799
-              FINAL/CONSTANT :CHIPBANK_21_START                                     2720
-              FINAL/CONSTANT :CHIPBANK_22_END                                       2927
-              FINAL/CONSTANT :CHIPBANK_22_START                                     2848
-              FINAL/CONSTANT :CHIPBANK_23_END                                       3055
-              FINAL/CONSTANT :CHIPBANK_23_START                                     2976
-              FINAL/CONSTANT :CHIPBANK_24_END                                       3183
-              FINAL/CONSTANT :CHIPBANK_24_START                                     3104
-              FINAL/CONSTANT :CHIPBANK_25_END                                       3263
-              FINAL/CONSTANT :CHIPBANK_25_START                                     3232
-              FINAL/CONSTANT :CHIPBANK_2_END                                        367
-              FINAL/CONSTANT :CHIPBANK_2_START                                      288
-              FINAL/CONSTANT :CHIPBANK_3_END                                        495
-              FINAL/CONSTANT :CHIPBANK_3_START                                      416
-              FINAL/CONSTANT :CHIPBANK_4_END                                        623
-              FINAL/CONSTANT :CHIPBANK_4_START                                      544
-              FINAL/CONSTANT :CHIPBANK_5_END                                        751
-              FINAL/CONSTANT :CHIPBANK_5_START                                      672
-              FINAL/CONSTANT :CHIPBANK_6_END                                        879
-              FINAL/CONSTANT :CHIPBANK_6_START                                      800
-              FINAL/CONSTANT :CHIPBANK_7_END                                        1007
-              FINAL/CONSTANT :CHIPBANK_7_START                                      928
-              FINAL/CONSTANT :CHIPBANK_8_END                                        1135
-              FINAL/CONSTANT :CHIPBANK_8_START                                      1056
-              FINAL/CONSTANT :CHIPBANK_9_END                                        1263
-              FINAL/CONSTANT :CHIPBANK_9_START                                      1184
-              FINAL/CONSTANT :CHIPCONFIGWORDS                                       5
-              FINAL/CONSTANT :CHIPEEPROM                                            0
-              FINAL/CONSTANT :CHIPERASEFLASHBLOCKSIZE                               32
-              FINAL/CONSTANT :CHIPERASEROWSIZEWORDS                                 32
-              FINAL/CONSTANT :CHIPFAMILY                                            15
+              FINAL/CONSTANT :CHIPBANK_0_END                                        3327
+              FINAL/CONSTANT :CHIPBANK_0_START                                      0
+              FINAL/CONSTANT :CHIPBANK_28_END                                       3614
+              FINAL/CONSTANT :CHIPBANK_28_START                                     3584
+              FINAL/CONSTANT :CHIPEEPROM                                            1024
+              FINAL/CONSTANT :CHIPERASEFLASHBLOCKSIZE                               128
+              FINAL/CONSTANT :CHIPERASEROWSIZEWORDS                                 128
+              FINAL/CONSTANT :CHIPFAMILY                                            16
               FINAL/CONSTANT :CHIPFAMILY18FXXK40                                    16104
               FINAL/CONSTANT :CHIPFAMILY18FXXK42                                    16103
               FINAL/CONSTANT :CHIPFAMILY18FXXK83                                    16107
@@ -9744,38 +8631,43 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :CHIPFAMILY18FXXQ71                                    16109
               FINAL/CONSTANT :CHIPFAMILY18FXXQ83                                    16108
               FINAL/CONSTANT :CHIPFAMILY18FXXQ84                                    16106
-              FINAL/CONSTANT :CHIPFAMILYVARIANT                                     1
               FINAL/CONSTANT :CHIPHEFMEMWORDS                                       0
-              FINAL/CONSTANT :CHIPINTOSC                                            32
-              FINAL/CONSTANT :CHIPIO                                                36
-              FINAL/CONSTANT :CHIPMAXADDRESS                                        8191
-              FINAL/CONSTANT :CHIPMAXMHZ                                            32
-              FINAL/CONSTANT :CHIPMHZ                                               32
-              FINAL/CONSTANT :CHIPNAME                                              16F15376
-              FINAL/CONSTANT :CHIPNAMESTR                                           "16F15376"    ;STRING140;
-              FINAL/CONSTANT :CHIPOSC                                               HFINT32
+              FINAL/CONSTANT :CHIPINTOSC                                            64
+              FINAL/CONSTANT :CHIPIO                                                35
+              FINAL/CONSTANT :CHIPMAXADDRESS                                        4095
+              FINAL/CONSTANT :CHIPMAXMHZ                                            64
+              FINAL/CONSTANT :CHIPMEMORYLOCK                                        NVMCON2
+              FINAL/CONSTANT :CHIPMHZ                                               64
+              FINAL/CONSTANT :CHIPNAME                                              18F47Q10
+              FINAL/CONSTANT :CHIPNAMESTR                                           "18F47Q10"    ;STRING240;
+              FINAL/CONSTANT :CHIPOSC                                               HFINTOSC_1MHZ
               FINAL/CONSTANT :CHIPPINS                                              40
-              FINAL/CONSTANT :CHIPPROGRAMMERNAMESTR                                 "16F15376"    ;STRING141;
+              FINAL/CONSTANT :CHIPPROGRAMMERNAMESTR                                 "18F47Q10"    ;STRING241;
               FINAL/CONSTANT :CHIPPSP                                               0
-              FINAL/CONSTANT :CHIPRAM                                               2048
+              FINAL/CONSTANT :CHIPPWMTIMERVARIANT                                   2
+              FINAL/CONSTANT :CHIPRAM                                               3359
               FINAL/CONSTANT :CHIPRESERVEHIGHPROG                                   0
-              FINAL/CONSTANT :CHIPSAFMEMWORDS                                       128
+              FINAL/CONSTANT :CHIPSAFMEMWORDS                                       0
+              FINAL/CONSTANT :CHIPSECTORRAMADDRESS                                  3328
+              FINAL/CONSTANT :CHIPSECTORRAMADDRESSSIZE                              256
               FINAL/CONSTANT :CHIPSELFWRITE                                         1
-              FINAL/CONSTANT :CHIPSHAREDRAM                                         112
-              FINAL/CONSTANT :CHIPSTACKS                                            16
-              FINAL/CONSTANT :CHIPSUBFAMILY                                         15000
+              FINAL/CONSTANT :CHIPSHAREDRAM                                         0
+              FINAL/CONSTANT :CHIPSTACKS                                            31
+              FINAL/CONSTANT :CHIPSUBFAMILY                                         16100
               FINAL/CONSTANT :CHIPUSART                                             2
-              FINAL/CONSTANT :CHIPUSERIDADDRESS                                     32768
-              FINAL/CONSTANT :CHIPUSERIDLENGTH                                      4
+              FINAL/CONSTANT :CHIPUSERIDADDRESS                                     2097152
+              FINAL/CONSTANT :CHIPUSERIDLENGTH                                      128
               FINAL/CONSTANT :CHIPUSINGINTOSC                                       255
-              FINAL/CONSTANT :CHIPWORDS                                             16384
-              FINAL/CONSTANT :CHIPWRITEFLASHBLOCKSIZE                               32
-              FINAL/CONSTANT :CHIP_16F15376                                         
+              FINAL/CONSTANT :CHIPWORDS                                             65536
+              FINAL/CONSTANT :CHIPWRITEFLASHBLOCKSIZE                               128
+              FINAL/CONSTANT :CHIP_18F47Q10                                         
               FINAL/CONSTANT :CIOV                                                  0
               FINAL/CONSTANT :CLOCKSOURCETYPETYPE                                   1
+              FINAL/CONSTANT :CLOCKSTATE                                            SYSBITVAR0.3
               FINAL/CONSTANT :CLSB                                                  0
               FINAL/CONSTANT :CMSB                                                  7
               FINAL/CONSTANT :CNAN                                                  4
+              FINAL/CONSTANT :COUNTDOWN_MAX                                         5
               FINAL/CONSTANT :CREN1                                                 CREN
               FINAL/CONSTANT :CREN2                                                 RC2STA_CREN
               FINAL/CONSTANT :CRND                                                  6
@@ -9784,19 +8676,25 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :CURSOROFF                                             13
               FINAL/CONSTANT :CURSORON                                              10
               FINAL/CONSTANT :CZ                                                    STATUS,Z
+              FINAL/CONSTANT :DATAERROR                                             SYSBITVAR0.2
               FINAL/CONSTANT :DEFAULTUSARTRETURNVALUE                               255
-              FINAL/CONSTANT :DIRECTION                                             SYSBITVAR0.0
               FINAL/CONSTANT :DISPLAYOFF                                            11
               FINAL/CONSTANT :DISPLAYON                                             12
-              FINAL/CONSTANT :DUTYCYCLE                                             422
-              FINAL/CONSTANT :DUTYCYCLEH                                            105
-              FINAL/CONSTANT :DUTYCYCLEL                                            2
+              FINAL/CONSTANT :DUTYCYCLE                                             212
+              FINAL/CONSTANT :DUTYCYCLEH                                            53
+              FINAL/CONSTANT :DUTYCYCLEL                                            0
+              FINAL/CONSTANT :EEPDEV                                                160
+              FINAL/CONSTANT :EEPROMPAGESIZE                                        64
+              FINAL/CONSTANT :EEPROM_FLAG_COUNTER_MAX                               6
+              FINAL/CONSTANT :EEPROM_RD_STRING                                      EEPROM_RD_ARRAY
+              FINAL/CONSTANT :EEPROM_WR_STRING                                      EEPROM_WR_ARRAY
               FINAL/CONSTANT :EPREAD                                                NVMADR_EPREAD
               FINAL/CONSTANT :EPWRITE                                               NVMADR_EPWRITE
               FINAL/CONSTANT :EXT                                                   0
               FINAL/CONSTANT :EXTOSC                                                6
               FINAL/CONSTANT :FALSE                                                 0
               FINAL/CONSTANT :FAST                                                  50
+              FINAL/CONSTANT :FLAG_COUNTER_MAX                                      4
               FINAL/CONSTANT :FLASH                                                 9
               FINAL/CONSTANT :FLASHOFF                                              14
               FINAL/CONSTANT :FLASHON                                               9
@@ -9812,33 +8710,31 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :FVR_4X                                                3
               FINAL/CONSTANT :FVR_OFF                                               0
               FINAL/CONSTANT :GCASM                                                 255
-              FINAL/CONSTANT :GO_NOT_DONE                                           GONDONE
+              FINAL/CONSTANT :GO                                                    WR
+              FINAL/CONSTANT :GONDONE                                               GO_NOT_DONE
               FINAL/CONSTANT :GPIO_A_ADDRESS                                        18
               FINAL/CONSTANT :GPIO_B_ADDRESS                                        19
-              FINAL/CONSTANT :HAS_HEFSAF                                            255
-              FINAL/CONSTANT :HEF_BLOCK0_ADDR                                       16256
-              FINAL/CONSTANT :HEF_BLOCK1_ADDR                                       16288
-              FINAL/CONSTANT :HEF_BLOCK2_ADDR                                       16320
-              FINAL/CONSTANT :HEF_BLOCK3_ADDR                                       16352
-              FINAL/CONSTANT :HEF_BYTES                                             128
-              FINAL/CONSTANT :HEF_NUM_BLOCKS                                        4
-              FINAL/CONSTANT :HEF_ROWSIZE_BYTES                                     32
-              FINAL/CONSTANT :HEF_ROWSIZE_WORDS                                     32
-              FINAL/CONSTANT :HEF_START_ADDR                                        16256
-              FINAL/CONSTANT :HEF_WORDS                                             128
+              FINAL/CONSTANT :HAS_HEFSAF                                            0
+              FINAL/CONSTANT :HEF_NUM_BLOCKS                                        0
+              FINAL/CONSTANT :HEF_ROWSIZE_BYTES                                     2
+              FINAL/CONSTANT :HEF_ROWSIZE_WORDS                                     2
+              FINAL/CONSTANT :HEF_START_ADDR                                        32
               FINAL/CONSTANT :HEX                                                   _HEXPICAS
               FINAL/CONSTANT :HFINTOSC                                              3
               FINAL/CONSTANT :HI2C2ITSCLWAITPERIOD                                  70
               FINAL/CONSTANT :HI2C2_BAUD_RATE                                       100
               FINAL/CONSTANT :HI2CITSCLWAITPERIOD                                   70
-              FINAL/CONSTANT :HI2C_BAUD_RATE                                        100
+              FINAL/CONSTANT :HI2C_BAUD_RATE                                        400
+              FINAL/CONSTANT :HI2C_BAUD_TEMP                                        39
+              FINAL/CONSTANT :HI2C_CLOCK                                            PORTC.3
+              FINAL/CONSTANT :HI2C_DATA                                             PORTC.4
               FINAL/CONSTANT :HIGHSPEED                                             255
               FINAL/CONSTANT :HPWM1                                                 1
-              FINAL/CONSTANT :HPWM16F_DCH_SCRIPT                                    1
-              FINAL/CONSTANT :HPWM16F_DCL_SCRIPT                                    165
+              FINAL/CONSTANT :HPWM16F_DCH_SCRIPT                                    3
+              FINAL/CONSTANT :HPWM16F_DCL_SCRIPT                                    74
               FINAL/CONSTANT :HPWM16F_DCY                                           0
-              FINAL/CONSTANT :HPWM16F_PRH_SCRIPT                                    3
-              FINAL/CONSTANT :HPWM16F_PRL_SCRIPT                                    74
+              FINAL/CONSTANT :HPWM16F_PRH_SCRIPT                                    6
+              FINAL/CONSTANT :HPWM16F_PRL_SCRIPT                                    148
               FINAL/CONSTANT :HPWM16F_PRPS_REQ                                      0
               FINAL/CONSTANT :HPWM16_10_HPWM16F_DCH_SCRIPT                          0
               FINAL/CONSTANT :HPWM16_10_HPWM16F_DCL_SCRIPT                          0
@@ -9900,7 +8796,7 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :HPWMXCON_DEFAULT                                      1
               FINAL/CONSTANT :HPWM_CCPTIMER2                                        HPWM
               FINAL/CONSTANT :HSERPRINTBYTE                                         HSERPRINT
-              FINAL/CONSTANT :HWSPIMODESCRIPT                                       13
+              FINAL/CONSTANT :HWSPIMODESCRIPT                                       12
               FINAL/CONSTANT :I2C1CLOCKSOURCE                                       3
               FINAL/CONSTANT :I2C1CLOCK_FOSC                                        1
               FINAL/CONSTANT :I2C1CLOCK_FOSC4                                       0
@@ -9947,8 +8843,9 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :I2C2_START_TIMEOUT                                    4
               FINAL/CONSTANT :I2C2_STOP_TIMEOUT                                     128
               FINAL/CONSTANT :I2C2_TXBE_TIMEOUT                                     2
-              FINAL/CONSTANT :I2CINTSTATESAVE                                       SYSBITVAR2.5
+              FINAL/CONSTANT :I2CINTSTATESAVE                                       SYSBITVAR3.1
               FINAL/CONSTANT :I2CSENDSTATE                                          I2CACKPOLLSTATE
+              FINAL/CONSTANT :I2CTEMPSENSOR                                         154
               FINAL/CONSTANT :I2C_BIT_DELAY                                         2 US
               FINAL/CONSTANT :I2C_CLOCK_DELAY                                       1 US
               FINAL/CONSTANT :I2C_CLOCK_HIGH                                        DIR I2C_CLOCK IN
@@ -9962,20 +8859,12 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :INTEGERTOHEX                                          WORDTOHEX
               FINAL/CONSTANT :INTEGERTOSTRING                                       STRINTEGER
               FINAL/CONSTANT :INTERNALCLOCK                                         192
-              FINAL/CONSTANT :INTSTATE                                              SYSBITVAR0.2
+              FINAL/CONSTANT :INTSTATE                                              SYSBITVAR0.6
               FINAL/CONSTANT :IO_DIR_A_ADDRESS                                      0
               FINAL/CONSTANT :IO_DIR_B_ADDRESS                                      1
               FINAL/CONSTANT :K107                                                  107
               FINAL/CONSTANT :KEYPADREADDELAY                                       10 US
-              FINAL/CONSTANT :KEYPAD_COL_1                                          PORTB.3
-              FINAL/CONSTANT :KEYPAD_COL_2                                          PORTB.2
-              FINAL/CONSTANT :KEYPAD_COL_3                                          PORTB.1
-              FINAL/CONSTANT :KEYPAD_COL_4                                          PORTB.0
               FINAL/CONSTANT :KEYPAD_KEYMAP                                         KEYPADBITTOCODETABLE
-              FINAL/CONSTANT :KEYPAD_ROW_1                                          PORTB.7
-              FINAL/CONSTANT :KEYPAD_ROW_2                                          PORTB.6
-              FINAL/CONSTANT :KEYPAD_ROW_3                                          PORTB.5
-              FINAL/CONSTANT :KEYPAD_ROW_4                                          PORTB.4
               FINAL/CONSTANT :KEY_A                                                 10
               FINAL/CONSTANT :KEY_B                                                 11
               FINAL/CONSTANT :KEY_C                                                 12
@@ -9983,6 +8872,25 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :KEY_HASH                                              15
               FINAL/CONSTANT :KEY_NONE                                              255
               FINAL/CONSTANT :KEY_STAR                                              14
+              FINAL/CONSTANT :LABI2CSTATE                                           SYSBITVAR0.0
+              FINAL/CONSTANT :LAB_ADC                                               4
+              FINAL/CONSTANT :LAB_BLINK                                             2
+              FINAL/CONSTANT :LAB_BUZZER                                            18
+              FINAL/CONSTANT :LAB_CLOCK                                             17
+              FINAL/CONSTANT :LAB_DEBOUNCE                                          6
+              FINAL/CONSTANT :LAB_EEPROM                                            11
+              FINAL/CONSTANT :LAB_HELLOWORLD                                        1
+              FINAL/CONSTANT :LAB_I2CDISCOVERY                                      14
+              FINAL/CONSTANT :LAB_I2CEEPROM                                         16
+              FINAL/CONSTANT :LAB_I2CTEMPERATURE                                    15
+              FINAL/CONSTANT :LAB_INTERRUPTS                                        9
+              FINAL/CONSTANT :LAB_LCD                                               12
+              FINAL/CONSTANT :LAB_NVMEMORY                                          13
+              FINAL/CONSTANT :LAB_PWM                                               7
+              FINAL/CONSTANT :LAB_ROTATELEDS                                        3
+              FINAL/CONSTANT :LAB_SLEEPWAKEUP                                       10
+              FINAL/CONSTANT :LAB_TIMER_1                                           8
+              FINAL/CONSTANT :LAB_VSR                                               5
               FINAL/CONSTANT :LCDINT                                                PRINT
               FINAL/CONSTANT :LCDOFF                                                11
               FINAL/CONSTANT :LCDON                                                 12
@@ -9996,27 +8904,34 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :LCD_CB                                                SYSLCDTEMP.0
               FINAL/CONSTANT :LCD_CD                                                SYSLCDTEMP.0
               FINAL/CONSTANT :LCD_CLEAR                                             1
-              FINAL/CONSTANT :LCD_DATA_PORT                                         PORTD
+              FINAL/CONSTANT :LCD_DATA_PORT                                         SYSLCDTEMP
               FINAL/CONSTANT :LCD_DB                                                SYSLCDTEMP.0
-              FINAL/CONSTANT :LCD_DB4                                               SYSLCDTEMP.0
-              FINAL/CONSTANT :LCD_DB5                                               SYSLCDTEMP.0
-              FINAL/CONSTANT :LCD_DB6                                               SYSLCDTEMP.0
-              FINAL/CONSTANT :LCD_DB7                                               SYSLCDTEMP.0
-              FINAL/CONSTANT :LCD_ENABLE                                            PORTA.3
+              FINAL/CONSTANT :LCD_DB4                                               PORTD.0
+              FINAL/CONSTANT :LCD_DB5                                               PORTD.1
+              FINAL/CONSTANT :LCD_DB6                                               PORTD.2
+              FINAL/CONSTANT :LCD_DB7                                               PORTD.3
+              FINAL/CONSTANT :LCD_ENABLE                                            PORTD.6
               FINAL/CONSTANT :LCD_FUNCTION_SET                                      60
               FINAL/CONSTANT :LCD_I2C_ADDRESS_1                                     78
-              FINAL/CONSTANT :LCD_IO                                                8
-              FINAL/CONSTANT :LCD_RS                                                PORTA.1
+              FINAL/CONSTANT :LCD_IO                                                4
+              FINAL/CONSTANT :LCD_PWR                                               PORTD.7
+              FINAL/CONSTANT :LCD_RS                                                PORTD.4
               FINAL/CONSTANT :LCD_RSTEMP                                            SYSLCDTEMP.2
-              FINAL/CONSTANT :LCD_RW                                                PORTA.2
+              FINAL/CONSTANT :LCD_RW                                                PORTD.5
               FINAL/CONSTANT :LCD_SET_DDRAM_ADDRESS                                 128
               FINAL/CONSTANT :LCD_SET_DISPLAY                                       12
-              FINAL/CONSTANT :LCD_SPEED                                             100
+              FINAL/CONSTANT :LCD_SPEED                                             50
               FINAL/CONSTANT :LCD_VDD_EN                                            32
               FINAL/CONSTANT :LCD_VERSION                                           14082023
-              FINAL/CONSTANT :LCD_WIDTH                                             20
+              FINAL/CONSTANT :LCD_WIDTH                                             16
               FINAL/CONSTANT :LCD_WRITE_DELAY                                       2 US
               FINAL/CONSTANT :LEADINGZEROACTIVE                                     2
+              FINAL/CONSTANT :LEDS_OFF                                              PORTB.3=0:PORTB.2=0:PORTB.1=0:PORTB.0=0
+              FINAL/CONSTANT :LED_D2                                                PORTB.0
+              FINAL/CONSTANT :LED_D3                                                PORTB.1
+              FINAL/CONSTANT :LED_D4                                                PORTB.2
+              FINAL/CONSTANT :LED_D5                                                PORTB.3
+              FINAL/CONSTANT :LEFTDIRECTION                                         0
               FINAL/CONSTANT :LFINTOSC                                              4
               FINAL/CONSTANT :LINE1_START_ADDRESS                                   128
               FINAL/CONSTANT :LINE2_START_ADDRESS                                   192
@@ -10029,6 +8944,7 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :MASTERSSPADDMODE                                      16
               FINAL/CONSTANT :MASTERULTRAFAST                                       14
               FINAL/CONSTANT :MAXDECIMAL                                            100000000
+              FINAL/CONSTANT :MAX_LABS                                              18
               FINAL/CONSTANT :MEDIUM                                                66
               FINAL/CONSTANT :MEDIUMSPEED                                           128
               FINAL/CONSTANT :MFINTOSC                                              5
@@ -10045,12 +8961,15 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :NAK                                                   0
               FINAL/CONSTANT :NEWNEXTFORHANDLER                                     
               FINAL/CONSTANT :NOT                                                   !
-              FINAL/CONSTANT :NVMCON1_0_STATE                                       SYSBITVAR0.5
-              FINAL/CONSTANT :NVMCON1_1_STATE                                       SYSBITVAR0.6
-              FINAL/CONSTANT :NVMCON1_2_STATE                                       SYSBITVAR0.7
-              FINAL/CONSTANT :NVMCON1_6_STATE                                       SYSBITVAR0.4
-              FINAL/CONSTANT :NVMCON1_7_STATE                                       SYSBITVAR0.3
-              FINAL/CONSTANT :NVMREGSSTATE                                          SYSBITVAR2.1
+              FINAL/CONSTANT :NOT_PRESSED                                           0
+              FINAL/CONSTANT :NOT_RUNNING                                           0
+              FINAL/CONSTANT :NVMCON1_0_STATE                                       SYSBITVAR1.1
+              FINAL/CONSTANT :NVMCON1_1_STATE                                       SYSBITVAR1.2
+              FINAL/CONSTANT :NVMCON1_2_STATE                                       SYSBITVAR1.3
+              FINAL/CONSTANT :NVMCON1_6_STATE                                       SYSBITVAR1.0
+              FINAL/CONSTANT :NVMCON1_7_STATE                                       SYSBITVAR0.7
+              FINAL/CONSTANT :NVMREGSSTATE                                          SYSBITVAR2.5
+              FINAL/CONSTANT :NVM_FLAG_COUNTER_MAX                                  20
               FINAL/CONSTANT :OERR2                                                 RC2STA_OERR
               FINAL/CONSTANT :OFF                                                   0
               FINAL/CONSTANT :ON                                                    1
@@ -10100,9 +9019,8 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :POST_7                                                6
               FINAL/CONSTANT :POST_8                                                7
               FINAL/CONSTANT :POST_9                                                8
-              FINAL/CONSTANT :PPSTOOLPART                                           16F15376
-              FINAL/CONSTANT :PR2_CPP_PWM_TEMP                                      210
-              FINAL/CONSTANT :PR2_CPP_PWM_TEMP_10BIT_POTENTIALLY                    842
+              FINAL/CONSTANT :PR2_CPP_PWM_TEMP                                      105
+              FINAL/CONSTANT :PR2_CPP_PWM_TEMP_10BIT_POTENTIALLY                    1684
               FINAL/CONSTANT :PRE0_1                                                0
               FINAL/CONSTANT :PRE0_1024                                             10
               FINAL/CONSTANT :PRE0_128                                              7
@@ -10119,7 +9037,8 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :PRE0_64                                               6
               FINAL/CONSTANT :PRE0_8                                                3
               FINAL/CONSTANT :PRE0_8192                                             13
-              FINAL/CONSTANT :PRXPERIODREGISTER                                     210
+              FINAL/CONSTANT :PRESSED                                               1
+              FINAL/CONSTANT :PRXPERIODREGISTER                                     105
               FINAL/CONSTANT :PS0_128                                               6
               FINAL/CONSTANT :PS0_16                                                3
               FINAL/CONSTANT :PS0_2                                                 0
@@ -10161,17 +9080,25 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :PS3_4                                                 32
               FINAL/CONSTANT :PS3_8                                                 48
               FINAL/CONSTANT :PS4_1                                                 0
-              FINAL/CONSTANT :PS4_16                                                2
-              FINAL/CONSTANT :PS4_4                                                 1
-              FINAL/CONSTANT :PS4_64                                                3
+              FINAL/CONSTANT :PS4_128                                               7
+              FINAL/CONSTANT :PS4_16                                                4
+              FINAL/CONSTANT :PS4_2                                                 1
+              FINAL/CONSTANT :PS4_32                                                5
+              FINAL/CONSTANT :PS4_4                                                 2
+              FINAL/CONSTANT :PS4_64                                                6
+              FINAL/CONSTANT :PS4_8                                                 3
               FINAL/CONSTANT :PS5_1                                                 0
               FINAL/CONSTANT :PS5_2                                                 16
               FINAL/CONSTANT :PS5_4                                                 32
               FINAL/CONSTANT :PS5_8                                                 48
               FINAL/CONSTANT :PS6_1                                                 0
-              FINAL/CONSTANT :PS6_16                                                2
-              FINAL/CONSTANT :PS6_4                                                 1
-              FINAL/CONSTANT :PS6_64                                                3
+              FINAL/CONSTANT :PS6_128                                               7
+              FINAL/CONSTANT :PS6_16                                                4
+              FINAL/CONSTANT :PS6_2                                                 1
+              FINAL/CONSTANT :PS6_32                                                5
+              FINAL/CONSTANT :PS6_4                                                 2
+              FINAL/CONSTANT :PS6_64                                                6
+              FINAL/CONSTANT :PS6_8                                                 3
               FINAL/CONSTANT :PS7_1                                                 0
               FINAL/CONSTANT :PS7_2                                                 16
               FINAL/CONSTANT :PS7_4                                                 32
@@ -10186,11 +9113,11 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :PS_1_256                                              4
               FINAL/CONSTANT :PS_1_64                                               3
               FINAL/CONSTANT :PS_1_8                                                2
-              FINAL/CONSTANT :PWMCCP1MAXDUTYVALUE                                   842
+              FINAL/CONSTANT :PWMCCP1MAXDUTYVALUE                                   421
               FINAL/CONSTANT :PWMMODULE                                             255
-              FINAL/CONSTANT :PWMOSC1                                               8000
-              FINAL/CONSTANT :PWMOSC16                                              500
-              FINAL/CONSTANT :PWMOSC4                                               2000
+              FINAL/CONSTANT :PWMOSC1                                               16000
+              FINAL/CONSTANT :PWMOSC16                                              1000
+              FINAL/CONSTANT :PWMOSC4                                               4000
               FINAL/CONSTANT :PWM_DUTY                                              50
               FINAL/CONSTANT :PWM_FREQ                                              38
               FINAL/CONSTANT :R1200                                                 16
@@ -10201,50 +9128,50 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :R600                                                  32
               FINAL/CONSTANT :R9600                                                 2
               FINAL/CONSTANT :RANDOMIZE_SEED                                        TIMER0
-              FINAL/CONSTANT :RANDSTART                                             27773
+              FINAL/CONSTANT :RANDSTART                                             31958
               FINAL/CONSTANT :RBITRATEUNIT                                          52
+              FINAL/CONSTANT :RCREG                                                 RC1REG
+              FINAL/CONSTANT :RIGHTDIRECTION                                        1
+              FINAL/CONSTANT :ROTATEDIRECTION                                       SYSBITVAR0.1
+              FINAL/CONSTANT :RUNNING                                               1
               FINAL/CONSTANT :R_NW1                                                 R_NOT_W
-              FINAL/CONSTANT :SAF_BLOCK0_ADDR                                       16256
-              FINAL/CONSTANT :SAF_BLOCK1_ADDR                                       16288
-              FINAL/CONSTANT :SAF_BLOCK2_ADDR                                       16320
-              FINAL/CONSTANT :SAF_BLOCK3_ADDR                                       16352
-              FINAL/CONSTANT :SAF_BYTES                                             128
-              FINAL/CONSTANT :SAF_NUM_BLOCKS                                        4
-              FINAL/CONSTANT :SAF_ROWSIZE_BYTES                                     32
-              FINAL/CONSTANT :SAF_ROWSIZE_WORDS                                     32
-              FINAL/CONSTANT :SAF_START_ADDR                                        16256
-              FINAL/CONSTANT :SAF_WORDS                                             128
+              FINAL/CONSTANT :SAF_ROWSIZE_BYTES                                     128
               FINAL/CONSTANT :SCRIPTREADAD10BITFORCEVARIANTDIFFENTIAL               0
               FINAL/CONSTANT :SCRIPT_DEFAULT_COMPORT                                1
-              FINAL/CONSTANT :SCRIPT_LCD_BF                                         PORTD.7
-              FINAL/CONSTANT :SCRIPT_LCD_POSTWRITEDELAY                             91 US
+              FINAL/CONSTANT :SCRIPT_LCD_BF                                         PORTD.3
+              FINAL/CONSTANT :SCRIPT_LCD_POSTWRITEDELAY                             40 US
               FINAL/CONSTANT :SCRIPT_SET_DEFAULTUSART1RETURNVALUE                   1
               FINAL/CONSTANT :SCRIPT_SET_DEFAULTUSART2RETURNVALUE                   0
               FINAL/CONSTANT :SCRIPT_SET_DEFAULTUSART3RETURNVALUE                   0
               FINAL/CONSTANT :SCRIPT_SET_DEFAULTUSART4RETURNVALUE                   0
               FINAL/CONSTANT :SCRIPT_SET_DEFAULTUSART5RETURNVALUE                   0
               FINAL/CONSTANT :SCRIPT_USART_USAGE_CHECK                              1
+              FINAL/CONSTANT :SHIFT_COUNTER_MAX                                     8
               FINAL/CONSTANT :SLAVE                                                 0
               FINAL/CONSTANT :SLAVE10                                               3
               FINAL/CONSTANT :SLAVESS                                               1
               FINAL/CONSTANT :SLOW                                                  100
               FINAL/CONSTANT :SOSC                                                  6
-              FINAL/CONSTANT :SOUNDOUT                                              SYSTEMP.0
+              FINAL/CONSTANT :SOUNDOUT                                              PORTC.2
               FINAL/CONSTANT :SOUNDOUT2                                             SYSTEMP.0
-              FINAL/CONSTANT :SOURCEFILE                                            "10_first-start-sample"     ;STRING139;
+              FINAL/CONSTANT :SOUND_CMD_NONE                                        0
+              FINAL/CONSTANT :SOUND_NOTE_FLAT                                       2
+              FINAL/CONSTANT :SOUND_NOTE_NORMAL                                     0
+              FINAL/CONSTANT :SOUND_NOTE_SHARP                                      1
+              FINAL/CONSTANT :SOURCEFILE                                            "20_Capability_demo"        ;STRING239;
               FINAL/CONSTANT :SPBRGH                                                SP1BRGH
-              FINAL/CONSTANT :SPBRGH_TEMP                                           3
+              FINAL/CONSTANT :SPBRGH_TEMP                                           6
               FINAL/CONSTANT :SPBRGL                                                SP1BRGL
-              FINAL/CONSTANT :SPBRGL_TEMP                                           64
-              FINAL/CONSTANT :SPBRG_TEMP                                            832.3332
+              FINAL/CONSTANT :SPBRGL_TEMP                                           129
+              FINAL/CONSTANT :SPBRG_TEMP                                            1665.667
               FINAL/CONSTANT :SPEN1                                                 SPEN
               FINAL/CONSTANT :SPEN2                                                 RC2STA_SPEN
-              FINAL/CONSTANT :SPI1DELAY_SCRIPT                                      4
+              FINAL/CONSTANT :SPI1DELAY_SCRIPT                                      1
               FINAL/CONSTANT :SPIBAUDRATE_SCRIPT                                    3
               FINAL/CONSTANT :SPIBAUDRATE_SCRIPT_MASTER                             9
               FINAL/CONSTANT :SPIBAUDRATE_SCRIPT_MASTERSLOW                         33
               FINAL/CONSTANT :SPITRANSFER                                           HWSPITRANSFER
-              FINAL/CONSTANT :SPI_BAUD_RATE                                         8000
+              FINAL/CONSTANT :SPI_BAUD_RATE                                         16000
               FINAL/CONSTANT :SPI_CPHA_0                                            0
               FINAL/CONSTANT :SPI_CPHA_1                                            1
               FINAL/CONSTANT :SPI_CPOL_0                                            0
@@ -10293,16 +9220,17 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :SSPIF                                                 SSP1IF
               FINAL/CONSTANT :SSPSTAT                                               SSP1STAT
               FINAL/CONSTANT :STRINGTOBYTE                                          STRINGTOWORD
-              FINAL/CONSTANT :SW1_RE3                                               PORTE.3
-              FINAL/CONSTANT :SW2_RA4                                               PORTA.4
-              FINAL/CONSTANT :SW3_RC2                                               PORTC.2
+              FINAL/CONSTANT :SWITCH_S2_PORT                                        PORTA.4
+              FINAL/CONSTANT :SWITCH_S3_PORT                                        PORTB.0
               FINAL/CONSTANT :SYNC                                                  SYNC_TX1STA
               FINAL/CONSTANT :SYNC1                                                 SYNC_TX1STA
               FINAL/CONSTANT :SYSEPREAD                                             NVMADR_EPREAD
               FINAL/CONSTANT :SYSTONEDELAY                                          WAIT TONEPERIOD 10US
               FINAL/CONSTANT :SYS_CLOCK_DIV_NEEDED                                  4
               FINAL/CONSTANT :SYS_CLOCK_INT_PLL_USED                                255
-              FINAL/CONSTANT :TIMERXPRESCALESELECTVALUE                             1
+              FINAL/CONSTANT :TIMERXPRESCALESELECTVALUE                             4
+              FINAL/CONSTANT :TIME_COUNT_MAX                                        100
+              FINAL/CONSTANT :TIME_COUNT_MIN                                        0
               FINAL/CONSTANT :TINYBOOTLOADER                                        128
               FINAL/CONSTANT :TINYBOOTLOADER128                                     128
               FINAL/CONSTANT :TINYBOOTLOADER256                                     256
@@ -10320,11 +9248,11 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :TXCKIPPS                                              0
               FINAL/CONSTANT :TXEN1                                                 TXEN
               FINAL/CONSTANT :TXEN2                                                 TX2STA_TXEN
-              FINAL/CONSTANT :TXIF                                                  TX1IF
-              FINAL/CONSTANT :TXPR                                                  1
+              FINAL/CONSTANT :TXPR                                                  4
+              FINAL/CONSTANT :TXREG                                                 TX1REG
               FINAL/CONSTANT :TXSTA2_SYNC                                           SYNC_TX2STA
-              FINAL/CONSTANT :U1TXB                                                 TXREG
-              FINAL/CONSTANT :U1TXIF                                                TX1IF
+              FINAL/CONSTANT :U1TXB                                                 TX1REG
+              FINAL/CONSTANT :U1TXIF                                                TXIF
               FINAL/CONSTANT :U2ERRIR_TXMTIF                                        TXSTA2_TRMT
               FINAL/CONSTANT :U2TXB                                                 TXREG2
               FINAL/CONSTANT :U2TXIF                                                TX2IF
@@ -10333,8 +9261,8 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :USART3_DELAY                                          1 MS
               FINAL/CONSTANT :USART4_DELAY                                          1 MS
               FINAL/CONSTANT :USART5_DELAY                                          1 MS
-              FINAL/CONSTANT :USARTHASDATA                                          RC1IF = 1
-              FINAL/CONSTANT :USARTHASDATASET                                       0
+              FINAL/CONSTANT :USARTHASDATA                                          RCIF = 1
+              FINAL/CONSTANT :USARTHASDATASET                                       1
               FINAL/CONSTANT :USART_BAUD_RATE                                       9600
               FINAL/CONSTANT :USART_DELAY                                           0
               FINAL/CONSTANT :USART_TX_BLOCKING                                     
@@ -10412,7 +9340,7 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :USE_ADE2                                              255
               FINAL/CONSTANT :USE_ADE3                                              255
               FINAL/CONSTANT :USE_ADE4                                              255
-              FINAL/CONSTANT :USE_HPWM1                                             255
+              FINAL/CONSTANT :USE_HPWM1                                             0
               FINAL/CONSTANT :USE_HPWM16_1                                          255
               FINAL/CONSTANT :USE_HPWM16_10                                         255
               FINAL/CONSTANT :USE_HPWM16_11                                         255
@@ -10425,21 +9353,21 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :USE_HPWM16_7                                          255
               FINAL/CONSTANT :USE_HPWM16_8                                          255
               FINAL/CONSTANT :USE_HPWM16_9                                          255
-              FINAL/CONSTANT :USE_HPWM2                                             255
-              FINAL/CONSTANT :USE_HPWM3                                             255
-              FINAL/CONSTANT :USE_HPWM4                                             255
-              FINAL/CONSTANT :USE_HPWM5                                             255
-              FINAL/CONSTANT :USE_HPWM6                                             255
-              FINAL/CONSTANT :USE_HPWM7                                             255
-              FINAL/CONSTANT :USE_HPWM8                                             255
+              FINAL/CONSTANT :USE_HPWM2                                             0
+              FINAL/CONSTANT :USE_HPWM3                                             0
+              FINAL/CONSTANT :USE_HPWM4                                             0
+              FINAL/CONSTANT :USE_HPWM5                                             0
+              FINAL/CONSTANT :USE_HPWM6                                             0
+              FINAL/CONSTANT :USE_HPWM7                                             0
+              FINAL/CONSTANT :USE_HPWM8                                             0
               FINAL/CONSTANT :USE_HPWMCCP1                                          255
-              FINAL/CONSTANT :USE_HPWMCCP2                                          255
+              FINAL/CONSTANT :USE_HPWMCCP2                                          0
               FINAL/CONSTANT :USE_HPWMCCP3                                          255
-              FINAL/CONSTANT :USE_HPWMCCP4                                          255
-              FINAL/CONSTANT :USE_HPWMCCP5                                          255
+              FINAL/CONSTANT :USE_HPWMCCP4                                          0
+              FINAL/CONSTANT :USE_HPWMCCP5                                          0
               FINAL/CONSTANT :USE_HPWM_TIMER2                                       255
-              FINAL/CONSTANT :USE_HPWM_TIMER4                                       255
-              FINAL/CONSTANT :USE_HPWM_TIMER6                                       255
+              FINAL/CONSTANT :USE_HPWM_TIMER4                                       0
+              FINAL/CONSTANT :USE_HPWM_TIMER6                                       0
               FINAL/CONSTANT :USE_TIMER0                                            255
               FINAL/CONSTANT :USE_TIMER1                                            255
               FINAL/CONSTANT :USE_TIMER10                                           255
@@ -10457,10 +9385,10 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :VAL32                                                 STRINGTOLONG
               FINAL/CONSTANT :WORDTOSTRING                                          STR
               FINAL/CONSTANT :XOR                                                   #
-              FINAL/CONSTANT :_SIGNVALUE                                            SYSBITVAR2.3
+              FINAL/CONSTANT :_SIGNVALUE                                            SYSBITVAR2.7
               FINAL/CONSTANT :_V9081PATCH                                           2
               FINAL/CONSTANT :__DEFINE_RS232H_CONSTANTS                             0
-              FINAL/CONSTANT :__LCD_CALC                                            91
-              FINAL/CONSTANT :__LCD_DELAYS                                          3
-              FINAL/CONSTANT :__LCD_INSTRUCTIONS                                    44
-              FINAL/CONSTANT :__LCD_PERIOD                                          100
+              FINAL/CONSTANT :__LCD_CALC                                            40
+              FINAL/CONSTANT :__LCD_DELAYS                                          5
+              FINAL/CONSTANT :__LCD_INSTRUCTIONS                                    74
+              FINAL/CONSTANT :__LCD_PERIOD                                          50

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Compilation Report</title>
+</head>
+<body>
+<h1>Compilation Report</h1>
+<p>Compiler Version (YYYY-MM-DD): 2024.08.30 (Windows 64 bit) : Build 1420)</p>
+<h2>Compilation time</h2>
+<p> (Compile time: 4.125 seconds)</p>
+<p> (Assembly time: 0 seconds)</p>
+<p> (Download time: 0 seconds)</p>
+<p> (Total time: 4.125 seconds)</p>
+<h2>Chip resource usage:</h2>
+<p>Chip Model: 18F47Q10</p>
+<p>Program Memory: 10141/65536 words (15.47%)</p>
+<p>RAM: 898/3359 bytes (26.73%)</p>
+<p> OSC: HFINTOSC_1MHZ, 64Mhz (Internal oscillator)</p>
+<h2>RAM Allocation</h2>
+<table border="1">
+</table>
+<h2>Subroutines</h2>
+<table border="1">
+<tr><th>Name</th><th>Code Size (lines)</th><th>Compiled Size (words)</th><th>Outgoing calls</th></tr>
+<tr><td>Main</td><td>170</td><td>382</td><td>INITRANDOM(1), HI2CINIT(1), INITSOUNDPLAY(8), BUTTONPRESSEDISR(3), INITLCD(57), MEMORY_ISR(3), LAB_TIMER0_ISR(1), INITPWM(1), SYSREADSTRING(8), Delay_S(2), NEXTLAB(1), BUZZER(1), CLOCK(1), I2CEEPROM(1), I2CTEMPERATURE(1), I2CDISCOVERY(1), NVMEMORY(1), LCD(1), EEPROM(1), SLEEPWAKEUP(1), INTERRUPTS(1), TIMER_1(1), PWM(1), DEBOUNCE(1), VSR(1), ADC(1), ROTATELEDS(1), BLINK(1), HELLOWORLD(1), CHECKBUTTONS2(1), CLS(2), LOCATE(3), PRINT(6), HSERPRINT(2), HSERPRINTCRLF(3), LCDINITOM16214(260), INITSYS(211)</td></tr>
+<tr><td>LCDINITOM16214</td><td>4</td><td>9</td><td>Delay_MS(1), INITPPS(1)</td></tr>
+<tr><td>INITPPS</td><td>6</td><td>15</td><td></td></tr>
+<tr><td>HELLOWORLD</td><td>18</td><td>98</td><td>SYSREADSTRING(3), SYSCOPYSTRING(1), PRINT(2), LOCATE(2), HSERPRINTCRLF(1), STR(1), HSERPRINT(1)</td></tr>
+<tr><td>BLINK</td><td>40</td><td>191</td><td>SYSREADSTRING(4), SYSCOPYSTRING(1), STOPTIMER(2), STARTTIMER(2), SETTIMER(2), INITTIMER1(1), PRINT(3), LOCATE(3), HSERPRINTCRLF(1), STR(1), HSERPRINT(1)</td></tr>
+<tr><td>ROTATELEDS</td><td>38</td><td>147</td><td>SYSREADSTRING(3), SYSCOPYSTRING(1), Delay_MS(1), PRINT(1), CHECKBUTTONS2(1), PRINT(2), LOCATE(3), HSERPRINTCRLF(1), STR(1), HSERPRINT(1)</td></tr>
+<tr><td>ADC</td><td>24</td><td>172</td><td>SYSMULTSUB16(1), SYSREADSTRING(4), SYSCOPYSTRING(1), Delay_MS(1), FNLSR(1), LEFTPAD(1), LOCATE(2), READAD10(1), PRINT(3), CLS(1), HSERPRINTCRLF(1), STR(2), HSERPRINT(1)</td></tr>
+<tr><td>VSR</td><td>41</td><td>206</td><td>SYSREADSTRING(4), SYSCOPYSTRING(1), Delay_MS(1), PAD(1), CHECKBUTTONS2(1), SCALE(1), READAD(1), PRINT(3), LOCATE(3), HSERPRINTCRLF(1), STR(2), HSERPRINT(1)</td></tr>
+<tr><td>DEBOUNCE</td><td>39</td><td>165</td><td>SYSREADSTRING(4), SYSCOPYSTRING(1), Delay_MS(1), PRINT(1), CHECKBUTTONS3(2), LOCATE(3), PRINT(3), CLS(1), HSERPRINTCRLF(1), STR(1), HSERPRINT(1)</td></tr>
+<tr><td>PWM</td><td>45</td><td>263</td><td>SYSDIVSUB16(1), SYSMULTSUB16(1), SYSREADSTRING(5), SYSCOPYSTRING(1), SYSCOMPLESSTHANINT(1), PWMOFF(1), LEFTPAD(1), ABS(1), READAD(1), HPWM(2), LOCATE(3), PRINT(4), CLS(1), HSERPRINTCRLF(1), STR(2), HSERPRINT(1)</td></tr>
+<tr><td>TIMER_1</td><td>58</td><td>239</td><td>SYSREADSTRING(5), SYSCOPYSTRING(1), Delay_MS(1), STOPTIMER(1), LEFTPAD(1), STARTTIMER(1), SETTIMER(1), INITTIMER1(1), PRINT(4), LOCATE(4), HSERPRINTCRLF(1), STR(2), HSERPRINT(1)</td></tr>
+<tr><td>INTERRUPTS</td><td>43</td><td>193</td><td>SYSREADSTRING(5), SYSCOPYSTRING(1), STOPTIMER(2), CHECKBUTTONS3(2), STARTTIMER(2), INITTIMER0(1), PRINT(4), LOCATE(4), HSERPRINTCRLF(1), STR(1), HSERPRINT(1)</td></tr>
+<tr><td>LAB_TIMER0_ISR</td><td>5</td><td>20</td><td></td></tr>
+<tr><td>SLEEPWAKEUP</td><td>46</td><td>215</td><td>SYSREADSTRING(6), SYSCOPYSTRING(1), SYSCOMPLESSTHAN(1), Delay_MS(1), CHECKBUTTONS2(1), PRINT(1), PRINT(5), LOCATE(6), HSERPRINTCRLF(1), STR(1), HSERPRINT(1)</td></tr>
+<tr><td>EEPROM</td><td>38</td><td>235</td><td>SYSREADSTRING(5), SYSCOPYSTRING(1), STOPTIMER(1), FNLSR(1), LEFTPAD(1), _HEXPICAS(1), LOCATE(3), NVMADR_EPREAD(1), STARTTIMER(1), SETTIMER(1), INITTIMER1(1), PRINT(5), CLS(1), RANDOM(1), READAD(1), RANDOMIZE(1), HSERPRINTCRLF(1), STR(2), HSERPRINT(1)</td></tr>
+<tr><td>MEMORY_ISR</td><td>48</td><td>216</td><td>SYSREADSTRING(4), STARTTIMER(1), SETTIMER(1), STOPTIMER(1), HSERPRINTCRLF(1), HSERPRINT(1), PRINT(1), HSERPRINT(2), PRINT(2), LOCATE(3), READAD10(1), PFMWRITE(1), READAD(1), NVMADR_EPWRITE(1)</td></tr>
+<tr><td>LCD</td><td>118</td><td>541</td><td>SYSCOPYSTRING(1), SYSREADSTRING(15), Delay_MS(3), Delay_S(10), LCDCURSOR(12), LOCATE(16), HSERPRINTCRLF(1), STR(1), HSERPRINT(1), PRINT(14), CLS(9)</td></tr>
+<tr><td>BUTTONPRESSEDISR</td><td>5</td><td>27</td><td>SYSCOMPEQUAL(1)</td></tr>
+<tr><td>NVMEMORY</td><td>50</td><td>303</td><td>SYSREADSTRING(5), SYSCOPYSTRING(1), SYSCOMPEQUAL32(1), Delay_S(1), STOPTIMER(1), FNLSR(1), _HEXPICAS(5), LOCATE(3), PFMREADWORD(1), STARTTIMER(1), SETTIMER(1), INITTIMER1(1), MEMORY_ISR(1), PRINT(9), CLS(1), HSERPRINTCRLF(1), STR(1), HSERPRINT(1)</td></tr>
+<tr><td>I2CDISCOVERY</td><td>63</td><td>382</td><td>SYSDIVSUB(1), SYSREADSTRING(11), SYSCOPYSTRING(1), HI2CSTOP(1), HI2CSEND(2), HI2CSTART(1), _HEXPICAS(3), PRINT(2), LOCATE(2), HSERPRINTCRLF(7), STR(1), HSERPRINT(12), HI2CMODE(1)</td></tr>
+<tr><td>I2CTEMPERATURE</td><td>45</td><td>166</td><td>SYSREADSTRING(3), SYSCOPYSTRING(1), LCDWRITECHAR(1), PRINT(1), HI2CSTOP(1), HI2CRECEIVE(1), HI2CRESTART(1), HI2CSEND(3), HI2CSTART(1), LCDCREATECHAR(1), PRINT(2), LOCATE(2), CLS(1), HSERPRINTCRLF(1), STR(1), HSERPRINT(1), HI2CMODE(1)</td></tr>
+<tr><td>I2CEEPROM</td><td>94</td><td>496</td><td>SYSREADSTRING(14), SYSCOPYSTRING(1), Delay_S(1), CHECKBUTTONS2(1), EEPROM_RD_ARRAY(1), EEPROM_WR_ARRAY(1), HSERPRINT(3), PRINT(3), LOCATE(2), CLS(1), HSERPRINTCRLF(8), STR(1), HSERPRINT(11), HI2CMODE(1)</td></tr>
+<tr><td>CLOCK</td><td>26</td><td>104</td><td>SYSREADSTRING(2), SYSCOPYSTRING(1), STARTTIMER(1), PRINT(1), LOCATE(1), CLS(1), HSERPRINTCRLF(1), STR(1), HSERPRINT(1)</td></tr>
+<tr><td>BUZZER</td><td>20</td><td>93</td><td>SYSREADSTRING(3), SYSCOPYSTRING(1), CHECKBUTTONS2HELDDOWN(1), PLAYRTTTL(1), PRINT(1), CLS(1), HSERPRINTCRLF(1), STR(1), HSERPRINT(1)</td></tr>
+<tr><td>CHECKBUTTONS3</td><td>6</td><td>13</td><td></td></tr>
+<tr><td>CHECKBUTTONS2</td><td>9</td><td>23</td><td>Delay_MS(1)</td></tr>
+<tr><td>CHECKBUTTONS2HELDDOWN</td><td>3</td><td>6</td><td></td></tr>
+<tr><td>NEXTLAB</td><td>5</td><td>10</td><td></td></tr>
+<tr><td>EEPROM_WR_ARRAY</td><td>44</td><td>80</td><td>SYSDIVSUB16(1), HI2CSTOP(2), HI2CSEND(7), HI2CRESTART(2)</td></tr>
+<tr><td>EEPROM_RD_ARRAY</td><td>40</td><td>72</td><td>SYSCOMPLESSTHAN(1), HI2CSTOP(1), HI2CRECEIVE(2), HI2CSEND(4), HI2CRESTART(2)</td></tr>
+<tr><td>INITSOUNDPLAY</td><td>6</td><td>10</td><td></td></tr>
+<tr><td>PLAYRTTTL</td><td>113</td><td>304</td><td>SYSCOMPLESSTHAN(6), SOUNDPLAYTONE(3)</td></tr>
+<tr><td>SOUNDPLAYTONE</td><td>33</td><td>283</td><td>SYSMULTSUB16(5), SYSDIVSUB16(7), SYSCOMPLESSTHAN16(2), Delay_10US(2), Delay_MS(1)</td></tr>
+<tr><td>_HEXPICAS</td><td>15</td><td>41</td><td></td></tr>
+<tr><td>READAD</td><td>74</td><td>316</td><td>Delay_10US(1)</td></tr>
+<tr><td>READAD10</td><td>46</td><td>321</td><td>Delay_10US(1)</td></tr>
+<tr><td>INITPWM</td><td>1480</td><td>23</td><td></td></tr>
+<tr><td>PWMOFF</td><td>1</td><td>2</td><td></td></tr>
+<tr><td>HPWM</td><td>482</td><td>136</td><td>SYSDIVSUB32(1), CALCULATEDUTY(1)</td></tr>
+<tr><td>CALCULATEDUTY</td><td>13</td><td>81</td><td>SYSDIVSUB32(1), SYSMULTSUB32(1)</td></tr>
+<tr><td>NVMADR_EPWRITE</td><td>121</td><td>50</td><td></td></tr>
+<tr><td>NVMADR_EPREAD</td><td>103</td><td>14</td><td></td></tr>
+<tr><td>SCALE</td><td>5</td><td>77</td><td>SYSDIVSUB32(1), SYSMULTSUB32(1)</td></tr>
+<tr><td>ABS</td><td>5</td><td>17</td><td></td></tr>
+<tr><td>FNLSR</td><td>5</td><td>17</td><td></td></tr>
+<tr><td>FNLSR</td><td>5</td><td>14</td><td></td></tr>
+<tr><td>LOCATE</td><td>7</td><td>24</td><td>Delay_10US(1), LCDNORMALWRITEBYTE(1)</td></tr>
+<tr><td>CLS</td><td>5</td><td>29</td><td>Delay_MS(1), LCDNORMALWRITEBYTE(2)</td></tr>
+<tr><td>INITLCD</td><td>244</td><td>102</td><td>Delay_MS(3), CLS(1), LCDNORMALWRITEBYTE(3)</td></tr>
+<tr><td>PRINT</td><td>8</td><td>33</td><td>LCDNORMALWRITEBYTE(1)</td></tr>
+<tr><td>PRINT</td><td>13</td><td>62</td><td>SYSDIVSUB(2), SYSCOMPLESSTHAN(2), LCDNORMALWRITEBYTE(3)</td></tr>
+<tr><td>LCDWRITECHAR</td><td>3</td><td>9</td><td>Delay_10US(1), LCDNORMALWRITEBYTE(1)</td></tr>
+<tr><td>CHECKBUSYFLAG</td><td>40</td><td>50</td><td></td></tr>
+<tr><td>LCDNORMALWRITEBYTE</td><td>223</td><td>74</td><td>CHECKBUSYFLAG(1)</td></tr>
+<tr><td>LCDNORMALREADBYTE</td><td>54</td><td>51</td><td></td></tr>
+<tr><td>LCDCURSOR</td><td>30</td><td>78</td><td>LCDNORMALWRITEBYTE(1)</td></tr>
+<tr><td>LCDCREATECHAR</td><td>32</td><td>49</td><td>Delay_10US(3), LCDNORMALWRITEBYTE(3), LCDNORMALREADBYTE(1)</td></tr>
+<tr><td>STARTTIMER</td><td>148</td><td>27</td><td></td></tr>
+<tr><td>SETTIMER</td><td>145</td><td>46</td><td></td></tr>
+<tr><td>STOPTIMER</td><td>136</td><td>27</td><td></td></tr>
+<tr><td>INITTIMER0</td><td>22</td><td>22</td><td></td></tr>
+<tr><td>INITTIMER1</td><td>84</td><td>43</td><td>SYSCOMPLESSTHAN(2)</td></tr>
+<tr><td>INITSYS</td><td>1134</td><td>29</td><td></td></tr>
+<tr><td>SYSCOPYSTRING</td><td>118</td><td>18</td><td></td></tr>
+<tr><td>SYSREADSTRING</td><td>114</td><td>21</td><td></td></tr>
+<tr><td>SYSMULTSUB16</td><td>73</td><td>17</td><td></td></tr>
+<tr><td>SYSMULTSUB32</td><td>43</td><td>67</td><td>SYSCOMPLESSTHAN32(1)</td></tr>
+<tr><td>SYSDIVSUB</td><td>48</td><td>22</td><td></td></tr>
+<tr><td>SYSDIVSUB16</td><td>38</td><td>56</td><td>SYSCOMPEQUAL16(1)</td></tr>
+<tr><td>SYSDIVSUB32</td><td>40</td><td>94</td><td>SYSCOMPEQUAL32(1)</td></tr>
+<tr><td>SYSCOMPEQUAL</td><td>20</td><td>5</td><td></td></tr>
+<tr><td>SYSCOMPEQUAL16</td><td>34</td><td>9</td><td></td></tr>
+<tr><td>SYSCOMPEQUAL32</td><td>52</td><td>15</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHAN</td><td>23</td><td>5</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHAN16</td><td>38</td><td>14</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHAN32</td><td>63</td><td>22</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHANINT</td><td>48</td><td>44</td><td></td></tr>
+<tr><td>PFMREADWORD</td><td>8</td><td>8</td><td></td></tr>
+<tr><td>PFMWRITE</td><td>8</td><td>104</td><td>SYSDIVSUB32(2), _PFMWRITEBLOCK(1), _PFMREADBLOCK(1)</td></tr>
+<tr><td>_PFMREADBLOCK</td><td>19</td><td>88</td><td>SYSMULTSUB32(2), SYSCOMPLESSTHAN16(2)</td></tr>
+<tr><td>_PFMWRITEBLOCK</td><td>84</td><td>131</td><td>SYSMULTSUB32(3), SYSCOMPLESSTHAN16(2)</td></tr>
+<tr><td>INITRANDOM</td><td>2</td><td>5</td><td></td></tr>
+<tr><td>RANDOM</td><td>8</td><td>40</td><td></td></tr>
+<tr><td>RANDOMIZE</td><td>5</td><td>19</td><td>SYSCOMPEQUAL16(1)</td></tr>
+<tr><td>STR</td><td>36</td><td>180</td><td>SYSDIVSUB16(4), SYSCOMPLESSTHAN16(4)</td></tr>
+<tr><td>PAD</td><td>16</td><td>145</td><td>SYSREADSTRING(1), SYSCOMPLESSTHAN(1)</td></tr>
+<tr><td>LEFTPAD</td><td>13</td><td>115</td><td>SYSCOPYSTRING(1), SYSREADSTRING(1)</td></tr>
+<tr><td>INITUSART</td><td>396</td><td>13</td><td></td></tr>
+<tr><td>HSERSEND</td><td>347</td><td>11</td><td></td></tr>
+<tr><td>HSERPRINT</td><td>42</td><td>33</td><td>HSERSEND(1)</td></tr>
+<tr><td>HSERPRINT</td><td>18</td><td>61</td><td>SYSDIVSUB(2), SYSCOMPLESSTHAN(2), HSERSEND(3)</td></tr>
+<tr><td>HSERPRINTCRLF</td><td>4</td><td>18</td><td>HSERSEND(2)</td></tr>
+<tr><td>HI2CMODE</td><td>27</td><td>33</td><td></td></tr>
+<tr><td>HI2CSTART</td><td>22</td><td>14</td><td>HI2CWAITMSSP(1)</td></tr>
+<tr><td>HI2CRESTART</td><td>8</td><td>9</td><td>HI2CWAITMSSP(1)</td></tr>
+<tr><td>HI2CSTOP</td><td>14</td><td>18</td><td>HI2CWAITMSSP(1)</td></tr>
+<tr><td>HI2CSEND</td><td>19</td><td>25</td><td>HI2CWAITMSSP(1)</td></tr>
+<tr><td>HI2CRECEIVE</td><td>25</td><td>53</td><td>HI2CWAITMSSP(1)</td></tr>
+<tr><td>HI2CWAITMSSP</td><td>28</td><td>28</td><td></td></tr>
+<tr><td>HI2CINIT</td><td>4</td><td>2</td><td></td></tr>
+<tr><td>Delay_10US</td><td>0</td><td>9</td><td></td></tr>
+<tr><td>Delay_MS</td><td>0</td><td>18</td><td></td></tr>
+<tr><td>Delay_S</td><td>0</td><td>10</td><td>Delay_MS(1)</td></tr>
+<tr><td>SysStringTables</td><td>0</td><td>780</td><td></td></tr>
+<tr><td>SOUNDPLAYNOTENUMBERS</td><td>0</td><td>21</td><td></td></tr>
+<tr><td>SOUNDPLAYNOTEPERIODS</td><td>0</td><td>48</td><td></td></tr>
+<tr><td>INTERRUPT</td><td>0</td><td>150</td><td></td></tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,175 @@
+;
+; MEGA_4809_USER_ROW_EEP_RW.asm
+;
+; Created: 8/27/2024 10:30:12 PM
+; Author : cribcat
+; 
+; the book says USER ROW contains a page [64 Bytes] of DATA space that opperates 
+; like the internal EEPROM. 
+
+; 7.6 User Row (USERROW)
+; In addition to the EEPROM, the ATmega4808/4809 has one extra page of EEPROM memory that can be used for
+; firmware settings, the User Row (USERROW). This memory supports single-byte read and write as the normal
+; EEPROM. The CPU can write and read this memory as normal EEPROM.
+; © 2020 Microchip Technology Inc. Datasheet DS40002173A 
+
+; *This code writes each byte separately vs. a page. It then reads back and sends to USART 
+; 
+
+#include <m4809def.inc>
+
+.def tmp = r16
+.def tmp2 = r17
+.equ URReladdr = 0x00   ; adds offset to the 0x1400 base address of the EEPROM    
+                        ; so you can put DATA/READ where you need to in the USERROW eeprom
+.equ fclk = 20000000  ; for USART
+.equ BAUD = 57600     ; for USART
+.equ fBAUD = ((64 * fclk)/(16 * BAUD)+0.5)  ; for USART
+
+.cseg
+
+.org 0 rjmp start
+start:
+
+chgPrescaler:
+		ldi tmp, CPU_CCP_IOREG_gc
+		clr tmp2          
+		out CPU_CCP, tmp              ; Change Protection 
+		sts CLKCTRL_MCLKCTRLB, tmp2   ; no Prescaler
+		sts CLKCTRL_MCLKCTRLA, tmp2   ; 20MHz
+	
+		
+    rcall usart_SETUP
+	sei                       ; 
+
+
+	ldi r16, LOW(URReladdr)
+	ldi r17, HIGH(URReladdr)  ; load any offset you want
+
+    ldi	ZL, LOW(Hello*2)      ; point Z to data
+    ldi	ZH, HIGH(Hello*2)
+     
+    ldi	XL,LOW(0x1300)        ; load register pair 
+    ldi	XH, HIGH(0x1300)      ; eeprom counter : eepromstarts @ 0x1400
+    add XL,R16                ; add your offset to USERROW EEPROM START address in the X register pair
+	adc XH,r17 
+loop:
+    lpm	r18, Z+               ; get data from flash
+	cpi r18, 0                ; look for zero termination to stop writing eeprom (can use counter too)
+	breq read_USERROW         ; goto  read_USERROW  
+
+    rcall  USERROW_Write      ; writes 1 byte at a time 
+	adiw XL,1                 ; add 1 to X register pair XL,XH (r26,r27)
+	                          ; to increment 
+    rjmp loop
+	
+  
+USERROW_Write:   
+    lds	    YL, NVMCTRL_STATUS
+    sbrc	YL, NVMCTRL_EEBUSY_bp
+    rjmp	USERROW_Write           ; Wait for completion of previous write 
+	;-------------------------------     
+    st	X, r18                      ; write pagebuffer as if it were a memory location in ram   
+    in	YH, CPU_SREG				; save context SREG
+    cli						        ; make sure interrupts are disabled for critical section
+    ldi	YL, CPU_CCP_SPM_gc			; unlock CCP change protection for NVM command register
+    out	CPU_CCP, YL
+    ldi	YL, NVMCTRL_CMD_PAGEERASEWRITE_gc	; execute NVM erase/write
+    sts	NVMCTRL_CTRLA, YL
+    out	CPU_SREG, YH				; restore interrupt flag<<<<< not restoring flag in SIMULATOR
+
+
+;???????????????????????????????????????????????????????????????????????????????????????????????????????
+; Check if interupt was restored because the simulator SREG shows interrupt not restored... send it through serial
+    ;in tmp2, CPU_SREG
+	;rcall sendbyte     ; should send 0x80  if it sends 0x00... another mystery.
+;????????????????????????????????????????????????????????????????????????????????????????????????????????????	 
+; sends 0x80 in serial...context save is fine. 02 AUGUST 2024 
+                    
+	ret
+    ;--------------------------------
+
+	        
+read_USERROW:
+		ldi XL, LOW(0x1300)   ; eeprom start address
+		ldi XH, HIGH(0x1300)  ; point X to USERROW eeprom start
+		add XL,R16            ; add offset to read the bytes you just wrote(changed it to read all bytes)
+	    adc XH,r17 
+		   
+loopstart:
+		ldi r18, 64            ; number of characters to read and send
+readlOOP:
+		ld r17, X+
+		rcall sendbyte
+		rcall delay100ms
+		dec r18 
+		breq endloop
+		rjmp readlOOP 
+endloop: 
+          rjmp endloop          ; end
+
+usart_SETUP:
+
+	ldi tmp,low(fBAUD)		    ; load low value of fBAUD as calculated in the formula provided above
+	ldi tmp2,high(fBAUD)		 
+	sts USART3_BAUD,tmp		    ; store low fBAUD in BAUD register
+	sts USART3_BAUD + 1,tmp2	; store low fBAUD in BAUD register
+	
+	;ldi tmp,  USART_RXCIE_bm    ; enable recv complete int enable 
+	;sts  USART1_CTRLA,tmp  
+	
+	 
+	ldi tmp,USART_NORMAL_PMODE_DISABLED_gc|USART_NORMAL_SBMODE_1BIT_gc|USART_NORMAL_CHSIZE_8BIT_gc    ; parity even with two stop bits
+	sts USART3_CTRLC,tmp   
+	ldi tmp,USART_TXEN_bm   ; TX only     |	USART_RXEN_bm   
+	sts USART3_CTRLB,tmp
+	ldi tmp,1	
+	sts   PORTB_DIRSET,tmp  ; PB0 TX
+	inc tmp
+	sts   PORTB_DIRCLR,tmp	; PB1 rx			
+						
+	ret   
+	
+	; Send_Byte	  
+sendbyte:
+ 	lds tmp,USART3_STATUS		; copy USART status register to r16	
+	sbrs tmp,5			        ; skip next instruction if bit 5 is 1 means flag set for data transmit buffer 
+	rjmp sendbyte			    ; if DREIF = 0 ,bit 5 in r16 is 0 then loop back to sendbyte until DREIF = 1	
+	sts USART3_TXDATAL,tmp2		; store r16 in TXDATAL transmit data low register
+	ret	 
+
+
+delay100ms:              
+   push r20
+   push r19
+   push r18
+; Generated by delay loop calculator
+; at http://www.bretmulvey.com/avrdelay.html
+;
+; Delay 2 000 000 cycles
+; 100ms at 20 MHz
+
+    ldi  r18, 11
+    ldi  r19, 38
+    ldi  r20, 94
+L1: dec  r20
+    brne L1
+    dec  r19
+    brne L1
+    dec  r18
+    brne L1
+    rjmp PC+1
+
+	pop r18
+	pop r19
+	pop r20
+
+	ret
+
+
+
+Hello:
+    .db" hello world from USERROW! ", 0
+
+
+ 

@@ -1,0 +1,142 @@
+/*
+
+    This program setups the following:
+        A LCD as an 8Bit device, this is faster than 4bit LCD but uses 4 more ports
+        A KeyPad connected to J4
+        J6 is disconnected
+        Serial out on PORTC.6
+        Switches as inputs
+        ADC is analog input
+
+    The program uses the LCD to show the value of the ADC, state of the switches and last key pressed on the keypad
+*/
+
+#CHIP 16F15376
+#option explicit
+
+#CONFIG CLKOUTEN=OFF
+#CONFIG CP=OFF
+#CONFIG FEXTOSC=OFF
+#CONFIG FCMEN=ON
+#CONFIG LVP=OFF
+#CONFIG MCLRE=OFF
+#CONFIG RSTOSC=HFINT32
+#CONFIG WDTE=OFF
+#CONFIG WRTB=OFF
+#CONFIG WRTSAF=OFF
+
+    // LCD Setup Constants and connection settings 
+        #DEFINE LCD_IO 8 
+        #DEFINE LCD_RS PORTA.1 
+        #DEFINE LCD_Enable PORTA.3
+        #DEFINE LCD_RW PORTA.2
+        #DEFINE LCD_DATA_PORT PORTD
+
+    // Keypad Setup Constants
+        #DEFINE KEYPAD_ROW_1 portb.7
+        #DEFINE KEYPAD_ROW_2 portb.6
+        #DEFINE KEYPAD_ROW_3 portb.5
+        #DEFINE KEYPAD_ROW_4 portb.4
+        #DEFINE KEYPAD_COL_1 portb.3
+        #DEFINE KEYPAD_COL_2 portb.2
+        #DEFINE KEYPAD_COL_3 portb.1
+        #DEFINE KEYPAD_COL_4 portb.0
+
+    // Setup the Switches as constants and set the DIRection
+        #DEFINE SW2_RA4 PORTA.4
+        #DEFINE SW3_RC2 PORTC.2
+        #DEFINE SW1_RE3 PORTE.3
+
+        DIR SW2_RA4 IN
+        DIR SW3_RC2 IN
+        DIR SW1_RE3 IN
+
+
+    // Serial Setup Constants and the PPS
+        #DEFINE USART_BAUD_RATE 9600
+        #DEFINE USART_TX_BLOCKING
+        #DEFINE USART_DELAY OFF
+
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #DEFINE PPSToolPart 16F15376
+
+    Sub InitPPS
+            
+            // Module: EUSART1
+            RC6PPS = 0x000F    // TX1 > RC6
+        
+        End Sub
+        // Add this code segment to your GCBASIC source program
+
+    Dim Direction As Bit
+    Dim Temp as Byte
+
+' ----- Main body of program commences here.
+
+    Print "GCBASIC 2024"
+    Locate 1,0
+    Print "PICDEM-2 DEMO BOARD"
+    Wait 3 s
+    CLS
+    Print "To operate keypad remove J6 jumper"
+            repeat 2
+                LCDCURSOR LCDOFF
+                wait 500 ms
+                LCDCURSOR LCDON
+                wait 500 ms
+                If !SW2_RA4 or !SW3_RC2 or !SW1_RE3 Then Exit Repeat
+            end repeat
+    CLS
+
+    Do Forever
+
+        'Get key value from keypad
+        Temp = KeypadData
+        'If a key is pressed, then display it
+        If Temp <> KEY_NONE Then
+
+            // Send to Serial
+            HSerPrint Temp
+            HserPrintCRLF
+
+            // Send to LCD
+            Locate 0,0
+            Print "Key Pressed :"
+            Print LeftPad ( ByteToString(Temp), 2, " ")
+
+            'Wait until key is released
+            wait while KeypadData <> KEY_NONE
+
+        End If
+
+        If Direction = 0 Then
+            PortB++    
+        Else
+            PortB--
+        End IF
+        
+        Locate 1,0
+        Print "ADC/RA0 :"
+        Print LeftPad ( ByteToString(ReadAD ( AN0 )), 3, " ")
+
+        Locate 0, 16
+        Print "SW1_RE3"
+        Locate 1, 19
+        Print SW1_RE3 
+
+        Locate 0, 24
+        Print "SW2_RA4"
+        Locate 1, 27
+        Print SW2_RA4
+
+        Locate 0, 32
+        Print "SW3_RC2"
+        Locate 1, 35
+        Print SW3_RC2
+
+    Loop
+
+
+
