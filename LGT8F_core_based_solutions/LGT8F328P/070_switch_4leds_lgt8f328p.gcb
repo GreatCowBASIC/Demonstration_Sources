@@ -48,7 +48,7 @@
 
     #DEFINE SWITCH porte.3
 
-    #DEFINE LEDDELAY  10
+    #DEFINE LEDDELAY  1000
 
     'Set LED as an output
     Dir LED1 Out

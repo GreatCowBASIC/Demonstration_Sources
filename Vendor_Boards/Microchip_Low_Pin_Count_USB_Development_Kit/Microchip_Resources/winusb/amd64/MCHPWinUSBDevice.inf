@@ -1,0 +1,108 @@
+[Version]
+Signature = "$Windows NT$"
+Class = MicrochipTools
+ClassGuid= {DEB97E2C-8B0F-446F-B280-7CFAC41C3BD9}
+
+Provider = %MFGNAME%
+DriverVer=12/08/2015,1.0.0.5
+CatalogFile=MCHPWinUSBDevice.cat	
+
+;----------------------------------------------------------------------------
+
+[Manufacturer]
+%MFGNAME% = MyDevice_WinUSB,NTx86,NTamd64
+
+;----------------------------------------------------------------------------
+
+[MyDevice_WinUSB.NTx86]
+
+[MyDevice_WinUSB.NTamd64]
+%DESCRIPTION%=USB_Install,USB\VID_04d8&PID_9004
+%DESCRIPTION%=USB_Install,USB\VID_04d8&PID_9009
+%DESCRIPTION%=USB_Install,USB\VID_04d8&PID_A001
+%DESCRIPTION%=USB_Install,USB\VID_04d8&PID_9010
+%DESCRIPTION%=USB_Install,USB\VID_04d8&PID_9011
+%DESCRIPTION%=USB_Install,USB\VID_04d8&PID_9012
+%DESCRIPTION%=USB_Install,USB\VID_04d8&PID_9013
+%DESCRIPTION%=USB_Install,USB\VID_04d8&PID_9014
+%DESCRIPTION%=USB_Install,USB\VID_04d8&PID_00e0
+%DESCRIPTION%=USB_Install,USB\VID_04d8&PID_00e1
+%DESCRIPTION%=USB_Install,USB\VID_04d8&PID_8001
+
+;=========================================================================================
+;ClassInstall32 and ClassInstall_AddReg sections used to make new device manager category.
+;=========================================================================================
+[ClassInstall32]
+AddReg=ClassInstall_AddReg
+
+[ClassInstall_AddReg]
+HKR,,,,%DEVICEMANAGERCATEGORY%
+HKR,,Icon,,"-20"
+
+
+;==================== Installation ===================
+
+[USB_Install]
+Include=winusb.inf
+Needs=WINUSB.NT
+
+[USB_Install.Services]
+Include=winusb.inf
+AddService=WinUSB,0x00000002,WinUSB_ServiceInstall
+
+[WinUSB_ServiceInstall]
+DisplayName     = %WinUSB_SvcDesc%
+ServiceType     = 1
+StartType       = 3
+ErrorControl    = 1
+ServiceBinary   = %12%\WinUSB.sys
+
+[USB_Install.Wdf]
+KmdfService=WINUSB, WinUsb_Install
+UmdfServiceOrder=WINUSB
+
+[WinUSB_Install]
+KmdfLibraryVersion=1.11
+
+[USB_Install.HW]
+AddReg=Dev_AddReg
+
+[Dev_AddReg]
+HKR,,DeviceInterfaceGUIDs,0x10000,"{58D07210-27C1-11DD-BD0B-0800200C9a66}"
+
+[USB_Install.CoInstallers]
+AddReg=CoInstallers_AddReg
+CopyFiles=CoInstallers_CopyFiles
+
+[CoInstallers_AddReg]
+HKR,,CoInstallers32,0x00010000,"winusbcoinstaller2.dll","WUDFUpdate_01011.dll","WdfCoInstaller01011.dll,WdfCoInstaller"
+
+[CoInstallers_CopyFiles]
+winusbcoinstaller2.dll
+WdfCoInstaller01011.dll
+WUDFUpdate_01011.dll
+
+[DestinationDirs]
+CoInstallers_CopyFiles=11
+
+; ================= Source Media Section =====================
+
+
+[SourceDisksNames.amd64]
+2 = %DISK_NAME%,,,
+
+[SourceDisksFiles.amd64]
+winusbcoinstaller2.dll=2
+WdfCoInstaller01011.dll=2
+WUDFUpdate_01011.dll=2
+
+
+; =================== Strings ===================
+
+[Strings]
+MFGNAME="Microchip Technology, Inc."
+DESCRIPTION="Microchip WinUSB Device"
+WinUSB_SvcDesc="WinUSB Device"
+DISK_NAME="WinUSB Device Install Disk"
+DEVICEMANAGERCATEGORY="Microchip Tools"
+
