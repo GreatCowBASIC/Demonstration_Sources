@@ -1,0 +1,65 @@
+/******************************************************************
+Lesson "Serial Buffer"
+
+This program demonstrates how to read the serial and send serial data.
+
+The program receives a character into the buffer and sends back. Try sending large volumes of characters…​..
+
+GCBASIC Header block
+
+@author  Evan R. Venn
+@licence GPL
+@version 1.00
+@date    20/09/2024
+*/
+' ----- Configuration
+'Chip Settings.
+#CHIP 16F15256
+#OPTION Explicit
+
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #define PPSToolPart 16F15256
+
+    Sub InitPPS
+            
+        // Module: EUSART1
+        RC6PPS = 0x0005    // TX1 > RC6
+        RX1DTPPS = 0x0017    // RC7 > RX1
+        
+        End Sub
+    // Add this code segment to your GCBASIC source program
+
+'Setup Serial port
+    #DEFINE USART_BAUD_RATE 19200
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
+
+'' ------------------PORTC-----------------
+'' Bit#:  -7---6---5---4---3---2---1---0---
+'' IO:    -RX|TX| A |-I---I----------------
+''-----------------------------------------
+''
+
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+
+' Now assumes Serial Terminal is operational
+
+    Dim InChar
+
+    HSerPrintCRLF
+    HSerPrint "Serial Loop Results"
+    HSerPrintCRLF 2
+
+Do Forever
+
+    HSerReceive InChar  'wait for char from Software-UART
+    If InChar <> DEFAULTUSARTRETURNVALUE Then
+        HSerSend InChar       'send back char to Hardware-UART
+    End If
+Loop
+End
