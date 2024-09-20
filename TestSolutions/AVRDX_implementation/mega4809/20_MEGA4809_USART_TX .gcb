@@ -1,0 +1,27 @@
+#chip mega4809
+#option Explicit
+
+#DEFINE USART3_BAUD_RATE 9600
+#DEFINE USART3_TX_BLOCKING
+#DEFINE USART3_DELAY OFF
+
+#DEFINE USART1_BAUD_RATE 9600
+#DEFINE USART1_TX_BLOCKING
+#DEFINE USART1_DELAY OFF
+
+    // Main loop  
+    Dim xx as Word
+    xx = 0
+    Do
+
+        wait 1 s
+        wait 1 s
+        HSerPrintStringCRLF WordToString( xx) + _ 
+            ": Hardware-UART1", 1        
+        HSerPrintStringCRLF WordToString( xx) + _ 
+            ": Hardware-UART3", 3
+        
+        xx = xx + 1
+
+    Loop
+

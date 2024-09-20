@@ -1,0 +1,36 @@
+#chip mega4809            ' Declare the Target Processor and Speed
+#option explicit          ' Require Explicit declaration of Variables
+  
+  // Main - generate PWM signal on PF5
+
+    // Sets PA7 as clock out for currently selected clock
+    AVRDX_PROTECTWRITECPP( CLKCTRL_MCLKCTRLA, CLKCTRL_MCLKCTRLA | CLKCTRL_CLKOUT_bm )
+
+    // Registers 
+
+    #DEFINE TCB_CMP_EXAMPLE_VALUE 0x40FF   ; 40 is the duty and FF is the period
+      Dim TCB1_CCMP_REGISTERS as Word Alias TCB1_CCMPH, TCB1_CCMPL
+
+    // Set the PWM duty and Period
+    TCB1_CCMP_REGISTERS = TCB_CMP_EXAMPLE_VALUE
+    TCB1_CTRLA = TCB_ENABLE_bm|TCB_CLKSEL_CLKDIV1_gc
+    TCB1_CTRLB = TCB_CCMPEN_bm|TCB_CNTMODE_PWM8_gc
+
+    // Change the default port to PF5 from the default is PA3
+    PORTMUX_TCBROUTEA.PORTMUX_TCB1_bp = 1
+    DIR PORTF.5 OUT                         ; PF5 to output
+
+    Do
+      // Change Duty
+      Dim myDuty as Byte
+      For myDuty = 0 to 255 Step 5
+        TCB1_CCMPH = myDuty
+        wait 25 ms
+      Next
+      For myDuty = 254 to 1 Step -5
+        TCB1_CCMPH = myDuty
+        wait 25 ms
+      Next
+    Loop
+
+END

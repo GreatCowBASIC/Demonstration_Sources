@@ -1,0 +1,24 @@
+#chip mega4809
+#option Explicit
+
+#DEFINE USART3_BAUD_RATE 9600
+#DEFINE USART3_TX_BLOCKING
+#DEFINE USART3_RX_BLOCKING
+#DEFINE USART3_DELAY OFF
+
+    // This assumes you are using a serial PC terminal.  
+
+    // Main program
+
+    // Wait for terminal to settle
+        wait 1 s
+        HSerPrintStringCRLF "GCBASIC serial loop back"
+        HSerPrintStringCRLF "Data received will be sent back"
+        HserPrintCRLF
+        PulseOut PortF.5, 100 ms
+        wait 100 ms
+
+    Do
+        HSerSend ( HSerReceive (3) , 3)  // HserSend needs to be told which USART to use, this will be fixed when only one USART is defined in program
+    Loop
+

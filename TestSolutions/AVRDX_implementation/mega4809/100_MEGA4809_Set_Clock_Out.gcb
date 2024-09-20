@@ -1,0 +1,38 @@
+#chip mega4809, 5            ' Declare the Target Processor and Speed
+#option explicit          ' Require Explicit declaration of Variables
+
+  
+  // Main 
+
+    // Sets PA7 as clock out for currently selected clock
+    AVRDX_PROTECTWRITECPP( CLKCTRL_MCLKCTRLA, CLKCTRL_MCLKCTRLA | CLKCTRL_CLKOUT_bm )
+
+    'This program controls the brightness of an LED on gpio.1
+    'using the software PWM routine and a potentiometer.
+    
+    ; ----- Constants
+      'PWM constant. This is a required constant.
+      #define PWM_Out1 PORTF.5
+
+    ; ----- Define Hardware settings
+      'PWM port out.  This is not required but good practice.
+      dir PWM_Out1 out
+
+      'A potentiometer is attached to ANO
+
+    ; ----- Variables
+      Dim duty as Byte
+
+    ; ----- Main body of program commences here.
+      Do
+        for duty = 0 to 255
+          ' cycles is a purely arbitrary value
+            PWMOut 1, duty , 1
+        next
+        for duty = 254 to 1 step -1
+          ' cycles is a purely arbitrary value
+            PWMOut 1, duty , 1
+        next
+      Loop
+    end  
+END

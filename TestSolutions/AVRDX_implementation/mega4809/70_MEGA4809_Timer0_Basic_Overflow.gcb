@@ -1,0 +1,43 @@
+#chip mega4809
+#option Explicit
+
+Dim ccounter as Byte
+ccounter = 0 
+
+/*
+    Some examples for testing
+
+    PS_0_1024   0x4C4A = 1s
+    PS_0_64     31250 =  100ms
+
+*/
+
+// Initialise the Timer
+InitTimer0 ( Osc, PS_0_1024 )
+// Set the timer
+SetTimer ( 0 , 0x4C4A )
+StartTimer ( 0 )
+
+Do
+    // Has the timer overflowed ?
+    If TCA0_SINGLE_INTFLAGS.TCA_SINGLE_OVF_bp = 1 Then
+
+
+        Select Case ccounter
+
+            Case 0 to 9
+                PulseOutInv PortF.5, 100 ms
+                // Clear the timer overflow flag
+                TCA0_SINGLE_INTFLAGS.TCA_SINGLE_OVF_bp = 1
+
+            Case 10
+                StopTimer ( 0 )
+                wait 5 s
+                ccounter = 0
+                StartTimer ( 0 )
+
+        End Select
+        ccounter++
+
+    End If
+Loop
