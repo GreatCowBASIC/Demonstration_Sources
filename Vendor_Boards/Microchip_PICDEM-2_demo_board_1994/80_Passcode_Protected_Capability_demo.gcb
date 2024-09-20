@@ -105,7 +105,7 @@
             end repeat
 
     
-    // Enter the passcode !! store in the EEPROM
+    // Enter the passcode !! stored in the EEPROM
     Do While NOT ValidPassCode
     Loop
 
