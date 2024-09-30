@@ -1,0 +1,114 @@
+/*
+This demo sets the LED on and off.
+The key test program is the the PORT.PIN operates as expected.
+The GCBASIC generated ASM can also be compiled in Microchip STUDIO 7.x then debugged, programmed etc.
+
+Enjoy
+
+        ------------PORTA---------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ---------------------------------
+    IO:    ---------------------------------
+
+        ------------PortF----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    -----SW-LED----------------------
+    IO:    --------------------------==-----
+
+        ------------PORTC----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ---------------------------------
+    IO:    ---------------------------------
+*/
+
+#chip mega4809, 10
+#option explicit
+
+    // USART settings for USART1 on the chip which is sent via the USB to the PC
+    #DEFINE USART3_BAUD_RATE 9600
+    #DEFINE USART3_TX_BLOCKING
+    #DEFINE USART3_DELAY 0
+
+
+    // Switch
+    #DEFINE SWITCH portf.6
+    DIR SWITCH in
+
+    ; ----- Define Hardware settings for hwi2c
+    #define HI2C_BAUD_RATE 100
+    #define HI2C_DATA PORTA.2  
+    #define HI2C_CLOCK PORTA.3 
+    HI2CMode Master
+    
+  ; ----- Main body of program commences here.
+    //  Now assumes Serial Terminal is operational
+    Dim DeviceID as byte
+    Dim DisplayNewLine as Byte
+    Dim I2CsearchStatus as Byte               // Pseudo-boolean variable(0=NonFound_Incorrect I2C ports selected, 1=Found, 2=Error_Missing PullUp resistors or Check your connnections).
+
+    Do
+        HSerPrintCRLF 2
+        HSerPrint "Show Hardware TWI/I2C Bus"
+        HSerPrintCRLF 2
+        HSerPrint "     "
+        for DeviceID = 0 to 15
+          HSerPrint hex(deviceID)             // First row: "00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F".
+          HSerPrint " "
+        next
+        for DeviceID = 0 to 255
+
+          DisplayNewLine = DeviceID % 16
+          if DisplayNewLine = 0 Then
+            HSerPrintCRLF
+            HserPrint hex(DeviceID)           // First column: "00" t/m "F0".
+            HSerPrint ": "
+          end if
+          HSerPrint " "
+
+          HI2CStart
+
+          if HI2CWaitMSSPTimeout <> True then 'I2C timeout?
+
+            HI2CSend (DeviceID)               // Found I2Caddress.
+
+            if HI2CAckPollState = false then
+              I2CsearchStatus=1               // Found something! But can also be "Error_Missing PullUp resistors or Check your connnections".
+              HSerPrint hex(DeviceID)         // Display found I2Caddress in table.
+          
+              HI2CSend (0)
+          
+            Else
+              // HSerPrint hex(TWI0_MSTATUS) //"--"
+              HSerPrint "--"
+            End if
+
+          Else
+            // Check and Save for "Error_Missing PullUp resistors or Check your connnections"!
+            I2CsearchStatus=2
+            HSerPrintCRLF
+            hserprint "ERROR: Missing PullUp resistors or Check your connnections!"
+            HSerPrintCRLF
+          end if
+        
+          HI2CStop
+        
+        Next
+        HSerPrintCRLF 2
+        HSerPrint   "End of Search"           // Search end.
+        HSerPrintCRLF 2
+        Select Case I2CsearchStatus           // Analyse I2C search.
+          Case 0
+            hserprint "NOT SUCCESSFUL"
+            HSerPrintCRLF
+          Case 1
+            hserprint "SUCCESSFUL"
+            HSerPrintCRLF
+        End Select
+        HSerPrintCRLF 2
+        I2CsearchStatus=0                     // Reset variable.
+
+        Wait While SWITCH = 1
+        
+    Loop
+
+END

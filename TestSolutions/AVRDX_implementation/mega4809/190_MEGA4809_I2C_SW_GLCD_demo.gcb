@@ -5,14 +5,9 @@
 
   // Define I2C settings
     #define I2C_MODE Master
-    #define I2C_DATA   PORTD.5
-    #define I2C_CLOCK  PORTD.4
+    #define I2C_DATA   PORTA.2
+    #define I2C_CLOCK  PORTA.3
     #define I2C_DISABLE_INTERRUPTS ON
-    // Set the following to 0 us to remove all delays, once you have the GLCD working
-    // #define I2C_END_DELAY 0 us
-    // #define I2C_BIT_DELAY 0 us
-    // #define I2C_CLOCK_DELAY 0 us
-    
 
 
     // Define GLCD Hardware settings

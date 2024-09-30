@@ -1,0 +1,63 @@
+/*
+
+    This code example shows how to initialize the Timer/Counter Type A (TCA) in Dual Slope mode to generate a 16-bit Pulse-Width Modulation (PWM) signal with 1 kHz frequency and 50% duty cycle on a GPIO pin.
+
+    The following configurations must be made for this project:
+
+    System clock is 3_33 MHz
+
+    TCA0:
+        Clock Selection: System clock/4
+        Timer Mode: 16-Bit (Normal)
+        1 kHz Frequency and 50% Duty Cycle
+        Waveform Generation Mode: Dual Slope PWM, Overflow on BOTTOM
+        Output on Channel 0
+    
+    Pin	Configuration
+        PA0	Digital output
+            
+    This code example showed how to initialize the TCA in Dual Slope mode to generate a 16-bit PWM signal with 1 kHz frequency and 50% duty cycle_
+
+    */
+
+#chip mega4809, 3.3333333
+#option Explicit
+
+#define PERIOD_EXAMPLE_VALUE        (0x01A0)
+#define DUTY_CYCLE_EXAMPLE_VALUE    (0x00D0)
+
+TCA0_init
+PORT_init
+
+Do
+Loop
+
+Sub TCA0_init
+
+    /* set waveform output on PORT A */
+    PORTMUX_TCAROUTEA = PORTMUX_TCA0_PORTA_gc
+    
+    TCA0_SINGLE_CTRLB = TCA_SINGLE_CMP0EN_bm | TCA_SINGLE_WGMODE_DSBOTTOM_gc            // enable compare channel 0; set dual-slope PWM mode
+    
+    /* disable event counting */
+    TCA0_SINGLE_EVCTRL.TCA_SINGLE_CNTEI_bm = 0
+    
+    // set PWM frequency
+    Dim TCA0_SINGLE_PERBUFFER as Word Alias TCA0_SINGLE_PERBUFH, TCA0_SINGLE_PERBUFL
+    TCA0_SINGLE_PERBUFFER  = PERIOD_EXAMPLE_VALUE   
+    
+    // set duty cycle (50%)
+    Dim TCA0_SINGLE_CMP0BUFFER as Word Alias TCA0_SINGLE_CMP0BUFH, TCA0_SINGLE_CMP0BUFL    
+    TCA0_SINGLE_CMP0BUFFER = DUTY_CYCLE_EXAMPLE_VALUE  
+    
+    // set clock source (sys_clk/4); start timer
+    TCA0_SINGLE_CTRLA = TCA_SINGLE_CLKSEL_DIV4_gc | TCA_SINGLE_ENABLE_bm        
+                                      
+    
+End Sub
+
+Sub PORT_init
+    /* set pin 0 of PORT A as output */
+    DIR PORTA.0 OUT
+End Sub
+

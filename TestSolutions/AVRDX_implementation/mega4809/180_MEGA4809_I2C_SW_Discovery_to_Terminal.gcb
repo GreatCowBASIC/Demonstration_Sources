@@ -5,8 +5,8 @@
 
   // Define I2C settings
     #define I2C_MODE Master
-    #define I2C_DATA   PORTD.5
-    #define I2C_CLOCK  PORTD.4
+    #define I2C_DATA   PORTA.2
+    #define I2C_CLOCK  PORTA.3
 
     #define I2C_DISABLE_INTERRUPTS ON
 
@@ -56,7 +56,7 @@
       HSerPrintCRLF 2
       HSerPrint   "End of Search"
       HSerPrintCRLF 2
-      wait 5 s
+      wait 1 s
     Loop
   END
 

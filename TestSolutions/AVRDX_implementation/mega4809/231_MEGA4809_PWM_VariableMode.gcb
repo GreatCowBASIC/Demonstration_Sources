@@ -1,0 +1,66 @@
+/*
+    This demonstration show the GCBASIC fixed mode PWM signal.
+
+    The fixed mode PWM signal always generates a PWM signal as follows:
+        16bit Normal mode TCA0 timer
+        PWM Frequency 38Hz
+        PWM Duty 50%
+        Always on the first PWM channel
+    
+    Directives are
+        #DEFINE PWM_FREQ 38  // this is the default
+        #DEFINE PWM_DUTY 50  // this is the default
+    
+    Controls are
+        PWMOn
+        PWMOff
+
+    This program is for the mega4809
+        The PWM signal is generaed PORTA.0
+        PORTA.0 is the TCA0/WO0_Channel 0 output port.pin
+
+    The output port may be different for other AVRDx chips.
+
+    Developers:
+
+        The supporting PWM script exposes - these can used in libraries
+            SCRIPT_PWM_PERIOD
+            SCRIPT_PWM_DUTY
+            SCRIPT_PWMPRESCALER
+
+*/
+#chip mega4809
+#option Explicit
+
+    #DEFINE PWM_FREQ 40
+    #DEFINE PWM_DUTY 50
+
+    // Set the PWM port.pin as an Output
+    // PORTA.0 is the TCA0/WO0_Channel 0 output port.pin
+
+    DIR PORTA.0 Out
+
+    // Flash the on-board LED to show the reset, or, any potential reset... :-)
+    Repeat 3
+        PulseOutInv PortF.5, 40 ms
+        wait 40 ms
+    End Repeat
+    
+    // Turn fixed mode PWM on using the constants
+    PWMon
+
+    Dim myDuty as Word
+    Do 
+        For myDuty = 0 to SCRIPT_PWM_PERIOD step 10
+            TCA0_Single_Compare0 = myDuty
+            wait 50 us
+        Next
+        wait 5 ms
+        For myDuty = [WORD]SCRIPT_PWM_PERIOD to 0 step -10
+            TCA0_Single_Compare0 = myDuty
+            wait 50 us
+        Next
+        wait 5 ms
+    Loop
+
+    End

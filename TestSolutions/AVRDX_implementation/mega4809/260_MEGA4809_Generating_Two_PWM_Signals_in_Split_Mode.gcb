@@ -1,0 +1,82 @@
+/*
+
+    This code example shows how to initialize the Timer/Counter Type A (TCA) in Split mode to generate two single-slope 8-bit Pulse-Width Modulation (PWM) signals on two GPIO pins_ The signals will be configured with different frequencies and different duty cycles, as follows:
+
+    1 kHz PWM signal with 50% duty cycle
+    3 kHz PWM signal with 25% duty cycle
+
+    The following configurations must be made for this project:
+
+    System clock is 3.33 MHz
+
+    TCA0:
+
+        Clock Selection: System clock/16
+        Timer Mode: 8-Bit (Split)
+        Signal with Output on PA0 has 1 kHz Frequency and 50% Duty Cycle
+        Signal with Output on PA3 has 3 kHz Frequency and 25% Duty Cycle
+        Output on Channel 0
+        Output on Channel 3
+
+    Pin	Configuration
+        PA0	Digital output
+        PA3	Digital output
+            
+    This code example shows how to initialize the TCA in Split mode to generate two single-slope 8-bit PWM signals on two GPIO pins, with independent duty cycle and frequency_
+
+    */
+
+#chip mega4809, 3.3333333
+#option Explicit
+
+#define PERIOD_EXAMPLE_VALUE_L        (0xCF)
+#define PERIOD_EXAMPLE_VALUE_H        (0x44)
+#define DUTY_CYCLE_EXAMPLE_VALUE_L    (0x68)
+#define DUTY_CYCLE_EXAMPLE_VALUE_H    (0x11)
+
+TCA0_init
+PORT_init
+
+Do
+Loop
+
+Sub TCA0_init
+
+    /* set waveform output on PORT A */
+    PORTMUX_TCAROUTEA = PORTMUX_TCA0_PORTA_gc;
+    
+    /* enable split mode */
+    TCA0_SPLIT_CTRLD = TCA_SPLIT_SPLITM_bm;                 
+    
+    /* enable compare channel 0 for the higher byte
+    enable compare channel 0 for the lower byte */
+    TCA0_SPLIT_CTRLB = TCA_SPLIT_HCMP0EN_bm | TCA_SPLIT_LCMP0EN_bm;    
+    
+    /* set the PWM frequencies and duty cycles */
+    TCA0_SPLIT_LPER = PERIOD_EXAMPLE_VALUE_L;                          
+    TCA0_SPLIT_LCMP0 = DUTY_CYCLE_EXAMPLE_VALUE_L;                           
+    TCA0_SPLIT_HPER = PERIOD_EXAMPLE_VALUE_H;                             
+    TCA0_SPLIT_HCMP0 = DUTY_CYCLE_EXAMPLE_VALUE_H;                               
+    
+    // set clock source (sys_clk/16); start timer
+    TCA0_SPLIT_CTRLA = TCA_SPLIT_CLKSEL_DIV16_gc | TCA_SPLIT_ENABLE_bm;         
+    
+End Sub
+
+Sub PORT_init
+    /* set pin 0 of PORT A as output */
+    DIR PORTA.0 OUT
+    DIR PORTA.3 OUT
+End Sub
+
+// must be used when switching from single mode to split mode
+sub TCA0_hardReset
+
+    /* stop timer */
+    TCA0_SINGLE_CTRLA.TCA_SINGLE_ENABLE_bm = 0
+    
+    /* force a hard reset */
+    TCA0_SINGLE_CTRLESET = TCA_SINGLE_CMD_RESET_gc; 
+
+End Sub
+

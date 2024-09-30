@@ -15,7 +15,6 @@
     Do
 
         wait 1 s
-        wait 1 s
         HSerPrintStringCRLF WordToString( xx) + _ 
             ": Hardware-UART1", 1        
         HSerPrintStringCRLF WordToString( xx) + _ 

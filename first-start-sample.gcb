@@ -27,6 +27,7 @@
 #CHIP 16f886
 '  #chip mega328p         'Uncomment to simply use the AVR chipset
 '  #chip LGT8F328P        'Uncomment to simply use the LGT chipset
+'  #chip mega4809        'Uncomment to simply use the AVRDx chipset
 
 
 // ----- Main body of program commences here.

@@ -1,0 +1,128 @@
+/*
+    This demo shows the GLCD capabilities.  This demo uses hardware TWI/I2C.
+
+    The GLCD commands are common to the hardware TWI/I2Cv and software TWI/I2C. These include:
+
+        GLCDCLS - clear the GLCD
+        BOX
+        LINE
+        GLCDPRINT
+        etc.
+
+    The GCBASIC generated ASM can also be compiled in Microchip STUDIO 7.x then debugged, programmed etc.
+
+    Enjoy
+
+        ------------PORTA---------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------SCL--SDA---------
+    IO:    ---------------------------------
+
+        ------------PORTB---------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------------------TX3--
+    IO:    ---------------------------------
+
+        ------------PortF----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    -----SW-LED----------------------
+    IO:    --------------------------==-----
+
+        ------------PORTC----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ---------------------------------
+    IO:    ---------------------------------
+*/
+
+#chip mega4809, 20
+#option explicit
+
+    //  ----- Define Hardware settings for hwi2c
+        #DEFINE HI2C_BAUD_RATE 400
+        #DEFINE HI2C_DATA PORTA.2  
+        #DEFINE HI2C_CLOCK PORTA.3 
+        HI2CMode Master
+
+    // DEFINE I2C SETTINGS
+        // #DEFINE I2C_MODE MASTER
+        // #DEFINE I2C_DATA   PORTA.2
+        // #DEFINE I2C_CLOCK  PORTA.3
+        // #DEFINE I2C_DISABLE_INTERRUPTS ON
+
+
+    // ----- Main body of program commences here.
+    // Define GLCD Hardware settings
+    #include <glcd.h>
+    #DEFINE GLCD_TYPE GLCD_TYPE_SSD1306
+    #DEFINE GLCD_I2C_ADDRESS 0X78
+
+    // Define variables
+
+    Dim BYTENUMBER, CCOUNT as Byte
+
+    CCount = 0
+    dim longNumber as long
+    longNumber = 123456 ' max value = 4294967290
+    dim wordNumber as Word
+    dim outstring as string
+    wordNumber = 0
+    byteNumber = 0
+
+    // ----- Main program
+
+    GLCDPrint 0, 0,   "GCBASIC"
+    GLCDPrint (0, 16, "Anobium 2024")
+    GLCDPrint (0, 32, "Portability Demo")
+    GLCDPrint (0, 48, ChipNameStr )
+
+    #IF DEF(HI2C_DATA)
+        GLCDPrint ( 80, 0, "(HW TWI)" )
+    #ELSE
+        GLCDPrint ( 80, 0, "(SW TWI)" )
+    #ENDIF
+
+
+    wait 5 s
+    GLCDCLS
+        
+
+    ' Prepare the static components of the screen
+    GLCDPrint ( 0,   0, "PrintStr")                                // Print some text
+    GLCDPrint ( 64,  0, "@")                                       // Print some more text
+    GLCDPrint ( 72,  0, ChipMhz)                                   // Print chip speed
+    GLCDPrint ( 86, 0, "Mhz")                                      // Print some text
+    GLCDDrawString( 0,8,"DrawStr")                                 // Draw some text
+    box 0,0,GLCD_WIDTH-1, GLCD_HEIGHT-1                            // Draw a box
+    box GLCD_WIDTH-5, GLCD_HEIGHT-5,GLCD_WIDTH-1, GLCD_HEIGHT-1    // Draw a box
+    Circle( 44,41,15)                                              // Draw a circle
+    line 64,31,0,31                                                // Draw a line
+
+    DO forever
+
+        for CCount = 32 to 127
+
+            GLCDPrint ( 64 ,  36,  hex(longNumber_E ) )                 // Print a HEX string
+            GLCDPrint ( 76 ,  36,  hex(longNumber_U ) )                 // Print a HEX string
+            GLCDPrint ( 88 ,  36,  hex(longNumber_H ) )                 // Print a HEX string
+            GLCDPrint ( 100 ,  36, hex(longNumber   ) )                 // Print a HEX string
+            GLCDPrint ( 112 ,  36, "h" )                                // Print a HEX string
+
+            GLCDPrint ( 64 ,  44, pad(str(wordNumber), 5 ) )           // Print a padded string
+            GLCDPrint ( 64 ,  52, pad(str(byteNumber), 3 ) )           // Print a padded string
+
+            box (46,8,56,18)                                           // Draw a Box
+            GLCDDrawChar(48, 9, CCount )                               // Draw a character
+            outString = str( CCount )                                  // Prepare a string
+            GLCDDrawString(64, 9, pad(outString,3) )                   // Draw a string
+
+            filledbox 3,43,11,51, wordNumber                           // Draw a filled box
+
+            FilledCircle( 44,41,9, longNumber xor 1)                   // Draw a filled box
+            line 0,63,64,31                                            // Draw a line
+
+                                                                        // Do some simple maths
+            longNumber = longNumber + 7 : wordNumber = wordNumber + 3 : byteNumber++
+        NEXT
+
+    LOOP
+    end
