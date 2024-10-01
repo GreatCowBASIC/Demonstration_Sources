@@ -1,0 +1,40 @@
+#chip mega4809
+#option explicit
+
+#DEFINE USART3_BAUD_RATE 9600
+#DEFINE USART3_TX_BLOCKING
+#DEFINE USART3_DELAY OFF
+
+
+//~ Optional control constants - advanced usage
+
+    //~ Change the constants can save up to 61 words but the functions are constrained to a specfic PORTx_Piny
+
+    //~ Set explicit port.pin - this will prevent any table lookup - would be used when either a single ADC is used, or, an error in the lookup table
+        //~ Save 22 words but makes the READAD and READAD10 locked on the specified PORTx_Piny
+        //~ ANIx MUST be correct for the specified PORTx_Piny
+
+        //~ #DEFINE AVRX_ADC_PORTx_PinyCTRL PORTD_Pin1CTRL //~ for AIN1 on a MEGA4809
+
+    //~ Do not cache the port.pin setting.Therefore, you need to manage the PORTx_PinyCTRL state.
+        //~ Saves 9 words
+        
+        //~ #DEFINE AVRX_ADC_NOCACHE_PORTx_PinyCTRL
+
+    //~ Change the ADC frequency
+        //~ No program size impact. This just overrides the default value
+        
+        //~ #DEFINE AVRX_ADC_PRESC_DIV 16    // Options are 16 or 4
+
+// main program
+    wait 100 ms
+    HSerPrintStringCRLF "ADC Read"
+    wait 4 s
+
+    Do
+        HSerPrint ReadAD10 ( AIN1 )
+        HserPrintCRLF 
+        wait 100 ms
+    Loop
+
+

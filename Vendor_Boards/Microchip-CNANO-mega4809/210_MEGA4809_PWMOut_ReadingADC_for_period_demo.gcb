@@ -1,0 +1,25 @@
+/*
+
+    Very simple demo to create a PWM signal to make an LED change intensity.
+
+    Uses PWMOut.  See the HELP for details.
+
+*/
+#chip mega4809 
+#option explicit
+
+    #define PWM_Out1 portf.5
+
+    Dim ADCValue as Byte
+
+    Do
+        ADCValue = ReadAD(AIN1)
+        If ADCValue < 253 then
+            PWMOut 1, ADCValue, 100
+        Else
+            // If LED is pulled low then set to 0
+            PWM_Out1 = 1
+            Wait 10 ms
+        End If
+    Loop
+

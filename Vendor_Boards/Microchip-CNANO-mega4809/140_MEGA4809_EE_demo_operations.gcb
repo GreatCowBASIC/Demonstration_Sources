@@ -1,0 +1,93 @@
+/*
+
+
+
+*/
+#chip mega4809            //  Declare the Target Processor and Speed
+#option explicit          //  Require Explicit declaration of Variables
+
+#DEFINE USART3_BAUD_RATE 115200
+#DEFINE USART3_TX_BLOCKING
+#DEFINE USART3_RX_BLOCKING
+#DEFINE USART3_DELAY OFF
+
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+'Now assumes Serial Terminal is operational
+
+Dim eepAddr, CCount, Temp As Byte
+Dim verified as Bit
+Dim Indata as Word
+Dim passcodeArrayEE as ALLOC * 4
+
+    Do
+        // Enter the passcode !! store in the EEPROM
+        Do While NOT ValidPassCode
+        Loop
+
+        HSerPrintStringCRLF "You entered the correct passcode - stored in EEPROM"
+        HSerPrintStringCRLF "Now do something great!"
+        HSerPrintCRLF 3
+        Wait 5 s
+    Loop
+    End
+
+//? A passcode validation method - returns TRUE or FALSE
+Function ValidPassCode 
+
+    // Read the array from EEProm
+    CCount = 0
+    For CCount = 0 to 3
+        //? Read the EEPROM into the structure passcodeArrayEE() - 4 items from address 0 onwards 
+        EPRead( CCount, passcodeArrayEE(CCount))
+    Next
+
+    HSerPrintStringCRLF "Press `enter` to start"
+
+    // Dump any serial data
+    Do 
+        HSerReceive ( Temp , 3)
+    Loop While Temp = DEFAULTUSARTRETURNVALUE
+
+    HSerPrintStringCRLF "Enter passcode on KeyPad, 4 presses"
+
+    verified = TRUE
+    ccount = 0
+    Do While ccount < 4
+        //? Get key value from serial
+        HSerReceive( Temp, 3)
+        
+        //? If a key is pressed, then display it
+        If Temp <> DEFAULTUSARTRETURNVALUE  Then
+            
+            HserPrint "*"
+
+            If Temp = 13 Then 
+                verified = FALSE
+                Exit Do
+            End If
+
+            //? Compare and set to false if not a match
+            If  passcodeArrayEE( ccount) <> Temp Then
+                verified = FALSE
+            End if
+    
+            //! Some debug... left intentionally
+            // HserPrint "Key Pressed :"
+            // HserPrint Temp
+            // HserPrintCRLF
+
+            ccount++    
+        End If
+    Loop
+
+    HserPrintCRLF
+    
+    If !verified Then
+        HSerPrintStringCRLF "Passcode does not match"
+    End If
+
+    Return verified
+
+End Function

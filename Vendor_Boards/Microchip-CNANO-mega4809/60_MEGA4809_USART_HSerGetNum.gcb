@@ -1,0 +1,24 @@
+#chip mega4809
+#option Explicit
+
+#DEFINE USART3_BAUD_RATE 9600
+// #DEFINE USART3_BLOCKING
+#DEFINE USART3_BLOCKING
+
+#DEFINE USART3_DELAY OFF
+
+Dim HSerNum as Word
+
+Do
+
+    HSerGetNum HSerNum
+    If HSerIndex = 1 then 
+        HserPrint "No number entered"
+    Else
+        HserPrint  HSerNum
+    End If
+
+    HserPrintCRLF
+
+Loop
+

@@ -1,0 +1,48 @@
+#Chip mega4809
+#option Explicit
+#option Bootloader 0x0100
+/*
+This demo sets the LED on and off when the interrupt happens.
+The GCBASIC generated ASM can also be compiled in Microchip STUDIO 7.x then debugged, programmed etc.
+
+This program assumes the FUSES BOOTEND=0x02 and APPEND=0xFF.
+If the FUSES are different then you MUST change the #option Bootloader nnnn : Where nnnn is BOOTEND * 256 / 2 . It BOOTEND = 0x02 use #option Bootloader 0x0100 
+If the FUSES are BOOTEND=0 and APPEND=0 then  #option Bootloader is not required
+
+Enjoy
+
+        ------------PORTA---------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ---------------------------------
+    IO:    ---------------------------------
+
+        ------------PortF----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    -----SW-LED----------------------
+    IO:    --------------------------==-----
+
+        ------------PORTC----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ---------------------------------
+    IO:    ---------------------------------
+*/
+
+#DEFINE SW PINF.6
+DIR SW In
+    // set the PULLUP for this specific port.pin
+    PortF_PIN6CTRL.3 = 1
+
+#DEFINE LED PORTF.5
+DIR LED Out
+LED = 1
+
+On Interrupt PortFChange call ISR
+    PORTF_PIN6CTRL = 0x03;
+
+Do
+Loop
+
+Sub ISR
+    LED = !LED
+    wait 10 ms
+End Sub

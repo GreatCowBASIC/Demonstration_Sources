@@ -1,0 +1,64 @@
+// Toogle LED RTC interrupt every second
+// Setup for USART 3 on a mega4809 - not used but there it needed
+
+#chip mega4809
+#option Explicit
+
+#DEFINE USART3_BAUD_RATE 9600
+#DEFINE USART3_TX_BLOCKING
+#DEFINE USART3_RX_BLOCKING
+#DEFINE USART3_DELAY OFF
+
+    // This assumes you are using an ANSI compatible terminal.  Use PUTTY.EXE it is very easy to use.
+
+    // Main program
+
+    // Wait for terminal to settle
+    wait 1 s
+
+    // hardware
+    #define LED PORTF.5
+    
+    // Variables
+    Dim RTCEVENT as Bit
+
+    // Call the initialisation routine
+    InitRTCControl
+
+    // Main routine
+    Do
+        If RTCEvent Then
+            PulseOutInv LED, 10 ms
+            RTCEvent = False
+        End If
+    Loop
+    end
+
+
+
+    // Setup routine
+    Sub InitRTCControl
+
+    //    Add the handler for the interrupt
+        On Interrupt RTCOverflow Call InterruptHandler
+
+        // Set up the RTC timer
+        wait while ( RTC_STATUS > 0 )               // Wait for all register to be synchronized
+ 
+        Dim RTC_PERiod AS WORD Alias RTC_PERH, RTC_PERL
+        RTC_PERiod  = 0x3FF                        // Period: 0x3FF - 1024 RTC clock cycles
+
+        RTC_CLKSEL  = RTC_CLKSEL_INT1K_gc         // 32kHz divided by 32
+
+        RTC_CTRLA.RTC_RTCEN_bp = 1                // Enable the RTC
+
+    End Sub
+
+
+    // This will be called when the Timer overflows
+    Sub InterruptHandler
+
+        RTCEvent = True
+        RTC_INTFLAGS.RTC_OVF_bp = 1
+
+    End Sub

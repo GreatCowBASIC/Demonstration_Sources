@@ -1,0 +1,108 @@
+/*
+
+    This program writes a BYTE to PROGRAM memory. 
+    The source BYTE is shown below, the result is shown on a serial terminal via the USART.
+
+    ***********************************************************************************************************************************************
+
+    Details of writing data into program memory on AVR microcontrollers using GCBASIC.
+
+    Writing Data to Program Memory in AVR Microcontrollers
+
+    1. **Background:**
+    - When working with AVR microcontrollers, understanding the fuses and their impact on writing to program memory is crucial.
+    - The AVRDX (ATmegaDX) series differs from ATmega328P-type chips in terms of memory organization.
+
+    2. **BOOT Section and APPDATA Section:**
+    - The BOOT section resides in low FLASH memory locations. In contrast, ATmega328P-type chips typically place the bootloader close to the end of high FLASH memory.
+    - GCBASIC loads the user program into low memory starting at location 0x00.
+    - The top of the bootloader (or, in the case of GCBASIC, that is the top of the user program) is referred to as BOOTEND.
+
+    3. **Fuses Configuration:**
+    - The BOOTEND and APPEND fuses play a critical role:
+        - **BOOTEND**: Determines the end address of the BOOT section.
+        - **APPEND**: Sets the starting address of the APPDATA section.
+    - The following relationship holds: APPDATA starts at APPEND + 1.
+
+    4. **Calculating APPDATA Start Address:**
+    - Let's break down the calculation:
+        - If the APPEND fuse is set to 1:
+        - APPEND = 1 * 256 = 256
+        - APPDATA starts at address 256.
+        - If the APPEND fuse is set to 2:
+        - APPEND = 2 * 256 = 512
+        - APPDATA starts at address 512.
+        - If the APPEND fuse is set to 4:
+        - APPEND = 4 * 256 = 1024
+        - APPDATA starts at address 1024.
+
+    5. **Example:**
+    - Suppose BOOTEND is set to 4, and APPEND is also set to 4.
+    - The memory layout:
+        - 0 to 1023: BOOT section
+        - 1024 to 49151: APPDATA section
+
+    Remember that the fuses must be configured appropriately to support the write operation. If the self-write capability of the AVRDX is used, it cannot write to memory locations designated as the bootloader (i.e., within the BOOT section).
+
+    Feel free to ask if you need further clarification or have additional questions via the GCBASIC Forum
+
+*/
+#chip mega4809            //  Declare the Target Processor and Speed
+#option explicit          //  Require Explicit declaration of Variables
+
+#DEFINE USART3_BAUD_RATE 9600
+#DEFINE USART3_TX_BLOCKING
+#DEFINE USART3_DELAY OFF
+
+'*****************************************************************************************************
+
+// Main program commences here.. everything before this is setup for the board.
+// Now assumes Serial Terminal is operational
+
+HserPrintCRLF 1
+HSerPrintStringCRLF "Change/set a byte in PROGRAM memory", 1
+
+// Variables
+Dim index, Value, DataOffset, Address as Word 
+Dim newValue as Word
+
+
+    // This is the address in PROGRAM memory.
+    // Can be any valid PROGRAM memory as determined by the FUSES.
+    Address = 0xB000
+    Value = 0xAA
+
+    // Write the byte
+    ProgramWrite( Address , value )
+
+    // Show results by reading the PROGRAM memory and send to a terminal via the USART
+    HserPrintCRLF
+    HserPrint "Byte value written to PROGRAM memory = 0x"
+    // Get the value of the byte written, set newvalue to 0 and use a new variable to prove this is a valid result
+    newvalue = 0
+
+    ProgramRead ( Address  , newvalue )          
+    
+    HserPrint Hex(newvalue)
+    HserPrintCRLF
+
+    // Show any error - a non zero value for NVMCTRLStatusCounter will be an error. 
+    If NVMCTRLStatusCounter <> 0 Then
+
+        // Bit 2 – WRERROR Write Error
+        // This bit will read '1' when a write error has happened. A write error could be writing to different sections before doing
+        // a page write or writing to a protected area. This bit is valid for the last operation.
+        // Bit 1 – EEBUSY EEPROM Busy
+        // This bit will read '1' when the EEPROM is busy with a command.
+        // Bit 0 – FBUSY Flash Busy
+        // This bit will read '1' when the Flash is busy with a command.
+
+        HserPrint "NVMCTRL Error Status = " 
+        HserPrintStringCRLF ByteToBin( NVMCTRLStatusCounter )  //~ Just shows the bits 2+1+0 of the status register
+    End If
+
+    Do
+
+    Loop
+
+End

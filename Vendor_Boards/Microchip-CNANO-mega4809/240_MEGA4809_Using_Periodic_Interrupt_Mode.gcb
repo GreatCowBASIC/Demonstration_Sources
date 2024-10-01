@@ -1,0 +1,61 @@
+/*
+
+    This demo shows how to initialize the timer in Single mode to work as a counter. 
+
+    The counter overflows every 250 ms and triggers an interrupt which toggles a pin, as this is NOT using the PWM channel this output port.pin can be any port.pin ( that is a valid output ).
+
+    The following configurations must be made for this project:
+
+        System clock is 3.33 MHz.
+        Global Interrupts Enabled via GCBASIC 
+
+        TCA0:
+            Clock Selection: System clock/256
+            Timer Mode: 16-Bit (Normal)
+            Timer Overflows Every 250 ms
+            Enable Overflow Interrupt
+
+        Pin	Configuration
+            PA0	Digital output
+            
+    This code example shows how to initialize the TCA as a counter to trigger an overflow interrupt every 250 ms, toggling a GPIO in the Interrupt Service Routine.
+
+    */
+
+#chip mega4809, 3.3333333
+#option Explicit
+
+#define PERIOD_EXAMPLE_VALUE = 0x0CB6
+
+TCA0_init
+PORT_init
+On Interrupt Timer0Overflow call ISR
+
+
+Do
+Loop
+
+Sub TCA0_init
+
+    /* set Normal mode */
+    TCA0_SINGLE_CTRLB = TCA_SINGLE_WGMODE_NORMAL_gc
+    
+    /* disable event counting */
+    TCA0_SINGLE_EVCTRL.TCA_SINGLE_CNTEI_bp = 0
+
+    /* set the period */
+    TCA0_SINGLE_PERIOD = PERIOD_EXAMPLE_VALUE  
+    
+    TCA0_SINGLE_CTRLA = TCA_SINGLE_CLKSEL_DIV256_gc | TCA_SINGLE_ENABLE_bm     
+    
+End Sub
+
+Sub PORT_init
+    /* set pin 0 of PORT A as output */
+    DIR PORTA.0 OUT
+End Sub
+
+Sub ISR
+    /* Toggle PIN 0 of PORT A - a specific AVRDx register to toggle a port.pin*/
+    PORTA_OUTTGL = PIN0_bm    
+End Sub

@@ -1,0 +1,72 @@
+/*
+
+
+
+*/
+#chip mega4809            //  Declare the Target Processor and Speed
+#option explicit          //  Require Explicit declaration of Variables
+
+#DEFINE nEDBG_using_UPDI
+
+#DEFINE USART3_BAUD_RATE 115200
+#DEFINE USART3_TX_BLOCKING
+#DEFINE USART3_DELAY OFF
+
+
+
+EEPROM myPassCode
+    "1234"
+End EEPROM
+
+
+
+
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+'Now assumes Serial Terminal is operational
+
+Dim DisplayNewLine, Outdata As Byte
+Dim EEPromAddress, Indata as Word
+
+Wait 1 s
+
+
+Do Forever
+
+    HSerPrintCRLF
+    HSerPrint "Show EEPROM"
+    HSerPrintCRLF 2
+
+    HSerPrint "      "
+
+    For EEPromAddress = 0 To 15
+        HSerPrint Hex(EEPromAddress)
+        HSerPrint " "
+    Next
+
+    For EEPromAddress = 0 To ChipEEProm -1
+        DisplayNewLine = EEPromAddress % 16
+        If DisplayNewLine = 0 Then
+            HSerPrintCRLF
+            HSerPrint right(Hex(EEPromAddress_H),1)
+            HSerPrint Hex(EEPromAddress)
+            HSerPrint ": "
+        End If
+        HSerPrint " "
+
+        InData = 0
+        //! Read internal EEPROM and show on the terminal
+        EPRead ( EEPromAddress, Indata )  
+        HSerPrint  Hex(Indata)
+
+    Next
+
+    HSerPrintCRLF 2
+    HSerPrint    "End of EEProm Program and Display"
+    HSerPrintCRLF 2
+
+    Wait 5 s
+    HserSend 1
+Loop
+

@@ -1,0 +1,48 @@
+#chip mega4809
+#option Explicit
+
+//! THIS CONSTANT IS A QUICK WAY TO CHANGE FROM 1s to 100ms
+    #DEFINE DEMO 1s
+
+/*
+    Flash LED every specified time period
+
+    Some examples for testing
+    PS_0_1024   0x4C4A = 1s
+    PS_0_64     31250 =  100ms
+
+    */
+
+
+
+#IF DEMO = 1s
+
+    //! Initialise the Timer for 1s
+    InitTimer0 ( Osc, PS_0_1024 )
+
+    //! Set the timer
+    SetTimer ( 0 , 0x4C4A )
+#ELSE
+
+    //! Initialise the Timer for 100ms
+    InitTimer0 ( Osc, PS_0_64 )
+
+    //! Set the timer
+    SetTimer ( 0 , 31250 )
+#ENDIF
+
+//! Start timer
+StartTimer ( 0 )
+
+//! Set the interrupt
+On Interrupt Timer0OverFlow Call ISR
+
+// Main loop
+Do
+Loop
+
+Sub ISR
+
+    PulseOutInv PortF.5, 50 ms
+
+End Sub

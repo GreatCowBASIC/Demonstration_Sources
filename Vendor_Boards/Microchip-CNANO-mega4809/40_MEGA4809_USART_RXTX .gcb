@@ -1,0 +1,86 @@
+// Setup for USART 3 on a mega4809
+
+#chip mega4809
+#option Explicit
+
+#DEFINE USART3_BAUD_RATE 9600
+#DEFINE USART3_TX_BLOCKING
+#DEFINE USART3_RX_BLOCKING
+#DEFINE USART3_DELAY OFF
+
+    // This assumes you are using an ANSI compatible terminal.  Use PUTTY.EXE it is very easy to use.
+
+    //    Main program
+
+    // Wait for terminal to settle
+    wait 1 s
+
+    // Create the supporting variables
+    Dim next_in As Byte
+    Dim next_out As Byte
+    Dim syncbyte As Byte
+    Dim temppnt As Byte
+
+    //  Constants etc required for Buffer Ring
+    #DEFINE BUFFER_SIZE 64
+    #DEFINE bkbhit (next_in <> next_out)
+
+    // Define the Buffer
+    Dim buffer( BUFFER_SIZE - 1 ) // we will use element 0 in the array as part of out buffer
+
+    // Call init the buffer
+    InitBufferRing
+
+    HSerSend 10, 3
+    HSerSend 13, 3
+    HSerSend 10, 3
+    HSerSend 13, 3
+    HSerPrint "Started: Serial between two devices", 3
+    HSerSend 10, 3
+    HSerSend 13, 3
+
+
+    // Get character(s) and send back
+    Do
+
+        //  Do we have data in the buffer?
+        if bkbhit then
+
+            // Send the next character in the buffer, exposed via the function `bgetc` back the terminal
+            HSerSend bgetc, 3
+
+        end if
+    Loop
+
+    // Supporting subroutines
+
+    Sub readUSART
+
+        buffer(next_in) = HSerReceive ( 3 )
+        temppnt = next_in
+        next_in = ( next_in + 1 ) % BUFFER_SIZE
+        If ( next_in = next_out ) Then  //  buffer is full!!
+            next_in = temppnt
+        End If
+
+    End Sub
+
+    Function bgetc
+        Dim local_next_out as Byte    // maintain a local copy of the next_out variable to ensure it does not change when an Interrupt happens
+        local_next_out = next_out
+        bgetc = buffer(local_next_out)
+        local_next_out=(local_next_out+1) % BUFFER_SIZE
+        INTOFF
+        next_out = local_next_out
+        INTON
+    End Function
+
+    Sub InitBufferRing
+
+        // Set the buffer to the first buffer address
+        next_in = 0
+        next_out = 0
+
+        On Interrupt Usart3RXReady Call readUSART
+        
+    End Sub 

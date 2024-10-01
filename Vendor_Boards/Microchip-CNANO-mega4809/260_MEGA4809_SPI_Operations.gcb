@@ -1,0 +1,115 @@
+/*
+
+  This example shows how to configure the device in SPI Host mode, control a client and send dummy datas with respect to the clock polarity and the clock phase, in data mode 0.
+
+    If the constant SPI_HardwareSPI is define then hardware SPI will be used
+    If the constant SPI_HardwareSPI is NOT define then software SPI will be used
+
+  The following configurations must be made for this project:
+
+    System clock is configured at 20 MHz
+    SPI
+        SPI clock configured at 12Mhz
+    SPI in Host mode
+      Data mode 0
+      LSB transmitted first
+
+    Pin	Configuration
+        SCK - PA6, SS - PA7, MOSI - PA4, MISO - PA5
+      PA4 (MOSI)	Digital output
+      PA5 (MISO)	Digital input
+      PA6 (SCK)	Digital output
+      PA7 (SS)	Digital output
+
+  The demo shows the SCK (PA6), SS (PA7) and MOSI (PA4) signals operating as hardware or software SPI.
+  Every time the client is selected (SS line low), the device outputs the SCK signal and sends the data through MOSI line, in data mode 0.
+
+    */
+
+#chip mega4809
+#option Explicit
+
+    #define SPI_HardwareSPI  'comment this out to make into Software SPI but, you WILL have to change clock lines
+        // Hardware SPI frequency 156kHz, 311kHz, 1.2mHz, 12mHz
+        // Software SPI frequency 530kHz
+
+    // Pin mappings for SPI - this SPI driver supports Hardware SPI or Software spi
+    #define SPI_CS       PORTA.7           ' SS pin / Chip select line
+
+    // When using Hardware SPI these are SPECIFIC to the chip selected SPI module
+    // These are different on different chips
+    #define SPI_DI       PORTA.5          ' Data in | MISO
+    #define SPI_DO       PORTA.4          ' Data out | MOSI
+    #define SPI_SCK      PORTA.6          ' Clock Line
+
+    dir SPI_CS    Out
+    dir SPI_DO    Out
+    dir SPI_DI    In
+    dir SPI_SCK   Out
+
+  // Hardware configuration completed.
+
+
+
+  // Main program
+
+    #Define byte1 0x55
+    #Define byte2 0b10000001
+    #Define byte3 0xAA
+
+    #startup InitSPIMode
+
+    do forever
+        
+        SendByteviaSPI (byte1)
+                
+        SendByteviaSPI (byte2)
+        
+        SendByteviaSPI (byte3)
+        
+        wait 10 ms
+    loop
+
+sub InitSPIMode
+
+      #ifdef SPI_HardwareSPI
+          // Options are MASTERSLOW | MASTER | MASTERFAST | MASTERULTRAFAST for specific AVRs = 156kHz, 311kHz, 1.2mHz, 12mHz
+          SPIMode ( MASTERULTRAFAST, SPI_CPOL_0 + SPI_CPHA_0 )
+      #endif
+
+      set SPI_DO OFF
+      set SPI_DI OFF
+      set SPI_CS ON   // therefore CPOL=0
+
+End sub
+
+sub  SendByteviaSPI( in SPISendByte as byte )
+
+  set SPI_CS OFF
+  
+  #ifdef SPI_HardwareSPI
+     FastHWSPITransfer  SPISendByte
+     set SPI_CS ON
+     exit sub
+  #endif
+
+  #ifndef SPI_HardwareSPI
+  // Bit bang the SPI data out
+  repeat 8
+
+    if SPISendByte.7 = ON  then
+      set SPI_DO ON
+    else
+      set SPI_DO OFF
+    end if
+    SET SPI_SCK On            // therefore CPOL=0 ==ON, and, where CPOL=1==ON
+    rotate SPISendByte left
+    set SPI_SCK Off           // therefore CPOL=0  =OFF, and, where CPOL=1==OFF
+
+  end repeat
+  set SPI_CS ON
+  set SPI_DO OFF
+  #endif
+
+end Sub
+
