@@ -1,0 +1,66 @@
+/*
+
+    Benchmark
+        - 0.064 on terminal clock
+        - 64 ms
+    20 hHz
+    9600 BPS for USART 3
+
+    Summary:
+        Compiled:
+            Program lines: 461
+            Subroutines:  User: 0 ; System: 18 of 484 ; Total: 18
+        Chip resource usage:
+            Program Memory: 1009/24576 words (4.11%)
+            RAM: 75/6144 bytes (1.22%)
+            OSC: 20Mhz (Internal oscillator)
+
+    Comments
+        Used #DEFINE MILLIS_TIMER_VALUE_ADJUST 1250 to correct millis.h value for 1ms - must be the wrong default value!
+
+        16:41:53.930> S
+        16:41:53.995> ..........
+        16:41:53.995> 500500
+        16:41:53.995> E
+        16:41:53.995> 65ms
+
+*/
+#chip mega4809, 20
+#option Explicit
+
+#include <millis.h>
+    // #DEFINE MILLIS_TIMER_VALUE_ADJUST 1250
+
+
+
+#DEFINE USART3_BAUD_RATE 9600
+#DEFINE USART3_TX_BLOCKING
+#DEFINE USART3_DELAY OFF
+
+Dim Iloop as Byte 
+Dim Jloop, Slog, Elog, Zlog as Long
+
+REM Noels Retro Lab BASIC Benchmark
+
+HserPrintCRLF 2
+HSerPrintStringCRLF "S" 
+Zlog = millis() 
+// Do the real work
+For Iloop=1 TO 10 
+    Slog=0 
+    For Jloop=1 TO 1000 
+        Slog=Slog+Jloop 
+    Next Jloop
+    HSerSend "."    
+Next Ilog 
+
+HserPrintCRLF
+HSerPrint Slog
+    HserPrintCRLF
+Elog = millis()
+HSerPrintStringCRLF  "E"
+
+
+HSerPrint Elog-Zlog 
+    HserPrintStringCRLF "ms"
+
