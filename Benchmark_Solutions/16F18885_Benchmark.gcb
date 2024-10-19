@@ -1,0 +1,65 @@
+/*
+
+    14:14:35.845> 
+    14:14:35.845> S
+    14:14:35.970> ..........
+    14:14:35.970> 500500
+    14:14:35.970> E
+    14:14:35.970> 82ms
+
+    @64 Mhz.. 82ms ... but 125ms on terminal calcs.... 
+
+*/
+#chip 16F18855
+#option Explicit
+
+#include <millis.h>
+
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #define PPSToolPart 16F18855
+
+    Sub InitPPS
+            
+            // Module: EUSART
+            RC6PPS = 0x0010    // TX > RC6
+        
+        End Sub
+    // Add this code segment to your GCBASIC source program
+
+
+
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
+Dim Iloop as Byte 
+Dim Jloop, Slog, Elog, Zlog as Long
+
+REM Noels Retro Lab BASIC Benchmark
+
+Wait 1 s
+HserPrintCRLF 2
+HSerPrintStringCRLF "S" 
+Zlog = millis() 
+// Do the real work
+For Iloop=1 TO 10 
+    Slog=0 
+    For Jloop=1 TO 1000 
+        Slog=Slog+Jloop 
+    Next Jloop
+    HSerSend "."    
+Next Ilog 
+
+HserPrintCRLF
+HSerPrint Slog
+    HserPrintCRLF
+Elog = millis()
+HSerPrintStringCRLF  "E"
+
+
+HSerPrint Elog-Zlog 
+    HserPrintStringCRLF "ms"
+
