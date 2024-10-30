@@ -2,9 +2,9 @@
     This demonstration shows the I2C devices attached the microcontroller, this program support the Microchip I2C module.
 
     I2C device required a data bus and a clock bus, devices also required an input voltage and 0v.
-    I2C data bus is connected to PortA.4
-    I2C clock bus is connected to PortA.1
-    Serial output is connected, as previously, to PortC.4
+    I2C data bus is connected to PortB.5
+    I2C clock bus is connected to PortB.6
+    Serial output is connected, as previously, to PortB.7
 
     Connect your IC2 devices and see the results on the serial terminal.
 
@@ -12,7 +12,7 @@
     @author  EvanV
     @licence GPL
     @version 1.02
-    @date    04-02-2024
+    @date    29-10-2024
     */
 // ----- Configuration
 
@@ -35,11 +35,12 @@
             I2C1SCLPPS = 0x000E    // RB6 > SCL1 (bi-directional)
             RB5PPS = 0x001D    // SDA1 > RB5
             I2C1SDAPPS = 0x000D    // RB5 > SDA1 (bi-directional)
+
             // Module: UART pin directions
             Dir PORTB.7 Out    // Make TX1 pin an output
             // Module: UART1
             RB7PPS = 0x0013    // TX1 > RB7
-
+ 
         End Sub
     // Add this code segment to your GCBASIC source program
 
@@ -50,16 +51,16 @@
     IO:    -----------------SW---------ADC-- 
     -----------------------------------------
 
-
     -------------------PORTB----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    TX--SCL-SDA----------------------
-    ----------------------------------------
-
+    IO:    TX--SCK-SDA--^-------------------
+    ------------------VDDIO3---------------- You must apply correct Voltage
+    
     ------------------PORTC-----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    LED-LED-LED-LED------------------
-    ----------------------------------------
+    IO:    LED-LED-LED-LED------^-----------
+    --------------------------VDDIO2-------- You must apply correct Voltage
+
   */
 
 // Define constants to make things easier. We can reuse these at any time.
@@ -84,10 +85,9 @@
     #DEFINE DOWN          0
 
 // Define I2C settings
-    #DEFINE HI2C_BAUD_RATE  125
+    #DEFINE HI2C_BAUD_RATE  100
     #DEFINE HI2C_DATA       PORTB.5
     #DEFINE HI2C_CLOCK      PORTB.6
-
     HI2CMode (Master)
 
 '*****************************************************************************************************
@@ -113,7 +113,7 @@
         Next
 
         'Create a vertical column of numbers
-        For DeviceID = 0 To 255
+        For DeviceID = 0 To 255 
             DisplayNewLine = DeviceID % 16
             If DisplayNewLine = 0 Then
                 HSerPrintCRLF
@@ -126,25 +126,23 @@
 
             //Do an initial Start
             HI2CStart
+            
             // Send address
             HI2CSend ( DeviceID )
+            
+            // Get the read datato prevent any potential slave lockup
+            HI2CSend ( 0x00 )
+            
+            // Stop the I2C
+            HI2CStop    
 
-            If HI2CWaitMSSPTimeout <> 255 Then
-
-                'Did device fail to respond?
+            'Did device fail to respond?
             If HI2CAckpollState = FALSE Then
-                    HSerPrint   Hex(DeviceID)
-                Else
-                    HSerPrint   "--"
-                End If
-                // Get the read datato prevent any potential slave lockup
-                If DeviceID.0 = 1 Then HI2CSend ( DumpI2CRead )
-
+                HSerPrint Hex(DeviceID)
             Else
-                HSerPrint "! "
+                HSerPrint "--"
             End If
-            // I2C Stop
-            HI2CStop
+
         Next
 
         HSerPrintCRLF 2
@@ -154,3 +152,4 @@
         Wait While SwitchIn <> DOWN
         
     Loop
+

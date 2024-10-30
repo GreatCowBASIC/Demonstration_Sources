@@ -4,7 +4,7 @@
     This program shows toggling an LED attached to a PIC18F16Q20
 
     Note:
-        To make the PIC operate you will need to connect Pin8 ( VDDIO2/VDDIO5 ) to a VDD within specification ( 5v0 or 3v3 ) on specific ports
+        To make the PIC operate you will need to connect VDDIO2/VDDIO3 to a VDD within specification ( 5v0 or 3v3 ) on specific ports
         SAF protection config is not operation by design.  The user will have to uncomment the SAF operation config in the chip specific DAT file. And, use PICKit4/5 to program
 
     @author    Evan R Venn   
@@ -25,16 +25,16 @@
     IO:    --------------------------------- 
     -----------------------------------------
     
-
     -------------------PORTB----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    ---------------------------------
-    -----------------------------------------
+    IO:    -------------^-------------------
+    ------------------VDDIO3---------------- You must apply correct Voltage
     
     ------------------PORTC-----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    LED-LED-LED-LED------------------
-    ----------------------------------------
+    IO:    LED-LED-LED-LED------^-----------
+    --------------------------VDDIO2-------- You must apply correct Voltage
+
 */
 
 // *****************************************************************************************************

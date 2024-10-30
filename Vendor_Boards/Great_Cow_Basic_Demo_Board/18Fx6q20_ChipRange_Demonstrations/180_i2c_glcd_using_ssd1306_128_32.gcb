@@ -14,7 +14,7 @@
 '''@author  EvanV
 '''@licence GPL
 '''@version 1.00
-'''@date    04-02-2024
+'''@date    30-10-2024
 ' ----- Configuration
 
 'Chip Settings.
@@ -27,57 +27,72 @@
     #define PPSToolPart 18F16Q20
 
     Sub InitPPS
-      
-        SSP1CLKPPS = 0x1;   'RA1->MSSP1:SCL1;
-        RA1PPS = 0x1B;      'RA1->MSSP1:SCL1;
-        SSP1DATPPS = 0x4;   'RA4->MSSP1:SDA1;
-        RA4PPS = 0x1C;      'RA4->MSSP1:SDA1;
+    
+            // Module: I2C1
+            RB6PPS = 0x001C    // SCL1 > RB6
+            I2C1SCLPPS = 0x000E    // RB6 > SCL1 (bi-directional)
+            RB5PPS = 0x001D    // SDA1 > RB5
+            I2C1SDAPPS = 0x000D    // RB5 > SDA1 (bi-directional)
+
+            // Module: UART pin directions
+            Dir PORTB.7 Out    // Make TX1 pin an output
+            // Module: UART1
+            RB7PPS = 0x0013    // TX1 > RB7
 
     End Sub
     'Template comment at the end of the config file
 
-'' -------------------PORTA----------------
-'' Bit#:  -7---6---5---4---3---2---1---0---
-'' IO:   -------------SDA-SW------SCL-ADC--
-''-----------------------------------------
-''
-
-'' -------------------PORTB----------------
-'' Bit#:  -7---6---5---4---3---2---1---0---
-'' IO:    ----SCL-----SDA------------------
-''-----------------------------------------
-''
-
-'' ------------------PORTC-----------------
-'' Bit#:  -7---6---5---4---3---2---1---0---
-'' IO:    ----TX---------LED--LED-LED LED--
-''-----------------------------------------
-
-'Define constants to make things easier. We can reuse these at any time.
-#DEFINE LEDPORT LATC
-
-Dir     RC0         Out
-Dir     RC1         Out
-Dir     RC2         Out
-Dir     RC3         Out
-
-#DEFINE POTENTIOMETER PORTA.0
-Dir     POTENTIOMETER In
-#DEFINE SWITCHIN      PORTA.3
-Dir     SWITCHIN      In
-
-'Setup Serial port
-#DEFINE USART_BAUD_RATE 9600
-#DEFINE USART_TX_BLOCKING
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
 
 
-' Define I2C settings
-#DEFINE HI2C_BAUD_RATE 400
-#DEFINE HI2C_DATA PORTA.4
-#DEFINE HI2C_CLOCK PORTA.1
-'Initialise I2C - note for the I2C module the ports need to be set correctly
-Dir HI2C_DATA In
-Dir HI2C_CLOCK In
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    -----------------SW---------ADC-- 
+    -----------------------------------------
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    TX-----------^-------------------
+    ------------------VDDIO3---------------- You must apply correct Voltage
+    
+    ------------------PORTC-----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    LED-LED-LED-LED------^-----------
+    --------------------------VDDIO2-------- You must apply correct Voltage
+
+  */
+
+// Define constants to make things easier. We can reuse these at any time.
+    #DEFINE LEDPORT LATC
+    #DEFINE LEDD7 PORTC.7
+    #DEFINE LEDD6 PORTC.6
+    #DEFINE LEDD5 PORTC.5
+    #DEFINE LEDD4 PORTC.4
+
+// Set the ports as an output
+    Dir LEDD7 Out
+    Dir LEDD6 Out
+    Dir LEDD5 Out
+    Dir LEDD4 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    // This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.3
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          0
+
+
+// Define I2C settings
+    #DEFINE HI2C_BAUD_RATE  100
+    #DEFINE HI2C_DATA       PORTB.5
+    #DEFINE HI2C_CLOCK      PORTB.6
+    HI2CMode (Master)
 
 '*****************************************************************************************************
 'Main program commences here.. everything before this is setup for the board.
@@ -90,8 +105,8 @@ Dir HI2C_CLOCK In
 
 'These constants allow you to change the GLCD memory usage.
 'We have set this demonstration to use only 128bytes of RAM for GLCD operations.
-#DEFINE GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
-#DEFINE GLCD_TYPE_SSD1306_CHARACTER_MODE_ONLY
+// #DEFINE GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+// #DEFINE GLCD_TYPE_SSD1306_CHARACTER_MODE_ONLY
 #DEFINE GLCD_PROTECTOVERRUN
 
 Dim BYTENUMBER, CCOUNT As Byte
@@ -108,11 +123,11 @@ byteNumber = 0
 // ----- Main program
 
 #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
-    GLCD_Open_PageTransaction 0,3
+    GLCD_Open_PageTransaction 0,7
 #ENDIF
 
 GLCDPrint 0, 0,   "GCBASIC"
-GLCDPrint (0, 16, "Anobium 2023")
+GLCDPrint (0, 16, "Anobium 2024")
 GLCDPrint (76, 16, GLCD_WIDTH )
 GLCDPrint (96, 16, "*" )
 GLCDPrint (104, 16, GLCD_HEIGHT )
@@ -125,11 +140,10 @@ Wait 3 s
 GLCDCLS
 
 #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
-    GLCD_Open_PageTransaction 0, 3
+    GLCD_Open_PageTransaction 0, 7
 #ENDIF
 
 GLCDPrint 0, 0,   "Version 1.xx.xx"
-
 
 #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
     GLCDPrint (0, 16, "LM GLCD MODE")
@@ -158,7 +172,7 @@ Do Forever
 
         ' Prepare the static components of the screen
         #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
-            GLCD_Open_PageTransaction 0,3
+            GLCD_Open_PageTransaction 0,7
         #ENDIF
 
         ' Print some text
@@ -200,7 +214,6 @@ Do Forever
         #ENDIF
 
         longNumber = longNumber + 7
-
 
     Next
 Loop

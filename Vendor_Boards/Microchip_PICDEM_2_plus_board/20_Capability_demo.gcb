@@ -62,7 +62,7 @@
 '''@author    Evan R. Venn   
 '''@license   GPL
 '''@version   1.00   
-'''@date      2024-08-10
+'''@date      2024-10-28
 '''********************************************************************************
 
 
@@ -134,7 +134,11 @@
         #define     Lab_CLOCK           17
         #define     Lab_Buzzer          18
         
-        
+        /* The Q10 has an issue as defined in the errata https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/Errata/PIC18F274-7Q10-Si-Errata-Data-Sheet-Clarifications-DS80000832.pdf 
+        section 1.4.4 where the ADC reads incorrectly.... 
+        The next constant works arounds the issue by reading the ADC twice before ADC value is returned
+        */
+        #define ADReadPreReadCommand    REPEAT 2: SET ADON ON: SET GO_NOT_DONE ON: Wait While GO_NOT_DONE ON: END REPEAT
 
 // ----- Main body of program commences here.
 
@@ -171,8 +175,9 @@
         Dir LED_D3          Out
         Dir LED_D4          Out
         Dir LED_D5          Out
-        
 
+        #define POT_R16     PORTA.0
+        
     // Common macro and constants
         #define LEDS_OFF            LED_D5=0:LED_D4=0:LED_D3=0:LED_D2=0
         #define PRESSED             1
@@ -207,6 +212,12 @@
         Locate 1,0
         Print "to PICDEM 2 Plus"
         wait 1 s
+        CLS
+        Print  ChipNameStr
+        Locate 1,0
+        Print ChipMhz 
+        Print "Mhz"
+        wait 5 s
         CLS
         Print "    GCBASIC     "
         Locate 1,0
@@ -427,6 +438,8 @@ Sub ADC
 
     if labState = NOT_RUNNING Then
 
+        DIR POT_R16 In
+
         #ifdef USART_BAUD_RATE
             HserPrint Str(labNumber) + ": ADC Lab"
             HserPrintCRLF
@@ -436,16 +449,17 @@ Sub ADC
         LEDS_OFF
         Print "      ADC      "
         labState = RUNNING
-                    
+        wait 1 s
+        CLS
+        Print " ADC Result =   "
+
     end if
 
     if labState = RUNNING Then
         // Get the top 3 MSBs and display these on the LEDs
         adcResult = ReadAD10 ( AN0 )
         
-        // Display the ADC result on the LCD
-        Locate 0,0
-        Print " ADC Result =   "
+        // Display the result on the LCD
         Locate 1,10
         Print leftpad( str(adcResult), 4, " " )
 

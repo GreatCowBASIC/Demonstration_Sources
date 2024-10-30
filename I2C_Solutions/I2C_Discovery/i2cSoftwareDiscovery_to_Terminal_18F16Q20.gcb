@@ -1,0 +1,137 @@
+/*
+    A demonstration program for GCBASIC.
+    --------------------------------------------------------------------------------------------------------------------------------
+
+    
+    This program searches for I2C devices and display their adresses to the attached PC terminal.
+    This program uses the software implementation of I2C for the Microchip microprocessors.
+    The hardware serial connections are shown in the program.
+
+
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    --------------------------------- 
+    ----------------------------------------
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    TX--SCK-SDA--^-------------------
+    ------------------VDDIO3---------------- You must apply correct Voltage
+    
+    ------------------PORTC-----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ---------------------^-----------
+    --------------------------VDDIO2-------- You must apply correct Voltage
+
+
+    @author  EvanV
+    @licence GPL
+    @version 1.0a
+    @date    03.09.2024
+
+    Example output showing a device on addresses A0 and A1
+
+        Software I2C
+
+            00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 
+        00:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        10:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        20:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        30:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        40:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        50:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        60:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        70:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        80:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        90:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        A0:  A0 A1 -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        B0:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        C0:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        D0:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        E0:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        F0:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+        End of Search
+
+
+*/
+; ----- Configuration
+#CHIP 18F16Q20, 16
+#OPTION Explicit
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #define PPSToolPart 18F16Q20
+
+    Sub InitPPS
+            
+            // Module: UART pin directions
+            Dir PORTB.7 Out    // Make TX1 pin an output
+            // Module: UART1
+            RB7PPS = 0x0013    // TX1 > RB7
+
+        End Sub
+    // Add this code segment to your GCBASIC source program
+
+    // I2C settings - set the software ports using the constants
+    #DEFINE I2C_MODE Master
+    #DEFINE I2C_DATA PORTB.5
+    #DEFINE I2C_CLOCK PORTB.6
+    #DEFINE I2C_DISABLE_INTERRUPTS ON
+
+    // Variables
+    Dim DISPLAYNEWLINE as Byte
+
+    //  Main body of program commences here.
+        // Now assumes Serial Terminal is operational
+        dim DeviceID as byte
+
+        HSerPrintCRLF
+        dim myMessage as String * 12
+        myMessage = "Software I2C"
+        HSerPrint myMessage
+        HSerPrintCRLF 2
+
+        Do 
+            HSerPrintCRLF
+            HSerPrint "Software I2C"
+            HSerPrintCRLF 2
+
+            HSerPrint "     "
+            for DeviceID = 0 to 15
+                HSerPrint hex(deviceID)
+                HSerPrint " "
+            next
+            for DeviceID = 0 to 255
+                DisplayNewLine = DeviceID % 16
+                if DisplayNewLine = 0 Then
+                HSerPrintCRLF
+                HserPrint hex(DeviceID)
+                HSerPrint ": "
+                end if
+                HSerPrint " "
+                I2CStart
+                I2CSend ( deviceID )
+
+                if I2CSendState = True  then
+                HSerPrint   hex(deviceID)
+                else
+                HSerPrint "--"
+                end if
+                I2CSend ( 0 )
+                I2CStop
+
+            Next
+            HSerPrintCRLF 2
+            HSerPrint   "End of Search"
+            HSerPrintCRLF 2
+
+            Wait 5 s
+        Loop
+        END
+

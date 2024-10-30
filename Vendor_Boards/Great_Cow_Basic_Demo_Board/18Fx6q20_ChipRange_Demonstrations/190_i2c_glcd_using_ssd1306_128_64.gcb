@@ -14,36 +14,38 @@
 '''@author  EvanV
 '''@licence GPL
 '''@version 1.00
-'''@date    31.11.2022
+'''@date    30-10-2024
 ' ----- Configuration
-
 
 'Chip Settings.
 #CHIP 18F16Q20
 #OPTION Explicit
 
-    #DEFINE USART_BAUD_RATE 9600
-    #DEFINE USART_TX_BLOCKING
-    #DEFINE USART_DELAY OFF
-    // PIC PPS Tool version: 0.0.6.5
-    
+    'Template comment at the start of the config file
+    '
     #startup InitPPS, 85
     #define PPSToolPart 18F16Q20
 
     Sub InitPPS
-            
+    
             // Module: I2C1
             RB6PPS = 0x001C    // SCL1 > RB6
             I2C1SCLPPS = 0x000E    // RB6 > SCL1 (bi-directional)
             RB5PPS = 0x001D    // SDA1 > RB5
             I2C1SDAPPS = 0x000D    // RB5 > SDA1 (bi-directional)
+
             // Module: UART pin directions
             Dir PORTB.7 Out    // Make TX1 pin an output
             // Module: UART1
             RB7PPS = 0x0013    // TX1 > RB7
 
-        End Sub
-    // Add this code segment to your GCBASIC source program
+    End Sub
+    'Template comment at the end of the config file
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
 
 /*
     Hardware
@@ -52,16 +54,16 @@
     IO:    -----------------SW---------ADC-- 
     -----------------------------------------
 
-
     -------------------PORTB----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    TX--SCL-SDA----------------------
-    ----------------------------------------
-
+    IO:    TX-----------^-------------------
+    ------------------VDDIO3---------------- You must apply correct Voltage
+    
     ------------------PORTC-----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    LED-LED-LED-LED------------------
-    ----------------------------------------
+    IO:    LED-LED-LED-LED------^-----------
+    --------------------------VDDIO2-------- You must apply correct Voltage
+
   */
 
 // Define constants to make things easier. We can reuse these at any time.
@@ -85,110 +87,134 @@
     Dir     SWITCHIN      In
     #DEFINE DOWN          0
 
+
 // Define I2C settings
     #DEFINE HI2C_BAUD_RATE  100
     #DEFINE HI2C_DATA       PORTB.5
     #DEFINE HI2C_CLOCK      PORTB.6
-    #DEFINE I2C1CLOCKSOURCE I2C1CLOCK_MFINTOSC
-
     HI2CMode (Master)
-
-    #INCLUDE <glcd.h>
-    #DEFINE GLCD_TYPE GLCD_TYPE_SSD1306
-    #DEFINE GLCD_I2C_Address 0x78
-
-    'A constant to  allow you to change the GLCD memory usage.
-    #DEFINE GLCD_PROTECTOVERRUN
-
 
 '*****************************************************************************************************
 'Main program commences here.. everything before this is setup for the board.
 
-' ----- Define variables
-Dim BYTENUMBER, CCOUNT As Byte
-CCount = 0
+#INCLUDE <glcd.h>
+#DEFINE GLCD_TYPE GLCD_TYPE_SSD1306
+#DEFINE GLCD_I2C_Address 0x78
 
+' ----- Define variables
+
+'These constants allow you to change the GLCD memory usage.
+'We have set this demonstration to use only 128bytes of RAM for GLCD operations.
+// #DEFINE GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+// #DEFINE GLCD_TYPE_SSD1306_CHARACTER_MODE_ONLY
+#DEFINE GLCD_PROTECTOVERRUN
+
+Dim BYTENUMBER, CCOUNT As Byte
+
+CCount = 0
 Dim longNumber As Long
 ' max value = 4294967290
-
-longNumber = 123456
-Dim wordNumber As Word
+longNumber = 0
+Dim wordNumber, adcval, ldrval As Word
 Dim outstring As String
 wordNumber = 0
 byteNumber = 0
 
 // ----- Main program
 
-GLCDPrint 2, 2,   "GCBASIC"
-GLCDPrint (2, 18, "Anobium 2024")
-GLCDPrint (2, 34, "GLCD Portability Demo")
-GLCDPrint (2, 50, ChipNameStr )
-Box 0,0,127,63
+#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCD_Open_PageTransaction 0,7
+#ENDIF
+
+GLCDPrint 0, 0,   "GCBASIC"
+GLCDPrint (0, 16, "Anobium 2024")
+GLCDPrint (76, 16, GLCD_WIDTH )
+GLCDPrint (96, 16, "*" )
+GLCDPrint (104, 16, GLCD_HEIGHT )
+
+#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCD_Close_PageTransaction
+#ENDIF
 
 Wait 3 s
 GLCDCLS
 
-' Prepare the static components of the screen
-' Print some text
-GLCDPrint ( 2,   1, "GLCDPrint")
-' Print some more text
-GLCDPrint ( 64,  1, "@")
-' Print chip speed
-GLCDPrint ( 72,  1, ChipMHz)
-' Print some text
-GLCDPrint ( 86, 1, "Mhz")
-' Draw some text
-GLCDDrawString( 2,9,"DrawStr")
-' Draw a box
-Box 0,0,GLCD_WIDTH-1, GLCD_HEIGHT-1
-' Draw a box
-Box GLCD_WIDTH-5, GLCD_HEIGHT-5,GLCD_WIDTH-1, GLCD_HEIGHT-1
-' Draw a circle
-Circle (44,41,15)
-' Draw a line
-Line 64,31,0,31
+#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCD_Open_PageTransaction 0, 7
+#ENDIF
 
-    Do Forever
+GLCDPrint 0, 0,   "Version 1.xx.xx"
 
-        For CCount = 31 To 127
+#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCDPrint (0, 16, "LM GLCD MODE")
+#ENDIF
 
-            ' Print a HEX string
-            GLCDPrint ( 64 ,  36,  Hex(longNumber_E ) )
-            ' Print a HEX string
-            GLCDPrint ( 76 ,  36,  Hex(longNumber_U ) )
-            ' Print a HEX string
-            GLCDPrint ( 88 ,  36,  Hex(longNumber_H ) )
-            ' Print a HEX string
-            GLCDPrint ( 100 ,  36, Hex(longNumber   ) )
-            ' Print a HEX string
-            GLCDPrint ( 112 ,  36, "h" )
+#IFNDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCDPrint (0, 16, "FULL GLCD MODE")
+#ENDIF
 
 
-            ' Print a padded string
-            GLCDPrint ( 64 ,  44, Pad(Str(wordNumber), 5 ) )
-            ' Print a padded string
-            GLCDPrint ( 64 ,  52, Pad(Str(byteNumber), 3 ) )
+#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCD_Close_PageTransaction
+#ENDIF
+
+Wait 3 s
+GLCDCLS
 
 
-            ' Draw a Box
-            Box (46,9,56,19)
-            ' Draw a character
-            GLCDDrawChar(48, 10, CCount )
-            ' Prepare a string
-            outString = Str( CCount )
-            ' Draw a string
-            GLCDDrawString(64, 9, Pad(outString,3) )
+Do Forever
 
-            ' Draw a filled box
-            FilledBox 3,43,11,51, wordNumber
+    For CCount = 31 To 127
 
-            ' Draw a filled box
-            FilledCircle( 44,41,9, longNumber XOR 1)
-            ' Draw a line
-            Line 0,63,64,31
+        ' Prepare a string
+        outString = Str( CCount )
+        adcval = ReadAD ( ANA0 )
 
-            ' Do some simple maths
-            longNumber = longNumber + 7 : wordNumber = wordNumber + 3 : byteNumber++
-        Next
-    Loop
+        ' Prepare the static components of the screen
+        #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+            GLCD_Open_PageTransaction 0,7
+        #ENDIF
+
+        ' Print some text
+        GLCDPrint ( 1,   1, "PrintStr")
+        ' Print some more text
+        GLCDPrint ( 64,  1, "@")
+        ' Print chip speed
+        GLCDPrint ( 72,  1, ChipMHz)
+        ' Print some text
+        GLCDPrint ( 86, 1, "Mhz")
+        ' Draw some text
+        GLCDDrawString( 1,11,"DrawStr")
+        ' Draw a box
+        Box 0,0,GLCD_WIDTH-1, GLCD_HEIGHT-1
+        ' Draw a box
+        Box GLCD_WIDTH-5, GLCD_HEIGHT-5,GLCD_WIDTH-1, GLCD_HEIGHT-1
+        ' Draw a circle
+        Circle( 44,24,5)
+        ' Draw a line
+        Line 0,GLCD_HEIGHT-1,44,19
+
+        GLCDPrint ( 75 ,  20,  "ADC:"+Pad(Str(adcval),4 ) )
+
+        ' Draw a Box
+        Box (3,24,6,27)
+
+        ' Draw a string
+        GLCDDrawString(44, 11, CHR(CCount)+"="+Pad(outString,3) )
+
+        Ellipse 118, 6, 7, 4
+        If adcval > 127 Then
+            FilledEllipse 118, 6, 5, 2
+        Else
+            FilledEllipse 118, 6, 5, 2, GLCDBackground
+        End If
+
+        #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+            GLCD_Close_PageTransaction
+        #ENDIF
+
+        longNumber = longNumber + 7
+
+    Next
+Loop
 End

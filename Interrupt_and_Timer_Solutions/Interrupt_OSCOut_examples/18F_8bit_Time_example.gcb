@@ -1,0 +1,42 @@
+/*
+  This demonstation shows a how to generate a "heartbeat" using
+  Timer0 on 18F27K40 and other related chips with the same
+  type of timer0. Uses no processor resources and no interrupt.
+
+  PIC: 18F27K40
+  Compiler: GCB
+  IDE: GCB@SYN
+    */
+
+#CHIP 18F27K40, 64	
+#OPTION EXPLICIT 
+
+  // PIC PPS Tool version: 0.0.6.5
+  
+  #startup InitPPS, 85
+  #define PPSToolPart 18F27K40
+
+  Sub InitPPS
+          
+          // Module: TMR0
+          RC3PPS = 0x0013    // TMR0 > RC0
+      
+      End Sub
+  // Add this code segment to your GCBASIC source program
+
+  DIR PORTC.3 OUT     // Set RC3 as output
+
+  //Inittimer0 source = FOSC/4 : Prescale = 16384, Postscale = 6
+  Inittimer0 (OSC, PRE0_16384 + TMR0_FOSC4, POST0_6)
+
+  //Start the timer
+  Starttimer 0
+
+  MAIN:
+  '---------------------------------
+  DO
+
+      //Main Program goes here
+
+  Loop
+

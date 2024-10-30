@@ -17,7 +17,7 @@
     @author  EvanV
     @licence GPL
     @version 1.00
-    @date    04-02-2024
+    @date    28-10-2024
 */
 //  ----- Configuration
 
@@ -51,16 +51,16 @@
     IO:    -----------------SW---------ADC-- 
     -----------------------------------------
 
-
     -------------------PORTB----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    TX-------------------------------
-    -----------------------------------------
-
+    IO:    TX-----------^-------------------
+    ------------------VDDIO3---------------- You must apply correct Voltage
+    
     ------------------PORTC-----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    LED-LED-LED-LED------------------
-    ----------------------------------------
+    IO:    LED-LED-LED-LED------^-----------
+    --------------------------VDDIO2-------- You must apply correct Voltage
+
   */
 
 // Define constants to make things easier. We can reuse these at any time.
@@ -120,8 +120,8 @@ Do Forever
             // Prepare some data to send    
 
                 // Outdata = Random
-                // Outdata = 0x55    // If you DON'T believe put your own value here!
-                Outdata = 255 - EEPromAddress    // If you DON'T believe put your own value here!
+                Outdata = 0x55    // If you DON'T believe put your own value here!
+                // Outdata = 255 - EEPromAddress    // If you DON'T believe put your own value here!
 
             // Write
 

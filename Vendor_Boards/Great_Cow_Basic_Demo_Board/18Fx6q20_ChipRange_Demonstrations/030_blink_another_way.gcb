@@ -15,7 +15,7 @@
 
 
     Note:
-        To make the PIC operate you will need to connect Pin8 ( VDDIO2 ) to a VDD within specification ( 5v0 or 3v3 )
+        To make the PIC operate you will need to connect VDDIO2/VDDIO3 to a VDD within specification ( 5v0 or 3v3 )
         SAF protection config is not operation by design.  The user will have to uncomment the SAF operation config in the chip specific DAT file. And, use PICKit4/5 to program
 
     @author    Evan R Venn   
@@ -36,9 +36,8 @@
 ' ----- Configuration
 
 'Chip Settings.
-#CHIP 18F16Q20, 16
+#CHIP 18F16Q20, 32
 #Option Explicit
-
 
 /*
     Hardware
@@ -47,21 +46,20 @@
     IO:    --------------------------------- 
     -----------------------------------------
     
-
     -------------------PORTB----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    ---------------------------------
-    -----------------------------------------
+    IO:    -------------^-------------------
+    ------------------VDDIO3---------------- You must apply correct Voltage
     
     ------------------PORTC-----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    LED-LED-LED-LED------------------
-    ----------------------------------------
+    IO:    LED-LED-LED-LED------^-----------
+    --------------------------VDDIO2-------- You must apply correct Voltage
     */
 
 'Define constants to make things easier. We can reuse a constant at any time.
 #DEFINE LEDD7 PORTC.7
-'#OPTION Volatile LEDD7
+// #OPTION Volatile LEDD7
 
 '*****************************************************************************************************
 'Main program commences here.. everything before this is setup for the board.
@@ -71,8 +69,8 @@ Dir LEDD7 Out
 
 do
 
-    'wait for 1 second which is 1000 ms
-    Wait 1000 ms
+    'wait for 1 second which is 500 ms
+    Wait 500 ms
     'Set the port bit to NOT value from previous state but using the ! as an alternative to NOT
     LEDD7 = !LEDD7
 

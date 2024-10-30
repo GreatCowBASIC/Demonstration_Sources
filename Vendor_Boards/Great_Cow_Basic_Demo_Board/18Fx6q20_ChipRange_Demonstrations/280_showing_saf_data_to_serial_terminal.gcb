@@ -67,9 +67,9 @@
     Sub InitPPS
 
             'Module: UART pin directions
-            Dir PORTC.4 Out    ' Make TX1 pin an output
+            Dir PORTB.7 Out    ' Make TX1 pin an output
             'Module: UART1
-            RC4PPS = 0x13          'RC4->EUSART1:TX1
+            RB7PPS = 0x13          'RC4->EUSART1:TX1
 
     End Sub
 
@@ -82,13 +82,13 @@
 
 '' -------------------PORTB----------------
 '' Bit#:  -7---6---5---4---3---2---1---0---
-'' IO:    ---------------------------------
+'' IO:    TX-------------------------------
 ''-----------------------------------------
 ''
 
 '' ------------------PORTC-----------------
 '' Bit#:  -7---6---5---4---3---2---1---0---
-'' IO:    ----TX---------LED--LED-LED LED--
+'' IO:    ---------------LED--LED-LED LED--
 ''-----------------------------------------
 
 

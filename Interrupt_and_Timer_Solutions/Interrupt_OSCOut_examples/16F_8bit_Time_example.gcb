@@ -1,0 +1,45 @@
+/*
+    This demonstation shows a how to generate a "heartbeat" using
+    Timer0 on PIC16F18855 and other related chips with the same
+    type of timer0. Uses no processor resources and no interrupt.
+
+    PIC: 16F18855
+    Compiler: GCB
+    IDE: GCB@SYN
+
+    William R.
+    Date: 26.12.2016
+*/
+
+#Chip 16F18855,32
+#Option Explicit
+
+    DIR PORTC.3 OUT     // Set RC3 (Pin 14) as output
+
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #define PPSToolPart 16F18855
+
+    Sub InitPPS
+            
+            // Module: TMR0
+            RC3PPS = 0x0018    // TMR0 > RC3
+        
+        End Sub
+    // Add this code segment to your GCBASIC source program
+
+    // Inittimer0 source = FOSC/4 : Prescale = 1:16384
+    INITTIMER0 (OSC, PRE0_16384 + TMR0_FOSC4, POST0_1)
+
+    // Start the timer
+    Starttimer 0
+
+    // ---------------------------------
+    DO
+
+        //Main Program goes here
+
+    Loop
+
+    // -----------------------------------
