@@ -26,7 +26,7 @@
             'Module: UART pin directions
             Dir PORTC.4 Out    ' Make TX1 pin an output
             'Module: UART1
-            RC4PPS = 0x13          'RC4->EUSART1:TX1
+            RB7PPS = 0x13           'RC4->EUSART1:TX1
 
     End Sub
     'Template comment at the end of the config file
@@ -60,60 +60,60 @@
 'Main program commences here.. everything before this is setup for the board.
 ' Now assumes Serial Terminal is operational
 
-  Dim  ProgMemAddress as long
-  Dim  DataWord as word
+    Dim  ProgMemAddress as long
+    Dim  DataWord as word
 
-  wait 1 s
-  HSerPrintCRLF 2
+    wait 1 s
+    HSerPrintCRLF 2
 
-  'We are reading words, so we send the ProgMemAddress address every two bytes (a word).
-  for ProgMemAddress = 0x0000 to 0x001F
-  
-      'Display the value
-      HSerPrint "0x"
-      HSerPrint hex(ProgMemAddress_h)
-      HSerPrint hex(ProgMemAddress)
-      HSerSend 9
-      HSerSend 9
+    'We are reading words, so we send the ProgMemAddress address every two bytes (a word).
+    for ProgMemAddress = 0x0000 to 0x001F Step 2
+    
+        'Display the value
+        HSerPrint "0x"
+        HSerPrint hex(ProgMemAddress_h)
+        HSerPrint hex(ProgMemAddress)
+        HSerSend 9
+        HSerSend 9
 
-      'Read the value of the ProgMem
-      ProgramRead  ( ProgMemAddress, DataWord )
+        'Read the value of the ProgMem
+        PFMRead  ( ProgMemAddress, DataWord )
 
-      'Display the received value
-      HSerPrint "0x"
-      HSerPrint hex(DataWord_h)
-      HSerPrint hex(DataWord)
-      HSerPrintCRLF
+        'Display the received value
+        HSerPrint "0x"
+        HSerPrint hex(DataWord_h)
+        HSerPrint hex(DataWord)
+        HSerPrintCRLF
 
-  Next
-  HSerPrintCRLF
+    Next
+    HSerPrintCRLF
 
- 'ProgramWrite
-  ProgramWrite ( 0x3FF8, 0x55 )
-  ProgramWrite ( 0x3FFC, 0x1234 )
+    'PFMWrite
+    PFMWrite ( 0x3FF8, 0x11 )
+    PFMWrite ( 0x3FFC, 0x55AA )
 
-  'We are reading words, so we send the ProgMemAddress address every two bytes (a word).
-  for ProgMemAddress = 0x3FF0 to 0x3FFF 
+    'We are reading words, so we send the ProgMemAddress address every two bytes (a word).
+    for ProgMemAddress = 0x3FF0 to 0x3FFF Step 2
 
-      'Display the value
-      HSerPrint "0x"
-      HSerPrint hex(ProgMemAddress_h)
-      HSerPrint hex(ProgMemAddress)
-      HSerSend 9
-      HSerSend 9
+        'Display the value
+        HSerPrint "0x"
+        HSerPrint hex(ProgMemAddress_h)
+        HSerPrint hex(ProgMemAddress)
+        HSerSend 9
+        HSerSend 9
 
-      'Read the value of the ProgMemAddress
-      ProgramRead  ( ProgMemAddress, DataWord )
+        'Read the value of the ProgMemAddress
+        PFMRead  ( ProgMemAddress, DataWord )
 
 
-      'Display the received value
-      HSerPrint "0x"
-      HSerPrint hex(DataWord_h)
-      HSerPrint hex(DataWord)
-      HSerPrintCRLF
+        'Display the received value
+        HSerPrint "0x"
+        HSerPrint hex(DataWord_h)
+        HSerPrint hex(DataWord)
+        HSerPrintCRLF
 
-  Next
-  HSerPrintCRLF
+    Next
+    HSerPrintCRLF
 
-do
-loop
+    do
+    loop

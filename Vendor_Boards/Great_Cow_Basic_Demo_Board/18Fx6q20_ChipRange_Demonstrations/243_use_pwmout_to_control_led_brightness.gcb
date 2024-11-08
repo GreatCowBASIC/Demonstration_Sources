@@ -1,14 +1,14 @@
-#SKIPTEST
-'''A demonstration program for GCBASIC.
-'''--------------------------------------------------------------------------------------------------------------------------------
-'''This program is a simple GLCD demonstration of the timer capabilities using hthe millis function.
-''':
-''':
-'''@author  EvanV
-'''@licence GPL
-'''@version 1.0
-'''@date    31.11.2022
-'''********************************************************************************
+/*
+    This demonstration flashes an LED to show the use of PWMOut() operations
+    This will pulse the IO at a max 4~kHz
+
+    ************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.00
+    @date    05.11.2024
+    */
+' ----- Configuration
 
 'Chip Settings.
 #CHIP 18F16Q20
@@ -67,27 +67,31 @@
 //*****************************************************************************************************
 // Main program commences here.. everything before this is setup for the board.
 
+    // ----- Constants
+    'PWM constant. This is a required constant.
+    #DEFINE PWM_OUT1 LEDD7
 
-#include <millis.h>       ' Include the Library
+    // ---- Optional Constant to add an delay after PWM pulse
+    #DEFINE PWM_DELAY 0 us
 
-        #define LED LEDD7        ' Define the LED Pin
-        #define LEDRate 1000     ' Flash rate in mS
+    // ----- Define Hardware settings
+    // PWM port out.  This is not required but it is good practice.
+    dir PWM_OUT1 out
 
-        Dim CurMs, LstMs as word  ' declare working variables
-        ' Main                    ' This loop runs over and over forever.
-        LstMs = 0
-        CurMs = 0
+    // A potentiometer is attached to ANA0
 
-        ' Main                    ' This loop runs over and over forever.
-        Do
-          CurMs = millis()
+    // ----- Variables
+    // No Variables specified in this example.
 
-          if CurMs - LstMs >= LEDRate then  ' required Time has Elapsed
+    // ----- Main body of program commences here.
+    do
+        
+        // cycle parameter ( the third parameter ) is a purely arbitrary value as the loop will maintain a relatively constant PWM
+        // This will pulse the IO at a max 4~kHz
+        PWMOut 1, 127, 100
 
-            LED = !LED                      ' So Toggle state of LED
-            LstMs = CurMs                   ' And Record Toggle Time
-          end if
-          IntOn
-        Loop
+    loop
 
-END
+end
+
+

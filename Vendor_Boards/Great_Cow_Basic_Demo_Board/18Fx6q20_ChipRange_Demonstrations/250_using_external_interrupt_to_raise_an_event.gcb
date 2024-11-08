@@ -1,14 +1,17 @@
-#SKIPTEST
-'''A demonstration program for GCBASIC.
-'''--------------------------------------------------------------------------------------------------------------------------------
-'''This program is a simple GLCD demonstration of the timer capabilities using hthe millis function.
-''':
-''':
+'''
+''' This demonstration will provide code for raising an event when a port changes.
+''' The port that is being set then inspected in PORTA.3. Why? Because we have the switch on that port.
+'''
+''' When the event happens the LED is toggled.  The LED will toggle when the Signal value is 0.
+'''
+''' This does not have a proper debounce check, you can add one.
+'''
+'''************************************************************************
 '''@author  EvanV
 '''@licence GPL
-'''@version 1.0
-'''@date    31.11.2022
-'''********************************************************************************
+'''@version 1.00
+'''@date    05.11.2024
+' ----- Configuration
 
 'Chip Settings.
 #CHIP 18F16Q20
@@ -67,27 +70,31 @@
 //*****************************************************************************************************
 // Main program commences here.. everything before this is setup for the board.
 
+/* Interrupt-on-change enabled on the IOCx pin for a negative-going edge. Associated Status bit 
+    and interrupt flag will be set upon detecting an edge. */
+IOCAN3 = 1
 
-#include <millis.h>       ' Include the Library
+// Setup the handler
+On Interrupt PORTChange  Call InterruptHandler
 
-        #define LED LEDD7        ' Define the LED Pin
-        #define LEDRate 1000     ' Flash rate in mS
+'Loop forever
+Do
+    LEDD6 = !LEDD6
+    wait 25 ms
+Loop
 
-        Dim CurMs, LstMs as word  ' declare working variables
-        ' Main                    ' This loop runs over and over forever.
-        LstMs = 0
-        CurMs = 0
 
-        ' Main                    ' This loop runs over and over forever.
-        Do
-          CurMs = millis()
+Sub InterruptHandler
 
-          if CurMs - LstMs >= LEDRate then  ' required Time has Elapsed
+    Dim SWState as BIT
 
-            LED = !LED                      ' So Toggle state of LED
-            LstMs = CurMs                   ' And Record Toggle Time
-          end if
-          IntOn
-        Loop
+    'Save the switch state
+    SWState = SWITCHIN
 
-END
+    'Toggle the LED
+    LEDD7 = !LEDD7
+
+    'We must clear this specific bit flag in software, the main IOC is cleare by the GCBASIC interrupt handler
+    IOCAF3  = 0
+
+End Sub

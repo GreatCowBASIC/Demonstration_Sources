@@ -1,14 +1,14 @@
-#SKIPTEST
-'''A demonstration program for GCBASIC.
-'''--------------------------------------------------------------------------------------------------------------------------------
-'''This program is a simple GLCD demonstration of the timer capabilities using hthe millis function.
-''':
-''':
-'''@author  EvanV
-'''@licence GPL
-'''@version 1.0
-'''@date    31.11.2022
-'''********************************************************************************
+/*
+    This demonstration flashes an LED to show the use of pulseout() operations
+    This will pulse the IO at 38kHz
+
+    ************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.00
+    @date    05.11.2024
+    */
+' ----- Configuration
 
 'Chip Settings.
 #CHIP 18F16Q20
@@ -67,27 +67,11 @@
 //*****************************************************************************************************
 // Main program commences here.. everything before this is setup for the board.
 
+Do
 
-#include <millis.h>       ' Include the Library
+    PulseOut LEDD7, 13 us
+    wait 13 us
 
-        #define LED LEDD7        ' Define the LED Pin
-        #define LEDRate 1000     ' Flash rate in mS
+Loop
 
-        Dim CurMs, LstMs as word  ' declare working variables
-        ' Main                    ' This loop runs over and over forever.
-        LstMs = 0
-        CurMs = 0
 
-        ' Main                    ' This loop runs over and over forever.
-        Do
-          CurMs = millis()
-
-          if CurMs - LstMs >= LEDRate then  ' required Time has Elapsed
-
-            LED = !LED                      ' So Toggle state of LED
-            LstMs = CurMs                   ' And Record Toggle Time
-          end if
-          IntOn
-        Loop
-
-END

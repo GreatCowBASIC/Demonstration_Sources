@@ -1,5 +1,5 @@
 /*
-    This demonstration shows the I2C devices attached the microcontroller, this program support the Microchip I2C module.
+    This demonstration shows the I2C devices attached the microcontroller, this program supports the Microchip I2C module.
 
     I2C device required a data bus and a clock bus, devices also required an input voltage and 0v.
     I2C data bus is connected to PortB.5
@@ -23,6 +23,7 @@
     #DEFINE USART_BAUD_RATE 9600
     #DEFINE USART_TX_BLOCKING
     #DEFINE USART_DELAY OFF
+
     // PIC PPS Tool version: 0.0.6.5
     
     #startup InitPPS, 85
@@ -53,7 +54,7 @@
 
     -------------------PORTB----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    TX--SCK-SDA--^-------------------
+    IO:    TX--SCL-SDA--^-------------------
     ------------------VDDIO3---------------- You must apply correct Voltage
     
     ------------------PORTC-----------------
@@ -130,7 +131,7 @@
             // Send address
             HI2CSend ( DeviceID )
             
-            // Get the read datato prevent any potential slave lockup
+            // Get the read data to prevent any potential slave lockup
             HI2CSend ( 0x00 )
             
             // Stop the I2C

@@ -1,0 +1,48 @@
+#chip 18F16Q20
+#option explicit
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
+    #startup InitPPS, 85
+    #define PPSToolPart 18F16Q20
+
+    Sub InitPPS
+
+            'Module: UART pin directions
+            Dir PORTB.7 Out    ' Make TX1 pin an output
+            'Module: UART1
+            RB7PPS = 0x13          'RC7->EUSART1:TX1
+
+    End Sub
+
+Wait 2 s
+HserPrintCRLF 2
+
+Dim offset as Byte
+Dim myDataWord as Word
+For offset = 0 to 6 Step 2
+    ProgramRead (@myDataBlock1 + offset, myDataWord)
+    HserPrintCRLF
+    Hserprint "0x"+WordToHex( myDataWord)
+Next
+HserPrintCRLF
+
+End
+
+EEPROM MyEEData1
+1,2,3,4,5,255
+END EEPROM
+
+EEPROM MyEEData2 16
+5,4,3,2,1,255
+END EEPROM
+
+DATA myDataBlock2 as Byte
+    1,2,3,4,5,6,7,8
+END DATA
+
+DATA myDataBlock1
+    0x1234,0x5678,0x1111,0x2222
+END DATA

@@ -1,24 +1,12 @@
-#CHIP 18F16Q20
-#option Explicit
-#SKIPTEST
+#CHIP 18F16Q20, 16
+#OPTION Explicit
 
-#DEFINE DEVELOPER_PWM_DEBUG
-
-#DEFINE USART_BAUD_RATE 9600
-#DEFINE USART_TX_BLOCKING
-#DEFINE USART_DELAY OFF
 
     // PIC PPS Tool version: 0.0.6.5
-
     #define PPSToolPart 18F16Q20
 
     Sub InitPPS
-
-            // Module: UART pin directions
-            Dir PORTB.7 Out    ' Make TX1 pin an output
-            // Module: UART1
-            RB7PPS = 0x0013    // TX1 > RB7
-
+            
             // Module: CCP1
             RC4PPS = 0x0005    // CCP1 > RC4
             CCP1PPS = 0x0014    // RC4 > CCP1 (bi-directional)
@@ -28,10 +16,68 @@
             CCP1PPS = 0x0016    // RC6 > CCP1 (bi-directional)
             RC7PPS = 0x0005    // CCP1 > RC7
             CCP1PPS = 0x0017    // RC7 > CCP1 (bi-directional)
-        
-            DIR PORTC OUT
+
+            // Module: UART pin directions
+            Dir PORTB.7 Out    ' Make TX1 pin an output
+            // Module: UART1
+            RB7PPS = 0x0013    // TX1 > RB7
+
         End Sub
     // Add this code segment to your GCBASIC source program
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    -----------------SW---------ADC-- 
+    -----------------------------------------
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    TX-----------^-------------------
+    ------------------VDDIO3---------------- You must apply correct Voltage
+    
+    ------------------PORTC-----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    LED-LED-LED-LED------^-----------
+    --------------------------VDDIO2-------- You must apply correct Voltage
+
+  */
+
+// Setup USART
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
+
+// Define constants to make things easier. We can reuse these at any time.
+    #DEFINE LEDPORT LATC
+    #DEFINE LEDD7 PORTC.7
+    #DEFINE LEDD6 PORTC.6
+    #DEFINE LEDD5 PORTC.5
+    #DEFINE LEDD4 PORTC.4
+
+// Set the ports as an output
+    Dir LEDD7 Out
+    Dir LEDD6 Out
+    Dir LEDD5 Out
+    Dir LEDD4 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    // This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.3
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          0
+
+
+' ------ Start of main Program
+
+    #DEFINE DEVELOPER_PWM_DEBUG     
+    #DEFINE PWM_FREQ    38
+    #DEFINE PWM_DUTY    50
+
+    #DEFINE CALCULATED_PWM_DUTY  ( ( 255 * PWM_DUTY ) / 100  )
 
     // These variables are in pmw.h used to calc the registers 
     PWMDuty = 0
@@ -44,13 +90,15 @@
                 HSerPrintStringCRLF "Hardware CCP/PWM Discovery"
                 
 
-                HSerPrintStringCRLF "Before PWMon"
+                HSerPrintStringCRLF "Before PWMon = Fixed Mode PWM"
                 ShowDetails
                 
     PWMOn       
                 HSerPrintStringCRLF "After PWMon"
                 ShowDetails
-                HSerPrintStringCRLF "If no PWM signal... are the PWM ports set to OUT? Correct PPS?"
+                HserPrintCRLF 2
+                HSerPrintStringCRLF "If no Fixed Mode PWM signal... are the PWM ports set to OUT? Correct PPS?"
+                HserPrintCRLF 2
 
                 Repeat 10
                     wait 500 ms
@@ -64,28 +112,46 @@
                 HserPrintCRLF
                 HSerPrintStringCRLF "After PWMoff"
                 ShowDetails
-                
-    HPWM 1, PWM_FREQ, 127  // Equates to 50%            
-    // HPWM_CCPTimerN 1, PWM_FREQ, 127, 2  // Equates to 50% on Timer2
+                HSerPrintStringCRLF "Fixed mode PWM signal will now stop"
+                HserPrintCRLF
+                wait 2 s
+
+                HSerPrint "Issue `HPWM 1, PWM_FREQ,"
+                HSerprint CALCULATED_PWM_DUTY
+                HSerPrintStringCRLF "` command.  The third parameter range is 0 to 255, where 127 = 50%"
+                HserPrintCRLF
+
+    HPWM 1, PWM_FREQ, CALCULATED_PWM_DUTY           
+    // HPWM_CCPTimerN 1, PWM_FREQ, CALCULATED_PWM_DUTY, 2  // Equates to using Timer2
 
     //! uncomment to add this to the pwm.h section as a test, if no PWM signal    
-    // #define AddHPWMCCPExit1 CCP1CON  = CCPCONCache 
-     
+    // #define AddHPWMCCPExit1 CCP1CON  = CCPCONCache
+    
                 HSerPrintStringCRLF pad("", 80, "*")
-                HSerPrintStringCRLF "After `HPWM 1, PWM_FREQ, 127` command"
+                HSerPrint "After `HPWM 1, PWM_FREQ,"
+                HSerprint CALCULATED_PWM_DUTY
+                HSerPrintStringCRLF "` command"
 
-                HSerPrintStringCRLF "Error CCP1CON set to CCPCONCache value..."
-                HSerPrintStringCRLF "As HPWM used same Frq & Duty as fixed mode PWM, then, CCP1CON should be equal to CCPCONCache"
-                HSerPrintStringCRLF " 1. Has ChipFamilyPWMCCP1CON16Handler been updated for this chip family ?"
-                HSerPrintStringCRLF " 2. Is CCPTMRS0 correct for timer2? Is PWMTimerVariant in DAT file the correct value ?"
-                HSerPrintStringCRLF "     See SETUPTHECORRECTTIMERBITS section in pwm.h"
-                HSerPrintStringCRLF " 3. Examine SETUPCCPPWMREGISTERS section in pwm.h"
+                HSerPrintCRLF 2
+                HSerPrintStringCRLF " As HPWM() used same Frq & Duty as `fixed mode PWM`, then, CCP1CON should be equal to CCPCONCache"
+                HSerPrintCRLF 
+                HSerPrintStringCRLF "No signal ?"
+                HSerPrintStringCRLF "  1. Has ChipFamilyPWMCCP1CON16Handler, in PWM.h, been updated for this chip family ?"
+                HSerPrintStringCRLF "     If the specific chip has ONLY ONE CCP then the section ChipFamilyPWMCCP1CON16Handler must be updated"
+                HSerPrintStringCRLF "     So, check the datasheet for CCP1 only.. so, search for CCP2 if not found then only one CCP"
+                HSerPrintCRLF
+                HSerPrintStringCRLF "  2. Is CCPTMRS0 correct for timer2? if not, is PWMTimerVariant in DAT file the correct value ?"
+                HSerPrintCRLF
+                HSerPrintStringCRLF "  3. Examine SETUPCCPPWMREGISTERS section in pwm.h... there is clearly a library issue"
                 HserPrintCRLF
                 HSerPrintStringCRLF "If PWM is working.. Then, all is good!"
 
 
                 HSerPrintStringCRLF pad("", 80, "*")
                 ShowDetails
+
+                HserPrintCRLF
+                HSerPrintStringCRLF "Completed - examine results"
 
                 Do
                 Loop
@@ -104,6 +170,7 @@
 Sub ShowDetails
 
     #IFDEF VAR(PPSLOCK)
+        //! If this causes and error .. remove the first one. Let the be the only #startup instruction
         #startup InitPPS, 85
     #endif
 
@@ -139,7 +206,7 @@ Sub ShowDetails
         dim _PWMTimerSelected as Byte
         Preg( "_PWMTimerSelected", _PWMTimerSelected, "Selected Timer")
         Preg( "PWMDuty          ", PWMDuty, "[WORD] used in calculateDuty() in pwm.h ")
-        Preg( "PWMResolution    ", PWMResolution, "[Word] used in calculateDuty() in pwm.h")
+        Preg( "PWMResolution    ", PWMResolution, "[WORD] used in calculateDuty() in pwm.h")
         
         
 

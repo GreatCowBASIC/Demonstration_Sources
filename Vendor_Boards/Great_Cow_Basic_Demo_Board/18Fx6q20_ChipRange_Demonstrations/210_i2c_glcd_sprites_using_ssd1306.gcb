@@ -105,7 +105,7 @@
 'Select the sprite and the user delay
 #DEFINE SPRITECHOICE 2
 '2ms is the lower limit of user visual perception
-#DEFINE SPRITEDELAY 10 ms
+#DEFINE SPRITEDELAY 1 ms
 
 '*******************************************************************************************
 'Draw initial screen

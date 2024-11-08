@@ -1,0 +1,120 @@
+/*
+    This demonstration flashes an LED to show the use of CCP PWM operations
+
+    Uses fixed mode PWM operations
+
+    This program will enable a 28 kHz PWM signal, with a duty cycle
+    of 50%. It will emit the signal for 10 seconds, then stop.
+    #define PWM_Freq 38    'Set frequency in KHz
+    #define PWM_Duty 50    'Set duty cycle to 50 %
+
+    ************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.00
+    @date    04-02-2024
+    */
+' ----- Configuration
+
+'Chip Settings.
+#CHIP 18F16Q20
+#OPTION Explicit
+
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #define PPSToolPart 18F16Q20
+
+    Sub InitPPS
+
+            // Module: CCP1
+            RC4PPS = 0x0005    // CCP1 > RC4
+            CCP1PPS = 0x0014    // RC4 > CCP1 (bi-directional)
+            RC5PPS = 0x0005    // CCP1 > RC5
+            CCP1PPS = 0x0015    // RC5 > CCP1 (bi-directional)
+            RC6PPS = 0x0005    // CCP1 > RC6
+            CCP1PPS = 0x0016    // RC6 > CCP1 (bi-directional)
+            RC7PPS = 0x0005    // CCP1 > RC7
+            CCP1PPS = 0x0017    // RC7 > CCP1 (bi-directional)
+        
+        End Sub
+    // Add this code segment to your GCBASIC source program
+
+
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    -----------------SW---------ADC-- 
+    -----------------------------------------
+
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    TX-------------------------------
+    ----------------------------------------
+
+    ------------------PORTC-----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    LED-LED-LED-LED------------------
+    ----------------------------------------
+  */
+
+// Define constants to make things easier. We can reuse these at any time.
+    #DEFINE LEDPORT LATC
+    #DEFINE LEDD7 PORTC.7
+    #DEFINE LEDD6 PORTC.6
+    #DEFINE LEDD5 PORTC.5
+    #DEFINE LEDD4 PORTC.4
+
+// Set the ports as an output
+    Dir LEDD7 Out
+    Dir LEDD6 Out
+    Dir LEDD5 Out
+    Dir LEDD4 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    // This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.3
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          0
+
+//*****************************************************************************************************
+// Main program commences here.. everything before this is setup for the board.
+
+    #DEFINE PWM_FREQ    38
+    #DEFINE PWM_DUTY    50
+
+    PWMOn
+
+    Do
+    Loop
+
+
+
+/* GCBASIC Optimisation file - this will optimise PWM operations by disabling the PWM operations on the PWM channel and Timer that is set to FALSE
+                             to enable PWM and Timer operations set to FALSE
+
+           Optimise CCP/PWM    
+*/
+           #DEFINE USE_HPWMCCP1 TRUE
+           #DEFINE USE_HPWMCCP2 FALSE
+           #DEFINE USE_HPWMCCP4 FALSE
+           #DEFINE USE_HPWMCCP5 FALSE
+
+//         Optimise PWM
+           #DEFINE USE_HPWM1 FALSE
+           #DEFINE USE_HPWM2 FALSE
+           #DEFINE USE_HPWM3 FALSE
+           #DEFINE USE_HPWM4 FALSE
+           #DEFINE USE_HPWM5 FALSE
+           #DEFINE USE_HPWM6 FALSE
+           #DEFINE USE_HPWM7 FALSE
+           #DEFINE USE_HPWM8 FALSE
+
+//         Optimise Timers associated with PWM operations
+           #DEFINE USE_HPWM_TIMER2 TRUE
+           #DEFINE USE_HPWM_TIMER4 FALSE
+           #DEFINE USE_HPWM_TIMER6 FALSE

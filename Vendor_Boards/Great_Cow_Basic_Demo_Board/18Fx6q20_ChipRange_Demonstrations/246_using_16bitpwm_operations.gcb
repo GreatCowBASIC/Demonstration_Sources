@@ -1,0 +1,149 @@
+/*
+    This demonstration flashes an LED to show the use of CCP PWM operations
+
+    Uses 16bit PWM operations
+
+
+    ************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.00
+    @date    04-02-2024
+    */
+' ----- Configuration
+
+'Chip Settings.
+#CHIP 18F16Q20
+#OPTION Explicit
+
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #define PPSToolPart 18F16Q20
+
+    Sub InitPPS
+
+        RC7PPS = 0x07;  //RC7->PWM1_16BIT:PWM11;
+        RC6PPS = 0x08;  //RC6->PWM1_16BIT:PWM12;
+
+        RC5PPS = 0x09;  //RC5->PWM2_16BIT:PWM21;
+        RC4PPS = 0x0A;  //RC4->PWM2_16BIT:PWM22;
+
+        // Module: UART pin directions
+        Dir PORTB.7 Out    // Make TX1 pin an output
+        // Module: UART1
+        RB7PPS = 0x0013    // TX1 > RB7
+
+        End Sub
+    // Add this code segment to your GCBASIC source program
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    -----------------SW---------ADC-- 
+    -----------------------------------------
+
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    TX-------------------------------
+    ----------------------------------------
+
+    ------------------PORTC-----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    LED-LED-LED-LED------------------
+    ----------------------------------------
+  */
+
+// Define constants to make things easier. We can reuse these at any time.
+    #DEFINE LEDPORT LATC
+    #DEFINE LEDD7 PORTC.7
+    #DEFINE LEDD6 PORTC.6
+    #DEFINE LEDD5 PORTC.5
+    #DEFINE LEDD4 PORTC.4
+
+// Set the ports as an output
+    Dir LEDD7 Out
+    Dir LEDD6 Out
+    Dir LEDD5 Out
+    Dir LEDD4 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    // This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.3
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          0
+
+//*****************************************************************************************************
+// Main program commences here.. everything before this is setup for the board.
+
+    //PWMERS External Reset Disabled; 
+    PWM1ERS = 0x0;
+
+    //PWMCLK FOSC; 
+    PWM1CLK = 0x2;
+
+    //PWMLDS Autoload disabled; 
+    PWM1LDS = 0x0;
+
+    //PWMPRL 147; 
+    PWM1PRL = 0x93;
+
+    //PWMPRH 6; 
+    PWM1PRH = 0x6;
+
+    //PWMCPRE No prescale; 
+    PWM1CPRE = 0x0;
+
+    //PWMPIPOS No postscale; 
+    PWM1PIPOS = 0x0;
+
+    //PWMS1P1IF PWM1 output match did not occur; PWMS1P2IF PWM2 output match did not occur; 
+    PWM1GIR = 0x0;
+
+    //PWMS1P1IE disabled; PWMS1P2IE disabled; 
+    PWM1GIE = 0x0;
+
+    //PWMPOL1 disabled; PWMPOL2 disabled; PWMPPEN disabled; PWMMODE Left aligned mode; 
+    PWM1S1CFG = 0x0;
+
+    //PWMS1P1L 74; 
+    PWM1S1P1L = 0x4A;
+
+    //PWMS1P1H 3; 
+    PWM1S1P1H = 0x3;
+
+    //PWMS1P2L 148; 
+    PWM1S1P2L = 0x94;
+
+    //PWMS1P2H 6; 
+    PWM1S1P2H = 0x6;
+    
+    //PWMEN enabled; PWMLD disabled; PWMERSPOL disabled; PWMERSNOW disabled; 
+    PWM1CON = 0x80;
+
+// Main program commences here.. everything before this is setup for the board.
+
+
+    // PWM16 is operational as specified above... 38kHz at 50% duty
+
+    Do
+
+        // Uncomment to use ADC to change Duty 
+            Dim myDuty as Word Alias PWM1S1P1H, PWM1S1P1L
+            Dim ADCVal as Word
+            ADCVal = ReadAD10( ANA0 )
+            myDuty = Scale ( ADCVal, 0, 1023, 0, 0x0728)
+
+            //Load the period and duty cycle registers on the next period event
+            LD_PWM1CON = 1           
+            Wait 10 ms
+
+    Loop

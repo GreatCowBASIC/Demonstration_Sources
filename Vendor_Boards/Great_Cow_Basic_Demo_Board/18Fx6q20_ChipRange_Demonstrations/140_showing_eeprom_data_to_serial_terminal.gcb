@@ -29,20 +29,7 @@
     #DEFINE USART_TX_BLOCKING
     #DEFINE USART_DELAY OFF
 
-    // PIC PPS Tool version: 0.0.6.5
-    
-    #startup InitPPS, 85
-    #define PPSToolPart 18F16Q20
 
-    Sub InitPPS
-            
-            // Module: UART pin directions
-            Dir PORTB.7 Out    ' Make TX1 pin an output
-            // Module: UART1
-            RB7PPS = 0x0013    // TX1 > RB7
-        
-        End Sub
-    // Add this code segment to your GCBASIC source program
     
 /*
     Hardware

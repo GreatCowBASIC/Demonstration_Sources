@@ -13,45 +13,76 @@
 ''' The PWM period defined as the duration of one complete cycle or the total
 ''' amount of on and off time combined is based on a simple counter.
 '''
-''' The demo varies the PWM to the LED.  We are pretending the motor is connected to PortC.1, via a suitable motor control device.
+''' The demo varies the PWM to the IO Port.  We are pretending the motor is connected to the IO port, via a suitable motor control device.
 '''
 '''************************************************************************
 '''@author  EvanV
 '''@licence GPL
 '''@version 1.00
-'''@date    31.11.2022
+'''@date    05.11.2024
 ' ----- Configuration
 
 'Chip Settings.
 #CHIP 18F16Q20
 #OPTION Explicit
 
+    // Ensure PPS is NOT set
+            RC4PPS = 0x00
+            CCP1PPS = 0x0
+            RC5PPS = 0x00
+            CCP1PPS = 0x00
+            RC6PPS = 0x00
+            CCP1PPS = 0x00
+            RC7PPS = 0x00
+            CCP1PPS = 0x00
+
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    -----------------SW---------ADC-- 
+    -----------------------------------------
 
 
-'' -------------------PORTA----------------
-'' Bit#:  -7---6---5---4---3---2---1---0---
-'' IO:   -----------------SW----------ADC--
-''-----------------------------------------
-''
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    TX-------------------------------
+    ----------------------------------------
 
-'' -------------------PORTB----------------
-'' Bit#:  -7---6---5---4---3---2---1---0---
-'' IO:    ---------------------------------
-''-----------------------------------------
-''
+    ------------------PORTC-----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    LED-LED-LED-LED------------------
+    ----------------------------------------
+  */
 
-'' ------------------PORTC-----------------
-'' Bit#:  -7---6---5---4---3---2---1---0---
-'' IO:    ----TX---------LED--LED-LED LED--
-''-----------------------------------------
+// Define constants to make things easier. We can reuse these at any time.
+    #DEFINE LEDPORT LATC
+    #DEFINE LEDD7 PORTC.7
+    #DEFINE LEDD6 PORTC.6
+    #DEFINE LEDD5 PORTC.5
+    #DEFINE LEDD4 PORTC.4
 
-'*****************************************************************************************************
-'Main program commences here.. everything before this is setup for the board.
+// Set the ports as an output
+    Dir LEDD7 Out
+    Dir LEDD6 Out
+    Dir LEDD5 Out
+    Dir LEDD4 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    // This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.3
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          0
+
+//*****************************************************************************************************
+// Main program commences here.. everything before this is setup for the board.
 
 Dim speed, MotorSpeed, PWMCounter As Byte
 
-'We are pretending the motor is connected to Portb.1, via a suitable motor control device.
-#DEFINE MOTOR PORTC.0
+'We are pretending the motor is connected to the IO port, via a suitable motor control device.
+#DEFINE MOTOR LEDD7
 Dir MOTOR Out
 
 'Call the initialisation routine

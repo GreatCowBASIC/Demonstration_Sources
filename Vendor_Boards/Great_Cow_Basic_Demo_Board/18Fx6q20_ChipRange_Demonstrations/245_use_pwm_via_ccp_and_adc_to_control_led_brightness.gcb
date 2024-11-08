@@ -1,20 +1,7 @@
 /*
     This demonstration flashes an LED to show the use of CCP PWM operations
 
-    Pulse-Width Modulation (PWM) is a scheme that provides power to a load by switching
-    quickly between fully on and fully off states. The PWM signal resembles a square wave
-    where the high portion of the signal is considered the on state and the low portion of
-    the signal is considered the off state. The high portion, also known as the pulse width,
-    can vary in time and is defined in steps. A longer, high on time will illuminate the LED
-    brighter. The frequency or period of the PWM does not change. A larger number of
-    steps applied, which lengthens the pulse width, also supplies more power to the load.
-    Lowering the number of steps applied, which shortens the pulse width, supplies less
-    power. The PWM period is defined as the duration of one complete cycle or the total
-    amount of on and off time combined.
-
-    This demonstation shows a how the changing PWM values can dim the LED
-
-    This demonstration uses CCP3. This is logically connect to Portb.5 and therefore the RC2
+    Uses variable mode PWM operations
 
 
     ************************************************************************
@@ -93,17 +80,18 @@
 //*****************************************************************************************************
 // Main program commences here.. everything before this is setup for the board.
 
-Dim ADCVal as byte
+    HPWM 1, 38, 127
 
-// Using ADC value to set the CCP/PWM duty
-Do
+    Do
 
-    // HPWM CCPchannel, frequency, duty cycle
-    ADCVal = ReadAD( ANA0 )
-    Wait 10 ms
-    HPWM 1, 38, ADCVal
+        // HPWM CCPchannel, frequency, duty cycle
+            // Uncomment to use ADC to change Duty 
+                // Dim ADCVal as Byte
+                // ADCVal = ReadAD( ANA0 )
+                // Wait 10 ms
+                // HPWM 1, 38, ADCVal
 
-Loop
+    Loop
 
 
 

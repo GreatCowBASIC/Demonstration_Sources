@@ -17,7 +17,7 @@
 '''@date    31.11.2022
 ' ----- Configuration
 
-#INCLUDE <trig2places.h>
+
 'Chip Settings.
 #CHIP 18F16Q20
 #OPTION Explicit
@@ -99,6 +99,8 @@
 #DEFINE GLCD_TYPE GLCD_TYPE_SSD1306
 #DEFINE GLCD_I2C_Address 0x78
 #DEFINE GLCD_PROTECTOVERRUN
+
+#INCLUDE <trig2places.h>
 
 '*****************************************************************************************************
 'Main program commences here.. everything before this is setup for the board.
