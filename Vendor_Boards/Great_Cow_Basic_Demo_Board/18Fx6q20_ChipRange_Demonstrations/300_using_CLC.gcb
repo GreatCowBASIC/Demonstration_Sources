@@ -1,31 +1,36 @@
-#SKIPTEST
-#CHIP 18F16Q20
-#OPTION Explicit
+/*
+    This demonstration flashes an LED to show the use of PIN IO operation but with no code in the main loop using CLC.
 
-    #startup InitPPS, 85
-    #define PPSToolPart 18F16Q20
+    The Microchip Configurable Logic Cell (CLC) is a built-in feature in PIC18F microcontrollers that allows users 
+    to implement custom logic functions without CPU intervention.
+    
+    It enables the combination of up to 16 input signals using configurable gates, which are then reduced to four logic lines 
+    driving one of eight selectable single-output logic functions. 
+    
+    This feature is useful for tasks like data signal modulation, LED dimming, and creating custom logic signals
 
-    Sub InitPPS
-
-    /**
-    PPS registers
+    ************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.00
+    @date    05.11.2024
     */
+' ----- Configuration
+
+#chip 18F16Q20
+#option explicit
+
+  // PPS direct from MCC Standalone
+
     CLCIN0PPS = 0x3; //RA3->CLC1:CLCIN0;
-    RC0PPS = 0x01;  //RC0->CLC1:CLC1OUT;
-    RC1PPS = 0x01;  //RC1->CLC1:CLC1OUT;
-    RC2PPS = 0x01;  //RC2->CLC1:CLC1OUT;
-    RC3PPS = 0x01;  //RC3->CLC1:CLC1OUT;
+    RC7PPS = 0x0F;  //RC7->CLC1:CLC1OUT;
 
-    End Sub
-    'Template comment at the end of the config file
+  // CLC direct from MCC Standalone
 
-
-
-    ' Set the CLC1
-      // SLCT 0x0; 
+    // SLCT 0x0; 
     CLCSELECT = 0x0;
-    // LCG1POL not_inverted; LCG2POL not_inverted; LCG3POL not_inverted; LCG4POL not_inverted; LCPOL not_inverted; 
-    CLCnPOL = 0x0;
+    // LCG1POL not_inverted; LCG2POL not_inverted; LCG3POL not_inverted; LCG4POL not_inverted; LCPOL inverted; 
+    CLCnPOL = 0x80;
     // LCD1S CLCIN0 (CLCIN0PPS); 
     CLCnSEL0 = 0x0;
     // LCD2S CLCIN0 (CLCIN0PPS); 
@@ -34,8 +39,8 @@
     CLCnSEL2 = 0x0;
     // LCD4S CLCIN0 (CLCIN0PPS); 
     CLCnSEL3 = 0x0;
-    // LCG1D1N enabled; LCG1D1T disabled; LCG1D2N disabled; LCG1D2T disabled; LCG1D3N disabled; LCG1D3T disabled; LCG1D4N disabled; LCG1D4T disabled; 
-    CLCnGLS0 = 0x1;
+    // LCG1D1N disabled; LCG1D1T enabled; LCG1D2N disabled; LCG1D2T disabled; LCG1D3N disabled; LCG1D3T disabled; LCG1D4N disabled; LCG1D4T disabled; 
+    CLCnGLS0 = 0x2;
     // LCG2D1N disabled; LCG2D1T disabled; LCG2D2N disabled; LCG2D2T disabled; LCG2D3N disabled; LCG2D3T disabled; LCG2D4N disabled; LCG2D4T disabled; 
     CLCnGLS1 = 0x0;
     // LCG3D1N disabled; LCG3D1T disabled; LCG3D2N disabled; LCG3D2T disabled; LCG3D3N disabled; LCG3D3T disabled; LCG3D4N disabled; LCG3D4T disabled; 
@@ -48,22 +53,29 @@
     CLCnCON = 0x81;
 
 
-
-    'Define constants to make things easier. We can reuse these at any time.
+// Define constants to make things easier. We can reuse these at any time.
     #DEFINE LEDPORT LATC
+    #DEFINE LEDD7 PORTC.7
+    #DEFINE LEDD6 PORTC.6
+    #DEFINE LEDD5 PORTC.5
+    #DEFINE LEDD4 PORTC.4
 
-    Dir     RC0         Out
-    Dir     RC1         Out
-    Dir     RC2         Out
-    Dir     RC3         Out
+// Set the ports as an output
+    Dir LEDD7 Out
+    Dir LEDD6 Out
+    Dir LEDD5 Out
+    Dir LEDD4 Out
 
     #DEFINE POTENTIOMETER PORTA.0
-    Dir     POTENTIOMETER In
+    // This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
     #DEFINE SWITCHIN      PORTA.3
     Dir     SWITCHIN      In
+    #DEFINE DOWN          0
 
-' *******************************************************************************
-'  Main code start here....
+// 
 
-    Do
-    Loop
+Do
+  // Look no code....no interrupt... just CLC magic
+Loop

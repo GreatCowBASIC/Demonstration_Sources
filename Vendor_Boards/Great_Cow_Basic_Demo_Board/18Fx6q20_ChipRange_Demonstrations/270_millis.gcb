@@ -1,7 +1,7 @@
-#SKIPTEST
+
 '''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------------------------------------------------------
-'''This program is a simple GLCD demonstration of the timer capabilities using hthe millis function.
+'''This program is a simple GLCD demonstration of the timer capabilities using the millis function.
 ''':
 ''':
 '''@author  EvanV
