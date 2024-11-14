@@ -13,7 +13,7 @@
     @author  EvanV
     @licence GPL
     @version 1.00
-    @date    05.11.2024
+    @date    13.11.2024
     */
 ' ----- Configuration
 
@@ -21,12 +21,16 @@
 #option explicit
 
   // PPS direct from MCC Standalone
-
+    /**
+    PPS registers
+    */
     CLCIN0PPS = 0x3; //RA3->CLC1:CLCIN0;
     RC7PPS = 0x0F;  //RC7->CLC1:CLC1OUT;
 
   // CLC direct from MCC Standalone
-
+    /**
+    CLC1_Initialize section
+    */
     // SLCT 0x0; 
     CLCSELECT = 0x0;
     // LCG1POL not_inverted; LCG2POL not_inverted; LCG3POL not_inverted; LCG4POL not_inverted; LCPOL inverted; 
@@ -52,7 +56,6 @@
     // LCMODE OR-XOR; LCINTN disabled; LCINTP disabled; LCEN enabled; 
     CLCnCON = 0x81;
 
-
 // Define constants to make things easier. We can reuse these at any time.
     #DEFINE LEDPORT LATC
     #DEFINE LEDD7 PORTC.7
@@ -74,7 +77,7 @@
     Dir     SWITCHIN      In
     #DEFINE DOWN          0
 
-// 
+// Main program
 
 Do
   // Look no code....no interrupt... just CLC magic

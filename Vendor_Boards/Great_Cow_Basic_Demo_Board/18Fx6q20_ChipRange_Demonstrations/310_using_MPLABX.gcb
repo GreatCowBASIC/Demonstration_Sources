@@ -1,23 +1,45 @@
 '''A demonstration program for GCBASIC.
 '''--------------------------------------------------------------------------------
-'''This program shows integration
+'''This program shows MPLAB-X integration
 '''
 '''
 '''@author    EvanV   
 '''@license   GPL
 '''@version   1.00   
-'''@date      2022-11-13
+'''@date      2024-11-14
 '''********************************************************************************
 
 #CHIP 18F16Q20
 #OPTION EXPLICIT
 
 
-#DEFINE LED1 PORTC.1
-DIR LED1 OUT
+// Define constants to make things easier. We can reuse these at any time.
+    #DEFINE LEDPORT LATC
+    #DEFINE LEDD7 PORTC.7
+    #DEFINE LEDD6 PORTC.6
+    #DEFINE LEDD5 PORTC.5
+    #DEFINE LEDD4 PORTC.4
 
-do
-    LED1 = !LED1
-    Wait 1 s
-loop
+// Set the ports as an output
+    Dir LEDD7 Out
+    Dir LEDD6 Out
+    Dir LEDD5 Out
+    Dir LEDD4 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    // This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.3
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          0
+
+
+
+    Do
+        LEDD7 = 1
+        nop
+        LEDD7 = 0
+        nop    
+    Loop
 
