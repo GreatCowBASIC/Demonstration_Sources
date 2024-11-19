@@ -1,0 +1,77 @@
+/*
+    A demonstration program for GCBASIC
+    --------------------------------------------------------------------------------
+    This program shows toggling an LED attached to a PIC18F26Q24
+
+    One way to create a delay is to spend time decrementing to a value, but GCBASIC  has timers built in.
+
+    The demonstration will use a GCBASIC method to toggle the LED using CONSTANTS rather than the port address.
+
+    LED blinks at a rate of approximately 1.0 seconds, we use CONSTANTS to refer to the LED port.
+
+    The LED is attached to the microcontroller via a suitable resistor to 0v.
+
+    We set one of the LEDs, you can try setting the other LED..  do not forget those appropiate resistors
+
+
+    Note:
+        To make this specific PIC operate you will need to connect VDDIO2 to a VDD within specification ( 5v0 or 3v3 )
+
+    @author    Evan R Venn   
+    @license   GPL
+    @version   1.00
+    @date      15-11-2024
+    ********************************************************************************
+*/
+
+
+'Chip Settings.
+#CHIP 18F26Q24, 32
+#Option Explicit
+
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    --------------------------------- 
+    ----------------------------------------
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    ----------------------------------------
+    
+    ------------------PORTC-----------------
+    Bit#:  -X---6---5---4---3---2---1---0---
+    IO:    -^-------------------------------
+    -----VDDIO2----------------------------- You must apply correct Voltage
+    
+    */
+
+// Define constants to make things easier. We can reuse a constant at any time.
+#DEFINE LEDD0 PORTB.0
+#DEFINE LEDD1 PORTB.1
+#DEFINE LEDD2 PORTB.2
+#DEFINE LEDD3 PORTB.3
+
+// #OPTION Volatile LEDD3
+
+Dir     LEDD0 Out
+Dir     LEDD1 Out
+Dir     LEDD2 Out
+Dir     LEDD3 Out
+
+
+// *****************************************************************************************************
+    // Main program commences here.. everything before this is setup for the board.
+
+    do
+
+        'wait for 1 second which is 500 ms
+        Wait 500 ms
+        'Set the port bit to NOT value from previous state but using the ! as an alternative to NOT
+        LEDD1 = !LEDD1
+
+    loop
+
+

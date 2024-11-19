@@ -1,0 +1,152 @@
+/*
+    This demonstration uses a simple software routine to avoid the initial noise on the switch
+    pin. The code will inspect the switch status, but should overcome most of the noise from a switch.
+
+    Some switches are worse than others.
+
+    When the switch is held down and released, LEDs will toggle.
+
+
+    ************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.00
+    @date    19-11-2024
+*/
+// ----- Configuration
+//Chip Settings.
+#CHIP 18F26Q24
+#OPTION Explicit
+
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------SW----------ADC-- 
+    ----------------------------------------
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    ----------------------------------------
+    
+    ------------------PORTC-----------------
+    Bit#:  -X---6---5---4---3---2---1---0---
+    IO:    -^-------------------------------
+    -----VDDIO2----------------------------- You must apply correct Voltage
+    
+    */
+
+// Define constants to make things easier. We can reuse a constant at any time.
+#DEFINE LEDD0 PORTB.0
+#DEFINE LEDD1 PORTB.1
+#DEFINE LEDD2 PORTB.2
+#DEFINE LEDD3 PORTB.3
+
+#DEFINE LEDPORT LATB
+
+Dir     LEDD0 Out
+Dir     LEDD1 Out
+Dir     LEDD2 Out
+Dir     LEDD3 Out
+
+#DEFINE POTENTIOMETER PORTA.0
+//This is the PORTA.0 port
+Dir POTENTIOMETER In
+
+#DEFINE SWITCHIN      PORTA.3
+Dir     SWITCHIN      In
+#DEFINE DOWN          1
+
+// *****************************************************************************************************
+    // Main program commences here.. everything before this is setup for the board.
+
+    Do Forever
+        
+        'keyPressed is a Function that returns the state
+        If  funcKeyPressed() = TRUE Then
+
+            'push button pressed
+            LEDD0 = !LEDD0
+            LEDD1 = !LEDD1
+            LEDD2 = !LEDD2
+            LEDD3 = !LEDD3
+
+        End If
+
+    Loop
+
+    /*
+
+    Explanation:
+    
+        Variable Definition:
+
+            `CurrentSwitchState` and `LastSwitchState` are declared as Bit 
+            to store the current and previous states of the switch.
+
+        Debouncing:
+
+            A small delay (wait 1 ms) is introduced to debounce the switch, ensuring stable readings.
+
+        Switch State Reading:
+
+            The state of the switch is read using SWITCHIN = DOWN. 
+            If the switch is pressed, CurrentSwitchState is set to TRUE; otherwise, it is set to FALSE.
+
+        State Change Detection:
+
+            The function checks if the current state of the switch (CurrentSwitchState) 
+            is different from the last recorded state (LastSwitchState).
+
+            If the state has changed, LastSwitchState is updated to the current state, 
+            and the function returns CurrentSwitchState (either TRUE or FALSE).
+
+        State Not Changed:
+
+            If the switch state has not changed, the function returns FALSE. 
+
+    */
+
+
+
+    // This function returns the state of the switch (pressed or not)
+    Function  funcKeyPressed as Bit
+        
+        // Define some variables
+        Dim CurrentSwitchState As Bit
+        Dim LastSwitchState As Bit
+
+        // Small delay to debounce the switch
+        wait 1 ms
+
+        // Check if the switch is pressed down
+        If ( SWITCHIN = DOWN ) Then
+            
+            // Set the state to TRUE if the switch is pressed
+            CurrentSwitchState = TRUE
+
+        Else
+
+            // Set the state to FALSE if the switch is released
+            CurrentSwitchState = FALSE
+
+        End If
+
+        // Check if the switch state has changed since the last read
+        If (CurrentSwitchState <> LastSwitchState) Then
+
+            // Update the last known state of the switch
+            LastSwitchState = CurrentSwitchState
+
+            // Return the current state of the switch 
+            // Returns TRUE if pressed, FALSE if not
+            funcKeyPressed =  CurrentSwitchState
+
+        Else
+            // Return FALSE if the switch state has not changed
+            funcKeyPressed = FALSE
+
+        End If
+
+    End Function

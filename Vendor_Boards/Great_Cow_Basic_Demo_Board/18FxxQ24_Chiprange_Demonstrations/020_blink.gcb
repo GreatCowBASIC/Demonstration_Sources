@@ -1,0 +1,57 @@
+/*
+    A demonstration program for GCBASIC
+    --------------------------------------------------------------------------------
+    This program shows toggling an LED attached to a PIC18F26Q24
+
+    Note:
+        To make this specific PIC operate you will need to connect VDDIO2 to a VDD within specification ( 5v0 or 3v3 )
+
+    @author    Evan R Venn   
+    @license   GPL
+    @version   1.00
+    @date      15-11-2024
+    ********************************************************************************
+*/
+
+
+#CHIP 18F26Q24, 32
+#option Explicit
+
+
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    --------------------------------- 
+    ----------------------------------------
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    ----------------------------------------
+    
+    ------------------PORTC-----------------
+    Bit#:  -X---6---5---4---3---2---1---0---
+    IO:    -^-------------------------------
+    -----VDDIO2----------------------------- You must apply correct Voltage
+
+    */
+
+
+// *****************************************************************************************************
+    // Main program commences here.. everything before this is setup for the board.
+
+    DIR PORTB Out
+    
+    do
+
+        // Set the LEDs on
+        PORTB = 255
+        wait 500 ms
+        
+        // Set the LEDs off
+        PORTB = 0
+        wait 500 ms
+
+    loop
+

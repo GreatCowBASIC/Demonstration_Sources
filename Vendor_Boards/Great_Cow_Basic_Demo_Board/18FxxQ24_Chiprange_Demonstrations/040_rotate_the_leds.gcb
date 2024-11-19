@@ -1,0 +1,84 @@
+/*
+    A demonstration program for GC BASIC
+    --------------------------------------------------------------------------------
+    This program shows the basic operation of a PIC18F16Q24
+
+    Note:
+        To make the PIC operate you will need to connect VDDIO2 to a VDD within specification ( 5v0 or 3v3 )
+        SAF protection config is not operation by design.  The user will have to uncomment the SAF operation config in the chip specific DAT file. And, use PICKit4/5 to program
+
+    @author    Evan R Venn   
+    @license   GPL
+    @version   1.00
+    @date      16-11-2024
+*/
+
+
+'Chip Settings.
+#CHIP 18F26Q24
+#Option Explicit
+
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    --------------------------------- 
+    ----------------------------------------
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    ----------------------------------------
+    
+    ------------------PORTC-----------------
+    Bit#:  -X---6---5---4---3---2---1---0---
+    IO:    -^-------------------------------
+    -----VDDIO2----------------------------- You must apply correct Voltage
+    
+    */
+
+// Define constants to make things easier. We can reuse a constant at any time.
+#DEFINE LEDD0 PORTB.0
+#DEFINE LEDD1 PORTB.1
+#DEFINE LEDD2 PORTB.2
+#DEFINE LEDD3 PORTB.3
+
+Dir     LEDD0 Out
+Dir     LEDD1 Out
+Dir     LEDD2 Out
+Dir     LEDD3 Out
+
+
+// *****************************************************************************************************
+    // Main program commences here.. everything before this is setup for the board.
+
+
+    // Program to rotate LEDs on a PIC18F26Q24 microcontroller with a 100 ms delay
+
+    // Initialize a variable to hold the LED states
+    DIM LEDs AS BYTE
+    LEDs = 0B0001  // Start with the first LED on
+
+    // Initialize a counter for rotations
+    DIM RotateCount AS BYTE
+    RotateCount = 0
+
+    // Main loop
+    Do
+        // Output the current state to PORTB
+        LATB = LEDs
+        
+        // Rotate the LEDs to the left
+        Rotate LEDs Left Simple
+        
+        // Increment the rotation counter
+        RotateCount = RotateCount + 1
+        
+        // Reset the LEDs after 4 rotations
+        If RotateCount >= 4 Then
+            LEDs = 0B0001  // Reset to initial state
+            RotateCount = 0  // Reset counter
+        End If
+        
+        WAIT 100 ms  // Wait 100 milliseconds
+    Loop

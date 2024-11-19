@@ -1,0 +1,38 @@
+// Program to read ADC, scale the value, and display result on four LEDs on a PIC18F26Q24
+
+// Chip selection
+#chip 18F26Q24, 16
+
+// Ensure all variables are defined
+#option explicit
+
+// Define LED pins
+#DEFINE LEDD0 PORTB.0
+#DEFINE LEDD1 PORTB.1
+#DEFINE LEDD2 PORTB.2
+#DEFINE LEDD3 PORTB.3
+
+// Initialize ports
+DIR LEDD0 Out  // Set PORTB.0 as output
+DIR LEDD1 Out  // Set PORTB.1 as output
+DIR LEDD2 Out  // Set PORTB.2 as output
+DIR LEDD3 Out  // Set PORTB.3 as output
+
+// Main loop
+Do
+    // Read the ADC value from channel AN0 (8-bit read)
+    Dim ADCValue As Byte
+    ADCValue = READAD(0)
+    
+    // Scale the 8-bit ADC value to 4-bit
+    Dim ScaledValue As Byte
+    ScaledValue = SCALE(ADCValue, 0, 255, 0, 15)
+    
+    // Output the 4-bit scaled value to PORTB
+    LATB.0 = ScaledValue.0  // Set LEDD0
+    LATB.1 = ScaledValue.1  // Set LEDD1
+    LATB.2 = ScaledValue.2  // Set LEDD2
+    LATB.3 = ScaledValue.3  // Set LEDD3
+    
+    WAIT 100 ms  // Wait 100 milliseconds
+Loop

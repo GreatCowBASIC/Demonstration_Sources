@@ -1,0 +1,57 @@
+/*
+
+
+    A demonstration program for GCBASIC
+    --------------------------------------------------------------------------------
+    This program shows the basic operation of a PIC18F16Q24
+
+    Notes:
+        To make the PIC operate you will need to connect VDDIO2 to a VDD within specification ( 5v0 or 3v3 ) on specific ports.
+
+        All LEDS are attached via a suitable resistor, typically a 230R.
+
+    @author    Evan R Venn   
+    @license   GPL
+    @version   1.00
+    @date      15-11-2024
+    */
+
+
+#chip 18F26Q24
+#option Explicit
+
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    --------------------------------- 
+    ----------------------------------------
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    ----------------------------------------
+    
+    ------------------PORTC-----------------
+    Bit#:  -X---6---5---4---3---2---1---0---
+    IO:    -^-------------------------------
+    -----VDDIO2----------------------------- You must apply correct Voltage
+    
+    */
+
+// *****************************************************************************************************
+        // Main program commences here.. everything before this is setup for the board.
+
+        // Set the a port as an output, we will use only one BIT to connect to the LED
+        Dir PORTB.0 Out
+
+        // Set one bit of the port on, where 1 equate to ON
+        // You can try changing the port - another LED, remember you will need a resistor! and the `Dir` above to your new port.pin
+        PORTB.0 = 1
+
+        // Put the PIC18F16Q24 to sleep
+        End
+        
+
+
+

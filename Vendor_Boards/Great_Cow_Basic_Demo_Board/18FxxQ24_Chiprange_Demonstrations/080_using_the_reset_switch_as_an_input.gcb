@@ -1,0 +1,94 @@
+/*
+    This demonstration uses the MCLRE as an input, then, as a reset.
+    To make this happen change the CONFIG using #CONFIG and PICINFO
+
+
+    ************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.00
+    @date    19/11/2024
+*/
+
+// ----- Configuration
+//Chip Settings.
+#CHIP 18F26Q24
+#OPTION Explicit
+
+#CONFIG MCLRE=INTMCLR    // Options are INTMCLR and EXTMCLR
+                         // EXTMCLR is MCLR Enable bit->If LVP = 0, MCLR pin is MCLR; If LVP = 1, RE3 pin function is MCLR
+
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------SW----------ADC-- 
+    ----------------------------------------
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    ----------------------------------------
+    
+    ------------------PORTC-----------------
+    Bit#:  -X---6---5---4---3---2---1---0---
+    IO:    -^-------------------------------
+    -----VDDIO2----------------------------- You must apply correct Voltage
+
+    -------------------PORTE----------------
+    Bit#:  -----------------3---------------
+    IO:---------------------SW-------------- INTMCLR or EXTMCLR
+    
+  */
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.3
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+
+// *****************************************************************************************************
+// Main program commences here.. everything before this is setup for the board.
+
+    // Flash an LED to show a reset has happened
+    Repeat 20
+        LEDD0 = !LEDD0
+        wait 100 ms
+    End Repeat
+
+
+    Do Forever
+        Wait 10 ms
+
+        // The reset line is always HIGH, so, we have to test when the line goes low.
+        If  RSTBUTTON = 0 Then
+
+            // push button pressed
+            LEDD1 = 1
+
+        Else
+
+            LEDD1 = 0
+
+        End If
+        
+    Loop
