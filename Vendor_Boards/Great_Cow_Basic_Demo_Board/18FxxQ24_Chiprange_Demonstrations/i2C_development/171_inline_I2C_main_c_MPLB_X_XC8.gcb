@@ -1,0 +1,267 @@
+    // 20241128 Works.
+// VDDIO2 must be tied to Vdd (or appropriate voltage domain)
+// PIC18F26Q24 Configuration Bit Settings
+ 
+// 'C' source line config statements
+ 
+// CONFIG1
+#pragma config FEXTOSC = OFF  // External Oscillator Selection (Oscillator not enabled.)
+#pragma config RSTOSC = HFINTOSC_64MHZ// Reset Oscillator Selection (HFINTOSC with HFFRQ = 64 MHz and CDIV = 1:1)
+ 
+// CONFIG2
+#pragma config CLKOUTEN = ON  // Clock out Enable bit (CLKOUT function is enabled)
+#pragma config PR1WAY = OFF  // PRLOCKED One-Way Set Enable bit (PRLOCKED bit can be set and cleared repeatedly)
+#pragma config BBEN = OFF   // Boot Block enable bit (Boot block disabled)
+#pragma config CSWEN = ON   // Clock Switch Enable bit (Writing to NOSC and NDIV is allowed)
+#pragma config ZCD2 = OFF   // ZCD2 Disable bit (ZCD2 module is disabled. ZCD2 can be enabled by setting the ZCDSEN bit of ZCDCON)
+#pragma config FCMEN = OFF   // Fail-Safe Clock Monitor Enable bit (Fail-Safe Clock Monitor disabled)
+#pragma config FCMENP = OFF  // Fail-Safe Clock Monitor - Primary XTAL Enable bit (Fail-Safe Clock Monitor Disabled)
+#pragma config FCMENS = OFF  // Fail-Safe Clock Monitor - Secondary XTAL Enable bit (Fail-Safe Clock Monitor Disabled)
+ 
+// CONFIG3
+#pragma config MCLRE = EXTMCLR // MCLR Enable bit (If LVP = 0, MCLR pin is MCLR; If LVP = 1, RE3 pin function is MCLR )
+#pragma config PWRTS = PWRT_OFF // Power-up timer selection bits (PWRT is disabled)
+#pragma config MVECEN = ON   // Multi-vector enable bit (Multi-vector enabled, Vector table used for interrupts)
+#pragma config IVT1WAY = ON  // IVTLOCK bit One-way set enable bit (IVTLOCKED bit can be cleared and set only once)
+#pragma config LPBOREN = OFF  // Low Power BOR Enable bit (Low-Power BOR disabled)
+#pragma config BOREN = OFF   // Brown-out Reset Enable bits (Brown-out Reset disabled)
+ 
+// CONFIG4
+#pragma config BORV = VBOR_1P9 // Brown-out Reset Voltage Selection bits (Brown-out Reset Voltage (VBOR) set to 1.9V)
+#pragma config ZCD1 = OFF   // ZCD1 Disable bit (ZCD1 module is disabled. ZCD1 can be enabled by setting the ZCDSEN bit of ZCDCON)
+#pragma config PPS1WAY = OFF  // PPSLOCK bit One-Way Set Enable bit (PPSLOCKED bit can be set and cleared repeatedly (subject to the unlock sequence))
+#pragma config STVREN = ON   // Stack Full/Underflow Reset Enable bit (Stack full/underflow will cause Reset)
+#pragma config LVP = ON    // Low Voltage Programming Enable bit (Low voltage programming enabled. MCLR/VPP pin function is MCLR. MCLRE configuration bit is ignored)
+#pragma config DEBUG = OFF   // Background Debugger (Background Debugger disabled)
+#pragma config XINST = OFF   // Extended Instruction Set Enable bit (Extended Instruction Set and Indexed Addressing Mode disabled)
+ 
+// CONFIG5
+#pragma config WDTCPS = WDTCPS_31// WDT Period selection bits (Divider ratio 1:65536; software control of WDTPS)
+#pragma config WDTE = OFF   // WDT operating mode (WDT Disabled; SEN is ignored)
+ 
+// CONFIG6
+#pragma config WDTCWS = WDTCWS_7// WDT Window Select bits (window always open (100%); software control; keyed access not required)
+#pragma config WDTCCS = SC   // WDT input clock selector (Software Control)
+ 
+// CONFIG7
+// BBSIZE = No Setting
+ 
+// CONFIG9
+#pragma config WRTB = OFF   // Boot Block Write Protection bit (Boot Block not Write protected)
+#pragma config WRTC = OFF   // Configuration Register Write Protection bit (Configuration registers not Write protected)
+#pragma config WRTD = OFF   // Data EEPROM Write Protection bit (Data EEPROM not Write protected)
+#pragma config WRTSAF = OFF  // SAF Write protection bit (SAF not Write Protected)
+#pragma config WRTAPP = OFF  // Application Block write protection bit (Application Block not write protected)
+ 
+// CONFIG10
+#pragma config CP = OFF    // PFM Code Protection bit (PFM code protection disabled)
+ 
+// CONFIG11
+#pragma config CPD = OFF    // Data EEPROM Code Protection bit (Data EEPROM code protection disabled)
+ 
+// #pragma config statements should precede project file includes.
+// Use project enums instead of #define for ON and OFF.
+ 
+#include <xc.h>
+ 
+#define _XTAL_FREQ (64000000UL)
+ 
+#define I2C_BAUD_RATE (100000UL)
+#define I2C_BRG ((_XTAL_FREQ/4)/I2C_BAUD_RATE-1)
+ 
+#define PCA9536_I2C_ADDR (0x3C)
+ 
+void I2C1Init(void)
+{
+  // SCL pin
+  RC3PPS=0;
+//  ANSELCbits.ANSELC3=0; // *** Not applicable to PIC18F26Q24
+  ODCONCbits.ODCC3=1;
+  SLRCONCbits.SLRC3=0; 
+  LATCbits.LATC3=1; 
+  TRISCbits.TRISC3=0;
+ 
+  RC4PPS=0;
+//  ANSELCbits.ANSELC4=0; // *** Not applicable to PIC18F26Q24
+  ODCONCbits.ODCC4=1;
+  SLRCONCbits.SLRC4=0; 
+  LATCbits.LATC4=1; 
+  TRISCbits.TRISC4=0;
+ 
+  // Clear a stuck bus by toggling SCL and probing SDA to go high
+  __delay_us(50); // Wait for open drain to pull up
+ 
+  while (PORTCbits.RC4==0) // Chec  k SDA state
+  {
+    // Toggle SCL
+    LATCbits.LATC3=0;
+    __delay_us(50);
+    LATCbits.LATC3=1;
+    __delay_us(50);
+  }
+ 
+  // SCL pin
+  RC3PPS=0x23; // 0x23 => SCL1
+  I2C1SCLPPS=0x13; // 0x13 => RC3 
+ 
+  RC4PPS=0x24; // 0x24 => SDA1
+  I2C1SDAPPS=0x14; // 0x14 => RC4 
+ 
+  // Configure the peripheral itself
+  I2C1CON0bits.MODE=0b100; // 0b100 => I2C Host mode, 7-bit address
+  I2C1CON1bits.ACKCNT=1; // 1 => I2CxCNT == 0 => Not Acknowledge (NACK) copied to SDA output
+  I2C1CON1bits.ACKDT=0; // 0 => I2CxCNT != 0 => Acknowledge (ACK) copied to SDA output
+//  I2C1CON2bits.FME=0; // 0 => SCL frequency (FSCL) = FI2CxCLK/5 // Not on Q24
+  I2C1CON3bits.FME=0b00; // 0b00 => SCL frequency (FSCL) = FI2CxCLK/5 // Q24 specific
+  I2C1CON2bits.BFRET=0b00; // 0b00 => Minimum stop time 8 I2CxCLK pulses
+  I2C1CON2bits.ABD=0; // 0 => Address buffers are enabled.
+  I2C1CLKbits.CLK=0b0011; // 0b0011 => MFINTOSC (500kHz): gives 100kHz with FME=0. 125kHz with FME=1
+  I2C1BAUD=0; // 0 => div-by-1. // **** New for Q24 devices
+  I2C1CON0bits.EN=1;
+}
+ 
+static void I2C1TxBytes(uint8_t u8I2CAddr,uint8_t *pu8TxData,uint8_t u8NumTxBytes)
+{
+  // Wait for bus to be available
+  while (!I2C1STAT0bits.BFRE)
+  {
+    NOP();
+  }
+ 
+  I2C1ADB1 = (uint8_t)(u8I2CAddr << 1) | 0U; // I2C address, write
+  I2C1CNT = u8NumTxBytes; // Number of bytes excluding address
+ 
+  // Send the Address byte for writing
+  I2C1CON0bits.S = 1; //Start
+  while (I2C1CON0bits.S)
+  {
+    NOP();
+  }
+ 
+  while (u8NumTxBytes--)
+  {
+    I2C1TXB = * pu8TxData++;
+   
+    while (!I2C1STAT1bits.TXBE)
+    {
+      NOP();
+    }   
+  }
+ 
+  // Wait for a stop bit to complete
+  while (I2C1STAT0bits.MMA)
+  {
+    NOP();
+  } 
+}
+ 
+ 
+static void I2C1TxRxBytes(uint8_t u8I2CAddr,uint8_t *pu8TxData,uint8_t u8NumTxBytes,uint8_t *pu8RxData,uint8_t u8NumRxBytes)
+{
+  // Wait for bus to be available
+  while (!I2C1STAT0bits.BFRE)
+  {
+    NOP();
+  }
+ 
+  I2C1ADB1 = (uint8_t)(u8I2CAddr << 1) | 0U; // I2C address, write
+  I2C1CNT = u8NumTxBytes; // Number of bytes excluding address
+  I2C1CON0bits.RSEN=1; // Enable restart mode: note the order in which this is set is important
+ 
+  // Send the Address byte for writing
+  I2C1CON0bits.S = 1; //Start
+ 
+  while (I2C1CON0bits.S)
+  {
+    NOP();
+  }
+ 
+  while (u8NumTxBytes--)
+  {
+    I2C1TXB = *pu8TxData++;
+   
+    while (!I2C1STAT1bits.TXBE)
+    {
+      NOP();
+    }   
+  }
+ 
+  // Wait for master to be ready to accept more
+  while (!I2C1CON0bits.MDR)
+  {
+    NOP();
+  } 
+ 
+  I2C1ADB1 = (uint8_t)(u8I2CAddr << 1) | 1U; // I2C address, read
+  I2C1CNT=u8NumRxBytes; // Number of bytes to receive
+ 
+  // Send the Address byte for reading
+  I2C1CON0bits.S = 1; // Generate restart condition (because RSEN=1)
+ 
+  while (I2C1CON0bits.S)
+  {
+    NOP();
+  }
+  I2C1CON0bits.RSEN=0; // Disable restart mode now restart condition has completed: note the order in which this is cleared is important
+ 
+  while (u8NumRxBytes--)
+  {
+    // Receive the data byte
+    while (!I2C1STAT1bits.RXBF)
+    {
+      NOP();
+    }
+    *pu8RxData++ = I2C1RXB;
+  }
+ 
+  // Wait for a stop bit
+  while (I2C1STAT0bits.MMA)
+  {
+    NOP();
+  }
+}
+ 
+int main(void)
+{
+  I2C1Init();
+ 
+  // Initialise I/O expander
+  {
+    static uint8_t au8Data[2]={3,0}; // Register 3 is data direction, 0 => output
+   
+    I2C1TxBytes(PCA9536_I2C_ADDR,au8Data,sizeof(au8Data));
+  }
+ 
+  while (1)
+  {
+    uint8_t u8Data;
+   
+    __delay_ms(100); 
+   
+    // Read GPIO output latch from I2C I/O Expander
+    {
+      static uint8_t au8TxData[1];
+      static uint8_t au8RxData[1];
+     
+      au8TxData[0]=1; // Register 1 is GPIO output latch
+   
+      I2C1TxRxBytes(PCA9536_I2C_ADDR,au8TxData,sizeof(au8TxData),au8RxData,sizeof(au8RxData));
+     
+      u8Data=au8RxData[0];         
+    }
+   
+    u8Data ^= 0x0F; // Toggle GPIO data
+   
+    // Write GPIO output latch to I2C I/O Expander
+    {
+      uint8_t au8TxData[2];
+     
+      au8TxData[0]=1; // Register 1 is GPIO output latch
+      au8TxData[1]=u8Data;
+ 
+       I2C1TxBytes(PCA9536_I2C_ADDR,au8TxData,sizeof(au8TxData));
+    }   
+  }
+ 
+  return 0;
+}

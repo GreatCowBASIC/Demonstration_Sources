@@ -5,28 +5,36 @@
     @author  EvanV
     @licence GPL
     @version 1.00
-    @date    21-11-2024
+    @date    22-11-2024
     ----- Configuration
 */
 // Chip Settings.
-#CHIP 18F26Q24 
+#CHIP 18F26Q24, 1 
 #OPTION Explicit
 
     // PIC PPS Tool version: 0.0.6.5
     
     #startup InitPPS, 85
+    #define PPSToolPart 18F26Q24
 
     Sub InitPPS
             
             // Module: UART pin directions
-            Dir PORTC.5 Out    ' Make TX1 pin an output
-            /**
-            PPS registers
-            */
-            U1RXPPS = 0x15; //RC5->UART1:RX1;
-            RC6PPS = 0x15;  //RC6->UART1:TX1;
+            Dir PORTC.6 Out    ' Make TX1 pin an output
+            // Module: UART1
+            RC6PPS = 0x0015    // TX1 > RC6
         
         End Sub
+    // Add this code segment to your GCBASIC source program
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+    //! Optional verification of auto baud rate calculation
+        //! #DEFINE ISSUE_CHECK_USART_BAUD_RATE_WARNING
+
+
 
 /*
     Hardware
@@ -81,12 +89,9 @@
 //*****************************************************************************************************
 //Main program commences here.. everything before this is setup for the board.
 
-    #DEFINE USART_BAUD_RATE 9600
-    #DEFINE USART_TX_BLOCKING
-    #DEFINE USART_DELAY OFF
-
     HSerPrintCRLF
-    HSerPrint "GCBASIC 2024 "
+    HSerPrint "GCBASIC 2024"
+    HSerPrintCRLF
     HSerPrint ChipNameStr
     HSerPrint " at "
     HSerPrint ChipMHz

@@ -1,0 +1,181 @@
+/*
+    This demonstration shows the I2C devices attached the microcontroller, this program supports the Microchip I2C module.
+
+    I2C device required a data bus and a clock bus, devices also required an input voltage and 0v.
+    I2C data bus is connected to PortC.4
+    I2C clock bus is connected to PortC.3
+    Serial output is connected, as previously, to PortC.6
+
+    Connect your IC2 devices and see the results on the serial terminal.
+
+    ************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.02
+    @date    01-12-2024
+    */
+// ----- Configuration
+
+'Chip Settings.
+#CHIP 18F26Q24, 64
+#OPTION Explicit
+
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #define PPSToolPart 18F26Q24
+
+    Sub InitPPS
+            
+        Dir PORTC.6 Out    ' Make TX1 pin an output
+        // Module: UART1
+        RC6PPS = 0x0015    // TX1 > RC6   
+
+        RC3PPS=0x23; // 0x23 => SCL1
+        I2C1SCLPPS=0x13; // 0x13 => RC3
+
+        RC4PPS=0x24; // 0x24 => SDA1
+        I2C1SDAPPS=0x14;// 0x14 => RC4
+
+        End Sub
+    // Add this code segment to your GCBASIC source program
+
+
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+    //! Optional verification of auto baud rate calculation
+        //! #DEFINE ISSUE_CHECK_USART_BAUD_RATE_WARNING
+
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------SW----------ADC-- 
+    ----------------------------------------
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    ----------------------------------------
+    
+    ------------------PORTC-----------------
+    Bit#:  -X---6---5---4---3---2---1---0---
+    IO:    -^--TX------SDA-SCL--------------
+    -----VDDIO2----------------------------- You must apply correct Voltage
+
+    -------------------PORTE----------------
+    Bit#:  -----------------3---------------
+    IO:---------------------SW-------------- INTMCLR or EXTMCLR
+    
+  */
+
+
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+    #DEFINE SWITCHIN      PORTA.3
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+// Define I2C settings
+    #DEFINE HI2C_DATA       PORTC.4
+    #DEFINE HI2C_CLOCK      PORTC.3
+    #DEFINE HI2C_BAUD_RATE  100
+    HI2CMode (Master)
+
+    // I2C Controls specific to 18FxxQ2x chips
+    //! Optional the default is 128
+    #DEFINE HIC2Q2XBUFFERSIZE 16
+    //! Optional the default is to issue a warning
+    #DEFINE MUTE_HIC2Q2XBUFFERSIZE_WARNING
+    
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+
+    Dim DeviceID As Byte
+    Dim DISPLAYNEWLINE As Byte
+    Dim HI2CWaitMSSPTimeout As Byte
+    Dim DumpI2CRead as Byte
+
+    Wait 1 s
+    HserSend 255
+
+    Do
+        HSerPrintCRLF
+        HSerPrint "Hardware I2C"
+        HSerPrintCRLF 2
+
+        // Now assumes Serial Terminal is operational
+        HSerPrintCRLF
+        HSerPrint "   "
+        // Create a horizontal row of numbers
+        For DeviceID = 0 To 15
+            HSerPrint Hex(deviceID)
+            HSerPrint " "
+        Next
+
+        'Create a vertical column of numbers
+        For DeviceID = 0 to 255
+            DisplayNewLine = DeviceID % 16
+            If DisplayNewLine = 0 Then
+                HSerPrintCRLF
+                HSerPrint Hex(DeviceID)
+                If DisplayNewLine > 0 Then
+                    HSerPrint " "
+                End If
+            End If
+            HSerPrint " "
+
+            //Do an initial Start
+            HI2CStart
+            
+            // Send address
+            HI2CSend ( DeviceID )
+            
+            // Send a byte to prevent any potential read address lockup
+            HI2CSend ( 0x00 )
+            
+            // Stop the I2C
+            HI2CStop    
+
+            'Did device fail to respond?
+            If HI2CAckpollState = FALSE Then
+                HSerPrint Hex(DeviceID)
+            Else
+                HSerPrint "--"
+            End If
+
+        Next
+
+        HSerPrintCRLF 2
+        HSerPrint   "End of Search"
+        HSerPrintCRLF 2
+
+        Wait While SwitchIn = DOWN
+        
+    Loop
+

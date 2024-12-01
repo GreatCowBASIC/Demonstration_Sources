@@ -1,0 +1,124 @@
+/*
+ This demonstration will show how you can determine the chip parameters, we show the ChipNameStr
+/*
+    This demonstration how you can check your program is intented for a specific Microcontroller
+
+    ************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.00
+    @date    04-02-2024
+*/
+// ----- Configuration
+
+// ----- Configuration
+//Chip Settings.
+#CHIP 18F26Q24
+#OPTION Explicit
+
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #define PPSToolPart 18F26Q24
+
+    Sub InitPPS
+            
+            // Module: UART pin directions
+            Dir PORTC.6 Out    ' Make TX1 pin an output
+            // Module: UART1
+            RC6PPS = 0x0015    // TX1 > RC6
+        
+        End Sub
+    // Add this code segment to your GCBASIC source program
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+    //! Optional verification of auto baud rate calculation
+        //! #DEFINE ISSUE_CHECK_USART_BAUD_RATE_WARNING
+
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------SW----------ADC-- 
+    ----------------------------------------
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    ----------------------------------------
+    
+    ------------------PORTC-----------------
+    Bit#:  -X---6---5---4---3---2---1---0---
+    IO:    -^--TX---------------------------
+    -----VDDIO2----------------------------- You must apply correct Voltage
+
+    -------------------PORTE----------------
+    Bit#:  -----------------3---------------
+    IO:---------------------SW-------------- INTMCLR or EXTMCLR
+    
+  */
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+    #DEFINE SWITCHIN      PORTA.3
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+//*****************************************************************************************************
+//Main program commences here.. everything before this is setup for the board.
+// Now assumes Serial Terminal is operational
+
+
+#DEFINE SYSDEFAULTCONCATSTRING 64
+
+HSerPrintCRLF
+HSerPrint  ChipNameStr + " GCBASIC Demo"
+HSerPrintCRLF
+Wait 1 s
+
+Dim TargetChip As String 
+TargetChip = "18F26Q24"
+
+If Trim( UCase( TargetChip ) )  <> ChipNameStr Then
+    HSerPrint "Wrong Microcontroller program intended for " + TargetChip
+    HSerPrintCRLF
+    HSerPrint "The Microcontroller is a " + ChipNameStr
+    HSerPrintCRLF
+    Wait While TRUE
+Else
+    HSerPrint "The Microcontroller is correct - program intended for the " + ChipNameStr
+    HSerPrintCRLF
+    Wait While TRUE
+End If
+
+
+
+
+
+End
+
+// ----- Support methods.  Subroutines and Functions

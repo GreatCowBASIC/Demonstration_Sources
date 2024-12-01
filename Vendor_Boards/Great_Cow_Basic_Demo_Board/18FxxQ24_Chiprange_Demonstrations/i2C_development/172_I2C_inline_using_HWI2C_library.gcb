@@ -1,0 +1,218 @@
+#chip 18F26Q24, 64
+#option Explicit
+
+#CONFIG CLKOUTEN=OFF
+#CONFIG CP=OFF
+#CONFIG CPD=OFF
+#CONFIG FCMEN=ON
+#CONFIG FEXTOSC=OFF
+#CONFIG LVP=OFF
+#CONFIG MCLRE=EXTMCLR
+#CONFIG MVECEN=OFF
+#CONFIG WDTE=OFF
+#CONFIG WRTB=OFF
+#CONFIG WRTD=OFF
+#CONFIG WRTSAF=OFF
+#CONFIG XINST=OFF
+
+
+/*
+Include the GCBVersionNumber.cnt to increment versionString and create the build time string called GCBBuildTimeStr.
+versionString a string is created automatically.
+GCBBuildTimeStr is a string that is also created automatically.
+use "GCBVersionNumber.cnt" as this will create a local copy of the versionString tracker.
+if you use <GCBVersionNumber.cnt> this is a system wide versionString tracker.
+*/
+#INCLUDE "gcbversionnumber.cnt"
+
+
+#startup PPS, 85
+
+#define HI2C_DATA   PORTC.4
+#define HI2C_CLOCK  PORTC.3
+HI2CMode Master
+
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
+HserPrintCRLF
+I2C1Init
+HSerPrintStringCRLF "Init completed"
+
+
+
+// Start
+HI2CStart
+HI2CSend 0x77
+HI2CSend StringToByte(GCBBuildStr)
+HI2CSend 0xAA
+HI2CStop
+
+
+
+HSerPrintStringCRLF "Completed"
+wait 100 ms
+
+End
+
+Sub PPS
+
+
+    Dir PORTC.6 Out    ' Make TX1 pin an output
+    // Module: UART1
+    RC6PPS = 0x0015    // TX1 > RC6   
+
+    RC3PPS=0x23; // 0x23 => SCL1
+    I2C1SCLPPS=0x13; // 0x13 => RC3
+
+    RC4PPS=0x24; // 0x24 => SDA1
+    I2C1SDAPPS=0x14;// 0x14 => RC4
+
+End Sub
+
+Sub I2C1Init
+
+    Dir PORTC.6 Out    ' Make TX1 pin an output
+    // Module: UART1
+    RC6PPS = 0x0015    // TX1 > RC6
+    
+    // SCL pin
+    PORTC.3  =1
+    dir PORTC.3 Out
+
+    PORTC.4 = 1
+    dir PORTC.4 Out
+
+
+    RC3PPS=0x23; // 0x23 => SCL1
+    I2C1SCLPPS=0x13; // 0x13 => RC3
+
+    RC4PPS=0x24; // 0x24 => SDA1
+    I2C1SDAPPS=0x14;// 0x14 => RC4
+
+
+    // Configure the peripheral itself
+    I2C1CON0.MODE0=0; // 0b100 => I2C Host mode, 7-bit address
+    I2C1CON0.MODE1=0; // 0b100 => I2C Host mode, 7-bit address
+    I2C1CON0.MODE2=1; // 0b100 => I2C Host mode, 7-bit address
+    
+    I2C1CON1.ACKCNT=1; // 1 => I2CxCNT == 0 => Not Acknowledge (NACK) copied to SDA output
+    I2C1CON1.ACKDT=0; // 0 => I2CxCNT != 0 => Acknowledge (ACK) copied to SDA output
+        //I2C1CON2.FME=0; // 0 => SCL frequency (FSCL) = FI2CxCLK/5 // Not on Q24
+    I2C1CON3.FME0=0b0; // 0b00 => SCL frequency (FSCL) = FI2CxCLK/5 // Q24 specific
+    I2C1CON3.FME1=0b0; // 0b00 => SCL frequency (FSCL) = FI2CxCLK/5 // Q24 specific
+    
+    I2C1CON2.BFRET0=0b0; // 0b00 => Minimum stop time 8 I2CxCLK pulses
+    I2C1CON2.BFRET1=0b0; // 0b00 => Minimum stop time 8 I2CxCLK pulses
+    I2C1CON2.ABD=0; // 0 => Address buffers are enabled.
+    I2C1CLK=0b0011; // 0b0011 => MFINTOSC (500kHz): gives 100kHz with FME=0. 125kHz with FME=1
+    I2C1BAUD=0; // 0 => div-by-1. // **** New for Q24 devices
+    I2C1CON0.I2CEN=1;
+        // This is the workaround as stated in the errata
+        wait 1 us
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+End Sub
+
+
+Sub I2C1TxBytes( u8I2CAddr as Byte , pu8TxData as Byte, u8NumTxBytes as Byte )
+    
+    Dim HI2CWaitMSSPTimeout as Byte
+    HI2CWaitMSSPTimeout = 0
+
+    HI2CAckpollState = 0
+
+    // Wait for bus to be available
+    Do while I2C1STAT0.BFRE = 0
+        NOP
+    Loop
+
+    I2C1ADB1 = u8I2CAddr
+    I2C1CNT = u8NumTxBytes + 1; // Number of bytes excluding address
+
+    // Send the Address byte for writing
+    I2C1CON0.S = 1; //Start
+
+    Do while I2C1CON0.S = 1
+        NOP
+    Loop
+    
+    I2C1TXB = pu8TxData
+
+    Do while I2C1STAT1.TXBE = 0
+        NOP
+        HI2CWaitMSSPTimeout++
+        If HI2CWaitMSSPTimeout = 255 and I2C1PIR.PCIF = 1 then 
+            HI2CAckpollState = 1
+            exit Sub
+        End If
+    Loop
+
+    I2C1TXB = 0x55
+
+    Do while I2C1STAT1.TXBE = 0
+        NOP
+    Loop
+
+    // Wait for a stop bit to complete
+    Do while I2C1STAT0.MMA = 1
+        NOP
+    Loop
+
+End Sub
+
+
+        
+        Sub DumpI2Cregs
+
+            HserPrintCRLF
+            HSerPrintStringCRLF "I2C1CON0  " + ByteToBin(I2C1CON0)
+            HSerPrintStringCRLF "I2C1CON1  " + ByteToBin(I2C1CON1)
+            HSerPrintStringCRLF "I2C1CON2  " + ByteToBin(I2C1CON2)
+            HSerPrintStringCRLF "I2C1CON3  " + ByteToBin(I2C1CON3)
+            // HSerPrintStringCRLF "I2C1CLK   " + ByteToBin(I2C1CLK)
+            // HSerPrintStringCRLF "I2C1PIR   " + ByteToBin(I2C1PIR)
+            // HSerPrintStringCRLF "I2C1PIE   " + ByteToBin(I2C1PIE)
+            // HSerPrintStringCRLF "I2C1ERR   " + ByteToBin(I2C1ERR)
+            // HSerPrintStringCRLF "I2C1CNTL  " + ByteToBin(I2C1CNTL)
+            // HSerPrintStringCRLF "I2C1CNTH  " + ByteToBin(I2C1CNTH)
+            // HSerPrintStringCRLF "I2C1BAUD  " + ByteToBin(I2C1BAUD)
+            HSerPrintStringCRLF "I2C1BTOC  " + ByteToBin(I2C1BTOC)
+            HSerPrintStringCRLF "I2C1STAT0 " + ByteToBin(I2C1STAT0)
+            HSerPrintStringCRLF "I2C1STAT1 " + ByteToBin(I2C1STAT1)
+            HSerPrintStringCRLF "I2C1ERR   " + ByteToBin(I2C1ERR)
+            HSerPrintStringCRLF "I2C1PIR   " + ByteToBin(I2C1PIR)
+            
+        End Sub
+
+
+            // I2C1RXB
+            // I2C1TXB
+            // I2C1CNT
+            // I2C1CNTL
+            // I2C1CNTH
+            // I2C1ADB0
+            // I2C1ADB1
+            // I2C1ADR0
+            // I2C1ADR1
+            // I2C1ADR2
+            // I2C1ADR3
+            // I2C1CON0
+            // I2C1CON1
+            // I2C1CON2
+            // I2C1CON3
+            // I2C1ERR
+            // I2C1STAT0
+            // I2C1STAT1
+            // I2C1PIR
+            // I2C1PIE
+            // I2C1BTO
+            // I2C1BAUD
+            // I2C1CLK
+            // I2C1BTOC

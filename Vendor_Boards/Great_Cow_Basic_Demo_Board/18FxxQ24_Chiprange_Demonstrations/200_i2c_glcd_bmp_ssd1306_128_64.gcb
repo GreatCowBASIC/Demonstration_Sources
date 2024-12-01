@@ -1,0 +1,177 @@
+
+/*
+This demonstration program is a simple GLCD demonstration of the SSD1306 GLCD capabilities.
+
+This program is a simple GLCD demonstration of the SSD1306 GLCD capabilities.
+This program draws lines, boxes, circles and prints strings and numbers.
+The SSD1306 controller a small graphical OLED, suitable for a lot of various projects.
+The display is 38*35 mm, with an active display surface of 0.96inches, and a 128*64 pixel resolution.
+The display is easy to interface, using an I2C type of communication.
+The GLCD is connected to the microprocessor as shown in the hardware section of this code.
+
+This version is compatible will all version of GCBASIC as this demonstration uses Full Memory GLCD mode only.  This can be adapted to Low Memory GLCD mode.
+
+************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.02
+    @date    01-12-2024
+    */
+// ----- Configuration
+
+'Chip Settings.
+#CHIP 18F26Q24, 64
+#OPTION Explicit
+
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #define PPSToolPart 18F26Q24
+
+    Sub InitPPS
+            
+        Dir PORTC.6 Out    ' Make TX1 pin an output
+        // Module: UART1
+        RC6PPS = 0x0015    // TX1 > RC6   
+
+        RC3PPS=0x23; // 0x23 => SCL1
+        I2C1SCLPPS=0x13; // 0x13 => RC3
+
+        RC4PPS=0x24; // 0x24 => SDA1
+        I2C1SDAPPS=0x14;// 0x14 => RC4
+
+        End Sub
+    // Add this code segment to your GCBASIC source program
+
+
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+    //! Optional verification of auto baud rate calculation
+        //! #DEFINE ISSUE_CHECK_USART_BAUD_RATE_WARNING
+
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------SW----------ADC-- 
+    ----------------------------------------
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    ----------------------------------------
+    
+    ------------------PORTC-----------------
+    Bit#:  -X---6---5---4---3---2---1---0---
+    IO:    -^--TX------SDA-SCL--------------
+    -----VDDIO2----------------------------- You must apply correct Voltage
+
+    -------------------PORTE----------------
+    Bit#:  -----------------3---------------
+    IO:---------------------SW-------------- INTMCLR or EXTMCLR
+    
+  */
+
+
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+    #DEFINE SWITCHIN      PORTA.3
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+// Define I2C settings
+    #DEFINE HI2C_DATA       PORTC.4
+    #DEFINE HI2C_CLOCK      PORTC.3
+    #DEFINE HI2C_BAUD_RATE  100
+    HI2CMode (Master)
+
+    // I2C Controls specific to 18FxxQ2x chips
+    //! Optional the default is 128
+    #DEFINE HIC2Q2XBUFFERSIZE 16
+    //! Optional the default is to issue a warning
+    #DEFINE MUTE_HIC2Q2XBUFFERSIZE_WARNING
+    
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+#INCLUDE <glcd.h>
+#DEFINE GLCD_TYPE GLCD_TYPE_SSD1306
+#DEFINE GLCD_I2C_Address 0x78
+
+'A constant to  allow you to change the GLCD memory usage.
+#DEFINE GLCD_PROTECTOVERRUN
+
+'Include a BMP file.  This will automatically convert to a table called ANOBIUMFULL
+#include "anobiumfull.bmp"
+
+  Dim lengthofpicture, ram_index as word
+  Dim bytenumber, widthofpicture, heightofpicture, orgcharlocx, currcharval, firstpass, charlocy, currcharrow, charlocx, ccount as Byte
+
+
+  ' Display a BMP file
+  GLCDCLS
+  GLCDPrintStringLn "About to load BMP"
+  Wait 1 s
+
+  ' Add your own case statement here to handle multiple BMPs, you just  need the variables to be defined
+  ReadTable AnobiumFull, 0, lengthofpicture
+  ReadTable AnobiumFull, 1, widthofpicture
+  ReadTable AnobiumFull, 2, heightofpicture
+  lengthofpicture =  heightofpicture / 8
+  lengthofpicture = [word]lengthofpicture * widthofpicture
+
+  ' For BMP that fit the display simple write the data to the screen
+
+  CharLocX = 0                       ' specify X pos for BMP
+  CharLocY = 0                       ' specify Y pos for BMP.  For buffer any valid Y, for non-buffered 0,8,16, 24 etc...
+  OrgCharLocX = CharLocX              ' specify X orginisal X pos
+  firstpass = true                    ' specify this is the first pass
+
+  for  ram_index =  3 to lengthofpicture + 3         ; start at third byte and finish at the end
+
+            ' Add your own case statement here to handle multiple BMPs, you just  need set CurrCharVal to the data value
+            ReadTable AnobiumFull,  ( ram_index ), CurrCharVal  ' read data
+
+            if ( ( ram_index - 3 ) % widthofpicture ) = 0  and firstpass = false then     ' change position for new line of data
+               CharLocY = CharLocY + 8
+               CharLocX = OrgCharLocX
+            end if
+
+                    For CurrCharRow = 0 to 7
+                        if ( CharLocY + CurrCharRow < GLCD_HEIGHT ) and ( CharLocX < GLCD_WIDTH ) then
+                            If CurrCharVal.0 = 0 Then
+                               PSet CharLocX , CharLocY + CurrCharRow, GLCDBackground
+                            Else
+                               PSet CharLocX , CharLocY + CurrCharRow, GLCDForeground
+                            End If
+                        end if
+                        Rotate CurrCharVal Right
+                    Next
+
+            firstpass = false                                          ' now this is NOT the first pass
+            CharLocX++                                                 ' increment the X pos
+  next

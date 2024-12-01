@@ -1,0 +1,164 @@
+/*
+    This demonstration shows the EEProm values on the Serial Terminal.
+
+    This lesson will provide code for writing and reading a single byte onto
+    the on-board EEPROM. EEPROM is non-volatile memory, meaning that it does
+    not lose its value when power is shut off. This is unlike RAM, which will
+    lose its value when no power is applied. The EEPROM is useful for storing
+    variables that must still be present during no power.
+    It is also convenient to use if the entire RAM space is used up.
+    Writes and reads to the EEPROM are practically instant and are much faster
+    than program memory operations.
+
+    This will show the value of the EEPROM on the serial Terminal.
+    You can experiment by changing the variable // Outdata//  from Random function to a specific range.  Enjoy.
+
+    ************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.00
+    @date    28-10-2024
+*/
+//  ----- Configuration
+
+// Chip Settings.
+#CHIP 18F26Q24
+#OPTION Explicit
+
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #define PPSToolPart 18F26Q24
+
+    Sub InitPPS
+            
+            // Module: UART pin directions
+            Dir PORTC.6 Out    ' Make TX1 pin an output
+            // Module: UART1
+            RC6PPS = 0x0015    // TX1 > RC6
+        
+        End Sub
+    // Add this code segment to your GCBASIC source program
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+    //! Optional verification of auto baud rate calculation
+        //! #DEFINE ISSUE_CHECK_USART_BAUD_RATE_WARNING
+
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------SW----------ADC-- 
+    ----------------------------------------
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    ----------------------------------------
+    
+    ------------------PORTC-----------------
+    Bit#:  -X---6---5---4---3---2---1---0---
+    IO:    -^--TX---------------------------
+    -----VDDIO2----------------------------- You must apply correct Voltage
+
+    -------------------PORTE----------------
+    Bit#:  -----------------3---------------
+    IO:---------------------SW-------------- INTMCLR or EXTMCLR
+    
+  */
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+    #DEFINE SWITCHIN      PORTA.3
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+// *****************************************************************************************************
+// Main program commences here.. everything before this is setup for the board.
+// Now assumes Serial Terminal is operational
+
+Dim DisplayNewLine, Outdata, Indata  As Byte
+Dim EEPromAddress as Word
+
+Wait 3 s
+
+Do Forever
+
+    // Terminal Preparation and Table header
+        HSerPrintCRLF
+        HSerPrint "EEPROM Test and Show Results "
+        HSerPrintCRLF 2
+
+        HSerPrint "      "
+        For EEPromAddress = 0 To 15
+            HSerPrint Hex(EEPromAddress)
+            HSerPrint " "
+        Next
+
+        For EEPromAddress = 0 To ChipEEProm -1
+            // Table formatting
+                DisplayNewLine = EEPromAddress % 16
+                If DisplayNewLine = 0 Then
+                    HSerPrintCRLF
+                    HSerPrint right(Hex(EEPromAddress_H),1)
+                    HSerPrint Hex(EEPromAddress)
+                    HSerPrint ": "
+                End If
+                HSerPrint " "
+
+            // Prepare some data to send    
+
+                // Outdata = Random
+                // Outdata = 0x55    // If you DON'T believe put your own value here!
+                Outdata = 255 - EEPromAddress    // If you DON'T believe put your own value here!
+
+            // Write
+
+                EPWrite ( EEPromAddress, Outdata )
+
+            // Reads, clear indata, just for good practice
+
+                Indata = 0
+                EPRead  ( EEPromAddress, Indata )
+
+            // Show result
+            If Outdata = Indata Then
+                HSerPrint  Hex(Indata)
+            Else
+                // Show -- as an error condition
+                HSerPrint  "--"
+            End If
+        Next
+
+    // End formating
+    HSerPrintCRLF 2
+    HSerPrint   "End of EEProm Program and Display"
+    HSerPrintCRLF 2
+
+    Wait While SwitchIn = DOWN
+Loop
+End
