@@ -30,7 +30,7 @@ This version is compatible will all version of GCBASIC as this demonstration use
 
     Sub InitPPS
             
-        Dir PORTC.6 Out    ' Make TX1 pin an output
+        Dir PORTC.6 Out   // Make TX1 pin an output
         // Module: UART1
         RC6PPS = 0x0015    // TX1 > RC6   
 
@@ -122,56 +122,55 @@ This version is compatible will all version of GCBASIC as this demonstration use
 #DEFINE GLCD_TYPE GLCD_TYPE_SSD1306
 #DEFINE GLCD_I2C_Address 0x78
 
-'A constant to  allow you to change the GLCD memory usage.
+// A constant to  allow you to change the GLCD memory usage.
 #DEFINE GLCD_PROTECTOVERRUN
 
-'Include a BMP file.  This will automatically convert to a table called ANOBIUMFULL
-#include "anobiumfull.bmp"
+//! Include a BMP file.  This will automatically convert to a table called ANOBIUMFULL
+#INCLUDE "ANOBIUMFULL.BMP"
 
-  Dim lengthofpicture, ram_index as word
-  Dim bytenumber, widthofpicture, heightofpicture, orgcharlocx, currcharval, firstpass, charlocy, currcharrow, charlocx, ccount as Byte
+    Dim lengthofpicture, ram_index as word
+    Dim bytenumber, widthofpicture, heightofpicture, orgcharlocx, currcharval, firstpass, charlocy, currcharrow, charlocx, ccount as Byte
 
+    // Display a BMP file
+    GLCDCLS
+    GLCDPrintStringLn "About to load BMP"
+    Wait 1 s
 
-  ' Display a BMP file
-  GLCDCLS
-  GLCDPrintStringLn "About to load BMP"
-  Wait 1 s
+    // Add your own case statement here to handle multiple BMPs, you just  need the variables to be defined
+    ReadTable AnobiumFull, 0, lengthofpicture
+    ReadTable AnobiumFull, 1, widthofpicture
+    ReadTable AnobiumFull, 2, heightofpicture
+    lengthofpicture =  heightofpicture / 8
+    lengthofpicture = [word]lengthofpicture * widthofpicture
 
-  ' Add your own case statement here to handle multiple BMPs, you just  need the variables to be defined
-  ReadTable AnobiumFull, 0, lengthofpicture
-  ReadTable AnobiumFull, 1, widthofpicture
-  ReadTable AnobiumFull, 2, heightofpicture
-  lengthofpicture =  heightofpicture / 8
-  lengthofpicture = [word]lengthofpicture * widthofpicture
+     // For BMP that fit the display simple write the data to the screen
 
-  ' For BMP that fit the display simple write the data to the screen
+    CharLocX = 0                      // specify X pos for BMP
+    CharLocY = 0                      // specify Y pos for BMP.  For buffer any valid Y, for non-buffered 0,8,16, 24 etc...
+    OrgCharLocX = CharLocX             // specify X orginisal X pos
+    firstpass = true                   // specify this is the first pass
 
-  CharLocX = 0                       ' specify X pos for BMP
-  CharLocY = 0                       ' specify Y pos for BMP.  For buffer any valid Y, for non-buffered 0,8,16, 24 etc...
-  OrgCharLocX = CharLocX              ' specify X orginisal X pos
-  firstpass = true                    ' specify this is the first pass
+    for  ram_index =  3 to lengthofpicture + 3         ; start at third byte and finish at the end
 
-  for  ram_index =  3 to lengthofpicture + 3         ; start at third byte and finish at the end
+            // Add your own case statement here to handle multiple BMPs, you just  need set CurrCharVal to the data value
+                ReadTable AnobiumFull,  ( ram_index ), CurrCharVal // read data
 
-            ' Add your own case statement here to handle multiple BMPs, you just  need set CurrCharVal to the data value
-            ReadTable AnobiumFull,  ( ram_index ), CurrCharVal  ' read data
+                if ( ( ram_index - 3 ) % widthofpicture ) = 0  and firstpass = false then    // change position for new line of data
+                    CharLocY = CharLocY + 8
+                    CharLocX = OrgCharLocX
+                end if
 
-            if ( ( ram_index - 3 ) % widthofpicture ) = 0  and firstpass = false then     ' change position for new line of data
-               CharLocY = CharLocY + 8
-               CharLocX = OrgCharLocX
-            end if
+                        For CurrCharRow = 0 to 7
+                            if ( CharLocY + CurrCharRow < GLCD_HEIGHT ) and ( CharLocX < GLCD_WIDTH ) then
+                                If CurrCharVal.0 = 0 Then
+                                    PSet CharLocX , CharLocY + CurrCharRow, GLCDBackground
+                                Else
+                                    PSet CharLocX , CharLocY + CurrCharRow, GLCDForeground
+                                End If
+                            end if
+                            Rotate CurrCharVal Right
+                        Next
 
-                    For CurrCharRow = 0 to 7
-                        if ( CharLocY + CurrCharRow < GLCD_HEIGHT ) and ( CharLocX < GLCD_WIDTH ) then
-                            If CurrCharVal.0 = 0 Then
-                               PSet CharLocX , CharLocY + CurrCharRow, GLCDBackground
-                            Else
-                               PSet CharLocX , CharLocY + CurrCharRow, GLCDForeground
-                            End If
-                        end if
-                        Rotate CurrCharVal Right
-                    Next
-
-            firstpass = false                                          ' now this is NOT the first pass
-            CharLocX++                                                 ' increment the X pos
-  next
+                firstpass = false                                         // now this is NOT the first pass
+                CharLocX++                                                // increment the X pos
+    next

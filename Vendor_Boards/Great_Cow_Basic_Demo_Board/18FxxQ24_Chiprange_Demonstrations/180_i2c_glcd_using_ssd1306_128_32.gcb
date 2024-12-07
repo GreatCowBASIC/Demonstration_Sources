@@ -120,7 +120,7 @@
 'Main program commences here.. everything before this is setup for the board.
 
 #INCLUDE <glcd.h>
-#DEFINE GLCD_TYPE GLCD_TYPE_SSD1306_32
+#DEFINE GLCD_TYPE           GLCD_TYPE_SSD1306_32
 #DEFINE GLCD_I2C_Address 0x78
 
 ' ----- Define variables

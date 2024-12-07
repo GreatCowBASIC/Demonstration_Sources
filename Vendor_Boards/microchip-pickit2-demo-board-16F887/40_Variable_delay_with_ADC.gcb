@@ -1,0 +1,74 @@
+/*
+A demonstration program for GCBASIC.
+--------------------------------------------------------------------------------
+The first lesson showed how to turn on a LED, this lesson shows how to make it blink. 
+
+Building on lessons 1 and 2, which showed how to light up a LED and then make it blink
+with a delay loop, this lesson adds rotation. It will light up DS8 and then shift it to DS7,
+then to DS6, to DS8, and then back to DS1.
+
+The program flow to rotate the lighting of the LEDs is listed below:
+1. First, initialize the chip
+2. Set the start bit.
+3. Delay for a time dependent on the value of the ADC.
+4. Rotate the display.
+
+@author    EvanV   
+@license   GPL
+@version   1.00   
+@date      2024-08-17
+********************************************************************************
+*/
+
+
+#chip 16F887
+#option explicit
+
+
+/*
+           ------------PORTA---------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------------------AN0--
+    IO:    ---------------------------------
+
+           ------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------------------SW---
+    IO:    ---------------------------------
+
+           ------------PORTC----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ---------------------------------
+    IO:    ---------------------------------
+
+           ------------PORTD----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:   -DS8-DS7-DS6-DS5-DS4-DS3-DS2-DS1--
+    IO:    ---------------------------------
+
+*/
+
+DIR PORTD OUT
+PORTD.7 = 1
+
+Dim ADCValue as Byte
+
+Do
+
+    ADCValue = Scale(  ReadAD10 ( AN0 ), 0, 1023, 1, 250)
+
+    //Wait for the value of ADC
+    Wait ADCValue ms
+
+    // Ensure the Carry bit is clear
+    Set C OFF
+
+    //Rotate the port to the right, shift the bits of the port to the right
+    ROTATE PORTD RIGHT
+
+    //Did the rotate set the carry bit? If, yes, set the bit to 1
+    IF C = 1 Then PORTD.7 = 1
+
+Loop
+
+End

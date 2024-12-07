@@ -122,6 +122,9 @@ This version is compatible will all version of GCBASIC as this demonstration use
 #DEFINE GLCD_TYPE GLCD_TYPE_SSD1306
 #DEFINE GLCD_I2C_Address 0x78
 
+//! Unomment to enable version tracking
+#INCLUDE "GCBversionnumber.cnt"
+
 ' ----- Define variables
 
 'These constants allow you to change the GLCD memory usage.
