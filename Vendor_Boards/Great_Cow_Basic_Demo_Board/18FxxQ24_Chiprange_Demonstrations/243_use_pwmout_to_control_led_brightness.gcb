@@ -1,0 +1,102 @@
+/*
+    This demonstration flashes an LED to show the use of PWMOut() operations
+    This will pulse the IO at a max 4~kHz
+
+    ************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.00
+    @date    05.11.2024
+    */
+
+//  ----- Configuration
+// Chip Settings.
+#CHIP 18F26Q24
+#OPTION Explicit
+
+    // Ensure PPS is NOT set
+            RB0PPS = 0x00
+            RB1PPS = 0x00
+            RB2PPS = 0x00
+            RB3PPS = 0x00
+            CCP1PPS = 0x00
+
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------SW----------ADC-- 
+    ----------------------------------------
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    ----------------------------------------
+    
+    ------------------PORTC-----------------
+    Bit#:  -X---6---5---4---3---2---1---0---
+    IO:    -^--TX---------------------------
+    -----VDDIO2----------------------------- You must apply correct Voltage
+
+    -------------------PORTE----------------
+    Bit#:  -----------------3---------------
+    IO:---------------------SW-------------- INTMCLR or EXTMCLR
+    
+  */
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+    #DEFINE SWITCHIN      PORTA.3
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+
+//*****************************************************************************************************
+// Main program commences here.. everything before this is setup for the board.
+
+    // ----- Constants
+    'PWM constant. This is a required constant.
+    #DEFINE PWM_OUT1 LEDD0
+
+    // ---- Optional Constant to add an delay after PWM pulse
+    #DEFINE PWM_DELAY 0 us
+
+    // ----- Define Hardware settings
+    // PWM port out.  This is not required but it is good practice.
+    dir PWM_OUT1 out
+
+    // PWMOut channel, duty cycle, cycles
+
+    // ----- Main body of program commences here.
+    do
+        
+        // cycle parameter ( the third parameter ) is a purely arbitrary value as the loop will maintain a relatively constant PWM
+        // This will pulse the IO at a max 4~kHz
+        PWMOut 1, 127, 4
+    
+    loop
+
+end
+
+

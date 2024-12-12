@@ -1,5 +1,5 @@
 /*
-    This demonstration flashes an LED to show the use of CCP PWM operations
+    This demonstration flashes an LED to show the use of 16bit PWM operations
 
     Uses 16bit PWM operations
 

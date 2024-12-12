@@ -1,28 +1,35 @@
 /*
- This demonstration will show how you can determine the chip parameters, we show the ChipNameStr
-/*
-    This demonstration how you can check your program is intented for a specific Microcontroller
+    This demonstration flashes an LED to show the use of CCP PWM operations
+
+    Uses variable mode PWM operations
+
 
     ************************************************************************
     @author  EvanV
     @licence GPL
     @version 1.00
     @date    12-12-2024
-*/
-// ----- Configuration
+    */
 
-// ----- Configuration
-//Chip Settings.
+//  ----- Configuration
+// Chip Settings.
 #CHIP 18F26Q24
 #OPTION Explicit
 
     // PIC PPS Tool version: 0.0.6.5
-    
-    #startup InitPPS, 85
     #define PPSToolPart 18F26Q24
-
+    #startup InitPPS, 85
     Sub InitPPS
             
+            // Module: CCP1
+            RB0PPS = 0x000D    // CCP1 > RB0
+            CCP1PPS = 0x0008    // RB0 > CCP1 (bi-directional)
+            RB1PPS = 0x000D    // CCP1 > RB1
+            CCP1PPS = 0x0009    // RB1 > CCP1 (bi-directional)
+            RB2PPS = 0x000D    // CCP1 > RB2
+            CCP1PPS = 0x000A    // RB2 > CCP1 (bi-directional)
+            RB3PPS = 0x000D    // CCP1 > RB3
+            CCP1PPS = 0x000B    // RB3 > CCP1 (bi-directional)
             // Module: UART pin directions
             Dir PORTC.6 Out    ' Make TX1 pin an output
             // Module: UART1
@@ -35,9 +42,6 @@
     #DEFINE USART_TX_BLOCKING
     #DEFINE USART_DELAY OFF
     
-    //! Optional verification of auto baud rate calculation
-        //! #DEFINE ISSUE_CHECK_USART_BAUD_RATE_WARNING
-
 /*
     Hardware
     -------------------PORTA----------------
@@ -89,36 +93,44 @@
     Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
 
 //*****************************************************************************************************
-//Main program commences here.. everything before this is setup for the board.
-// Now assumes Serial Terminal is operational
+// Main program commences here.. everything before this is setup for the board.
 
+    HPWM 1, 38, 127
 
-#DEFINE SYSDEFAULTCONCATSTRING 64
+    Do
 
-HSerPrintCRLF
-HSerPrint  ChipNameStr + " GCBASIC Demo"
-HSerPrintCRLF
-Wait 1 s
+        // HPWM CCPchannel, frequency, duty cycle
+            // Uncomment to use ADC to change Duty 
+                Dim ADCVal as Byte
+                ADCVal = ReadAD( ANA0 )
+                Wait 10 ms
+                HPWM 1, 38, ADCVal
 
-Dim TargetChip As String 
-TargetChip = "18F26Q24"
-
-If Trim( UCase( TargetChip ) )  <> ChipNameStr Then
-    HSerPrint "Wrong Microcontroller program intended for " + TargetChip
-    HSerPrintCRLF
-    HSerPrint "The Microcontroller is a " + ChipNameStr
-    HSerPrintCRLF
-    Wait While TRUE
-Else
-    HSerPrint "The Microcontroller is correct - program intended for the " + ChipNameStr
-    HSerPrintCRLF
-    Wait While TRUE
-End If
+    Loop
 
 
 
+/* GCBASIC Optimisation file - this will optimise PWM operations by disabling the PWM operations on the PWM channel and Timer that is set to FALSE
+                             to enable PWM and Timer operations set to FALSE
 
+           Optimise CCP/PWM    
+*/
+           #DEFINE USE_HPWMCCP1 TRUE
+           #DEFINE USE_HPWMCCP2 FALSE
+           #DEFINE USE_HPWMCCP4 FALSE
+           #DEFINE USE_HPWMCCP5 FALSE
 
-End
+//         Optimise PWM
+           #DEFINE USE_HPWM1 FALSE
+           #DEFINE USE_HPWM2 FALSE
+           #DEFINE USE_HPWM3 FALSE
+           #DEFINE USE_HPWM4 FALSE
+           #DEFINE USE_HPWM5 FALSE
+           #DEFINE USE_HPWM6 FALSE
+           #DEFINE USE_HPWM7 FALSE
+           #DEFINE USE_HPWM8 FALSE
 
-// ----- Support methods.  Subroutines and Functions
+//         Optimise Timers associated with PWM operations
+           #DEFINE USE_HPWM_TIMER2 TRUE
+           #DEFINE USE_HPWM_TIMER4 FALSE
+           #DEFINE USE_HPWM_TIMER6 FALSE

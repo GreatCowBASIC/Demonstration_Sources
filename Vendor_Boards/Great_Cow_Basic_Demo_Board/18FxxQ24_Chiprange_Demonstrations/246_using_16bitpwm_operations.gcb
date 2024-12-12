@@ -1,16 +1,16 @@
 /*
-    This demonstration shows the use of EEProm values created from a Table..
+    This demonstration flashes an LED to show the use of CCP PWM operations
 
-    This will show the value of the EEPROM on the serial Terminal.
+    Uses 16bit PWM operations
+
 
     ************************************************************************
     @author  EvanV
     @licence GPL
     @version 1.00
     @date    12-12-2024
-*/
+    */
 //  ----- Configuration
-
 // Chip Settings.
 #CHIP 18F26Q24
 #OPTION Explicit
@@ -22,6 +22,11 @@
 
     Sub InitPPS
             
+            // Module: PWM1_16BIT
+            RB0PPS = 0x000F    // PWM11 > RB0
+            RB1PPS = 0x000F    // PWM11 > RB1
+            RB2PPS = 0x000F    // PWM11 > RB2
+            RB3PPS = 0x000F    // PWM11 > RB3
             // Module: UART pin directions
             Dir PORTC.6 Out    ' Make TX1 pin an output
             // Module: UART1
@@ -34,9 +39,6 @@
     #DEFINE USART_TX_BLOCKING
     #DEFINE USART_DELAY OFF
     
-    //! Optional verification of auto baud rate calculation
-        //! #DEFINE ISSUE_CHECK_USART_BAUD_RATE_WARNING
-
 /*
     Hardware
     -------------------PORTA----------------
@@ -87,70 +89,87 @@
     #DEFINE RSTBUTTON     PORTE.3
     Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
 
-// *****************************************************************************************************
+//*****************************************************************************************************
 // Main program commences here.. everything before this is setup for the board.
 
-    Wait 1 s
+    //PWMERS External Reset Disabled; 
+    PWM1ERS = 0x0;
+
+    //PWMCLK FOSC; 
+    PWM1CLK = 0x2;
+
+    //PWMLDS Autoload disabled; 
+    PWM1LDS = 0x0;
+
+    //PWMPRL 147; 
+    PWM1PRL = 0x93;
+
+    //PWMPRH 6; 
+    PWM1PRH = 0x6;
+
+    //PWMCPRE No prescale; 
+    PWM1CPRE = 0x0;
+
+    //PWMPIPOS No postscale; 
+    PWM1PIPOS = 0x0;
+
+    //PWMS1P1IF PWM1 output match did not occur; PWMS1P2IF PWM2 output match did not occur; 
+    PWM1GIR = 0x0;
+
+    //PWMS1P1IE disabled; PWMS1P2IE disabled; 
+    PWM1GIE = 0x0;
+
+    //PWMPOL1 disabled; PWMPOL2 disabled; PWMPPEN disabled; PWMMODE Left aligned mode; 
+    PWM1S1CFG = 0x0;
+
+    //PWMS1P1L 74; 
+    PWM1S1P1L = 0x4A;
+
+    //PWMS1P1H 3; 
+    PWM1S1P1H = 0x3;
+
+    //PWMS1P2L 148; 
+    PWM1S1P2L = 0x94;
+
+    //PWMS1P2H 6; 
+    PWM1S1P2H = 0x6;
+    
+    //Clear PWM1_16BIT period interrupt flag
+    PIR4.PWM1PIF = 0;
+    
+    //Clear PWM1_16BIT interrupt flag
+    PIR4.PWM1IF = 0;
+    
+    //Clear PWM1_16BIT slice 1, output 1 interrupt flag
+    PWM1GIR.S1P1IF = 0;
+    
+    //Clear PWM1_16BIT slice 1, output 2 interrupt flag
+    PWM1GIR.S1P2IF = 0;
+    
+    //PWM1_16BIT interrupt enable bit
+    PIE4.PWM1IE = 0;
+    
+    //PWM1_16BIT period interrupt enable bit
+    PIE4.PWM1PIE = 0;
+    
+    //PWMEN enabled; PWMLD disabled; PWMERSPOL disabled; PWMERSNOW disabled; 
+    PWM1CON = 0x80;
+
+// Main program commences here.. everything before this is setup for the board.
 
 
-    // Read EEPROM items
-    ShowEEProm()
+    // PWM16 is operational as specified above... 38kHz at 50% duty
 
     Do
+
+        // Use ADC to change Duty 
+            Dim myDuty as Word Alias PWM1S1P1H, PWM1S1P1L
+            Dim ADCVal as Word
+            ADCVal = ReadAD10( ANA0 )
+            myDuty = Scale ( ADCVal, 0, 1023, 0, 0x0694)
+
+            //Load the period and duty cycle register.bit on the next period event
+            LD_PWM1CON = 1           
+            Wait 10 ms
+
     Loop
-
-
-    // Table of values to write to EEPROM
-    // EEPROM location is specified
-    // Subsequent locations will each store a value
-
-    EEPROM TestDataSource 0x10
-        0x01
-        0x02
-        0x03
-        0x04
-        0x05
-        0x06
-    End EEPROM
-
-    EEPROM TestDataSource2 0x16
-        0x11
-        0x12
-        0x13
-        0x14
-        0x15
-        0x16
-    End EEPROM
-
-
-Sub ShowEEProm
-
-    Dim DisplayNewLine, Outdata, Indata  As Byte
-    Dim EEPromAddress as Word
-
-    HserPrintCRLF 2
-
-    HserPrint "      "
-    For EEPromAddress = 0 To 15
-        HSerPrint Hex(EEPromAddress)
-        HSerPrint " "
-    Next
-
-    For EEPromAddress = 0 To ChipEEProm -1
-        DisplayNewLine = EEPromAddress % 16
-        If DisplayNewLine = 0 Then
-            HSerPrintCRLF
-            HSerPrint right(Hex(EEPromAddress_H),1)
-            HSerPrint Hex(EEPromAddress)
-            HSerPrint ": "
-        End If
-        HSerPrint " "
-
-        // Read EEPROM at specific address
-        Indata = 0
-        EPRead  ( EEPromAddress, Indata )
-        HSerPrint  Hex(Indata)
-
-    Next
-
-End Sub

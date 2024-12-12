@@ -1,42 +1,25 @@
 /*
- This demonstration will show how you can determine the chip parameters, we show the ChipNameStr
-/*
-    This demonstration how you can check your program is intented for a specific Microcontroller
+    This demonstration flashes an LED to show the use of pulseout() operations
+    This will pulse the IO at 38kHz
 
     ************************************************************************
     @author  EvanV
     @licence GPL
     @version 1.00
-    @date    12-12-2024
-*/
-// ----- Configuration
+    @date    05.11.2024
+    */
 
-// ----- Configuration
-//Chip Settings.
+//  ----- Configuration
+// Chip Settings.
 #CHIP 18F26Q24
 #OPTION Explicit
 
-    // PIC PPS Tool version: 0.0.6.5
-    
-    #startup InitPPS, 85
-    #define PPSToolPart 18F26Q24
-
-    Sub InitPPS
-            
-            // Module: UART pin directions
-            Dir PORTC.6 Out    ' Make TX1 pin an output
-            // Module: UART1
-            RC6PPS = 0x0015    // TX1 > RC6
-        
-        End Sub
-    // Add this code segment to your GCBASIC source program
-
-    #DEFINE USART_BAUD_RATE 9600
-    #DEFINE USART_TX_BLOCKING
-    #DEFINE USART_DELAY OFF
-    
-    //! Optional verification of auto baud rate calculation
-        //! #DEFINE ISSUE_CHECK_USART_BAUD_RATE_WARNING
+    // Ensure PPS is NOT set
+            RB0PPS = 0x00
+            RB1PPS = 0x00
+            RB2PPS = 0x00
+            RB3PPS = 0x00
+            CCP1PPS = 0x00
 
 /*
     Hardware
@@ -89,36 +72,13 @@
     Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
 
 //*****************************************************************************************************
-//Main program commences here.. everything before this is setup for the board.
-// Now assumes Serial Terminal is operational
+// Main program commences here.. everything before this is setup for the board.
+
+Do
+
+    PulseOut LEDD0, 13 us
+    wait 13 us
+
+Loop
 
 
-#DEFINE SYSDEFAULTCONCATSTRING 64
-
-HSerPrintCRLF
-HSerPrint  ChipNameStr + " GCBASIC Demo"
-HSerPrintCRLF
-Wait 1 s
-
-Dim TargetChip As String 
-TargetChip = "18F26Q24"
-
-If Trim( UCase( TargetChip ) )  <> ChipNameStr Then
-    HSerPrint "Wrong Microcontroller program intended for " + TargetChip
-    HSerPrintCRLF
-    HSerPrint "The Microcontroller is a " + ChipNameStr
-    HSerPrintCRLF
-    Wait While TRUE
-Else
-    HSerPrint "The Microcontroller is correct - program intended for the " + ChipNameStr
-    HSerPrintCRLF
-    Wait While TRUE
-End If
-
-
-
-
-
-End
-
-// ----- Support methods.  Subroutines and Functions

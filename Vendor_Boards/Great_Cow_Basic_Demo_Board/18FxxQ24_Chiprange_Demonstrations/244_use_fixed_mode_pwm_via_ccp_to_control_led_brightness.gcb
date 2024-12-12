@@ -1,0 +1,201 @@
+/*
+    This demonstration flashes an LED to show the use of CCP PWM operations
+
+    Uses fixed mode PWM operations
+
+    This program will enable a 28 kHz PWM signal, with a duty cycle
+    of 50%. It will emit the signal for 10 seconds, then stop.
+    #define PWM_Freq 38    'Set frequency in KHz
+    #define PWM_Duty 50    'Set duty cycle to 50 %
+
+    ************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.00
+    @date    12-12-2024
+    */
+
+//  ----- Configuration
+// Chip Settings.
+#CHIP 18F26Q24
+#OPTION Explicit
+
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #define PPSToolPart 18F26Q24
+
+    Sub InitPPS
+            
+            // Module: CCP1
+            RB0PPS = 0x000D    // CCP1 > RB0
+            CCP1PPS = 0x0008    // RB0 > CCP1 (bi-directional)
+            RB1PPS = 0x000D    // CCP1 > RB1
+            CCP1PPS = 0x0009    // RB1 > CCP1 (bi-directional)
+            RB2PPS = 0x000D    // CCP1 > RB2
+            CCP1PPS = 0x000A    // RB2 > CCP1 (bi-directional)
+            RB3PPS = 0x000D    // CCP1 > RB3
+            CCP1PPS = 0x000B    // RB3 > CCP1 (bi-directional)
+            // Module: UART pin directions
+            Dir PORTC.6 Out    ' Make TX1 pin an output
+            // Module: UART1
+            RC6PPS = 0x0015    // TX1 > RC6
+        
+        End Sub
+    // Add this code segment to your GCBASIC source program
+
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------SW----------ADC-- 
+    ----------------------------------------
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    ----------------------------------------
+    
+    ------------------PORTC-----------------
+    Bit#:  -X---6---5---4---3---2---1---0---
+    IO:    -^--TX---------------------------
+    -----VDDIO2----------------------------- You must apply correct Voltage
+
+    -------------------PORTE----------------
+    Bit#:  -----------------3---------------
+    IO:---------------------SW-------------- INTMCLR or EXTMCLR
+    
+  */
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+    #DEFINE SWITCHIN      PORTA.3
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+//*****************************************************************************************************
+// Main program commences here.. everything before this is setup for the board.
+
+    #DEFINE PWM_FREQ    38
+    #DEFINE PWM_DUTY    50
+
+    PWMOn
+
+    // Uncomment to review the paramaters, registers etc
+        // ShowDetails
+
+    Do
+    Loop
+
+
+Sub ShowDetails
+
+    //Clear terminal
+        HSerSend 1  // clear terminal
+        wait 100 ms
+        HSerSend 1  // clear terminal
+        wait 100 ms
+        HserPrintCRLF 
+
+    HSerPrint "Constants"               : HserPrintCRLF
+        HserPrint "PWM_FREQ:        "
+            HserPrint PWM_FREQ          : HserPrintCRLF
+        HserPrint "PWM_DUTY:        "
+            HserPrint PWM_DUTY          : HserPrintCRLF
+        HserPrint "USE_HPWMCCP1:    "
+            HserPrint USE_HPWMCCP1      : HserPrintCRLF
+        HserPrint "USE_HPWM_TIMER2: "
+            HserPrint USE_HPWM_TIMER2   : HserPrintCRLF
+        #If def(DisableCCPFixedModePWM) 
+            HserPrint "DisableCCPFixedModePWM: "
+                HserPrint DisableCCPFixedModePWM    : HserPrintCRLF
+        #endif
+
+    HserPrintCRLF
+    HserPrint "Registers": HserPrintCRLF
+        PReg("CCP1CON      ", CCP1CON, "CCP Control Register" )
+        PReg("CCPCONCache  ", CCPCONCache, "Cached register used to by PWMon" )
+        #ifdef var(T2PR)
+            PReg("T2PR         ", T2PR, "Timer Period" )
+        #else
+            PReg("PR2          ", PR2, "Timer Period" )
+        #endif
+        Preg("T2CON        ", T2CON ,"Timer2 control")
+        Preg("T2CLKCON     ", T2CLKCON, "Clock Source Selection" )
+        Preg("CCPR1H       ", CCPR1H, "Duty cycle H" )
+        Preg("CCPR1L       ", CCPR1L, "Duty cycle L")
+        Preg("CCPTMRS0     ", CCPTMRS0, "Timer Selection")
+        
+        
+    HserPrintCRLF
+    HserPrint "Variables": HserPrintCRLF
+        dim _PWMTimerSelected as Byte
+        Preg( "_PWMTimerSelected", _PWMTimerSelected, "Selected Timer")
+        // Preg( "PWMDuty          ", PWMDuty, "[WORD] used in calculateDuty() in pwm.h ")
+        // Preg( "PWMResolution    ", PWMResolution, "[WORD] used in calculateDuty() in pwm.h")
+        
+        
+
+End Sub
+
+Macro PReg ( xstr, xreg , comment )
+
+        
+        HSerPrint "  "+xstr+": "
+            HSerPrint ByteToBin(xreg): HSerPrint ", 0x"+Hex(xreg):HSerPrint ", "+ Pad(Str(xreg),10," "  ):HserPrint chr(9)+comment: HserPrintCRLF
+
+
+End Macro
+
+
+
+/* GCBASIC Optimisation file - this will optimise PWM operations by disabling the PWM operations on the PWM channel and Timer that is set to FALSE
+                             to enable PWM and Timer operations set to FALSE
+
+           Optimise CCP/PWM    
+*/
+           #DEFINE USE_HPWMCCP1 TRUE
+           #DEFINE USE_HPWMCCP2 FALSE
+           #DEFINE USE_HPWMCCP4 FALSE
+           #DEFINE USE_HPWMCCP5 FALSE
+
+//         Optimise PWM
+           #DEFINE USE_HPWM1 TRUE
+           #DEFINE USE_HPWM2 FALSE
+           #DEFINE USE_HPWM3 FALSE
+           #DEFINE USE_HPWM4 FALSE
+           #DEFINE USE_HPWM5 FALSE
+           #DEFINE USE_HPWM6 FALSE
+           #DEFINE USE_HPWM7 FALSE
+           #DEFINE USE_HPWM8 FALSE
+
+//         Optimise Timers associated with PWM operations
+           #DEFINE USE_HPWM_TIMER2 TRUE
+           #DEFINE USE_HPWM_TIMER4 FALSE
+           #DEFINE USE_HPWM_TIMER6 FALSE

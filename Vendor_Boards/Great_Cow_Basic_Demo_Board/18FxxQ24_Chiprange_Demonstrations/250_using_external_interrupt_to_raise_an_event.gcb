@@ -1,0 +1,114 @@
+'''
+''' This demonstration will provide code for raising an event when a port changes.
+''' The port that is being set then inspected in PORTA.3. Why? Because we have the switch on that port.
+'''
+''' When the event happens the LED is toggled.  The LED will toggle when the Signal value is 0.
+'''
+''' This does not have a proper debounce check, you can add one.
+'''
+'''************************************************************************
+'''@author  EvanV
+'''@licence GPL
+'''@version 1.00
+'''@date    05.11.2024
+' ----- Configuration
+
+#CHIP 18F26Q24
+#OPTION Explicit
+
+    // Ensure PPS is NOT set
+            RB0PPS = 0x00
+            RB1PPS = 0x00
+            RB2PPS = 0x00
+            RB3PPS = 0x00
+            CCP1PPS = 0x00
+
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------SW----------ADC-- 
+    ----------------------------------------
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    ----------------------------------------
+    
+    ------------------PORTC-----------------
+    Bit#:  -X---6---5---4---3---2---1---0---
+    IO:    -^--TX---------------------------
+    -----VDDIO2----------------------------- You must apply correct Voltage
+
+    -------------------PORTE----------------
+    Bit#:  -----------------3---------------
+    IO:---------------------SW-------------- INTMCLR or EXTMCLR
+    
+  */
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+    #DEFINE SWITCHIN      PORTA.3
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+
+//*****************************************************************************************************
+// Main program commences here.. everything before this is setup for the board.
+
+/* Interrupt-on-change enabled on the IOCx pin for a negative-going edge. Associated Status bit 
+    and interrupt flag will be set upon detecting an edge. */
+IOCAN3 = 1
+
+// Setup the handler
+On Interrupt PORTChange  Call InterruptHandler
+
+'Loop forever
+Do
+    LEDD0 = !LEDD0
+    wait 25 ms
+Loop
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Sub InterruptHandler
+
+    'Toggle the LED
+    LEDD3 = !LEDD3
+
+    'We must clear this specific bit flag in software, the main IOC is cleare by the GCBASIC interrupt handler
+    IOCAF3  = 0
+
+End Sub
