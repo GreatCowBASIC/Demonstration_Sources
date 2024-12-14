@@ -1,0 +1,123 @@
+'''
+'''  This demonstration shows reading and writing PROGMEM on the Serial Terminal.
+'''
+'''************************************************************************
+'''@author  EvanV
+'''@licence GPL
+'''@version 1.00
+'''@date    14.12.2024
+' ----- Configuration
+
+#CHIP 18F26Q24, 16
+#OPTION Explicit
+
+
+    // PIC PPS Tool version: 0.0.6.5
+    #define PPSToolPart 18F26Q24
+    #startup InitPPS, 85
+    Sub InitPPS
+            
+            // Module: UART pin directions
+            Dir PORTC.6 Out    ' Make TX1 pin an output
+            // Module: UART1
+            RC6PPS = 0x0015    // TX1 > RC6
+        
+        End Sub
+    // Add this code segment to your GCBASIC source program
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+    //! Optional verification of auto baud rate calculation
+        //! #DEFINE ISSUE_CHECK_USART_BAUD_RATE_WARNING
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+    #DEFINE SWITCHIN      PORTA.3
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+' Now assumes Serial Terminal is operational
+
+    Dim  ProgMemAddress as long
+    Dim  DataWord as word
+
+    wait 1 s
+    HSerPrintCRLF 2
+
+    'We are reading words, so we send the ProgMemAddress address every two bytes (a word).
+    for ProgMemAddress = 0x0000 to 0x001F Step 2
+    
+        'Display the value
+        HSerPrint "0x"
+        HSerPrint hex(ProgMemAddress_h)
+        HSerPrint hex(ProgMemAddress)
+        HSerSend 9
+        HSerSend 9
+
+        'Read the value of the ProgMem
+        PFMRead  ( ProgMemAddress, DataWord )
+
+        'Display the received value
+        HSerPrint "0x"
+        HSerPrint hex(DataWord_h)
+        HSerPrint hex(DataWord)
+        HSerPrintCRLF
+
+    Next
+    HSerPrintCRLF
+
+    'PFMWrite
+    PFMWrite ( 0x3FF8, 0x11 )
+    PFMWrite ( 0x3FFC, 0x55AA )
+
+    'We are reading words, so we send the ProgMemAddress address every two bytes (a word).
+    for ProgMemAddress = 0x3FF0 to 0x3FFF Step 2
+
+        'Display the value
+        HSerPrint "0x"
+        HSerPrint hex(ProgMemAddress_h)
+        HSerPrint hex(ProgMemAddress)
+        HSerSend 9
+        HSerSend 9
+
+        'Read the value of the ProgMemAddress
+        PFMRead  ( ProgMemAddress, DataWord )
+
+
+        'Display the received value
+        HSerPrint "0x"
+        HSerPrint hex(DataWord_h)
+        HSerPrint hex(DataWord)
+        HSerPrintCRLF
+
+    Next
+    HSerPrintCRLF
+
+    do
+    loop

@@ -1,0 +1,92 @@
+/*
+    This demonstrations show how create DATA and EEPROM data blocks.
+    DATA and EEPROM data blocks are very useful to store reference information in PROGMEM or EEPROM.
+
+    */
+    
+#CHIP 18F26Q24, 16
+#OPTION Explicit
+
+
+    // PIC PPS Tool version: 0.0.6.5
+    #define PPSToolPart 18F26Q24
+    #startup InitPPS, 85
+    Sub InitPPS
+            
+            // Module: UART pin directions
+            Dir PORTC.6 Out    ' Make TX1 pin an output
+            // Module: UART1
+            RC6PPS = 0x0015    // TX1 > RC6
+        
+        End Sub
+    // Add this code segment to your GCBASIC source program
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+    //! Optional verification of auto baud rate calculation
+        //! #DEFINE ISSUE_CHECK_USART_BAUD_RATE_WARNING
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+    #DEFINE SWITCHIN      PORTA.3
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+//********************* Main program
+
+Wait 2 s
+HserPrintCRLF 2
+
+Dim offset as Byte
+Dim myDataWord as Word
+For offset = 0 to 6 Step 2
+    //! Addressing a memory address, or, label address can be achieved by using the @ prefix.    
+    //! This will return the address of the variable ( @ applies to table data and any data block).
+    ProgramRead (@myDataBlock1 + offset, myDataWord)
+    HserPrintCRLF
+    Hserprint "0x"+WordToHex( myDataWord)
+Next
+HserPrintCRLF
+
+End
+
+// ******************* data.. EEPROM & DATA ********************
+
+EEPROM MyEEData1
+    1,2,3,4,5,255
+END EEPROM
+
+EEPROM MyEEData2 16
+    5,4,3,2,1,255
+END EEPROM
+
+DATA myDataBlock2 as Byte
+    1,2,3,4,5,6,7,8
+END DATA
+
+DATA myDataBlock1
+    0x1234,0x5678,0x1111,0x2222
+END DATA
