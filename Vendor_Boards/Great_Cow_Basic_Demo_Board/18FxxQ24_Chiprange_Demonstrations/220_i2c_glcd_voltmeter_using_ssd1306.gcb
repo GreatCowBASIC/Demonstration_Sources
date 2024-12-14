@@ -113,6 +113,7 @@ To change the analogue port change the ADCChannelSelected constant
     #DEFINE HIC2Q2XBUFFERSIZE 16
     //! Optional the default is to issue a warning
     #DEFINE MUTE_HIC2Q2XBUFFERSIZE_WARNING
+
 #INCLUDE <glcd.h>
 
 '*****************************************************************************************************

@@ -111,7 +111,7 @@ You can define your own in the sprite tables. Each table is 8 pixles vertical - 
     //! Optional the default is 128
     #DEFINE HIC2Q2XBUFFERSIZE 128
     //! Optional the default is to issue a warning
-    // #DEFINE MUTE_HIC2Q2XBUFFERSIZE_WARNING
+    #DEFINE MUTE_HIC2Q2XBUFFERSIZE_WARNING
 
 '*****************************************************************************************************
 'Main program commences here.. everything before this is setup for the board.

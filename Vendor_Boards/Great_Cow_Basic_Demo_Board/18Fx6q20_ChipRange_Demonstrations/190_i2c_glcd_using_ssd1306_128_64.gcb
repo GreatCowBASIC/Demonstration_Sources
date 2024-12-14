@@ -94,6 +94,8 @@
     #DEFINE HI2C_CLOCK      PORTB.6
     HI2CMode (Master)
 
+    #DEFINE MUTE_HIC2Q2XBUFFERSIZE_WARNING
+
 '*****************************************************************************************************
 'Main program commences here.. everything before this is setup for the board.
 

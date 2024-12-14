@@ -32,6 +32,7 @@ if you use <GCBVersionNumber.cnt> this is a system wide versionString tracker.
 #define HI2C_CLOCK  PORTC.3
 HI2CMode Master
 
+#DEFINE MUTE_HIC2Q2XBUFFERSIZE_WARNING
 
 #DEFINE USART_BAUD_RATE 9600
 #DEFINE USART_TX_BLOCKING

@@ -73,7 +73,7 @@
 
 ' ------ Start of main Program
 
-    #DEFINE DEVELOPER_PWM_DEBUG     
+    // #DEFINE DEVELOPER_PWM_DEBUG     
     #DEFINE PWM_FREQ    38
     #DEFINE PWM_DUTY    50
 
