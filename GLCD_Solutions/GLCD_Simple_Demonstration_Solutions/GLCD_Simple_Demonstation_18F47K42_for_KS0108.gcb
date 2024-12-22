@@ -1,0 +1,97 @@
+/*
+A demonstration program for GCBASIC.
+--------------------------------------------------------------------------------------------------------------------------------
+This program is a simple GLCD demonstration of the KS0108 GLCD capabilities.
+This program draws lines, boxes, circles and prints strings.
+The GLCD is connected to the microprocessor as shown in the hardware section of this code.
+@author  EvanV
+@licence GPL
+@version 1.0a
+@date    10.12.2024
+***********************************************************/
+
+    #chip 18F47K42
+    #option explicit
+    #include <glcd.h>
+//  ----------------------------------------------------------------   
+
+    // Setup the GLCD - all the constants are required
+    #DEFINE GLCD_RW     PORTE.1         
+    #DEFINE GLCD_RESET  PORTC.2    
+    #DEFINE GLCD_CS1    PORTC.1    
+    #DEFINE GLCD_CS2    PORTC.0    
+    #DEFINE GLCD_RS     PORTE.0    
+    #DEFINE GLCD_ENABLE PORTE.2   
+
+    #DEFINE GLCD_DB0 PORTD.0  'D0
+    #DEFINE GLCD_DB1 PORTD.1  'D1
+    #DEFINE GLCD_DB2 PORTD.2  'D2
+    #DEFINE GLCD_DB3 PORTD.3  'D3
+    #DEFINE GLCD_DB4 PORTD.4  'D4
+    #DEFINE GLCD_DB5 PORTD.5  'D5
+    #DEFINE GLCD_DB6 PORTD.6  'D6
+    #DEFINE GLCD_DB7 PORTD.7  'D7 ON LCD
+
+    // Specify the type of GLCD
+    #define GLCD_TYPE GLCD_TYPE_KS0108
+    #define GLCD_WIDTH 128
+    #define GLCD_HEIGHT 64
+    #define GLCD_PROTECTOVERRUN
+
+    // For 64 mHz ops
+    #define KS0108ReadDelay    0  
+    #define KS0108WriteDelay   4   
+    #define KS0108ClockDelay   0   
+
+    //-------------------------------------------------------------------
+
+    Dim BYTENUMBER, CCOUNT as Byte
+
+    CCount = 0
+    dim longNumber as long
+    longNumber = 4294967290 ' max value = 4294967296
+    dim wordNumber as Word
+    dim outString as string
+    wordNumber = 0
+    byteNumber = 0
+
+    // Prepare the static components of the screen
+    GLCDPrint ( 0,   0, "PrintStr")                                ; Print some text
+    GLCDPrint ( 64,  0, "@")                                    ; Print some more text
+    GLCDPrint ( 72,  0, str(ChipMhz) + "Mhz")                                   ; Print chip speed
+    
+    GLCDDrawString( 0,8,"DrawStr")                                 ; Draw some text
+    box 0,0,GLCD_WIDTH-1, GLCD_HEIGHT-1                            ; Draw a box
+    box GLCD_WIDTH-5, GLCD_HEIGHT-5,GLCD_WIDTH-1, GLCD_HEIGHT-1    ; Draw a box
+    Circle( 44,41,15)                                              ; Draw a circle
+    line 64,31,0,31                                                ; Draw a line
+
+    DO forever
+        for CCount = 32 to 127
+            GLCDPrint ( 64 ,  36,  hex(longNumber_E ) )                 ; Print a HEX string
+            GLCDPrint ( 76 ,  36,  hex(longNumber_U ) )                 ; Print a HEX string
+            GLCDPrint ( 88 ,  36,  hex(longNumber_H ) )                 ; Print a HEX string
+            GLCDPrint ( 100 ,  36, hex(longNumber   ) )                 ; Print a HEX string
+            GLCDPrint ( 112 ,  36, "h" )                                ; Print a HEX string
+
+
+            GLCDPrint ( 64 ,  44, pad(str(wordNumber), 5 ) )           ; Print a padded string
+            GLCDPrint ( 64 ,  52, pad(str(byteNumber), 3 ) )           ; Print a padded string
+
+            GLCDDrawChar(48, 8, CCount )                               ; Draw a character
+            box (46,8,56,16)                                           ; Draw a Box
+            outString = str( CCount )                                  ; Prepare a string
+            GLCDDrawString(64, 9, pad(outString,3) )                   ; Draw a string
+
+            filledbox 3,43,11,51, wordNumber                           ; Draw a filled box
+
+            FilledCircle( 44,41,9, longNumber xor 1)                   ; Draw a filled box
+            line 0,63,64,31                                            ; Draw a line
+
+                                                                        ; Do some simple maths
+            longNumber = longNumber + 7 : wordNumber = wordNumber + 3 : byteNumber++
+        NEXT
+    LOOP
+
+    end
+

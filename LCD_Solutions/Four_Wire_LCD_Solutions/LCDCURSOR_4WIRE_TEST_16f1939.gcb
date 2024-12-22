@@ -1,0 +1,145 @@
+'''A demonstration program for GCBASIC.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''This program demonstrates the capabilities of a LCD display.
+'''The LCD is using an 4-bit bus for connectivity.
+'''For the LCD connection - please refer to the program.
+'''@author 	TheoL plus works of WilliamR
+'''@licence	GPL
+'''@version	1.0a
+'''@date   	21.01.2015
+'''********************************************************************************
+
+;Set chip model required:
+
+ ;#chip 16F886, 8
+ ;
+
+ ; or
+
+ #chip 16F1937, 4
+
+dir portb.0 out
+dir portb.1 out
+dir portb.2 out
+dir portb.3 out
+
+portb = 0
+
+
+  ;Setup LCD Parameters
+  #define OCULAR_OM1614
+  #define LCD_IO 4
+  #define LCD_Speed SLOW
+  #define LCD_NO_RW
+; ----- Define Hardware settings
+#define LCD_RS PORTD.4
+#define LCD_RW PORTD.5
+#define LCD_Enable PORTD.6
+
+#define LCD_DB4 PORTD.0
+#define LCD_DB5 PORTD.1
+#define LCD_DB6 PORTD.2
+#define LCD_DB7 PORTD.3
+
+// #DEFINE LCD_PWR portD.7
+ #define LCD_Backlight portD.7
+LCDBacklight ( On )
+
+// DIR LCD_PWR oUT
+// LCD_PWR = 1
+
+LCDWriteByte 0x22
+LCDWriteByte 0x80
+LCDWriteByte 0xc0
+LCDWriteByte 0x10
+LCDWriteByte 0x24
+LCDWriteByte 0x0e
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
+HSerPrintStringCRLF "Started"
+print "Xtarted"
+do
+  wait 1 s
+loop
+; ----- Main body of program commences here.
+    Do Forever
+        CLS
+        PRINT "START TEST"
+        locate 1,0
+        PRINT "DISPLAY ON"
+        wait 3 s
+
+        CLS
+        Locate 0,0
+        Print "Cursor ON"
+        Locate 1,0
+        LCDcursor CursorOn
+        wait 3 S
+
+        CLS
+        LCDcursor CursorOFF
+        locate 0,0
+        Print "Cursor OFF"
+        wait 3 s
+
+        CLS
+        Locate 0,0
+        Print "FLASH ON"
+        Locate 1,0
+        LCDcursor FLASHON
+        wait 3 s
+
+        CLS
+        locate 0,0
+        Print "FLASH OFF"
+        LCDCURSOR FLASHOFF
+        wait 3 sec
+
+        Locate 0,0
+        Print "CURSR & FLSH ON"
+        locate 1,0
+        LCDCURSOR CURSORON
+        LCDCURSOR FLASHON
+        Wait 3 sec
+
+        Locate 0,0
+        Print "CURSR & FLSH OFF"
+        locate 1,0
+        LCDCURSOR CursorOFF
+        LCDCURSOR FLASHOFF
+        Wait 3 sec
+
+        CLS
+        Locate 0,4
+        PRINT "Flashing"
+        Locate 1,4
+        Print "Display"
+        wait 500 ms
+
+        repeat 10
+            LCDCURSOR LCDOFF
+            wait 500 ms
+            LCDCURSOR LCDON
+            wait 500 ms
+        end repeat
+
+        CLS
+        Locate 0,0
+        Print "DISPLAY OFF"
+        Locate 1,0
+        Print "FOR 5 SEC"
+        Wait 2 SEC
+        LCDCURSOR LCDOFF
+        WAIT 5 s
+
+        CLS
+        Locate 0,0
+        LCDCURSOR LCDON
+        Print "END TEST"
+        wait 3 s
+
+    loop
+

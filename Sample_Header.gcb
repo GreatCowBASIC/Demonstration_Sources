@@ -1,37 +1,40 @@
-'''A demonstration program for GCBASIC.
-'''--------------------------------------------------------------------------------------------------------------------------------
-'''This program
-'''
-'''
-'''@author
-'''@licence	GPL
-'''@version
-'''@date   	31.01.2015
-'''********************************************************************************
-
-; ----- Configuration
-
- #chip mega8
-
-; ----- Constants
-  ' No Constants specified in this example.
-'  [todo]
-
-; ----- Define Hardware settings
-'  [todo]
+/*
+A program for GCBASIC.
+--------------------------------------------------------------------------------------------------------------------------------
+This program ... add your description here...
 
 
-; ----- Variables
-  ' No Variables specified in this example. All byte variables are defined upon use.
-'  [todo]
+@author
+@licence	GPL
+@version
+@date   	31.01.2025
+********************************************************************************/
 
-; ----- Quick Command Reference
-'  [todo]
+// ----- Configuration
+
+#chip mega8
+
+// ----- Constants
+  // No Constants specified in this example.
+  //todo
+
+// ----- Define Hardware settings
+  //todo
+
+
+// ----- Variables
+  // No Variables specified in this example. All byte variables are defined upon use.
+  //todo
+
+
+// ----- Quick Command Reference
+  //todo
 
 
 
-; ----- Main body of program commences here.
+
+// ----- Main body of program commences here.
 
 end
 
-; ----- Support methods.  Subroutines and Functions
+// ----- Support methods.  Subroutines and Functions

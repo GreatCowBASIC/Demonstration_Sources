@@ -19,8 +19,8 @@
   'Config Hardware-UART to send with
   #define USART_BAUD_RATE 2400
   #define USART_BLOCKING
-  'Invert UART Tx polarity to connect without max232
-  Set SCKP ON
+  'SCKP inverts UART Tx polarity to connect with max232
+    // Set SCKP ON
   'Set UART transmit pin to output (Tx)
   Dir PORTC.6 Out  'Pin 25
 

@@ -1,42 +1,44 @@
-'''An example program for GCGB and GCB.
-'''------------------------------------------------------------------------
-'''This program blinks the onboard LED of a microcontroller - simple - the demonstration should work across many microcontrollers.
-'''
-'''This sample file can be adapted to any of the supported microcontrollers by simply changing the #chip definition - do this by changing to your chip. Other common chips are shown.
-'''
-'''To make your programmer or your bootloader work, simply do the following.
-'''
-'''From within this IDE, press function_key F4, then select  'Edit Programmer Preferences'.   This will show you the 'Programmer Preferences', select the 'Programmer' tab.
-'''
-'''For PIC:  Typically, if you are using a PICKIT2 then select 'Microchip PICKit 2 CLI - Default' will work for you - select and drag this to the top of the dialog area.
-'''
-'''For AVR:  Typically, for an UNO the programmer 'Arduino UNO/328p@115200' will work, select the option from the list of programmers, then, select 'Edit',
-'''   please edit the communication 'Port', select 'OK', and, then select this option again and drag this to the top of the dialog area.
-'''
-'''
-'''For further adventures with GCBASIC .... Select F4 and then "view Demos" for 1000's of sample programs.
-'''
-'''
-'''Enjoy.
-'''
-'''
-'''************************************************************************
+/*
+    An example program for GCGB and GCB.
+    ------------------------------------------------------------------------
+    This program blinks the onboard LED of a microcontroller - simple - the demonstration should work across many microcontrollers.
 
-' ----- Configuration
-'Make into a comment to use the AVR chipset
+    This sample file can be adapted to any of the supported microcontrollers by simply changing the #chip definition - do this by changing to your chip. Other common chips are shown.
+
+    To make your programmer or your bootloader work, simply do the following.
+
+    From within this IDE, press function_key F4, then select  'Edit Programmer Preferences'.   This will show you the 'Programmer Preferences', select the 'Programmer' tab.
+
+    For PIC:  Typically, if you are using a PICKIT2 then select 'Microchip PICKit 2 CLI - Default' will work for you - select and drag this to the top of the dialog area.
+
+    For AVR:  Typically, for an UNO the programmer 'Arduino UNO/328p@115200' will work, select the option from the list of programmers, then, select 'Edit',
+    please edit the communication 'Port', select 'OK', and, then select this option again and drag this to the top of the dialog area.
+
+
+    For further adventures with GCBASIC .... Select F4 and then "view Demos" for 1000's of sample programs.
+
+
+    Enjoy.
+
+*/
+
+// ************************************************************************
+
+//  ----- Configuration
+
 #CHIP 16f886
-'  #chip mega328p         'Uncomment to simply use the AVR chipset
-'  #chip LGT8F328P        'Uncomment to simply use the LGT chipset
-'  #chip mega4809        'Uncomment to simply use the AVRDx chipset
+//   #chip mega328p        // Uncomment to simply use the AVR chipset
+//   #chip LGT8F328P       // Uncomment to simply use the LGT chipset
+//   #chip mega4809       // Uncomment to simply use the AVRDx chipset
 
 
 // ----- Main body of program commences here.
 Do Forever
 
-    'Lighten Arduinos onboard LED for 100 milliseconds
+   // PulseOut o LED for 100 milliseconds
     PulseOut PortB.5, 100 ms
 
-    'Then wait 900 milliseconds after LED goes off
+   // Then wait 900 milliseconds after LED goes off
     Wait 900 ms
 
 Loop

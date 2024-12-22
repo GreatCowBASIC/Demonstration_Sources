@@ -1,4 +1,4 @@
-# Great-Cow-BASIC
+# GCBASIC
 
 This GIT contains the latest user contributed demonstrations. 
 
@@ -24,54 +24,55 @@ This page also does not cover libraries.   The style suggestions below may be us
 This is the standard program. This is included in every GCBASIC installation.  See IDE/Snippets.
 
 ----
-    '''A program  for GCGB and GCB the demonsations......
-    '''--------------------------------------------------------------------------------------------------------------------------------
-    '''This program [todo] a decription of the demonstration
-    '''
-    '''@author     [todo]
-    '''@licence    GPL
-    '''@version    [todo]
-    '''@date       [todo]
-    '''********************************************************************************
+    /*
+    A program  for GCGB and GCB the demonsations......
+    --------------------------------------------------------------------------------------------------------------------------------
+    This program [todo] a decription of the demonstration
+    
+    @author     [todo]
+    @licence    GPL
+    @version    [todo]
+    @date       [todo]
+    ********************************************************************************/
 
-    ; ----- Configuration
-     #chip [todo]
-     #config [todo]
-     #include [todo]
+    // ----- Configuration
+    #chip 16f88
+    // #config [todo]
+    // #include [todo]
 
-     #option explicit
-     
-    ; ----- Constants
-      ' No Constants specified in this example.
-      ' [todo]
+    #option explicit
+    
+    // ----- Constants
+      // No Constants specified in this example.
+      // todo
 
-    ; ----- Define Hardware settings
-      ' [todo]
+    // ----- Define Hardware settings
+      // todo
 
-    ; ----- Variables
-      ' No Variables specified in this example. All byte variables are defined upon use.
-      ' [todo]
+    // ----- Variables
+      // No Variables specified in this example. All byte variables are defined upon use.
+      // todo
 
-    ; ----- Quick Command Reference:
-      [todo]
+    // ----- Quick Command Reference:
+      //todo
 
-    ; ----- Main body of program commences here.
+    // ----- Main body of program commences here.
 
     end
-    ; ----- Support methods.  Subroutines and Functions
+    // ----- Support methods.  Subroutines and Functions
 ----
 
 The template should be completed with the sections marked `[todo]` being updated as appropiate.
 
-The header is strict.  Great Cow Graphical BASIC and GCBASIC test routines use the header to determine parameters and key information.
+The header is strict.  GC Graphical BASIC and GCBASIC test routines use the header to determine parameters and key information.
 
 # Language Style
 
-It is *Great Cow BASIC* always not any variant. 
+It is *GCBASIC* always, not any variant of *GCBASIC*. 
 
-The license is for GCBASIC and not any other variant.
+The license is for *GCBASIC* and not any other variant.
 
-Do not use slang and do not use contractions - for example use `do not` do not use `don't`.  GCBASIC users may not have English as their first language.
+Do not use slang and do not use contractions - for example use `do not` do not use `don't`.  *GCBASIC* users may not have English as their first language.
 
 Use microcontroller not `part`, `chip`, `pic` or any other variant.
 
