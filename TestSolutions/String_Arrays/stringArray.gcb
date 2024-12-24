@@ -1,0 +1,92 @@
+#skiptest
+/*
+By using these parallel arrays and functions, you can effectively create and manipulate structures in GBBASIC. 
+Keep in mind that this approach has limitations compared to true structures in other programming languages, 
+but it's a practical workaround for organizing data in GCBASIC
+*/
+
+#chip 16f877a           
+#option Explicit
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
+/*
+Here's an example to demonstrate how you can achieve this:
+
+Define a Structure:
+
+Instead of using a single structure, you'll define parallel arrays to represent the structure fields.
+*/
+
+// Define the maximum number of items
+#DEFINE MAX_ITEMS 10
+
+// Define parallel arrays for the structure fields
+Dim IDs(MAX_ITEMS) As Byte
+Dim Names(MAX_ITEMS) As String  // Assuming name length is 10 characters
+Dim Ages(MAX_ITEMS) As Byte
+
+/*
+Access Structure Elements:
+
+You can access the elements of the "structure" using the array index.
+*/
+
+
+
+// Set values
+
+_index = 1
+
+IDs(_index) = _index
+Names(_index) = "Alice"
+Ages(_index) = 25
+
+_index = 2
+IDs(_index) = _index
+Names(_index) = "Evan"
+Ages(_index) = 69
+
+
+_index = 2
+
+// Get values
+Dim id As Byte
+Dim name As String
+Dim age As Byte
+
+id = IDs(_index)
+name = Names(_index)
+age = Ages(_index)
+
+HserPrintByteCRLF ID
+HSerPrintStringCRLF name
+HserPrintByteCRLF age
+
+PrintItem(_index)
+
+/*
+Functions to Manipulate Structure:
+
+You can create functions to manipulate the "structure" elements.
+*/
+
+' Function to add a new item
+Sub AddItem( _index As Byte, _id As Byte, _namestr As string, _age As Byte)
+    If _index < MAX_ITEMS Then
+        IDs(_index) = _id
+        Names(_index) = _namestr
+        Ages(_index) = _age
+    End If
+End Sub
+
+' Function to print item
+Sub PrintItem( _index As Byte)
+    If _index < MAX_ITEMS Then
+        HSerPrint "ID:   ":   HSerPrint IDs(_index):    HSerPrintCRLF
+        HSerPrint "Name: ":   HSerPrint Names(_index):  HSerPrintCRLF
+        HSerPrint "Age:  ":   HSerPrint Ages(_index):   HSerPrintCRLF
+    End If
+End Sub

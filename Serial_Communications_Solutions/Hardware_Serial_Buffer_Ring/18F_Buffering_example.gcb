@@ -1,0 +1,112 @@
+/*
+
+    Loop back test using a buffer ring.
+
+*/
+#chip 18F47q10, 64
+#option explicit
+#CONFIG MCLRE=EXTMCLR
+
+
+    // PIC PPS Tool version: 0.0.6.5
+        #startup InitPPS, 85
+        #define PPSToolPart 18F47Q10
+
+        Sub InitPPS
+
+            // Module: EUSART2
+            RB2PPS = 0x000B    // TX2 > RB2
+            RX2PPS = 0x0009    // RB1 > RX2
+
+        End Sub
+    // Add this code segment to your GCBASIC source program
+
+        #DEFINE USART2_BAUD_RATE 9600
+        #DEFINE USART2_BLOCKING
+        #DEFINE USART2_DELAY OFF
+        #DEFINE DEFAULT_COMPORT 2
+
+'This assumes you are using an ANSI compatible terminal.  Use PUTTY.EXE it is very easy to use.
+
+'   Main program
+
+        'Wait for terminal to settle
+        wait 2 s
+
+        'Create the supporting variables
+        Dim next_in As Byte
+        Dim next_out As Byte
+        Dim syncbyte As Byte
+        Dim temppnt As Byte
+
+        ' Constants etc required for Buffer Ring
+        #DEFINE BUFFER_SIZE 8
+        #DEFINE bkbhit (next_in <> next_out)
+
+        'Define the Buffer
+        Dim buffer( BUFFER_SIZE - 1 ) 'we will use element 0 in the array as part of out buffer
+
+        'Call init the buffer
+        InitBufferRing
+
+        HSerSend 10
+        HSerSend 13
+        HSerSend 10
+        HSerSend 13
+        HSerPrint "Started: Serial between two devices"
+        HSerSend 10
+        HSerSend 13
+
+
+        'Get character(s) and send back
+        Do
+
+        ' Do we have data in the buffer?
+        if bkbhit then
+
+                'Send the next character in the buffer, exposed via the function `bgetc` back the terminal
+                HSerSend bgetc
+
+        end if
+
+        Loop
+
+        'Supporting subroutines
+
+        Sub readUSART
+
+                buffer(next_in) = HSerReceive2
+                temppnt = next_in
+                next_in = ( next_in + 1 ) % BUFFER_SIZE
+                If ( next_in = next_out ) Then  ' buffer is full!!
+                        next_in = temppnt
+                End If
+
+        End Sub
+
+        Function bgetc
+                Dim local_next_out as Byte    'maintain a local copy of the next_out variable to ensure it does not change when an Interrupt happens
+                local_next_out = next_out
+                bgetc = buffer(local_next_out)
+                local_next_out=(local_next_out+1) % BUFFER_SIZE
+                INTOFF
+                next_out = local_next_out
+                INTON
+        End Function
+
+
+
+
+        Sub InitBufferRing
+
+                'Set the buffer to the first address
+                next_in = 0
+                next_out = 0
+                #IFDEF BIT( RCIE )
+                        On Interrupt UsartRX2Ready Call readUSART
+                #ELSE
+                    //! Error - the interrupt vectors do not match. Check the GCBASIC for the buffer ring example.
+                    !
+                #ENDIF
+
+        End Sub
