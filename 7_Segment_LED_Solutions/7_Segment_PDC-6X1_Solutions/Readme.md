@@ -18,10 +18,9 @@ A driver for the 6-digit, 7-segment LCD, featuring the HT1621 LCD driver chip. T
 
 The driver and demo program are attached for reference.
 
+If anybody wants to use my driver to send other letters to the display, or write just one character at a time, it can be done, but is less convenient. If you want to do it, look into the driver source code to see how to do it.
 
-If anybody wants to use my driver to send other letters to the display, or write just one character at a time, it can be done, but is less convenient.  If you want to do it, look into the driver source code to see how to do it.
-
-All variable names and subroutines used by the driver begin with "LCD7", to minimize chances of conflict with user programs.
+All variable names and subroutines used by the driver begin with `LCD7`, to minimize chances of conflict with user programs.
 
 The driver, and a small demo program that shows how to use it, are attached. Maybe somebody out there might find this useful.
 
