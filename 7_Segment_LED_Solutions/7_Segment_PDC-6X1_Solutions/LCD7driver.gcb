@@ -1,0 +1,236 @@
+/*********************************************************************
+6 digit 7 segment LCD driver
+for PDC-6X1 LCD using HT1621 driver
+Compiles in Great Cow Basic
+Manfred Mornhinweg, December 2024
+********************************************************************/
+
+
+dim LCD7Value as long      'value to display, 0 to 999999 when positive, or 99999 when negative
+dim LCD7Negative as bit       '1 for negative
+dim LCD7Decimals as byte      'number of decimals, 0 to 3
+dim LCD7Battery as byte      'battery value for display, 0 to 3
+dim LCD7MemoryAddress as byte    'memory address
+dim LCD7DataByte as byte    'data byte
+dim LCD7Counter1 as byte
+dim LCD7Counter2 as byte
+dim LCD7Error as bit       'error flag
+dim LCD7Digit, LCD7Digit5, LCD7Digit4, LCD7Digit3, LCD7Digit2, LCD7Digit1, LCD7Digit0 as byte    'the six digits of the display
+dim LCD7Remainder as long
+
+
+sub LCD7WriteZeroBit        'write zero bit to display
+  LCD7DataPin=0
+  LCD7WritePin=0
+  wait 4 us
+  LCD7WritePin=1
+  wait 4 us
+end sub
+
+sub LCD7WriteOneBit        'write 1 bit to display
+  LCD7DataPin=1
+  LCD7WritePin=0
+  wait 4 us
+  LCD7WritePin=1
+  wait 4 us
+end sub
+
+sub LCD7SetCommandMode          'put display in command mode
+  LCD7WriteOneBit
+  LCD7WriteZeroBit
+  LCD7WriteZeroBit
+end sub
+
+sub LCD7SetDataMode         'put display in data mode
+  LCD7WriteOneBit
+  LCD7WriteZeroBit
+  LCD7WriteOneBit
+end sub
+
+sub LCD7WriteAddress          'send 6 bit address to display
+  for LCD7Counter1=5 to 0 step -1
+    if LCD7MemoryAddress.LCD7Counter1 then
+      LCD7WriteOneBit
+    else
+      LCD7WriteZeroBit
+    end if
+  next
+end sub
+
+sub LCD7WriteDataByte          'send 8 bit data to display
+  for LCD7Counter1=7 to 0 step -1
+    if LCD7DataByte.LCD7Counter1 then
+      LCD7WriteOneBit
+    else
+      LCD7WriteZeroBit
+    end if
+  next
+end sub
+
+sub LCD7WriteCommand          'send 8 bit command to display, adding dummy bit at end
+  for LCD7Counter1=7 to 0 step -1
+    if LCD7DataByte.LCD7Counter1 then
+      LCD7WriteOneBit
+    else
+      LCD7WriteZeroBit
+    end if
+  next
+  LCD7WriteZeroBit
+end sub
+
+sub LCD7Init    'HT1621 display initialization
+  dir LCD7WritePin out
+  dir LCD7DataPin out
+  dir LCD7ChipSelectPin out
+
+  LCD7ChipSelectPin=1
+  LCD7WritePin=1
+  LCD7ChipSelectPin=0
+  LCD7SetCommandMode          'put display in command mode
+  LCD7DataByte=24     'use internal 256kHz oscillator
+  LCD7WriteCommand           'send to display
+  LCD7DataByte=41     '1/3 bias, 1/4 duty cycle
+  LCD7WriteCommand
+  LCD7DataByte=1      'enable system
+  LCD7WriteCommand
+  LCD7ChipSelectPin=1
+  LCD7ChipSelectPin=0
+  LCD7SetDataMode         'put display in data mode
+  LCD7MemoryAddress=0
+  LCD7WriteAddress
+  LCD7DataByte=0
+  for LCD7Counter2=1 to 16  '16 data bytes, 128 bits total
+    LCD7WriteDataByte          ' send 16 zero bytes, to clear complete data memory
+  next
+  LCD7ChipSelectPin=1
+  LCD7ChipSelectPin=0
+  LCD7SetCommandMode
+  LCD7DataByte=3      'Display ON
+  LCD7WriteCommand
+  LCD7ChipSelectPin=1      'Display is now ready for use!
+end sub
+
+sub LCD7ConvertTo7Segments      'decodes a value 0-9 to a 7-segment byte
+  select case LCD7Digit
+    case 0
+      LCD7DataByte=125
+    case 1
+      LCD7DataByte=96
+    case 2
+      LCD7DataByte=62
+    case 3
+      LCD7DataByte=122
+    case 4
+      LCD7DataByte=99
+    case 5
+      LCD7DataByte=91
+    case 6
+      LCD7DataByte=95
+    case 7
+      LCD7DataByte=112
+    case 8
+      LCD7DataByte=127
+    case 9
+      LCD7DataByte=123
+  end select
+end sub
+
+
+sub LCD7Write   'writes the value in LCD7Value to the display, with LCD7Decimals, LCD7Negative and LCD7Battery
+  LCD7Error=0
+  if LCD7Negative then
+    if LCD7Value>99999 then LCD7Error=1
+  else
+    if LCD7Value>999999 then LCD7Error=1
+  end if
+  if LCD7Decimals>3 then LCD7Error=1
+  if LCD7Battery>3 then LCD7Error=1
+  if LCD7Error then      'write "Error"
+    LCD7ChipSelectPin=0
+    LCD7SetDataMode
+    LCD7MemoryAddress=0
+    LCD7WriteAddress
+    LCD7DataByte=6
+    LCD7WriteDataByte
+    LCD7DataByte=78
+    LCD7WriteDataByte
+    LCD7DataByte=6
+    LCD7WriteDataByte
+    LCD7WriteDataByte
+    LCD7DataByte=31
+    LCD7WriteDataByte
+    LCD7DataByte=0
+    LCD7WriteDataByte
+    LCD7ChipSelectPin=1
+  else
+    LCD7Digit5=LCD7Value /100000      'decimally decompose LCD7Value into six bytes
+    LCD7Remainder=LCD7Value%100000        'get remainder
+    LCD7Digit4=LCD7Remainder/10000
+    LCD7Remainder=LCD7Remainder%10000
+    LCD7Digit3=LCD7Remainder/1000
+    LCD7Remainder=LCD7Remainder%1000
+    LCD7Digit2=LCD7Remainder/100
+    LCD7Remainder=LCD7Remainder%100
+    LCD7Digit1=LCD7Remainder/10
+    LCD7Digit0=LCD7Remainder%10
+    LCD7ChipSelectPin=0
+    LCD7SetDataMode
+    LCD7MemoryAddress=0
+    LCD7WriteAddress
+
+    LCD7Digit=LCD7Digit0          'rightmost digit
+    LCD7ConvertTo7Segments
+    if LCD7Decimals=1 then LCD7DataByte.7=1   'add decimal point
+    LCD7WriteDataByte
+
+    if LCD7Value<10 and LCD7Decimals=0 then    'next digit
+      LCD7DataByte=0        'blank
+    else
+      LCD7Digit=LCD7Digit1
+      LCD7ConvertTo7Segments
+    end if
+    if LCD7Decimals=2 then LCD7DataByte.7=1
+    LCD7WriteDataByte
+
+    if LCD7Value<100 and LCD7Decimals<2 then    '3rd digit
+      LCD7DataByte=0
+    else
+      LCD7Digit=LCD7Digit2
+      LCD7ConvertTo7Segments
+    end if
+    if LCD7Decimals=3 then LCD7DataByte.7=1
+    LCD7WriteDataByte
+
+    if LCD7Value<1000 and LCD7Decimals<3 then    '4th digit
+      LCD7DataByte=0
+    else
+      LCD7Digit=LCD7Digit3
+      LCD7ConvertTo7Segments
+    end if
+    if LCD7Battery>0 then LCD7DataByte.7=1    'add battery indicator
+    LCD7WriteDataByte
+
+    if LCD7Value<10000 then    '5th digit
+      LCD7DataByte=0
+    else
+      LCD7Digit=LCD7Digit4
+      LCD7ConvertTo7Segments
+    end if
+    if LCD7Battery>1 then LCD7DataByte.7=1
+    LCD7WriteDataByte
+
+    if LCD7Negative then         'Value is negative
+      LCD7DataByte=2              'Minus sign
+    else
+          if LCD7Value<100000 then    'next digit
+            LCD7DataByte=0
+          else
+            LCD7Digit=LCD7Digit5 'positive value, show leftmost digit
+            LCD7ConvertTo7Segments
+          end if
+    end if
+    if LCD7Battery>2 then LCD7DataByte.7=1
+    LCD7WriteDataByte
+    LCD7ChipSelectPin=1
+  end if
+end sub

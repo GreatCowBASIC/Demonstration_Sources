@@ -1,0 +1,95 @@
+/*********************************************************************
+Demo for LCD7driver
+for 6 digit 7 segment display type PDC-6X1, using HT1621 driver chip
+Compiles in GCBASIC
+Manfred Mornhinweg, December 2024
+********************************************************************/
+
+#chip 16f1788, 32       'set to your chip and clock speed
+
+'***************** Define pins, insert LCD7 driver, initialize display ****************
+#define LCD7WritePin portA.4    'change these three pin values according to your circuit
+#define LCD7DataPin portA.5
+#define LCD7ChipSelectPin portC.4
+#include "LCD7driver.gcb"
+LCD7Init                        'Display is now ready for use
+'**************************************************************************************
+
+/****  Basic use  *********************************************************************
+Put the number to display into the long variable "LCD7Value". The accepted range is
+0 to 999999 for positive numbers, and 0 to 99999 for negative ones.
+Set the sign into bit variable "LCD7Negative". 1 is negative, 0 is positive.
+Set the byte variable "LCD7Decimals" to the number of decimals you want to display.
+The acceptable range is 0 to 3, since the display only has 3 decimal points.
+Set the byte variable "LCD7Battery" to the desired value, 0 to 3.
+Call the subroutine "LCD7Write".
+Values outside the acceptable range will result in the display showing "Error". This can
+be used to intentionally give error reports.
+It's not necessary to rewrite any of these four variables before each LCD7Write. Write
+only those that have changed.
+***************************************************************************************/
+
+
+' Demo program
+
+LCD7Negative=0
+LCD7Decimals=0
+LCD7Battery=0
+
+do
+  LCD7Value=1       'let's write a 1, with the battery meter off
+  LCD7Negative=0
+  LCD7Decimals=0
+  LCD7Battery=0
+  LCD7Write
+  wait 1 s
+  LCD7Value=12      'now a 12
+  LCD7Write
+  wait 1 s
+  LCD7Value=345     'now a 345
+  LCD7Write
+  wait 1 s
+  LCD7Value=6789    'now 6789
+  LCD7Write
+  wait 1 s
+  LCD7Value=12345   'and 12345
+  LCD7Write
+  wait 1 s
+  LCD7Value=678912  'and 678912, completing a run of single-character to six-character numbers.
+  LCD7Write
+  wait 1 s
+  LCD7Value=138     'now let's display a fractional value, 13.8
+  LCD7Decimals=1
+  LCD7Write
+  LCD7Decimals=0    'and reset the decimals value, just for tidyness
+  wait 1 s
+  LCD7Value=500     'and show a negative value with two decimals, -5.00
+  LCD7Decimals=2
+  LCD7Negative=1
+  LCD7Write
+  LCD7Negative=0
+  LCD7Decimals=0
+  wait 1 s
+  LCD7Value=888888  'and now 888888, with the battery graph showing a single bar
+  LCD7Battery=1
+  LCD7Write
+  wait 1 s
+  LCD7Value=0       'and show 0.0, with two battery bars
+  LCD7Decimals=1
+  LCD7Battery=2
+  LCD7Write
+  LCD7Decimals=0
+  wait 1 s
+  LCD7Value=12345   'now -12345, with all three battery bars on
+  LCD7Negative=1
+  LCD7Battery=3
+  LCD7Write
+  LCD7Battery=0
+  LCD7Negative=0
+  wait 1 s
+  LCD7Value=1000000 'and now let's show "Error", by sending an oversize value.
+  LCD7Write
+  wait 1 s
+loop                'and let's loop the demo forever!
+
+
