@@ -1,6 +1,6 @@
 # Russian LCD Support
 
-This demonstration uses the I2C LCD interface. 
+This demonstration uses the I2C LCD interface, can adapt to any LCD interface.  The LCD must support Russian characters.
 
 
 # MUSTS - things you MUST DO
