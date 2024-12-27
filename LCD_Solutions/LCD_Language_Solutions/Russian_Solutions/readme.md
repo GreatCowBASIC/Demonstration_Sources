@@ -9,7 +9,7 @@ An LCD with Russian character support.
 
 You must use Windows-1251 encoding in GCBASIC IDE.
 
-[Example shown on an LCD](Russian_charset.jpg)
+[Example shown on an LCD](https://github.com/GreatCowBASIC/Demonstration_Sources/blob/main/LCD_Solutions/LCD_Language_Solutions/Russian_Solutions/lcd_rus.gcb)
 
 
 
