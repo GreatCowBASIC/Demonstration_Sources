@@ -11,6 +11,6 @@ You must use Windows-1251 encoding in GCBASIC IDE.
 
 ![Example shown on an LCD](RussianLCDSupport.jpg)
 
-image::lcd_rus.jpg[display,80%,align="center"] 
+image::RussianLCDSupport.jpg[display,50%,align="center"] 
 
 
