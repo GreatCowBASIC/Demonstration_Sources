@@ -22,3 +22,6 @@ The datasheet shows the characters and the index number.
 
 image::Russian_charset.jpg[display,50%,align="center"] 
 
+## Installation
+
+You can use the provided .h file in your project folder using `#incude "lcd_rus.h"`, however, you can copy to your include folder and then use `#incude <lcd_rus.h>`
