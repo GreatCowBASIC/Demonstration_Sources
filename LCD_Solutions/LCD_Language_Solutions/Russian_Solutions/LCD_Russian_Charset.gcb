@@ -1,0 +1,41 @@
+/*
+    Library for Russian LCD type 1602
+    библиотека для русского LCD типа 1602
+
+@author    alexandr-g   
+@license   GPL
+@version   1.00   
+@date      2024-12-28
+*/
+
+#chip mega328p, 16
+
+#include "lcd_rus.h"
+
+//Setup  i2c - this can be any valid LCD setup - critical is the 1602 support
+#define I2C_MODE Master
+#define I2C_DATA PORTC.4
+#define I2C_CLOCK PORTC.5
+#define I2C_DISABLE_INTERRUPTS ON
+
+//Setup addresses to I2C LCD adapter
+#define LCD_IO 10
+#define LCD_I2C_Address 0x4E 
+ 
+Do Forever
+
+    // пример кода для LCD с русскими буквами (писать только в кодировке Windows 1251 !!!)
+    // Example code for LCD with Russian letters (write only in Windows 1251 encoding !!)
+    CLS
+    PrintR "Привет, друг!"
+    Wait 600 ms
+    Locate 1,0
+    PrintR "Как твои дела?"
+    Wait 600 ms
+    Locate 2,0
+    PrintR "Hi, friend!"
+    Wait 600 ms
+    Locate 3,0 
+    PrintR "How are you?"
+    Wait 10 s
+Loop
