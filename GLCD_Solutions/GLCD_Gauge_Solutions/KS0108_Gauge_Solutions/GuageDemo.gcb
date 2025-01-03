@@ -1,0 +1,686 @@
+/*
+A demonstration program for GCBASIC.
+--------------------------------------------------------------------------------------------------------------------------------
+
+This program shows a simple guage set - it uses the ADC to show values.  Replace the ADC with your own sensors.
+
+@author  EvanV
+@licence GPL
+@version 1.0a
+@date    03/01/2025
+***********************************************************/
+
+#CHIP 16F877a
+#OPTION Explicit
+
+#INCLUDE <glcd.h>
+' This is the Default value, not required.
+#DEFINE GLCD_TYPE GLCD_TYPE_KS0108
+
+'The constant is required to support OLED fonts
+#DEFINE GLCD_OLED_FONT
+
+
+  #DEFINE GLCD_CS1 PORTb.5
+  #DEFINE GLCD_CS2 PORTb.4
+  'D0 to pin 7 on LCD
+  #DEFINE GLCD_DB0 PORTD.0
+  'D1 to pin 8 on LCD
+  #DEFINE GLCD_DB1 PORTD.1
+  'D2 to pin 9 on LCD
+  #DEFINE GLCD_DB2 PORTD.2
+  'D3 to pin 10 on LCD
+  #DEFINE GLCD_DB3 PORTD.3
+  'D4 to pin 11 on LCD
+  #DEFINE GLCD_DB4 PORTD.4
+  'D5 to pin 12 on LCD
+  #DEFINE GLCD_DB5 PORTD.5
+  'D6 to pin 13 on LCD
+  #DEFINE GLCD_DB6 PORTD.6
+  'D7 to pin 14 on LCD
+  #DEFINE GLCD_DB7 PORTD.7
+
+  #DEFINE GLCD_RS PORTb.3
+  #DEFINE GLCD_Enable PORTb.2
+  #DEFINE GLCD_RW PORTc.7
+  #DEFINE GLCD_RESET PORTc.2
+
+  #DEFINE KS0108ReadDelay 2
+  #DEFINE KS0108WriteDelay 2
+  #DEFINE KS0108ClockDelay 2
+
+
+// *************************** MAIN ***********************************************
+
+
+
+// *** Variables
+    Dim tempString as String * 4
+    Dim CounterX, oldCounterX as Word
+
+// Show startup
+
+    For Counterx = 99  to 0 step -11
+
+        // Draw Unit or clear
+        If Counterx/10 = 0 then 
+        GLCD_Draw48x48 ( 0, 0, -1 )
+        Else
+        GLCD_Draw48x48 ( 0, 0, Counterx / 10 )
+        End If
+
+        // Draw decimal
+        GLCD_Draw48x48 ( 48, 0, Counterx Mod 10 )
+
+        // Show Speed
+            //Show Unit
+            If Counterx/10 = 0 then 
+            GLCD_Draw48x48 ( 0, 0, -1 )
+            Else
+            GLCD_Draw48x48 ( 0, 0, Counterx / 10 )
+            End If
+            // Show digit
+            GLCD_Draw48x48 ( 48, 0, Counterx Mod 10 )
+
+            // Draw Decimal value
+                // Change font
+                GLCDFNTDEFAULTSIZE= 2
+                // Print Value
+                
+                GLCDPrint 98, 32, scale( CounterX, 0, 99, 0, 9)
+
+                Box 94, 44, 96, 42
+                GLCDFNTDEFAULTSIZE= 1
+            
+        // Show Temp
+            ShowTemp( CounterX )
+        // Show Date
+            ShowDate()
+        // ShowTime
+            ShowTime()
+        // Show ShowDistance()
+            ShowDistance()
+        // Show ShowFuel
+            // Send a value just to show fuel bar ... scale to prevent overflow
+            ShowFuel ( scale( CounterX, 0, 99, 0, 70 ) )
+        wait 400 ms
+
+    Next
+
+// Main loop
+    // Ensure oldCounterX <> CounterX 
+    oldCounterX = !CounterX
+
+    Do
+
+        CounterX = readAd(AN1)
+        CounterX = scale ( CounterX, 0,254,0,70 )
+        
+        If oldCounterX <> CounterX then 
+            
+            oldCounterX = CounterX
+
+            // Show Speed
+                //Show Unit
+                If Counterx/10 = 0 then 
+                GLCD_Draw48x48 ( 0, 0, -1 )
+                Else
+                GLCD_Draw48x48 ( 0, 0, Counterx / 10 )
+                End If
+                // Show digit
+                GLCD_Draw48x48 ( 48, 0, Counterx Mod 10 )
+
+                // Draw Decimal value
+                    // Change font
+                    GLCDFNTDEFAULTSIZE= 2
+                    // Print Value
+                    
+                    GLCDPrint 98, 32, scale( CounterX, 0, 70, 0, 9)
+
+                    Box 94, 44, 96, 42
+                    GLCDFNTDEFAULTSIZE= 1
+                
+            // Show Temp
+                ShowTemp( CounterX )
+            // Show Date
+                ShowDate()
+            // ShowTime
+                ShowTime()
+            // Show ShowDistance()
+                ShowDistance()
+            // Show ShowFuel
+                // Send a value just to show fuel bar
+                ShowFuel ( CounterX )
+        End If
+
+    Loop
+// End of Main loop
+
+Sub ShowTemp ( in value )
+
+    tempString = ""
+    GLCDPrint 8, 47, str(value) + "  "
+    // Draw degree
+    Box 18, 47, 20, 49
+    GLCDPrint 22, 47, "F"
+    
+
+ End Sub
+
+Sub ShowDate
+
+    tempString = ""
+    GLCDPrint 8, 55, "1:21 PM"
+
+ End Sub
+
+Sub ShowTime
+
+    tempString = ""
+    GLCDPrint 65, 47, "0Hr 01 Mn"
+    
+ End Sub
+
+Sub ShowDistance
+
+    tempString = ""
+    GLCDPrint 65, 55, "0.3 Mi"
+    
+ End Sub
+
+Sub ShowFuel ( in value )
+
+    value = scale ( value, 0, 70, 0, 28 )
+    GLCDPrint 105, 1, "FUEL"
+    GLCDPrint 98, 16, "E"
+    GLCDPrint 123, 16, "F"
+    Line 102, 20, 120, 20
+    
+    // Draw guage
+    FilledBox 98, 10, 98 + value , 14, 1
+    FilledBox 98 + value + 1, 10, 127, 14, 0
+
+
+ End Sub
+
+Sub Fast_GLCDWriteByte_KS0108 ( in GLCDData )
+
+    //Manage X Y 
+    If _GLCDX MOD 48 = 0 then
+        // Reset the X position
+        _GLCDX = 0
+    End If   
+
+    // Select the correct IC
+    #ifdef GLCD_KS0108_CS_LOW
+      If _GLCDX + _XPOS < 64 Then
+        Set GLCD_CS1 On
+        Set GLCD_CS2 Off
+      Else
+        Set GLCD_CS1 Off
+        Set GLCD_CS2 On
+      End If
+    #else
+      If _GLCDX + _XPOS < 64 Then
+        Set GLCD_CS1 Off
+        Set GLCD_CS2 On
+      Else
+        Set GLCD_CS1 On
+        Set GLCD_CS2 OFF
+      End If
+    #endif
+
+    'Select page
+    Set GLCD_RS Off
+    GLCDWriteByte b'10111000' Or ( _GLCDY + _YPOS ) / 8
+
+    'Select column
+    Set GLCD_RS Off
+    GLCDWriteByte 64 Or ( _GLCDX + _XPOS )
+
+    'Dummy read first
+    Set GLCD_RS On
+    GLCDDataTemp = GLCDReadByte
+    'Read current data
+    Set GLCD_RS On
+    GLCDDataTemp = GLCDReadByte
+
+    'ReSelect column
+    Set GLCD_RS Off
+    GLCDWriteByte 64 Or ( _GLCDX + _XPOS )
+
+    // Increment X value
+    _GLCDX++
+
+    // Increment Y value
+    If _GLCDX = 47 Then _GLCDY = _GLCDY + 8 
+
+    // Exit if nothing to send
+    If GLCDDataTemp = GLCDData Then exit Sub
+
+    'Write data back
+    Set GLCD_RS On
+
+    'Set LCD data direction
+    Set GLCD_RW Off
+
+    'Set output data
+    GLCD_DB7 = GLCDData.7
+    GLCD_DB6 = GLCDData.6
+    GLCD_DB5 = GLCDData.5
+    GLCD_DB4 = GLCDData.4
+    GLCD_DB3 = GLCDData.3
+    GLCD_DB2 = GLCDData.2
+    GLCD_DB1 = GLCDData.1
+    GLCD_DB0 = GLCDData.0
+
+    'Write
+    Wait KS0108WriteDelay us
+    Set GLCD_ENABLE On
+    Wait KS0108ClockDelay us
+    Set GLCD_ENABLE Off
+    Wait KS0108WriteDelay us
+
+    // enable the wait here to show pixel draw
+    // wait 10 ms
+
+ End Sub
+
+
+Sub GLCD_Draw48x48 ( _XPOS, _YPOS, _num as Integer )
+
+    Dim Dataptr, adcval as Word
+    Dim myNum as Integer
+
+    Dim Dataptr as Word
+    Dim _GLCDY, _GLCDX, GLCDDataTemp, GLCDData, _XPOS, _YPOS
+    Dim swval, swcache, swprev as Integer
+
+    Dataptr = 1
+    swcache = -1
+    swval = -1
+    swprev = -1
+
+    _GLCDX = 0  // to 47 step 1
+    _GLCDY = 0
+
+    Do while swval <> 0
+        Select Case _Num
+            Case -1
+                swval = 288
+                GLCDData = 0 
+            Case 0
+                ReadTable TableZeroRLECompressed, Dataptr, swval
+                ReadTable TableZeroRLECompressed, Dataptr+1, GLCDData
+            Case 1
+                ReadTable TableOneRLECompressed, Dataptr, swval
+                ReadTable TableOneRLECompressed, Dataptr+1, GLCDData
+            Case 2
+                ReadTable TableTwoRLECompressed, Dataptr, swval
+                ReadTable TableTwoRLECompressed, Dataptr+1, GLCDData
+            Case 3
+                ReadTable TableThreeRLECompressed, Dataptr, swval
+                ReadTable TableThreeRLECompressed, Dataptr+1, GLCDData
+            Case 4
+                ReadTable TableFourRLECompressed, Dataptr, swval
+                ReadTable TableFourRLECompressed, Dataptr+1, GLCDData
+            Case 5
+                ReadTable TableFiveRLECompressed, Dataptr, swval
+                ReadTable TableFiveRLECompressed, Dataptr+1, GLCDData
+            Case 6
+                ReadTable TableSixRLECompressed, Dataptr, swval
+                ReadTable TableSixRLECompressed, Dataptr+1, GLCDData
+            Case 7
+                ReadTable TableSevenRLECompressed, Dataptr, swval
+                ReadTable TableSevenRLECompressed, Dataptr+1, GLCDData
+            Case 8
+                ReadTable TableEightRLECOmpressed, Dataptr, swval
+                ReadTable TableEightRLECOmpressed, Dataptr+1, GLCDData
+            Case 9
+                ReadTable TableNineRLECompressed, Dataptr, swval
+                ReadTable TableNineRLECompressed, Dataptr+1, GLCDData
+            Case Else
+                Exit Do                
+        End Select
+
+        //increment table pointer
+        Dataptr = Dataptr + 2           
+
+        Repeat swval 
+            Fast_GLCDWriteByte_KS0108 GLCDData
+        End Repeat
+
+        // Force an exit from the DO - this must be a CLEAR Char or -1
+        If swval = 288 then swval = 0
+
+    Loop    
+
+    #ifdef GLCD_KS0108_CS_LOW
+        Set GLCD_CS1 On
+        Set GLCD_CS2 On
+    #else
+        Set GLCD_CS1 Off
+        Set GLCD_CS2 Off
+    #endif
+
+
+  End Sub
+
+
+
+Table TableZeroRLECompressed
+    // Row 1
+    6, 255    // 6 times 255
+    32, 31    // 32 times 31
+    6, 255    // 6 times 255
+    4, 0      // 4 times 0
+    
+    // Row 2-5 (identical rows)
+    6, 255    // 6 times 255
+    32, 0     // 32 times 0
+    6, 255    // 6 times 255
+    4, 0      // 4 times 0
+
+    6, 255    // 6 times 255
+    32, 0     // 32 times 0
+    6, 255    // 6 times 255
+    4, 0      // 4 times 0
+
+    6, 255    // 6 times 255
+    32, 0     // 32 times 0
+    6, 255    // 6 times 255
+    4, 0      // 4 times 0
+
+    6, 255    // 6 times 255
+    32, 0     // 32 times 0
+    6, 255    // 6 times 255
+    4, 0      // 4 times 0
+
+    // Row 6
+    6, 63     // 6 times 63
+    32, 62    // 32 times 62
+    6, 63     // 6 times 63
+    4, 0       // 4 times 0
+    End Table
+
+ Table TableOne
+  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 120, 124, 126, 255, 255, 255, 255, 255, 255,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
+  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 255, 255, 255, 255, 255, 255,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
+  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 255, 255, 255, 255, 255, 255,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
+  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 255, 255, 255, 255, 255, 255,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
+  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 255, 255, 255, 255, 255, 255,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
+  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  62,  62,  63,  63,  63,  63,  63,  63,  62,  62,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
+
+ End Table
+
+Table TableOneRLECompressed
+
+    26, 0  //     # 26 zeros
+    1, 120 //    # 1 time 120
+    1, 124 //    # 1 time 124
+    1, 126 //    # 1 time 126
+    6, 255 //    # 6 times 255
+    13, 0 //    # 13 zeros
+
+    // Row 2-5 (identical rows)
+    29, 0 //    # 29 zeros
+    6, 255 //   # 6 times 255
+    13, 0 //    # 13 zeros
+
+    29, 0 //    # 29 zeros
+    6, 255 //   # 6 times 255
+    13, 0 //    # 13 zeros
+
+    29, 0 //    # 29 zeros
+    6, 255 //   # 6 times 255
+    13, 0 //    # 13 zeros
+
+    29, 0 //    # 29 zeros
+    6, 255 //   # 6 times 255
+    13, 0 //    # 13 zeros
+
+    // Row 6
+    27, 0 //    # 27 zeros
+    2, 62 //    # 2 times 62
+    6, 63 //    # 6 times 63
+    2, 62 //    # 2 times 62
+    11, 0      # 11 zeros
+ End Table
+
+ Table TableTwoRLECompressed
+  6, 127
+  32, 31
+  6, 255
+  42, 0
+  6, 255
+  4, 0
+  38, 240
+  6, 255
+  4, 0
+  6, 255
+  38, 1
+  4, 0
+  6, 255
+  32, 0
+  6, 128
+  4, 0
+  6, 63
+  32, 62
+  6, 63
+  4, 0
+ End Table
+
+
+Table TableThreeRLECompressed
+    6, 63
+    33, 31
+    6, 255
+    42, 0
+    6, 255
+    13, 0
+    29, 240
+    6, 255
+    13, 0
+    29, 1
+    6, 255
+    42, 0
+    6, 255
+    4, 0
+    6, 63
+    32, 62
+    6, 63
+    4, 0
+ End Table
+
+Table TableFourRLECompressed
+    6, 255
+    1, 7
+    30, 0
+    1, 7
+    6, 255
+    4, 0
+    
+    6, 255
+    32, 0
+    6, 255
+    4, 0
+    
+    6, 255
+    32, 240
+    6, 255
+    4, 0
+
+    38, 1
+    6, 255
+    4, 0
+
+    38, 0
+    6, 255
+    4, 0
+    
+    37, 0
+    1, 56
+    6, 63
+    4, 0
+ End Table
+
+Table TableFiveRLECompressed
+ 
+    
+    6, 255
+    32, 31
+    6, 255
+    4, 0
+
+    6, 255
+    42, 0
+
+    6, 255
+    38,240
+    4, 0
+
+    38, 1 
+    6, 255
+    4, 0
+
+    6, 128
+    32, 0 
+    6, 255
+    4, 0
+
+    6, 63
+    32, 62
+    6, 63
+    4,0
+
+ End Table
+
+Table TableSixRLECompressed
+
+  6, 255
+  32, 31
+  6, 63
+  4, 0
+
+  6, 255
+  42, 0
+
+  6, 255
+  38, 240
+  4, 0
+
+  6, 255
+  32, 1
+  6, 255
+  4, 0
+
+  6, 255
+  32, 0
+  6, 255
+  4, 0
+  
+  6, 63
+  32, 62
+  6, 63
+  4,0
+
+ End Table
+
+Table TableSevenRLECompressed
+
+    6, 63
+    32, 31
+    6, 255
+    4, 0
+
+    38, 0
+    6, 255
+    4, 0
+
+    38, 0
+    6, 255
+    4, 0
+
+    38, 0
+    6, 255
+    4, 0
+
+    38, 0
+    6, 255
+    4, 0
+
+    37, 0
+    1, 62
+    6, 63
+    4, 0
+
+ End Table
+
+Table TableEightRLECOmpressed
+    
+    6, 255
+    32, 31
+    6, 255
+    4, 0
+    
+    6, 255
+    32, 0
+    6, 255
+    4, 0
+    
+    6, 255
+    32, 240
+    6, 255
+    4, 0
+    
+    6, 255
+    32, 1
+    6, 255
+    4, 0
+    
+    6, 255
+    32, 0
+    6, 255
+    4, 0
+    
+    6, 63
+    32, 62
+    6, 63
+    4, 0
+    
+ End Table
+
+Table TableNineRLECompressed
+
+    6, 255
+    32, 31
+    6, 255
+    4, 0
+
+    6, 255
+    32, 0
+    6, 255
+    4, 0
+
+    6, 255
+    32, 240
+    6, 255
+    4, 0
+
+    38, 1
+    6, 255
+    4, 0
+
+    38, 0
+    6, 255
+    4, 0
+
+    6, 63
+    32, 62
+    6, 63
+    4, 0
+
+End Table
+
+
+

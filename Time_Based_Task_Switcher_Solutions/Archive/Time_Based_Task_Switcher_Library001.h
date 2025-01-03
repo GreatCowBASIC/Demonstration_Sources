@@ -1,13 +1,13 @@
 '_______________________________________________________________________
 '
 '
-'                       Multitasking functions (30-07-2011)
+'                       Multitasking functions
 '
 '_______________________________________________________________________
 '
 '
 '    multitasking routines for the GCBASIC compiler
-'    2009 Santiago Gonzalez
+'    2009 Santiago Gonzalez and 2017 Evan Venn
 '
 '    This library is free software; you can redistribute it and/or
 '    modify it under the terms of the GNU Lesser General Public
@@ -26,241 +26,110 @@
 '_______________________________________________________________________
 '
 '
-'  Notes:
+'Notes:
 '
-'  ¡¡¡¡¡ this library will use Timer0, don'  t use it in your program !!!!!.
+'¡¡¡¡¡ this library will use Timer0, don't use it in your program !!!!!.
 '
-'  Actually a maximum of 16 Tasks and 8 LTasks are supported.
+'Actually a maximum of 16 Tasks and 8 LTasks are supported.
 '
-'  The base time must be defined:
+'The base time must be defined:
 '
-'      #define base_time value
-'
-'  where value is the desired value in us, for example:
-'
-'      #define base_time 100      '  for 100 us
+'#define base_time value
 
-'  For PIC mcus:
-'      Maximum base_time value with 20 MHz clock is 13107.
-'      Maximum base_time value with 4 MHz clock is 65535.
-'      Maximum base_time value with other clocks: 65535/ChipMhz/4.
+'where value is the desired value in us, for example:
 '
-'
-'  The subroutine containing each task must be defined:
-'
-'      #define Task1 Sub_name1
-'      #define Task2 Sub_name2
-'      #define LTask1 Sub_name3
-'
-'
-'  The period of each Task must be defined:
-'
-'      #define Task1_us 500            '  Task1 period is 500 us
-'      #define Task2_ms 10             '  Task2 period is 10 ms
-'      #define LTask1_s 1              '  LTask1 period is 1 s
-'
-'  In the previous example, Sub_name1 will be executed every 500 us,
-'      Sub_name2 every 10 ms and Sub_name3 every 1 S.
-'
-'  Maximum value for Task period in us is: base_time*255
-'
-'  For example, with a 100 us base_time,
-'      maximum value for Tasks is: 100*255 = 25500 us => 25 ms
-'
-'  LTask is for long period tasks,
-'      a period is long or not depending on the base_time
-'      When the needed period > base_time*255 then you need a LTask
-'
-'  Maximun value for LTask period in us is: base_time*65535
-'
-'  For example, with a 100 us base_time,
-'      maximum value for LTasks is: 100*65535 = 6553500 us => 6553 ms => 6 s
-'
-'
-'  Task will be executed with the command: Do_Taskx,
-'  for example  in a main loop:
-'
-'      do
-'          Do_Task2
-'          Do_LTask1
-'      loop
-'
-'  or any other way... for example:
-'
-'      do
-'          Do_Task2
-'          if PORTB.0= 1 Then Do_LTask1
-'      loop
-'
-'
-'  Is possible to execute a Task inside Interrupt subroutine:
-'
-'      #define Run_Task1               'Run Task inside interrupt subroutine
-'________________________________________________________________________
-'
-'
-'-SOFTWARE PWM:
-'
-'  There are 8 predefined pwm channels.  For use them, prodeed this way:
-'
-'  Define pwm resolution for all channels (0-255), for example:
-'
-'      #define pwm_res 20
-'
-'
-'  Define outputs for each used channels:
-'
-'      #define pwm1_out PORTB.0
-'
-'
-'  Set the duty ( 0 to pwm_res range ):
-'
-'      pwm1_duty = 10
-'
-'________________________________________________________________________
+'#define base_time 100      'for 100 us
 
+'Maximum base_time value with 20 MHz clock is 13107.
+'Maximum base_time value with 4 MHz clock is 65535.
+'Maximum base_time value with other clocks: 65535/ChipMhz/4.
+'
+'
+'The subroutine containing each task must be defined:
+'
+'#define Task1 Sub_name1
+'#define Task2 Sub_name2
+'#define LTask1 Sub_name3
+'
+'
+'The period of each Task must be defined:
+'
+'#define Task1_us 500            'Task1 period is 500 us
+'#define Task2_ms 10             'Task2 period is 10 ms
+'#define LTask1_s 1              'LTask1 period is 1 s
+'
+'In the previous example, Sub_name1 will be executed every 500 us,
+'   Sub_name2 every 10 ms and Sub_name3 every 1 S.
+'
+'Maximum value for Task period in us is: base_time*255
+'
+'For example, with a 100 us base_time,
+'   maximum value for Tasks is: 100*255 = 25500 us => 25 ms
+'
+'LTask is for long period tasks,
+'   a period is long or not depending on the base_time
+'   When the needed period > base_time*255 then you need a LTask
+'
+'Maximun value for LTask period in us is: base_time*65535
+'
+'For example, with a 100 us base_time,
+'   maximum value for LTasks is: 100*65535 = 6553500 us => 6553 ms => 6 s
+'
+'
+'Task will be executed with the command: Do_Taskx,
+'   for example  in a main loop:
+'
+'do
+'    Do_Task2
+'    Do_LTask1
+'loop
+'
+'or any other way... for example:
+'
+'do
+'    Do_Task2
+'    if PORTB.0 = 1 Then Do_LTask1
+'loop
+'
+'
+'Is possible to execute a Task inside Interrupt subroutine:
+'
+'#define Run_Task1               'Run Task inside interrupt subroutine
+'
+'_______________________________________________________________________
 
-
-#option Explicit
-#startup Init_Multitask     'Initialisation routine
-
-Dim time_Task1 as Word
-Dim time_Task2 as Word
-Dim time_Task3 as Word
-Dim time_Task4 as Word
-Dim time_Task5 as Word
-Dim time_Task6 as Word
-Dim time_Task7 as Word
-Dim time_Task8 as Word
-Dim time_Task9 as Word
-Dim time_Task10 as Word
-
-Dim cont_Task1 as Word
-Dim cont_Task2 as Word
-Dim cont_Task3 as Word
-Dim cont_Task4 as Word
-Dim cont_Task5 as Word
-Dim cont_Task6 as Word
-Dim cont_Task7 as Word
-Dim cont_Task8 as Word
-Dim cont_Task9 as Word
-Dim cont_Task10 as Word
-
-Dim flag_Task1 as Word
-Dim flag_Task2 as Word
-Dim flag_Task3 as Word
-Dim flag_Task4 as Word
-Dim flag_Task5 as Word
-Dim flag_Task6 as Word
-Dim flag_Task7 as Word
-Dim flag_Task8 as Word
-Dim flag_Task9 as Word
-Dim flag_Task10 as Word
-
-Dim flag_LTask1 as Word
-Dim flag_LTask2 as Word
-Dim flag_LTask3 as Word
-Dim flag_LTask4 as Word
-Dim flag_LTask5 as Word
-Dim flag_LTask6 as Word
-Dim flag_LTask7 as Word
-Dim flag_LTask8 as Word
-Dim flag_LTask9 as Word
-Dim flag_LTask10 as Word
+'Initialisation routine
+#startup Init_Multitask
 
 
 Sub Init_Multitask
-    #ifndef base_time
-        #define base_time 1000
-    #endif
 
-    #script
-        If PIC Then
-            'Dim timer0_val as byte
+    dim flags as word                   '2 bytes for 16 flags
+    dim value_tmr0 as byte
 
-            MipsPic = ChipMHz/4
-            TMR0PresPic = 0
-            T0TOP_Pic = MipsPic*base_time/2
+    flags = ChipMhz/4 * base_time       'use flags variable as temporary register
 
-            if T0TOP_Pic > 255 then
-                TMR0PresPic = 1
-                T0TOP_Pic = MipsPic*base_time/4
-                if T0TOP_Pic > 255 then
-                    TMR0PresPic = 2
-                    T0TOP_Pic = MipsPic*base_time/8
-                    if T0TOP_Pic > 255 then
-                        TMR0PresPic = 3
-                        T0TOP_Pic = MipsPic*base_time/16
-                        if T0TOP_Pic > 255 then
-                            TMR0PresPic = 4
-                            T0TOP_Pic = MipsPic*base_time/32
-                            if T0TOP_Pic > 255 then
-                                TMR0PresPic = 5
-                                T0TOP_Pic = MipsPic*base_time/64
-                                if T0TOP_Pic > 255 then
-                                    TMR0PresPic = 6
-                                    T0TOP_Pic = MipsPic*base_time/128
-                                    if T0TOP_Pic > 255 then
-                                        TMR0PresPic = 7
-                                        T0TOP_Pic = MipsPic*base_time/256
-                                    end if
-                                end if
-                            end if
-                        end if
-                    end if
-                end if
-            end if
-            timer0_val = 255 - T0TOP_Pic
-      End If
+    if flags_H = 0 then                 'calculate prescaler and initial timer0 counter
+      TimerInitValue = 8
 
-      If AVR Then
-            TMR0PresAvr = 1
-            T0TOP_Avr = ChipMHz*base_time
+    else
+      TimerInitValue = 0
 
-            if T0TOP_Avr > 255 then
-                TMR0PresAvr = 2
-                T0TOP_Avr = ChipMHz*base_time/8
-                if T0TOP_Avr > 255 then
-                    TMR0PresAvr = 3
-                    T0TOP_Avr = ChipMHz*base_time/64
-                    if T0TOP_Avr > 255 then
-                        TMR0PresAvr = 4
-                        T0TOP_Avr = ChipMHz*base_time/256
-                        if T0TOP_Avr > 255 then
-                            TMR0PresAvr = 5
-                            T0TOP_Avr = ChipMHz*base_time/1024
-                        end if
-                    end if
-                end if
-            end if
-        End If
-    #endscript
+      do while flags_H <> 0
+        flags = flags / 2
+        TimerInitValue++
+      loop
+      TimerInitValue++
 
-    #ifdef PIC
-        #ifdef var(OPTION_REG)
-            OPTION_REG = 192 and OPTION_REG
-            OPTION_REG = TMR0PresPic or OPTION_REG
-        #endif
-        #ifdef var(T0CON)
-            T0CON = 192
-            T0CON = TMR0PresPic or T0CON
-        #endif
-        On Interrupt Timer0Overflow Call Interr_Timer0
-    #endif
+    End if
+    value_tmr0 = 0
+    value_tmr0 = value_tmr0 - flags
+    flags = 0
 
-    #ifdef AVR
-        #ifdef Var(OCR0)
-            OCR0  = T0TOP_Avr
-            TCCR0 = 64 + TMR0PresAvr ' CTC mode: TOP = OCR0
-        #endif
-        #ifdef Var(OCR0A)
-            OCR0A  = T0TOP_Avr
-            TCCR0A = 2  ' CTC mode: TOP = OCR0A
-            TCCR0B = TMR0PresAvr
-        #endif
-            On Interrupt Timer0Match1 Call Interr_Timer0
-    #endif
+    StartTimer 0
 
+    ' Set the Timer start value
+    SetTimer ( 0, value_tmr0 )
 
 
     #ifdef Task1
@@ -270,7 +139,7 @@ Sub Init_Multitask
         #ifdef Task1_ms
             time_Task1 = Task1_ms*1000/base_time
         #endif
-        #define flag_Task1 = mtsk_flags.0
+        #define flag_Task1 flags.0
     #endif
 
     #ifdef LTask1
@@ -285,121 +154,27 @@ Sub Init_Multitask
         #ifdef LTask1_s
             time_LTask1 = LTask1_s*1000000/base_time
         #endif
-        #define flag_LTask1 Lmtsk_flags.0
+        #define flag_LTask1 Lflags.0
     #endif
 
     call init_rest_of_tasks     'here only Task1 and LTask1 are defined
                                 'to show procedure, rest of task are defined
                                 'in: Sub init_rest_of_tasks
+
+    On Interrupt Timer0Overflow Call Interr_Timer0
+
 End Sub
 
 
 Sub Interr_Timer0
+     TMR0IF = 0
 
-    #ifdef PIC
-        TMR0 = TMR0 + timer0_val              'init timer0 counter
-    #endif
-
-    #ifdef pwm_res
-        dim cont_pwm as byte
-        cont_pwm += 1
-        if cont_pwm >= pwm_res then cont_pwm = 0
-
-        #ifdef pwm1_out
-          dim pwm1_duty as byte
-
-          if cont_pwm >= pwm1_duty then
-              pwm1_out = 0
-          else
-              pwm1_out = 1
-          End if
-      #endif
-
-      #ifdef pwm2_out
-          dim pwm2_duty as byte
-
-          if cont_pwm >= pwm2_duty then
-              pwm2_out = 0
-          else
-              pwm2_out = 1
-          End if
-      #endif
-
-      #ifdef pwm3_out
-          dim pwm3_duty as byte
-
-          if cont_pwm >= pwm3_duty then
-              pwm3_out = 0
-          else
-              pwm3_out = 1
-          End if
-      #endif
-
-      #ifdef pwm4_out
-          dim pwm4_duty as byte
-
-          if cont_pwm >= pwm4_duty then
-              pwm4_out = 0
-          else
-              pwm4_out = 1
-          End if
-      #endif
-
-      #ifdef pwm5_out
-          dim pwm5_duty as byte
-
-          if cont_pwm >= pwm5_duty then
-              pwm5_out = 0
-          else
-              pwm5_out = 1
-          End if
-      #endif
-
-      #ifdef pwm6_out
-          dim pwm6_duty as byte
-
-          if cont_pwm >= pwm6_duty then
-              pwm6_out = 0
-          else
-              pwm6_out = 1
-          End if
-      #endif
-
-      #ifdef pwm7_out
-          dim pwm7_duty as byte
-
-          if cont_pwm >= pwm7_duty then
-              pwm7_out = 0
-          else
-              pwm7_out = 1
-          End if
-      #endif
-
-      #ifdef pwm8_out
-          dim pwm8_duty as byte
-
-          if cont_pwm >= pwm8_duty then
-              pwm8_out = 0
-          else
-              pwm8_out = 1
-          End if
-      #endif
-
-      #ifdef pwm9_out
-          dim pwm9_duty as byte
-
-          if cont_pwm >= pwm9_duty then
-              pwm9_out = 0
-          else
-              pwm9_out = 1
-          End if
-      #endif
-
-  #endif
+    ' Set the Timer start value
+    SetTimer ( 0, TMR0 + value_tmr0 )
 
     #ifdef Task1
         cont_Task1 += 1                   'increment task counter
-        if cont_Task1 >= time_Task1 then   'if task time reached
+        if cont_Task1 >= time_Task1 then  'if task time reached
             cont_Task1 = 0                'restart counter
             flag_Task1 = 1                'set task flag
         End if
@@ -430,7 +205,7 @@ Sub Interr_Timer0
         #endif
     #endif
 
-    #ifdef Task4        
+    #ifdef Task4
         cont_Task4 += 1
         if cont_Task4 >= time_Task4 then
             cont_Task4 = 0
@@ -487,7 +262,7 @@ Sub Interr_Timer0
 
     #ifdef Task9
         cont_Task9 += 1                   'increment task counter
-        if cont_Task9 >= time_Task9 then   'if task time reached
+        if cont_Task9 >= time_Task9 then  'if task time reached
             cont_Task9 = 0                'restart counter
             flag_Task9 = 1                'set task flag
         End if
@@ -576,13 +351,21 @@ Sub Interr_Timer0
     '--------------------------- LONG TASKs -------------------------
 
     #ifdef LTask1
-        dim time_LTask1 as word
-        dim cont_LTask1 as word
-
-        cont_LTask1 += 1               'increment LTask counter
-      if cont_LTask1 >= time_LTask1 then
-            cont_LTask1 = 0
-            flag_LTask1 = 1
+        movlw 1
+        addwf   cont_LTask1,F               'increment LTask counter
+      movlw 0
+      btfsc STATUS,C
+      addlw 1
+      addwf cont_LTask1_H,F
+        SysCalcTempB_H = CONT_LTASK1_H
+        SysCalcTempB = CONT_LTASK1
+        SysCalcTempA_H = TIME_LTASK1_H
+        SysCalcTempA = TIME_LTASK1
+      call SysCompLessThan
+        if SysCalcTempX.0 on  then          'if LTask time reached
+            cont_LTask1 = 0                 'restart counter
+            cont_LTask1_H = 0
+            flag_LTask1 = 1                 'set LTask flag
         End if
         #ifdef Run_LTask1
             Do_LTask1
@@ -590,12 +373,20 @@ Sub Interr_Timer0
     #endif
 
     #ifdef LTask2
-        dim time_LTask2 as word
-        dim cont_LTask2 as word
-
-        cont_LTask2 += 1
-      if cont_LTask2 >= time_LTask2 then
+        movlw 1
+        addwf    cont_LTask2
+      movlw 0
+      btfsc STATUS,C
+      addlw 1
+      addwf cont_LTask2_H,F
+        SysCalcTempB_H = CONT_LTASK2_H
+        SysCalcTempB = CONT_LTASK2
+        SysCalcTempA_H = TIME_LTASK2_H
+        SysCalcTempA = TIME_LTASK2
+      call SysCompLessThan
+        if SysCalcTempX.0 on  then
             cont_LTask2 = 0
+            cont_LTask2_H = 0
             flag_LTask2 = 1
         End if
         #ifdef Run_LTask2
@@ -604,12 +395,20 @@ Sub Interr_Timer0
     #endif
 
     #ifdef LTask3
-        dim time_LTask3 as word
-        dim cont_LTask3 as word
-
-        cont_LTask3 += 1
-      if cont_LTask3 >= time_LTask3 then
+        movlw 1
+        addwf    cont_LTask3
+      movlw 0
+      btfsc STATUS,C
+      addlw 1
+      addwf cont_LTask3_H,F
+        SysCalcTempB_H = CONT_LTASK3_H
+        SysCalcTempB = CONT_LTASK3
+        SysCalcTempA_H = TIME_LTASK3_H
+        SysCalcTempA = TIME_LTASK3
+      call SysCompLessThan
+        if SysCalcTempX.0 on  then
             cont_LTask3 = 0
+            cont_LTask3_H = 0
             flag_LTask3 = 1
         End if
         #ifdef Run_LTask3
@@ -618,12 +417,20 @@ Sub Interr_Timer0
     #endif
 
     #ifdef LTask4
-        dim time_LTask4 as word
-        dim cont_LTask4 as word
-
-        cont_LTask4 += 1
-      if cont_LTask4 >= time_LTask4 then
+        movlw 1
+        addwf    cont_LTask4
+      movlw 0
+      btfsc STATUS,C
+      addlw 1
+      addwf cont_LTask4_H,F
+        SysCalcTempB_H = CONT_LTASK4_H
+        SysCalcTempB = CONT_LTASK4
+        SysCalcTempA_H = TIME_LTASK4_H
+        SysCalcTempA = TIME_LTASK4
+      call SysCompLessThan
+        if SysCalcTempX.0 on  then
             cont_LTask4 = 0
+            cont_LTask4_H = 0
             flag_LTask4 = 1
         End if
         #ifdef Run_LTask4
@@ -632,12 +439,20 @@ Sub Interr_Timer0
     #endif
 
     #ifdef LTask5
-        dim time_LTask5 as word
-        dim cont_LTask5 as word
-
-        cont_LTask5 += 1
-      if cont_LTask5 >= time_LTask5 then
+        movlw 1
+        addwf    cont_LTask5
+      movlw 0
+      btfsc STATUS,C
+      addlw 1
+      addwf cont_LTask5_H,F
+        SysCalcTempB_H = CONT_LTASK5_H
+        SysCalcTempB = CONT_LTASK5
+        SysCalcTempA_H = TIME_LTASK5_H
+        SysCalcTempA = TIME_LTASK5
+      call SysCompLessThan
+        if SysCalcTempX.0 on  then
             cont_LTask5 = 0
+            cont_LTask5_H = 0
             flag_LTask5 = 1
         End if
         #ifdef Run_LTask5
@@ -646,12 +461,20 @@ Sub Interr_Timer0
     #endif
 
     #ifdef LTask6
-        dim time_LTask6 as word
-        dim cont_LTask6 as word
-
-        cont_LTask6 += 1
-      if cont_LTask6 >= time_LTask6 then
+        movlw 1
+        addwf    cont_LTask6
+      movlw 0
+      btfsc STATUS,C
+      addlw 1
+      addwf cont_LTask6_H,F
+        SysCalcTempB_H = CONT_LTASK6_H
+        SysCalcTempB = CONT_LTASK6
+        SysCalcTempA_H = TIME_LTASK6_H
+        SysCalcTempA = TIME_LTASK6
+      call SysCompLessThan
+        if SysCalcTempX.0 on  then
             cont_LTask6 = 0
+            cont_LTask6_H = 0
             flag_LTask6 = 1
         End if
         #ifdef Run_LTask6
@@ -660,12 +483,20 @@ Sub Interr_Timer0
     #endif
 
     #ifdef LTask7
-        dim time_LTask7 as word
-        dim cont_LTask7 as word
-
-        cont_LTask7 += 1
-      if cont_LTask7 >= time_LTask7 then
+        movlw 1
+        addwf    cont_LTask7
+      movlw 0
+      btfsc STATUS,C
+      addlw 1
+      addwf cont_LTask7_H,F
+        SysCalcTempB_H = CONT_LTASK7_H
+        SysCalcTempB = CONT_LTASK7
+        SysCalcTempA_H = TIME_LTASK7_H
+        SysCalcTempA = TIME_LTASK7
+      call SysCompLessThan
+        if SysCalcTempX.0 on  then
             cont_LTask7 = 0
+            cont_LTask7_H = 0
             flag_LTask7 = 1
         End if
         #ifdef Run_LTask7
@@ -674,12 +505,20 @@ Sub Interr_Timer0
     #endif
 
     #ifdef LTask8
-        dim time_LTask8 as word
-        dim cont_LTask8 as word
-
-        cont_LTask8 += 1
-      if cont_LTask8 >= time_LTask8 then
+        movlw 1
+        addwf    cont_LTask8
+      movlw 0
+      btfsc STATUS,C
+      addlw 1
+      addwf cont_LTask8_H,F
+        SysCalcTempB_H = CONT_LTASK8_H
+        SysCalcTempB = CONT_LTASK8
+        SysCalcTempA_H = TIME_LTASK8_H
+        SysCalcTempA = TIME_LTASK8
+      call SysCompLessThan
+        if SysCalcTempX.0 on  then
             cont_LTask8 = 0
+            cont_LTask8_H = 0
             flag_LTask8 = 1
         End if
         #ifdef Run_LTask8
@@ -696,7 +535,7 @@ Sub init_rest_of_tasks          'Calculate ticks value from time value
         #ifdef Task2_ms
             time_Task2 = Task2_ms*1000/base_time
         #endif
-        #define flag_Task2 mtsk_flags.1
+        #define flag_Task2 flags.1
     #endif
 
     #ifdef Task3
@@ -706,7 +545,7 @@ Sub init_rest_of_tasks          'Calculate ticks value from time value
         #ifdef Task3_ms
             time_Task3 = Task3_ms*1000/base_time
         #endif
-        #define flag_Task3 mtsk_flags.2
+        #define flag_Task3 flags.2
     #endif
 
     #ifdef Task4
@@ -716,7 +555,7 @@ Sub init_rest_of_tasks          'Calculate ticks value from time value
         #ifdef Task4_ms
             time_Task4 = Task4_ms*1000/base_time
         #endif
-        #define flag_Task4 mtsk_flags.3
+        #define flag_Task4 flags.3
     #endif
 
     #ifdef Task5
@@ -726,7 +565,7 @@ Sub init_rest_of_tasks          'Calculate ticks value from time value
         #ifdef Task5_ms
             time_Task5 = Task5_ms*1000/base_time
         #endif
-        #define flag_Task5 mtsk_flags.4
+        #define flag_Task5 flags.4
     #endif
 
     #ifdef Task6
@@ -736,7 +575,7 @@ Sub init_rest_of_tasks          'Calculate ticks value from time value
         #ifdef Task6_ms
             time_Task6 = Task6_ms*1000/base_time
         #endif
-        #define flag_Task6 mtsk_flags.5
+        #define flag_Task6 flags.5
     #endif
 
     #ifdef Task7
@@ -746,7 +585,7 @@ Sub init_rest_of_tasks          'Calculate ticks value from time value
         #ifdef Task7_ms
             time_Task7 = Task7_ms*1000/base_time
         #endif
-        #define flag_Task7 mtsk_flags.6
+        #define flag_Task7 flags.6
     #endif
 
     #ifdef Task8
@@ -756,7 +595,7 @@ Sub init_rest_of_tasks          'Calculate ticks value from time value
         #ifdef Task8_ms
             time_Task8 = Task8_ms*1000/base_time
         #endif
-        #define flag_Task8 mtsk_flags.7
+        #define flag_Task8 flags.7
     #endif
 
     #ifdef Task9
@@ -766,7 +605,7 @@ Sub init_rest_of_tasks          'Calculate ticks value from time value
         #ifdef Task9_ms
             time_Task9 = Task9_ms*1000/base_time
         #endif
-        #define flag_Task9 mtsk_flags_H.0
+        #define flag_Task9 flags_H.0
     #endif
 
     #ifdef Task10
@@ -776,7 +615,7 @@ Sub init_rest_of_tasks          'Calculate ticks value from time value
         #ifdef Task10_ms
             time_Task10 = Task10_ms*1000/base_time
         #endif
-        #define flag_Task10 mtsk_flags_H.1
+        #define flag_Task10 flags_H.1
     #endif
 
     #ifdef Task11
@@ -786,7 +625,7 @@ Sub init_rest_of_tasks          'Calculate ticks value from time value
         #ifdef Task11_ms
             time_Task11 = Task11_ms*1000/base_time
         #endif
-        #define flag_Task11 mtsk_flags_H.2
+        #define flag_Task11 flags_H.2
     #endif
 
     #ifdef Task12
@@ -796,7 +635,7 @@ Sub init_rest_of_tasks          'Calculate ticks value from time value
         #ifdef Task12_ms
             time_Task12 = Task12_ms*1000/base_time
         #endif
-        #define flag_Task12 mtsk_flags_H.3
+        #define flag_Task12 flags_H.3
     #endif
 
     #ifdef Task13
@@ -806,7 +645,7 @@ Sub init_rest_of_tasks          'Calculate ticks value from time value
         #ifdef Task13_ms
             time_Task13 = Task13_ms*1000/base_time
         #endif
-        #define flag_Task13 mtsk_flags_H.4
+        #define flag_Task13 flags_H.4
     #endif
 
     #ifdef Task14
@@ -816,7 +655,7 @@ Sub init_rest_of_tasks          'Calculate ticks value from time value
         #ifdef Task14_ms
             time_Task14 = Task14_ms*1000/base_time
         #endif
-        #define flag_Task14 mtsk_flags_H.5
+        #define flag_Task14 flags_H.5
     #endif
 
     #ifdef Task15
@@ -826,7 +665,7 @@ Sub init_rest_of_tasks          'Calculate ticks value from time value
         #ifdef Task15_ms
             time_Task15 = Task15_ms*1000/base_time
         #endif
-        #define flag_Task15 mtsk_flags_H.6
+        #define flag_Task15 flags_H.6
     #endif
 
     #ifdef Task16
@@ -836,7 +675,7 @@ Sub init_rest_of_tasks          'Calculate ticks value from time value
         #ifdef Task16_ms
             time_Task16 = Task16_ms*1000/base_time
         #endif
-        #define flag_Task16 mtsk_flags_H.7
+        #define flag_Task16 flags_H.7
     #endif
 
     '--------------------------- LONG TASKs -------------------------
@@ -854,7 +693,7 @@ Sub init_rest_of_tasks          'Calculate ticks value from time value
         #ifdef LTask2_s
             time_LTask2 = LTask2_s*1000000/base_time
         #endif
-        #define flag_LTask2 Lmtsk_flags.1
+        #define flag_LTask2 Lflags.1
     #endif
 
     #ifdef LTask3
@@ -869,7 +708,7 @@ Sub init_rest_of_tasks          'Calculate ticks value from time value
         #ifdef LTask3_s
             time_LTask3 = LTask3_s*1000000/base_time
         #endif
-        #define flag_LTask3 Lmtsk_flags.2
+        #define flag_LTask3 Lflags.2
     #endif
 
     #ifdef LTask4
@@ -884,7 +723,7 @@ Sub init_rest_of_tasks          'Calculate ticks value from time value
         #ifdef LTask4_s
             time_LTask4 = LTask4_s*1000000/base_time
         #endif
-        #define flag_LTask4 Lmtsk_flags.3
+        #define flag_LTask4 Lflags.3
     #endif
 
     #ifdef LTask5
@@ -899,7 +738,7 @@ Sub init_rest_of_tasks          'Calculate ticks value from time value
         #ifdef LTask5_s
             time_LTask5 = LTask5_s*1000000/base_time
         #endif
-        #define flag_LTask5 Lmtsk_flags.4
+        #define flag_LTask5 Lflags.4
     #endif
 
     #ifdef LTask6
@@ -914,7 +753,7 @@ Sub init_rest_of_tasks          'Calculate ticks value from time value
         #ifdef LTask6_s
             time_LTask6 = LTask6_s*1000000/base_time
         #endif
-        #define flag_LTask6 Lmtsk_flags.5
+        #define flag_LTask6 Lflags.5
     #endif
 
     #ifdef LTask7
@@ -929,7 +768,7 @@ Sub init_rest_of_tasks          'Calculate ticks value from time value
         #ifdef LTask7_s
             time_LTask7 = LTask7_s*1000000/base_time
         #endif
-        #define flag_LTask7 Lmtsk_flags.6
+        #define flag_LTask7 Lflags.6
     #endif
 
     #ifdef LTask8
@@ -944,14 +783,14 @@ Sub init_rest_of_tasks          'Calculate ticks value from time value
         #ifdef LTask8_s
             time_LTask8 = LTask8_s*1000000/base_time
         #endif
-        #define flag_LTask8 Lmtsk_flags.7
+        #define flag_LTask8 Lflags.7
     #endif
 End Sub
 
 
 #ifdef Task1
     Sub Do_Task1
-        if flag_Task1= 1 Then
+        if flag_Task1 = 1 Then
             flag_Task1 = 0
             call Task1
         End if
@@ -960,7 +799,7 @@ End Sub
 
 #ifdef Task2
     Sub Do_Task2
-        if flag_Task2= 1 Then
+        if flag_Task2 = 1 Then
             flag_Task2 = 0
             call Task2
         End if
@@ -969,8 +808,8 @@ End Sub
 
 #ifdef Task3
     Sub Do_Task3
-        if flag_Task3= 1 Then
-            flag_Task3 = 0
+        if flag_Task3 = 1 Then
+            flag_Task3= 0
             call Task3
         End if
     End Sub
@@ -978,8 +817,8 @@ End Sub
 
 #ifdef Task4
     Sub Do_Task4
-        if flag_Task4= 1 Then
-            flag_Task4 = 0
+        if flag_Task4 = 1 Then
+            set flag_Task4 off
             call Task4
         End if
     End Sub
@@ -987,8 +826,8 @@ End Sub
 
 #ifdef Task5
     Sub Do_Task5
-        if flag_Task5= 1 Then
-            flag_Task5 = 0
+        if flag_Task5 = 1 Then
+            set flag_Task5 off
             call Task5
         End if
     End Sub
@@ -996,8 +835,8 @@ End Sub
 
 #ifdef Task6
     Sub Do_Task6
-        if flag_Task6= 1 Then
-            flag_Task6 = 0
+        if flag_Task6 = 1 Then
+            set flag_Task6 off
             call Task6
         End if
     End Sub
@@ -1005,8 +844,8 @@ End Sub
 
 #ifdef Task7
     Sub Do_Task7
-        if flag_Task7= 1 Then
-            flag_Task7 = 0
+        if flag_Task7 = 1 Then
+            set flag_Task7 off
             call Task7
         End if
     End Sub
@@ -1014,8 +853,8 @@ End Sub
 
 #ifdef Task8
     Sub Do_Task8
-        if flag_Task8= 1 Then
-            flag_Task8 = 0
+        if flag_Task8 = 1 Then
+            set flag_Task8 off
             call Task8
         End if
     End Sub
@@ -1023,8 +862,8 @@ End Sub
 
 #ifdef Task9
     Sub Do_Task9
-        if flag_Task9= 1 Then
-            flag_Task9 = 0
+        if flag_Task9 = 1 Then
+            set flag_Task9 off
             call Task9
         End if
     End Sub
@@ -1032,8 +871,8 @@ End Sub
 
 #ifdef Task10
     Sub Do_Task10
-        if flag_Task10= 1 Then
-            flag_Task10 = 0
+        if flag_Task10 = 1 Then
+            set flag_Task10 off
             call Task10
         End if
     End Sub
@@ -1041,8 +880,8 @@ End Sub
 
 #ifdef Task11
     Sub Do_Task11
-        if flag_Task11= 1 Then
-            flag_Task11 = 0
+        if flag_Task11 = 1 Then
+            set flag_Task11 off
             call Task11
         End if
     End Sub
@@ -1050,8 +889,8 @@ End Sub
 
 #ifdef Task12
     Sub Do_Task12
-        if flag_Task12= 1 Then
-            flag_Task12 = 0
+        if flag_Task12 = 1 Then
+            set flag_Task12 off
             call Task12
         End if
     End Sub
@@ -1059,8 +898,8 @@ End Sub
 
 #ifdef Task13
     Sub Do_Task13
-        if flag_Task13= 1 Then
-            flag_Task13 = 0
+        if flag_Task13 = 1 Then
+            set flag_Task13 off
             call Task13
         End if
     End Sub
@@ -1068,8 +907,8 @@ End Sub
 
 #ifdef Task14
     Sub Do_Task14
-        if flag_Task14= 1 Then
-            flag_Task14 = 0
+        if flag_Task14 = 1 Then
+            set flag_Task14 off
             call Task14
         End if
     End Sub
@@ -1077,8 +916,8 @@ End Sub
 
 #ifdef Task15
     Sub Do_Task15
-        if flag_Task15= 1 Then
-            flag_Task15 = 0
+        if flag_Task15 = 1 Then
+            set flag_Task15 off
             call Task15
         End if
     End Sub
@@ -1086,8 +925,8 @@ End Sub
 
 #ifdef Task16
     Sub Do_Task16
-        if flag_Task16= 1 Then
-            flag_Task16 = 0
+        if flag_Task16 = 1 Then
+            set flag_Task16 off
             call Task16
         End if
     End Sub
@@ -1097,8 +936,8 @@ End Sub
 
 #ifdef LTask1
     Sub Do_LTask1
-        if flag_LTask1= 1 Then
-            set flag_LTask1 = 0
+        if flag_LTask1 = 1 Then
+            flag_LTask1 = 0
             call LTask1
         End if
     End Sub
@@ -1107,8 +946,8 @@ End Sub
 
 #ifdef LTask2
     Sub Do_LTask2
-        if flag_LTask2= 1 Then
-            set flag_LTask2 = 0
+        if flag_LTask2 = 1 Then
+            flag_LTask2 off
             call LTask2
         End if
     End Sub
@@ -1116,8 +955,8 @@ End Sub
 
 #ifdef LTask3
     Sub Do_LTask3
-        if flag_LTask3= 1 Then
-            set flag_LTask3 = 0
+        if flag_LTask3 = 1 Then
+            flag_LTask3 off
             call LTask3
         End if
     End Sub
@@ -1125,8 +964,8 @@ End Sub
 
 #ifdef LTask4
     Sub Do_LTask4
-        if flag_LTask4= 1 Then
-            set flag_LTask4 = 0
+        if flag_LTask4 = 1 Then
+            flag_LTask4 off
             call LTask4
         End if
     End Sub
@@ -1134,8 +973,8 @@ End Sub
 
 #ifdef LTask5
     Sub Do_LTask5
-        if flag_LTask5= 1 Then
-            set flag_LTask5 = 0
+        if flag_LTask5 = 1 Then
+            flag_LTask5 off
             call LTask5
         End if
     End Sub
@@ -1143,8 +982,8 @@ End Sub
 
 #ifdef LTask6
     Sub Do_LTask6
-        if flag_LTask6= 1 Then
-            set flag_LTask6 = 0
+        if flag_LTask6 = 1 Then
+            flag_LTask6 off
             call LTask6
         End if
     End Sub
@@ -1152,8 +991,8 @@ End Sub
 
 #ifdef LTask7
     Sub Do_LTask7
-        if flag_LTask7= 1 Then
-            set flag_LTask7 = 0
+        if flag_LTask7 = 1 Then
+            flag_LTask7 off
             call LTask7
         End if
     End Sub
@@ -1161,12 +1000,11 @@ End Sub
 
 #ifdef LTask8
     Sub Do_LTask8
-        if flag_LTask8= 1 Then
-            set flag_LTask8 = 0
+        if flag_LTask8 = 1 Then
+            flag_LTask8 off
             call LTask8
         End if
     End Sub
 #endif
-
 
 

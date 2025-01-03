@@ -1,0 +1,51 @@
+'  See the .h file for documenatation
+
+
+#chip 16f88, 16
+#option Explicit
+
+#include "time_based_task_switcher_library002.h"      'in gcbasic includes folder
+
+#define base_time 100          ' Base time or "tick" = 100 uS
+
+#define Task1 blink1
+  #define Task1_ms 10            '  Run this Task every 1000 mS
+  #define Run_Task1              '  Run Task inside interrupt subroutine
+
+#define Task2 blink2
+  #define Task2_ms 20            '  Run this Task every 2500 mS
+
+#define LTask1 longBlink
+  #define LTask1_ms 500         '  Run this Task every  500 mS
+
+#define Task4 blink4
+  #define Task4_ms 1000            '  Run this Task every xx mS in side the interrupt
+  #define Run_Task4                '  enable interrupt
+  
+Dir PORTB.0 in
+Dir PORTB.1 out
+Dir PORTB.2 out
+Dir PORTB.5 out
+Dir PORTB.6 out
+
+
+Do
+  Do_Task2
+  if PORTB.0 on then Do_LTask1
+Loop
+
+Sub blink1
+  PORTB.1 = !PORTB.1  'Toggle portb.1
+End Sub
+
+Sub blink2
+  PORTB.2 = !PORTB.2  'Toggle portb.2
+End Sub
+
+Sub longBlink
+  PORTB.5 = !PORTB.5  'Toggle portb.5
+End Sub
+
+Sub blink4
+  PORTB.6 = !PORTB.6 'Toggle portb.6
+End Sub
