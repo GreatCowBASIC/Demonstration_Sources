@@ -113,35 +113,40 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
 
     Do
 
-        CounterX = readAd(AN1)
-        CounterX = scale ( CounterX, 0,254,0,70 )
+        CounterX = readAd10(AN1)
+        CounterX = scale ( CounterX, 0,1022,0,700 )
         
+
+        // Counter is the range of 0 to 700
+        // equates to 70.0
+
         If oldCounterX <> CounterX then 
             
             oldCounterX = CounterX
 
             // Show Speed
                 //Show Unit
-                If Counterx/10 = 0 then 
+                If Counterx/100 = 0 then 
                 GLCD_Draw48x48 ( 0, 0, -1 )
                 Else
-                GLCD_Draw48x48 ( 0, 0, Counterx / 10 )
+                GLCD_Draw48x48 ( 0, 0, Counterx / 100 )
                 End If
+                
                 // Show digit
-                GLCD_Draw48x48 ( 48, 0, Counterx Mod 10 )
+                GLCD_Draw48x48 ( 48, 0, ( Counterx / 10 ) MOD 10 )
 
                 // Draw Decimal value
                     // Change font
                     GLCDFNTDEFAULTSIZE= 2
                     // Print Value
                     
-                    GLCDPrint 98, 32, scale( CounterX, 0, 70, 0, 9)
+                    GLCDPrint 98, 32, Counterx Mod 10
 
                     Box 94, 44, 96, 42
                     GLCDFNTDEFAULTSIZE= 1
                 
             // Show Temp
-                ShowTemp( CounterX )
+                ShowTemp( CounterX / 10 )
             // Show Date
                 ShowDate()
             // ShowTime
@@ -150,7 +155,7 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
                 ShowDistance()
             // Show ShowFuel
                 // Send a value just to show fuel bar
-                ShowFuel ( CounterX )
+                ShowFuel ( CounterX /10 )
         End If
 
     Loop
@@ -191,14 +196,18 @@ Sub ShowDistance
 Sub ShowFuel ( in value )
 
     value = scale ( value, 0, 70, 0, 28 )
-    GLCDPrint 105, 1, "FUEL"
+    GLCDPrint 105, 0, "FUEL"
     GLCDPrint 98, 16, "E"
     GLCDPrint 123, 16, "F"
     Line 102, 20, 120, 20
     
     // Draw guage
-    FilledBox 98, 10, 98 + value , 14, 1
-    FilledBox 98 + value + 1, 10, 127, 14, 0
+    IF value >0 Then 
+        FilledBox 98, 9, 98 + value , 14, 1
+    Else
+        GLCDPrint 98, 8, "!"
+    End If
+    FilledBox 98 + value + 1, 9, 127, 14, 0
 
 
  End Sub
