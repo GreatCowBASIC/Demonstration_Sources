@@ -1,6 +1,6 @@
 [Real Pic Simulator]
 Version=1.3.0.0
-HexFile=GuageDemo.hex
+HexFile=GaugeDemo.hex
 Processor=16F877A
 RealFrequency=64000000
 SimFrequency=64000000
