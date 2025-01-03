@@ -75,9 +75,9 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
         // Show Speed
             //Show Unit
             If Counterx/10 = 0 then 
-            GLCD_Draw48x48 ( 0, 0, -1 )
+                GLCD_Draw48x48 ( 0, 0, -1 )
             Else
-            GLCD_Draw48x48 ( 0, 0, Counterx / 10 )
+                GLCD_Draw48x48 ( 0, 0, Counterx / 10 )
             End If
             // Show digit
             GLCD_Draw48x48 ( 48, 0, Counterx Mod 10 )
@@ -87,7 +87,7 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
                 GLCDFNTDEFAULTSIZE= 2
                 // Print Value
                 
-                GLCDPrint 98, 32, scale( CounterX, 0, 99, 0, 9)
+                GLCDPrint 98, 32, 0
 
                 Box 94, 44, 96, 42
                 GLCDFNTDEFAULTSIZE= 1
@@ -102,7 +102,7 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
             ShowDistance()
         // Show ShowFuel
             // Send a value just to show fuel bar ... scale to prevent overflow
-            ShowFuel ( scale( CounterX, 0, 99, 0, 70 ) )
+            ShowFuel ( CounterX  )
         wait 400 ms
 
     Next
@@ -113,8 +113,8 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
 
     Do
 
-        CounterX = readAd10(AN1)
-        CounterX = scale ( CounterX, 0,1022,0,700 )
+        CounterX = readAd(AN1)
+        CounterX = scale ( CounterX, 0,255,0, 999 )
         
 
         // Counter is the range of 0 to 700
@@ -149,13 +149,13 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
                 ShowTemp( CounterX / 10 )
             // Show Date
                 ShowDate()
-            // ShowTime
+            // Show Time
                 ShowTime()
             // Show ShowDistance()
                 ShowDistance()
             // Show ShowFuel
                 // Send a value just to show fuel bar
-                ShowFuel ( CounterX /10 )
+                ShowFuel ( CounterX  )
         End If
 
     Loop
@@ -164,7 +164,7 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
 Sub ShowTemp ( in value )
 
     tempString = ""
-    GLCDPrint 8, 47, str(value) + "  "
+    GLCDPrint 8, 47, str(value) + "   "
     // Draw degree
     Box 18, 47, 20, 49
     GLCDPrint 22, 47, "F"
@@ -193,9 +193,10 @@ Sub ShowDistance
     
  End Sub
 
-Sub ShowFuel ( in value )
+Sub ShowFuel ( in value as word )
 
-    value = scale ( value, 0, 70, 0, 28 )
+    value = scale ( value, 0, 999, 0, 28 )
+
     GLCDPrint 105, 0, "FUEL"
     GLCDPrint 98, 16, "E"
     GLCDPrint 123, 16, "F"
