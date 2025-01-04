@@ -52,8 +52,6 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
 
 // *************************** MAIN ***********************************************
 
-
-
 // *** Variables
     Dim tempString as String * 4
     Dim CounterX, oldCounterX as Word
