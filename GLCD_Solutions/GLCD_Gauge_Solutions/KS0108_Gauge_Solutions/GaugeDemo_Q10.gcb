@@ -10,8 +10,10 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
 @date    03/01/2025
 ***********************************************************/
 
-#CHIP 16F877a
+#CHIP 18F47Q10
 #OPTION Explicit
+#CONFIG MCLRE=EXTMCLR
+
 
 #INCLUDE <glcd.h>
 ' This is the Default value, not required.
@@ -20,37 +22,41 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
 'The constant is required to support OLED fonts
 #DEFINE GLCD_OLED_FONT
 
+// GLCD Setup
+    #DEFINE GLCD_CS1 PORTC.1
+    #DEFINE GLCD_CS2 PORTC.0
+    'D0 to pin 7 on LCD
+    #DEFINE GLCD_DB0 PORTD.0
+    'D1 to pin 8 on LCD
+    #DEFINE GLCD_DB1 PORTD.1
+    'D2 to pin 9 on LCD
+    #DEFINE GLCD_DB2 PORTD.2
+    'D3 to pin 10 on LCD
+    #DEFINE GLCD_DB3 PORTD.3
+    'D4 to pin 11 on LCD
+    #DEFINE GLCD_DB4 PORTD.4
+    'D5 to pin 12 on LCD
+    #DEFINE GLCD_DB5 PORTD.5
+    'D6 to pin 13 on LCD
+    #DEFINE GLCD_DB6 PORTD.6
+    'D7 to pin 14 on LCD
+    #DEFINE GLCD_DB7 PORTD.7
 
-  #DEFINE GLCD_CS1 PORTb.5
-  #DEFINE GLCD_CS2 PORTb.4
-  'D0 to pin 7 on LCD
-  #DEFINE GLCD_DB0 PORTD.0
-  'D1 to pin 8 on LCD
-  #DEFINE GLCD_DB1 PORTD.1
-  'D2 to pin 9 on LCD
-  #DEFINE GLCD_DB2 PORTD.2
-  'D3 to pin 10 on LCD
-  #DEFINE GLCD_DB3 PORTD.3
-  'D4 to pin 11 on LCD
-  #DEFINE GLCD_DB4 PORTD.4
-  'D5 to pin 12 on LCD
-  #DEFINE GLCD_DB5 PORTD.5
-  'D6 to pin 13 on LCD
-  #DEFINE GLCD_DB6 PORTD.6
-  'D7 to pin 14 on LCD
-  #DEFINE GLCD_DB7 PORTD.7
+    #DEFINE GLCD_RS       PORTE.0
+    #DEFINE GLCD_Enable   PORTE.2
+    #DEFINE GLCD_RW       PORTE.1
 
-  #DEFINE GLCD_RS PORTb.3
-  #DEFINE GLCD_Enable PORTb.2
-  #DEFINE GLCD_RW PORTc.7
-  #DEFINE GLCD_RESET PORTc.2
+    #DEFINE GLCD_RESET    PORTC.2
 
-  #DEFINE KS0108ReadDelay 2
-  #DEFINE KS0108WriteDelay 2
-  #DEFINE KS0108ClockDelay 2
+    //! YOU MAY HAVE TO ADJUST THESE TIMING CONSTANTS FOR A SPECIFIC GLCD
+    #DEFINE KS0108ReadDelay  4
+    #DEFINE KS0108WriteDelay 4
+    #DEFINE KS0108ClockDelay 4
 
 
 // *************************** MAIN ***********************************************
+
+
 
 // *** Variables
     Dim tempString as String * 4
@@ -73,9 +79,9 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
         // Show Speed
             //Show Unit
             If Counterx/10 = 0 then 
-            GLCD_Draw48x48 ( 0, 0, -1 )
+                GLCD_Draw48x48 ( 0, 0, -1 )
             Else
-            GLCD_Draw48x48 ( 0, 0, Counterx / 10 )
+                GLCD_Draw48x48 ( 0, 0, Counterx / 10 )
             End If
             // Show digit
             GLCD_Draw48x48 ( 48, 0, Counterx Mod 10 )
@@ -85,7 +91,7 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
                 GLCDFNTDEFAULTSIZE= 2
                 // Print Value
                 
-                GLCDPrint 98, 32, scale( CounterX, 0, 99, 0, 9)
+                GLCDPrint 98, 32, 0
 
                 Box 94, 44, 96, 42
                 GLCDFNTDEFAULTSIZE= 1
@@ -100,8 +106,8 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
             ShowDistance()
         // Show ShowFuel
             // Send a value just to show fuel bar ... scale to prevent overflow
-            ShowFuel ( scale( CounterX, 0, 99, 0, 70 ) )
-        wait 400 ms
+            ShowFuel ( CounterX  )
+        wait 200 ms
 
     Next
 
@@ -111,8 +117,8 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
 
     Do
 
-        CounterX = readAd10(AN1)
-        CounterX = scale ( CounterX, 0,1022,0,700 )
+        CounterX = readAd(AN1)
+        CounterX = scale ( CounterX, 0,255,0, 999 )
         
 
         // Counter is the range of 0 to 700
@@ -147,13 +153,13 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
                 ShowTemp( CounterX / 10 )
             // Show Date
                 ShowDate()
-            // ShowTime
+            // Show Time
                 ShowTime()
             // Show ShowDistance()
                 ShowDistance()
             // Show ShowFuel
                 // Send a value just to show fuel bar
-                ShowFuel ( CounterX /10 )
+                ShowFuel ( CounterX  )
         End If
 
     Loop
@@ -162,7 +168,7 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
 Sub ShowTemp ( in value )
 
     tempString = ""
-    GLCDPrint 8, 47, str(value) + "  "
+    GLCDPrint 8, 47, str(value) + "   "
     // Draw degree
     Box 18, 47, 20, 49
     GLCDPrint 22, 47, "F"
@@ -191,9 +197,10 @@ Sub ShowDistance
     
  End Sub
 
-Sub ShowFuel ( in value )
+Sub ShowFuel ( in value as word )
 
-    value = scale ( value, 0, 70, 0, 28 )
+    value = scale ( value, 0, 999, 0, 28 )
+
     GLCDPrint 105, 0, "FUEL"
     GLCDPrint 98, 16, "E"
     GLCDPrint 123, 16, "F"
