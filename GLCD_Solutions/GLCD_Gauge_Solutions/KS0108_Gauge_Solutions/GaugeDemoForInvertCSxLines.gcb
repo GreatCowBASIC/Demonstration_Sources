@@ -292,7 +292,7 @@ Sub Fast_GLCDWriteByte_KS0108 ( in GLCDData )
     Wait KS0108WriteDelay us
 
     // enable the wait here to show pixel draw
-    // wait 10 ms
+    // wait 20 ms
 
  End Sub
 
@@ -457,7 +457,7 @@ Table TableOneRLECompressed
     11, 0      # 11 zeros
  End Table
 
- Table TableTwoRLECompressed
+Table TableTwoRLECompressed
   6, 127
   32, 31
   6, 255
