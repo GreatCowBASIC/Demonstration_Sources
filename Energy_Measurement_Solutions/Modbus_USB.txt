@@ -1,0 +1,17 @@
+USB to modbus-RTU adaptor. Search Google for
+
+"windows program to test modbus-RTU via USB" or similar
+
+you will find a number of programs that will let you emulate a modbus slave. You can then set the registers on your computer & interrogate them over the USB-RS485-TTL link from your GCBasic micro. This lets you easily test your code without having to power up the ADL200 (which will need 240Vac). To test the import power simply connect up the ADL200 on the bench & power up a hair dryer (or similar). To check for export power, simply turn the ADL200 around & use the hair dryer again (a toaster might be quieter). You can obviously power up the ADL200 using 2 x power points, just turning on one to push the power from left to right through the Acrel & then turn it off, then turn on the 2nd power point to push the power from right to left. Two hair dryers (one on each side of the Acrel) will let you demonstrate the forward/reverse power readings without actually having to fiddle with any electrical wires.
+
+The ADL200 is designed to be placed in your mains power box. When your house is using energy from the grid, it will indicate the amount of power being imported, and when your solar is exporting power to the grid, the ADL200 will indicate the amount of power being exported. The ADL200 stores the KWH imported & exported, so you can read it any time you want.
+
+Here are the specs for the ADL200 power meter on the Acril website:
+
+https://www.acrel-electric.com.au/adl200-single-phase-energy-meter-product/
+
+
+
+
+
+

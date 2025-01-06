@@ -1,0 +1,20 @@
+The full manual can be found on the link below. Note that the import power & export power instantaneous readings are always held in different registers.
+
+Pages 8, 9 & 10 give you the register locations. We only pull out the data for:
+
+mains voltage
+mains current
+mains frequency
+watts instantaneous import
+watts instantaneous export
+KWH import total
+KWH export total
+
+Page 7 gives you the communications protocols. Note that some protocols can be user selected via the menu on the ADL200. We use 9600 baud.
+
+RS-485 would normally have 2 x 120R resistors across the data lines - one at each end, but we have found ~25m (maybe more) is fine with just one 120R terminating resistor across the RS-485 output on the master to work reliably. We use 2 wire screened microphone cable (as it is easy to pull up inside of walls etc - the screen is unconnected at the ADL200 end), but the recommended cable is to use LAN twisted & shielded cable.
+
+The ADL200 RS-485 output is fully isolated from the mains voltage.
+
+https://www.acrelenergy.com/uploads/file/adl200-manual.pdf
+
