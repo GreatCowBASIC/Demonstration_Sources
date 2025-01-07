@@ -147,11 +147,6 @@ byteNumber = 0
     GLCD_Open_PageTransaction 0,7
 #ENDIF
 
-    Repeat 5
-        PulseOut LEDD1, 200 ms
-        Wait 100 ms
-    End Repeat
-
 GLCDPrint 0, 0,   "GCBASIC"
 GLCDPrint (0, 16, "Anobium 2024")
 GLCDPrint (76, 16, GLCD_WIDTH )

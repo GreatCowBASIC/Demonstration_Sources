@@ -1,0 +1,162 @@
+'''*******************************************************************
+''' GC-Basic Program for Testing a connected LCD (GLCD).
+'''
+'''
+''' An I2C-LCD (16x2 or 20x4 charater) or grafic I2C-LCD (64x128) can
+''' be connect. (Address 0x40...0x4E) or 0x78)
+''' If a LCD is connected, it will be used automatically.
+''' If no LCD found a LED on PORTB.0 will blink.
+'''
+''' Most of the I2C-LCD Adaptors use a PCF8574, wich can have 8 different
+''' Addresses (0x40, 0x42, 0x44, 0x46, 0x48, 0x4A, 0x4C, 0x4E)
+'''
+'''-------------------------------------------------------------------
+'''@Name    HaJoKa
+'''@licence GPL
+'''@Version 1.00
+'''@date    07.01.2025
+'''*******************************************************************
+
+; ----- Configuration
+  #CHIP 16F18857, 16
+  #config MCLRE=ON, PWRTE=ON, WDTE=OFF, ZCD=OFF // change as required
+  #option Explicit
+ 
+  // PIC PPS Tool version: 0.0.6.5
+
+  #startup InitPPS, 85
+  #define PPSToolPart 16F18857
+
+  Sub InitPPS
+
+    // Module: MSSP1
+    SSP1CLKPPS = 0x0013    // RC3 > SCL1
+    RC3PPS = 0x0014    // SCL1 > RC3 (bi-directional)
+    SSP1DATPPS = 0x0014    // RC4 > SDA1
+    RC4PPS = 0x0015    // SDA1 > RC4 (bi-directional)
+
+  End Sub
+  // Add this code segment to your GCBASIC source program
+
+  'Setup Hardware I2C
+  #define HI2C_DATA PORTC.4 ' Standard SDA1-Port
+  #define HI2C_CLOCK PORTC.3 ' Standard SCL1-Port
+  'I2C pins need to be input for SSP module when used on Microchip PIC device
+  Dir HI2C_DATA in
+  Dir HI2C_CLOCK in
+'  #define HI2CITSCLWaitPeriod 70
+  'MASTER MODE
+  #define HI2C_BAUD_RATE 400
+  HI2CMode Master
+
+  'Set up LCD
+  #define LCD_IO 10
+  'Set LCD_IO to 10 for the YwRobot LCD1602 IIC V1 or the Sainsmart LCD_PIC I2C adapter
+  'Set LCD_IO to 12 for the Ywmjkdz I2C adapter with pot bent over top of chip
+    #define LCD_I2C_Address_1 0x4E '
+    #define LCD_I2C_Address_2 0x4C '
+    #define LCD_I2C_Address_3 0x4A '
+    #define LCD_I2C_Address_4 0x48 '
+    #define LCD_I2C_Address_5 0x46 '
+    #define LCD_I2C_Address_6 0x44 '
+    #define LCD_I2C_Address_7 0x42 '
+    #define LCD_I2C_Address_8 0x40 '
+    #define LCD_WIDTH 20 ;specified lcd width for clarity only. 20 is the default width
+    'You may need to use SLOW or MEDIUM if your LCD is a slower device.
+    #define LCD_SPEED OPTIMAL
+    'You may need to invert these states. Dependent of LCD I2C adapter.
+    #define LCD_Backlight_On_State  1
+    #define LCD_Backlight_Off_State 0
+    #define I2C_DISABLE_INTERRUPTS ON
+
+; Setup Error port
+  #define ERRORLED PORTB.0
+; ----- Variables
+  Dim LCDF as byte       ' LCD of type x detected
+  ' 0 = no LCD, 1 = grafic LCD, 2 = character LCD
+  Dim DeviceID As Byte   ' only for I2C-Scan used
+  Dim Txt as String      '
+
+; ----- Define Hardware settings
+
+  Check_LCD        ' Test if any LCD are connected
+  
+  If LCDF = 2 Then ' character LCD
+    Hello_LCD
+  End If
+  If LCDF = 0 Then ' no LCD found, Let a LED blink
+    Do Forever
+      PulseOut ERRORLED, 500 ms
+      Wait 500 ms
+    Loop
+  End If
+
+End
+
+''' **********************************************
+''' Subroutines and Functions
+''' **********************************************
+
+  Sub Check_LCD
+
+    ' Check for a connected LCD
+
+    For DeviceID = 64 To 78 Step 2 ' Adress 0x40 to 0x4E step 2
+      I2C_Check_Address         ' look for a I2C-Device on Address DeviceID
+      If LCDF = 255 Then        ' character LCD found
+        LCDF = 2                ' set Flag to character LCD
+        LCD_I2C_Address_Current = DeviceID ' set Address to 0x4y
+        Exit Sub                ' leave the Test
+      End If
+    Next DeviceID
+
+    DeviceID = 120              ' Decimal 120 = Hex 78 Grafic LCD
+    I2C_Check_Address           ' look for a I2C-Device on Address 0x78
+    If LCDF = 255 Then          ' grafic LCD found
+      LCDF = 1                  ' set Flag to grafic LCD
+      Exit Sub                  ' leave the Test
+    End if
+
+    LCDF = 0 ' No LCD
+
+  End Sub
+
+  Sub I2C_Check_Address
+
+    LCDF = 0 ' set LCD-Flag to 0 ==> no LCD
+
+    HI2CStart
+    If HI2CWaitMSSPTimeout <> TRUE Then
+      'Send to address to device
+      HI2CSend (deviceID)
+      'Did device fail to respond?
+      If HI2CAckpollState = FALSE Then
+        ' found
+        HI2CSend ( 0 )
+        LCDF = 255 ' set the Flag
+      Else
+        ' not found
+      End If
+      'Do a stop.
+      HI2CStop
+    Else
+'      HSerPrint "! I2C search"
+    End If
+
+  End Sub
+
+  Sub Hello_LCD
+
+    If LCDF <> 2 then ' no character LCD connected
+      Exit Sub
+    End If
+
+    CLS
+    Print "Character LCD"             ' Line 1
+    Locate 1, 0
+    Print "found on 0x"
+    Print Hex(LCD_I2C_Address_Current)' Line 2
+    '      ----------------
+    wait 3 s
+
+  End Sub
