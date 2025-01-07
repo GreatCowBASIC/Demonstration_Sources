@@ -75,9 +75,9 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
         // Show Speed
             //Show Unit
             If Counterx/10 = 0 then 
-                GLCD_Draw48x48 ( 0, 0, -1 )
+            GLCD_Draw48x48 ( 0, 0, -1 )
             Else
-                GLCD_Draw48x48 ( 0, 0, Counterx / 10 )
+            GLCD_Draw48x48 ( 0, 0, Counterx / 10 )
             End If
             // Show digit
             GLCD_Draw48x48 ( 48, 0, Counterx Mod 10 )
@@ -87,7 +87,7 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
                 GLCDFNTDEFAULTSIZE= 2
                 // Print Value
                 
-                GLCDPrint 98, 32, 0
+                GLCDPrint 98, 32, scale( CounterX, 0, 99, 0, 9)
 
                 Box 94, 44, 96, 42
                 GLCDFNTDEFAULTSIZE= 1
@@ -102,7 +102,7 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
             ShowDistance()
         // Show ShowFuel
             // Send a value just to show fuel bar ... scale to prevent overflow
-            ShowFuel ( CounterX  )
+            ShowFuel ( scale( CounterX, 0, 99, 0, 70 ) )
         wait 400 ms
 
     Next
@@ -113,8 +113,8 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
 
     Do
 
-        CounterX = readAd(AN1)
-        CounterX = scale ( CounterX, 0,255,0, 999 )
+        CounterX = readAd10(AN1)
+        CounterX = scale ( CounterX, 0,1022,0,700 )
         
 
         // Counter is the range of 0 to 700
@@ -149,13 +149,13 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
                 ShowTemp( CounterX / 10 )
             // Show Date
                 ShowDate()
-            // Show Time
+            // ShowTime
                 ShowTime()
             // Show ShowDistance()
                 ShowDistance()
             // Show ShowFuel
                 // Send a value just to show fuel bar
-                ShowFuel ( CounterX  )
+                ShowFuel ( CounterX /10 )
         End If
 
     Loop
@@ -164,7 +164,7 @@ This program shows a simple guage set - it uses the ADC to show values.  Replace
 Sub ShowTemp ( in value )
 
     tempString = ""
-    GLCDPrint 8, 47, str(value) + "   "
+    GLCDPrint 8, 47, str(value) + "  "
     // Draw degree
     Box 18, 47, 20, 49
     GLCDPrint 22, 47, "F"
@@ -193,10 +193,9 @@ Sub ShowDistance
     
  End Sub
 
-Sub ShowFuel ( in value as word )
+Sub ShowFuel ( in value )
 
-    value = scale ( value, 0, 999, 0, 28 )
-
+    value = scale ( value, 0, 70, 0, 28 )
     GLCDPrint 105, 0, "FUEL"
     GLCDPrint 98, 16, "E"
     GLCDPrint 123, 16, "F"
@@ -320,35 +319,35 @@ Sub GLCD_Draw48x48 ( _XPOS, _YPOS, _num as Integer )
                 swval = 288
                 GLCDData = 0 
             Case 0
-                ReadTable TableZeroRLECompressed, Dataptr, swval
-                ReadTable TableZeroRLECompressed, Dataptr+1, GLCDData
+                ReadTable 48x48ZeroRLECompressed, Dataptr, swval
+                ReadTable 48x48ZeroRLECompressed, Dataptr+1, GLCDData
             Case 1
-                ReadTable TableOneRLECompressed, Dataptr, swval
-                ReadTable TableOneRLECompressed, Dataptr+1, GLCDData
+                ReadTable 48x48OneRLECompressed, Dataptr, swval
+                ReadTable 48x48OneRLECompressed, Dataptr+1, GLCDData
             Case 2
-                ReadTable TableTwoRLECompressed, Dataptr, swval
-                ReadTable TableTwoRLECompressed, Dataptr+1, GLCDData
+                ReadTable 48x48TwoRLECompressed, Dataptr, swval
+                ReadTable 48x48TwoRLECompressed, Dataptr+1, GLCDData
             Case 3
-                ReadTable TableThreeRLECompressed, Dataptr, swval
-                ReadTable TableThreeRLECompressed, Dataptr+1, GLCDData
+                ReadTable 48x48ThreeRLECompressed, Dataptr, swval
+                ReadTable 48x48ThreeRLECompressed, Dataptr+1, GLCDData
             Case 4
-                ReadTable TableFourRLECompressed, Dataptr, swval
-                ReadTable TableFourRLECompressed, Dataptr+1, GLCDData
+                ReadTable 48x48FourRLECompressed, Dataptr, swval
+                ReadTable 48x48FourRLECompressed, Dataptr+1, GLCDData
             Case 5
-                ReadTable TableFiveRLECompressed, Dataptr, swval
-                ReadTable TableFiveRLECompressed, Dataptr+1, GLCDData
+                ReadTable 48x48FiveRLECompressed, Dataptr, swval
+                ReadTable 48x48FiveRLECompressed, Dataptr+1, GLCDData
             Case 6
-                ReadTable TableSixRLECompressed, Dataptr, swval
-                ReadTable TableSixRLECompressed, Dataptr+1, GLCDData
+                ReadTable 48x48SixRLECompressed, Dataptr, swval
+                ReadTable 48x48SixRLECompressed, Dataptr+1, GLCDData
             Case 7
-                ReadTable TableSevenRLECompressed, Dataptr, swval
-                ReadTable TableSevenRLECompressed, Dataptr+1, GLCDData
+                ReadTable 48x48SevenRLECompressed, Dataptr, swval
+                ReadTable 48x48SevenRLECompressed, Dataptr+1, GLCDData
             Case 8
-                ReadTable TableEightRLECOmpressed, Dataptr, swval
-                ReadTable TableEightRLECOmpressed, Dataptr+1, GLCDData
+                ReadTable 48x48EightRLECOmpressed, Dataptr, swval
+                ReadTable 48x48EightRLECOmpressed, Dataptr+1, GLCDData
             Case 9
-                ReadTable TableNineRLECompressed, Dataptr, swval
-                ReadTable TableNineRLECompressed, Dataptr+1, GLCDData
+                ReadTable 48x48NineRLECompressed, Dataptr, swval
+                ReadTable 48x48NineRLECompressed, Dataptr+1, GLCDData
             Case Else
                 Exit Do                
         End Select
@@ -378,7 +377,7 @@ Sub GLCD_Draw48x48 ( _XPOS, _YPOS, _num as Integer )
 
 
 
-Table TableZeroRLECompressed
+Table 48x48ZeroRLECompressed
     // Row 1
     6, 255    // 6 times 255
     32, 31    // 32 times 31
@@ -413,17 +412,7 @@ Table TableZeroRLECompressed
     4, 0       // 4 times 0
     End Table
 
- Table TableOne
-  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 120, 124, 126, 255, 255, 255, 255, 255, 255,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
-  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 255, 255, 255, 255, 255, 255,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
-  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 255, 255, 255, 255, 255, 255,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
-  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 255, 255, 255, 255, 255, 255,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
-  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 255, 255, 255, 255, 255, 255,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
-  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  62,  62,  63,  63,  63,  63,  63,  63,  62,  62,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
-
- End Table
-
-Table TableOneRLECompressed
+Table 48x48OneRLECompressed
 
     26, 0  //     # 26 zeros
     1, 120 //    # 1 time 120
@@ -457,18 +446,18 @@ Table TableOneRLECompressed
     11, 0      # 11 zeros
  End Table
 
- Table TableTwoRLECompressed
+ Table 48x48TwoRLECompressed
   6, 127
   32, 31
   6, 255
   42, 0
   6, 255
   4, 0
-  38, 240
+  38, 248
   6, 255
   4, 0
   6, 255
-  38, 1
+  38, 0
   4, 0
   6, 255
   32, 0
@@ -481,17 +470,17 @@ Table TableOneRLECompressed
  End Table
 
 
-Table TableThreeRLECompressed
+Table 48x48ThreeRLECompressed
     6, 63
     33, 31
     6, 255
     42, 0
     6, 255
     13, 0
-    29, 240
+    29, 248
     6, 255
     13, 0
-    29, 1
+    29, 0
     6, 255
     42, 0
     6, 255
@@ -502,7 +491,7 @@ Table TableThreeRLECompressed
     4, 0
  End Table
 
-Table TableFourRLECompressed
+Table 48x48FourRLECompressed
     6, 255
     1, 7
     30, 0
@@ -516,11 +505,11 @@ Table TableFourRLECompressed
     4, 0
     
     6, 255
-    32, 240
+    32, 248
     6, 255
     4, 0
 
-    38, 1
+    38, 0
     6, 255
     4, 0
 
@@ -534,7 +523,7 @@ Table TableFourRLECompressed
     4, 0
  End Table
 
-Table TableFiveRLECompressed
+Table 48x48FiveRLECompressed
  
     
     6, 255
@@ -546,10 +535,10 @@ Table TableFiveRLECompressed
     42, 0
 
     6, 255
-    38,240
+    38,248
     4, 0
 
-    38, 1 
+    38, 0 
     6, 255
     4, 0
 
@@ -565,7 +554,7 @@ Table TableFiveRLECompressed
 
  End Table
 
-Table TableSixRLECompressed
+Table 48x48SixRLECompressed
 
   6, 255
   32, 31
@@ -576,11 +565,11 @@ Table TableSixRLECompressed
   42, 0
 
   6, 255
-  38, 240
+  38, 248
   4, 0
 
   6, 255
-  32, 1
+  32, 0
   6, 255
   4, 0
 
@@ -596,7 +585,7 @@ Table TableSixRLECompressed
 
  End Table
 
-Table TableSevenRLECompressed
+Table 48x48SevenRLECompressed
 
     6, 63
     32, 31
@@ -626,7 +615,7 @@ Table TableSevenRLECompressed
 
  End Table
 
-Table TableEightRLECOmpressed
+Table 48x48EightRLECOmpressed
     
     6, 255
     32, 31
@@ -639,12 +628,12 @@ Table TableEightRLECOmpressed
     4, 0
     
     6, 255
-    32, 240
+    32, 248
     6, 255
     4, 0
     
     6, 255
-    32, 1
+    32, 0
     6, 255
     4, 0
     
@@ -660,7 +649,7 @@ Table TableEightRLECOmpressed
     
  End Table
 
-Table TableNineRLECompressed
+Table 48x48NineRLECompressed
 
     6, 255
     32, 31
@@ -673,11 +662,11 @@ Table TableNineRLECompressed
     4, 0
 
     6, 255
-    32, 240
+    32, 248
     6, 255
     4, 0
 
-    38, 1
+    38, 0
     6, 255
     4, 0
 
@@ -690,7 +679,5 @@ Table TableNineRLECompressed
     6, 63
     4, 0
 
-End Table
-
-
-
+ End Table
+// End of 48x48 Tables

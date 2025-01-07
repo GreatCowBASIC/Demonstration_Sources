@@ -13,6 +13,7 @@
 #OPTION Explicit
 #CONFIG MCLRE=EXTMCLR
 
+#INCLUDE <millis.h>
 #INCLUDE <glcd.h>
 ' This is the Default value, not required.
 #DEFINE GLCD_TYPE GLCD_TYPE_KS0108
@@ -94,19 +95,63 @@
     Next
 
     // Main loop
+    
     // Ensure oldCounterX <> CounterX, so the display is updated only when needed
     oldCounterX = !CounterX
 
-    // Prepart static
-        // add statics
+
+    
+    Dim DrawMainNowCurMs, DrawMainNowMs, DrawOtherNowCurMs, DrawOtherNowMs as word  ' declare working variables
+    DrawMainNowMs = 0
+    DrawMainNowCurMs = 0
+    DrawOtherNowMs = 0
+    DrawOtherNowCurMs = 0
+    
+    Dim DrawMainNow, DrawOtherNow, DecimalPointState as Bit
 
     Do
-    For CounterX = 0 to MAXVALUE
-        // CounterX = readAd(AN1)
-        // CounterX = scale ( CounterX, 0,255,0,MAXVALUE )
 
+        // Manage interrupts as handling Millis() requires it
+            // Now draws the RPM every 80ms and draws the rest every 1s
 
-        // Counter is the range of 0 to MAXVALUE
+            DrawMainNowCurMs = millis()
+            IntOn    
+            if DrawMainNowCurMs - DrawMainNowMs >= 80 then  ' required Time has Elapsed  - every 80ms
+                DrawMainNow = True
+                DrawMainNowMs = DrawMainNowCurMs                   ' And Record Toggle Time
+            end if
+            IntOff
+            
+            DrawOtherNowCurMs = millis()
+            IntOn
+            if DrawOtherNowCurMs - DrawOtherNowMs >= 1000 then  ' required Time has Elapsed - every 1s
+                DrawOtherNow = True
+                DrawOtherNowMs = DrawOtherNowCurMs                   ' And Record Toggle Time
+            end if
+        
+
+        If DrawMainNow = True Then 
+
+            // Do sensor reads ?? 
+            CounterX = readAd(AN1)
+            CounterX = scale ( CounterX, 0,255,0,MAXVALUE )
+
+            DrawMain()
+            DrawMainNow = False
+        End if
+
+        If DrawOtherNow = True Then 
+            DrawOther()
+            DrawOtherNow = False
+        End if
+
+    Loop
+    // End of Main loop
+
+// Draw Main
+Sub DrawMain
+
+    Dim CounterX, oldCounterX as Word
 
     If oldCounterX <> CounterX then 
         
@@ -125,9 +170,16 @@
             
             // Draw Decimal value                   
                 GLCD_DrawPixelNumbers 98, 24, Counterx Mod 10, 24       
-                    FilledBox 94, 44, 95, 45
+    End If
 
-            If Counterx Mod 10 = 0 then 
+End Sub
+
+Sub DrawOther
+
+    // Draw decimal point, invert it ever time
+    FilledBox 94, 44, 95, 45, DecimalPointState
+    DecimalPointState =!DecimalPointState
+
     // Show Temp
         ShowTemp( CounterX / 10 )
     // Show Date
@@ -139,11 +191,8 @@
     // Show ShowFuel
         // Send a value just to show fuel bar
         ShowFuel ( CounterX  )
-            End If
-        End If
-    Next
-    Loop
-// End of Main loop
+
+End Sub
 
 '------------------------------------------------------------------------
 Sub ShowTemp ( in value )
@@ -222,11 +271,11 @@ Sub Fast_GLCDWriteByte_KS0108 ( in GLCDData, swval as Word, optional _pixels as 
 
         'Select page
         Set GLCD_RS Off
-        GLCDWriteByte b'10111000' Or ( _GLCDY + _YPOS ) / 8
+        GLCDWriteByte ( b'10111000' Or ( _GLCDY + _YPOS ) / 8 )
 
         'Select column
         Set GLCD_RS Off
-        GLCDWriteByte 64 Or ( _GLCDX + _XPOS )
+        GLCDWriteByte ( 64 Or ( _GLCDX + _XPOS ) )
 
         'Dummy read first
         Set GLCD_RS On
@@ -726,6 +775,7 @@ Table 48x48NineRLECompressed
  End Table
 // End of 48x48 Tables
 
+// 24x24 Tables
 
 
 Table 24x24ZeroRLECompressed

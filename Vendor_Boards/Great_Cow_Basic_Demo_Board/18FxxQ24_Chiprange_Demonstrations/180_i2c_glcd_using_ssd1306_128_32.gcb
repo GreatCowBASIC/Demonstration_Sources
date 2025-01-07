@@ -19,9 +19,10 @@
 */
 // ----- Configuration
 
-'Chip Settings.
-#CHIP 18F26Q24, 64
+// Chip Settings.
+#CHIP 18F26Q24
 #OPTION Explicit
+#CONFIG EXTMCLR
 
     // PIC PPS Tool version: 0.0.6.5
     
@@ -42,8 +43,6 @@
 
         End Sub
     // Add this code segment to your GCBASIC source program
-
-
 
     #DEFINE USART_BAUD_RATE 9600
     #DEFINE USART_TX_BLOCKING
@@ -116,17 +115,17 @@
     //! Optional the default is to issue a warning
     #DEFINE MUTE_HIC2Q2XBUFFERSIZE_WARNING
 
-'*****************************************************************************************************
-'Main program commences here.. everything before this is setup for the board.
+// *****************************************************************************************************
+// Main program commences here.. everything before this is setup for the board.
 
 #INCLUDE <glcd.h>
-#DEFINE GLCD_TYPE           GLCD_TYPE_SSD1306_32
+#DEFINE GLCD_TYPE           GLCD_TYPE_SSD1306
 #DEFINE GLCD_I2C_Address 0x78
 
-' ----- Define variables
+//  ----- Define variables
 
-'These constants allow you to change the GLCD memory usage.
-'We have set this demonstration to use only 128bytes of RAM for GLCD operations.
+// These constants allow you to change the GLCD memory usage.
+// We can set this demonstration to use only 128bytes of RAM for GLCD operations.
 // #DEFINE GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
 // #DEFINE GLCD_TYPE_SSD1306_CHARACTER_MODE_ONLY
 #DEFINE GLCD_PROTECTOVERRUN
@@ -135,7 +134,7 @@ Dim BYTENUMBER, CCOUNT As Byte
 
 CCount = 0
 Dim longNumber As Long
-' max value = 4294967290
+//  max value = 4294967290
 longNumber = 0
 Dim wordNumber, adcval, ldrval As Word
 Dim outstring As String
@@ -147,6 +146,11 @@ byteNumber = 0
 #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
     GLCD_Open_PageTransaction 0,7
 #ENDIF
+
+    Repeat 5
+        PulseOut LEDD1, 200 ms
+        Wait 100 ms
+    End Repeat
 
 GLCDPrint 0, 0,   "GCBASIC"
 GLCDPrint (0, 16, "Anobium 2024")
