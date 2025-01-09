@@ -1,0 +1,189 @@
+/* An analysis of five approaches for calculating the scaling of ADC(0-4095) to Volts (0-200)
+
+    This is an analysis of five approaches for calculating the scaling of ADC(0-4095) to Volts (0-200). I was asked a question yesterday on 'how to' to this.
+
+        Dim VOLTS As Byte
+        Dim ADCValWord As Word
+
+        VOLTS = ADCValWord * 5 * 40 / 4096
+    The ask looks simple but there a overflow issues, and, the calculation uses Long cacls and needs to a Byte.
+
+    Summary:
+    1. Most efficient memory: Approach #3 (415 words) maintaining accuracy
+    2. Most RAM efficient: Approach #1 (27 bytes) maintaining accuracy
+    3. Most readable: Approach #2 (Scale function) maintaining accuracy
+    4. Most precise: Approach #4 (Shift method) maintaining accuracy
+
+    The trade-offs between these approaches involve:
+    - Program memory usage vs RAM usage
+    - Code readability vs execution efficiency
+    - Mathematical precision vs resource usage
+
+    The best choice would depend on your specific requirements:
+    - If program memory is tight: Use Approach #3
+    - If RAM is critical: Use Approach #1
+    - If maintainability is priority: Use Approach #2
+    - If precision is crucial: Use Approach #4
+    - If accuracy loss can be accepted then use Approach #5
+
+    Approach #1:
+
+    VOLTS = ([LONG](ADCValWord * 5)*40)/[WORD]4096
+    Uses explicit type casting with [LONG] and [WORD]
+    Resource usage: 454 words, 27 bytes RAM
+    Simple to understand but uses more program memory
+    Handles overflow by using LONG type cast
+    Approach #2:
+
+    VOLTS = Scale(ADCValWord,0, 4095, 0, 200)
+    Uses built-in Scale() function
+    Resource usage: 463 words, 45 bytes RAM
+    Most RAM usage but very readable code
+    Most program memory usage
+    Mathematically robust approach
+    Approach #3:
+
+    VOLTS = ADCValLong * 5 * 40/ 4096
+    Direct mathematical calculation
+    Resource usage: 415 words, 29 bytes RAM
+    Best program memory usage
+    Risk of overflow during multiplication
+    Simple to read and understand
+    Approach #4 (Shift method):
+
+    ADCValLong_Temp = ADCValLong * 256
+    ADCValLong_Temp = ADCValLong_Temp - (ADCValLong * 56)
+    Repeat 12
+        Set C Off
+        Rotate ADCValLong_Temp Right
+    End Repeat
+    Uses bit shifting to optimize calculation
+    Resource usage: 490 words, 34 bytes RAM
+    Most complex code but handles overflow well
+    Highest program memory usage
+    Most mathematically precise approach
+    Approach#5(Approx method)
+
+            Dim ADCValWord as Word
+            ADCValWord = 4095
+
+            ' Divide by 4 first (shift right 2)
+            Repeat 2
+                Set C Off
+                Rotate ADCValWord Right
+            End Repeat
+
+            ' Now divide by 5
+            Volts = ADCValWord / 5 
+    Let's look at factorizing 200/4096. Let's break it down step by step:
+    200/4096 can be factored as:
+    200 = 2^3 × 5^2 (8 × 25)
+    4096 = 2^12
+    So 200/4096 = (2^3 × 5^2) / 2^12 = 5^2 / 2^9 = 25 / 512
+    This means we could:
+    Shift right 9 times (divide by 512)
+    Then multiply by 25
+    This should:
+    Be more accurate than dividing by 20
+    Use fewer operations than previous approaches
+    Avoid the need for LONG variables
+    Still handle the full input range correctly
+    Resource usage: 221 words, 11 bytes RAM
+
+    Code - you can play with this. I used the 16F887a as I could run the result into a simulator to check results.
+
+*/
+#chip 16F877a
+#option Explicit
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
+Dim Volts as Byte
+
+//!Approach #1
+    // Dim ADCValWord as Word
+    // ADCValWord = 4095
+    // VOLTS = ([LONG](ADCValWord * 5)*40)/[WORD]4096           // 454w and 27ram
+
+//!Approach #2
+    // Dim ADCValWord as Word
+    // ADCValWord = 4095
+    // VOLTS = Scale(ADCValWord,0, 4095, 0, 200 )              // 463w and 45ram
+
+//!Approach #3
+    // Dim ADCValLong As Long
+    // ADCValLong = 4095
+    // VOLTS = ADCValLong * 5 * 40/ 4096                       // 415w and 29ram
+
+//!Approach #4
+    /*
+        For GCBASIC, we can break this down since we want to scale ADCValLong (0-4095) to a byte range (0-255). Let's analyze the calculation:
+
+        The formula `ADCValLong * 5 * 40 / 4096` can be rewritten as:
+        - `ADCValLong * 200 / 4096`  (since 5 * 40 = 200)
+        - `ADCValLong / 20.48`  (since 4096/200 = 20.48)
+
+        In GCBASIC with shifts:
+        1. 4096 is 2^12, so dividing by 4096 is a right shift by 12
+        2. To multiply by 200 we can use 256 (2^8) and subtract 56
+        3. This gives us: `(ADCValLong * 256 - ADCValLong * 56) >> 12
+
+        Here's the efficient code:
+
+        ' Shift left by 8 (multiply by 256)
+        ADCValLong_Temp = ADCValLong * 256
+        ' Subtract (ADCValLong * 56)
+        ADCValLong_Temp = ADCValLong_Temp - (ADCValLong * 56)
+        ' Shift right by 12 to complete division by 4096
+        Repeat 12
+            Set C Off
+            Rotate ADCValLong_Temp Right
+        End Repeat
+        result = ADCValLong_Temp
+        */
+ 
+    // Dim ADCValLong, ADCValLong_Temp As Long
+    // ADCValLong = 4095
+    // ADCValLong_Temp = ADCValLong * 256
+    // ' Subtract (ADCValLong * 56)
+    // ADCValLong_Temp = ADCValLong_Temp - (ADCValLong * 56)
+    // ' Shift right by 12 to complete division by 4096
+    // Repeat 12
+    //     Set C Off
+    //     Rotate ADCValLong_Temp Right
+    // End Repeat
+    // Volts = ADCValLong_Temp                                   // 303w and 31ram
+
+
+//!Approach #5
+    /*
+        This approach:
+
+        Uses fewer resources than all previous methods
+        More mathematically straightforward
+        Still maintains good accuracy
+        Avoids overflow issues
+        No need for LONG variables
+        Simpler to understand and maintain
+
+        The error from using 20 instead of 20.475 is minimal in this application, and the resource savings are significant.
+        */
+
+        // Start with value 0-4095
+        Dim ADCValWord as Word
+        ADCValWord = 4095
+        
+        ' Divide by 4 first (shift right 2)
+        Repeat 2
+            Set C Off
+            Rotate ADCValWord Right
+        End Repeat
+        
+        ' Now divide by 5
+        Volts = ADCValWord / 5                      // 221w and 11ram
+
+
+HSerPrint VOLTS
+

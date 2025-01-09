@@ -1,0 +1,90 @@
+/*
+    This demonstration shows the EEProm values on the Serial Terminal.
+
+    This lesson will provide code for writing and reading a single byte onto
+    the on-board EEPROM. EEPROM is non-volatile memory, meaning that it does
+    not lose its value when power is shut off. This is unlike RAM, which will
+    lose its value when no power is applied. The EEPROM is useful for storing
+    variables that must still be present during no power.
+    It is also convenient to use if the entire RAM space is used up.
+    Writes and reads to the EEPROM are practically instant and are much faster
+    than program memory operations.
+
+    This will show the value of the EEPROM on the serial Terminal.
+    You can experiment by changing the variable // Outdata//  from Random function to a specific range.  Enjoy.
+
+    ************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.00
+    @date    28-10-2024
+*/
+//  ----- Configuration
+
+#insert "000_chipHeader.h"
+
+// *****************************************************************************************************
+// Main program commences here.. everything before this is setup for the board.
+// Now assumes Serial Terminal is operational
+
+Dim DisplayNewLine, Outdata, Indata  As Byte
+Dim EEPromAddress as Word
+
+Wait 3 s
+
+Do Forever
+
+    // Terminal Preparation and Table header
+        HSerPrintCRLF
+        HSerPrint "EEPROM Test and Show Results "
+        HSerPrintCRLF 2
+
+        HSerPrint "      "
+        For EEPromAddress = 0 To 15
+            HSerPrint Hex(EEPromAddress)
+            HSerPrint " "
+        Next
+
+        For EEPromAddress = 0 To ChipEEProm -1
+            // Table formatting
+                DisplayNewLine = EEPromAddress % 16
+                If DisplayNewLine = 0 Then
+                    HSerPrintCRLF
+                    HSerPrint right(Hex(EEPromAddress_H),1)
+                    HSerPrint Hex(EEPromAddress)
+                    HSerPrint ": "
+                End If
+                HSerPrint " "
+
+            // Prepare some data to send    
+
+                // Outdata = Random
+                // Outdata = 0x55    // If you DON'T believe put your own value here!
+                Outdata = 255 - EEPromAddress    // If you DON'T believe put your own value here!
+
+            // Write
+
+                EPWrite ( EEPromAddress, Outdata )
+
+            // Reads, clear indata, just for good practice
+
+                Indata = 0
+                EPRead  ( EEPromAddress, Indata )
+
+            // Show result
+            If Outdata = Indata Then
+                HSerPrint  Hex(Indata)
+            Else
+                // Show -- as an error condition
+                HSerPrint  "--"
+            End If
+        Next
+
+    // End formating
+    HSerPrintCRLF 2
+    HSerPrint   "End of EEProm Program and Display"
+    HSerPrintCRLF 2
+
+    Wait While SwitchIn = DOWN
+Loop
+End

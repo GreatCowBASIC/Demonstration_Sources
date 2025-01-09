@@ -21,7 +21,7 @@
   #CHIP 16F18857, 16
   #config MCLRE=ON, PWRTE=ON, WDTE=OFF, ZCD=OFF // change as required
   #option Explicit
- 
+
   // PIC PPS Tool version: 0.0.6.5
 
   #startup InitPPS, 85

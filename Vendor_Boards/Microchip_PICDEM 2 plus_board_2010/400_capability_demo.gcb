@@ -1,0 +1,73 @@
+/*
+A demonstration program for GCBASIC.
+--------------------------------------------------------------------------------------------------------------------------------
+This program demonstrates the capabilities of a OCULAR OM1614 1602 LCD display.
+The LCD is using an 4-bit bus for connectivity.
+For the LCD connection - please refer to the program.
+
+@author 	EvanV
+@licence	GPL
+@version	1.0a
+@date   	27.12.2024
+********************************************************************************/
+
+//Set chip model required
+#chip 16F1937
+#option Explicit
+
+//! Specify explicit OCULAR_OM1614 support!!  This changes the behaviour of the LCD library
+#DEFINE LCD_OCULAR_OM1614
+
+// Setup LCD Parameters
+#DEFINE LCD_IO 4
+
+// Define LCD Hardware settings
+#DEFINE LCD_RS      PORTD.4
+#DEFINE LCD_RW      PORTD.5
+#DEFINE LCD_Enable  PORTD.6
+
+#DEFINE LCD_DB4     PORTD.0
+#DEFINE LCD_DB5     PORTD.1
+#DEFINE LCD_DB6     PORTD.2
+#DEFINE LCD_DB7     PORTD.3
+
+//! Required for OCULAR LCD driver
+#DEFINE LCD_POWER   PORTD.7
+
+/*
+        ------------PORTA---------------
+Bit#:  -7---6---5---4---3---2---1---0---
+IO:    ---------------------------------
+IO:    ---------------------------------
+
+        ------------PORTB----------------
+Bit#:  -7---6---5---4---3---2---1---0---
+IO:    ---------------------------------
+IO:    ---------------------------------
+
+        ------------PORTC----------------
+Bit#:  -7---6---5---4---3---2---1---0---
+IO:    ---------------------------------
+IO:    ---------------------------------
+
+        ------------PORTD----------------
+Bit#:  -7---6---5---4---3---2---1---0---
+IO:    PWR-EN--RW--RS--DB7-DB6-DB5-DB4--
+IO:    ---------------------------------
+*/
+
+
+// ----- Main body of program commences here.
+
+Locate 0,3 
+Print "Microchip"
+Locate 1,1
+Print "PICDEM 2 PLUS"
+
+wait 3 s
+
+CLS
+Locate 0,4
+Print "GCBASIC"
+Locate 1,1
+Print "Anobium 12/24"

@@ -1,0 +1,83 @@
+/*
+    A demonstration program for GCBASIC
+    --------------------------------------------------------------------------------
+    This program shows the basic operation of the board
+
+
+@author 	EvanV
+@licence	GPL
+@version	1.0a
+@date   	27.12.2024
+********************************************************************************/
+
+//Set chip model required
+#chip 16F1937
+#option Explicit
+
+/*
+        ------------PORTA---------------
+Bit#:  -7---6---5---4---3---2---1---0---
+IO:    ---------------------------------
+IO:    ---------------------------------
+
+        ------------PORTB----------------
+Bit#:  -7---6---5---4---3---2---1---0---
+IO:    ----------------LED-LED-LED-LED--
+IO:    ---------------------------------
+
+        ------------PORTC----------------
+Bit#:  -7---6---5---4---3---2---1---0---
+IO:    ---------------------------------
+IO:    ---------------------------------
+
+        ------------PORTD----------------
+Bit#:  -7---6---5---4---3---2---1---0---
+IO:    PWR-EN--RW--RS--DB7-DB6-DB5-DB4--
+IO:    ---------------------------------
+*/
+
+// Define constants to make things easier. We can reuse a constant at any time.
+#DEFINE LEDD0 PORTB.0
+#DEFINE LEDD1 PORTB.1
+#DEFINE LEDD2 PORTB.2
+#DEFINE LEDD3 PORTB.3
+
+// #OPTION Volatile LEDD3
+
+Dir     LEDD0 Out
+Dir     LEDD1 Out
+Dir     LEDD2 Out
+Dir     LEDD3 Out
+// *****************************************************************************************************
+    // Main program commences here.. everything before this is setup for the board.
+
+
+    // Program to rotate LEDs on a PIC18F26Q24 microcontroller with a 100 ms delay
+
+    // Initialize a variable to hold the LED states
+    DIM LEDs AS BYTE
+    LEDs = 0B0001  // Start with the first LED on
+
+    // Initialize a counter for rotations
+    DIM RotateCount AS BYTE
+    RotateCount = 0
+
+    // Main loop
+    Do
+        // Output the current state to PORTB
+        LATB = LEDs
+        
+        // Rotate the LEDs to the left
+        Rotate LEDs Left Simple
+        
+        // Increment the rotation counter
+        RotateCount = RotateCount + 1
+        
+        // Reset the LEDs after 4 rotations
+        If RotateCount >= 4 Then
+            LEDs = 0B0001  // Reset to initial state
+            RotateCount = 0  // Reset counter
+        End If
+        
+        WAIT 100 ms  // Wait 100 milliseconds
+    Loop

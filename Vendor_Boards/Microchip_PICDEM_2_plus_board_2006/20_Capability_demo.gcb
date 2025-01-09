@@ -62,7 +62,7 @@
 '''@author    Evan R. Venn   
 '''@license   GPL
 '''@version   1.00   
-'''@date      2024-10-28
+'''@date      08/01/2025
 '''********************************************************************************
 
 
@@ -204,14 +204,14 @@
             HserPrintCRLF
             HserPrint "Welcome to PICDEM 2 Plus"
             HserPrintCRLF
-            HserPrint "GCBASIC - Anobium   2024"
+            HserPrint "GCBASIC - Anobium Jan 2025"
             HserPrintCRLF
         #endif
 
         Print "    Welcome     "
         Locate 1,0
         Print "to PICDEM 2 Plus"
-        wait 1 s
+        wait 4 s
         CLS
         Print  ChipNameStr
         Locate 1,0
@@ -221,7 +221,7 @@
         CLS
         Print "    GCBASIC     "
         Locate 1,0
-        Print " Anobium   2024 "
+        Print "Anobium Jan 2025"
         wait 5 s
         CLS
         Print "    Welcome     "

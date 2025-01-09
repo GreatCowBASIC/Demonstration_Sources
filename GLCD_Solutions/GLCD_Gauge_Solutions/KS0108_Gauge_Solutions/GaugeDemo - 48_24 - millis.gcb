@@ -39,6 +39,8 @@
     'D7 to pin 14 on LCD
     #DEFINE GLCD_DB7 PORTD.7
 
+    #DEFINE GLCD_DATAPORT PORTD
+
     #DEFINE GLCD_RS PORTb.3
     #DEFINE GLCD_Enable PORTb.2
     #DEFINE GLCD_RW PORTc.7
@@ -46,10 +48,19 @@
 
     #DEFINE KS0108ReadDelay     3
     #DEFINE KS0108WriteDelay    3
-    #DEFINE KS0108ClockDelay    3
+    #DEFINE KS0108ClockDelay    5
 
 
 // *************************** MAIN ***********************************************
+
+// LED to inspect frequency
+    #DEFINE INSPECTIONPORT      PORTA
+    #DEFINE INSPECTIONLED       INSPECTIONPORT.2
+    #DEFINE INSPECTIONLEDMASK   4
+    DIR     INSPECTIONLED       OUT
+    INSPECTIONLED = 0
+
+
 
 // *** Variables
     Dim tempString as String * 4
@@ -116,7 +127,7 @@
 
             DrawMainNowCurMs = millis()
             IntOn    
-            if DrawMainNowCurMs - DrawMainNowMs >= 80 then  ' required Time has Elapsed  - every 80ms
+            if DrawMainNowCurMs - DrawMainNowMs >= 25 then  ' required Time has Elapsed  - every 25ms
                 DrawMainNow = True
                 DrawMainNowMs = DrawMainNowCurMs                   ' And Record Toggle Time
             end if
@@ -128,7 +139,8 @@
                 DrawOtherNow = True
                 DrawOtherNowMs = DrawOtherNowCurMs                   ' And Record Toggle Time
             end if
-        
+            
+        DrawMainNow = True
 
         If DrawMainNow = True Then 
 
@@ -151,10 +163,14 @@
 // Draw Main
 Sub DrawMain
 
+
+
     Dim CounterX, oldCounterX as Word
 
     If oldCounterX <> CounterX then 
-        
+
+        INSPECTIONLED = 1
+
         oldCounterX = CounterX
 
         // Show Speed
@@ -170,6 +186,9 @@ Sub DrawMain
             
             // Draw Decimal value                   
                 GLCD_DrawPixelNumbers 98, 24, Counterx Mod 10, 24       
+        
+        INSPECTIONLED = 0
+
     End If
 
 End Sub
@@ -242,6 +261,10 @@ Sub ShowFuel ( in value as word )
 
 Sub Fast_GLCDWriteByte_KS0108 ( in GLCDData, swval as Word, optional _pixels as byte = 48 )
 
+    Dim _YPOSPage as Byte
+
+    DIR GLCD_DATAPORT OUT
+
     Repeat swval 
 
         //Manage X Y 
@@ -252,13 +275,13 @@ Sub Fast_GLCDWriteByte_KS0108 ( in GLCDData, swval as Word, optional _pixels as 
 
         // Select the correct IC
         #ifdef GLCD_KS0108_CS_LOW
-        If _GLCDX + _XPOS < 64 Then
-            Set GLCD_CS1 On
-            Set GLCD_CS2 Off
-        Else
-            Set GLCD_CS1 Off
-            Set GLCD_CS2 On
-        End If
+            If _GLCDX + _XPOS < 64 Then
+                Set GLCD_CS1 On
+                Set GLCD_CS2 Off
+            Else
+                Set GLCD_CS1 Off
+                Set GLCD_CS2 On
+            End If
         #else
         If _GLCDX + _XPOS < 64 Then
             Set GLCD_CS1 Off
@@ -271,39 +294,33 @@ Sub Fast_GLCDWriteByte_KS0108 ( in GLCDData, swval as Word, optional _pixels as 
 
         'Select page
         Set GLCD_RS Off
-        GLCDWriteByte ( b'10111000' Or ( _GLCDY + _YPOS ) / 8 )
+        _YPOSPage = _GLCDY + _YPOS
+        // Faster then divide by 8 to calc the page
+        Rotate _YPOSPage RIGHT
+        Rotate _YPOSPage RIGHT    
+        Rotate _YPOSPage RIGHT 
+        GLCDWriteByte ( b'10111000' Or _YPOSPage )
 
         'Select column
-        Set GLCD_RS Off
+        Set GLCD_RS Off 
         GLCDWriteByte ( 64 Or ( _GLCDX + _XPOS ) )
-
-        'Dummy read first
-        Set GLCD_RS On
-        GLCDDataTemp = GLCDReadByte
-        'Read current data
-        Set GLCD_RS On
-        GLCDDataTemp = GLCDReadByte
-
-        'ReSelect column
-        Set GLCD_RS Off
-        GLCDWriteByte 64 Or ( _GLCDX + _XPOS )
 
         // Increment X value
         _GLCDX++
 
-            // Increment Y value
-            If _GLCDX = _pixels  Then _GLCDY = _GLCDY + 8 
+        // Increment Y value
+        If _GLCDX = _pixels  Then _GLCDY = _GLCDY + 8 
 
-        // If something to send
-        If GLCDDataTemp <> GLCDData Then 
+        'Write data back
+        Set GLCD_RS On
 
-            'Write data back
-            Set GLCD_RS On
+        'Set LCD data direction
+        Set GLCD_RW Off
 
-            'Set LCD data direction
-            Set GLCD_RW Off
-
-            'Set output data
+        'Set output data
+        #IFDEF GLCD_DATAPORT 
+            GLCD_DATAPORT = GLCDData
+        #ELSE
             GLCD_DB7 = GLCDData.7
             GLCD_DB6 = GLCDData.6
             GLCD_DB5 = GLCDData.5
@@ -312,18 +329,14 @@ Sub Fast_GLCDWriteByte_KS0108 ( in GLCDData, swval as Word, optional _pixels as 
             GLCD_DB2 = GLCDData.2
             GLCD_DB1 = GLCDData.1
             GLCD_DB0 = GLCDData.0
-
-            'Write
-            Wait KS0108WriteDelay us
-            Set GLCD_ENABLE On
-            Wait KS0108ClockDelay us
-            Set GLCD_ENABLE Off
-            Wait KS0108WriteDelay us
-
-            // enable the wait here to show pixel draw
-            // wait 100 ms
-        End If
+        #ENDIF
         
+        'Write
+        PulseOut GLCD_ENABLE, KS0108ClockDelay us
+
+        // enable the wait here to show pixel draw
+        // wait 100 ms
+
     End Repeat
 
  End Sub

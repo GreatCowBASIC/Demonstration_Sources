@@ -1,0 +1,133 @@
+/*
+ This demonstration will show how you can determine the chip parameters, we show the ChipNameStr
+/*
+    This demonstration how you can check your program is intented for a specific Microcontroller
+
+    ************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.00
+    @date    12-12-2024
+*/
+//Set chip model required
+#chip 16F1937
+#option Explicit
+#CONFIG MCLRE=ON
+
+/*
+            ------------PORTA---------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ------------SW--------------ADC--
+    IO:    ---------------------------------
+
+            ------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    IO:    ---------------------------------
+
+            ------------PORTC----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ---------------------------------
+    IO:    ---------------------------------
+
+            ------------PORTD----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    PWR-EN--RW--RS--DB7-DB6-DB5-DB4--
+    IO:    ---------------------------------
+
+            ------------PORTE----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------RST---------------
+    IO:    ---------------------------------
+    */
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.4
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+    //! Specify explicit OCULAR_OM1614 support!!
+    #DEFINE LCD_OCULAR_OM1614
+
+    // Setup LCD Parameters
+    #DEFINE LCD_IO 4
+
+    // Define LCD Hardware settings
+    #DEFINE LCD_RS      PORTD.4
+    #DEFINE LCD_RW      PORTD.5
+    #DEFINE LCD_Enable  PORTD.6
+
+    #DEFINE LCD_DB4     PORTD.0
+    #DEFINE LCD_DB5     PORTD.1
+    #DEFINE LCD_DB6     PORTD.2
+    #DEFINE LCD_DB7     PORTD.3
+
+    //! Required for OCULAR LCD driver
+    #DEFINE LCD_POWER   PORTD.7
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+
+//*****************************************************************************************************
+//Main program commences here.. everything before this is setup for the board.
+// Now assumes Serial Terminal is operational
+
+
+#DEFINE SYSDEFAULTCONCATSTRING 64
+
+HSerPrintCRLF 2
+HSerPrint  ChipNameStr + " GCBASIC Demo"
+HSerPrintCRLF
+Wait 1 s
+
+Dim TargetChip As String 
+TargetChip = "16F1937"
+
+If Trim( UCase( TargetChip ) )  <> ChipNameStr Then
+    HSerPrint "Wrong Microcontroller program intended for " + TargetChip
+    HSerPrintCRLF
+    HSerPrint "The Microcontroller is a " + ChipNameStr
+    HSerPrintCRLF
+    Wait While TRUE
+Else
+    HSerPrint "The Microcontroller is correct - program intended for the " + ChipNameStr
+    HSerPrintCRLF
+    Wait While TRUE
+End If
+
+
+
+
+
+End
+
+// ----- Support methods.  Subroutines and Functions

@@ -1,0 +1,52 @@
+/*
+    A demonstration program for GCBASIC
+    --------------------------------------------------------------------------------
+    This program shows toggling the LEDs attached
+
+@author 	EvanV
+@licence	GPL
+@version	1.0a
+@date   	27.12.2024
+********************************************************************************/
+
+//Set chip model required
+#chip 16F1937
+#option Explicit
+
+/*
+        ------------PORTA---------------
+Bit#:  -7---6---5---4---3---2---1---0---
+IO:    ---------------------------------
+IO:    ---------------------------------
+
+        ------------PORTB----------------
+Bit#:  -7---6---5---4---3---2---1---0---
+IO:    ----------------LED-LED-LED-LED--
+IO:    ---------------------------------
+
+        ------------PORTC----------------
+Bit#:  -7---6---5---4---3---2---1---0---
+IO:    ---------------------------------
+IO:    ---------------------------------
+
+        ------------PORTD----------------
+Bit#:  -7---6---5---4---3---2---1---0---
+IO:    PWR-EN--RW--RS--DB7-DB6-DB5-DB4--
+IO:    ---------------------------------
+*/
+
+    // Main program commences here.. everything before this is setup for the board.
+
+    DIR PORTB Out
+    
+    do
+
+        // Set the LEDs on
+        PORTB = 255
+        wait 500 ms
+        
+        // Set the LEDs off
+        PORTB = 0
+        wait 500 ms
+
+    loop

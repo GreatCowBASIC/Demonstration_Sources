@@ -1,0 +1,178 @@
+/*
+    This demonstration flashes an LED to show the use of a Timer 0 overflow event
+
+    Timer0 is a counter implemented in the processor. It may be used to count instruction
+    cycles or external events, that occur at or below the instruction cycle rate.
+    In thE pic, Timer0 can be used as either an 8-bit or 16-bit counter, or timer. The
+    enhanced mid-range core implements only an 8-bit counter.
+    This lesson configures Timer0 to count instruction cycles and to set a flag when it rolls
+    over. This frees up the processor to do meaningful work rather than wasting instruction
+    cycles in a timing loop.
+    Using a counter provides a convenient method of measuring time or delay loops as it
+    allows the processor to work on other tasks rather than counting instruction cycles.
+
+
+    ************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.00
+    @date    24-11-2024
+*/
+' ----- Configuration
+
+//Set chip model required
+#chip 16F1937
+#option Explicit
+#CONFIG MCLRE=ON
+
+/*
+            ------------PORTA---------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ------------SW--------------ADC--
+    IO:    ---------------------------------
+
+            ------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    IO:    ---------------------------------
+
+            ------------PORTC----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ---------------------------------
+    IO:    ---------------------------------
+
+            ------------PORTD----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    PWR-EN--RW--RS--DB7-DB6-DB5-DB4--
+    IO:    ---------------------------------
+
+            ------------PORTE----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------RST---------------
+    IO:    ---------------------------------
+    */
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.4
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+    //! Specify explicit OCULAR_OM1614 support!!
+    #DEFINE LCD_OCULAR_OM1614
+
+    // Setup LCD Parameters
+    #DEFINE LCD_IO 4
+
+    // Define LCD Hardware settings
+    #DEFINE LCD_RS      PORTD.4
+    #DEFINE LCD_RW      PORTD.5
+    #DEFINE LCD_Enable  PORTD.6
+
+    #DEFINE LCD_DB4     PORTD.0
+    #DEFINE LCD_DB5     PORTD.1
+    #DEFINE LCD_DB6     PORTD.2
+    #DEFINE LCD_DB7     PORTD.3
+
+    //! Required for OCULAR LCD driver
+    #DEFINE LCD_POWER   PORTD.7
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+    
+//*****************************************************************************************************
+// Main program commences here.. everything before this is setup for the board.
+
+//! Initialise the timer.
+
+    // Set the type of event
+    On Interrupt Timer0Overflow Call blink
+
+    //! Init the Timer 
+    InitTimer0 Osc, PS0
+
+    //! Start the Timer - you need to start this Timer!!
+    StartTimer 0
+
+    // Support variables
+    // Create variable as a flag
+    Dim TimeOut As Word
+    TimeOut = 0
+
+    // Initialize a variable to hold the LED states
+    DIM LEDs AS BYTE
+    LEDs = 0B0001  // Start with the first LED on
+
+    // Initialize a counter for rotations
+    DIM RotateCount AS BYTE
+    RotateCount = 0
+
+    // Initialize a variable for LCD
+    DIM LcdChar as Byte
+
+    Do Forever
+
+        //! We need many interrupts for 1 second!!
+        If TimeOut = 8000 Then
+
+            // Print on LCD and Terminal - I will let you figure out what GET() does... toggles the character
+            LcdChar = Get ( 0,0 )
+            LcdChar = !LcdChar
+            Locate 0,0
+            Print Chr( LcdChar )
+            HSerPrintStringCRLF "."
+            
+            //! Same code as previous demo 040
+            // Output the current state to PORTB
+            LATB = LEDs
+            
+            // Rotate the LEDs to the left
+            Rotate LEDs Left Simple
+            
+            // Increment the rotation counter
+            RotateCount = RotateCount + 1
+            
+            // Reset the LEDs after 4 rotations
+            If RotateCount >= 4 Then
+                LEDs = 0B0001  // Reset to initial state
+                RotateCount = 0  // Reset counter
+            End If
+            
+            TimeOut= 0
+
+        End If
+
+    Loop
+
+
+Sub blink
+    TimeOut++
+End Sub
