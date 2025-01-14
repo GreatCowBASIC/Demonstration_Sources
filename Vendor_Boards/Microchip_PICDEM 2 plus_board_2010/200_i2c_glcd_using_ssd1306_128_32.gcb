@@ -14,9 +14,8 @@
     @author  EvanV
     @licence GPL
     @version 1.02
-    @date    01-12-2024
-    
-*/
+   @date    14-01-2025
+    */
 // ----- Configuration
 //Set chip model required
 #chip 16F1937
@@ -36,7 +35,7 @@
 
             ------------PORTC----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    ---------------------------------
+    IO:    ----TX------SDA-SCK--------------
     IO:    ---------------------------------
 
             ------------PORTD----------------
@@ -116,76 +115,120 @@
 'Main program commences here.. everything before this is setup for the board.
 
 #INCLUDE <glcd.h>
-#DEFINE GLCD_TYPE GLCD_TYPE_SSD1306_64x32
-#DEFINE GLCD_I2C_Address 0x78
+#DEFINE GLCD_TYPE           GLCD_TYPE_SSD1306_32
+#DEFINE GLCD_I2C_Address    0x78
+
+//  ----- Define variables
+
+// A constants to allow you to change the GLCD memory usage.
+#DEFINE GLCD_PROTECTOVERRUN
+
+Dim BYTENUMBER, CCOUNT As Byte
+
+CCount = 0
+Dim longNumber As Long
+//  max value = 4294967290
+longNumber = 0
+Dim wordNumber, adcval, ldrval As Word
+Dim outstring As String
+wordNumber = 0
+byteNumber = 0
 
 // ----- Main program
 
-    Dim BYTENUMBER, CCOUNT As Byte
+#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCD_Open_PageTransaction 0,7
+#ENDIF
 
-    CCount = 0
-    Dim longNumber As Long
-    //  max value = 4294967290
-    longNumber = 0
-    Dim wordNumber, adcval, ldrval As Word
-    Dim outstring As String
-    wordNumber = 0
-    byteNumber = 0
+GLCDPrint 0, 0,   "GCBASIC"
+GLCDPrint (0, 16, "Anobium 2025")
+GLCDPrint (76, 16, GLCD_WIDTH )
+GLCDPrint (96, 16, "*" )
+GLCDPrint (104, 16, GLCD_HEIGHT )
 
-    GLCDPrint (10, 0,   "GCBASIC")
-    GLCDPrint (10, 8,  "Anobium")
-    GLCDPrint (20, 16, "2025")
+#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCD_Close_PageTransaction
+#ENDIF
 
-    Wait 2 s
-    GLCDCLS
+Wait 3 s
+GLCDCLS
+
+#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCD_Open_PageTransaction 0, 7
+#ENDIF
+
+GLCDPrint 0, 0,   "Version 1.xx.xx"
+
+#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCDPrint (0, 16, "LM GLCD MODE")
+#ENDIF
+
+#IFNDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCDPrint (0, 16, "FULL GLCD MODE")
+#ENDIF
 
 
-    GLCDPrint (20, 0, GLCD_WIDTH )
-    GLCDPrint (23, 8, "*" )
-    GLCDPrint (20, 16, GLCD_HEIGHT )
+#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCD_Close_PageTransaction
+#ENDIF
+
+Wait 3 s
+GLCDCLS
 
 
-    Wait 3 s
-    GLCDCLS
+Do Forever
 
+    For CCount = 31 To 127
 
-    GLCDPrint 0, 0,   "Version 1"
+        ' Prepare a string
+        outString = Str( CCount )
+        adcval = ReadAD ( ANA0 )
 
+        ' Prepare the static components of the screen
+        #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+            GLCD_Open_PageTransaction 0,7
+        #ENDIF
 
-        GLCDPrint (0, 8, "Full Mem.")
-        GLCDPrint (0, 16, "GLCD mode")
+        ' Print some text
+        GLCDPrint ( 1,   1, "PrintStr")
+        ' Print some more text
+        GLCDPrint ( 64,  1, "@")
+        ' Print chip speed
+        GLCDPrint ( 72,  1, ChipMHz)
+        ' Print some text
+        GLCDPrint ( 86, 1, "Mhz")
+        ' Draw some text
+        GLCDDrawString( 1,11,"DrawStr")
+        ' Draw a box
+        Box 0,0,GLCD_WIDTH-1, GLCD_HEIGHT-1
+        ' Draw a box
+        Box GLCD_WIDTH-5, GLCD_HEIGHT-5,GLCD_WIDTH-1, GLCD_HEIGHT-1
+        ' Draw a circle
+        Circle( 44,24,5)
+        ' Draw a line
+        Line 0,GLCD_HEIGHT-1,44,19
 
-    Wait 3 s    
-    GLCDCLS
-    
-    Do Forever
+        GLCDPrint ( 75 ,  20,  "ADC:"+Pad(Str(adcval),4 ) )
 
-        For CCount = 31 To 127
+        ' Draw a Box
+        Box (3,24,6,27)
 
-            ' Prepare a string
-            outString = Str( CCount )
-            adcval = ReadAD ( ANA0 )
+        ' Draw a string
+        GLCDDrawString(44, 11, CHR(CCount)+"="+Pad(outString,3) )
 
-            ' Draw a box
-            Box 0,0,GLCD_WIDTH-1, GLCD_HEIGHT-1
-            ' Draw a box
-            Box GLCD_WIDTH-5, GLCD_HEIGHT-5,GLCD_WIDTH-1, GLCD_HEIGHT-1
+        Ellipse 118, 6, 7, 4
+        If adcval > 127 Then
+            FilledEllipse 118, 6, 5, 2
+        Else
+            FilledEllipse 118, 6, 5, 2, GLCDBackground
+        End If
 
-            ' Draw a circle
-            Circle( 44,24,5)
-            ' Draw a line
-            Line 0,GLCD_HEIGHT-1,44,19
+        #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+            GLCD_Close_PageTransaction
+        #ENDIF
 
-            GLCDPrint ( 2 , 2,  "ADC:"+Pad(Str(adcval),4 ) )
+        longNumber = longNumber + 7
 
-            ' Draw a Box
-            Box (3,24,6,27)
-
-            ' Draw a string
-            GLCDDrawString(2, 10, CHR(CCount)+"="+Pad(outString,3) )
-
-            longNumber = longNumber + 7
-
-        Next
-    Loop
-    End
+    Next
+Loop
+End

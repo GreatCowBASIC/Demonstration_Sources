@@ -1,0 +1,28 @@
+'''A demonstration program for GCBASIC.
+'''--------------------------------------------------------------------------------
+'''This program shows integration
+'''
+'''
+'''@author    EvanV   
+'''@license   GPL
+'''@version   1.00   
+'''@date      14-01-2025
+'''********************************************************************************
+
+#CHIP 16F1937
+// #CHIP 18F16Q20
+// #CHIP 18F16Q40
+// #CHIP MEGA328P, 16  //uses and external oscillator
+// #CHIP LGT8F328P
+
+#OPTION EXPLICIT
+
+
+#DEFINE LED1 PORTB.1
+DIR LED1 OUT
+
+do
+    LED1 = !LED1
+    Wait 1 s
+loop
+

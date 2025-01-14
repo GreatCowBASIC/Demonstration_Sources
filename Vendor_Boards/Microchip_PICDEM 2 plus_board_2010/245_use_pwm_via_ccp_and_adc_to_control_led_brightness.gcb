@@ -1,17 +1,18 @@
 /*
-    This demonstration shows the use of EEProm values created from a Table..
+    This demonstration flashes an LED to show the use of CCP PWM operations
 
-    This will show the value of the EEPROM on the serial Terminal.
+    Uses variable mode PWM operations
+
 
     ************************************************************************
     @author  EvanV
     @licence GPL
     @version 1.00
     @date    14-01-2025
-*/
-//  ----- Configuration
+    */
 
-//Set chip model required
+//  ----- Configuration
+// Chip Settings.
 #chip 16F1937
 #option Explicit
 #CONFIG MCLRE=ON
@@ -27,10 +28,10 @@
     IO:    ----------------LED-LED-LED-LED--
     IO:    ---------------------------------
 
-            ------------PORTC----------------
+    ------------------PORTC-----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    -----TX--------------------------
-    IO:    ---------------------------------
+    IO:    --------------------CCP1---------
+    ---------------------------------------- 
 
             ------------PORTD----------------
     Bit#:  -7---6---5---4---3---2---1---0---
@@ -96,76 +97,51 @@
 
     #DEFINE USART_BAUD_RATE 9600
     #DEFINE USART_TX_BLOCKING
-    #DEFINE USART_DELAY OFF
-    
-    
-    
-    
+    #DEFINE USART_DELAY OFF  
 
-// *****************************************************************************************************
-// Main program commences here.. everything before this is setup for the board.
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
 
-    Wait 1 s
+    #DEFINE CCP1_PORT   PORTC.2
+    DIR CCP1_PORT       OUT 
 
-
-    // Read EEPROM items
-    ShowEEProm()
+    HPWM 1, 38, 127
 
     Do
+
+        // HPWM CCPchannel, frequency, duty cycle
+            // Uncomment to use ADC to change Duty 
+                Dim ADCVal as Byte
+                ADCVal = ReadAD( ANA0 )
+                Wait 10 ms
+                HPWM 1, 38, ADCVal
+
     Loop
 
 
-    // Table of values to write to EEPROM
-    // EEPROM location is specified
-    // Subsequent locations will each store a value
 
-    EEPROM TestDataSource 0x10
-        0x01
-        0x02
-        0x03
-        0x04
-        0x05
-        0x06
-    End EEPROM
+/* GCBASIC Optimisation file - this will optimise PWM operations by disabling the PWM operations on the PWM channel and Timer that is set to FALSE
+                             to enable PWM and Timer operations set to FALSE
 
-    EEPROM TestDataSource2 0x16
-        0x11
-        0x12
-        0x13
-        0x14
-        0x15
-        0x16
-    End EEPROM
+           Optimise CCP/PWM    
+*/
+           #DEFINE USE_HPWMCCP1 TRUE
+           #DEFINE USE_HPWMCCP2 FALSE
+           #DEFINE USE_HPWMCCP3 FALSE           
+           #DEFINE USE_HPWMCCP4 FALSE
+           #DEFINE USE_HPWMCCP5 FALSE
 
+//         Optimise PWM
+           #DEFINE USE_HPWM1 TRUE
+           #DEFINE USE_HPWM2 FALSE
+           #DEFINE USE_HPWM3 FALSE
+           #DEFINE USE_HPWM4 FALSE
+           #DEFINE USE_HPWM5 FALSE
+           #DEFINE USE_HPWM6 FALSE
+           #DEFINE USE_HPWM7 FALSE
+           #DEFINE USE_HPWM8 FALSE
 
-Sub ShowEEProm
-
-    Dim DisplayNewLine, Outdata, Indata  As Byte
-    Dim EEPromAddress as Word
-
-    HserPrintCRLF 2
-
-    HserPrint "      "
-    For EEPromAddress = 0 To 15
-        HSerPrint Hex(EEPromAddress)
-        HSerPrint " "
-    Next
-
-    For EEPromAddress = 0 To ChipEEProm -1
-        DisplayNewLine = EEPromAddress % 16
-        If DisplayNewLine = 0 Then
-            HSerPrintCRLF
-            HSerPrint right(Hex(EEPromAddress_H),1)
-            HSerPrint Hex(EEPromAddress)
-            HSerPrint ": "
-        End If
-        HSerPrint " "
-
-        // Read EEPROM at specific address
-        Indata = 0
-        EPRead  ( EEPromAddress, Indata )
-        HSerPrint  Hex(Indata)
-
-    Next
-
-End Sub
+//         Optimise Timers associated with PWM operations
+           #DEFINE USE_HPWM_TIMER2 TRUE
+           #DEFINE USE_HPWM_TIMER4 FALSE
+           #DEFINE USE_HPWM_TIMER6 FALSE

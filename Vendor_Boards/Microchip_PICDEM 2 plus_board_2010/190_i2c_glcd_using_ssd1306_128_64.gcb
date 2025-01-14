@@ -1,0 +1,240 @@
+/*
+This demonstration program is a simple GLCD demonstration of the SSD1306 GLCD capabilities.
+
+This program is a simple GLCD demonstration of the SSD1306 GLCD capabilities.
+This program draws lines, boxes, circles and prints strings and numbers.
+The SSD1306 controller a small graphical OLED, suitable for a lot of various projects.
+The display is 38*35 mm, with an active display surface of 0.96inches, and a 128*64 pixel resolution.
+The display is easy to interface, using an I2C type of communication.
+The GLCD is connected to the microprocessor as shown in the hardware section of this code.
+
+This version is compatible will all version of GCBASIC as this demonstration uses Full Memory GLCD mode only.  This can be adapted to Low Memory GLCD mode.
+
+************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.02
+    @date    09/01/2025
+    */
+// ----- Configuration
+//Set chip model required
+#chip 16F1937
+#option Explicit
+#CONFIG MCLRE=ON
+
+/*
+            ------------PORTA---------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ------------SW--------------ADC--
+    IO:    ---------------------------------
+
+            ------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    IO:    ---------------------------------
+
+            ------------PORTC----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----TX------SDA-SCK---------------
+    IO:    ---------------------------------
+
+            ------------PORTD----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    PWR-EN--RW--RS--DB7-DB6-DB5-DB4--
+    IO:    ---------------------------------
+
+            ------------PORTE----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------RST---------------
+    IO:    ---------------------------------
+    */
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.4
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+    //! Specify explicit OCULAR_OM1614 support!!
+    #DEFINE LCD_OCULAR_OM1614
+
+    // Setup LCD Parameters
+    #DEFINE LCD_IO 4
+
+    // Define LCD Hardware settings
+    #DEFINE LCD_RS      PORTD.4
+    #DEFINE LCD_RW      PORTD.5
+    #DEFINE LCD_Enable  PORTD.6
+
+    #DEFINE LCD_DB4     PORTD.0
+    #DEFINE LCD_DB5     PORTD.1
+    #DEFINE LCD_DB6     PORTD.2
+    #DEFINE LCD_DB7     PORTD.3
+
+    //! Required for OCULAR LCD driver
+    #DEFINE LCD_POWER   PORTD.7
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+    
+// Define I2C settings
+    #DEFINE HI2C_DATA       PORTC.4
+    #DEFINE HI2C_CLOCK      PORTC.3
+    #DEFINE HI2C_BAUD_RATE  100
+    HI2CMode (Master)
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+
+#INCLUDE <glcd.h>
+#DEFINE GLCD_TYPE GLCD_TYPE_SSD1306
+#DEFINE GLCD_I2C_Address 0x78
+
+//! Unomment to enable version tracking
+// #INCLUDE "GCBversionnumber.cnt"
+
+' ----- Define variables
+
+'These constants allow you to change the GLCD memory usage.
+'We have set this demonstration to use only 128bytes of RAM for GLCD operations.
+// #DEFINE GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+// #DEFINE GLCD_TYPE_SSD1306_CHARACTER_MODE_ONLY
+#DEFINE GLCD_PROTECTOVERRUN
+
+Dim BYTENUMBER, CCOUNT As Byte
+
+CCount = 0
+Dim longNumber As Long
+' max value = 4294967290
+longNumber = 0
+Dim wordNumber, adcval, ldrval As Word
+Dim outstring As String
+wordNumber = 0
+byteNumber = 0
+
+// ----- Main program
+
+#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCD_Open_PageTransaction 0,7
+#ENDIF
+
+GLCDPrint 0, 0,   "GCBASIC"
+GLCDPrint (0, 16, "Anobium 2025")
+GLCDPrint (76, 16, GLCD_WIDTH )
+GLCDPrint (96, 16, "*" )
+GLCDPrint (104, 16, GLCD_HEIGHT )
+
+#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCD_Close_PageTransaction
+#ENDIF
+
+Wait 3 s
+GLCDCLS
+
+#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCD_Open_PageTransaction 0, 7
+#ENDIF
+
+GLCDPrint 0, 0,   "Version 1.xx.xx"
+
+#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCDPrint (0, 16, "LM GLCD MODE")
+#ENDIF
+
+#IFNDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCDPrint (0, 16, "FULL GLCD MODE")
+#ENDIF
+
+
+#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    GLCD_Close_PageTransaction
+#ENDIF
+
+Wait 3 s
+GLCDCLS
+
+
+Do Forever
+
+    For CCount = 31 To 127
+
+        ' Prepare a string
+        outString = Str( CCount )
+        adcval = ReadAD ( ANA0 )
+
+        ' Prepare the static components of the screen
+        #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+            GLCD_Open_PageTransaction 0,7
+        #ENDIF
+
+        ' Print some text
+        GLCDPrint ( 1,   1, "PrintStr")
+        ' Print some more text
+        GLCDPrint ( 64,  1, "@")
+        ' Print chip speed
+        GLCDPrint ( 72,  1, ChipMHz)
+        ' Print some text
+        GLCDPrint ( 86, 1, "Mhz")
+        ' Draw some text
+        GLCDDrawString( 1,11,"DrawStr")
+        ' Draw a box
+        Box 0,0,GLCD_WIDTH-1, GLCD_HEIGHT-1
+        ' Draw a box
+        Box GLCD_WIDTH-5, GLCD_HEIGHT-5,GLCD_WIDTH-1, GLCD_HEIGHT-1
+        ' Draw a circle
+        Circle( 44,24,5)
+        ' Draw a line
+        Line 0,GLCD_HEIGHT-1,44,19
+
+        GLCDPrint ( 75 ,  20,  "ADC:"+Pad(Str(adcval),4 ) )
+
+        ' Draw a Box
+        Box (3,24,6,27)
+
+        ' Draw a string
+        GLCDDrawString(44, 11, CHR(CCount)+"="+Pad(outString,3) )
+
+        Ellipse 118, 6, 7, 4
+        If adcval > 127 Then
+            FilledEllipse 118, 6, 5, 2
+        Else
+            FilledEllipse 118, 6, 5, 2, GLCDBackground
+        End If
+
+        #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+            GLCD_Close_PageTransaction
+        #ENDIF
+
+        longNumber = longNumber + 7
+
+    Next
+Loop
+End

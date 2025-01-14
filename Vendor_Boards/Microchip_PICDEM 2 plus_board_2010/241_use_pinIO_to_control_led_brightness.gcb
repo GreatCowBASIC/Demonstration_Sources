@@ -1,4 +1,16 @@
-//Set chip model required
+/*
+    This demonstration flashes an LED to show the use of PIN IO operations
+    This will pulse the IO at 38kHz
+
+    ************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.00
+    @date    14-01-2025
+    */
+
+//  ----- Configuration
+// Chip Settings.
 #chip 16F1937
 #option Explicit
 #CONFIG MCLRE=ON
@@ -14,10 +26,10 @@
     IO:    ----------------LED-LED-LED-LED--
     IO:    ---------------------------------
 
-            ------------PORTC----------------
+    ------------------PORTC-----------------
     Bit#:  -7---6---5---4---3---2---1---0---
     IO:    ---------------------------------
-    IO:    ---------------------------------
+    ---------------------------------------- 
 
             ------------PORTD----------------
     Bit#:  -7---6---5---4---3---2---1---0---
@@ -83,6 +95,19 @@
 
     #DEFINE USART_BAUD_RATE 9600
     #DEFINE USART_TX_BLOCKING
-    #DEFINE USART_DELAY OFF
-    
-    
+    #DEFINE USART_DELAY OFF  
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+
+    Do
+
+        LEDD3 = NOT LEDD3
+        wait 11 us
+        nop
+        nop
+        nop
+
+    Loop
+
+

@@ -34,6 +34,7 @@
             I2C1SCLPPS = 0x0013    'RC3 > SCL1 (bi-directional)
             RC4PPS = 0x0022    'SDA1 > RC4
             I2C1SDAPPS = 0x0014    'RC4 > SDA1 (bi-directional)
+
             'Module: I2C1 extra settings
             #Define HI2C_CLOCK PORTC.3    'Define a constant
             Dir HI2C_CLOCK out    'Set I2C pin as output
@@ -45,9 +46,9 @@
             ODCC4=1    'Set pin as open drain output
 
             'Module: UART pin directions
-            Dir PORTC.6 Out    ' Make TX1 pin an output
+            Dir PORTC.7 Out    ' Make TX1 pin an output
             'Module: UART1
-            RC6PPS = 0x0013    'TX1 > RC6
+            RC7PPS = 0x0013    'TX1 > RC7
 
     End Sub
     'Template comment at the end of the config file

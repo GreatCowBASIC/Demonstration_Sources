@@ -8,7 +8,7 @@ This the basic test - set the LEDs on
 @author 	EvanV
 @licence	GPL
 @version	1.0a
-@date   	27.12.2024
+@date   	14.01.2025
 ********************************************************************************/
 
 //Set chip model required
@@ -90,7 +90,7 @@ This the basic test - set the LEDs on
 //*****************************************************************************************************
 //Main program commences here.. everything before this is setup for the board.
 
-    Print "GCBASIC 2024"
+    Print "GCBASIC 2025"
     Wait 2 s: CLS
     Print ChipNameStr
     Locate 1,0

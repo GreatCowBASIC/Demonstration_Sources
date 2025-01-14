@@ -1,0 +1,246 @@
+/*
+    A demonstration program for GCBASIC.
+    --------------------------------------------------------------------------------------------------------------------------------
+    This program is a simple GLCD demonstration of the SPI capabilities using an GLCD SSD1331.
+    It is a nice graphical LCD, suitable for a lot of various projects.
+    This program draws lines, boxes, circles and prints strings and numbers.
+    The GLCD is connected to the microprocessor as shown in the hardware section of this code.
+    :
+    This has been tested using the hardware and software SPI option.  If you change from hardware SPI when using PPS, you will need to power cycle the chip.
+    :
+    :
+    @author  EvanV
+    @licence GPL
+    @version 1.0
+    @date    14-01-2025
+    */
+// ----- Configuration
+//Set chip model required
+#chip 16F1937
+#option Explicit
+#CONFIG MCLRE=ON
+
+/*
+            ------------PORTA---------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ------------SW--------------ADC--
+    IO:    ---------------------------------
+
+            ------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    IO:    ---------------------------------
+
+    ------------------PORTC-----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----TX--SDO-----SCK-RST--CS--DC--
+    ---------------------------------------- 
+
+            ------------PORTD----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    PWR-EN--RW--RS--DB7-DB6-DB5-DB4--
+    IO:    ---------------------------------
+
+            ------------PORTE----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------RST---------------
+    IO:    ---------------------------------
+    */
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.4
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+    //! Specify explicit OCULAR_OM1614 support!!
+    #DEFINE LCD_OCULAR_OM1614
+
+    // Setup LCD Parameters
+    #DEFINE LCD_IO 4
+
+    // Define LCD Hardware settings
+    #DEFINE LCD_RS      PORTD.4
+    #DEFINE LCD_RW      PORTD.5
+    #DEFINE LCD_Enable  PORTD.6
+
+    #DEFINE LCD_DB4     PORTD.0
+    #DEFINE LCD_DB5     PORTD.1
+    #DEFINE LCD_DB6     PORTD.2
+    #DEFINE LCD_DB7     PORTD.3
+
+    //! Required for OCULAR LCD driver
+    #DEFINE LCD_POWER   PORTD.7
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF  
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+
+
+    // ******************* GLCD setup and configuratio ******************
+    #INCLUDE <glcd.h>
+    #define GLCD_TYPE GLCD_TYPE_SSD1331
+
+    // This is NOT a PPS chip, so, needs to make the phyiscal hardware
+    #DEFINE GLCD_DO     portC.5
+    #DEFINE GLCD_SCK    portC.3
+
+    // Pin mappings for GLCD
+    #DEFINE GLCD_DC     portC.0
+    #DEFINE GLCD_CS     portC.1
+    #DEFINE GLCD_RESET  portC.2
+
+
+    //! Uncomment out the next line... and, enable or disable the PPS!!!
+    #DEFINE SSD1331_HardwareSPI    ' remove/comment out if you want to use software SPI
+    #DEFINE HWSPIClockMode 1          ' specify mode 1 for this GLCD device [0/1/2/3] 
+//  ********************** DEMO REALLY STARTS HERE ************************************************
+
+    // GLCD selected OLED font set.
+    #define GLCD_OLED_FONT
+    #define GLCD_PROTECTOVERRUN
+    GLCDfntDefaultsize = 1
+
+    // GLCDCLS  ' supports GLCDBackground as default
+    // GLCDCLS  also support passing color parameter.
+    // GLCDCLS [color]
+    // GLCDRotate ( Landscape )
+
+    Dim CCOUNT, BYTENUMBER, OLDFONT, OLDFONT as Byte
+
+    CCount = 31
+    dim longNumber as long
+    longNumber = 0 ' max value = 4294967290
+    dim wordNumber as Word
+    dim outstring as string
+    wordNumber = 0
+    byteNumber = 0
+
+    GLCDSetContrast ( 0xFF )
+    SetPowerMode_SSD1331(0x1A)                    // Explicit commmands for this device
+    SetBrightness_SSD1331( 0xFF )                 // Explicit commmands for this device - full brightness
+
+    GLCDPrintStringLN "GCBASIC 2025"
+    GLCDPrintStringLN ""
+    GLCDPrintStringLN "SSD1331 GLCD"
+    GLCDPrintStringLN ""
+    GLCDPrintStringLN "by  Anobium"
+    wait 5 s
+
+    repeat 2
+
+            GLCDRotate ( Landscape )
+            GLCDCLS SSD1331_BLUE
+
+            GLCDForeground = SSD1331_MAROON
+            GLCDPrint ( 2, 2, "GLCDPrint String" )
+
+            GLCDForeground = SSD1331_WHITE
+            GLCDPrint ( 2, 13, "GLCDPrint String" )
+
+            GLCDForeground = SSD1331_RED
+            GLCDPrint ( 2,30, "GLCDPrint String" )
+
+
+            FilledBox 50,40,55,45,SSD1331_RED
+
+            wait 2 s
+
+            longNumber = 0xFFFFFFFF
+            wordNumber = 0xFFFF
+            byteNumber = 0xFF
+
+            GLCDRotate ( Portrait )
+            GLCDCLS SSD1331_RED
+
+            GLCDForeground = SSD1331_MAROON
+            GLCDPrint ( 2, 2, bytenumber )
+
+
+            GLCDForeground = SSD1331_BLACK
+            GLCDPrint ( 2, 12, wordNumber )
+
+
+            GLCDForeground = SSD1331_CYAN
+            GLCDPrint ( 2,30, longnumber )
+
+            wait 2 s
+
+    end Repeat
+
+
+    GLCDCLS SSD1331_BLUE
+    GLCDRotate ( Landscape )
+    GLCDForeground = SSD1331_White
+    // Prepare the static components of the screen
+    GLCDPrint ( 2,   2, "SSD1331 Library")                         // Print some text
+    GLCDPrint ( 2,   10, "PrintStr")                               // Print some text
+    GLCDPrint ( 64,  2,  ChipMhz)                                  // Print chip speed
+    GLCDPrint ( 74,  2, "Mhz")                                     // Print some text
+    GLCDDrawString( 2,18,"DrawStr")                                // Draw some text
+    box 0,0,GLCD_WIDTH-1, GLCD_HEIGHT-1                            // Draw a box
+    box GLCD_WIDTH-5, GLCD_HEIGHT-5,GLCD_WIDTH-1, GLCD_HEIGHT-1    // Draw a box
+    Circle( 32,41,10)                                              // Draw a circle
+    line 50,31,0,31                                                // Draw a line
+
+    DO forever
+        for CCount = 32 to 127
+            outstring = hex(longNumber_E )
+            outstring = outstring+hex(longNumber_E )
+            outstring = outstring+hex(longNumber_H )
+            outstring = outstring+hex(longNumber )
+            outstring = outstring+"h"
+
+            GLCDPrint ( 46 ,  36,  Outstring  )                        // Print a HEX string
+            GLCDPrint ( 46 ,  44, pad(str(wordNumber), 30 ) )          // Print a padded string
+            GLCDPrint ( 46 ,  52, pad(str(byteNumber), 30 ) )          // Print a padded string
+
+            box (46,19,56,28)                                          // Draw a Box  
+            filledbox (47,20,55,27,SSD1331_BLUE)                       // Draw a Box
+            GLCDDrawChar(49, 20, CCount )                              // Draw a character
+            outString = str( CCount )                                  // Prepare a string
+            GLCDDrawString(64, 19, pad(outString,5) )                  // Draw a string
+
+            filledbox 3,43,11,51, wordNumber                           // Draw a filled box
+
+            FilledCircle( 32,41,8, longNumber )                         // Draw a filled box
+            line 0,63,50,31                                             // Draw a line
+
+                                                                        // Do some simple maths
+            longNumber = longNumber + 7 : wordNumber = wordNumber + 3 : byteNumber++
+
+            wait 25 ms
+
+        NEXT
+
+    LOOP
+    end

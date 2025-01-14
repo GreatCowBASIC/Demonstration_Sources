@@ -5,7 +5,7 @@
     @author  EvanV
     @licence GPL
     @version 1.00
-    @date    27-12-2024
+    @date    14.01.2025
     ----- Configuration
 */
 // Chip Settings.
@@ -74,7 +74,7 @@
 //Main program commences here.. everything before this is setup for the board.
 
     HSerPrintCRLF
-    HSerPrint "GCBASIC 2024"
+    HSerPrint "GCBASIC 2025"
     HSerPrintCRLF
     HSerPrint ChipNameStr
     HSerPrint " at "

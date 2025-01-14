@@ -1,0 +1,215 @@
+/*
+This demonstration program is a simple GLCD demonstration of the SSD1306 GLCD capabilities and Maths/Trig capabilities.
+
+This program demonstrates theGCBASIC primatives a voltmeter on a Graphical LCD (GLCD)
+:
+You can change the microcontroller, the GLCD and the analogue port.
+
+To change the microcontroller simply change the #chip statement
+To change the GLCD replace GLCD definition
+To change the analogue port change the ADCChannelSelected constant
+
+************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.02
+    @date    14-01-2025
+    */
+// ----- Configuration
+//Set chip model required
+#chip 16F1937
+#option Explicit
+#CONFIG MCLRE=ON
+
+/*
+            ------------PORTA---------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ------------SW--------------ADC--
+    IO:    ---------------------------------
+
+            ------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    IO:    ---------------------------------
+
+            ------------PORTC----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    -----TX-----SDA-SCK---------------
+    IO:    ---------------------------------
+
+            ------------PORTD----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    PWR-EN--RW--RS--DB7-DB6-DB5-DB4--
+    IO:    ---------------------------------
+
+            ------------PORTE----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------RST---------------
+    IO:    ---------------------------------
+    */
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.4
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+    //! Specify explicit OCULAR_OM1614 support!!
+    #DEFINE LCD_OCULAR_OM1614
+
+    // Setup LCD Parameters
+    #DEFINE LCD_IO 4
+
+    // Define LCD Hardware settings
+    #DEFINE LCD_RS      PORTD.4
+    #DEFINE LCD_RW      PORTD.5
+    #DEFINE LCD_Enable  PORTD.6
+
+    #DEFINE LCD_DB4     PORTD.0
+    #DEFINE LCD_DB5     PORTD.1
+    #DEFINE LCD_DB6     PORTD.2
+    #DEFINE LCD_DB7     PORTD.3
+
+    //! Required for OCULAR LCD driver
+    #DEFINE LCD_POWER   PORTD.7
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+    
+// Define I2C settings
+    #DEFINE HI2C_DATA       PORTC.4
+    #DEFINE HI2C_CLOCK      PORTC.3
+    #DEFINE HI2C_BAUD_RATE  100
+    HI2CMode (Master)
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+
+#INCLUDE <glcd.h>
+#DEFINE GLCD_TYPE           GLCD_TYPE_SSD1306
+#DEFINE GLCD_I2C_Address    0x78
+#DEFINE GLCD_PROTECTOVERRUN
+
+#INCLUDE <trig2places.h>
+
+'analogue port selection
+#DEFINE ADCChannelSelected ANA0
+#DEFINE ADSpeed LowSpeed
+
+
+
+'*******************************************************************************************
+
+Dim radius,xcentre,ycentre,xend,old_xend,yend,old_yend As Byte
+Dim angle,old_angle,adcval As Word
+Dim volts As String * 4
+xcentre=63
+ycentre=58
+radius=120
+angle=1
+anglecheck
+
+Do
+    old_angle=angle
+    '--- DVM
+    adcval=ReadAD10(ADCChannelSelected)
+
+    //Calicabrate to 4.08V
+    adcval = scale( adcval, 0, 1023, 0, 255 )
+    angle=adcval/2
+    '
+    adcval=adcval*100
+    adcval=adcval/51
+    volts=Str(adcval)
+    If adcval<10 Then
+        volts="0.0"+Left(volts,1,1)
+        Goto volt_format_done
+    End If
+    If adcval<100 Then
+        volts="0."+Mid(volts,1,2)
+    Else
+        volts=Left(volts,1,1)+"."+Mid(volts,2,2)
+    End If
+volt_format_done:
+    '---
+    anglecheck
+    old_xend = xcentre + radius  * sin (old_angle)/255
+    old_yend = ycentre - radius  * cos (old_angle)/255
+    xend = xcentre + radius  * sin (angle)/255
+    yend = ycentre - radius  * cos (angle)/255
+    If old_angle<>angle Then
+        '-- update screen if volts has changed
+        '   erase old needle
+        #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+            GLCD_Open_PageTransaction 0,7
+        #ENDIF
+            Box 0,0,127,63
+            GLCDDrawChar (5,40,Asc("0")):GLCDDrawChar (115,40,Asc("5"))        
+            Line (xcentre,ycentre,old_xend,old_yend,0)
+            '   draw V
+            Line (55,22,63,38):Line (63,38,71,22)
+            '   print new voltage
+            'print Voltage
+            GLCDPrint (50,10,volts,1)
+            '   draw new needle
+            Line (xcentre,ycentre,xend,yend,1)
+        #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+        GLCD_Close_PageTransaction
+        #ENDIF    
+        Wait 20 ms
+    End If
+Loop
+'end main
+
+
+Sub plotdial
+    xend = 63 + radius  * sin (angle)/255
+    yend = 58 - radius  * cos (angle)/255
+    Pset (xend,yend,1)
+End Sub
+'
+Sub dial
+    For angle= 296 To 359
+        plotdial
+    Next angle
+    '
+    For angle= 0 To 63
+        plotdial
+    Next angle
+End Sub
+'
+Sub anglecheck
+    If angle>127 Then
+        angle =angle-127
+    Else
+        angle =296+angle
+    End If
+End Sub

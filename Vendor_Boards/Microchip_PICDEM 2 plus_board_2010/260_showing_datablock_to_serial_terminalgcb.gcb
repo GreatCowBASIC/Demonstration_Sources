@@ -1,17 +1,10 @@
 /*
-    This demonstration shows the use of EEProm values created from a Table..
+    This demonstrations show how create DATA and EEPROM data blocks.
+    DATA and EEPROM data blocks are very useful to store reference information in PROGMEM or EEPROM.
 
-    This will show the value of the EEPROM on the serial Terminal.
-
-    ************************************************************************
-    @author  EvanV
-    @licence GPL
-    @version 1.00
-    @date    14-01-2025
-*/
-//  ----- Configuration
-
-//Set chip model required
+    */
+    
+' ----- Configuration
 #chip 16F1937
 #option Explicit
 #CONFIG MCLRE=ON
@@ -27,10 +20,10 @@
     IO:    ----------------LED-LED-LED-LED--
     IO:    ---------------------------------
 
-            ------------PORTC----------------
+    ------------------PORTC-----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    -----TX--------------------------
-    IO:    ---------------------------------
+    IO:    ----TX---------------------------
+    ---------------------------------------- 
 
             ------------PORTD----------------
     Bit#:  -7---6---5---4---3---2---1---0---
@@ -96,76 +89,47 @@
 
     #DEFINE USART_BAUD_RATE 9600
     #DEFINE USART_TX_BLOCKING
-    #DEFINE USART_DELAY OFF
-    
-    
-    
-    
+    #DEFINE USART_DELAY OFF  
 
-// *****************************************************************************************************
+'*****************************************************************************************************
 // Main program commences here.. everything before this is setup for the board.
 
-    Wait 1 s
+Wait 2 s
 
+#DEFINE  SYSDEFAULTCONCATSTRING  8
 
-    // Read EEPROM items
-    ShowEEProm()
+Dim offset as Byte
+Dim myDataWord as Word
+For offset = 0 to 6 Step 1
+    //! Addressing a memory address, or, label address can be achieved by using the @ prefix.    
+    //! This will return the address of the variable ( @ applies to table data and any data block).
+    ProgramRead (( @myDataBlock1  + offset ), myDataWord)
+    CLS
+    Print "Address: "
+    Print WordToHex( @myDataBlock1  + offset )
+    Locate 1,0
+    Print "0x"+WordToHex( myDataWord)
+    Wait 3 s
+Next
+Locate 1,0
+Print "End"
 
-    Do
-    Loop
+End
 
+// ******************* data.. EEPROM & DATA ********************
 
-    // Table of values to write to EEPROM
-    // EEPROM location is specified
-    // Subsequent locations will each store a value
+DATA myDataBlock2 as Byte
+    1,2,3,4,5,6,7,8
+END DATA
 
-    EEPROM TestDataSource 0x10
-        0x01
-        0x02
-        0x03
-        0x04
-        0x05
-        0x06
-    End EEPROM
+DATA myDataBlock1
+    0x1234,0x3456,0x1111,0x2222
+END DATA
 
-    EEPROM TestDataSource2 0x16
-        0x11
-        0x12
-        0x13
-        0x14
-        0x15
-        0x16
-    End EEPROM
+EEPROM MyEEData1
+    1,2,3,4,5,255
+END EEPROM
 
-
-Sub ShowEEProm
-
-    Dim DisplayNewLine, Outdata, Indata  As Byte
-    Dim EEPromAddress as Word
-
-    HserPrintCRLF 2
-
-    HserPrint "      "
-    For EEPromAddress = 0 To 15
-        HSerPrint Hex(EEPromAddress)
-        HSerPrint " "
-    Next
-
-    For EEPromAddress = 0 To ChipEEProm -1
-        DisplayNewLine = EEPromAddress % 16
-        If DisplayNewLine = 0 Then
-            HSerPrintCRLF
-            HSerPrint right(Hex(EEPromAddress_H),1)
-            HSerPrint Hex(EEPromAddress)
-            HSerPrint ": "
-        End If
-        HSerPrint " "
-
-        // Read EEPROM at specific address
-        Indata = 0
-        EPRead  ( EEPromAddress, Indata )
-        HSerPrint  Hex(Indata)
-
-    Next
-
-End Sub
+EEPROM MyEEData2 16
+    5,4,3,2,1,255
+END EEPROM

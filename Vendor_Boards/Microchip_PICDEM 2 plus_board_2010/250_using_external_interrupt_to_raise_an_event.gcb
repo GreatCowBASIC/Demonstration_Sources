@@ -1,16 +1,25 @@
-/*
-A demonstration program for GCBASIC.
---------------------------------------------------------------------------------------------------------------------------------
-This program demonstrates the capabilities of a OCULAR OM1614 1602 LCD display.
-The LCD is using an 4-bit bus for connectivity.
-For the LCD connection - please refer to the program.
-
-@author 	EvanV
-@licence	GPL
-@version	1.0a
-@date   	14.01.2025
-********************************************************************************/
-
+'''
+''' This demonstration will show how you can control a motor using a PWM signal.
+'''
+''' Pulse-Width Modulation (PWM) is a scheme that provides power to a load by switching
+''' quickly between fully on and fully off states. The PWM signal resembles a square wave
+''' where the high portion of the signal is considered the on state and the low portion of
+''' the signal is considered the off state. The high portion, also known as the pulse width,
+''' can vary in time and is defined in steps. A longer, high on time will illuminate the LED
+''' brighter. The frequency or period of the PWM does not change.
+'''
+''' This program demostrates a method where the number of steps applied,
+''' which lengthens the pulse width are calculated in an Interrupt routine.
+''' The PWM period defined as the duration of one complete cycle or the total
+''' amount of on and off time combined is based on a simple counter.
+'''
+''' The demo varies the PWM to the IO Port.  We are pretending the motor is connected to the IO port, via a suitable motor control device.
+'''
+'''************************************************************************
+'''@author  EvanV
+'''@licence GPL
+'''@version 1.00
+'''@date    05.11.2024
 ' ----- Configuration
 #chip 16F1937
 #option Explicit
@@ -24,12 +33,12 @@ For the LCD connection - please refer to the program.
 
             ------------PORTB----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    ----------------LED-LED-LED-LED--
+    IO:    ----------------LED-LED-LED-INT--
     IO:    ---------------------------------
 
     ------------------PORTC-----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    ----TX---------------------------
+    IO:    ----TX--SDO-----SCK-RST--CS--DC--
     ---------------------------------------- 
 
             ------------PORTD----------------
@@ -98,33 +107,35 @@ For the LCD connection - please refer to the program.
     #DEFINE USART_TX_BLOCKING
     #DEFINE USART_DELAY OFF  
 
-'*****************************************************************************************************
+    #DEFINE INT0     PORTB.0
+
+//*****************************************************************************************************
 // Main program commences here.. everything before this is setup for the board.
 
+/* Interrupt-on-change enabled on the IOCx pin for a negative-going edge. Associated Status bit 
+    and interrupt flag will be set upon detecting an edge. */
+    IOCBP = 0x01
+    IOCBN = 0x00
+    IOCBF = 0x00
 
-Locate 0,3 
-Print "Microchip"
-Locate 1,1
-Print "PICDEM 2 PLUS"
+    DIR INT0 IN
+    INT0 = 1
 
-wait 1 s
+// Setup the handler
+On Interrupt PORTBChange  Call InterruptHandler
 
-CLS
-Locate 0,4
-Print "GCBASIC"
-Locate 1,1
-Print "Anobium 2025"
-
-#DEFINE BIT0 0
-#DEFINE BIT1 1
-#DEFINE BIT2 2
-#DEFINE BIT3 3
-
-Dim Leds As Byte
-
+'Loop forever
 Do
-
-    Leds = 1<<BIT1 or(1<<BIT2)
-    PORTB = Leds
-
+    LEDD3 = !LEDD3
+    wait 100 ms
 Loop
+
+
+Sub InterruptHandler
+
+    'Toggle the LED
+    LEDD2 = !LEDD2
+    ' Clear interrupt flag is required to clear the interrupt
+    IOCBF0 = 0
+
+End Sub

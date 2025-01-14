@@ -1,17 +1,16 @@
 /*
-    This demonstration shows the use of EEProm values created from a Table..
-
-    This will show the value of the EEPROM on the serial Terminal.
+    This demonstration flashes an LED to show the use of PWMOut() operations
+    This will pulse the IO at a max 4~kHz
 
     ************************************************************************
     @author  EvanV
     @licence GPL
     @version 1.00
     @date    14-01-2025
-*/
-//  ----- Configuration
+    */
 
-//Set chip model required
+//  ----- Configuration
+// Chip Settings.
 #chip 16F1937
 #option Explicit
 #CONFIG MCLRE=ON
@@ -27,10 +26,10 @@
     IO:    ----------------LED-LED-LED-LED--
     IO:    ---------------------------------
 
-            ------------PORTC----------------
+    ------------------PORTC-----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    -----TX--------------------------
-    IO:    ---------------------------------
+    IO:    ----TX--SDO-----SCK-RST--CS--DC--
+    ---------------------------------------- 
 
             ------------PORTD----------------
     Bit#:  -7---6---5---4---3---2---1---0---
@@ -96,76 +95,33 @@
 
     #DEFINE USART_BAUD_RATE 9600
     #DEFINE USART_TX_BLOCKING
-    #DEFINE USART_DELAY OFF
+    #DEFINE USART_DELAY OFF  
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+
+    // ----- Constants
+    'PWM constant. This is a required constant.
+    #DEFINE PWM_OUT1 LEDD3
+
+    // ---- Optional Constant to add an delay after PWM pulse
+    #DEFINE PWM_DELAY 0 us
+
+    // ----- Define Hardware settings
+    // PWM port out.  This is not required but it is good practice.
+    dir PWM_OUT1 out
+
+    // PWMOut channel, duty cycle, cycles
+
+    // ----- Main body of program commences here.
+    do
+        
+        // cycle parameter ( the third parameter ) is a purely arbitrary value as the loop will maintain a relatively constant PWM
+        // This will pulse the IO at a max 1.78~kHz
+        PWMOut 1, 127, 4
     
-    
-    
-    
+    loop
 
-// *****************************************************************************************************
-// Main program commences here.. everything before this is setup for the board.
-
-    Wait 1 s
+end
 
 
-    // Read EEPROM items
-    ShowEEProm()
-
-    Do
-    Loop
-
-
-    // Table of values to write to EEPROM
-    // EEPROM location is specified
-    // Subsequent locations will each store a value
-
-    EEPROM TestDataSource 0x10
-        0x01
-        0x02
-        0x03
-        0x04
-        0x05
-        0x06
-    End EEPROM
-
-    EEPROM TestDataSource2 0x16
-        0x11
-        0x12
-        0x13
-        0x14
-        0x15
-        0x16
-    End EEPROM
-
-
-Sub ShowEEProm
-
-    Dim DisplayNewLine, Outdata, Indata  As Byte
-    Dim EEPromAddress as Word
-
-    HserPrintCRLF 2
-
-    HserPrint "      "
-    For EEPromAddress = 0 To 15
-        HSerPrint Hex(EEPromAddress)
-        HSerPrint " "
-    Next
-
-    For EEPromAddress = 0 To ChipEEProm -1
-        DisplayNewLine = EEPromAddress % 16
-        If DisplayNewLine = 0 Then
-            HSerPrintCRLF
-            HSerPrint right(Hex(EEPromAddress_H),1)
-            HSerPrint Hex(EEPromAddress)
-            HSerPrint ": "
-        End If
-        HSerPrint " "
-
-        // Read EEPROM at specific address
-        Indata = 0
-        EPRead  ( EEPromAddress, Indata )
-        HSerPrint  Hex(Indata)
-
-    Next
-
-End Sub
