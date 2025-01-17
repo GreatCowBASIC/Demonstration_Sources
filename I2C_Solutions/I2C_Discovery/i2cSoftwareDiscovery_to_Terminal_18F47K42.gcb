@@ -6,11 +6,10 @@
 '''@author  EvanV
 '''@licence GPL
 '''@version 1.0a
-'''@date    14.12.15
 '''********************************************************************************
 
 ; ----- Configuration
-  #chip 18F47K42, 64
+  #chip 18F47K42, 4
   #option explicit
 
       // PIC PPS Tool version: 0.0.6.5
@@ -28,6 +27,30 @@
         End Sub
     // Add this code segment to your GCBASIC source program
 
+/*
+
+  ------------PORTA---------------
+  Bit#: -7---6---5---4---3---2---1---0---
+  IO: ---------------------------------
+  
+  ------------PORTB----------------
+  Bit#: -7---6---5---4---3---2---1---0---
+  IO: ----------------------------------
+
+  ------------PORTC----------------
+  Bit#: -7---6---5---4---3---2---1---0---
+  IO: --TX------------------------------
+        PPS
+
+  ------------PORTD----------------
+  Bit#: -7---6---5---4---3---2---1---0---
+  IO: ----------------------------------
+
+  ------------PORTE---------------
+  Bit#: -7---6---5---4---3---2---1---0---
+  IO: -----------------------------------
+
+*/
 
 ; ----- Define Hardware settings
   ' Define I2C settings - CHANGE PORTS
@@ -54,39 +77,42 @@
 '  myMessage = "Software I2C"
 '  HSerPrint myMessage
 '  HSerPrintCRLF 2
-
-    HSerPrintCRLF
-    HSerPrint "Software I2C   Live Demo"
-    HSerPrintCRLF 2
-
-  HSerPrint "     "
-  for DeviceID = 0 to 15
-    HSerPrint hex(deviceID)
-    HSerPrint " "
-  next
-  for DeviceID = 0 to 255
-    DisplayNewLine = DeviceID % 16
-    if DisplayNewLine = 0 Then
+  
+  Do
       HSerPrintCRLF
-      HserPrint hex(DeviceID)
-      HSerPrint ": "
-    end if
-    HSerPrint " "
-    I2CStart
-    I2CSend ( deviceID )
+      HSerPrint "Software I2C   Live Demo"
+      HSerPrintCRLF 2
 
-    if I2CSendState = True  then
-      HSerPrint   hex(deviceID)
-    else
-      HSerPrint "--"
-    end if
-    I2CSend ( 0 )
-    i2cstop
+    HSerPrint "     "
+    for DeviceID = 0 to 15
+      HSerPrint hex(deviceID)
+      HSerPrint " "
+    next
+    for DeviceID = 0 to 255
+      DisplayNewLine = DeviceID % 16
+      if DisplayNewLine = 0 Then
+        HSerPrintCRLF
+        HserPrint hex(DeviceID)
+        HSerPrint ": "
+      end if
+      HSerPrint " "
+      I2CStart
+      I2CSend ( deviceID )
+
+      if I2CSendState = True  then
+        HSerPrint   hex(deviceID)
+      else
+        HSerPrint "--"
+      end if
+      I2CSend ( 0 )
+      i2cstop
 
 
-  Next
-  HSerPrintCRLF 2
-  HSerPrint   "End of Search"
-  HSerPrintCRLF 2
-  END
+    Next
+    HSerPrintCRLF 2
+    HSerPrint   "End of Search"
+    HSerPrintCRLF 2
+  
+    wait 3 s
+  Loop
 
