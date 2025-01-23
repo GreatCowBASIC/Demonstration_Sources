@@ -1,0 +1,23 @@
+/*
+    GCBASIC serial demo
+*/
+
+// ************************************************************************
+
+//  ----- Configuration
+
+#CHIP 18F1320
+#option Explicit
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
+
+// ----- Main body of program commences here.
+Do Forever
+
+    HSerPrintStringCRLF "GCBASIC 2025"
+    Wait 100 ms
+
+Loop

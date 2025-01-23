@@ -1,0 +1,123 @@
+/*
+    GCBASIC Demonstration for PICDEM 4 BOARD
+*/
+
+#CHIP 16F648A
+#OPTION EXPLICIT
+
+//Constants - LCD connectivity type
+        #DEFINE LCD_IO 16
+        
+        //PIN MAPPINGS FOR PIC16LF72 LCD IO SPI EXPANDER
+        #DEFINE LCD_SPI_DO          PORTB.2             // CONSTANT IS MANDATED - DATA LINE
+        #DEFINE LCD_SPI_SCK         PORTB.5             // CONSTANT IS MANDATED - CLOCK LINE
+
+
+//! ----- Main body of program commences here.
+
+
+    // Control the LCD cursor
+    LCDCursor CURSOROFF 
+
+    // Display messages
+    Print "Microchip PICDEM 4"
+    Locate 1,2
+    Print "GCBASIC 2025"
+    Wait 3 s
+
+    CLS
+    Locate 0,2
+    Print "GCBASIC 2025"
+    Locate 1,4
+    Print "Anobium"
+    Wait 3 s
+    CLS 
+
+
+    Locate 0,2
+    Print "GCBASIC 2025"
+    Locate 1,4
+    Print ChipNameStr
+    Wait 3 s
+    CLS 
+
+    Do Forever
+
+        Print "START TEST"
+        Locate 1,0
+        Print "DISPLAY ON"
+        wait 3 s
+
+        Cls
+        Locate 0,0
+        Print "Cursor ON"
+        Locate 1,0
+        LCDcursor CursorOn
+        wait 3 S
+
+        Cls
+        LCDcursor CursorOFF
+        locate 0,0
+        Print "Cursor OFF"
+        wait 3 s
+
+        Cls
+        Locate 0,0
+        Print "FLASH ON"
+        Locate 1,0
+        LCDcursor FLASHON
+        wait 3 s
+
+        Cls
+        locate 0,0
+        Print "FLASH OFF"
+        LCDCURSOR FLASHOFF
+        wait 3 sec
+
+        Locate 0,0
+        Print "CURSR & FLSH ON"
+        locate 1,0
+        LCDCURSOR CURSORON
+        LCDCURSOR FLASHON
+        Wait 3 sec
+
+        Locate 0,0
+        Print "CURSR & FLSH OFF"
+        locate 1,0
+        LCDCURSOR CursorOFF
+        LCDCURSOR FLASHOFF
+        Wait 3 sec
+
+        Cls
+        Locate 0,4
+        Print "Flashing"
+        Locate 1,4
+        Print "Display"
+        wait 500 ms
+
+        repeat 10
+            LCDCURSOR LCDOFF
+            wait 500 ms
+            LCDCURSOR LCDON
+            wait 500 ms
+        end repeat
+
+        Cls
+        Locate 0,0
+        Print "DISPLAY OFF"
+        Locate 1,0
+        Print "FOR 5 SEC"
+        Wait 2 SEC
+        LCDCURSOR LCDOFF
+        WAIT 5 s
+
+        Cls
+        Locate 0,0
+        LCDCURSOR LCDON
+        Print "END TEST"
+        wait 3 s
+        Cls
+    loop
+
+
+End

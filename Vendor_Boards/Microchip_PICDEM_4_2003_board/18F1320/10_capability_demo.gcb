@@ -1,0 +1,364 @@
+/*
+
+    TUTORIAL FIRMWARE OPERATION
+
+    The PIC18F tutorial firmware is made up of two components, which are individually
+    displayed on the LCD. The PIC18f microcontroller’s internal RC oscillator is used as the system clock source.
+
+    1. Voltmeter
+
+    This mode uses the A/D module to measure the voltage of the R33 pot and displays a voltage between 0.00V and 5.00V on the LCD. 
+    Voltage is continually updated until the mode is exited by pressing SW3 (RB0).
+
+    2. Clock
+
+    Once this mode is entered from the main menu, a real-time clock will start counting from 00:00:00. 
+
+    The Timer1 module and a 32 kHz clock crystal is used to establish a Real-Time Clock. 
+    By pressing SW1, the clock time can be set to the user's preference. 
+    Press SW1 and SW3 and the time will be set and the LCD is returned to an active clock display.
+
+    */
+#CHIP 18F1320
+#OPTION EXPLICIT
+#CONFIG MCLRE=ON
+
+// Setup serial - not use in this demo
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
+// Setup LCD connectivity type - this use the standard LCD library
+    // See the Help for the extent of all the LCD instructions avalable.
+    
+    #DEFINE LCD_IO 16          // Selects&sets the LCD conectivity type
+        
+    //PIN MAPPINGS FOR PIC16LF72 LCD IO SPI EXPANDER
+    #DEFINE LCD_SPI_DO          PORTB.2             // CONSTANT IS MANDATED - DATA LINE
+    #DEFINE LCD_SPI_SCK         PORTB.5             // CONSTANT IS MANDATED - CLOCK LINE
+
+// Setup the Switches
+    #DEFINE SW1 PORTA.4
+            DIR SW1 IN
+    #DEFINE SW3 PORTB.0
+            DIR SW3 IN
+
+    #DEFINE SW_DOWN     0        
+    #DEFINE SW_UP       1
+
+//! ----- Main body of program commences here.
+
+    // Init the 31k external clock
+    InitClock
+
+    // Create a varaible
+    Dim DemoSelect as Byte
+    DemoSelect = 1
+
+    // Control the LCD cursor
+    LCDCursor CURSOROFF 
+
+    // Display messages
+    CLS
+    Print "Microchip PICDEM 4"
+    Locate 1,2
+    Print "GCBASIC 2025"
+    SWPressed
+
+    CLS
+    Locate 0,2
+    Print "GCBASIC 2025"
+    Locate 1,4
+    Print "Anobium"
+    SWPressed
+
+    // Main loop
+    Do
+        CLS
+        If DemoSelect = 1 Then
+            Print "Voltmeter"
+        Else
+            Print "Real-Time Clock"
+        End If
+
+        Locate 1,0
+        Print "SW1-Next SW3-Now" 
+        
+        SWPressed
+
+    Loop
+    End
+
+Sub SWPressed
+
+    // Check for button press 
+
+    // Ensure the ADC operations not active... think would stop digital checks of switches
+    ADCON1 = 255
+
+    //! Potentially waits 3s but will exit when a button is pressed
+    Repeat 120
+        If SW3 = SW_DOWN Then
+            ' select demo and run
+            If DemoSelect = 1 then
+                ShowVoltmeter
+            Else
+                ShowClock
+            End If
+
+            Exit Sub
+
+        End If
+        
+        If SW1 = SW_DOWN Then
+            ' change demo
+            If DemoSelect = 1 Then
+                DemoSelect = 0
+            Else
+                DemoSelect = 1
+            End If
+
+            Exit Sub
+
+        End If
+
+        Wait 25 ms
+    End Repeat
+
+       End Sub
+
+Sub ShowVoltmeter
+
+    // Read AN0 and display results
+    Dim VoltsRead as Word
+    Dim VoltsInteger, VoltsDecimal
+    Dim VoltsString as String * 7  
+
+    ADCON1 = 255
+
+    Wait While SW3 = SW_DOWN
+
+    CLS
+    Print "Voltmeter"
+    Locate 1,0
+    Print "SW3-Exit Test"
+
+    Do
+
+        VoltsRead = Scale( ReadAD( AN0 ), 0, 255, 0, 500 )
+        VoltsInteger = VoltsRead / 100
+        VoltsDecimal = VoltsRead Mod 100
+
+        Locate 0,0
+        Print "Volts:" 
+        Print VoltsInteger
+        Print "."
+        Print Left("0"+Str(VoltsDecimal),2)
+        // Print " ["
+        // Print Right("00" + IntegerToString(VoltsRead),3 )
+        // Print "]"
+        
+        pulseout PORTA.2, 100 ms
+
+        // Restore register
+        ADCON1 = 255
+        If SW3 = SW_DOWN Then
+            Wait While SW3 = SW_DOWN
+            Exit Sub
+        End If
+
+    Loop
+
+    End Sub
+
+Sub InitClock
+
+    // Initialise the clock
+
+    Dim Secs, Mins, Hours as Byte
+    
+    // Commence Clock
+    T1CON = B'00001111'             ;Timer 1 On, Osc On, 31k
+
+    Secs = 0
+    Mins = 0
+    Hours = 0
+    TMR1L = 0
+
+    End Sub
+
+Sub ShowClock
+        
+    // Show clock and increment seconds
+
+    ADCON1 = 255
+    Wait While SW3 = SW_UP
+
+    CLS
+    Locate 1,0
+    Print "SW1-Set SW3-Menu"
+    
+    TMR1L = 0
+
+    Do     
+
+        Locate 0,0
+        Print Right( "0" + Str(Hours), 2)
+        Print ":"
+        Print Right( "0" +Str(Mins),2)
+        Print ":"
+        Print Right( "0" +Str(Secs),2)
+        
+        TMR1IF = 0
+        TMR1H += 0x80
+        Wait while TMR1IF = 0
+        
+        Secs++
+        If Secs = 60 then 
+            Mins++
+            Secs = 0
+            If Mins = 60 Then 
+                Hours++
+                Mins = 0
+                If Hours = 24 then Hours = 0
+            End If
+        End If
+
+        If SW3 = SW_DOWN Then
+            Wait While SW3 = SW_DOWN
+            Exit Sub
+        End If
+
+        If SW1 = SW_DOWN Then
+            Wait While SW1 = SW_DOWN
+            SetClock
+        End If
+
+    Loop
+
+    End Sub
+
+Sub SetClock
+
+    // Set the clock
+    CLS
+    Locate 1,0
+    Print "SW1 --  SW3 ++"
+
+    Secs = 0
+
+    Do     
+
+        Locate 0,0
+        Print Right( "0" + Str(Hours), 2)
+        Print ":"
+        Print Right( "0" +Str(Mins),2)
+        Print ":"
+        Print Right( "0" +Str(Secs),2)
+
+        If SW3 = SW_DOWN Then Mins++
+        If SW1 = SW_DOWN Then Mins--
+
+        Mins++
+        If Mins = 60 Then 
+            Hours++
+            Mins = 0
+            If Hours = 24 then Hours = 0
+        End If
+
+        Mins--
+        If Mins = 255 Then 
+            Hours--
+            Mins = 59
+            If Hours = 255 then Hours = 23
+        End If
+
+        If SW3 = SW_DOWN and SW1 = SW_DOWN Then
+            Wait While SW3 = SW_DOWN
+            Exit Sub
+        End If
+
+    Loop
+
+       End Sub
+
+
+/* GCBASIC Optimisation file - this will optimise ADC operations by disabling the ADC operations on the AD channel that is set to FALSE
+                             to enable ADC operations on a specific AD channel set to TRUE
+
+            Legacy chip Constants for ADC
+ */
+            #DEFINE USE_AD0 TRUE
+            #DEFINE USE_AD1 FALSE
+            #DEFINE USE_AD2 FALSE
+            #DEFINE USE_AD2 FALSE
+            #DEFINE USE_AD3 FALSE
+            #DEFINE USE_AD4 FALSE
+            #DEFINE USE_AD5 FALSE
+            #DEFINE USE_AD6 FALSE
+            #DEFINE USE_AD7 FALSE
+            #DEFINE USE_AD8 FALSE
+            #DEFINE USE_AD9 FALSE
+            #DEFINE USE_AD10 FALSE
+            #DEFINE USE_AD11 FALSE
+            #DEFINE USE_AD12 FALSE
+            #DEFINE USE_AD13 FALSE
+            #DEFINE USE_AD14 FALSE
+            #DEFINE USE_AD15 FALSE
+            #DEFINE USE_AD16 FALSE
+            #DEFINE USE_AD17 FALSE
+            #DEFINE USE_AD18 FALSE
+            #DEFINE USE_AD19 FALSE
+            #DEFINE USE_AD20 FALSE
+            #DEFINE USE_AD21 FALSE
+            #DEFINE USE_AD22 FALSE
+            #DEFINE USE_AD23 FALSE
+            #DEFINE USE_AD24 FALSE
+            #DEFINE USE_AD25 FALSE
+            #DEFINE USE_AD26 FALSE
+            #DEFINE USE_AD27 FALSE
+            #DEFINE USE_AD28 FALSE
+            #DEFINE USE_AD29 FALSE
+            #DEFINE USE_AD30 FALSE
+            #DEFINE USE_AD31 FALSE
+            #DEFINE USE_AD32 FALSE
+            #DEFINE USE_AD33 FALSE
+            #DEFINE USE_AD34 FALSE
+            // Recent chip Constants for ADC 
+            #DEFINE USE_ADA0 FALSE
+            #DEFINE USE_ADA1 FALSE
+            #DEFINE USE_ADA2 FALSE
+            #DEFINE USE_ADA3 FALSE
+            #DEFINE USE_ADA4 FALSE
+            #DEFINE USE_ADA5 FALSE
+            #DEFINE USE_ADA6 FALSE
+            #DEFINE USE_ADA7 FALSE
+            #DEFINE USE_ADB0 FALSE
+            #DEFINE USE_ADB1 FALSE
+            #DEFINE USE_ADB2 FALSE
+            #DEFINE USE_ADB3 FALSE
+            #DEFINE USE_ADB4 FALSE
+            #DEFINE USE_ADB5 FALSE
+            #DEFINE USE_ADB6 FALSE
+            #DEFINE USE_ADB7 FALSE
+            #DEFINE USE_ADC0 FALSE
+            #DEFINE USE_ADC1 FALSE
+            #DEFINE USE_ADC2 FALSE
+            #DEFINE USE_ADC3 FALSE
+            #DEFINE USE_ADC4 FALSE
+            #DEFINE USE_ADC5 FALSE
+            #DEFINE USE_ADC6 FALSE
+            #DEFINE USE_ADC7 FALSE
+            #DEFINE USE_ADD0 FALSE
+            #DEFINE USE_ADD1 FALSE
+            #DEFINE USE_ADD2 FALSE
+            #DEFINE USE_ADD3 FALSE
+            #DEFINE USE_ADD4 FALSE
+            #DEFINE USE_ADD5 FALSE
+            #DEFINE USE_ADD6 FALSE
+            #DEFINE USE_ADD7 FALSE
+            #DEFINE USE_ADE0 FALSE
+            #DEFINE USE_ADE1 FALSE
+            #DEFINE USE_ADE2 FALSE
+
+
