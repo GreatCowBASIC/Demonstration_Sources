@@ -1,15 +1,5 @@
 **CHEAP-RC project**
 
-**About the person:**
-
-I, a trained high-voltage electrician and computer dinosaur, have been working with electronics and computers since my training. My first microprocessor was a KIM-1 (purchased in 1976 at the tender age of 19). Apple II, IBM PC and Commodore C64 only came onto the market later. I have been working with PIC microprocessors since around 1998. As a computer dinosaur, I started with BASIC and I still use it today. BASIC existed and exists in various versions for microprocessors. I will come back to **C** as a programming language later. I also started making my own circuit boards very early on.
-
-Since my birth, I have tried unsuccessfully to get rid of the railway virus😊 😊.
-
-In order to promote the spread of such projects, I provide the relevant sources (circuit diagrams, layouts, program listings, parts lists and other necessary information) for **non-commercial** use to anyone interested. Simply get in touch.
-
-This description is a translation (with Google Translator) of an Article, I wrote for a German Magazine. So, there are some “German Words” left e.g. in pictures.
-
 **Why “CHEAP-RC”?**
 
 Cheap-RC are a translation of “Billig-RC” (the German word “Billig” means the same as Cheap, but the word “Billig” has a negative touch in this conjunction). So, I use CHEAP-RC. But “ cheap ” doesn’t mean that the system can’t do anything (quite the opposite).
@@ -18,17 +8,15 @@ To explain: The **R**adio **C**ontrol including receiver is available from China
 
 **Target area:**
 
-This control is intended for a small entry-level locomotive (e.g. 5-inch or 7-¼ inch) (see Foto on last page). However, that does not mean that the control cannot also be used in really large models. In order to fit into smaller models, some components were deliberately kept small (e.g. standing resistors), without limiting versatility or making it difficult to replicate. With the exception of an 8-pin IC (SMD), only wired components are used. At 98 x 73mm, the board is quite compact despite all its options. The transmitter fits comfortably in one hand and enables the model to be controlled over a distance of several hundred meters. There is also the option of local control (with cable).
+This control is intended for a small entry-level locomotive (e.g. 5-inch or 7-¼ inch) (there is a Foto in the description). However, that does not mean that the control cannot also be used in really large models. In order to fit into smaller models, some components were deliberately kept small (e.g. standing resistors), without limiting versatility or making it difficult to replicate. With the exception of an 8-pin IC (SMD), only wired components are used. At 98 x 73mm, the board is quite compact despite all its options. The transmitter fits comfortably in one hand and enables the model to be controlled over a distance of several hundred meters. There is also the option of local control (with cable).
 
 **Components of the control system:**
 
 The entire system consists of three components.
 
-1. A six-channel transmitter DS600 (Figure 1 and Figure 2)
-2. A six-channel receiver F-06A (Figure 4)
-3. A printed circuit board for preparing and outputting the control signals (Figure 5)
-
-A motor controller for 50V and 40A has almost the same mounting holes as the board. This makes it possible to create a small, compact block for the entire system. This is sufficient for smaller models with, for example, 2 motors of 250W at **+24V**. An example of how to connect a motor controller can be found further down.
+1. A six-channel transmitter DS600
+2. A six-channel receiver F-06A
+3. A printed circuit board for preparing and outputting the control signals
 
 **Possibilities of the board:**
 
@@ -40,33 +28,9 @@ The six digital outputs each switch the operating voltage (**+12V** or **+24V**)
 
 An I2C connection is also implemented. An LCD can be connected here for status or diagnostic purposes. This interface could also be used for other peripherals.
 
-**Sources:**
+**Reference:**
 
-I buy most of my components from a German Distributor (Reichelt Elektronik). It is not worth buying resistors individually, for example. Even a pack of 10 is considerably cheaper. As already described, some parts come from the Far East (Ali-Express) or from AMAZON or EBAY. The circuit boards are from JLC-PCB.
-
-**Programming:**
-
-As I mentioned at the beginning, I program the PIC processors in Basic. The Basic compiler that I used to use (Mikro-Basic Pro from Mikroelektronika) is no longer supported. Fortunately, I have come across something even better, namely GCBASIC. This compiler is FREE, open source (large developer community, not a single company) and can serve three different processor families. These are Microchip PIC, AVR and LGT processors. So, unless you are dealing with absolutely CPU-specific things, you can serve three different processors with one program.
-
-Speaking of loading: In order to get the program into the processor, you need a programming device. All three families are “_in-circuit_ serial programming” device. This means that the CPU can programmed in the circuit. So, there is no constant processor "out-programming-in" as it was common in the past. There is a suitable connector for PICKIT3 (also PICKIT4 and PICKIT5) on this board.
-
-Automatisch generierte Beschreibung](data:)For the PIC processors, I use PICKIT3 as a programming device. If someone knows about programming PICs, they might say: The PICKIT3 is old and doesn't know any newer processors. That's true. But there is a small additional PC software for PICKIT3 that makes it possible to program the latest PICs (such as the PIC16F18857 on this board). This additional software + PICKIT3 costs less than half of a new PICKIT 4 or 5. So it's " cheap " here too. (PICKIT3 approx. €22 depending on the supplier)
-
-GCBASIC (similar to Arduino libraries) has libraries for almost all processor functions and components (LCD, thermal sensor, IO expander, etc.**)**. This means you don't have to delve into the deepest depths of the processor registers. An integrated development environment, or IDE for short, is also included. **The whole** thing is supported by a number of demo programs. This makes working very comfortable.
-
-I have never become friends with **C as a programming language. For fans of C,** I would recommend the tools from Microchip (some of which are also free). Together with the PIC microprocessors, this is a complete product line (compiler, processors and programming device (PICKIT3, 4 and 5)). Microchip's support is very good.
-
-**PCB design and manufacturing:**
-
-Since many years I use a software called TARGET 3001! to design circuit boards. It is developed by a German company. There is a free trial version (TARGET Discover) for small projects (boards). This version is limited to 250 pins/pads. But otherwise, it is fully functional (including saving, printing and Gerber files for production!). It is also available in English and it can handle “Eagle”-Files.
-
-Just for your information: The CHEAP-RC board uses just only 305 pins/ pads!
-
-So, you can see that you can create nice projects with the free "trial version". For larger projects you could create two or more boards with the "trial version" and then connect them together. This is then free. Or you can purchase a full version for a fee (e.g. TARGET 3001! Light (approx. €76)).
-
-I have the circuit boards manufactured by JLC-PCB. The only "flaw" with JLC-PCB is that they don't manufacture single boards. There are always a batch of at least 5. But for 5 double-sided, plated-through and printed circuit boards I pay (for example CHEAP-RC) just over €12 including shipping. However, the delivery time is 14 days (2 days production and 12 days shipping). Even if I only need one board, this is considerably cheaper than boards from Europe.
-
-With these low prices, I no longer have to mess around with chemicals at home and drill lots of small holes that aren't even connected through. Not to mention the silk screen top and bottom.
+For a much more detailed description look to the PDF-File: Projekt Cheap-RC english.pdf.
 
 **Summary:**
 
@@ -76,7 +40,7 @@ Hans-Joachim (Hajo) Kaps
 
 Chairman of Dampfbahn Leverkusen e. V.
 
-[Hajo@Arenka.de](mailto:Hajo AT Arenka.de)
+[Hajo AT Arenka.de](mailto:Hajo AT Arenka.de)
 
 <https://www.Dampfbahn-Leverkusen.com>
 
