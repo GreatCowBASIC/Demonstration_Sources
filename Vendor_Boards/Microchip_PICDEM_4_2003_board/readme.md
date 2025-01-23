@@ -32,9 +32,8 @@ The original Microchip product description is here: [Microchip PICDEM 4 Board 20
 Watch the attached video for operational demonstrations showcasing the capabilities of the PICDEM 4 Board 2003.
 
 
-<img src="https://youtu.be/ZuW_LUatD-A" alt="Microchip PICDEM 4 Board" width="50%" height="50%">
+Check out this [YouTube video](https://www.youtube.com/watch?v=ZuW_LUatD-A) for more information.
 
-<iframe width="560" height="315" src="2025-01-23 13-03-45.mp4" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 #### Best Upgrade for PICAXE Users:
 This is the best upgrade for PICAXE users. You can use your old 18Pin PICAXE microcontrollers and reprogram using PICKitPlus and GBCASIC to take advantage of all the features of the board and the microcontrollers! The easier way to move forward with your projects.
