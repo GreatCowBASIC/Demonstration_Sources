@@ -32,7 +32,7 @@ The original Microchip product description is here: [Microchip PICDEM 4 Board 20
 Watch the attached video for operational demonstrations showcasing the capabilities of the PICDEM 4 Board 2003.
 
 
-<img src="2025-01-23 13-03-45.mp4" alt="Microchip PICDEM 4 Board" width="50%" height="50%">
+<img src="https://youtu.be/ZuW_LUatD-A" alt="Microchip PICDEM 4 Board" width="50%" height="50%">
 
 <iframe width="560" height="315" src="2025-01-23 13-03-45.mp4" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
