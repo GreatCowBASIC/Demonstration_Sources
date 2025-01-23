@@ -1,5 +1,5 @@
 '''*******************************************************************
-''' GC-Basic Program for Cheap-RC.
+''' GCBASIC Program for Cheap-RC.
 '''
 ''' Signals from the RC-Receiver (Channel 1 to 4 or 6) are detected by
 ''' Interrupt. At first Channel X are prepared for a leading Edge
@@ -35,7 +35,6 @@
   #CHIP 16F18857, 16
   #config MCLRE=ON, PWRTE=ON, WDTE=OFF, ZCD=OFF '[todo]
   #option Explicit
- ' #include '[todo]
 
 '  #define DEBUG true
 
