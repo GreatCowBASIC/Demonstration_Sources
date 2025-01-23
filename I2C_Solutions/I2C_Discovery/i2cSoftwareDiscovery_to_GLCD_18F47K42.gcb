@@ -1,0 +1,127 @@
+'''A demonstration program for GCBASIC.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''This program searches for I2C devices and display their adresses to the attached GLCD.
+'''This program uses the software implementation of I2C for the Microchip microprocessors.
+'''The hardware serial connections are shown in the program.
+'''@author  EvanV
+'''@licence GPL
+'''@version 1.0a
+'''********************************************************************************
+
+; ----- Configuration
+  #chip 18F47K42, 4
+  #option explicit
+
+
+#INCLUDE <glcd.h>
+#include <DS1307.h>
+#CONFIG MCLRE = off
+
+' GLCD Configuration
+#DEFINE GLCD_TYPE GLCD_TYPE_KS0108
+#DEFINE GLCD_KS0108_CS_LOW
+
+/*
+
+  ------------PORTA---------------
+  Bit#: -7---6---5---4---3---2---1---0---
+  IO: ---------------------------------
+  
+  ------------PORTB----------------
+  Bit#: -7---6---5---4---3---2---1---0---
+  IO: ----------CS1-CS2--RS-EN-----------
+                |--   GLCD --|
+
+  ------------PORTC----------------
+  Bit#: -7---6---5---4---3---2---1---0---
+  IO: --RW------------------RST----------
+        GLCD                GLCD 
+
+  !                         LED
+  !                         BLUE
+
+  ------------PORTD----------------
+  Bit#: -7---6---5---4---3---2---1---0---
+  IO: --DB7-DB6-DB5-DB4-DB3-DB2-DB2-DB0--
+        |-------GLCD------------------|
+
+
+  ------------PORTE---------------
+  Bit#: -7---6---5---4---3---2---1---0---
+  IO: ----------------------LED-----BLT--
+  !                         RED
+
+*/
+
+
+' GLCD Port Settings
+    //!Check this is correct
+    #DEFINE GLCD_CS1 PORTb.4
+    //!Check this is correct
+    #DEFINE GLCD_CS2 PORTb.5
+    #DEFINE GLCD_DB0 PORTD.0
+    #DEFINE GLCD_DB1 PORTD.1
+    #DEFINE GLCD_DB2 PORTD.2
+    #DEFINE GLCD_DB3 PORTD.3
+    #DEFINE GLCD_DB4 PORTD.4
+    #DEFINE GLCD_DB5 PORTD.5
+    #DEFINE GLCD_DB6 PORTD.6
+    #DEFINE GLCD_DB7 PORTD.7
+    #DEFINE GLCD_RS PORTb.3
+    #DEFINE GLCD_Enable PORTb.2
+    #DEFINE GLCD_RW PORTc.7
+    #DEFINE GLCD_RESET PORTc.2
+
+    #DEFINE KS0108ReadDelay     5
+    #DEFINE KS0108WriteDelay    5
+    #DEFINE KS0108ClockDelay    5
+
+
+; ----- Define Software settings
+    #define I2C_MODE Master
+    #define I2C_DATA   PORTC.4
+    #define I2C_CLOCK  PORTC.3
+    #define I2C_DISABLE_INTERRUPTS ON
+    
+;----- Variables
+    Dim DISPLAYNEWLINE as Byte
+
+
+; ----- Main body of program commences here.    
+' Now assumes GLCD is operational
+    dim DeviceID as byte
+
+    GLCDPrint 0, 0, "Software I2C"
+    Wait 3 s
+    GLCDCLS
+
+    Do     
+        
+        for DeviceID = 0 to 15
+            GLCDPrint ( DeviceID * 7) + 10 , 0, Right(hex(deviceID),1)
+        next
+
+            for DeviceID = 0 to 255
+                DisplayNewLine = DeviceID % 16
+                if DisplayNewLine = 0 Then
+                    GLCDPrint 0, ( DeviceID * 7) + 8, Left(hex(deviceID),1)
+                end if
+            
+                I2CStart
+                I2CSend ( deviceID )
+
+                if I2CSendState = True  then
+                    If DeviceID.0 = 0 Then GLCDPrint ( DeviceID /16 * 7) + 10, ( DeviceID / 16 * 7) + 8,  hex(deviceID)
+                    If DeviceID.0 = 1 Then GLCDPrint ( DeviceID /16 * 7) + 10, ( DeviceID / 16 * 7) + 16, hex(deviceID)
+                end if
+
+                I2CSend ( 0 )
+                i2cstop
+
+
+            Next
+
+        wait 3 s
+        GLCDCLS
+    Loop
+

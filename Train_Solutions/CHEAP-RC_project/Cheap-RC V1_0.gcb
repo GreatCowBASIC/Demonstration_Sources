@@ -1,0 +1,1506 @@
+'''*******************************************************************
+''' GC-Basic Program for Cheap-RC.
+'''
+''' Signals from the RC-Receiver (Channel 1 to 4 or 6) are detected by
+''' Interrupt. At first Channel X are prepared for a leading Edge
+''' (0 to 1). On the Interrupt for this edge a Timer are started and
+''' the Channel are prepared for the trailing Edge (1 to 0). On the
+''' trailing edge-Interrupt the Timer is stopped, edge detect turned
+''' off and the Timer-Value reflects the Time in us for that Channel.
+''' This is done for all 4 or 6 Channels. After processing all 4 or 6
+''' Channels the Values for them are analyzed and the Output's are
+''' controlled accordingly (based on the MODE).
+'''
+''' An I2C-LCD (16x2 or 20x4 charater) or grafic I2C-LCD (64x128) can
+''' be connect. (Address 0x40...0x4E) or 0x78)
+''' If a LCD is connected, it will be used automatically. Only the
+''' type of character LCD (16x2 or 20x4) has to be configured.
+''' For that a configuration-Key on the Local-Connector must be used
+''' during Power-Up (see documentation).
+'''
+''' Some Inputs are analog Inputs. So different level can be evaluated.
+''' Digital Input can have only 2 Level (Off, On).
+'''
+''' At the time only MODE=1 is implemented (RC and local).
+'''
+''' Board-Version ist V2.2
+'''-------------------------------------------------------------------
+'''@Name    HaJoKa
+'''@licence GPL
+'''@Version 1.00
+'''@date    19.01.2025
+'''*******************************************************************
+
+; ----- Configuration
+  #CHIP 16F18857, 16
+  #config MCLRE=ON, PWRTE=ON, WDTE=OFF, ZCD=OFF '[todo]
+  #option Explicit
+ ' #include '[todo]
+
+'  #define DEBUG true
+
+  #include <glcd.h>
+  #Include <SMT_Timers.h>
+  #include <lowlevel\lcd.h>
+
+  // PIC PPS Tool version: 0.0.6.5
+
+  #startup InitPPS, 85
+  #define PPSToolPart 16F18857
+
+  Sub InitPPS
+
+    // Module: MSSP1
+    SSP1CLKPPS = 0x0013    // RC3 > SCL1
+    RC3PPS = 0x0014    // SCL1 > RC3 (bi-directional)
+    RC4PPS = 0x0015    // SDA1 > RC4
+    SSP1DATPPS = 0x0014    // RC4 > SDA1 (bi-directional)
+    // Module: PWM6
+    RA2PPS = 0x000E    // PWM6OUT > RA2
+
+  End Sub
+  // Add this code segment to your GCBASIC source program
+
+  'Setup Hardware I2C
+  #define HI2C_DATA PORTC.4 ' Standard SDA1-Port
+  #define HI2C_CLOCK PORTC.3 ' Standard SCL1-Port
+  'I2C pins need to be input for SSP module when used on Microchip PIC device
+  Dir HI2C_DATA in
+  Dir HI2C_CLOCK in
+'  #define HI2CITSCLWaitPeriod 70
+  'MASTER MODE
+  #define HI2C_BAUD_RATE 400
+  HI2CMode Master
+
+  'Set up LCD
+   #define LCD_IO 10
+  'Set LCD_IO to 10 for the YwRobot LCD1602 IIC V1 or the Sainsmart LCD_PIC I2C adapter
+  'Set LCD_IO to 12 for the Ywmjkdz I2C adapter with pot bent over top of chip
+  #define LCD_I2C_Address_1 0x4E '
+  #define LCD_I2C_Address_2 0x4C '
+  #define LCD_I2C_Address_3 0x4A '
+  #define LCD_I2C_Address_4 0x48 '
+  #define LCD_I2C_Address_5 0x46 '
+  #define LCD_I2C_Address_6 0x44 '
+  #define LCD_I2C_Address_7 0x42 '
+  #define LCD_I2C_Address_8 0x40 '
+  #define LCD_WIDTH 20 ;specified lcd width for clarity only. 20 is the default width
+  'You may need to use SLOW or MEDIUM if your LCD is a slower device.
+  #define LCD_SPEED OPTIMAL
+  'You may need to invert these states. Dependent of LCD I2C adapter.
+  #define LCD_Backlight_On_State  1
+  #define LCD_Backlight_Off_State 0
+  #define I2C_DISABLE_INTERRUPTS ON
+
+  ' Setup GLCD
+  #define GLCD_I2C_Address 0x78
+
+  'Define GLCD Hardware settings for SSD1306
+  #define GLCD_TYPE GLCD_TYPE_SSD1306
+  #define GLCD_TYPE_SSD1306_CHARACTER_MODE_ONLY
+
+  ; ----- Define GLCD Hardware settings for SH1106
+'  #define GLCD_TYPE GLCD_TYPE_SH1106
+'  #define GLCD_TYPE_SH1106_LOWMEMORY_GLCD_MODE 'select Low Memory mode of operation
+'  #define GLCD_TYPE_SH1106_CHARACTER_MODE_ONLY 'select Text mode of operation
+
+; ----- Constants
+
+  #define LA_TRIGGER PORTA.0 ' for Debug only
+  #define SERVO PORTA.0
+  #define CH1_In PORTA.1
+  #define CH2_In PORTA.3
+  #define CH3_IN PORTA.4
+  #define CH4_IN PORTA.5
+  #define CH5_IN PORTA.7
+  #define CH6_IN PORTA.6
+  #define CH1_OUT PORTB.0
+  #define CH2_OUT PORTB.1
+  #define CH3_OUT PORTB.2
+  #define CH4_OUT PORTB.3
+  #define CH5_OUT PORTB.4
+  #define CH6_OUT PORTB.5
+  #define OPTION1 PORTC.0
+  #define OPTION2 PORTC.1
+  #define CONTROL PORTC.7 ' Remote-Local Input / Error Output
+  #define EXT1 PORTC.5    ' TxD in DEBUG-Mode
+  #define EXT2 PORTC.6    ' RxD in DEBUG-Mode
+  #define RELAY PORTC.2
+  #define ANA1_OUT PORTA.2
+  #define ANA2_OUT PORTB.7
+
+; ----- Variables
+  Dim Nb as Byte           ' global Byte-Var
+  Dim Txt as String * 30   ' global String-Var
+  Dim WorkS as string * 8  ' String for working
+  Dim SVers as String * 6  ' Programm-Version
+  Dim SDate as String * 8  ' Programm-Date
+  Dim ErrMsg as byte       ' Error-Message
+  Dim EEP1 as byte         ' Data 1 in EEPROM
+  Dim LCDS0 as string * 20 ' String for LCD Output
+  Dim LCDS1 as string * 6  ' String for Channel 1
+  Dim LCDS2 as string * 6  ' String for Channel 2
+  Dim LCDS3 as string * 6  ' String for Channel 3
+  Dim LCDS4 as string * 6  ' String for Channel 4
+  Dim LCDS5 as string * 6  ' String for Channel 5
+  Dim LCDS6 as string * 6  ' String for Channel 6
+  Dim LCDF as byte         ' LCD of typ x detected
+  ' 0 = no LCD, 1 = grafic LCD, 2 = character LCD
+  Dim DeviceID As Byte     ' only for I2C-Scan used
+  Dim LCDCyc as byte       ' Cyclecount for LCD Messages
+  Dim DISPLAYNEWLINE As Byte
+  Dim Nb_Ch as byte        ' Number of Servo-Channels
+  Dim Channel as byte      ' Pointer to Servo-Channel Array
+  Dim ChxVal(7) as word    ' Servo-Channel(x) Value in us
+  Dim ChxCycle(7) as byte  ' step for Channel(x) processing
+  ' 0 = Chx Cyclestart / 1 = Chx prepared / 2 = Chx Value available
+  Dim ChxPerc(7) as integer ' Percent (-100 to +100) of Servo-Channel x
+  ' 1000us = -100% / 1500us = 0% / 2000us = +100%
+  Dim Receiver as byte     ' Receiver-Typ 4-Ch or 6-Ch
+  Dim Out_Puls as Word     ' length of Servo-Out Puls in us
+  Dim Out_Pause as Word    ' pause for Servo-Out Puls in us
+  Dim T5_Low as word       ' Timer3 value for Servo-Puls low
+  Dim T5_High as word      ' Timer3 value for Servo-Puls high
+  Dim Freq as word         ' Frequency of Servo-Output Puls
+  Dim Period as Word       ' Period of Servo-Puls (Puls + Pause) in us
+  Dim ContRL as word       ' Control (Remote / Local / Configuration)
+  ' 0 = local / 1 = remote / > 1 configuration
+  Dim Mode as byte         ' Option (Program sequence 0, 1, 2, 3)
+  Dim ADVal as word        ' Value for AD-Reading
+  Dim SWBH as word         ' Port C5 (SWitch Brake-none-Horn)
+  Dim Speed as word        ' Port C6 (Speed-input)
+  Dim CH1 as byte          ' temp. Info for CH1-Out
+  Dim CH6 as byte          ' temp. Info for CH6-Out
+  Dim Analog1 as word      ' Analog Out-Value1
+  Dim Analog2 as byte      ' Analog Out-Value2
+  Dim AnaCalc as Integer   ' temp for speedcalculation
+  Dim RevDir as Byte       ' Flag for reverse Direction
+  Dim BTemp as byte        ' temp Var.
+  Dim WTemp as word        ' temp Var.
+  Dim LCnt as word         ' Count L-Level RC-Signal
+  Dim HCnt as word         ' Count H-Level RC-Signal
+  Dim RelOld as byte       ' save old Relay-Status
+  Dim T1Cnt as integer     ' Timecounter 1 (counting seconds)
+  Dim T2Cnt as integer     ' Timecounter 2 (counting seconds)
+  Dim AWork1 as word       ' temp Var.
+
+; ----- Define Hardware settings
+  Dir CH1_IN In      ' Servo-Input Ch1
+  Dir CH2_IN In      ' Servo-Input Ch2
+  Dir CH3_IN In      ' Servo-Input Ch3
+  Dir CH4_IN In      ' Servo-Input Ch4
+  Dir CH5_IN In      ' Servo-Input Ch6
+  Dir CH6_IN In      ' Servo-Input Ch5
+  Dir SERVO Out      ' Output for RC-Servo
+  Dir LA_TRIGGER Out ' LA-Trigger for Debug only
+  Dir CH1_OUT Out    ' Ch1 Output
+  Dir CH2_OUT Out    ' Ch2 Output
+  Dir CH3_OUT Out    ' Ch3 Output
+  Dir CH4_OUT Out    ' Ch4 Output
+  Dir CH5_OUT Out    ' Ch5 Output
+  Dir CH6_OUT Out    ' Ch6 Output
+  Dir OPTION1 IN     ' Option switch 1
+  Dir OPTION2 IN     ' Option switch 2
+  Dir CONTROL IN     ' Extension I/O Remote-Local / Error Output
+  Dir EXT1 IN        ' Extension Input for local control
+  Dir EXT2 IN        ' Extension Input for local control
+  Dir RELAY OUT      ' Relay I/O control
+  Dir ANA1_OUT Out   ' Signal to Ana1 Amplifier
+  Dir ANA2_OUT Out   ' Signal to Ana2 Amplifier
+
+' Setup the Interrupt(s)
+
+'  IntOff
+  On Interrupt Timer1Overflow call T1Overflowed
+'  On Interrupt Timer5Overflow call T5Overflowed
+  On Interrupt PORTChange Call Process_IO_Interrupt
+  On Interrupt SMT1Overflow Call SMT1Interrupt
+
+  Set LA_Trigger 0 ' Logic-Analyzer Trigger-Signal low
+
+  SVers = "V1.00"
+  SDate = "21.01.25"
+
+' EEP1 = 1 = LCD 16x2
+' EEP1 = 2 = LCD 20x4
+' EEP1 = 4 = ???
+' EEP1 = 8 = ???
+EEP1 = 2
+'EPWrite 0, EEP1
+
+  Trigger_LA
+
+'
+' Setup the System
+'
+  Setup_System       ' Set Systemparameter
+  Check_Ext_Control  ' Check Workmode (RC / Local / Configuration)
+  Check_Option       ' Read Option switch (for Program Mode)
+
+  Trigger_LA
+
+  IOCAP = 0          ' Clear all positive edge detect
+  IOCAN = 0          ' Clear all negetive edge detect
+  IOCAF = 0          ' Clear all Flags
+  IntOn              ' turn Interrupt processing on
+
+  Check_LCD          ' Test if any LCD are connected
+  If LCDF = 1 Then   ' grafic LCD
+    Hello_GLCD
+  End If
+  If LCDF = 2 Then   ' character LCD
+    Hello_LCD
+  End If
+
+ ' testpwm
+  If ContRL = 1 Then  ' Remote Mode
+    Check_RC_Receiver ' check RC-Receiver
+    wait 2 s
+  End If
+
+  If LCDF = 1 Then   ' grafic LCD
+    Report_Status_GLCD
+  End If
+  If LCDF = 2 Then   ' character LCD
+    Report_Status_LCD
+  End If
+
+''' ----- Main body of program starts here.
+
+''' **********************************************
+''' Mainloop
+''' **********************************************
+  Channel = 1 ' Pointer to Channel to work with
+  If (ContRL = 1) and (Receiver = 0) Then ' Remote Control impossible !! no Receiver !!
+    ErrMsg = 1
+    Emergency_Stop
+  end If
+
+  Do Forever
+    If ContRL = 0 then ' manage local Control
+      Local_Control
+    End If
+'    trigger_la
+    If ContRL = 1 Then ' manage Remote Control
+      ' ChxCycle(x) = 0 Channel x has to be prepared
+      ' ChxCycle(x) = 1 Channel x is prepared
+      ' ChxCycle(x) = 2 Channel x Value is valid. Can be used
+      '                 for further Operations.
+      If (Channel = 1) and (ChxCycle(1) = 0) Then
+        Prepare_Chx ' prepare Ch1 for Measurement
+      End If
+      If (Channel = 2) and (ChxCycle(2) = 0) Then
+        Prepare_Chx ' prepare Ch2 for Measurement
+      End If
+      If (Channel = 3) and (ChxCycle(3) = 0) Then
+        Prepare_Chx ' prepare Ch3 for Measurement
+      End If
+      If (Channel = 4) and (ChxCycle(4) = 0) Then
+        Prepare_Chx ' prepare Ch4 for Measurement
+      End If
+      If (Channel = 5) and (ChxCycle(5) = 0) Then
+        Prepare_Chx ' prepare Ch5 for Measurement
+      End If
+      If (Channel = 6) and (ChxCycle(6) = 0) Then
+        Prepare_Chx ' prepare Ch6 for Measurement
+      End If
+
+      ' all Channels done if a 4-Channel Receiver is used
+      If (ChxCycle(4) = 2) and (Receiver = 4) Then ' all 4 Channels are valid
+        ' do all calculations and Output-Control
+        Execute_Channels
+      End If
+
+      ' all Channels done if a 6-Channel Receiver is used
+      If (ChxCycle(6) = 2) and (Receiver = 6) then ' all 6 Channels are valid
+        ' do all calculations and Output-Control
+        Execute_Channels
+      End If
+    End If
+
+   #IF DEBUG = true
+      HSerPrint "Looping " + ByteToString(Mode)
+      HSerPrintCRLF
+   #EndIF
+
+  Loop
+
+End
+
+''' **********************************************
+''' Subroutines and Functions
+''' **********************************************
+sub TestPWM
+
+    'Set the PWM pin to output mode
+    DIR PORTA.2 out
+    ' Setup PWM - this is mandated as this specifies the frequency and
+    ' the clock source. Uses casting [word] to ensure the intialisation
+    ' value of Zero (0) is a treated as a word.
+    ' The variable type MUST match the HPWMUpdate variable type.
+    PMD3.5 = off          '
+    PWM6CON.7 = on        '
+    T2CON.7 = on          '
+    HPWM 6, 5, [word]0, 2 '
+
+    'Main code
+    do
+        'Turn up brightness over 2.5 seconds
+        For WTemp = 0 to 1023
+            HPWMUpdate 6, WTemp
+            wait 10 ms
+        next
+        'Turn down brightness over 2.5 seconds
+        For WTemp = 1023 to 0 Step -1
+            HPWMUpdate 6, WTemp
+            wait 10 ms
+        next
+    loop
+
+end sub
+
+  Sub Setup_System
+
+Trigger_LA
+
+    AOut1_Init    ' Initialize Analog Output1
+    Analog1 = 0   ' min. PWM
+    AOut1_Set     ' Set Analog Output1
+    AOut2_Init    ' Initialize Analog Output2
+    Analog2 = 0   ' Min. Out2
+    AOut2_Set     ' Set Analog Output2
+    RELAY = Off   ' Set Relay to foreward dir.
+    CH1_Out = Off ' turn Channel-Out off
+    CH2_Out = Off ' turn Channe2-Out off
+    CH3_Out = Off ' turn Channe3-Out off
+    CH4_Out = Off ' turn Channe4-Out off
+    CH5_Out = Off ' turn Channe5-Out off
+    CH6_Out = Off ' turn Channe6-Out off
+    SERVO = Off   '
+    T1Cnt = 0     '
+    T2Cnt = 0     '
+
+    Nb_Ch = 6           ' Number of Input-Channels
+                        ' regardless of Receiver type.
+    For Nb = 1 to Nb_Ch ' reset all Channelvalues
+      ChxVal(Nb) = 0    ' reset Channelvalue
+      ChxCycle(Nb) = 0  ' reset Channelcycle
+    Next Nb
+    ErrMsg = 0          ' clear Error-Message
+
+    InitTimer1 Osc, PS1_4 ' used for Puls-width
+    SetTimer 1, 1
+
+'  InitTimer5 Osc, PS1_4 ' used for Puls-pause
+'  SetTimer 5, 1
+'  In_Pause = 0
+'
+' Setting the Frequency and Out_Puls to define the Servo-Work.
+' then call Calculate_Servo_Out.
+'
+    Freq = 50             ' Frequency of Servo-Puls
+    Out_Puls = 1500       ' Pulsewidth in us
+    Calculate_Servo_Out()
+
+    InitTimer5 Osc, PS5_2 ' after first call of Calculate_Servo_Out
+    SetTimer 5, T5_Low    ' initialize Timer5
+    SERVO = 0             ' set Servo-Output to low
+    StartTimer 5          ' Start the Timer for first Pulse
+
+    Clock_Init  ' Start the Clock (1 secound counting)
+
+  End Sub
+
+  Sub Check_Option
+
+    Mode = 1            ' Set Mode to 0.
+    if OPTION1 = 1 then
+      Mode = Mode + 1 ' If switch is on, incr Mode by 1
+    end if
+    if OPTION2 = 2 then
+      Mode = Mode + 2 ' If switch is on, incr Mode by 2
+    end if
+
+  End Sub
+
+  Sub Check_Ext_Control
+
+    ADVal = ReadAD10(ANC7, true) ' read Control-input
+    ' ADVal around 340 = Ext. Contol open
+    ' ADVal around 45 = Ext. Control on GND
+    ' ADVal around 620 = Ext. Control on +5V
+    If ADVal < 200 Then ' local Control
+      ContRL = 0        ' local Control
+      Dir RELAY In      ' turn Relay to Input
+    End If
+    If (ADVal > 250) and (ADVal < 450) Then ' remote Control
+      ContRL = 1        ' remote Control
+      Exit Sub
+    End If
+    ' PORTC5 = EXT1, PORTC6 = EXT2
+    If ADVal > 500 Then ' configuration
+      ' Ext1 Ext2 Config
+      '  0    0  =   1
+      '  0    1  =   2
+      '  1    0  =   4
+      '  1    1  =   8
+      If (EXT1 = 0) and (EXT2 = 0) Then ' Config. 1
+        EEP1 = 1        ' Config. 1
+        EPWrite 0, EEP1
+      End If
+      If (EXT1 = 0) and (EXT2 = 1) Then ' Config. 2
+        EEP1 = 2        ' Config. 2
+        EPWrite 0, EEP1
+      End If
+      If (EXT1 = 1) and (EXT2 = 0) Then ' Config. 3
+        EEP1 = 4        ' Config. 3
+        EPWrite 0, EEP1
+      End If
+      If (EXT1 = 1) and (EXT2 = 1) Then ' Config. 4
+        EEP1 = 8        ' Config. 4
+        EPWrite 0, EEP1
+      End If
+      ErrMsg = 3        ' configuration done
+      Emergency_Stop    ' stop system
+    End If
+
+  End Sub
+
+'  Sub Read_EEPROM
+'
+'    EPRead 0, EEP1
+'
+'  End Sub
+
+  Sub Check_LCD
+
+    ' Check for a connected LCD
+
+    For BTemp = 64 To 78 Step 2 ' Adress 0x40 to 0x4E step 2
+      DeviceID = BTemp
+      I2C_Check_Adress          ' look for a I2C-Device on Address BTemp
+      If LCDF = 255 Then        ' character LCD found
+        LCDF = 2                ' set Flag to character LCD
+        LCD_I2C_Address_Current = BTemp ' set Address to 0x4y
+        Exit Sub                ' leave the Test
+      End If
+    Next BTemp
+
+    DeviceID = 120              ' Decimal 120 = Hex 78 Grafic LCD
+    I2C_Check_Adress            ' look for a I2C-Device on Address 0x78
+    If LCDF = 255 Then          ' grafic LCD found
+      LCDF = 1                  ' set Flag to grafic LCD
+      Exit Sub                  ' leave the Test
+    End if
+
+    LCDF = 0 ' No LCD
+
+  End Sub
+
+  Sub Check_RC_Receiver
+    '
+    ' Check the connected Receiver type. There should be some H-L-H-L pulses if a Receiver ist connected.
+    ' If no Receiver ist connected the number of Pulses are Zero.
+    ' If there are Pulses on Ch4-Input at least a 4-Channel Receiver is connectet.
+    ' If there are Pulses on Ch6-Input a 6-Channel is connected.
+    '
+    If LCDF <> 0 Then
+      If LCDF = 1 Then
+        GLCDCls
+        GLCDPrint 2,0, "Receiver-Check"
+      End If
+      If LCDF = 2 Then
+        Cls
+      End If
+    End If
+
+    LCnt = 0
+    HCnt = 0
+    BTemp = 0
+    Receiver = 0 ' no Receiver detected
+    Do
+      If CH4_IN = 0 Then ' Check for Low-Level
+        LCnt = LCnt + 1
+      End If
+      If CH4_IN = 1 Then ' Check for High-Level
+        HCnt = HCnt + 1
+      End If
+      Wait 250 us
+      BTemp = BTemp + 1
+    Loop While BTemp < 250 ' Check 250 times the logic level
+    IF (LCnt > 1) and (HCnt > 1) Then ' L-H-L-H detected
+      Nb_Ch = 4 ' a 4-Channel Receiver is found
+      Receiver = 4
+      If LCDF = 1 Then
+        GLCDPrint 2,0, "4-Ch L"
+        GLCDPrint 40,0, WordToString(LCnt) + " H"
+        GLCDPrint 72,0, WordToString(HCnt)
+      End If
+      If LCDF = 2 Then
+        Locate 0, 0
+        Print "4-Ch L"
+        Print WordToString(LCnt) + " H"
+        Print WordToString(HCnt)
+      End If
+    End If
+
+    LCnt = 0
+    HCnt = 0
+    BTemp = 0
+'    locate 2, 0
+'    Print WordToString(LCnt) + " "
+'    Print WordToString(HCnt)
+'    Wait 2 s
+    Do
+      If CH6_IN = 0 Then ' Check for Low-Level
+        LCnt = LCnt + 1
+      End If
+      If CH6_IN = 1 Then ' Check for High-Level
+        HCnt = HCnt + 1
+      End If
+      Wait 250 us
+      BTemp = BTemp + 1
+    Loop While BTemp < 250 ' Check 250 times the logic level
+    IF (LCnt > 1) and (HCnt > 1) Then ' L-H-L-H detected
+      Nb_Ch = 6 ' a 6-Channel Receiver is found
+      Receiver = 6
+      If LCDF = 1 Then
+        Locate 1, 0
+        GLCDPrint 2,16, "6-Ch L"
+        GLCDPrint 40,16, WordToString(LCnt) + " H"
+        GLCDPrint 72,16, WordToString(HCnt)
+      End If
+      If LCDF = 2 Then
+        Locate 1, 0
+        Print "6-Ch L"
+        Print WordToString(LCnt) + " H"
+        Print WordToString(HCnt)
+      End If
+    End If
+'    Nb_Ch = 6
+
+  End Sub
+
+  Sub Prepare_Chx
+
+'    Trigger_LA      ' For Test only
+    Select Case Channel
+      Case 1
+        CH1_OUT = !CH1_OUT ' for test only
+        ChxVal(1) = 0   ' Value for Ch1
+        ChxCycle(1) = 1 ' incr Cycle for Ch1
+        Set IOCAP.1 On  ' Set PortA1 IOC positive Edge (Ch1)
+      Case 2
+        CH2_OUT = !CH2_OUT ' for test only
+        ChxVal(2) = 0   ' Value for Ch2
+        ChxCycle(2) = 1 ' incr Cycle for Ch2
+        Set IOCAP.3 On  ' Set PortA3 IOC positive Edge (Ch2)
+      Case 3
+        ChxVal(3) = 0   ' Value for Ch3
+        ChxCycle(3) = 1 ' incr Cycle for Ch3
+        Set IOCAP.4 On  ' Set PortA4 IOC positive Edge (Ch3)
+      Case 4
+        ChxVal(4) = 0   ' Value for Ch4
+        ChxCycle(4) = 1 ' incr Cycle for Ch4
+        Set IOCAP.5 On  ' Set PortA5 IOC positive Edge (Ch4)
+      Case 5
+        ChxVal(5) = 0   ' Value for Ch5
+        ChxCycle(5) = 1 ' incr Cycle for Ch5
+        Set IOCAP.6 On  ' Set PortA6 IOC positive Edge (Ch5)
+      Case 6
+        ChxVal(6) = 0   ' Value for Ch6
+        ChxCycle(6) = 1 ' incr Cycle for Ch6
+        Set IOCAP.7 On  ' Set PortA7 IOC positive Edge (Ch6)
+      Case Else
+    End Select
+
+  End Sub
+
+  Sub Interrupt
+  '
+  ' For test only
+  '
+    For Nb = 1 to 10
+      Trigger_LA
+    Next Nb
+
+  End sub
+
+  Sub Process_IO_Interrupt
+
+  ' IOCxFn: INTERRUPT-ON-CHANGE PORTx
+  ' (x = A, B, C, D or E depending on CPU) (n = 0 to 7 Portpin)
+  ' FLAG REGISTER. To be Reset after Code processing
+  '
+  ' IOCxPn: POSITIVE EDGE REGISTER (to be set prior in Code)
+  '
+  ' IOCxNn: NEGATIVE EDGE REGISTER (to be set prior in Code)
+  '
+    If IOCIF Then ' An Interrupt on Change is detected. (General)
+    ' IF IOCportbit = 1 Then ' Specific Portpin generates an Interrupt
+    '   Code for IOCportbit
+    '   IOCportflag = 0 ' Clear specific IOC-Flag
+    ' END If
+    '
+    ' Measuring Servo-Input parameter
+    ' Timer1 used for Puls (High) measuring
+    '
+
+      If IOCAF.1 Then        ' Servo-Input Ch1
+        If PORTA.1 = 1 Then  ' Start Time messuring
+          ClearTimer 1
+          StartTimer 1
+          IOCAP = 0          ' Clear all positive edge detect
+          Set IOCAN.1 On     ' Set PortA1 IOC negative Edge (Ch1)
+        Else                 ' Stop Time mesuring
+          StopTimer 1
+          IOCAN = 0          ' Clear all negetive edge detect
+          ChxVal(1) = Timer1 ' fetch value for Ch1
+          ChxCycle(1) = 2    ' incr Cycle for Ch1
+          Channel = 2        ' set to next Channel
+        End If
+        IOCAF.1 = 0          ' reset IOC-Flag
+      End If
+
+      If IOCAF.3 Then        ' Servo-Input Ch2
+        If PORTA.3 = 1 Then  ' Start Time messuring
+          ClearTimer 1
+          StartTimer 1
+          IOCAP = 0          ' Clear all positive edge detect
+          Set IOCAN.3 On     ' Set PortA1 IOC negative Edge (Ch2)
+        Else                 ' Stop Time mesuring
+          StopTimer 1
+          IOCAN = 0          ' Clear all negetive edge detect
+          ChxVal(2) = Timer1 ' fetch Value for Ch2
+          ChxCycle(2) = 2    ' incr Cycle for Ch2
+          Channel = 3        ' set to next Channel
+        End If
+        IOCAF.3 = 0          ' reset IOC-Flag
+      End If
+
+      If IOCAF.4 Then        ' Servo-Input Ch3
+        If PORTA.4 = 1 Then  ' Start Time messuring
+          ClearTimer 1
+          StartTimer 1
+          IOCAP = 0          ' Clear all positive edge detect
+          Set IOCAN.4 On     ' Set PortA1 IOC negative Edge (Ch3)
+        Else                 ' Stop Time mesuring
+          StopTimer 1
+          IOCAN = 0          ' Clear all negetive edge detect
+          ChxVal(3) = Timer1 ' fetch Value for Ch3
+          ChxCycle(3) = 2    ' incr Cycle for Ch3
+          Channel = 4        ' set to next Channel
+        End If
+        IOCAF.4 = 0          ' reset IOC-Flag
+      End If
+
+      If IOCAF.5 Then        ' Servo-Input Ch4
+        If PORTA.5 = 1 Then  ' Start Time messuring
+          ClearTimer 1
+          StartTimer 1
+          IOCAP = 0          ' Clear all positive edge detect
+          Set IOCAN.5 On     ' Set PortA1 IOC negative Edge (Ch4)
+        Else                 ' Stop Time mesuring
+          StopTimer 1
+          IOCAN = 0          ' Clear all negetive edge detect
+          ChxVal(4) = Timer1 ' fetch Value for Ch4
+          ChxCycle(4) = 2    ' incr Cycle for Ch4
+          Channel = 5        ' set to next Channel
+        End If
+        IOCAF.5 = 0          ' reset IOC-Flag
+      End If
+
+      If IOCAF.6 Then        ' Servo-Input Ch5
+        If PORTA.6 = 1 Then  ' Start Time messuring
+          ClearTimer 1
+          StartTimer 1
+          IOCAP = 0          ' Clear all positive edge detect
+          Set IOCAN.6 On     ' Set PortA1 IOC negative Edge (Ch5)
+        Else                 ' Stop Time mesuring
+          StopTimer 1
+          IOCAN = 0          ' Clear all negetive edge detect
+          ChxVal(5) = Timer1 ' fetch Value for Ch5
+          ChxCycle(5) = 2    ' incr Cycle for Ch5
+          Channel = 6        ' set to next Channel
+        End If
+        IOCAF.6 = 0          ' reset IOC-Flag
+      End If
+
+      If IOCAF.7 Then        ' Servo-Input Ch6
+        If PORTA.7 = 1 Then  ' Start Time messuring
+          ClearTimer 1
+          StartTimer 1
+          IOCAP = 0          ' Clear all positive edge detect
+          Set IOCAN.7 On     ' Set PortA1 IOC negative Edge (Ch6)
+        Else                 ' Stop Time mesuring
+          StopTimer 1
+          IOCAN = 0          ' Clear all negetive edge detect
+          ChxVal(6) = Timer1 ' fetch Value for Ch6
+          ChxCycle(6) = 2    ' incr Cycle for Ch6
+          Channel = 7        ' indicate all Channels are done
+        End If
+        IOCAF.7 = 0          ' reset IOC-Flag
+      End If
+
+      If IOCAF.0 Then
+        For Nb = 1 to 10
+          LA_Trigger = 1
+          wait 40 us
+          LA_Trigger = 0
+          wait 10 us
+        Next Nb
+        IOCAF = 0
+      End If
+
+      If IOCAF.2 Then
+        For Nb = 1 to 10
+          LA_Trigger = 1
+          wait 40 us
+          LA_Trigger = 0
+          wait 10 us
+        Next Nb
+        IOCAF = 0
+      End If
+
+      IOCIF = 0
+
+    End If
+
+  End Sub
+
+  Sub T1Overflowed
+
+    LA_Trigger = 0
+    For Nb = 1 to Channel
+      LA_Trigger = 1
+      Wait 50 us
+      LA_Trigger = 0
+      wait 10 us
+    Next Nb
+
+    TMR1IF = 0 ' Clear Timerflag
+
+  End Sub
+
+  Sub T5Overflowed
+
+    ' Toggle SERVO Signal
+    If SERVO = 0 Then ' time for Puls high
+      InitTimer5 Osc, PS5_1 '
+      SetTimer 5, T5_High
+      SERVO = 1 ' set Servo-Output to high
+      StartTimer 5
+      exit sub
+    End If
+    If SERVO = 1 Then ' time for Puls low
+      InitTimer5 Osc, PS5_2 '
+      SetTimer 5, T5_Low
+      SERVO = 0 ' set Servo-Output to low
+      StartTimer 5
+    End If
+    TMR5IF = 0
+
+  End Sub
+
+  Sub Clock_Init
+
+    T1Cnt = 0
+    T2Cnt = 0
+    SETSMT1PERIOD ( 4045000 ) ' 1.000s periodwith the parameters of SMT_FOSC
+                              ' and SMTPres_1 within the clock variance of
+                              ' the internal clock.
+                              ' a perfect internal clock would be 4000000
+    InitSMT1(SMT_FOSC4,SMTPres_1)
+    ClearSMT1
+    StartSMT1
+
+  End Sub
+
+  Sub Clock_Stop
+
+    StopSMT1
+
+  End Sub
+
+  Sub SMT1Interrupt
+
+    If T1Cnt > 0 Then ' if timecount1 > 0 then decrement
+      T1Cnt = T1Cnt - 1
+    End If
+    If T2Cnt > 0 Then ' if timecount2 > 0 then decrement
+      T2Cnt = T2Cnt - 1
+    End If
+    SMT1IF = 0
+
+  End Sub
+
+  Sub Emergency_Stop
+
+    IF LCDF <> 0 Then ' use LCD if available
+      If LCDF = 1 Then
+        GLCDCls
+        Select Case ErrMsg
+          Case 1
+            GLCDPrint 2,0, "General fault !!"
+            GLCDPrint 2,16, "System stopped"
+          Case 2
+            GLCDPrint 2,0, "Error"
+          Case 3
+            GLCDPrint 2,0, "Config. done"
+            GLCDPrint 2,16, "Remove Config.-Key"
+          Case Else
+        End Select
+      End If
+      If LCDF = 2 Then
+        Cls
+        Select Case ErrMsg
+          Case 1
+            Print "General fault !!"
+            '      ----------------
+            Locate 1,0
+            Print "System stopped"
+            '      ----------------
+          Case 2
+            Print "Error"
+          Case 3
+            Print "Config. done"
+            '      ----------------
+            Locate 1,0
+            Print "Remove Conf.-Key"
+            '      ----------------
+          Case Else
+        End Select
+      End If
+    End If
+
+    Dir CONTROL Out    ' turn CONTROL to Output and show the Error-Condition
+    If ErrMsg = 1 Then ' first Level fault
+      CONTROL = On
+      End
+    End If
+    If ErrMsg = 2 Then ' second Level fault
+      Do forever
+        CONTROL = On
+        Wait 250 ms
+        CONTROL = Off
+        Wait 250 ms
+      Loop
+    End If
+    If ErrMsg = 3 Then ' configuration was made
+      Do forever
+        CONTROL = On
+        Wait 500 ms
+        CONTROL = Off
+        Wait 500 ms
+      Loop
+    End If
+
+  End Sub
+
+  sub Trigger_LA ()    ' generate a short High-Pulse
+
+' exit sub
+    ' PULSOUT is not suitable because it uses TIMER1.
+    ' We need TIMER1 for Interrupt On Change
+    Set LA_TRIGGER Off ' set Port-Pin to low
+    Set LA_TRIGGER On  ' set Port-pin to High
+    Wait 50 us         ' short delay
+    Set LA_TRIGGER Off ' set Port-pin to low
+    Wait 10 us         '
+
+  end sub
+
+  Sub AOut1_Init
+
+    Analog1 = 0
+    'Set the PWM pin to output mode
+    DIR PORTA.2 out
+    'Setup PWM - this is mandated as this specifies the frequency and
+    ' the clock source. Uses casting [word] to ensure the intialisation
+    ' value of Zero (0) is a treated as a word.
+    ' The variable type MUST match the HPWMUpdate variable type.
+    PMD3.5 = off          '
+    PWM6CON.7 = on        '
+    T2CON.7 = on          '
+    HPWM 6, 5, [word]0, 2 '
+
+  End Sub
+
+  Sub AOut1_Set
+
+'   HPWMUpdate ( channel, duty_cycle )
+' Analog1 = 950
+    HPWMUpdate (6, [word]Analog1)
+'            HPWMUpdate 6, Bright
+
+  End Sub
+
+  Sub AOut2_Init
+
+    DAC1CON0 = 0b10010000 ' set DAC-Configuration DAC-Out on RB7
+    DAC1CON1 = 0
+
+  End Sub
+
+  Sub AOut2_Set
+  ' ! ! !
+  ' For full Output (VMax) remove PICKIT ! ! !
+  ' ! ! !
+    If Analog2 > 31 Then
+      Analog2 = 31
+    End If
+    DAC1CON1 = Analog2 ' set DAC-Value for Output
+
+  End Sub
+
+  Sub Calculate_Servo_Out()
+
+    ' Out_Puls as Word ' length of Servo-Out Puls in us
+    ' Out_Pause as Word ' pause for Servo-Out Puls in us
+    ' T5_Low as word ' Timer5 value for Servo-Puls low
+    ' T5_High as word ' Timer5 value for Servo-Puls high
+    ' Example for T5_Low: 29536 = 18ms / 27536 = 19ms / prescaler 1:2
+    ' Example for T5_High: 61536 = 1ms / 57536 = 2ms / prescaler 1:1
+
+    ' this way is used because Datatype SINGLE is not working
+
+    Period = 1000000 / Freq ' calculate Period (us) based on Frequency
+    Out_Pause = Period - Out_Puls ' Calculate Out_Pause in us
+
+    ' T5_Low = 65535 - (Pausetime (us) * 2)
+    T5_Low = 65535 - (Out_Pause * 2)
+    ' T5_High = 65535 - (Pulstime (us) * 4)
+    T5_High = 65535 - (Out_Puls * 4)
+
+  End Sub
+
+  Sub Execute_Channels
+
+    Trigger_LA ' only for Test
+
+  ' Trigger_LA ' only for Test
+    If LCDF = 1 Then
+      Report_Inputs_GLCD
+    End If
+    If LCDF = 2 Then
+      Report_Inputs_LCD
+    End If
+
+    Trigger_LA ' only for Test
+
+    #IF DEBUG = true
+      HSerPrint "All Channels done"
+      HSerPrintCRLF
+      For Temp = 1 to Nb_Ch
+        If ChxCycle(Temp) = 2 Then
+          Txt = WordToString(ChxVal(Temp))
+          HSerPrint ByteToString(Temp) + " = "
+          HSerPrint Txt + " : "
+        End If
+      Next Temp
+      HSerPrintCRLF
+      HSerPrintCRLF
+    #EndIF
+
+    If Mode = 1 Then
+      Process_Mode1
+    End If
+    If Mode = 2 Then
+      Process_Mode2
+    End If
+    If Mode = 3 Then
+      Process_Mode3
+    End If
+    If Mode = 4 Then
+      Process_Mode4
+    End If
+    '
+    ' after this Point all Values for Ch1 to Ch6 invalid ! ! !
+    ' Next Cycle has to be started ! ! !
+    '
+    For BTemp = 1 To Nb_Ch ' reset all Cycle-Flags and Values
+      ChxVal(BTemp) = 0
+      ChxCycle(BTemp) = 0
+    Next BTemp
+    Channel = 1 ' start next Cycle
+
+' Restart Watchdog
+
+  End Sub
+
+  Sub Recalculate_CH1
+
+    ' Stick to left < 1500, Stick to right > 1500
+    If ChxCycle(1) = 2 Then
+    End If
+
+  End Sub
+
+  Sub Recalculate_Ch2
+
+    ' Stick to front > 1500, Stick to back < 1500
+    If ChxCycle(2) = 2 Then
+      If ChxVal(2) > 2000 Then   ' check upper bound
+        ChxVal(2) = 2000         ' set to 2000 as maximaum
+      End If
+      If ChxVal(2) < 1000 Then   ' check lower bound
+        ChxVal(2) = 1000         ' set to 1000 as minimum
+      End If
+      RevDir = 0                 ' Direction forward
+      If ChxVal(2) < 1480 Then   ' value lower then trippoint
+        RevDir = 1               ' turn Direction to reverse
+      End If
+      AnaCalc = ChxVal(2)        '
+      If (AnaCalc > 1485) and (Anacalc < 1515) Then '
+        AnaCalc = 1500           ' create a deathband to prevent flickering
+      End If
+      If AnaCalc < 1499 Then     ' reverse the value 1500=0% / 1000=100%
+        AnaCalc = 1500 - AnaCalc ' set AnaCalc to 0 - 255
+      End If
+      If AnaCalc > 1499 Then     ' value 1500=0% / 2000=100%
+        AnaCalc = AnaCalc - 1500 ' set AnaCalc to 0 - 255
+      End if
+      Analog1 = AnaCalc * 2
+ #IF DEBUG = true
+        HSerPrint "Analog Value"
+        HSerPrintCRLF
+        Txt = IntegerToString(Analog1)
+        If RevDir = 0 Then
+          HSerPrint Txt + " Analog forward"
+        Else
+          HSerPrint Txt + " Analog reverse"
+        End If
+        HSerPrintCRLF
+ #EndIF
+
+    End If
+
+  End Sub
+
+  Sub Process_Mode1
+
+    Recalculate_Ch1
+
+    Recalculate_CH2
+    If RevDir = 1 then
+      RELAY = On  ' turn Relay on for backward direction
+    Else
+      RELAY = Off ' forward direction
+    End If
+    AOut1_Set
+
+    if CHxCycle(3) = 2 then ' Ch3 ready for Output
+      if CHxVal(3) > 1500 then
+        CH3_Out = On
+      else
+        CH3_Out = Off
+      end if
+    end if
+    if CHxCycle(4) = 2 then ' Ch4 ready for Output
+      if CHxVal(4) > 1500 then
+        CH4_Out = On
+      else
+        CH4_Out = Off
+      end if
+    end if
+    if CHxCycle(5) = 2 then ' Ch5 ready for Output
+      if CHxVal(5) > 1500 then
+        CH5_Out = On
+      else
+        CH5_Out = Off
+      end if
+    end if
+    if CHxCycle(6) = 2 then ' Ch6 ready for Output
+      if CHxVal(6) > 1500 then
+        CH6_Out = On
+      else
+        CH6_Out = Off
+      end if
+    end if
+
+  End Sub
+
+  Sub Process_Mode2
+
+  End Sub
+
+  Sub Process_Mode3
+
+  End Sub
+
+  Sub Process_Mode4
+
+  End Sub
+
+  Sub Process_Watchdog
+
+ ' Watchdog restartet in EXECUTE_CHANNELS
+
+  End Sub
+
+  Sub Local_Control
+
+    ' EXT1 and EXT2
+    ' read analog Input for Horn and Brake
+    SWBH = ReadAD10(ANC5)  ' Horn-0-Brake
+    ' read analog Input for speed
+    Speed = ReadAD10(ANC6) ' Speed-Pot
+    CH1 = Off              ' use temp Var
+    CH6 = Off              ' use temp Var
+
+    If SWBH < 250 Then     ' Brake-switch
+      CH1 = On
+    End If
+    If SWBH > 750 Then     ' Horn-switch
+      CH6 = On
+    End If
+
+    ' Check if Brake is needed depending on Mode and Speed
+    ' In Mode 1 and Speed < 50 then the Brake is turned on.
+    If (Speed < 50) and (Mode = 1) Then ' turn Brake on in Mode 1
+      Ch1 = On
+    End If
+    If Speed > 50 Then ' disable direction control if speed is > 50.
+      T1Cnt = 3        ' set timelock for direction control.
+    End If
+
+    Ch1_Out = CH1 ' set Output to temp Var.
+    CH6_Out = Ch6 ' set Output to temp Var.
+
+    Analog2 = Speed / 32 ' for DAC-Test only
+    AOut2_Set
+
+    AWork1 = Speed
+    Analog1 = Speed
+    AOut1_Set
+    ' Relay could not change if Timelock > 0
+    ' ' ' ! ! !
+    ' ' ' Timewindow for Gearbox / Gasoline-Motor
+    ' ' ' ! ! !
+    If T1Cnt = 0 Then ' if timelock is over, check the external input
+      Dir RELAY in    ' Relay now controled by external switch.
+      wait 10 ms
+      RelOld = RELAY  ' save the external input
+      Dir RELAY out   ' external switch overwritten
+      wait 10 ms
+      RELAY = RelOld  '
+    End If
+    If T1Cnt > 0 then ' during timelock, set Relay to saved status
+      RELAY = RelOld  ' independent of external switch
+    End If
+
+    AWork1 = AWork1 / 10
+
+    If LCDF = 1 Then ' GLCD
+      GLCDCls
+      GLCDPrint (2, 0, "Local Mode")       ' Line 1
+      GLCDPrint (2, 16, "Speed = " + WordToString(AWork1)) ' Line 3
+      If RELAY = 1 Then
+        GLCDPrint (2, 32, "Dir = Backward")' Line 5
+      Else
+        GLCDPrint (2, 32, "Dir = Forward") ' Line 5
+      End If
+      If CH1_Out = 1 Then
+        GLCDPrint (2, 48, "Brake = On")    ' Line 7
+      Else
+        GLCDPrint (2, 48, "Brake = Off")   ' Line 7
+      End If
+      If Ch6_Out = 1 Then
+        GLCDPrint (2, 56, "Horn")        ' line 8
+      End If
+    End If
+    If LCDF = 2 Then ' C-LCD
+      Cls
+      If EEP1 = 1 Then ' 16x2
+      End If
+      If EEP1 = 2 Then ' 20x4
+      End If
+      Print "Local"
+      '      Local xxx% Forw.
+      '      Local xxx% Back.
+      '      ----------------
+      Locate 0,7
+      Print WordToString(AWork1) + "% "
+      If RELAY = 1 Then
+        Print "Back."
+      Else
+        Print "Forw."
+      End If
+      If Ch1_Out = On then
+        Locate 1,0
+        Print "Brake"
+      End If
+      If Ch6_Out = On Then
+        Locate 1,9
+        Print "Horn"
+      End If
+      Locate 2,0
+'      print WordToString(SWBH) + " "
+'      print WordToString(Speed) + " "
+'      print IntegerToString(T1Cnt) + "sec."
+    End If
+    Wait 200 ms
+
+  End Sub
+
+  Sub I2C_Check_Adress
+
+    LCDF = 0 ' set LCD-Flag to 0 ==> no LCD
+
+    HI2CStart
+    If HI2CWaitMSSPTimeout <> TRUE Then
+      'Send to address to device
+      HI2CSend (deviceID)
+      'Did device fail to respond?
+      If HI2CAckpollState = FALSE Then
+        ' found
+        HI2CSend ( 0 )
+        LCDF = 255
+      Else
+        ' not found
+      End If
+      'Do a stop.
+      HI2CStop
+    Else
+'      HSerPrint "! I2C search"
+    End If
+
+  End Sub
+
+  Sub Hello_GLCD
+''' Character memory mode - screen addressing
+''' 8 lines of text, any GLCDPrint (xpos, YPOS, text) and YPOS will be
+''' translated to Address Line #n.
+''' Address Line #0 = YPOS 0 to 7
+''' Address Line #1 = YPOS 8 to 15
+''' Address Line #2 = YPOS 16 to 23
+''' Address Line #3 = YPOS 14 to 31
+''' Address Line #4 = YPOS 32 to 39
+''' Address Line #5 = YPOS 40 to 47
+''' Address Line #6 = YPOS 48 to 55
+''' Address Line #7 = YPOS 56 to 63
+'''
+    If LCDF <> 1 then ' no grafic LCD connected
+      Exit Sub
+    End If
+
+    GLCDCLS
+
+    GLCDPrint 2,0, "CHEAP-RC " + SVers ' Line 1
+    GLCDPrint 2,8, ""
+    GLCDPrint 2,16, "by HaJoKa"        ' Line 3
+    GLCDPrint 2,24, ""
+    GLCDPrint 2,32, "" + SDate         ' Line 5
+    GLCDPrint 2,40, ""
+    GLCDPrint 2,48, ""
+    GLCDPrint 2,56, ""                 ' Line 8
+    wait 3 s
+
+  End Sub
+
+  Sub Report_Status_GLCD
+
+    If LCDF <> 1 then ' no grafic LCD connected
+'      Exit Sub
+    End If
+'
+' show the Value of Prom1
+'
+
+  End Sub
+
+  Sub Report_Inputs_GLCD
+
+    If LCDF <> 1 then ' no grafic LCD connected
+      Exit Sub
+    End If
+
+    GLCDCLS
+
+    LCDS0 = "RC-Inputs"
+    GLCDPrint (2,0,LCDS0) ' Headline
+    LCDS0 = " "
+    GLCDPrint (2,8,LCDS0) ' Line 2
+
+    if ChxCycle(1) = 2 then
+      LCDS1 = "Ch1 = " + WordToString(ChxVal(1))
+    else
+      LCDS1 = "Ch1 = None"
+    end if
+'    GLCDPrint (0,16,LCDS) ' Line 3
+    GLCDPrintWithSize (2,16,LCDS1,2) ' Line 3
+
+    if ChxCycle(2) = 2 then
+      LCDS2 = "Ch2 = " + WordToString(ChxVal(2))
+    else
+      LCDS2 = "Ch2 = None"
+    end if
+'    GLCDPrint (0,24,LCDS) ' Line 4
+    GLCDPrintWithSize (2,24,LCDS2,2) ' Line 4
+
+    if ChxCycle(3) = 2 then
+      LCDS3 = "Ch3 = " + WordToString(ChxVal(3))
+    else
+      LCDS3 = "Ch3 = None"
+    end if
+    GLCDPrintWithSize (2,32,LCDS3,2) ' Line 5
+
+    if ChxCycle(4) = 2 then
+      LCDS4 = "Ch4 = " + WordToString(ChxVal(4))
+    else
+      LCDS4 = "Ch4 = None"
+    end if
+    GLCDPrintWithSize (2,40,LCDS4,2) ' Line 6
+
+    if ChxCycle(5) = 2 then
+      LCDS5 = "Ch5 = " + WordToString(ChxVal(5))
+    else
+      LCDS5 = "Ch5 = None"
+    end if
+    GLCDPrintWithSize (2,48,LCDS5,2) ' Line 7
+
+    if ChxCycle(6) = 2 then
+      LCDS6 = "Ch6 = " + WordToString(ChxVal(6))
+    else
+      LCDS6 = "Ch6 = None"
+    end if
+    GLCDPrintWithSize (2,56,LCDS6,2) ' Line 8
+
+  End Sub
+
+  Sub Report_Outputs_GLCD
+
+    If LCDF <> 1 then ' no grafic LCD connected
+      Exit Sub
+    End If
+
+  End Sub
+
+  Sub Hello_LCD
+
+    If LCDF <> 2 then ' no character LCD connected
+      Exit Sub
+    End If
+
+    CLS
+    Print "CHEAP-RC " + SVers ' Line 1
+    Locate 1, 0
+    Print "HaJoKa " + SDate   ' Line 2
+    wait 4 s
+
+print "step"
+  End Sub
+
+  Sub Report_Status_LCD
+
+    If LCDF <> 2 then ' no character LCD connected
+      Exit Sub
+    End If
+'
+' show the Value of Prom1
+'
+    CLS
+    If ContRL = 0 Then
+      Print "Local Control"
+    End If
+    If ContRL = 1 Then
+      Print "Remote Control"
+      Locate 1,0 ' Line 2
+      Select Case Receiver
+        Case = 4
+          Print "4-Ch Receiver"
+        Case = 6
+          Print "6-Ch Receiver"
+        Case Else
+          Print "No RC-Receiver !"
+      End Select
+    End If
+
+    If EEP1 = 1 Then ' LCD 16x2
+      Wait 3 s
+      Cls
+      Print "Prog-Mode = " + ByteToString(Mode)
+      '     ----------------
+      Locate 1, 0
+      Print ""
+    End If
+    If EEP1 = 2 Then ' LCD 20x4
+      Locate 2,0 ' Line 3
+      Print "Prog-Mode = " + ByteToString(Mode)
+      '
+      Locate 3,0 ' Line 4
+    End If
+    Wait 3 s
+
+  End Sub
+
+  Sub Report_Inputs_LCD
+
+    If LCDF <> 2 then ' no character LCD connected
+      Exit Sub
+    End If
+
+    CLS
+
+    LCDS0 = "RC-Inputs" ' Headline
+
+    if ChxCycle(1) = 2 then
+      LCDS1 = "1=" + WordToString(ChxVal(1))
+    else
+      LCDS1 = "1=None"
+    end if
+    Print LCDS1 ' Line 1
+
+    if ChxCycle(2) = 2 then
+      LCDS2 = "2=" + WordToString(ChxVal(2))
+    else
+      LCDS2 = "2=None"
+    end if
+    Locate 0, 7
+    Print LCDS2 ' Line 1
+
+    if ChxCycle(3) = 2 then
+      LCDS3 = "3=" + WordToString(ChxVal(3))
+    else
+      LCDS3 = "3=None"
+    end if
+    Locate 0, 14
+    Print LCDS3 ' Line 1
+
+    if ChxCycle(4) = 2 then
+      LCDS4 = "4=" + WordToString(ChxVal(4))
+    else
+      LCDS4 = "4=None"
+    end if
+    Locate 1, 0
+    Print LCDS4 ' Line 2
+
+    if ChxCycle(5) = 2 then
+      LCDS5 = "5=" + WordToString(ChxVal(5))
+    else
+      LCDS5 = "5=None"
+    end if
+    Locate 1, 7
+    Print LCDS5 ' Line 2
+
+    if ChxCycle(6) = 2 then
+      LCDS6 = "6=" + WordToString(ChxVal(6))
+    else
+      LCDS6 = "6=None"
+    end if
+    Locate 1, 14
+    Print LCDS6 ' Line 2
+
+  End Sub
+
+  Sub Report_Outputs_LCD
+
+    If LCDF <> 2 then ' no character LCD connected
+      Exit Sub
+    End If
+    Cls
+    Print "C1="
+    Locate 1,0
+    Print "C3="
+
+  End Sub
