@@ -13,7 +13,7 @@
 // Chip Settings 
 //! The timer calculations are based on 2mHz.  
 //! You would need to recalculate the timer values if 2mHz is not used
-//Set chip model required
+//Set microcontroller required
 #chip 16F1937, 2
 #option Explicit
 #CONFIG MCLRE=ON

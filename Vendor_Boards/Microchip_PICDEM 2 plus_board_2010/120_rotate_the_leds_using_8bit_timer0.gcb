@@ -21,7 +21,7 @@
     */
 
 
-//Set chip model required
+//Set microcontroller required
 #chip 16F1937, 16
 #option Explicit
 #CONFIG MCLRE=ON

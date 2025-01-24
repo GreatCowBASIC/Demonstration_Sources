@@ -1,17 +1,17 @@
 /*
-    A demonstration program for GCBASIC
-    --------------------------------------------------------------------------------
-    This program shows toggling an LED attached
+        A demonstration program for GCBASIC
+        --------------------------------------------------------------------------------
+        This program shows toggling an LED attached
 
-    One way to create a delay is to spend time decrementing to a value, but GCBASIC  has timers built in.
+        One way to create a delay is to spend time decrementing to a value, but GCBASIC  has timers built in.
 
-    The demonstration will use a GCBASIC method to toggle the LED using CONSTANTS rather than the port address.
+        The demonstration will use a GCBASIC method to toggle the LED using CONSTANTS rather than the port address.
 
-    LED blinks at a rate of approximately 1.0 seconds, we use CONSTANTS to refer to the LED port.
+        LED blinks at a rate of approximately 1.0 seconds, we use CONSTANTS to refer to the LED port.
 
-    The LED is attached to the microcontroller via a suitable resistor to 0v.
+        The LED is attached to the microcontroller via a suitable resistor to 0v.
 
-    We set one of the LEDs, you can try setting the other LED..  do not forget those appropiate resistors
+        We set one of the LEDs, you can try setting the other LED..  do not forget those appropiate resistors
 
 
 @author 	EvanV
@@ -20,7 +20,7 @@
 @date   	14.01.2025
 ********************************************************************************/
 
-//Set chip model required
+//Set microcontroller required
 #chip 16F1937
 #option Explicit
 
@@ -42,7 +42,7 @@ IO:    ---------------------------------
 
         ------------PORTD----------------
 Bit#:  -7---6---5---4---3---2---1---0---
-IO:    PWR-EN--RW--RS--DB7-DB6-DB5-DB4--
+IO:    ---------------------------------
 IO:    ---------------------------------
 */
 
@@ -60,13 +60,13 @@ Dir     LEDD2 Out
 Dir     LEDD3 Out
 
 // *****************************************************************************************************
-    // Main program commences here.. everything before this is setup for the board.
+// Main program commences here.. everything before this is setup for the board.
 
     do
 
-        'wait for 1 second which is 500 ms
-        Wait 500 ms
+        'wait for 1 second which is 1000 ms
+        Wait 1000 ms
         'Set the port bit to NOT value from previous state but using the ! as an alternative to NOT
-        LEDD1 = !LEDD1
+        LEDD1 = NOT LEDD1
 
     loop

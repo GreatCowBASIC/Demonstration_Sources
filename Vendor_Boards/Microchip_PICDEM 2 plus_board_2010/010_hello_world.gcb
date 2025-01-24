@@ -1,9 +1,7 @@
 /*
 A demonstration program for GCBASIC.
 --------------------------------------------------------------------------------------------------------------------------------
-This program demonstrates the capabilities of a OCULAR OM1614 1602 LCD display.
-The LCD is using an 4-bit bus for connectivity.
-For the LCD connection - please refer to the program.
+This program demonstrates the capabilities of a PICDEM 2 Board
 
 @author 	EvanV
 @licence	GPL
@@ -11,50 +9,31 @@ For the LCD connection - please refer to the program.
 @date   	14.01.2025
 ********************************************************************************/
 
-//Set chip model required
-#chip 16F1937
+//Set microcontroller required
+#chip 16f1937
 #option Explicit
 
-//! Specify explicit OCULAR_OM1614 support!!
-#DEFINE LCD_OCULAR_OM1614
-
-// Setup LCD Parameters
-#DEFINE LCD_IO 4
-
-// Define LCD Hardware settings
-#DEFINE LCD_RS      PORTD.4
-#DEFINE LCD_RW      PORTD.5
-#DEFINE LCD_Enable  PORTD.6
-
-#DEFINE LCD_DB4     PORTD.0
-#DEFINE LCD_DB5     PORTD.1
-#DEFINE LCD_DB6     PORTD.2
-#DEFINE LCD_DB7     PORTD.3
-
-//! Required for OCULAR LCD driver
-#DEFINE LCD_POWER   PORTD.7
-
 /*
-        ------------PORTA---------------
-Bit#:  -7---6---5---4---3---2---1---0---
-IO:    ---------------------------------
-IO:    ---------------------------------
+                ------------PORTA---------------
+        Bit#:  -7---6---5---4---3---2---1---0---
+        IO:    ---------------------------------
+        IO:    ---------------------------------
 
-        ------------PORTB----------------
-Bit#:  -7---6---5---4---3---2---1---0---
-IO:    ----------------LED-LED-LED-LED--
-IO:    ---------------------------------
+                ------------PORTB----------------
+        Bit#:  -7---6---5---4---3---2---1---0---
+        IO:    ----------------LED-LED-LED-LED--
+        IO:    ---------------------------------
 
-        ------------PORTC----------------
-Bit#:  -7---6---5---4---3---2---1---0---
-IO:    ---------------------------------
-IO:    ---------------------------------
+                ------------PORTC----------------
+        Bit#:  -7---6---5---4---3---2---1---0---
+        IO:    ---------------------------------
+        IO:    ---------------------------------
 
-        ------------PORTD----------------
-Bit#:  -7---6---5---4---3---2---1---0---
-IO:    PWR-EN--RW--RS--DB7-DB6-DB5-DB4--
-IO:    ---------------------------------
-*/
+                ------------PORTD----------------
+        Bit#:  -7---6---5---4---3---2---1---0---
+        IO:    ---------------------------------
+        IO:    ---------------------------------
+        */
 
 
 // ----- Main body of program commences here.
@@ -66,8 +45,8 @@ DIR PORTB.2 OUT
 DIR PORTB.3 OUT
 
 PORTB.0 = 1
-PORTB.1 = 1
+PORTB.1 = 0
 PORTB.2 = 1
-PORTB.3 = 1
+PORTB.3 = 0
 
 End

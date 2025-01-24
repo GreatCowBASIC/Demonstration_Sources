@@ -17,7 +17,7 @@ This version is compatible will all version of GCBASIC as this demonstration use
     @date    09/01/2025
     */
 // ----- Configuration
-//Set chip model required
+//Set microcontroller required
 #chip 16F1937
 #option Explicit
 #CONFIG MCLRE=ON

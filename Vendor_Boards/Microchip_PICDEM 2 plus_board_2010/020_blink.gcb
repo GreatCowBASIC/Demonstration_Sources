@@ -9,7 +9,7 @@
 @date   	14.01.2025
 ********************************************************************************/
 
-//Set chip model required
+//Set microcontroller required
 #chip 16F1937
 #option Explicit
 
@@ -31,15 +31,15 @@ IO:    ---------------------------------
 
         ------------PORTD----------------
 Bit#:  -7---6---5---4---3---2---1---0---
-IO:    PWR-EN--RW--RS--DB7-DB6-DB5-DB4--
+IO:    ---------------------------------
 IO:    ---------------------------------
 */
 
     // Main program commences here.. everything before this is setup for the board.
 
     DIR PORTB Out
-    
-    do
+
+    Do
 
         // Set the LEDs on
         PORTB = 255
@@ -49,4 +49,4 @@ IO:    ---------------------------------
         PORTB = 0
         wait 500 ms
 
-    loop
+    Loop

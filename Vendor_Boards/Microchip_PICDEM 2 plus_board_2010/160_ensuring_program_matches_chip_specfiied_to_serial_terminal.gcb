@@ -9,7 +9,7 @@
     @version 1.00
     @date    14-01-2025
 */
-//Set chip model required
+//Set microcontroller required
 #chip 16F1937
 #option Explicit
 #CONFIG MCLRE=ON

@@ -10,7 +10,7 @@
 @date   	14.01.2025
 ********************************************************************************/
 
-//Set chip model required
+//Set microcontroller required
 #chip 16F1937
 #option Explicit
 
@@ -32,7 +32,7 @@ IO:    ---------------------------------
 
         ------------PORTD----------------
 Bit#:  -7---6---5---4---3---2---1---0---
-IO:    PWR-EN--RW--RS--DB7-DB6-DB5-DB4--
+IO:    ---------------------------------
 IO:    ---------------------------------
 */
 
@@ -52,7 +52,7 @@ Dir     LEDD3 Out
     // Main program commences here.. everything before this is setup for the board.
 
 
-    // Program to rotate LEDs on a PIC18F26Q24 microcontroller with a 100 ms delay
+    // Program to rotate LEDs on a PIC16 microcontroller with a 100 ms delay
 
     // Initialize a variable to hold the LED states
     DIM LEDs AS BYTE
@@ -65,7 +65,7 @@ Dir     LEDD3 Out
     // Main loop
     Do
         // Output the current state to PORTB
-        LATB = LEDs
+        PORTB = LEDs
         
         // Rotate the LEDs to the left
         Rotate LEDs Left Simple
