@@ -101,12 +101,7 @@
     #DEFINE LCD_DB7     PORTD.3
 
     //! Required for OCULAR LCD driver
-    #DEFINE LCD_POWER   PORTD.7
-
-    #DEFINE USART_BAUD_RATE 9600
-    #DEFINE USART_TX_BLOCKING
-    #DEFINE USART_DELAY OFF
-    
+    #DEFINE LCD_POWER   PORTD.7 
     
 //*****************************************************************************************************
 // Main program commences here.. everything before this is setup for the board.
@@ -174,5 +169,5 @@
 
 
 Sub blink
-    TimeOut++
+    TimeOut = TimeOut + 1
 End Sub

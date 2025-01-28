@@ -1,0 +1,200 @@
+'''A demonstration program for GCBASIC.
+'''--------------------------------------------------------------------------------------------------------------------------------
+
+'''@author  EvanV
+'''@licence GPL
+'''@version 1.0a
+'''@date    24.01.2025
+'''***********************************************************
+
+#CHIP 18F47K42, 64
+#OPTION Explicit
+#CONFIG MCLRE=EXTMCLR
+#include <DS1307.h>
+#include <DS3231.h>
+#INCLUDE <glcd.h>
+
+
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #define PPSToolPart 18F47K42
+
+    Sub InitPPS
+            
+            // Module: UART pin directions
+            Dir PORTC.6 Out    ' Make TX1 pin an output
+            // Module: UART1
+            RC6PPS = 0x0013    // TX1 > RC6
+        
+        End Sub
+    // Add this code segment to your GCBASIC source program
+
+
+' This is the Default value, not required.
+#DEFINE GLCD_TYPE GLCD_TYPE_KS0108
+#DEFINE GLCD_KS0108_CS_LOW
+
+// GLCD Settings
+    //! Evan's settings
+    #DEFINE GLCD_CS1 PORTb.4
+    #DEFINE GLCD_CS2 PORTb.5
+    'D0 to pin 7 on LCD
+    #DEFINE GLCD_DB0 PORTD.0
+    'D1 to pin 8 on LCD
+    #DEFINE GLCD_DB1 PORTD.1
+    'D2 to pin 9 on LCD
+    #DEFINE GLCD_DB2 PORTD.2
+    'D3 to pin 10 on LCD
+    #DEFINE GLCD_DB3 PORTD.3
+    'D4 to pin 11 on LCD
+    #DEFINE GLCD_DB4 PORTD.4
+    'D5 to pin 12 on LCD
+    #DEFINE GLCD_DB5 PORTD.5
+    'D6 to pin 13 on LCD
+    #DEFINE GLCD_DB6 PORTD.6
+    'D7 to pin 14 on LCD
+    #DEFINE GLCD_DB7 PORTD.7
+
+    #DEFINE GLCD_DATAPORT PORTD
+
+    #DEFINE GLCD_RS PORTb.3
+    #DEFINE GLCD_Enable PORTb.2
+    #DEFINE GLCD_RW PORTc.7
+    #DEFINE GLCD_RESET PORTc.2
+
+    #DEFINE KS0108ReadDelay     10
+    #DEFINE KS0108WriteDelay    10
+    #DEFINE KS0108ClockDelay    10
+
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
+
+// *************************** MAIN ***********************************************
+
+
+  //I2C settings
+  #define I2C_MODE Master
+  #define I2C_DATA PORTC.4
+  #define I2C_CLOCK PORTC.3
+  #define I2C_BIT_DELAY 20 us
+  #define I2C_CLOCK_DELAY 30 us
+//   #define I2C_DISABLE_INTERRUPTS
+
+
+
+
+#define clocktype   0               ;0 is US or 1 is UK style
+
+;----- Variables
+dim hour, min, sec, am_pm as byte
+dim date, month, year, DOW as byte
+dim xpos, ypos as byte            ' Position variables for GLCD
+dim mode as byte
+;----- Tables
+table monthDays                   ;# of days in months
+  31
+  29                             ;leap years only
+  31
+  30
+  31
+  30
+  31
+  31
+  30
+  31
+  30
+  31
+end table
+
+;----- Main Program
+
+    GLCDPrint(0, 0, "DS1307 Inspection" )
+
+    // Check DS1307 is working
+    I2CStart                          ; is device present?
+    I2CSend(DS_AddrWrite)
+    I2CStop
+
+    if I2CSendState = False  then     ; is device present?
+        GLCDPrint(0, 16, "No DS1307" )
+        GLCDPrint(0, 24, "Stopped" )
+    end if
+
+    Wait 2 s
+    GLCDCLS
+
+    ; Initialize clock
+        
+            DS1307_ReadDate(DOW, date, month, year)   ;get initial date
+            DS1307_ReadHourMode(mode)                 ;and the current mode
+            DS1307_SetHourMode(mode)                  ;update hour mode from RTC
+            DS1307_EnableOscillator( true )           ;and, ensure the clock is running
+            DS3231_SetSQW 0                           ;and, turn on at 1 Hz, see documentation for permitted values
+            DS3231_EnableSQW
+            INTON
+
+    // Variable to count events
+        Dim intevent as Bit
+        intevent = FALSE
+
+        Dim updateglcdevent, lastupdateglcdevent as Long
+        updateglcdevent = 0
+        lastupdateglcdevent = updateglcdevent - 1
+        Dim ccount as Long
+        ccount = 0
+
+    // A constant
+        #DEFINE INTPORT PORTB.0
+        Dir INTPORT IN
+        GLCDPrint 0,0, "Loaded"
+        HserPrint "Loaded"
+
+        //Sets the external interrupt to trigger when the pin's level transitions from high to low (negative edge trigger).
+        IOCBP = 0x03
+        On Interrupt PORTCHANGE Call ISRHandler
+
+
+        Do
+
+            If intevent = TRUE Then
+                ccount++
+                intevent = FALSE
+                GLCDPrint 0,8, "bit 0 : "
+                GLCDPrint 40, 8, ccount                
+            End If
+
+            If lastupdateglcdevent <> updateglcdevent Then
+                If updateglcdevent.1 = 1 Then
+                    GLCDPrint 0,32, "bit 1 : "
+                    GLCDPrint 40, 32, ccount
+                Else If updateglcdevent.3 = 1 Then
+                    GLCDPrint 0,16, "bit 3 : "
+                    GLCDPrint 40, 16, ccount
+                Else If updateglcdevent.4 = 1 Then
+                    GLCDPrint 0,24, "bit 4 : "
+                    GLCDPrint 40, 24, ccount
+                End If
+                lastupdateglcdevent = updateglcdevent
+            End If
+    
+        Loop
+
+Sub ISRHandler 
+    // Prevent reentrant events and prevents bounce
+    If IOCBF0 = 1 then
+        intevent = TRUE
+        IOCBF0 = 0
+        HserSend "."
+    End If
+
+    If IOCBF1 = 1 Then
+        updateglcdevent++
+        IOCBF1 = 0
+        HserSend "!"
+    End If
+
+End Sub

@@ -1,3 +1,4 @@
+
 /*
 This demonstration program is a simple GLCD demonstration of the SSD1306 GLCD capabilities.
 
@@ -14,7 +15,7 @@ This version is compatible will all version of GCBASIC as this demonstration use
     @author  EvanV
     @licence GPL
     @version 1.02
-    @date    09/01/2025
+    @date    14-01-2025
     */
 // ----- Configuration
 //Set microcontroller required
@@ -35,7 +36,7 @@ This version is compatible will all version of GCBASIC as this demonstration use
 
             ------------PORTC----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    ----TX------SDA-SCL---------------
+    IO:    -----TX-----SDA-SCL---------------
     IO:    ---------------------------------
 
             ------------PORTD----------------
@@ -115,126 +116,66 @@ This version is compatible will all version of GCBASIC as this demonstration use
 'Main program commences here.. everything before this is setup for the board.
 
 #INCLUDE <glcd.h>
-#DEFINE GLCD_TYPE GLCD_TYPE_SSD1306
-#DEFINE GLCD_I2C_Address 0x78
-
-//! Unomment to enable version tracking
-// #INCLUDE "GCBversionnumber.cnt"
-
-' ----- Define variables
+#DEFINE GLCD_TYPE           GLCD_TYPE_SSD1306
+#DEFINE GLCD_I2C_Address    0x78
+#DEFINE GLCD_PROTECTOVERRUN
 
 'These constants allow you to change the GLCD memory usage.
 'We have set this demonstration to use only 128bytes of RAM for GLCD operations.
-// #DEFINE GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+#DEFINE GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
 // #DEFINE GLCD_TYPE_SSD1306_CHARACTER_MODE_ONLY
-#DEFINE GLCD_PROTECTOVERRUN
 
-Dim BYTENUMBER, CCOUNT As Byte
+//! Include a BMP file.  This will automatically convert to a table called ANOBIUMFULL
+#INCLUDE "ANOBIUMFULL.BMP"
 
-CCount = 0
-Dim longNumber As Long
-' max value = 4294967290
-longNumber = 0
-Dim wordNumber, adcval, ldrval As Word
-Dim outstring As String
-wordNumber = 0
-byteNumber = 0
+    Dim lengthofpicture, ram_index as word
+    Dim bytenumber, widthofpicture, heightofpicture, orgcharlocx, currcharval, firstpass, charlocy, currcharrow, charlocx, ccount as Byte
 
-// ----- Main program
-
-#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+    
+    GLCDCLS
     GLCD_Open_PageTransaction 0,7
-#ENDIF
-
-        GLCDPrint 0, 0,   "GCBASIC"
-        GLCDPrint (0, 16, "Anobium 2025")
-        GLCDPrint (76, 16, GLCD_WIDTH )
-        GLCDPrint (96, 16, "*" )
-        GLCDPrint (104, 16, GLCD_HEIGHT )
-
-#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+        GLCDPrint 0,0, "About to load BMP"
     GLCD_Close_PageTransaction
-#ENDIF
+    Wait 4 s
 
-Wait 3 s
-GLCDCLS
+    // Display a BMP file
+    // Add your own case statement here to handle multiple BMPs, you just  need the variables to be defined
+    ReadTable AnobiumFull, 0, lengthofpicture
+    ReadTable AnobiumFull, 1, widthofpicture
+    ReadTable AnobiumFull, 2, heightofpicture
+    lengthofpicture =  heightofpicture / 8
+    lengthofpicture = [word]lengthofpicture * widthofpicture
 
-#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
-    GLCD_Open_PageTransaction 0, 7
-#ENDIF
+     // For BMP that fit the display simple write the data to the screen
+    GLCD_Open_PageTransaction 0,7
 
-        GLCDPrint 0, 0,   "Version 1.xx.xx"
+        CharLocX = 0                      // specify X pos for BMP
+        CharLocY = 0                      // specify Y pos for BMP.  For buffer any valid Y, for non-buffered 0,8,16, 24 etc...
+        OrgCharLocX = CharLocX             // specify X orginisal X pos
+        firstpass = true                   // specify this is the first pass
 
-#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
-    GLCDPrint (0, 16, "LM GLCD MODE")
-#ENDIF
+        for  ram_index =  3 to lengthofpicture + 3         ; start at third byte and finish at the end
 
-#IFNDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
-    GLCDPrint (0, 16, "FULL GLCD MODE")
-#ENDIF
+                // Add your own case statement here to handle multiple BMPs, you just  need set CurrCharVal to the data value
+                    ReadTable AnobiumFull,  ( ram_index ), CurrCharVal // read data
 
+                    if ( ( ram_index - 3 ) % widthofpicture ) = 0  and firstpass = false then    // change position for new line of data
+                        CharLocY = CharLocY + 8
+                        CharLocX = OrgCharLocX
+                    end if
 
-#IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+                            For CurrCharRow = 0 to 7
+                                if ( CharLocY + CurrCharRow < GLCD_HEIGHT ) and ( CharLocX < GLCD_WIDTH ) then
+                                        If CurrCharVal.0 = 0 Then
+                                            PSet CharLocX , CharLocY + CurrCharRow, GLCDBackground
+                                        Else
+                                            PSet CharLocX , CharLocY + CurrCharRow, GLCDForeground
+                                        End If
+                                end if
+                                Rotate CurrCharVal Right
+                            Next
+
+                    firstpass = false                                         // now this is NOT the first pass
+                    CharLocX++                                                // increment the X pos
+        next
     GLCD_Close_PageTransaction
-#ENDIF
-
-Wait 3 s
-GLCDCLS
-
-
-Do Forever
-
-    For CCount = 31 To 127
-
-        ' Prepare a string
-        outString = Str( CCount )
-        adcval = ReadAD ( ANA0 )
-
-        ' Prepare the static components of the screen
-        #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
-            GLCD_Open_PageTransaction 0,7
-        #ENDIF
-
-        ' Print some text
-        GLCDPrint ( 1,   1, "PrintStr")
-        ' Print some more text
-        GLCDPrint ( 64,  1, "@")
-        ' Print chip speed
-        GLCDPrint ( 72,  1, ChipMHz)
-        ' Print some text
-        GLCDPrint ( 86, 1, "Mhz")
-        ' Draw some text
-        GLCDDrawString( 1,11,"DrawStr")
-        ' Draw a box
-        Box 0,0,GLCD_WIDTH-1, GLCD_HEIGHT-1
-        ' Draw a box
-        Box GLCD_WIDTH-5, GLCD_HEIGHT-5,GLCD_WIDTH-1, GLCD_HEIGHT-1
-        ' Draw a circle
-        Circle( 44,24,5)
-        ' Draw a line
-        Line 0,GLCD_HEIGHT-1,44,19
-
-        GLCDPrint ( 75 ,  20,  "ADC:"+Pad(Str(adcval),4 ) )
-
-        ' Draw a Box
-        Box (3,24,6,27)
-
-        ' Draw a string
-        GLCDDrawString(44, 11, CHR(CCount)+"="+Pad(outString,3) )
-
-        Ellipse 118, 6, 7, 4
-        If adcval > 127 Then
-            FilledEllipse 118, 6, 5, 2
-        Else
-            FilledEllipse 118, 6, 5, 2, GLCDBackground
-        End If
-
-        #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
-            GLCD_Close_PageTransaction
-        #ENDIF
-
-        longNumber = longNumber + 7
-
-    Next
-Loop
-End

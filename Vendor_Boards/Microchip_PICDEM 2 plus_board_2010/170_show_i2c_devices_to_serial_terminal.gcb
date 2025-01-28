@@ -34,7 +34,7 @@
 
             ------------PORTC----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    ----TX---------------------------
+    IO:    -----TX-----SDA-SCL---------------
     IO:    ---------------------------------
 
             ------------PORTD----------------
@@ -97,12 +97,7 @@
     #DEFINE LCD_DB7     PORTD.3
 
     //! Required for OCULAR LCD driver
-    #DEFINE LCD_POWER   PORTD.7
-
-    #DEFINE USART_BAUD_RATE 9600
-    #DEFINE USART_TX_BLOCKING
-    #DEFINE USART_DELAY OFF
-    
+    #DEFINE LCD_POWER   PORTD.7   
     
 // Define I2C settings
     #DEFINE HI2C_DATA       PORTC.4

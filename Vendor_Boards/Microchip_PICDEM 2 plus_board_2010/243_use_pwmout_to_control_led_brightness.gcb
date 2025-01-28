@@ -119,6 +119,7 @@
         // cycle parameter ( the third parameter ) is a purely arbitrary value as the loop will maintain a relatively constant PWM
         // This will pulse the IO at a max 1.78~kHz
         PWMOut 1, 127, 4
+        wait 3 ms
     
     loop
 

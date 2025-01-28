@@ -115,16 +115,3 @@ Print "GCBASIC"
 Locate 1,1
 Print "Anobium 2025"
 
-#DEFINE BIT0 0
-#DEFINE BIT1 1
-#DEFINE BIT2 2
-#DEFINE BIT3 3
-
-Dim Leds As Byte
-
-Do
-
-    Leds = 1<<BIT1 or(1<<BIT2)
-    PORTB = Leds
-
-Loop

@@ -113,21 +113,21 @@ Dim TargetChip As String
 TargetChip = "16F1937"
 
 If Trim( UCase( TargetChip ) )  <> ChipNameStr Then
-    HSerPrint "Wrong Microcontroller program intended for " + TargetChip
-    HSerPrintCRLF
-    HSerPrint "The Microcontroller is a " + ChipNameStr
-    HSerPrintCRLF
-    Wait While TRUE
+        HSerPrint "Wrong Microcontroller program intended for " + TargetChip
+        HSerPrintCRLF
+        HSerPrint "The Microcontroller is a " + ChipNameStr
+        HSerPrintCRLF
+        Wait While TRUE
 Else
-    HSerPrint "The Microcontroller is correct - program intended for the " + ChipNameStr
-    HSerPrintCRLF
-    Wait While TRUE
+        HSerPrint "The Microcontroller is correct - program intended for the "
+        HSerPrint ChipNameStr
+        HSerPrintCRLF
+        Wait While TRUE
 End If
 
 
 
-
-
+Wait 100 ms 
 End
 
 // ----- Support methods.  Subroutines and Functions

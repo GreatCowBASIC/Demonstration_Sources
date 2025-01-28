@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Compilation Report</title>
+</head>
+<body>
+<h1>Compilation Report</h1>
+<p>Compiler Version (YYYY-MM-DD): 2025.01.21 (Windows 64 bit) : Build 1460)</p>
+<h2>Compilation time</h2>
+<p> (Compile time: 3.875 seconds)</p>
+<p> (Assembly time: 0.375 seconds)</p>
+<p> (Download time: 7.125 seconds)</p>
+<p> (Total time: 11.375 seconds)</p>
+<h2>Chip resource usage:</h2>
+<p>Chip Model: 18F47K42</p>
+<p>Program Memory: 2454/65536 words (3.74%)</p>
+<p>RAM: 151/8192 bytes (1.84%)</p>
+<p> OSC: HFINTOSC_1MHZ, 64Mhz (Internal oscillator)</p>
+<h2>RAM Allocation</h2>
+<table border="1">
+</table>
+<h2>Subroutines</h2>
+<table border="1">
+<tr><th>Name</th><th>Code Size (lines)</th><th>Compiled Size (words)</th><th>Outgoing calls</th></tr>
+<tr><td>Main</td><td>86</td><td>395</td><td>INITGLCD_KS0108(24), SYSREADSTRING(9), SYSCOMPEQUAL32(1), ISRHANDLER(1), Delay_S(1), GLCDPRINT(4), HSERPRINT(1), DS3231_ENABLESQW(1), DS3231_SETSQW(1), DS1307_ENABLE(1), DS1307_SETHOURMODE(1), DS1307_READHOURMODE(1), DS1307_READDATE(1), GLCDCLS_KS0108(1), INITI2C(32), I2CSTOP(1), I2CSEND(1), I2CSTART(1), GLCDPRINT(8), INITPPS(111), INITSYS(113)</td></tr>
+<tr><td>INITPPS</td><td>2</td><td>6</td><td></td></tr>
+<tr><td>ISRHANDLER</td><td>10</td><td>34</td><td>HSERSEND(2)</td></tr>
+<tr><td>DECTOBCD</td><td>1</td><td>23</td><td>SYSDIVSUB(2)</td></tr>
+<tr><td>BCDTODEC</td><td>1</td><td>23</td><td>SYSDIVSUB(2)</td></tr>
+<tr><td>DS1307_ENABLE</td><td>38</td><td>43</td><td>I2CSTOP(1), I2CRECEIVE(1), I2CSEND(6), I2CSTART(3)</td></tr>
+<tr><td>DS1307_READDATE</td><td>34</td><td>62</td><td>I2CSTOP(1), BCDTODEC(4), I2CRECEIVE(4), I2CRESTART(1), I2CSEND(3), I2CSTART(1)</td></tr>
+<tr><td>DS1307_SETHOURMODE</td><td>72</td><td>101</td><td>I2CSTOP(1), DECTOBCD(3), BCDTODEC(2), I2CRECEIVE(1), I2CSEND(6), I2CSTART(3)</td></tr>
+<tr><td>DS1307_READHOURMODE</td><td>30</td><td>33</td><td>I2CSTOP(1), I2CRECEIVE(1), I2CSEND(3), I2CSTART(2)</td></tr>
+<tr><td>DS3231_SETSQW</td><td>64</td><td>75</td><td>I2CSTOP(2), I2CRECEIVE(1), I2CSEND(6), I2CSTART(3)</td></tr>
+<tr><td>DS3231_ENABLESQW</td><td>38</td><td>43</td><td>I2CSTOP(2), I2CRECEIVE(1), I2CSEND(6), I2CSTART(3)</td></tr>
+<tr><td>GLCDPRINT</td><td>19</td><td>73</td><td>GLCDDRAWCHAR(1)</td></tr>
+<tr><td>GLCDPRINT</td><td>22</td><td>114</td><td>SYSDIVSUB32(1), SYSCOMPEQUAL32(1), GLCDDRAWCHAR(1)</td></tr>
+<tr><td>GLCDDRAWCHAR</td><td>107</td><td>226</td><td>SYSCOMPLESSTHAN(2), SYSCOMPEQUAL16(1), PSET_KS0108(3)</td></tr>
+<tr><td>INITGLCD_KS0108</td><td>38</td><td>45</td><td>Delay_MS(2), GLCDCLS_KS0108(1), GLCDWRITEBYTE_KS0108(2)</td></tr>
+<tr><td>GLCDCLS_KS0108</td><td>39</td><td>46</td><td>GLCDWRITEBYTE_KS0108(3)</td></tr>
+<tr><td>PSET_KS0108</td><td>68</td><td>96</td><td>SYSDIVSUB(1), GLCDREADBYTE_KS0108(2), GLCDWRITEBYTE_KS0108(4)</td></tr>
+<tr><td>GLCDWRITEBYTE_KS0108</td><td>58</td><td>43</td><td>GLCDREADBYTE_KS0108(1)</td></tr>
+<tr><td>GLCDREADBYTE_KS0108</td><td>21</td><td>46</td><td></td></tr>
+<tr><td>INITSYS</td><td>1146</td><td>31</td><td></td></tr>
+<tr><td>SYSREADSTRING</td><td>114</td><td>24</td><td></td></tr>
+<tr><td>SYSDIVSUB</td><td>48</td><td>22</td><td></td></tr>
+<tr><td>SYSDIVSUB32</td><td>40</td><td>94</td><td>SYSCOMPEQUAL32(1)</td></tr>
+<tr><td>SYSCOMPEQUAL16</td><td>34</td><td>9</td><td></td></tr>
+<tr><td>SYSCOMPEQUAL32</td><td>52</td><td>15</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHAN</td><td>23</td><td>5</td><td></td></tr>
+<tr><td>INITUSART</td><td>399</td><td>13</td><td></td></tr>
+<tr><td>HSERSEND</td><td>77</td><td>9</td><td></td></tr>
+<tr><td>HSERSEND</td><td>347</td><td>9</td><td></td></tr>
+<tr><td>HSERPRINT</td><td>42</td><td>37</td><td>HSERSEND(1)</td></tr>
+<tr><td>INITI2C</td><td>8</td><td>4</td><td></td></tr>
+<tr><td>I2CSTART</td><td>34</td><td>21</td><td></td></tr>
+<tr><td>I2CSTOP</td><td>19</td><td>26</td><td></td></tr>
+<tr><td>I2CRESTART</td><td>1</td><td>2</td><td>I2CSTART(1)</td></tr>
+<tr><td>I2CSEND</td><td>127</td><td>83</td><td></td></tr>
+<tr><td>I2CRECEIVE</td><td>116</td><td>65</td><td></td></tr>
+<tr><td>Delay_MS</td><td>0</td><td>18</td><td></td></tr>
+<tr><td>Delay_S</td><td>0</td><td>10</td><td>Delay_MS(1)</td></tr>
+<tr><td>SysStringTables</td><td>0</td><td>44</td><td></td></tr>
+<tr><td>GLCDCHARCOL3</td><td>0</td><td>74</td><td></td></tr>
+<tr><td>GLCDCHARCOL4</td><td>0</td><td>74</td><td></td></tr>
+<tr><td>GLCDCHARCOL5</td><td>0</td><td>74</td><td></td></tr>
+<tr><td>GLCDCHARCOL6</td><td>0</td><td>74</td><td></td></tr>
+<tr><td>GLCDCHARCOL7</td><td>0</td><td>74</td><td></td></tr>
+<tr><td>INTERRUPT</td><td>0</td><td>16</td><td></td></tr>
+</table>
+</body>
+</html>

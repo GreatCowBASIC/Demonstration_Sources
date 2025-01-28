@@ -33,7 +33,7 @@ You can define your own in the sprite tables. Each table is 8 pixles vertical - 
 
             ------------PORTC----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    -----TX-----SDA-SCK---------------
+    IO:    -----TX-----SDA-SCL---------------
     IO:    ---------------------------------
 
             ------------PORTD----------------
@@ -141,7 +141,7 @@ You can define your own in the sprite tables. Each table is 8 pixles vertical - 
     #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
         GLCD_Open_PageTransaction 0,7
     #ENDIF
-        Box 0,0,127,63
+
     #IFDEF GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
         GLCD_Close_PageTransaction
     #ENDIF

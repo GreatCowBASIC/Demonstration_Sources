@@ -41,7 +41,7 @@ IO:    ---------------------------------
 
         ------------PORTD----------------
 Bit#:  -7---6---5---4---3---2---1---0---
-IO:    PWR-EN--RW--RS--DB7-DB6-DB5-DB4--
+IO:    ---------------------------------
 IO:    ---------------------------------
 */
 
@@ -51,7 +51,7 @@ IO:    ---------------------------------
 #DEFINE LEDD2 PORTB.2
 #DEFINE LEDD3 PORTB.3
 
-#DEFINE LEDPORT LATB
+#DEFINE LEDPORT PORTB
 
 Dir     LEDD0 Out
 Dir     LEDD1 Out
@@ -66,8 +66,8 @@ Dir POTENTIOMETER In
 //Main program commences here.. everything before this is setup for the board.
 
   //A word variable has the  range of 0 to 65535
-    Dim ADCVal As Word
-    Dim LEDportState as Byte
+Dim ADCVal As Word
+Dim LEDportState as Byte
 
   // Set one bit of the port on, where 1 equates to ON
     LEDportState = 0b10000
@@ -75,11 +75,12 @@ Dir POTENTIOMETER In
     Do
 
         //ReadAD10 can return values of 0 to 1023 (max)
-        ADCVal = ReadAD10 ( ANA0 )  
-        ADCVal = Scale ( ADCVal, 0, 1023, 30, 500 )
+        ADCVal = ReadAD10 ( AN0 )  
+        ADCVal = Scale ( ADCVal, 0, 1023, 100, 500 )
 
         //Wait for the number of milliseconds
         Wait ADCVal ms
+        
         //! If ADCVal > 0 Then Wait ADCVal ms
         
         // Clear the Carry Register

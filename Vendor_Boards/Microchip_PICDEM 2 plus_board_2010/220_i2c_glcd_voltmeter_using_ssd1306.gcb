@@ -34,7 +34,7 @@ To change the analogue port change the ADCChannelSelected constant
 
             ------------PORTC----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    -----TX-----SDA-SCK---------------
+    IO:    -----TX-----SDA-SCL---------------
     IO:    ---------------------------------
 
             ------------PORTD----------------

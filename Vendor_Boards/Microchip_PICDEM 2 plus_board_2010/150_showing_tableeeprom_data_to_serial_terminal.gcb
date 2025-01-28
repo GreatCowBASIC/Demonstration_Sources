@@ -93,13 +93,6 @@
 
     //! Required for OCULAR LCD driver
     #DEFINE LCD_POWER   PORTD.7
-
-    #DEFINE USART_BAUD_RATE 9600
-    #DEFINE USART_TX_BLOCKING
-    #DEFINE USART_DELAY OFF
-    
-    
-    
     
 
 // *****************************************************************************************************

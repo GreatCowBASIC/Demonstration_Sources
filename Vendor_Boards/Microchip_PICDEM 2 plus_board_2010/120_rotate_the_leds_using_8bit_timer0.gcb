@@ -125,7 +125,7 @@
     StartTimer 0
 
     'Every 10 msec, we will count 100 to make 1 second
-    SetTimer ( 0 , 0x87  )
+    SetTimer ( 0 , 100  )
 
     'we will use this to count the number of times the event happens
     Dim TimerCounter As Byte
@@ -150,7 +150,7 @@ Do
     TMR0IF = 0
 
     ' Set the Timer start value
-    SetTimer ( 0 , 0x87  )
+    SetTimer ( 0 , 100  )
 
 
     TimerCounter = TimerCounter + 1

@@ -29,7 +29,7 @@ This the basic test - set the LEDs on
 
             ------------PORTC----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    ---------------------------------
+    IO:    ----TX---------------------------
     IO:    ---------------------------------
 
             ------------PORTD----------------
@@ -68,24 +68,21 @@ This the basic test - set the LEDs on
     Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
 
     // Setup LCD Parameters
-    #DEFINE LCD_IO 4
-    //! Specify explicit OCULAR_OM1614 support!!
-    #DEFINE LCD_OCULAR_OM1614
-    //! Required for OCULAR LCD driver
-    #DEFINE LCD_POWER   PORTD.7
+        #DEFINE LCD_IO 4
+        //! Specify explicit OCULAR_OM1614 support!!
+        #DEFINE LCD_OCULAR_OM1614
+        //! Required for OCULAR LCD driver
+        #DEFINE LCD_POWER   PORTD.7
 
-    // Setup LCD Parameters
-    #DEFINE LCD_IO 4
+        // Define LCD Hardware settings
+        #DEFINE LCD_RS      PORTD.4
+        #DEFINE LCD_RW      PORTD.5
+        #DEFINE LCD_Enable  PORTD.6
 
-    // Define LCD Hardware settings
-    #DEFINE LCD_RS      PORTD.4
-    #DEFINE LCD_RW      PORTD.5
-    #DEFINE LCD_Enable  PORTD.6
-
-    #DEFINE LCD_DB4     PORTD.0
-    #DEFINE LCD_DB5     PORTD.1
-    #DEFINE LCD_DB6     PORTD.2
-    #DEFINE LCD_DB7     PORTD.3
+        #DEFINE LCD_DB4     PORTD.0
+        #DEFINE LCD_DB5     PORTD.1
+        #DEFINE LCD_DB6     PORTD.2
+        #DEFINE LCD_DB7     PORTD.3
 
 
 //*****************************************************************************************************

@@ -102,7 +102,7 @@ Do
     // Manage the direction
         If  funcKeyPressed() = TRUE Then
             //  change the direction
-            direction = !direction
+            direction = NOT direction
         End If
 
     //Set the LEDs

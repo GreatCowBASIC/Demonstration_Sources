@@ -38,7 +38,7 @@
 
     ------------------PORTC-----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    ----TX--SDO-----SCK-RST--CS--DC--
+    IO:    ---------------------------------
     ---------------------------------------- 
 
             ------------PORTD----------------
@@ -114,8 +114,8 @@
 
 /* Interrupt-on-change enabled on the IOCx pin for a negative-going edge. Associated Status bit 
     and interrupt flag will be set upon detecting an edge. */
-    IOCBP = 0x01
-    IOCBN = 0x00
+    IOCBP = 0x00
+    IOCBN = 0x01
     IOCBF = 0x00
 
     DIR INT0 IN

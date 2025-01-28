@@ -120,7 +120,7 @@
     #DEFINE GLCD_RESET  portC.2
 
 
-    //! Uncomment out the next line... and, enable or disable the PPS!!!
+    //! Uncomment out the next line... and, enable or disable the hardware SPI!!!
     #DEFINE SSD1331_HardwareSPI    ' remove/comment out if you want to use software SPI
     #DEFINE HWSPIClockMode 1          ' specify mode 1 for this GLCD device [0/1/2/3] 
 //  ********************** DEMO REALLY STARTS HERE ************************************************
