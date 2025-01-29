@@ -22,7 +22,7 @@
 DIR LED1 OUT
 
 do
-    LED1 = !LED1
+    LED1 = LED1 XOR 1
     Wait 1 s
 loop
 
