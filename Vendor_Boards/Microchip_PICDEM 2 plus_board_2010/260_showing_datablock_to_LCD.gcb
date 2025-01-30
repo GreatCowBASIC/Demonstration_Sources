@@ -94,25 +94,25 @@
 '*****************************************************************************************************
 // Main program commences here.. everything before this is setup for the board.
 
+#DEFINE  SYSDEFAULTCONCATSTRING  8
 Wait 2 s
 
-#DEFINE  SYSDEFAULTCONCATSTRING  8
-
-Dim offset as Byte
-Dim myDataWord as Word
-For offset = 0 to 6 Step 1
-    //! Addressing a memory address, or, label address can be achieved by using the @ prefix.    
-    //! This will return the address of the variable ( @ applies to table data and any data block).
-    ProgramRead (( @myDataBlock1  + offset ), myDataWord)
-    CLS
-    Print "Address: "
-    Print WordToHex( @myDataBlock1  + offset )
-    Locate 1,0
-    Print "0x"+WordToHex( myDataWord)
+    Dim offset as Byte
+    Dim myDataWord as Word
+    For offset = 0 to 6 Step 1
+        //! Addressing a memory address, or, label address can be achieved by using the @ prefix.    
+        //! This will return the address of the variable ( @ applies to table data and any data block).
+        ProgramRead (( @myDataBlock1  + offset ), myDataWord)
+        CLS
+        Print "Address: "
+        Print WordToHex( @myDataBlock1  + offset )
+        Locate 1,0
+        Print "0x"+WordToHex( myDataWord)
+        Wait 3 s
+    Next
     Wait 3 s
-Next
-Locate 1,0
-Print "End"
+    Locate 1,0
+    Print "End   "
 
 End
 

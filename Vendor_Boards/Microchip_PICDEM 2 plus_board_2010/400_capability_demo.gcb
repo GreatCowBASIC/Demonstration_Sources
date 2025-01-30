@@ -25,7 +25,7 @@ For the LCD connection - please refer to the program.
             ------------PORTB----------------
     Bit#:  -7---6---5---4---3---2---1---0---
     IO:    ----------------LED-LED-LED-LED--
-    IO:    ---------------------------------
+    IO:    --------------------BZ-----------
 
     ------------------PORTC-----------------
     Bit#:  -7---6---5---4---3---2---1---0---
@@ -64,9 +64,14 @@ For the LCD connection - please refer to the program.
     //This is the PORTA.0 port
     Dir POTENTIOMETER In
 
-    #DEFINE SWITCHIN      PORTA.4
-    Dir     SWITCHIN      In
-    #DEFINE DOWN          1
+    #DEFINE SW2      PORTA.4
+    Dir     SW2      In
+
+    #DEFINE SW3      PORTB.0
+    Dir     SW3      In
+
+    #DEFINE SW_DOWN     0        
+    #DEFINE SW_UP       1
 
     #DEFINE RSTBUTTON     PORTE.3
     Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
@@ -94,24 +99,254 @@ For the LCD connection - please refer to the program.
     //! Required for OCULAR LCD driver
     #DEFINE LCD_POWER   PORTD.7
 
-    #DEFINE USART_BAUD_RATE 9600
-    #DEFINE USART_TX_BLOCKING
-    #DEFINE USART_DELAY OFF  
+    #DEFINE SOUNDOUT PORTC.2
 
 '*****************************************************************************************************
 // Main program commences here.. everything before this is setup for the board.
 
+    #DEFINE  SYSDEFAULTCONCATSTRING  8
 
-Locate 0,3 
-Print "Microchip"
-Locate 1,1
-Print "PICDEM 2 PLUS"
+    // Init the 31k external clock
+    InitClock
 
-wait 1 s
+    // Create a varaible
+    Dim DemoSelect as Byte
+    DemoSelect = 1
 
-CLS
-Locate 0,4
-Print "GCBASIC"
-Locate 1,1
-Print "Anobium 2025"
+    // Control the LCD cursor
+    LCDCursor CURSOROFF 
+
+    Locate 0,3 
+    Print "Microchip"
+    Locate 1,1
+    Print "PICDEM 2 PLUS"
+    SWPressed
+
+    CLS
+    Locate 0,2
+    Print "GCBASIC 2025"
+    Locate 1,4
+    Print "Anobium"
+    SWPressed
+
+        // Main loop
+        Do
+            CLS
+            If DemoSelect = 1 Then
+                Print "Voltmeter"
+            Else
+                Print "Real-Time Clock"
+            End If
+
+            Locate 1,0
+            Print "SW2-Next SW3-Now" 
+            
+            SWPressed
+
+        Loop
+        End
+
+    Sub SWPressed
+
+        // Check for button press 
+
+        // Ensure the ADC operations not active... think would stop digital checks of switches
+        // ADCON1 = 255
+
+        //! Potentially waits 3s but will exit when a button is pressed
+        Repeat 120
+            If SW3 = SW_DOWN Then
+
+                ShortTone 127, 50
+
+                ' select demo and run
+                If DemoSelect = 1 then
+                    ShowVoltmeter
+                Else
+                    ShowClock
+                End If
+
+                ShortTone 127, 50
+                Exit Sub
+
+            End If
+            
+            If SW2 = SW_DOWN Then
+
+                ShortTone 127, 50
+
+                ' change demo
+                If DemoSelect = 1 Then
+                    DemoSelect = 0
+                Else
+                    DemoSelect = 1
+                End If
+
+                ShortTone 127, 50
+                Exit Sub
+
+            End If
+
+            Wait 25 ms
+        End Repeat
+
+        End Sub
+
+    Sub ShowVoltmeter
+
+        // Read AN0 and display results
+        Dim VoltsRead as Word
+        Dim VoltsInteger, VoltsDecimal
+        Dim VoltsString as String * 7  
+
+        // ADCON1 = 255
+
+        Wait While SW3 = SW_DOWN
+
+        CLS
+        Print "Voltmeter"
+        Locate 1,0
+        Print "SW3-Exit Test"
+
+        Do
+
+            VoltsRead = Scale( ReadAD( AN0 ), 0, 255, 0, 500 )
+            VoltsInteger = VoltsRead / 100
+            VoltsDecimal = VoltsRead Mod 100
+
+            Locate 0,0
+            Print "Volts:" 
+            Print VoltsInteger
+            Print "."
+            Print Left("0"+Str(VoltsDecimal),2)
+            // Print " ["
+            // Print Right("00" + IntegerToString(VoltsRead),3 )
+            // Print "]"
+            
+            pulseout PORTA.2, 100 ms
+
+            // Restore register
+            // ADCON1 = 255
+            If SW3 = SW_DOWN Then
+                Wait While SW3 = SW_DOWN
+                Exit Sub
+            End If
+
+        Loop
+
+        End Sub
+
+    Sub InitClock
+
+        // Initialise the clock
+
+        Dim Secs, Mins, Hours as Byte
+        
+        // Commence Clock
+        //T1OSCEN enabled; nT1SYNC synchronize; T1CKPS 1:1; TMR1CS External; TMR1ON enabled; 
+        T1CON = 0x89
+
+        Secs = 0
+        Mins = 0
+        Hours = 0
+        TMR1L = 0
+
+        End Sub
+
+    Sub ShowClock
+            
+        // Show clock and increment seconds
+
+        // ADCON1 = 255
+        Wait While SW3 = SW_DOWN
+
+        CLS
+        Locate 1,0
+        Print "SW2-Set SW3-Menu"
+        
+        TMR1L = 0
+
+        Do     
+
+            Locate 0,0
+            Print Right( "0" + Str(Hours), 2)
+            Print ":"
+            Print Right( "0" +Str(Mins),2)
+            Print ":"
+            Print Right( "0" +Str(Secs),2)
+            
+            TMR1IF = 0
+            TMR1H += 0x80
+            Wait while TMR1IF = 0
+            
+            ShortTone 75, 50
+
+            Secs++
+            If Secs = 60 then 
+                Mins++
+                Secs = 0
+                If Mins = 60 Then 
+                    Hours++
+                    Mins = 0
+                    If Hours = 24 then Hours = 0
+                End If
+            End If
+
+            If SW3 = SW_DOWN Then
+                Wait While SW3 = SW_DOWN
+                Exit Sub
+            End If
+
+            If SW2 = SW_DOWN Then
+                Wait While SW2 = SW_DOWN
+                SetClock
+            End If
+
+        Loop
+
+        End Sub
+
+    Sub SetClock
+
+        // Set the clock
+        CLS
+        Locate 1,0
+        Print "SW2 --  SW3 ++"
+
+        Secs = 0
+
+        Do     
+
+            Locate 0,0
+            Print Right( "0" + Str(Hours), 2)
+            Print ":"
+            Print Right( "0" +Str(Mins),2)
+            Print ":"
+            Print Right( "0" +Str(Secs),2)
+
+            If SW3 = SW_DOWN Then Mins++
+            If SW2 = SW_DOWN Then Mins--
+
+            Mins++
+            If Mins = 60 Then 
+                Hours++
+                Mins = 0
+                If Hours = 24 then Hours = 0
+            End If
+
+            Mins--
+            If Mins = 255 Then 
+                Hours--
+                Mins = 59
+                If Hours = 255 then Hours = 23
+            End If
+
+            If SW3 = SW_DOWN and SW2 = SW_DOWN Then
+                Wait While SW3 = SW_DOWN
+                Exit Sub
+            End If
+
+        Loop
+
+        End Sub
 
