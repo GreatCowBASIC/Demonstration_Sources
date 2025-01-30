@@ -29,7 +29,7 @@ For the LCD connection - please refer to the program.
 
     ------------------PORTC-----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    ----TX---------------------------
+    IO:    -----TX-----SDA-SCL--------------
     ---------------------------------------- 
 
             ------------PORTD----------------
@@ -101,6 +101,17 @@ For the LCD connection - please refer to the program.
 
     #DEFINE SOUNDOUT PORTC.2
 
+    // Define I2C settings
+    #DEFINE HI2C_DATA       PORTC.4
+    #DEFINE HI2C_CLOCK      PORTC.3
+    #DEFINE HI2C_BAUD_RATE  100
+    HI2CMode (Master)
+
+    // Setup temperature sensor address
+    #DEFINE I2CTEMPSENSOR 0x9A      
+    Dim temperatureVal as Byte
+    
+
 '*****************************************************************************************************
 // Main program commences here.. everything before this is setup for the board.
 
@@ -132,10 +143,15 @@ For the LCD connection - please refer to the program.
         // Main loop
         Do
             CLS
-            If DemoSelect = 1 Then
+
+            ShowI2CTemperature
+
+            Locate 0,0
+
+            If DemoSelect = 1 Then    
                 Print "Voltmeter"
             Else
-                Print "Real-Time Clock"
+                Print "Clock"
             End If
 
             Locate 1,0
@@ -158,6 +174,7 @@ For the LCD connection - please refer to the program.
             If SW3 = SW_DOWN Then
 
                 ShortTone 127, 50
+                Wait While SW3 = SW_DOWN  
 
                 ' select demo and run
                 If DemoSelect = 1 then
@@ -174,6 +191,7 @@ For the LCD connection - please refer to the program.
             If SW2 = SW_DOWN Then
 
                 ShortTone 127, 50
+                Wait While SW2 = SW_DOWN 
 
                 ' change demo
                 If DemoSelect = 1 Then
@@ -350,3 +368,49 @@ For the LCD connection - please refer to the program.
 
         End Sub
 
+    Sub InitLCDChar
+        'Create an array to store the character until it is copied
+        Dim CharArray(8)
+
+        'Set the array to hold the character
+        'Binary has been used to improve the readability of the code, but is not essential
+        CharArray(1) = b'00001100'
+        CharArray(2) = b'00010010'
+        CharArray(3) = b'00001100'
+        CharArray(4) = b'00000000'
+        CharArray(5) = b'00000000'
+        CharArray(6) = b'00000000'
+        CharArray(7) = b'00000000'
+        CharArray(8) = b'00000000'
+
+        'Copy the character from the array to the LCD
+        LCDCreateChar 0, CharArray()
+    End Sub
+
+    Sub ShowI2CTemperature
+
+        InitLCDChar
+
+        // This routine is called to get current temperature reading
+        //            		from the TC74 on the PICDEM 2 Plus board and return the value
+        //            		to the caller as 2 BCD nibbles.
+        // In temperature data registers, each unit value represents one degree (Celsius). The value is in 2’s
+        // complement binary format such that a reading of 0000
+        // 0000b corresponds to 0°C. 
+
+        // This routine only supports positive temperatures.  You would need to add a 2's compliment routine for negative results.
+
+            HI2CStart
+            HI2CSend I2CTEMPSENSOR
+            HI2CSend 0                      // RTR 00h Read Temperature (TEMP)
+            HI2CReStart
+            HI2CSend I2CTEMPSENSOR + 1
+            HI2CReceive ( temperatureVal, NACK )
+            HI2CStop
+            
+            Locate 0,12
+            Print temperatureVal
+            LCDWriteChar 0
+            Print "C "
+
+    End Sub
