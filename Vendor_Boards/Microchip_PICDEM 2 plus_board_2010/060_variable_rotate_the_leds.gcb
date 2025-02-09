@@ -1,15 +1,14 @@
 /*
     A demonstration program for GCBASIC
     --------------------------------------------------------------------------------
-    This shows how to read the ADC converter and display the
-    a proportional delay value by changing/inverting the LEDs state.
-    The pot on the board varies the voltage coming in from the ADC.
+    This shows how to read the ADC converter and display a proportional delay value
+    by changing/inverting the LEDs state.
+    The pot on the board varies the voltage coming into the ADC.
 
     The ADC is referenced to the same Vdd as the device, which
-    is nominally is 5V.  The ADC returns the ratio of the voltage
+    is nominally 5V.  The ADC returns the ratio of the voltage
     on Pin RA0 to 5V.  The ADC has a resolution of 10 bits, with 1023
-    representing 5V and 0 representing 0V.
-
+    representing 5V and 0 representing 0V
     Rotate the potentiometer to change the LEDs displayed.
 
 
