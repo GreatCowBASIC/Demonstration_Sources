@@ -1,0 +1,76 @@
+/*
+
+
+This version uses the built-in GCBASIC ultrasonic sensor library. 
+
+Key points are:
+
+1. Uses the  `#define USxPing` and `USxEcho` format for pin definitions
+2. Uses the `USDistance()` function instead of manual pulse timing
+3. Includes error checking (the function returns 0 if there's an error)
+4. Uses the `USUnits` define to set measurement units (can be m, cm, feet, or inch)
+
+To use different units, you could change the units line to:
+
+    #define USUnits feet   ; or m, inch
+
+
+*/
+#chip 16F877A
+#option Explicit
+
+#include <srf04.h>
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
+; Define measurement units (optional, defaults to cm)
+#define USUnits cm
+
+; First sensor pins
+#define US1Ping PORTB.0    ; Trigger pin for sensor 1
+#define US1Echo PORTB.1    ; Echo pin for sensor 1
+
+; Second sensor pins
+#define US2Ping PORTB.2    ; Trigger pin for sensor 2
+#define US2Echo PORTB.3    ; Echo pin for sensor 2
+
+; Variables for storing distances
+Dim Distance1 as Word
+Dim Distance2 as Word
+
+; Main program
+Do
+    ; Read from first sensor
+    Distance1 = USDistance(1)
+    
+    ; Display reading from sensor 1
+    HSerPrint "Sensor 1: "
+    HSerPrint Distance1
+    HSerPrint " cm"
+    HSerPrintCRLF
+    
+    ; Small delay between readings
+    Wait 50 ms
+    
+    ; Read from second sensor
+    Distance2 = USDistance(2)
+    
+    ; Display reading from sensor 2
+    HSerPrint "Sensor 2: "
+    HSerPrint Distance2
+    HSerPrint " cm"
+    HSerPrintCRLF
+    
+    ; Error checking example for sensor 2
+    If Distance2 = 0 Then
+        HSerPrint "Sensor 2 error or out of range"
+        HSerPrintCRLF
+    End If
+    
+    HSerPrintCRLF
+    
+    ; Wait before next readings
+    Wait 500 ms
+Loop
