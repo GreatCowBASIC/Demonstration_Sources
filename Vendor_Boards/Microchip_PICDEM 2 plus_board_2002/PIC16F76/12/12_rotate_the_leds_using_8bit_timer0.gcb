@@ -1,0 +1,147 @@
+/*
+    This demonstration flashes an LED to show the use of an 8Bit Timer 0
+
+    Timer0 is a counter implemented in the processor. It may be used to count instruction
+    cycles or external events, that occur at or below the instruction cycle rate.
+    In the PIC18, Timer0 can be used as either an 8-bit or 16-bit counter, or timer. 
+    The mid-range core implements only an 8-bit counter.
+
+    This lesson configures Timer0 to count instruction cycles and to set a flag when it rolls
+    over. This frees up the processor to do meaningful work rather than wasting instruction
+    cycles in a timing loop.
+    Using a counter provides a convenient method of measuring time or delay loops as it
+    allows the processor to work on other tasks rather than counting instruction cycles.
+
+
+    ************************************************************************
+    @author  EvanV / HiB
+    @licence GPL
+    @version 1.1
+    @date    11-02-2025
+    */
+
+
+//Set microcontroller required
+#chip 16F76
+#option Explicit
+
+
+/*
+            ------------PORTA---------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ------------SW--------------ADC--
+    IO:    ---------------------------------
+
+            ------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    IO:    ---------------------------------
+
+            ------------PORTC----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ---------------------------------
+    IO:    ---------------------------------
+
+    */
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.4
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+
+//*****************************************************************************************************
+// Main program commences here.. everything before this is setup for the board.
+
+//! Initialise the timer.
+
+
+    //Prescaler 1:256; TMR0 Preload = 100; Actual Interrupt Time : 9.984 ms
+
+    InitTimer0 Osc, PS0_256
+
+    '   Start the Timer
+    StartTimer 0
+
+    'Every 10 msec, we will count 100 to make 1 second
+    SetTimer ( 0 , 100  )
+
+    'we will use this to count the number of times the event happens
+    Dim TimerCounter As Byte
+    TimerCounter = 0
+
+    //! Support variables
+
+        // Initialize a variable to hold the LED states
+        DIM LEDs AS BYTE
+        LEDs = 0B0001  // Start with the first LED on
+
+        // Initialize a counter for rotations
+        DIM RotateCount AS BYTE
+        RotateCount = 0
+
+
+Do
+    'wait for the event
+    Wait While TMR0IF = 0
+
+    ' Clearing Timer flag will reset event
+    TMR0IF = 0
+
+    ' Set the Timer start value
+    SetTimer ( 0 , 100  )
+
+
+    TimerCounter = TimerCounter + 1
+
+    'When at 100 we are at 1 s
+    If TimerCounter = 100 Then
+
+        //! Same code as previous demo 040
+
+        
+
+            // Output the current state to PORTB
+            PORTB = LEDs
+            
+            // Rotate the LEDs to the left
+            Rotate LEDs Left Simple
+            
+            // Increment the rotation counter
+            RotateCount = RotateCount + 1
+            
+            // Reset the LEDs after 4 rotations
+            If RotateCount >= 4 Then
+                LEDs = 0B0001  // Reset to initial state
+                RotateCount = 0  // Reset counter
+            End If
+
+        TimerCounter = 0
+
+    End If
+Loop

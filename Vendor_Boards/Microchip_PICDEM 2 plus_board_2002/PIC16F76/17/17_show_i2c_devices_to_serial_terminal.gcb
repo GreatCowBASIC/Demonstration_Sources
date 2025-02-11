@@ -1,0 +1,142 @@
+/*
+    This demonstration shows the I2C devices attached the microcontroller, this program supports the Microchip I2C module.
+
+    I2C device required a data bus and a clock bus, devices also required an input voltage and 0v.
+    I2C data bus is connected to PortC.4
+    I2C clock bus is connected to PortC.3
+    Serial output is connected, as previously, to PortC.6
+
+    Connect your IC2 devices and see the results on the serial terminal.
+
+    ************************************************************************
+    @author  EvanV / HiB
+    @licence GPL
+    @version 1.03
+    @date    11-02-2025
+    */
+// ----- Configuration
+
+//Set microcontroller required
+#chip 16F76
+#option Explicit
+
+
+/*
+            ------------PORTA---------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ------------SW--------------ADC--
+    IO:    ---------------------------------
+
+            ------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    IO:    ---------------------------------
+
+            ------------PORTC----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    -----TX-----SDA-SCL---------------
+    IO:    ---------------------------------
+
+    */
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT PORTB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.4
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+
+   
+    
+// Define I2C settings
+    #DEFINE HI2C_DATA       PORTC.4
+    #DEFINE HI2C_CLOCK      PORTC.3
+    #DEFINE HI2C_BAUD_RATE  100
+    HI2CMode (Master)
+
+    
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+
+    Dim DeviceID As Byte
+    Dim DISPLAYNEWLINE As Byte
+    Dim HI2CWaitMSSPTimeout As Byte
+    Dim DumpI2CRead as Byte
+
+    Wait 1 s
+    HserSend 255
+
+    Do
+        HSerPrintCRLF
+        HSerPrint "Hardware I2C"
+        HSerPrintCRLF 2
+
+        // Now assumes Serial Terminal is operational
+        HSerPrintCRLF
+        HSerPrint "   "
+        // Create a horizontal row of numbers
+        For DeviceID = 0 To 15
+            HSerPrint Hex(deviceID)
+            HSerPrint " "
+        Next
+
+        'Create a vertical column of numbers
+        For DeviceID = 0 to 255
+            DisplayNewLine = DeviceID % 16
+            If DisplayNewLine = 0 Then
+                HSerPrintCRLF
+                HSerPrint Hex(DeviceID)
+                If DisplayNewLine > 0 Then
+                    HSerPrint " "
+                End If
+            End If
+            HSerPrint " "
+
+            //Do an initial Start
+            HI2CStart
+            
+            // Send address
+            HI2CSend ( DeviceID )
+            
+            // Send a byte to prevent any potential read address lockup
+            HI2CSend ( 0x00 )
+            
+            // Stop the I2C
+            HI2CStop    
+
+            'Did device fail to respond?
+            If HI2CAckpollState = FALSE Then
+                HSerPrint Hex(DeviceID)
+            Else
+                HSerPrint "--"
+            End If
+
+        Next
+
+        HSerPrintCRLF 2
+        HSerPrint   "End of Search"
+        HSerPrintCRLF 2
+
+        Wait While SwitchIn = DOWN
+        
+    Loop
+
