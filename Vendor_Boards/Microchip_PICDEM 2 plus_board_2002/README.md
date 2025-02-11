@@ -1,7 +1,5 @@
 # Great-Cow-BASIC
 
-[The PIC Demo 2 2002 board](picdemplus%202002.png)
-
 
 <img src="picdemplus%202002.png" alt="The PIC Demo 2 2002 board" width="300">
 
