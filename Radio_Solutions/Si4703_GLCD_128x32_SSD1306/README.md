@@ -23,7 +23,7 @@ Follow these steps to get started with the SI4703 module:
    Connect the module to your microcontroller as follows:
    - `SDA` to microcontroller SDA pin
    - `SCL` to microcontroller SCL pin
-   - `5V0` power source
+   - `3v3` power source
    - `GND` to ground
 
 3. **Software:**
