@@ -19,12 +19,13 @@ Follow these steps to get started with the SI4703 module:
    - I²C communication support
    - Connecting wires and breadboard
 
-2. **Wiring:**
+2. **Wiring for SI4703:**
    Connect the module to your microcontroller as follows:
    - `SDA` to microcontroller SDA pin
    - `SCL` to microcontroller SCL pin
+   - `SEN` to microcontroller allocated SEN pin
+   - `RST` to microcontroller allocated RESET pin
    - `3v3` power source to SI4703
-   - `5v0` to OLED LCD and Microcontroller
    - `GND` to ground
 
 <div style="text-align: center;">
