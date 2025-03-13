@@ -27,7 +27,9 @@ Follow these steps to get started with the SI4703 module:
    - `5v0` to OLED LCD and Microcontroller
    - `GND` to ground
 
-image::Shema.png
+<div style="text-align: center;">
+  <img src="Shema.png" alt="The schema" width="300">
+</div>
 
 3. **Software:**
    - Clone this repository to your local machine.
