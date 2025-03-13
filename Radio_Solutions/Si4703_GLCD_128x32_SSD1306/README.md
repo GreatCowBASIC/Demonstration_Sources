@@ -23,8 +23,11 @@ Follow these steps to get started with the SI4703 module:
    Connect the module to your microcontroller as follows:
    - `SDA` to microcontroller SDA pin
    - `SCL` to microcontroller SCL pin
-   - `3v3` power source
+   - `3v3` power source to SI4703
+   - `5v0` to OLED LCD and Microcontroller
    - `GND` to ground
+
+image::Shema.png
 
 3. **Software:**
    - Clone this repository to your local machine.
