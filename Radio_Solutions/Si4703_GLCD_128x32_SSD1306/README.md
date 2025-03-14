@@ -32,6 +32,8 @@ Follow these steps to get started with the SI4703 module:
   <img src="demo.gif" alt="The schema" width="300">
 </div>
 
+![Alt Text](demo.gif)
+
 3. **Software:**
    - Clone this repository to your local machine.
    - Upload the provided code examples to your microcontroller.
