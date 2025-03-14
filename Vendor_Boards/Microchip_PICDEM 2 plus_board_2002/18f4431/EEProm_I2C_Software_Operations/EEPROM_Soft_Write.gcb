@@ -1,0 +1,281 @@
+// Lesson 16  I2C EEPROM verification.
+
+    /*
+    This shows how to read and write and validate that the external I2C EEPROM device is capable of storing data.
+
+    This uses the software I2C bus;as there is no hardware one on this chip.
+    The target is microchip's PICDEM2+ board c2002,using a PIC 18F4431 microcontroller.
+
+    The demo writes an array to the external I2C EEPROM device, then, the array elements are set to a specific value, then
+    the array is repopulated with the external I2C EEPROM device data - the array is then validated. 
+
+    The LCD uses a 4-bit bus for connectivity.
+    For the new LCD connections - please refer to the program.
+
+@author 	EvanV HiB
+@licence	GPL
+@version	1.4  //new chip new board def's version 
+@date   	13.03.2025
+********************************************************************************/
+
+' ----- Configuration
+#chip 18F4431,4 
+#option Explicit
+#CONFIG MCLRE=ON
+
+/* NEW LCD layout for this display only
+
+            ------------PORTA---------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ------------SW--RS--RW---E--ADC--
+    IO:    ---------------------------------
+
+            ------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    IO:    --------------------BZ-----------
+
+    ------------------PORTC-----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    -----TX-----SDA-SCL--------------
+    ---------------------------------------- 
+
+            ------------PORTD----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------DB7-DB6-DB5-DB4-- //no power option for this display
+    IO:    ---------------------------------
+
+            ------------PORTE----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------RST---------------
+    IO:    ---------------------------------
+    */
+    
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    // Common macro and constants
+    //#DEFIINE LEDS_OFF            LED_D4=0:LED_D3=0:LED_D2=0:LED_D1=0:LED_D0=0
+    #DEFINE RUNNING             1
+    #DEFINE NOT_RUNNING         0
+  	#DEFINE Lab_I2CEEPROM       16
+
+
+	 // Variable Definitions
+        Dim labNumber as Byte:          labNumber   = 0               
+        Dim switchEvent as Byte:        switchEvent = 0
+        Dim labState as Byte:           labState = NOT_RUNNING
+        Dim btnState as Byte:           btnState = SW_NOT_PRESSED
+        Dim activeLedNum as Byte
+        Dim LabI2CState as Bit:         LabI2CState = 0
+	
+
+    #DEFINE LED_D0 PORTB.0
+    #DEFINE LED_D1 PORTB.1
+    #DEFINE LED_D2 PORTB.2
+    #DEFINE LED_D3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LED_D0 Out
+    Dir     LED_D1 Out
+    Dir     LED_D2 Out
+    Dir     LED_D3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    Dir POTENTIOMETER In
+
+    #DEFINE SW2      PORTA.4
+    Dir     SW2      In
+
+    #DEFINE SW3      PORTB.0
+    Dir     SW3      In
+
+    #DEFINE SW_PRESSED    0        
+    #DEFINE SW_NOT_PRESSED     1
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
+    // Setup LCD Parameters
+    #DEFINE LCD_IO 4
+
+   // Define new LCD Hardware settings
+    #DEFINE LCD_RS      PORTA.3
+    #DEFINE LCD_RW      PORTA.2
+    #DEFINE LCD_Enable  PORTA.1
+
+    #DEFINE LCD_DB4     PORTD.0
+    #DEFINE LCD_DB5     PORTD.1
+    #DEFINE LCD_DB6     PORTD.2
+    #DEFINE LCD_DB7     PORTD.3
+
+    #DEFINE SOUNDOUT PORTC.2
+
+    // Define I2C settings
+    #DEFINE I2C_DATA       PORTC.4
+    #DEFINE I2C_CLOCK      PORTC.3
+    #DEFINE I2C_BAUD_RATE  100
+    #DEFINE I2C_MODE master 
+
+
+     Sub checkButtonS2
+
+    if btnState = SW_NOT_PRESSED Then
+        if SW2  = 0 Then  
+            wait 100 ms
+            btnState = SW_PRESSED
+        end If
+    else if SW2  = 1 Then  
+            btnState = SW_NOT_PRESSED
+            switchEvent = 1                                                   
+    end if
+
+End Sub  
+
+    if labState = NOT_RUNNING Then
+
+        // Initialise I2C
+        // I2C pins need to be input for SSP module - this is not an option
+        Dir I2C_DATA In
+        Dir I2C_CLOCK In
+      
+
+        #ifdef USART_BAUD_RATE
+            HserPrint "I2C EEPROM"
+            HserPrintCRLF
+        #endif
+
+        CLS
+        Locate 0,0
+        Print "I2C EEPROM"
+        labState = RUNNING
+
+        // ----- Define Hardware settings
+
+        // You must check the 'eepDev' address 0x0A - 0xAF are typical.
+        // You must check the 'EEpromPageSize'. 16, 32 or 64 are typical.
+        // You must check the 'eepAddr' type. Byte or Word is valid. This is device specific.
+        // 
+        // A 24LC16B uses 0x0A (thro to 0xAF), EEpromPageSize = 16 and eepAddr as Byte
+        // A 24LC256 uses 0x0A (thro to 0xAF), EEpromPageSize = 64 and eepAddr as Word
+
+        #include <i2ceeprom.h>
+
+        #define eepDev 0xA0               // external I2C EEPROM device address
+        #define EEpromPageSize 64         
+
+        // ----- Variables
+        Dim XLOOP as Byte
+
+        Dim eepAddr as Word               // Change this type Byte or Word.
+                                          // This IS EEPROM device specific. Smaller device with 16 byte page size are typically requird 'Dim eepAddr as byte'
+                                          // Large devices will required 'Dim eepAddr as word'
+
+        Dim datarray( EEpromPageSize )
+        Dim datastring as String * 16
+        Dim dataerror as Bit
+        dataerror = FALSE
+
+        switchEvent = 0    
+    end if
+
+    if labState = RUNNING Then
+
+        ArrayOps:
+        // Write an Array
+            // Populate the initial array, the array is 10 elements long
+            datarray = 1,2,3,4,5,6,7,8,9,10
+
+            #ifdef USART_BAUD_RATE
+                HSerPrint "    Initial Array"
+                HSerPrintCRLF
+                HSerPrint "        -:"
+            #endif
+
+            for xloop = 1 to 10
+                #ifdef USART_BAUD_RATE
+                    HSerPrint datarray(xloop)
+                    if xloop < 10 then HSerPrint ","
+                #endif
+
+            next
+            #ifdef USART_BAUD_RATE
+                HSerPrintCRLF 2
+            #endif
+
+            // set EEProm start address for saving the array
+            eepAddr = 0
+            // write array
+            eeprom_wr_array( eepDev, EEpromPageSize, eepAddr , datarray(), 10 )
+
+            // populate the array with 127 as test to see if the operation populates correctly.
+            #ifdef USART_BAUD_RATE
+                HSerPrint "    Repopulate Array with #127 to ensure the EEPROM results are read correctly"
+                HSerPrintCRLF
+                HSerPrint "        -:"
+            #endif
+
+            for xloop = 1 to 10
+                datarray(xloop) = 127
+                #ifdef USART_BAUD_RATE
+                    HSerPrint datarray(xloop)
+                    if xloop < 10 then HSerPrint ","
+                #endif
+
+            next
+
+            #ifdef USART_BAUD_RATE
+                HSerPrintCRLF 2
+            #endif
+
+            // set EEProm start address for reading the array
+            eepAddr = 0
+            eeprom_rd_array( eepDev, eepAddr , datarray(), 10 )
+
+            #ifdef USART_BAUD_RATE
+                HSerPrint "    Read Array from EEProm results"
+                HSerPrintCRLF
+                HSerPrint "        -:"
+            #endif
+
+            // show results
+            for xloop = 1 to 10
+
+                #ifdef USART_BAUD_RATE
+                    HSerPrint datarray(xloop)
+                    If xloop < 10 then HSerPrint ","
+                #endif
+
+                If datarray(xloop) <> xloop Then
+                    dataerror = TRUE
+                End if
+            
+            next
+
+            #ifdef USART_BAUD_RATE
+                HSerPrintCRLF 2
+                HSerPrint "    End of array operations"
+                HSerPrintCRLF 3
+            #endif
+
+            Locate 1,0
+            If dataerror = TRUE Then
+                Print "EEPROM read error"
+            Else
+                Print "EEPROM read OK"
+            End If
+            
+            checkButtonS2   
+            Wait 2 s
+
+    end if
+
+    if switchEvent = 1 Then
+        labState = NOT_RUNNING
+    End If
+
+End Sub
