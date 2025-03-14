@@ -29,8 +29,11 @@ Follow these steps to get started with the SI4703 module:
    - `GND` to ground
 
 <div style="text-align: center;">
-  <img src="Shema.png" alt="The schema" width="300">
+  <img src="demo.mp4" alt="The schema" width="300">
 </div>
+
+
+[Watch the video](demo.mp4)
 
 3. **Software:**
    - Clone this repository to your local machine.
