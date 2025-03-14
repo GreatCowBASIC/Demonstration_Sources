@@ -28,10 +28,9 @@ Follow these steps to get started with the SI4703 module:
    - `3v3` power source to SI4703
    - `GND` to ground
 
-<video width="640" height="360" controls>
-  <source src="demo.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+<div style="text-align: center;">
+  <img src="demo.gif" alt="The schema" width="300">
+</div>
 
 3. **Software:**
    - Clone this repository to your local machine.
