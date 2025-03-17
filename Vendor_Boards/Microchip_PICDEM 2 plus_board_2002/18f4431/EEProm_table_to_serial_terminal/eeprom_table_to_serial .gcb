@@ -1,0 +1,162 @@
+/*
+    This demonstration shows the use of EEProm values created from a Table..
+
+    This will show the value of the EEPROM on the serial Terminal.
+
+    ************************************************************************
+    @author  EvanV HiB
+    @licence GPL
+    @version 1.01
+    @date    17-03-2025
+
+
+*/
+//  ----- Configuration
+
+//Set microcontroller required
+#chip 18F4431
+#option Explicit
+#CONFIG MCLRE=ON
+/*
+// NEW LCD layout for this display ONLY
+
+            ------------PORTA---------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ------------SW--RS--RW---E--ADC--
+    IO:    ---------------------------------
+
+            ------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    IO:    --------------------BZ-----------
+
+    ------------------PORTC-----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    -----TX-----SDA-SCL--------------
+    ---------------------------------------- 
+
+            ------------PORTD----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------DB7-DB6-DB5-DB4-- //no power option for this display
+    IO:    ---------------------------------
+
+            ------------PORTE----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------RST---------------
+    IO:    ---------------------------------
+    */
+
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.4
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+    // Setup LCD Parameters
+    #DEFINE LCD_IO 4
+
+    // Define LCD Hardware settings
+    #DEFINE LCD_RS      PORTD.4
+    #DEFINE LCD_RW      PORTD.5
+    #DEFINE LCD_Enable  PORTD.6
+
+    #DEFINE LCD_DB4     PORTD.0
+    #DEFINE LCD_DB5     PORTD.1
+    #DEFINE LCD_DB6     PORTD.2
+    #DEFINE LCD_DB7     PORTD.3
+    
+
+// *****************************************************************************************************
+// Main program commences here.. everything before this is setup for the board.
+
+    Wait 1 s
+
+
+    // Read EEPROM items
+    ShowEEProm()
+
+    Do
+    Loop
+
+
+    // Table of values to write to EEPROM
+    // EEPROM location is specified
+    // Subsequent locations will each store a value
+
+    EEPROM TestDataSource 0x10
+        0x01
+        0x02
+        0x03
+        0x04
+        0x05
+        0x06
+    End EEPROM
+
+    EEPROM TestDataSource2 0x16
+        0x11
+        0x12
+        0x13
+        0x14
+        0x15
+        0x16
+    End EEPROM
+
+
+Sub ShowEEProm
+
+    Dim DisplayNewLine, Outdata, Indata  As Byte
+    Dim EEPromAddress as Word
+
+    HserPrintCRLF 2
+
+    HserPrint "      "
+    For EEPromAddress = 0 To 15
+        HSerPrint Hex(EEPromAddress)
+        HSerPrint " "
+    Next
+
+    For EEPromAddress = 0 To ChipEEProm -1
+        DisplayNewLine = EEPromAddress % 16
+        If DisplayNewLine = 0 Then
+            HSerPrintCRLF
+            HSerPrint right(Hex(EEPromAddress_H),1)
+            HSerPrint Hex(EEPromAddress)
+            HSerPrint ": "
+        End If
+        HSerPrint " "
+
+        // Read EEPROM at specific address
+        Indata = 0
+        EPRead  ( EEPromAddress, Indata )
+        HSerPrint  Hex(Indata)
+
+    Next
+
+End Sub
