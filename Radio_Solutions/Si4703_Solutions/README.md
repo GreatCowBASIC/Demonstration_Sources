@@ -38,6 +38,6 @@ Follow these steps to get started with the SI4703 module:
    - There are different demos
       - GLCD
       - LCD
-      - TM1938
+      - TM1638
 
 Enjoy
