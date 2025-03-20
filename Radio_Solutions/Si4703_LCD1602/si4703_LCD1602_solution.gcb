@@ -1,0 +1,335 @@
+'''A demonstration program for GCBASIC.
+'''--------------------------------------------------------------------------------
+'***************************************************************
+' SI4703 FM Radio Tuner Module
+' Description: The si4703.h header file provides the necessary constants,
+'              configurations, and functions to interface with
+'              the SI4703 FM Radio Tuner module using GCBASIC.
+' Features:
+' - FM band support (76–108 MHz)
+' - Digital low-IF receiver
+' - Automatic frequency control (AFC)
+' - Signal strength measurement
+' - RDS/RBDS support
+' - Stereo audio output
+'***************************************************************
+'''@author    alexandr-g
+'''@license   GPL
+'''@version   1.00
+'''@date      2025-03-13
+'''********************************************************************************
+
+
+#chip mega328p, 16
+#include "si4703.h"     //local folder
+
+
+// настройки i2c
+#define HI2C_BAUD_RATE 400
+#define HI2C_DATA PORTC.4
+#define HI2C_CLOCK PORTC.5
+Dir HI2C_DATA in
+Dir HI2C_CLOCK in
+HI2CMode Master
+
+// Настройки LCD
+#define LCD_IO 10
+#define LCD_I2C_Address 0x4E // i2c адрес диcплея
+
+//настройки Si4703
+#define 4703_adress 0x20 // адрес модуля Si4703
+#define si4703_SEN PORTD.5
+#define si4703_RST PORTD.4
+Dir si4703_SEN out
+Dir si4703_RST out
+
+Dim Simb as Word
+Dim Simb1 as Word
+Dim count as Word
+
+Dim VolRSSI as Byte // нижний порог RSSI для поиска
+VolRSSI=40
+Dim NewChannel as Byte
+Dim ReadChannel as Word
+Dim Volume as Byte
+//Dim Stroka as String
+//Dim Si4307readresult as Word
+
+Dim RDSBuf(64) as Byte 
+For VolBuf= 1 to 64
+RDSBuf(VolBuf)=0
+If VolBuf=64 Then Exit For
+Next
+
+Dim RDSBufSt(8) as Byte
+For VolBuf= 1 to 8
+RDSBuf(VolBuf)=0
+If VolBuf=8 Then Exit For
+Next
+
+// Buttons (when pressing low level)
+#define StUp PortD.7 // switching to the next saved channel
+Dir StUp In
+#define StDn PortB.0 // switching to the previous saved channel
+Dir StDn In
+#define SeekUp PortB.1 // channel search up
+Dir SeekUp In
+#define SeekDn PortB.2 // channel search down
+Dir SeekDn In
+#define VolUp PortB.3 // volume level up (max-15)
+Dir VolUp In
+#define VolDn PortB.4 // volume level down (min-1)
+Dir VolDn In
+
+Dim RDS_Station as String
+Dim RDS_Song as String
+
+Dim RSSI_1, RSSI_0, READ_CH_1, READ_CH_0, RDSA_1, RDSA_0, RDSB_1, RDSB_0, RDSC_1, RDSC_0, RDSD_1, RDSD_0 as Byte
+
+#Define RDSR     RSSI_1.7
+#Define STC      RSSI_1.6
+#Define SF/BL    RSSI_1.5
+#Define AFCRL    RSSI_1.4
+#Define RDSS     RSSI_1.3
+#Define BLERA:1  RSSI_1.2
+#Define BLERA:0  RSSI_1.1
+#Define STEREO   RSSI_1.0
+
+#Define BLERB:1  READ_CH_1.7
+#Define BLERB:0  READ_CH_1.6
+#Define BLERC:1  READ_CH_1.5
+#Define BLERC:0  READ_CH_1.4
+#Define BLERD:1  READ_CH_1.3
+#Define BLERD:0  READ_CH_1.2
+
+
+// каналы радио
+Dim ChVal as Byte
+//ChVal=5 // номер канала при запуске
+Dim Ch(50) as Word // каналы радио
+Ch(1) = 875 // Бизнес FM
+Ch(2) = 879 // Like FM 
+Ch(3) = 883 // Ретро FM
+Ch(4) = 887 // Юмор FM
+Ch(5) = 891 // Радио Jazz
+Ch(6) = 895 // Мегаполис FM
+Ch(7) = 899 // Радио Record
+Ch(8) = 903 // Авторадио
+Ch(9) = 908 // Relax FM
+Ch(10) = 912 // Эхо Москвы
+Ch(11) = 916 // Радио Культура
+Ch(12) = 920 // Москва FM
+Ch(13) = 924 // Радио Дача
+Ch(14) = 928 // Радио Карнавал
+Ch(15) = 932 // Спорт FM
+Ch(16) = 936 // Коммерсант FM
+Ch(17) = 940 // Восток FM
+Ch(18) = 944 // Весна FM
+Ch(19) = 948 // Говорит Москва
+Ch(20) = 952 // ROCK FM
+Ch(21) = 956 // Радио Звезда
+Ch(22) = 960 // Дорожное радио
+Ch(23) = 964 // Такси FM
+Ch(24) = 968 // Детское радио
+Ch(25) = 972 // Комсомольская Правда
+Ch(26) = 976 // Вести FM
+Ch(27) = 980 // Radio Chocolate (Радио Шоколад)
+Ch(28) = 984 // Новое радио (бывшее радио Рекорд)
+Ch(29) = 988 // Радио Romantika (радио Романтика)
+Ch(30) = 992 // Радио Орфей
+Ch(31) = 996 // Столица FM
+Ch(32) = 1001 // Серебряный дождь
+Ch(33) = 1005 // Best FM
+Ch(34) = 1009 // Радио Вера
+Ch(35) = 1012 // DFM
+Ch(36) = 1017 // Наше Радио
+Ch(37) = 1021 // Монте-Карло
+Ch(38) = 1025 // Comedy Radio (Камеди радио)
+Ch(39) = 1030 // Шансон
+Ch(40) = 1034 // Радио Маяк
+Ch(41) = 1037 // Maximum (радио Максимум)
+Ch(42) = 1042 // NRJ (Energy, радио Энерджи, Энергия)
+Ch(43) = 1047 // Радио 7 на семи холмах
+Ch(44) = 1052 // Moscow FM (Москоу FM, Москва ФМ)
+Ch(45) = 1057 // Русское Радио
+Ch(46) = 1062 // Европа Плюс
+Ch(47) = 1066 // Love Radio (Лав радио)
+Ch(48) = 1070 // Русская служба новостей
+Ch(49) = 1074 // Хит FM
+Ch(50) = 1078 // Милицейская волна#EXTM3U
+
+
+
+
+
+// i2c Si4703
+Set si4703_SEN=1
+Set HI2C_DATA=0; //A low SDIO indicates a 2-wire interface
+Set si4703_RST=0; //Put Si4703 into reset
+Wait 1 ms; //Some delays while we allow pins to settle
+Set si4703_RST=1; //Bring Si4703 out of reset with SDIO set to low and SEN pulled high with on-board resistor
+Wait 100 ms; //Allow Si4703 to come out of reset
+
+
+Volume=12
+ChVal=2
+
+CLS
+Locate 0,0
+Print "Channel: "
+Locate 1,0
+Print "RSSI:"
+Locate 1, 13
+Print "Vol: "
+Print Volume
+
+Call InitSi
+Call SetVolume
+Call SetChannel
+Call PrintChannel //Print Channel
+
+Do
+If StUp<1 or StDn<1 or SeekUp<1 or SeekDn<1 or VolUp<1 or VolDn<1 Then Call Button // calling the button click handler when one of the buttons is pressed
+Call Read_Ch_St
+Call PrintChannel //Print Channel
+Call RDS // starting the RDS reading
+
+// передача на LCD названия радиостанции из RDS
+Locate 2,0
+//Print RDS_Station
+For Simb = 1 to 8
+//If RDSBufSt(Simb) < 32 Then Exit For
+If StUp<1 or StDn<1 or SeekUp<1 or SeekDn<1 or VolUp<1 or VolDn<1 Then Call Button // calling the button click handler when one of the buttons is pressed
+Print chr(RDSBufSt(Simb))
+If Simb = 8 Then Exit For
+Next
+
+// бегущая трока с названием песни
+Locate 3,0
+Print "                    "
+
+For Simb=1 to 44
+Locate 3,0
+If RDSBuf(Simb)<32 Then Exit For
+Print chr(RDSBuf(Simb))
+If RDSBuf(Simb+1)<32 Then Exit For
+Print chr(RDSBuf(Simb+1))
+If RDSBuf(Simb+2)<32 Then Exit For
+Print chr(RDSBuf(Simb+2))
+If RDSBuf(Simb+3)<32 Then Exit For
+Print chr(RDSBuf(Simb+3))
+If RDSBuf(Simb+4)<32 Then Exit For
+Print chr(RDSBuf(Simb+4))
+If RDSBuf(Simb+5)<32 Then Exit For
+Print chr(RDSBuf(Simb+5))
+If RDSBuf(Simb+6)<32 Then Exit For
+Print chr(RDSBuf(Simb+6))
+If RDSBuf(Simb+7)<32 Then Exit For
+Print chr(RDSBuf(Simb+7))
+If RDSBuf(Simb+8)<32 Then Exit For
+Print chr(RDSBuf(Simb+8))
+If RDSBuf(Simb+9)<32 Then Exit For
+Print chr(RDSBuf(Simb+9))
+If RDSBuf(Simb+10)<32 Then Exit For
+Print chr(RDSBuf(Simb+10))
+If RDSBuf(Simb+11)<32 Then Exit For
+Print chr(RDSBuf(Simb+11))
+If RDSBuf(Simb+12)<32 Then Exit For
+Print chr(RDSBuf(Simb+12))
+If RDSBuf(Simb+13)<32 Then Exit For
+Print chr(RDSBuf(Simb+13))
+If RDSBuf(Simb+14)<32 Then Exit For
+Print chr(RDSBuf(Simb+14))
+If RDSBuf(Simb+15)<32 Then Exit For
+Print chr(RDSBuf(Simb+15))
+If RDSBuf(Simb+16)<32 Then Exit For
+Print chr(RDSBuf(Simb+16))
+If RDSBuf(Simb+17)<32 Then Exit For
+Print chr(RDSBuf(Simb+17))
+If RDSBuf(Simb+18)<32 Then Exit For
+Print chr(RDSBuf(Simb+18))
+If RDSBuf(Simb+19)<32 Then Exit For
+Print chr(RDSBuf(Simb+19))
+If RDSBuf(Simb+20)<32 Then Exit For
+If StUp<1 or StDn<1 or SeekUp<1 or SeekDn<1 or VolUp<1 or VolDn<1 Then Call Button
+Wait 500 ms
+If Simb=44 Then Exit For
+Next
+//Wait 2 s
+Loop
+
+
+Sub Button
+if StUp<1 Then 
+ChVal++
+Call SetChannel
+Call PrintChannel
+End If
+
+if StDn<1 Then 
+ChVal--
+Call SetChannel
+Call PrintChannel
+End If
+
+if SeekUp<1 Then 
+Call 4703_Seek_Up
+Call PrintChannel
+End If
+
+if SeekDn<1 Then 
+Call 4703_Seek_Down
+Call PrintChannel
+End If
+
+if VolUp<1 Then
+Volume++
+Call SetVolume
+Locate 1,18
+Print Volume
+End If
+
+if VolDn<1 Then
+Volume--
+Call SetVolume
+Locate 1,18
+Print Volume
+End If
+Wait 300 ms
+End Sub
+
+Sub PrintChannel
+
+HI2CStart
+HI2CSend 4703_adress OR 1
+HI2CReceive RSSI_1, ACK
+HI2CReceive RSSI_0, ACK
+HI2CReceive READ_CH_1, ACK
+HI2CReceive READ_CH_0, NACK
+HI2CStop
+
+
+Locate 0,9
+ReadChannel=READ_CH_0+875
+ChanR=ReadChannel/10
+Print ChanR
+Print ","
+DECM= ReadChannel-ChanR*10
+Print DECM
+Print "MHz "
+
+Locate 0,18
+If STEREO=1 Then
+Print "ST"
+Else
+Print "MO"
+Wait 50 ms
+End If
+
+// уровень сигнала
+
+Locate 1,5
+Print RSSI_0
+Print "dB "
+Wait 100 ms
+End Sub

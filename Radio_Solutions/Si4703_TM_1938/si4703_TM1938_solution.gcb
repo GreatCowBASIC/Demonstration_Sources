@@ -1,0 +1,261 @@
+/*
+A demonstration program for GCBASIC.
+
+SI4703 FM Radio Tuner Module
+
+    Description: The si4703.h header file provides the necessary constants,
+            configurations, and functions to interface with
+            the SI4703 FM Radio Tuner module using GCBASIC.
+
+Features:
+- FM band support (76–108 MHz)
+- Digital low-IF receiver
+- Automatic frequency control (AFC)
+- Signal strength measurement
+- RDS/RBDS support
+- Stereo audio output
+
+Si4703 with an 8-character LED module, 8 buttons, and 8 LEDs on a TM1638 chip.
+Buttons 1 and 2 adjust the volume, 4 and 5 search for a radio station, 7 and 8 switch saved radio stations. 
+The string of LEDs displays the signal strength. 
+The Stereo indicator, the volume level and the frequency of the radio station are displayed.  
+*/
+
+'***************************************************************
+'''@author    alexandr-g
+'''@license   GPL
+'''@version   1.00
+'''@date      2025-03-13
+'''********************************************************************************
+
+
+
+
+#chip mega328p, 16
+#include <TM1638_OEM_Lib.h>
+#include "si4703.h"
+
+// настройки I2C
+#define HI2C_BAUD_RATE 400
+#define HI2C_DATA PORTC.4
+#define HI2C_CLOCK PORTC.5
+Dir HI2C_DATA in
+Dir HI2C_CLOCK in
+HI2CMode Master
+// Настройки LED
+#define TM1638_CLK PortD.2  'Arduino Digital_2
+#define TM1638_DIO PortD.3 'Arduino Digital_3
+#define TM1638_STB1 PortD.4
+
+//TM_dpPos = 3     '  0 - 6     на каком символе включить точку, [0 = disabled]
+TM_Bright = 2      ' яркость от 0 - 7 
+// TM_Disp = On       '  включение и выключение дисплея
+
+
+#Define TM_DispLen 8      ' Number of digits on display
+#Define Com_Cathode       ' CC Display up to 8x 7-seg digits (This is default if not set)
+//#Define Com_Anode         ' CA Display up to 10x 7-seg digits
+'#Define RevDig            ' Reverse display digits (need for rev wired display boards)
+#Define Butn_Map1         ' Remap ButnValue as per Table Butn_Map1 (if not set create your own)
+//#Define Butn_Map2         ' Remap ButnValue as per Table Butn_Map2
+#Define TM_LEDs 2         ' Use when eg. TM_DispLen=8, TM_DispBuf(9 & 10) for other LED's
+'#Define TMdly 2           ' Modify clk <-> DIO delay us (if need a shorter write message)
+
+
+//настройки Si4703
+#define 4703_adress 0x20 // адрес модуля Si4703
+#define si4703_SEN PORTD.6
+#define si4703_RST PORTD.5
+Dir si4703_SEN out
+Dir si4703_RST out
+
+Dim NewChannel as Byte
+Dim Volume as Byte
+
+ChMax=50
+// каналы радио
+Dim ChVal as Byte
+ChVal=1 // номер канала при запуске
+Dim Ch(50) as Word // каналы радио
+Ch(1) = 875 // Бизнес FM
+Ch(2) = 879 // Like FM (бывшее Сити-FM)
+Ch(3) = 883 // Ретро FM
+Ch(4) = 887 // Юмор FM
+Ch(5) = 891 // Радио Jazz
+Ch(6) = 895 // Мегаполис FM
+Ch(7) = 899 // Радио Record
+Ch(8) = 903 // Авторадио
+Ch(9) = 908 // Relax FM
+Ch(10) = 912 // Эхо Москвы
+Ch(11) = 916 // Радио Культура
+Ch(12) = 920 // Москва FM
+Ch(13) = 924 // Радио Дача
+Ch(14) = 928 // Радио Карнавал
+Ch(15) = 932 // Спорт FM
+Ch(16) = 936 // Коммерсант FM
+Ch(17) = 940 // Восток FM
+Ch(18) = 944 // Весна FM
+Ch(19) = 948 // Говорит Москва
+Ch(20) = 952 // ROCK FM
+Ch(21) = 956 // Радио Звезда
+Ch(22) = 960 // Дорожное радио
+Ch(23) = 964 // Такси FM
+Ch(24) = 968 // Детское радио
+Ch(25) = 972 // Комсомольская Правда
+Ch(26) = 976 // Вести FM
+Ch(27) = 980 // Radio Chocolate (Радио Шоколад)
+Ch(28) = 984 // Новое радио (бывшее радио Рекорд)
+Ch(29) = 988 // Радио Romantika (радио Романтика)
+Ch(30) = 992 // Радио Орфей
+Ch(31) = 996 // Столица FM
+Ch(32) = 1001 // Серебряный дождь
+Ch(33) = 1005 // Best FM
+Ch(34) = 1009 // Радио Вера
+Ch(35) = 1012 // DFM
+Ch(36) = 1017 // Наше Радио
+Ch(37) = 1021 // Монте-Карло
+Ch(38) = 1025 // Comedy Radio (Камеди радио)
+Ch(39) = 1030 // Шансон
+Ch(40) = 1034 // Радио Маяк
+Ch(41) = 1037 // Maximum (радио Максимум)
+Ch(42) = 1042 // NRJ (Energy, радио Энерджи, Энергия)
+Ch(43) = 1047 // Радио 7 на семи холмах
+Ch(44) = 1052 // Moscow FM (Москоу FM, Москва ФМ)
+Ch(45) = 1057 // Русское Радио
+Ch(46) = 1062 // Европа Плюс
+Ch(47) = 1066 // Love Radio (Лав радио)
+Ch(48) = 1070 // Русская служба новостей
+Ch(49) = 1074 // Хит FM
+Ch(50) = 1078 // Милицейская волна#EXTM3U
+
+
+// Перевод Si4703 в режим I2C
+Set si4703_SEN=1
+Set HI2C_DATA=0; //A low SDIO indicates a 2-wire interface
+Set si4703_RST=0; //Put Si4703 into reset
+Wait 1 ms; //Some delays while we allow pins to settle
+Set si4703_RST=1; //Bring Si4703 out of reset with SDIO set to low and SEN pulled high with on-board resistor
+Wait 1 ms; //Allow Si4703 to come out of reset
+
+Volume=12 // volume when turned on
+ChVal=2 // the number of the saved channel when turned on
+
+
+Call InitSi
+Call SetVolume
+Call SetChannel
+
+Do
+tmGetKey
+
+If TM_ButnVal1<>0 Then Call Button
+
+Call Read_Ch_St
+ReadChannel=READ_CH_0+875
+tmDecBuf ReadChannel // добавляем в буфер частоту
+tmDecBuf Volume,4 // добавляем в буфер громкость от 2 символа влево
+
+If STEREO=1 Then
+tmChrBuf "S", 1
+tmChrBuf "t", 2
+Else
+tmChrBuf " ", 1
+tmChrBuf " ", 2
+End If
+
+tmSndBuf // отправляем буфер на дисплей
+TM_dpPos = 7 // точка на 7 символе
+Call RSSI_Led
+// Wait 1  s
+
+Loop
+
+
+
+Sub Button
+
+tmGetKey
+
+If TM_ButnVal1 = 7 then 
+ChVal--
+Call SetChannel
+Wait 500 ms
+End If
+
+If TM_ButnVal1 = 8 then 
+ChVal++
+Call SetChannel
+Wait 500 ms
+End If
+
+If TM_ButnVal1 = 5 then 
+Call 4703_Seek_Up
+Wait 500 ms
+End If
+
+If TM_ButnVal1 = 4 then 
+Call 4703_Seek_Down
+Wait 500 ms
+End If
+
+If TM_ButnVal1 = 1 then 
+Volume--
+Call SetVolume
+Wait 500 ms
+End If
+
+If TM_ButnVal1 = 2 then 
+Volume++
+Call SetVolume
+Wait 500 ms
+End If
+End Sub
+
+Sub RSSI_Led
+If RSSI_0 > 40 Then 
+tmSetLED (1, on)
+Else
+tmSetLED (1, off)
+End If
+
+If RSSI_0 > 45 Then 
+tmSetLED (2, on)
+Else
+tmSetLED (2, off)
+End If
+If RSSI_0 > 50 Then 
+tmSetLED (3, on)
+Else
+tmSetLED (3, off)
+End If
+
+If RSSI_0 > 55 Then 
+tmSetLED (4, on)
+Else 
+tmSetLED (4, off)
+End If
+
+If RSSI_0 > 55 Then 
+tmSetLED (5, on)
+Else
+tmSetLED (5, off)
+End If
+
+If RSSI_0 > 60 Then 
+tmSetLED (6, on)
+Else
+tmSetLED (6, off)
+End If
+
+If RSSI_0 > 65 Then 
+tmSetLED (7, on)
+Else
+tmSetLED (7, off)
+End If
+
+If RSSI_0 > 70 Then 
+tmSetLED (8, on)
+Else
+tmSetLED (8, off)
+End If
+End Sub
