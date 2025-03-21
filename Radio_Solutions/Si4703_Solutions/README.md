@@ -45,7 +45,7 @@ Follow these steps to get started with the SI4703 module:
          Si4703 with 1602 LCD
 
       <div style="text-align: center;">
-      <img src="Si4703_TM_1638_Demo.gif" alt="The schema" width="300">
+      <img src="Si4703_1602LCD_Demo.gif" alt="The schema" width="300">
       </div>
 
       - TM1638
