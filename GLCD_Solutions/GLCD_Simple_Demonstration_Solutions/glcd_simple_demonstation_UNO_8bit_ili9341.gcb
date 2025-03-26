@@ -185,7 +185,7 @@ sub ShowCase1
 
         GLCDfntDefaultsize = 1
         GLCDDrawString ( 72, ILI9341_GLCD_HEIGHT - 60 , "GCBASIC" , ILI9341_WHITE )
-        GLCDDrawString ( ILI9341_GLCD_WIDTH - 60, 2 , "Aug 2023" , ILI9341_WHITE )
+        GLCDDrawString ( ILI9341_GLCD_WIDTH - 60, 2 , "Mar 2025" , ILI9341_WHITE )
         GLCDDrawString ( ILI9341_GLCD_WIDTH - 38, 10 , "8 bit" , ILI9341_WHITE )
 
 
@@ -246,7 +246,7 @@ sub ShowCase2
         GLCDDrawString ( 50, ILI9341_GLCD_HEIGHT - 30 , "ILI9341 Driver" , ILI9341_WHITE )
 
         GLCDfntDefaultsize = 1
-        GLCDDrawString ( ILI9341_GLCD_WIDTH - 60, 2 , "Aug 2023" , ILI9341_WHITE )
+        GLCDDrawString ( ILI9341_GLCD_WIDTH - 60, 2 , "Mar 2025" , ILI9341_WHITE )
 
         GLCDDrawString ( ILI9341_GLCD_WIDTH - 38, 10 , "8 bit" , ILI9341_WHITE )
 

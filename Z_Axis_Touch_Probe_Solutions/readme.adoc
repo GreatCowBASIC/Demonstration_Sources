@@ -6,7 +6,6 @@
 :imagesdir: ./Images
 
 *About the Z Axis Touch Probe solution* + 
-November 2023
 
 More or less 10 years ago, i needed for my new CNC portal a touching probe to set the origin of the Z axis on the top of the material. +
 Several approachs exist, starting with the sheet of paper method, but I was looking for something more motivating.
@@ -74,5 +73,5 @@ image:Zzero_integrated_CNC2Laser.jpg[width=512]
 
 *Source code ZZero Project for PIC12F683*
 
-&#160;&#160;&#160;&#160;&#160;&#160;link:ZZero_V1.1.gcb[Source code]
+&#160;&#160;&#160;&#160;&#160;&#160;link:Wabeco F1200 ZZero V1.2.gcb[Source code]
 

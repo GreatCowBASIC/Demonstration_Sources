@@ -25,8 +25,8 @@
 
     'Pin mappings for SPI - this GLCD driver supports Hardware SPI and Software SPI
     #define GLCD_DC       DIGITAL_8         ' Data command line
-    #define GLCD_CS       DIGITAL_10          ' Chip select line
-    #define GLCD_RESET          DIGITAL_9         ' Reset line
+    #define GLCD_CS       DIGITAL_10        ' Chip select line
+    #define GLCD_RESET    DIGITAL_9         ' Reset line
 
     #define GLCD_DI       DIGITAL_12          ' Data in | MISO    - Not used therefore not really required
     #define GLCD_DO       DIGITAL_11          ' Data out | MOSI
@@ -181,7 +181,7 @@ sub ShowCase1
         GLCDDrawString ( 42, ILI9341_GLCD_HEIGHT - 30 , "ILI9341 Driver" , ILI9341_WHITE )
 
         GLCDfntDefaultsize = 1
-        GLCDDrawString ( ILI9341_GLCD_WIDTH - 60, 2 , "Dec 2023" , ILI9341_WHITE )
+        GLCDDrawString ( ILI9341_GLCD_WIDTH - 60, 2 , "Mar 2025" , ILI9341_WHITE )
         #ifdef ILI9341_HardwareSPI
             GLCDDrawString ( ILI9341_GLCD_WIDTH - 42, 10 , "HW SPI" , ILI9341_WHITE )
         #endif
@@ -247,7 +247,7 @@ sub ShowCase2
         GLCDDrawString ( 50, ILI9341_GLCD_HEIGHT - 30 , "ILI9341 Driver" , ILI9341_WHITE )
 
         GLCDfntDefaultsize = 1
-        GLCDDrawString ( ILI9341_GLCD_WIDTH - 58, 2 , "Dec 2023" , ILI9341_WHITE )
+        GLCDDrawString ( ILI9341_GLCD_WIDTH - 58, 2 , "Mar 2025" , ILI9341_WHITE )
 
         #ifdef ILI9341_HardwareSPI
             GLCDDrawString ( ILI9341_GLCD_WIDTH - 44, 10 , "HW SPI" , ILI9341_WHITE )
