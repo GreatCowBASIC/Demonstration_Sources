@@ -180,7 +180,7 @@ frame=0:frame_count=0
 
 dim delay as word
 dim rocket_on,rocket_x as byte
-rocket_on=0:delay=3000
+rocket_on=0:delay=1
 dim rocket_y,rocket_old_y as word
 dim cannon_x,old_cannon_x as byte
 cannon_x=100
