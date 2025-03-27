@@ -11,8 +11,8 @@
 '''
 '''@author  MarcoC&EvanV
 '''@licence GPL
-'''@version 1.0
-'''@date    08.16.2016
+'''@version 2.0
+'''@date    26/03/2025
 '''********************************************************************************
 
 ; ----- Configuration
@@ -137,8 +137,8 @@
               GLCDPrint ( 64 ,  52, pad(str(byteNumber), 3 ) )           ; Print a padded string
 
 
-              box (46,9,56,19)                                           ; Draw a Box
-              GLCDDrawChar(48, 9, CCount )                               ; Draw a character
+              box (50,9,60,19)                                           ; Draw a Box
+              GLCDDrawChar(52, 10, CCount )                               ; Draw a character
               outString = str( CCount )                                  ; Prepare a string
               GLCDDrawString(64, 9, pad(outString,3) )                   ; Draw a string
 

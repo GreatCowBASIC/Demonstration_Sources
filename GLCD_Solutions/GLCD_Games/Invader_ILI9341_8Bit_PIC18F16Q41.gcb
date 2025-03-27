@@ -1,0 +1,418 @@
+/*
+===============================================================
+Program Title: Invaders Shooting Game                         
+                                                                
+  Description:                                                  
+    A retro-style target-shooting game designed for a           
+    microcontroller-based platform. The game displays a         
+    blue background populated with "ALIEN" symbols representing 
+    targets or enemies, along with a small robot                
+    at the bottom of the screen for gameplay interaction.       
+
+Features:                                                     
+  - Visuals:                                                    
+      Blue background with dynamic "alien" targets.             
+      Player-controlled robot at the bottom for shooting and    
+      movement.                                                 
+  - Gameplay:                                                   
+      Player navigates and interacts with targets to            
+      score points.                                             
+      Retro-style mechanics for nostalgic appeal.               
+  - Hardware:                                                   
+      ILI9341 display module.                                   
+      Housed in a red frame with connected microcontroller for  
+      game logic.                                               
+      Three switches: left, right & fire. Swtiches pulled low   
+  - Development Context:                                        
+      Designed as a DIY electronics project integrating         
+      display, controls, and interactive visuals.               
+
+Notes:                                                        
+  - Ensure appropriate pin connections for the display and      
+    input hardware.                                             
+  - Calibrate the microcontroller settings for optimal          
+    performance.                                                
+
+Enjoy the game and have fun retro gaming!                     
+===============================================================
+
+
+This progam is for a target-shooting game implemented on a microcontroller with an ILI9341-based graphical LCD display. 
+
+### Summary of Gameplay:
+The player controls a cannon and shoots rockets to destroy moving sprites while dodging bombs dropped by the sprites. 
+The game keeps track of the score and high score, providing a visual and interactive experience.
+
+Here's an overview of the key components:
+
+### 1. **Setup and Initialization**
+- **Color Definitions:*   The `#define` directives rename predefined colours (e.g., `ILI9341_RED`) to shorter names (`re`) for easier use in sprite data configuration.
+- **Variables:*   Game-related variables are defined, including `hits` (score), `hiscore` (high score), and sprite-specific attributes (e.g., `sprite_x`, `sprite_y` for position, `sprite_height`, `sprite_width` for dimensions).
+- **Screen Setup:*   The screen background is initialized, and the score and high score are displayed.
+
+### 2. **Game Elements**
+- **Sprites:*   Sprites representing targets and bombs are managed with arrays for position (`spx`, `spy`), direction (`dx`, `dy`), and status (`sprite_status`).
+  - Starting positions and movement directions are initialized for all sprites.
+  - Bomb-related attributes are set up with counters for timing bomb drops.
+
+### 3. **Main Game Logic (Inside Loop)**
+The game runs within a `do` loop, continuously updating the display and game elements:
+- **Sprite Movement:*   Sprites move across the screen, bouncing off the edges.
+  - Positions are updated based on direction (`dx`, `dy`), and previous positions are erased using the `erase_sprite` subroutine.
+  - Sprites alternate between two visual frames to create animation (`frame` and `frame_count` manage this).
+- **Rocket (Player's Projectile):*   
+  - When the fire button is pressed, a rocket is launched from the cannon’s current position.
+  - The rocket moves upward and is erased/redrawn at each step.
+  - If the rocket collides with a sprite, the sprite is destroyed, score (`hits`) is incremented, and explosions are visualized.
+
+### 4. **Cannon Movement and Interaction**
+- **Left and Right Buttons:*   The cannon moves horizontally in response to user inputs.
+- **Shoot Button:*   Fires the rocket when pressed.
+
+### 5. **Bomb Mechanics**
+- **Bomb Drops:*   Sprites periodically drop bombs based on counters (`bomb_counter`). Bombs move downward and collide with the cannon or reach the bottom of the screen.
+- **Collision Detection:*   If a bomb hits the cannon, the game ends.
+
+### 6. **Game Over and Restart**
+- If a sprite or bomb collides with the cannon, the `dead` section is executed, displaying a circular explosion effect, and the game restarts from the `Start` label.
+
+### 7. **Subroutines**
+- **`sprite`:*   Draws a sprite at a specified position.
+- **`erase_sprite`:*   Clears the sprite’s previous position by filling it with the background color.
+
+### 8. **Sprite Data Table**
+- Contains pixel data for various elements like sprites, the cannon, and the missile. Each data point corresponds to a predefined colour.
+
+
+*/
+#chip 18F16Q41
+#CONFIG MCLRE= INTMCLR              // As the fire button in on the MCLRE, you cannot use EXTMCLR
+
+#option explicit
+#include <glcd.h>
+
+#define GLCD_TYPE GLCD_TYPE_ILI9341
+
+// Control lines for the GLCD
+#define GLCD_RD    PORTB.4 //Read
+#define GLCD_WR    PORTB.5 //Write
+#define GLCD_RS    PORTB.6 //Command_/Data
+#define GLCD_CS    PORTB.7 //ChipSelect
+#define GLCD_RESET PORTA.2 //Reset
+
+// Activates the 8-bit parallel mode for PIC and defines the port used in the glcd_ili9341.h library
+#define GLCD_DATA_PORT PORTC  
+
+// Cannon buttons
+#define left_button  PORTA.3  // MCLR_/Vpp
+#define right_button PORTA.4  
+#define fire_button  PORTA.5 
+dir left_button in
+dir right_button in
+dir fire_button in
+
+// The main game program starts here
+
+#define GLCD_OLED_FONT
+
+// Rename colours to make it easier to set up sprite data
+#define bk ILI9341_BLACK
+#define re ILI9341_RED
+#define gr ILI9341_GREEN
+#define bl ILI9341_BLUE
+#define wh ILI9341_WHITE
+#define pu ILI9341_PURPLE
+#define ye ILI9341_YELLOW
+#define cy ILI9341_CYAN
+#define dg ILI9341_D_GRAY
+#define lg ILI9341_L_GRAY
+#define si ILI9341_SILVER
+#define ma ILI9341_MAROON
+#define ol ILI9341_OLIVE
+#define li ILI9341_LIME
+#define aq ILI9341_AQUA
+#define te ILI9341_TEAL
+#define na ILI9341_NAVY
+#define fu ILI9341_FUCHSIA
+
+dim hits as byte
+dim hiscore as word
+hiscore=0
+
+Start:
+GLCDBackground = ILI9341_BLACK
+GLCDRotate Portrait_Rev
+GLCDCLS ILI9341_BLACK
+GLCDPrint (0,0,"SCORE 0",ILI9341_WHITE)
+GLCDPrint (96,0,"HISCORE",ILI9341_WHITE)
+GLCDPrint (152,0,str(hiscore),ILI9341_YELLOW)
+
+// Variables
+dim rnd as byte
+dim sprite_height,sprite_width as byte  // height and width of sprite in pixels
+dim sprite_x,sprite_y as Word
+dim ptr ,spritedata_ptr ,pixel ,sprite_size as word
+dim temp,frame,frame_count as byte
+dim dx(8),dy(8) as word
+dim sprite_status(8) as byte
+dim spy(8),oldspy(8) as word
+dim spx(8),oldspx(8) as word
+
+// set up start sprite positions and directions
+dx(1)=2:dx(2)=4:dx(3)=6:dx(4)=8
+dx(5)=65536-2:dx(6)=65536-5:dx(7)=65536-4:dx(8)=65536-2
+dy(1)=65536-4:dy(2)=65536-2:dy(3)=65536-4:dy(4)=4
+dy(5)=2:dy(6)=4:dy(7)=65536-5:dy(8)=65536-6
+
+dim bomb_x(8),bomb_y(8),bomb_old_y(8) as word
+dim bomb(8) , bomb_counter(8) as byte
+for temp =1 to 8
+  sprite_status(temp)=1 //activate sprites
+  spx(temp)=100:spy(temp)=100 //sprite start x,y position
+  bomb(temp)=0
+  rnd=random
+  bomb_counter(temp)=(random/2)+100
+next
+
+sprite_height=16:sprite_width=16
+spritedata_ptr=1
+frame=0:frame_count=0
+
+dim delay as word
+dim rocket_on,rocket_x as byte
+rocket_on=0:delay=3000
+dim rocket_y,rocket_old_y as word
+dim cannon_x,old_cannon_x as byte
+cannon_x=100
+hits=0
+
+do //demo moving sprite
+    for temp=1 to 8
+        if sprite_status(temp)=1 then //is sprite active
+            if spx(temp)> (229-sprite_width) then //check right edge
+              dx(temp)= 65536-dx(temp)
+            end if
+            if spx(temp)<8 then //check left edge
+              dx(temp)= 65536-dx(temp)
+            end if
+            if spy(temp)> (305-sprite_height) then //check bottom edge
+              dy(temp)= 65536-dy(temp)
+            end if
+            if spy(temp)<32 then //check top edge
+              dy(temp)= 65536-dy(temp)
+            end if
+
+            oldspx(temp)=spx(temp):oldspy(temp)=spy(temp) //get last position for erase
+            spx(temp)+=dx(temp):spy(temp)+=dy(temp) //get new position for draw
+
+            if sprite_status(temp)=1 then //is sprite active
+                if frame=0 then // which sprite to draw
+                  erase_sprite (oldspx(temp),oldspy(temp),16,16,256) //erase sprite at last position
+                  sprite (spx(temp),spy(temp),16,16,1,256) //draw sprite1 at new position
+                else
+                  erase_sprite (oldspx(temp),oldspy(temp),16,16,256) //erase sprite at last position
+                  sprite (spx(temp),spy(temp),16,16,257,256) //draw sprite2 at new position
+                end if
+            end if
+        end if
+    next temp
+
+    frame_count++ //when to change spritedata_ptr
+    if frame_count=5 then
+      frame=!frame
+      frame_count=0
+    end if
+
+  //cannon left right buttons
+    old_cannon_x=cannon_x
+    if left_button on then //left button pressed
+      cannon_x-=4
+      if cannon_x<4 then //left edge
+        cannon_x=4
+      end if
+    end if
+
+    if right_button on then //right button pressed
+      cannon_x+=4
+      if cannon_x>225 then //right edge
+        cannon_x=225
+      end if
+    end if
+
+    if old_cannon_x<>cannon_x then //has cannon moved
+      erase_sprite (old_cannon_x,309,12,10,120)
+    end if
+    sprite (cannon_x,309,12,10,513,120)
+
+  //cannon shoot button
+    if (fire_button=1) and (rocket_on=0) then //fire button pressed and rocket not active
+      rocket_on=1 : rocket_x=cannon_x+5 : rocket_y=310 //init rocket
+    end if
+  //move rocket if active
+    if rocket_on =1 then //is rocket active
+      rocket_old_y=rocket_y
+      rocket_y-=8
+      erase_sprite (rocket_x,rocket_old_y,2,8,16) //erase old rocket
+      if rocket_y>16 then
+        sprite (rocket_x,rocket_y,2,8,633,16) //draw new rocket
+      else
+        rocket_on=0 //rocket not active now
+      end if
+  //active rocket collision with any active sprite
+      for temp=1 to 8
+        if sprite_status(temp)=1 then //is sprite active
+          if (rocket_x>=spx(temp)) and (rocket_x<=(spx(temp)+16)) and (rocket_y>=spy(temp)) and (rocket_y<=(spy(temp)+16)) then
+            sprite_status(temp)=2:rocket_on=0
+            erase_sprite (rocket_x,rocket_y,2,8,16) //erase rocket
+            erase_sprite (spx(temp),spy(temp),16,16,256) //erase sprite
+            hits++
+            glcdprint (42,0,str(hits),ILI9341_YELLOW)
+            delay+=5
+            if hits=8 then
+              if hits>hiscore then
+                hiscore=hits
+              end if
+              goto start
+            end if
+          end if
+        end if
+      next
+    end if
+  //is any sprite exploding
+    for temp=1 to 8
+      if sprite_status(temp)>=2 then
+        if sprite_status(temp)<14 then
+          circle (spx(temp)+7,spy(temp)+7,sprite_status(temp),ILI9341_WHITE)
+        else
+          circle (spx(temp)+7,spy(temp)+7,sprite_status(temp)-12,ILI9341_BLACK)
+        end if
+        sprite_status(temp)++
+        if sprite_status(temp)=29 then
+          sprite_status(temp)=0
+        end if
+      end if
+  //has any sprite hit cannon
+      if spy(temp)>288 then //bottom of sprite touches cannon
+        if (cannon_x<=spx(temp)+15) and (cannon_x+11>=spx(temp)) then //sprite over cannon
+          goto dead
+        end if
+      end if
+    next
+  //time for sprite to drop bomb?
+    for temp=1 to 8
+      if sprite_status(temp)=1 then //is sprite active
+        if bomb(temp)=0 then //sprite bomb not active
+          bomb_counter(temp)---
+          if bomb_counter(temp)=0 then //init bomb
+            bomb(temp)=1 //bomb now active
+            bomb_x(temp)=spx(temp)+8
+            bomb_y(temp)=spy(temp)+16 //bomb under sprite
+          end if
+        end if
+      end if
+    next
+  //is sprite bomb active?
+  for temp=1 to 8
+      if bomb(temp)=1 then //is bomb active
+        bomb_old_y(temp)=bomb_y(temp)
+        bomb_y(temp)+=2 //move sprite's bomb down
+        erase_sprite (bomb_x(temp),bomb_old_y(temp),2,8,16) //erase sprite's old bomb
+        if bomb_y(temp)<305 then
+          sprite (bomb_x(temp),bomb_y(temp),2,8,633,16) //draw sprite's new bomb
+        else //bomb bottom of screen
+          bomb(temp)=0 //sprite's bomb not active now
+          if (bomb_x(temp)>cannon_x) and (bomb_x(temp)<cannon_x+12) then
+            goto dead //bomb hit cannon
+          end if
+          bomb_counter(temp)=(random/2)+100 //reset sprite's bomb counter
+        end if
+      end if
+    next
+
+  wait delay ms
+loop //end
+
+dead:
+erase_sprite (cannon_x,309,12,10,120) //erase cannon
+for frame=2 to 30
+  circle (cannon_x+5,319,frame,ILI9341_WHITE)
+next
+for frame=2 to 30
+  circle (cannon_x+5,319,frame,ILI9341_BLACK)
+next
+goto start
+
+sub sprite (sprite_x,sprite_y,sprite_width,sprite_height,spritedata_ptr,sprite_size) //fills window with sprite data
+  SetAddressWindow_ILI9341 ( sprite_x,sprite_y,sprite_x +sprite_width-1,sprite_y +sprite_height-1 )
+  for ptr=spritedata_ptr to spritedata_ptr + sprite_size-1
+    ReadTable spritedata,ptr,pixel
+    SendWord_ILI9341 pixel
+  next ptr
+end sub
+
+sub erase_sprite (sprite_x,sprite_y,sprite_width,sprite_height,sprite_size) //fills window background colour
+  SetAddressWindow_ILI9341 ( sprite_x,sprite_y,sprite_x +sprite_width-1,sprite_y +sprite_height-1 )
+  repeat sprite_size
+    SendWord_ILI9341 GLCDBackground
+  end repeat
+end sub
+
+table spritedata //sprite 1=1
+wh,bl,bl,bl,bl,bk,bk,bk,bk,bk,bk,bl,bl,bl,bl,wh
+bk,bl,re,re,re,bl,bl,bk,bk,bl,bl,re,re,re,bl,bk
+bk,bk,bl,re,re,re,bl,bk,bk,bl,re,re,re,bl,bk,bk
+bk,bk,bk,bl,re,wh,bl,bk,bk,bl,wh,re,bl,bk,bk,bk
+bk,bk,bk,bk,bl,wh,bl,bk,bk,bl,wh,bl,bk,bk,bk,bk
+bk,bk,bk,bk,bk,bl,bl,bk,bk,bl,bl,bk,bk,bk,bk,bk
+bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk
+bk,bk,bk,bk,ye,ye,ye,bk,bk,ye,ye,ye,bk,bk,bk,bk
+bk,bk,bk,ye,bk,bk,bk,bk,bk,bk,bk,bk,ye,bk,bk,bk
+bk,ye,ye,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,ye,ye,bk
+bk,ye,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,ye,bk
+ye,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,bl,ye
+ye,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,ye
+ye,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,ye
+bk,ye,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,ye,bk
+bk,bk,ye,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,ye,bk,bk
+
+// sprite 2=256+1
+bl,bl,bl,bl,bl,bk,bk,bk,bk,bk,bk,bl,bl,bl,bl,bl
+bk,bl,re,re,re,bl,bl,bk,bk,bl,bl,re,re,re,bl,bk
+bk,bk,bl,wh,wh,re,bl,bk,bk,bl,re,wh,wh,bl,bk,bk
+bk,bk,bk,bl,re,wh,bl,bk,bk,bl,wh,re,bl,bk,bk,bk
+bk,bk,bk,bk,bl,wh,bl,bk,bk,bl,wh,bl,bk,bk,bk,bk
+bk,bk,bk,bk,bk,bl,bl,bk,bk,bl,bl,bk,bk,bk,bk,bk
+bk,bk,bk,bk,bk,bk,bk,ye,ye,bk,bk,bk,bk,bk,bk,bk
+bk,bk,bk,bk,bk,ye,ye,bk,bk,ye,ye,bk,bk,bk,bk,bk
+bk,bk,bk,bk,ye,ye,bk,bk,bk,bk,ye,ye,bk,bk,bk,bk
+bk,bk,bk,bk,ye,bk,bk,bk,bk,bk,bk,ye,bk,bk,bk,bk
+bk,bk,bk,ye,bk,bk,bk,bk,bk,bk,bk,bk,ye,bk,bk,bk
+bk,bk,ye,bk,bk,bk,bk,bk,bk,bk,bk,bk,bk,ye,bk,bk
+bk,bk,bk,ye,ye,bk,bk,bk,bk,bk,bk,ye,ye,bk,bk,bk
+bk,bk,bk,bk,ye,ye,bk,bk,bk,bk,ye,ye,bk,bk,bk,bk
+bk,bk,bk,bk,bk,ye,bk,bk,bk,bk,ye,bk,bk,bk,bk,bk
+bk,bk,bk,bk,bk,bk,ye,bk,bk,ye,bk,bk,bk,bk,bk,bk
+
+// cannon=256+256+1=513
+bk,bk,bk,bk,bk,wh,wh,bk,bk,bk,bk,bk
+bk,bk,bk,bk,ye,pu,pu,ye,bk,bk,bk,bk
+bk,bk,bk,ye,pu,wh,wh,pu,ye,bk,bk,bk
+bk,bk,bk,ye,pu,pu,pu,pu,ye,bk,bk,bk
+bk,bk,ye,ye,pu,wh,wh,pu,ye,ye,bk,bk
+bk,bk,ye,pu,pu,pu,pu,pu,pu,ye,bk,bk
+bk,ye,bl,bl,bl,re,re,bl,bl,bl,ye,bk
+ye,ye,bl,bl,bl,re,re,bl,bl,bl,ye,ye
+bk,bk,ye,re,re,re,re,re,re,ye,bk,bk
+bk,bk,bk,ye,fu,fu,fu,fu,ye,bk,bk,bk
+
+// missile=256+256+120+1=633
+wh,wh
+re,re
+ye,ye
+wh,wh
+wh,wh
+ye,ye
+re,re
+wh,wh
+end table
+
