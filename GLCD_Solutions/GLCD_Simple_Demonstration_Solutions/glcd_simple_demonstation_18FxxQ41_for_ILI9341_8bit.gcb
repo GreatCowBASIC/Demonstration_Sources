@@ -15,11 +15,9 @@
 '''********************************************************************************
 
 #chip 18F16Q41
-#CONFIG MCLRE= INTMCLR              // As the fire button in on the MCLRE, you cannot use EXTMCLR
-
 #option explicit
-#include <glcd.h>
 
+#include <glcd.h>
 #define GLCD_TYPE GLCD_TYPE_ILI9341
 
 // Control lines for the GLCD
@@ -32,6 +30,8 @@
 // Activates the 8-bit parallel mode for PIC and defines the port used in the glcd_ili9341.h library
 #define GLCD_DATA_PORT PORTC  
 
+
+// Main program
 
     Dim CCOUNT, BYTENUMBER, OLDFONT, OLDFONT as Byte
 

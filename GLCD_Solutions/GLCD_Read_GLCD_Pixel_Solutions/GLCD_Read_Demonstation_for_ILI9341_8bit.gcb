@@ -1,0 +1,89 @@
+/*
+    This GCBASIC program demonstrates the use of the ILI9341 graphical LCD with a PIC microprocessor.
+    It showcases the read pixel functionality using 8bit bus communication.
+    The program initializes the GLCD, draws pixels with specific colors, and reads their values to display them in hexadecimal format.
+    It uses a landscape-reversed screen orientation and sets up GLCD control lines and an 8-bit parallel data port.
+    Tested with 8bit bus for pixel reading and rendering functionalities.
+
+    @author: EvanV
+    @licence: GPL
+    @version: 1.1
+    @date: 28/03/2025
+*/
+
+/* Chip and configuration */
+#chip 18F16Q41
+#option explicit
+
+/* Include and define GLCD library type */
+#include <glcd.h>
+#define GLCD_TYPE GLCD_TYPE_ILI9341
+
+/* Define control lines for the GLCD */
+#define GLCD_RD    PORTB.4 //Read
+#define GLCD_WR    PORTB.5 //Write
+#define GLCD_RS    PORTB.6 //Command_/Data
+#define GLCD_CS    PORTB.7 //ChipSelect
+#define GLCD_RESET PORTA.2 //Reset
+
+// Activates the 8-bit parallel mode for PIC and defines the port used in the glcd_ili9341.h library
+#define GLCD_DATA_PORT PORTC  
+
+/* Main program starts here */
+
+dim pixcol as long          /* Variable to store pixel color (long type) */
+dim setpixcol as word       /* Variable to set pixel color (word type) */
+
+/* Initialize the GLCD display */
+GLCDRotate ( Landscape_rev )     /* Optionally rotate the screen to landscape reversed */
+GLCDCLS TFT_BLACK           /* Clear the GLCD and fill with black color */
+
+GLCDPrint 20,100,"Pixel Read Demonstration"
+
+
+/* Setup initial pixel colors */
+Line 0,0,319,0, TFT_RED            /* Set pixel at (0,0) to red */
+Line 0,1,319,1, TFT_GREEN          /* Set pixel at (0,1) to green */
+Line 0,2,319,2, TFT_BLUE           /* Set pixel at (0,2) to red */
+
+/* Begin main loop */
+do
+    /* Read pixel at (0,0) and print its color in hex format */
+    pixcol = ReadPixel_ILI9341( 0,0 )
+    GLCDPrint 10, 10, "0x"+Wordtohex( RGB888toRGB565(pixcol) )     /* Print full value */
+
+    /* Repeat for pixel at (1,1) */
+    pixcol = ReadPixel_ILI9341( 1,1 )
+    GLCDPrint 10, 20, "0x"+Wordtohex( RGB888toRGB565(pixcol) )
+
+    /* Repeat for pixel at (2,2) */
+    pixcol = ReadPixel_ILI9341( 2,2 )
+    GLCDPrint 10, 30, "0x"+Wordtohex( RGB888toRGB565(pixcol) )
+
+    /* Set a new pixel color at (3,3) and read its value */
+    Line 0,3,319,3, setpixcol
+    setpixcol = setpixcol + 16         /* Increment pixel color */
+    pixcol = ReadPixel_ILI9341( 3,3 )
+    GLCDPrint 10, 40, "0x"+Wordtohex( RGB888toRGB565(pixcol) )
+
+loop
+/* End of main loop */
+
+/* Program ends */
+end
+
+Function RGB888toRGB565 ( in pixcol as Long ) As Word
+    Dim RGB888toRGB565 as Word
+
+    /* Build RGB565 value step by step using pixcol directly */
+    RGB888toRGB565 = pixcol_U >> 3            /* Scale red down to 5 bits */
+    RGB888toRGB565 = RGB888toRGB565 << 11     /* Shift scaled red to bits [15–11] */
+
+    pixcol_H = pixcol_H >> 2                  /* Scale green down to 6 bits */
+    pixcol_H = pixcol_H << 5                  /* Shift scaled green to bits [10–5] */
+    RGB888toRGB565 = RGB888toRGB565 | pixcol_H /* Add green to RGB888toRGB565 */
+
+    RGB888toRGB565 = RGB888toRGB565 | ([byte]pixcol >> 3) /* Scale blue down to 5 bits and add blue */
+
+    /* Return the final RGB565 value */
+End Function
