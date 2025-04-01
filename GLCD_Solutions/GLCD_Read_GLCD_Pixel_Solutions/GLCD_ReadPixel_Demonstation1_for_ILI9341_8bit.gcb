@@ -5,7 +5,7 @@
     It uses a landscape-reversed screen orientation and sets up GLCD control lines and an 8-bit parallel data port.
     Tested with 8bit bus for pixel reading and rendering functionalities.
 
-    @author: EvanV
+    @author: Uwe Seifert
     @licence: GPL
     @version: 1.1
     @date: 28/03/2025
@@ -72,18 +72,23 @@ loop
 /* Program ends */
 end
 
-Function RGB888toRGB565 ( in pixcol as Long ) As Word
+
+Function RGB888toRGB565(in pixcol as Long) As Word
     Dim RGB888toRGB565 as Word
 
-    /* Build RGB565 value step by step using pixcol directly */
-    RGB888toRGB565 = pixcol_U >> 3            /* Scale red down to 5 bits */
-    RGB888toRGB565 = RGB888toRGB565 << 11     /* Shift scaled red to bits [15–11] */
+    // Extract and convert Red component (upper byte of pixcol)
+    // Scale red down from 8 bits to 5 bits and position at bits 11-15
+    RGB888toRGB565 = pixcol_U >> 3            // Scale red down to 5 bits
+    RGB888toRGB565 = RGB888toRGB565 << 11     // Shift scaled red to bits [15-11]
 
-    pixcol_H = pixcol_H >> 2                  /* Scale green down to 6 bits */
-    pixcol_H = pixcol_H << 5                  /* Shift scaled green to bits [10–5] */
-    RGB888toRGB565 = RGB888toRGB565 | pixcol_H /* Add green to RGB888toRGB565 */
+    // Extract and convert Green component (middle byte of pixcol)
+    // Scale green down from 8 bits to 6 bits and position at bits 5-10
+    pixcol_H = pixcol_H >> 2                  // Scale green down to 6 bits
+    RGB888toRGB565 = RGB888toRGB565 + ([WORD]pixcol_H << 5)  // Shift scaled green to bits [10-5] and Add green to RGB888toRGB565
 
-    RGB888toRGB565 = RGB888toRGB565 | ([byte]pixcol >> 3) /* Scale blue down to 5 bits and add blue */
+    // Extract and convert Blue component (lower byte of pixcol)
+    // Scale blue down from 8 bits to 5 bits and position at bits 0-4
+    RGB888toRGB565 = RGB888toRGB565 + ([byte]pixcol >> 3) // Scale blue down to 5 bits and add blue
 
-    /* Return the final RGB565 value */
+    // Return the final RGB565 value
 End Function
