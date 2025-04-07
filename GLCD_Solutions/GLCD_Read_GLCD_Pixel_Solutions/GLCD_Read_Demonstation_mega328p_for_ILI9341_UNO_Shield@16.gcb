@@ -1,0 +1,198 @@
+'''A demonstration program for GCBASIC.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''This program is a simple GLCD demonstration of the ILI9341 GLCD read pixel capabilities.
+'''The read pixel routine only supports 8bit UNO Shield mode.
+'''It is a nice graphical LCD, suitable for a lot of various projects.
+'''The GLCD is connected to the microprocessor as shown in the hardware section of this code.
+''':
+'''This has been tested using the 8bit UNO Shield mode.
+''':
+'''Note: for the correct operation of this display you MAY have to  connect via a CD4050, see http://forum.arduino.cc/index.php?topic=181679.90
+''':
+'''@author
+'''@licence GPL
+'''@version 1.0
+'''@date 07/02/2025
+'''********************************************************************************
+
+  'Chip Settings.
+  #include <uno_mega328p.h >
+  #option explicit
+
+    #include <glcd.h>
+    
+
+    #define GLCD_TYPE GLCD_TYPE_ILI9341
+
+    'Pin mappings for 8bit bus
+    #define GLCD_RD       ANALOG_0          ' read command line
+    #define GLCD_WR       ANALOG_1          ' write command line
+    #define GLCD_RS       ANALOG_2          ' Command/Data line
+    #define GLCD_CS       ANALOG_3          ' Chip select line
+    #define GLCD_RESET    ANALOG_4          ' Reset line
+
+    #define GLCD_DB0       DIGITAL_8
+    #define GLCD_DB1       DIGITAL_9
+    #define GLCD_DB2       DIGITAL_2
+    #define GLCD_DB3       DIGITAL_3
+    #define GLCD_DB4       DIGITAL_4
+    #define GLCD_DB5       DIGITAL_5
+    #define GLCD_DB6       DIGITAL_6
+    #define GLCD_DB7       DIGITAL_7
+
+  
+    // Color component variables
+    DIM Red AS BYTE
+    DIM Green AS BYTE
+    DIM Blue AS BYTE
+    DIM MyCol AS WORD
+    DIM Pixel AS LONG
+    DIM YO AS BYTE       // Y-Offset for display
+    DIM ccount as Word   // Counter for color testing
+    DIM currentString as String * 14
+
+    // Set display orientation
+    GLCDROTATE Landscape
+
+    Do
+
+        // Test each primary color
+        For ccount = 1 to 18
+
+            ReadTable DisplayColor, ccount, MyCol
+
+            GLCDPRINTLARGEFONT 0, 0, ConstructString ( ccount ), TFT_WHITE
+
+            // Draw a yellow horizontal line for reference
+            LINE (10,117,319,117,TFT_yellow)
+            
+            // Draw a small box with the current test color
+            FILLEDBOX (310,110,319,116,MyCol)
+
+            // Read the pixel value at position 310,110
+            Pixel=ReadPixel_ILI9341(310,110)
+            
+            // Set Y-Offset for display
+            YO=125 
+
+            // Decode the pixel and display components
+            DecodeAndShow
+            
+            // Pause before testing next color
+            Wait 1 s
+
+        Next
+
+    Loop
+    End
+
+    Sub DecodeAndShow
+        Dim Pixel as Long
+
+      // Display the original RGB888 value in hex
+        GLCDPRINTLARGEFONT 10,YO,"0x"+LongToHex(Pixel)
+        GLCDPRINTLARGEFONT 160,YO,"RGB888"
+
+      // Convert the RGB888 value to RGB565
+        Pixel = RGB888toRGB565(Pixel)
+
+      // Display the converted RGB565 value in hex
+        GLCDPRINTLARGEFONT 10,YO+37,"0x"+WordToHex(Pixel)
+        GLCDPRINTLARGEFONT 160,YO+37,"RGB565"
+      // Extract Red component (5 bits from bits 11-15)
+        Red = Pixel >> 11 & 0x1F
+        
+      // Extract Green component (6 bits from bits 5-10)
+      Green = Pixel >> 5 & 0x3F
+        
+      // Extract Blue component (5 bits from bits 0-4)
+      Blue = [BYTE]Pixel & 0x1F
+        
+      // Optional scaling to 0-255 range (commented out)
+      // Red = Red * 255 / 31
+      // Green = Green * 255 / 63
+      // Blue = Blue * 255 / 31
+
+      // Display binary representation of each color component
+      GLCDPRINTLARGEFONT 10,YO+60,Right(ByteToBin(Red),5), TFT_RED
+      GLCDPRINTLARGEFONT 76,YO+60,Right(ByteToBin(Green),6), TFT_GREEN
+      GLCDPRINTLARGEFONT 156,YO+60,Right(ByteToBin(Blue),5), TFT_BLUE
+    End Sub
+
+    Function RGB888toRGB565(in pixcol as Long) As Word
+        Dim RGB888toRGB565 as Word
+
+        // Extract and convert Red component (upper byte of pixcol)
+        // Scale red down from 8 bits to 5 bits and position at bits 11-15
+        RGB888toRGB565 = pixcol_U >> 3            // Scale red down to 5 bits
+        RGB888toRGB565 = RGB888toRGB565 << 11     // Shift scaled red to bits [15-11]
+
+        // Extract and convert Green component (middle byte of pixcol)
+        // Scale green down from 8 bits to 6 bits and position at bits 5-10
+        pixcol_H = pixcol_H >> 2                  // Scale green down to 6 bits
+        RGB888toRGB565 = RGB888toRGB565 + ([WORD]pixcol_H << 5)  // Shift scaled green to bits [10-5] and Add green to RGB888toRGB565
+
+        // Extract and convert Blue component (lower byte of pixcol)
+        // Scale blue down from 8 bits to 5 bits and position at bits 0-4
+        RGB888toRGB565 = RGB888toRGB565 + ([byte]pixcol >> 3) // Scale blue down to 5 bits and add blue
+
+        // Return the final RGB565 value
+    End Function
+
+
+    Table DisplayColor 
+    ILI9341_BLACK   // 0x0000
+    ILI9341_RED     // 0xF800
+    ILI9341_GREEN   // 0x07E0
+    ILI9341_BLUE    // 0x001F
+    ILI9341_WHITE   // 0xFFFF
+    ILI9341_PURPLE  // 0xF11F
+    ILI9341_YELLOW  // 0xFFE0
+    ILI9341_CYAN    // 0x07FF
+    ILI9341_D_GRAY  // 0x528A
+    ILI9341_L_GRAY  // 0x7997
+    ILI9341_SILVER  // 0xC618
+    ILI9341_MAROON  // 0x8000
+    ILI9341_OLIVE   // 0x8400
+    ILI9341_LIME    // 0x07E0
+    ILI9341_AQUA    // 0x07FF
+    ILI9341_TEAL    // 0x0410
+    ILI9341_NAVY    // 0x0010
+    ILI9341_FUCHSIA // 0xF81F
+    End Table
+
+    Function ConstructString ( ccount ) as String * 15
+
+        Dim stringpointer as Word
+        Dim stringpointercount as Byte
+        Dim stringchar as Word
+        ConstructString = ""
+        For stringpointer = 0 to 14
+            Readtable ColorStrings, ( 15 * ( ccount - 1 ) ) + stringpointer + 1, stringchar
+            ConstructString = ConstructString + Chr(stringchar)
+        Next
+
+    End Function
+
+    Table ColorStrings as Word
+
+        "ILI9341_BLACK  "
+        "ILI9341_RED    "
+        "ILI9341_GREEN  "
+        "ILI9341_BLUE   "
+        "ILI9341_WHITE  "
+        "ILI9341_PURPLE "
+        "ILI9341_YELLOW "
+        "ILI9341_CYAN   "
+        "ILI9341_D_GRAY "
+        "ILI9341_L_GRAY "
+        "ILI9341_SILVER "
+        "ILI9341_MAROON "
+        "ILI9341_OLIVE  "
+        "ILI9341_LIME   "
+        "ILI9341_AQUA   "
+        "ILI9341_TEAL   "
+        "ILI9341_NAVY   "
+        "ILI9341_FUCHSIA"
+
+    End Table
