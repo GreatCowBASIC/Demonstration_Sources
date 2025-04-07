@@ -36,7 +36,7 @@
 '''@author    Evan R. Venn   
 '''@license   GPL
 '''@version   1.02   
-'''@date      2023-08-20
+'''@date      07/04/2025
 '''********************************************************************************
 
 
@@ -181,7 +181,7 @@
             HserPrintCRLF
             HserPrint "Welcome to Explorer 8"
             HserPrintCRLF
-            HserPrint "GCBASIC - Anobium   2023"
+            HserPrint "GCBASIC - Anobium   2025"
             HserPrintCRLF
         #endif
 
@@ -192,7 +192,7 @@
         CLS
         Print "    GCBASIC     "
         Locate 1,0
-        Print " Anobium   2023 "
+        Print " Anobium   2025 "
         wait 5 s
         CLS
         Print "    Welcome     "
