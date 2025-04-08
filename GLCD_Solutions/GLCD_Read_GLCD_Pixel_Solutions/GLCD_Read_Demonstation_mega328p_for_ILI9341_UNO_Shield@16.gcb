@@ -77,7 +77,15 @@
 
             // Decode the pixel and display components
             DecodeAndShow
-            
+
+
+            // Display result
+              If Pixel = MyCol Then
+                GLCDPRINTLARGEFONT 10, 210, "ReadPixel() Matched "
+              Else
+                GLCDPRINTLARGEFONT 10, 210, "ReadPixel() Incorrect"
+              End If
+
             // Pause before testing next color
             Wait 1 s
 
