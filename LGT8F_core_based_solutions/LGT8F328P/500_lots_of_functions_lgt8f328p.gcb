@@ -23,7 +23,7 @@
 '''@author  Evan Venn
 '''@licence GPL
 '''@version 1.0
-'''@date    08/10/2020
+'''@date    14/04/2025
 '''********************************************************************************
 
 
@@ -102,7 +102,7 @@
 
     Box 0,0,127,63
     GLCDPrint ( 1, 36, "GCBASIC")
-    GLCDPrint ( 1, 46, "GLCD Library 2023")
+    GLCDPrint ( 1, 46, "GLCD Library 2025")
     GLCDPrint ( 1, 54, "Sprite Support")
     wait 1 s
     GLCDCLS
