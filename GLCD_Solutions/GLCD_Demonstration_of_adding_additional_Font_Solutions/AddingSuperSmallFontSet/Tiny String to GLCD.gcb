@@ -1,0 +1,117 @@
+//***********************************************************
+// Mini-Font Display Program for PIC16F15376 Microcontroller
+//
+// This program displays text on an SSD1306 64x32 GLCD display
+// using a custom tiny font (3x5 pixels per character) to
+// maximize screen space usage.
+//
+// The program supports digits 0-9 and uppercase letters A-Z.
+//***********************************************************
+
+// @author    Roger Jönsson   
+// @license   GPL
+// @version   1.00   
+// @date      2025-04-14
+
+#Chip 16F15376, 16
+#Option Explicit
+#include <glcd.h>
+
+// Display configuration
+#DEFINE GLCD_TYPE         GLCD_TYPE_SSD1306_64x32 
+#DEFINE GLCD_I2C_Address  0x78 
+
+// I2C Software settings
+#DEFINE I2C_MODE Master
+#DEFINE I2C_DATA    PORTC.4
+#DEFINE I2C_CLOCK   PORTC.5
+#DEFINE I2C_DISABLE_INTERRUPTS ON
+
+// Initialize display
+// 0-255 (5 is a moderate contrast level)
+GLCDSetContrast (5) 
+
+// Variable declarations
+// Text to be displayed
+Dim displayText as string         
+// ASCII code of current character
+Dim characterCode as byte         
+// Loop counters and indexes
+Dim currentBit, smallfont_row, smallfont_col, charIndex as Byte  
+// Screen coordinates
+Dim smallfont_positionX, smallfont_positionY as Byte  
+// Pixel on/off state
+Dim pixelState as Bit             
+// Bitmap of current character
+Dim characterBitmap as Word       
+// Position in font table
+Dim TinyTableCharIndex as Byte    
+
+// Font data tables - each Word contains a 3x5 pixel bitmap (15 bits)
+// for a character, starting from bottom left
+Table TinyDigits As Word 
+    32319, 992, 30391, 32437, 31900, 24253, 24255, 32272, 32447, 32445  
+    // Items: 0123456789
+End Table
+
+Table Tinyletters As Word 
+    16015, 10943, 17966, 14911, 18111, 17055, 24238, 31903, 992, 30754
+    27807, 1087, 32543, 32287, 14894, 8863, 15918, 11935, 19113, 17392 
+    30782, 28796, 31871, 27803, 24824, 26291 
+    // A,B,C,D,E,F...Z (26 letters)
+End Table
+
+// Initial position for text
+  // X coordinate of first character
+  smallfont_positionX = 0       
+  // Y coordinate of first character
+  smallfont_positionY = 15      
+
+// Text to display
+displayText = "41 GAME OVER"
+
+// Main text rendering loop
+// Processes each character in the string, retrieves its bitmap,
+// and sends it to the TinyPrinter routine
+For charIndex = 1 to Len(displayText)
+    characterCode = ASC(displayText, charIndex)
+
+    // Handle digits (ASCII 48-57)
+    If characterCode >= 48 and characterCode < 58 then
+        TinyTableCharIndex = characterCode - 47
+        Readtable TinyDigits, TinyTableCharIndex, characterBitmap    
+        TinyPrinter(smallfont_positionX, smallfont_positionY, characterBitmap) 
+    // Handle uppercase letters (ASCII 65-90)
+    else
+        TinyTableCharIndex = characterCode - 64
+        Readtable Tinyletters, TinyTableCharIndex, characterBitmap    
+        TinyPrinter(smallfont_positionX, smallfont_positionY, characterBitmap) 
+    end if
+
+    // Move X position for next character (3 pixels wide + 2 pixel spacing)
+    smallfont_positionX = smallfont_positionX + 5  
+Next charIndex
+
+// Example of printing a single character directly:
+// Prints the letter "J"
+// TinyPrinter(10, 10, 17055)  
+
+// TinyPrinter Subroutine
+// Renders a 3x5 pixel character at the specified position
+// Parameters:
+// smallfont_positionX, smallfont_positionY: Top-left corner coordinates
+// characterBitmap: 15-bit bitmap of the character (3 columns x 5 rows)
+Sub TinyPrinter(smallfont_positionX, smallfont_positionY, characterBitmap) 
+    // Bit position counter
+    currentBit = 0  
+    
+    // Loop through columns (3 pixels wide)
+    For smallfont_col = 1 to 3
+        // Loop through rows (5 pixels high)
+        For smallfont_row = 1 to 5
+            pixelState = characterBitmap.currentBit
+            PSet(smallfont_positionX + smallfont_col, smallfont_positionY - smallfont_row, pixelState)
+            currentBit = currentBit + 1
+        Next smallfont_row
+    Next smallfont_col
+End Sub
