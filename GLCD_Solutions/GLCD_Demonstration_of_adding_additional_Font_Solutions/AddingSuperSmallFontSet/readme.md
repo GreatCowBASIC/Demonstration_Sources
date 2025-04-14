@@ -11,3 +11,5 @@ Determined to find a solution, he set out to create a custom tiny font that woul
 
 ## The Result?
 A super “cheap” font that is... well, let’s just say it’s barely readable, but it gets the job done!
+
+![Tiny Font](GLCDTinyFont.jpg)
