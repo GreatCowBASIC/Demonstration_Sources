@@ -1,0 +1,56 @@
+/*
+A demonstration program for GCBASIC.
+--------------------------------------------------------------------------------
+This program initializes an LCD display and prints various messages. It also demonstrates reading analog data and displaying it continuously.
+Designed for use with the PIC 16LF1939 microcontroller.
+
+@author    Name
+@license   GPL
+@version   Version
+@date      2025-04-16
+********************************************************************************
+*/
+
+#chip 16LF1939               // Specifies the microcontroller used for this program.
+#option Explicit             // Enforces explicit declarations of variables, ensuring clarity.
+
+//
+// Setup LCD Parameters
+//
+#define LCD_IO 4             // Defines the I/O pin configuration for the LCD.
+#define LCD_NO_RW            // Indicates the LCD does not use the Read/Write pin.
+#define LCD_Speed fast       // Sets the communication speed with the LCD to fast.
+#define LCD_WIDTH 20         // Specifies the LCD width (default is 20 characters).
+
+//
+// Define Hardware Settings
+//
+#define LCD_RS PORTC.0       // Configures the RS (Register Select) pin of the LCD.
+#define LCD_Enable PORTA.6   // Configures the Enable pin of the LCD.
+#define LCD_DB4 PORTD.0      // Configures the data pin DB4 for the LCD.
+#define LCD_DB5 PORTD.1      // Configures the data pin DB5 for the LCD.
+#define LCD_DB6 PORTD.2      // Configures the data pin DB6 for the LCD.
+#define LCD_DB7 PORTD.3      // Configures the data pin DB7 for the LCD.
+
+//
+// Program Execution: Display Messages
+//
+Print " GCBASIC 2025"        // Prints a greeting message on the LCD.
+Locate 1,2                  // Moves the cursor to the second line of the LCD.
+Print "One PIC MCU"         // Prints a description of the microcontroller.
+
+wait 2 s                    // Waits for 2 seconds before clearing the screen.
+CLS                         // Clears the LCD screen.
+
+Print "   PIC"              // Prints a short message on the LCD.
+Print CHIPNAMESTR           // Prints the name of the microcontroller (retrieved dynamically).
+
+//
+// Main Loop: Read and Display Analog Data
+//
+Do
+    Locate 1,0              // Moves the cursor to the first line of the LCD.
+    Print ReadAD10( AN13 )  // Reads analog data from channel AN13 and prints it.
+    Print " "               // Adds a space after the printed value for clarity.
+    wait 100 ms             // Waits for 100 milliseconds before repeating.
+Loop                        // Repeats the loop indefinitely.
