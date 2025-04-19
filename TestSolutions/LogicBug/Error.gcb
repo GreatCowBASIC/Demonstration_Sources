@@ -1,0 +1,97 @@
+#SKIPTEST
+/*
+I'll expand on the three cases for handling shift operators in this code. The Case 1 is what I have added in Build 1480.
+
+
+Process:
+
+    Intial operation.
+
+    1. The code identifies that the shift operator is followed by a opening parenthesis "("
+    2. It needs to find the matching opening parenthesis ")" and capture everything in between
+    3. It handles nested parentheses by counting opening and closing parentheses:
+    - When it encounters a "(", it increments braceIndex
+    - When it encounters a ")", it decrements braceIndex
+    - It continues until all parentheses are balanced (braceIndex = 0)
+    4. It reconstructs the entire expression inside the parentheses as shiftCalc and replaces the initial "(", removing all elements to the closing ")"
+
+Next Operation
+    
+    1. The code then identifies that the shift operator is preceded by a closing parenthesis ")"
+    2. It needs to find the matching opening parenthesis "(" and capture everything in between
+    3. It handles nested parentheses by counting opening and closing parentheses:
+    - When it encounters a ")", it increments braceIndex
+    - When it encounters a "(", it decrements braceIndex
+    - It continues until all parentheses are balanced (braceIndex = 0)
+    4. It reconstructs the entire expression inside the parentheses as shiftCalc
+    5. It captures the number of bits to shift (the right operand) as NumBits
+    6. It transforms the entire construction into a function call:
+        - FnLSL(expression, bits) for left shifts (<<)
+        - FnLSR(expression, bits) for right shifts (>>)
+
+    Case 1: Parenthesized Expressions - (expression) << bits
+
+    This is the most complex case, handling situations where the left operand of a shift operator is a parenthesized expression.
+
+    Example Input: (x + 3) << 2
+
+    Example Output: FnLSL(x + 3, 2)
+
+Else if 
+    Case 2: Constant Values - constant << constant
+
+    This case handles shift operations where both operands are constant values that can be evaluated at compile time.
+
+    Example Input: 4 << 2
+
+    Process:
+    1. The code checks that both the left and right operands are constants using IsConst()
+    2. It concatenates the original expression leftOperand + operator + rightOperand
+    3. It evaluates the result using the Calculate() function
+    4. It replaces the shift operation with the calculated result
+    5. It clears the original operands since they've been incorporated into the result
+
+    Example Output: 16 (the precalculated result)
+
+Else
+
+    Case 3: Standard Variable Shifting - variable << constant
+
+    This is the most straightforward case, handling standard shift operations on variables.
+
+    Example Input: myVar << 3
+
+    Process:
+    1. The code captures the left operand (the value to be shifted) as BitsIn
+    2. It captures the right operand (the number of bits to shift) as NumBits
+    3. It creates a function call based on the shift direction:
+    - FnLSL(myVar, 3) for left shifts (<<)
+    - FnLSR(myVar, 3) for right shifts (>>)
+    4. It clears the original operands since they've been incorporated into the function call
+
+    Example Output: FnLSL(myVar, 3)
+
+The purpose of all the transformations is to convert C-style shift operators (<< and >>) into function calls that the GCBASIC compiler can understand and process correctly. 
+This enables developers to use familiar syntax while ensuring compatibility with the target compiler.
+
+*/
+
+#CHIP 16f1939
+
+Dim BitNum as Byte
+Dim MyVar as Word
+Dim Addr as Word
+Dim Row as Byte
+Dim Col as Byte
+
+// Works
+MyVar = FnLSL( 1, BitNum)
+MyVar = 1<<BitNum
+// This failed prior to Build 1480, this is now expanded to work
+ADDR = 0x80 OR ((Row - 1) << 6) OR (Col-1) OR 1
+
+// Very complex... works
+ADDR = 0 + ( (Row - 1) << ( BitNum + 2 ) + 3) | 1 << Bitnum
+
+
+
