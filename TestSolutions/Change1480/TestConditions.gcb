@@ -74,13 +74,25 @@ Else
 The purpose of all the transformations is to convert C-style shift operators (<< and >>) into function calls that the GCBASIC compiler can understand and process correctly. 
 This enables developers to use familiar syntax while ensuring compatibility with the target compiler.
 
+These may still overflow the temporary variables...beware and keep the logical simple
+
+Use #DEFINE MUTEBITWISEERRORS  to mute error handling.
+
 */
 
-#CHIP 16f1939
+#CHIP 16F877a
+#option Explicit
+
+// #DEFINE MUTEBITWIDEWARNINGS
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
 
 Dim BitNum as Byte
 Dim MyVar as Word
-Dim Addr as Word
+Dim Addr as Long
 Dim Row as Byte
 Dim Col as Byte
 
@@ -88,10 +100,38 @@ Dim Col as Byte
 MyVar = FnLSL( 1, BitNum)
 MyVar = 1<<BitNum
 // This failed prior to Build 1480, this is now expanded to work
-ADDR = 0x80 OR ((Row - 1) << 6) OR (Col-1) OR 1
+
+Row = 2
+Col = 5
+Addr = 0x80 OR ((Row - 1) << 6) OR (Col-1) OR 1
+
+Hserprint "0b"
+Hserprint ByteToBin(Addr)
 
 // Very complex... works
-ADDR = 0 + ( (Row - 1) << ( BitNum + 2 ) + 3) | 1 << Bitnum
+Addr = 0 + ( (Row - 1) << ( BitNum + 2 ) + 3) | 1 << Bitnum
 
+// Testing array elements
 
+    Dim SerialBuffer(20)
+        SerialBuffer (1) = 0x76
+        SerialBuffer (2) = 0x54
+        SerialBuffer (3) = 0x32
+        SerialBuffer (4) = 0x10
+        
 
+    Dim RegIndex
+        RegIndex = 1
+
+    HserPrintCRLF
+
+    //! This raises the error correctly - this is good
+    // Addr = ([LONG]SerialBuffer(RegIndex) << 24) |  ([LONG]SerialBuffer(RegIndex+1) << 16)  |  ([LONG]SerialBuffer(RegIndex+2) << 8)  |  [LONG]SerialBuffer(RegIndex+3)
+    // HSerPrint "0X"
+    // HSerPrint LongToHex( [long]Addr )
+    // HserPrintCRLF
+
+    Addr =   ([LONG]SerialBuffer(RegIndex+1) << 16)  |  ([LONG]SerialBuffer(RegIndex+2) << 8) |  [LONG]SerialBuffer(RegIndex+3)
+    Addr = ([LONG]SerialBuffer(RegIndex) << 24) | Addr 
+    HSerPrint "0x"
+    HSerPrint LongToHex( [long]Addr )

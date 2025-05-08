@@ -1,0 +1,259 @@
+'       ******************************************************************************
+//*     LIGHT CONTROL    
+'       By JackJames58
+'       GCBasic compiler
+'       ******************************************************************************
+'       -
+        #Chip 16F1847, 32
+        #Config FOSC=INTOSC, WDTE=Off, PWRTE=Off, MCLRE=Off, CP=Off, BOREN=Off, CLKOUTEN=Off
+        #Option Explicit
+'       -
+'       Costanti
+        #Define SAMPLE_RATE  8000
+        #Define DelayUS  125
+'       -
+'       Uscite LED ExtraBass, bass, Muddle, High
+        #Define LED_EXTRA_BASS LATB.0
+        #Define LED_BASS       LATB.1
+        #Define LED_MIDDLE     LATB.2
+        #Define LED_HIGH       LATB.3
+'       -
+'       Coefficienti dei filtri (come in mikroBasic)
+        Dim EXTRA_BASS_COEFF_A (2) As Single
+        EXTRA_BASS_COEFF_A (0) = 1.0
+        EXTRA_BASS_COEFF_A (1) = -1.561
+        EXTRA_BASS_COEFF_A (2) = 0.6414
+'       EXTRA_BASS_COEFF_A = 1.0, -1.561, 0.6414
+'       -
+        Dim EXTRA_BASS_COEFF_B (2) As Single
+        EXTRA_BASS_COEFF_B (0) = 0.0201
+        EXTRA_BASS_COEFF_B (1) = 0.0402
+        EXTRA_BASS_COEFF_B (2) = 0.0201
+'       EXTRA_BASS_COEFF_B = 0.0201, 0.0402, 0.0201
+'       -
+        Dim BASS_COEFF_A (4) As Single
+        BASS_COEFF_A (0) = 1.0
+        BASS_COEFF_A (1) = -3.124
+        BASS_COEFF_A (2) = 3.748
+        BASS_COEFF_A (3) = -2.124
+        BASS_COEFF_A (4) = 0.4999
+'       BASS_COEFF_A = 1.0, -3.124, 3.748, -2.124, 0.4999
+'       -
+        Dim BASS_COEFF_B (4) As Single
+        BASS_COEFF_B (0) = 0.0087
+        BASS_COEFF_B (1) = 0.0
+        BASS_COEFF_B (2) = -0.0174
+        BASS_COEFF_B (3) = 0.0
+        BASS_COEFF_B (4) = 0.0087
+'       BASS_COEFF_B = 0.0087, 0.0, -0.0174, 0.0, 0.0087
+'       -
+        Dim MIDDLE_COEFF_A (4) As Single
+        MIDDLE_COEFF_A (0) = 1.0
+        MIDDLE_COEFF_A (1) = -3.124
+        MIDDLE_COEFF_A (2) = 3.748
+        MIDDLE_COEFF_A (3) = -2.124
+        MIDDLE_COEFF_A (4) = 0.4999
+'       MIDDLE_COEFF_A = 1.0, -3.124, 3.748, -2.124, 0.4999
+'       -
+        Dim MIDDLE_COEFF_B (4) As Single
+        MIDDLE_COEFF_B (0) = 0.0087
+        MIDDLE_COEFF_B (1) = 0.0
+        MIDDLE_COEFF_B (2) = -0.0174
+        MIDDLE_COEFF_B (3) = 0.0
+        MIDDLE_COEFF_B (4) = 0.0087
+'       MIDDLE_COEFF_B = 0.0087, 0.0, -0.0174, 0.0, 0.0087
+'       -
+        Dim HIGH_COEFF_A (2) As Single
+        HIGH_COEFF_A (0) = 1.0
+        HIGH_COEFF_A (1) = -1.561
+        HIGH_COEFF_A (2) = 0.6414
+'       HIGH_COEFF_A = (1.0, -1.561, 0.6414)
+'       -
+        Dim HIGH_COEFF_B(2) As Single
+        HIGH_COEFF_B (0) = 0.9201
+        HIGH_COEFF_B (1) = -1.8402
+        HIGH_COEFF_B (2) = 0.9201
+'       HIGH_COEFF_B = (0.9201, -1.8402, 0.9201)
+'       -
+'       Variabili globali
+        Dim AudioSample     As Word
+        Dim ExtraBassSignal As Single
+        Dim BassSignal      As Single
+        Dim MiddleSignal    As Single
+        Dim HighSignal      As Single
+'       -
+        Dim Pot1 As Word
+        Dim Pot2 As Word
+        Dim Pot3 As Word
+        Dim Pot4 As Word
+'       -
+        Dim ExtraBass As Bit
+        Dim Bass      As Bit
+        Dim Middle    As Bit
+        Dim High      As Bit
+'       -
+'       Buffer dei filtri
+        Dim ExtraBassBufferX (2) As Single
+        Dim ExtraBassBufferY (2) As Single
+'       -
+        Dim BassBufferX (4) As Single
+        Dim BassBufferY (4) As Single
+'       -
+        Dim MiddleBufferX (4) As Single
+        Dim MiddleBufferY (4) As Single
+'       -
+        Dim HighBufferX (2) As Single
+        Dim HighBufferY (2) As Single
+'       -
+'       -
+'       -------------------------------------
+Sub Initialize ()
+        TRISA = 0b00101111
+        TRISB = 0b11110000
+        
+        ANSELA = 0b00101111
+        ANSELB = 0b00000000
+        PORTB = 0
+End Sub
+'       -
+'       -------------------------------------
+Function ReadAudioSample () As Word
+        ReadAudioSample = ReadAd10(0)
+End Function
+'       -
+'       -------------------------------------
+Function ApplyIIRFilter (Aa() As Single, Bb() As Single, Xx() As Single,  Yy() As Single, Sample As Single, Order As Byte) As Single
+        Dim I As Byte
+        Dim Output As Single
+        
+'       Shift buffer
+        For I = Order To 1 Step -1
+           Xx (I) = Xx (I - 1)
+           Yy (I) = Yy (I - 1)
+        Next
+        Xx (0) = Sample
+'       -
+'       Calcolo output
+        Output = 0.0
+        For I = 0 To Order
+           Output = Output + Bb (I) * Xx (I)
+        Next
+        For I = 1 To Order
+           Output = Output - Aa (I) * Yy (I)
+        Next
+        Yy (0) = Output
+        ApplyIIRFilter = Output
+End Function
+'       -
+'       -------------------------------------
+Sub ReadPots()
+        Pot1 = ReadAd10 (1)
+        Pot2 = ReadAd10 (2)
+        Pot3 = ReadAd10 (3)
+        Pot4 = ReadAd10 (4)
+End Sub
+'       -
+'       -------------------------------------
+Sub ControlOutputs()
+        ExtraBass = (ExtraBassSignal > Pot1)
+        Bass = (BassSignal > Pot2)
+        Middle = (MiddleSignal > Pot3)
+        High = (HighSignal > Pot4)
+'       -
+        LED_EXTRA_BASS = ExtraBass
+        LED_BASS       = Bass
+        LED_MIDDLE     = Middle
+        LED_HIGH       = High
+End Sub
+'       -
+'       -
+'       -
+'       ******************************************************************************
+//!     MAIN
+'       ******************************************************************************
+        Initialize()
+        Do
+           AudioSample = ReadAudioSample()
+'          -
+           ExtraBassSignal = ApplyIIRFilter (EXTRA_BASS_COEFF_A, EXTRA_BASS_COEFF_B, ExtraBassBufferX, ExtraBassBufferY, AudioSample, 2)
+           BassSignal      = ApplyIIRFilter (BASS_COEFF_A, BASS_COEFF_B, BassBufferX, BassBufferY, AudioSample, 4)
+           MiddleSignal    = ApplyIIRFilter (MIDDLE_COEFF_A, MIDDLE_COEFF_B, MiddleBufferX, MiddleBufferY, AudioSample, 4)
+           HighSignal      = ApplyIIRFilter (HIGH_COEFF_A, HIGH_COEFF_B, HighBufferX, HighBufferY, AudioSample, 2)
+'          -
+           ReadPots()
+           ControlOutputs()
+           Wait DelayUS us
+        Loop
+        
+        
+'       ******************************************************************************
+//!     DESCRIPTION OF OPERATION AND PIN CONNECTION
+'       ******************************************************************************
+//*     OPERATION:
+'       1. The audio signal is sampled via the ADC (channel AN0).
+'       2. The signal is processed by four IIR digital filters to separate the bands:
+'          - ExtraBass: Low-pass filter with a cutoff frequency of 100 Hz.
+'          - Bass: Band-pass filter with frequencies between 101 Hz and 400 Hz.
+'          - Middle: Band-pass filter with frequencies between 401 Hz and 2 kHz.
+'          - High: High-pass filter with a cutoff frequency of 2 kHz.
+'       3. The filtered signals are compared with the potentiometer values.
+'       4. If the signal of a band exceeds the corresponding threshold, the output is activated.
+'       
+//*     PIN CONNECTION:
+'       - AN0: Incoming audio signal (connect the audio signal here).
+'       - AN1: Potentiometer for adjusting the ExtraBass threshold.
+'       - AN2: Potentiometer for adjusting the Bass threshold.
+'       - AN3: Potentiometer for adjusting the Middle threshold.
+'       - AN4: Potentiometer for adjusting the High threshold.
+'       - RB0: Output for the ExtraBass band (active if the signal > threshold).
+'       - RB1: Output for the Bass band (active if the signal > threshold).
+'       - RB2: Output for the Middle band (active if the signal > threshold).
+'       - RB3: Output for the High band (active if the signal > threshold).
+'       
+//*     NOTES:
+'       - The coefficients of the IIR filters must be calculated using design tools
+'         such as MATLAB, Python (scipy.signal), or online tools.
+'       - The potentiometers should be connected between VDD and GND, with the wiper connected to pins AN1-AN4.
+'       - The outputs RB0-RB3 can drive LEDs, mosfets, transistor or other devices.
+'       
+'       
+'       ******************************************************************************
+//!     DESCRIPTION OF THE OPERATION OF IIR FILTERS AND IMPLEMENTATION IN GCBASIC
+'       ******************************************************************************
+//*     OPERATION OF IIR FILTERS:
+'       IIR filters (Infinite Impulse Response) are digital filters that use both the input samples
+'       and previous output samples to calculate the current output.
+'       Their general equation is:
+'       
+//*     y[n] = b0*x[n] + b1*x[n-1] + b2*x[n-2] + ... - a1*y[n-1] - a2*y[n-2] - ...
+'       
+//*     Where:
+'       - y[n] is the current output.
+'       - x[n] is the current input.
+'       - b0, b1, b2, ... are the numerator coefficients (feedforward).
+'       - a1, a2, ... are the denominator coefficients (feedback).
+'       
+'       IIR filters are resource-efficient and can be used to implement
+'       low-pass, band-pass, and high-pass filters with few coefficients.
+'       
+//*     IMPLEMENTATION IN GCBASIC:
+//?     1. Filter coefficients:
+'       - The filter coefficients (feedforward and feedback) are defined as arrays of constants.
+'       - For example, for the ExtraBass low-pass filter:
+'         const EXTRA_BASS_COEFF_A as float[3] = (1.0, -1.8, 0.81)  ' Feedback coefficients (a)
+'         const EXTRA_BASS_COEFF_B as float[3] = (0.1, 0.2, 0.1)    ' Feedforward coefficients (b)
+'       
+//?     2. Sample buffers:
+'       - For each filter, two buffers are used:
+'       - One buffer to store the input samples (x[n], x[n-1], x[n-2], ...).
+'       - One buffer to store the output samples (y[n-1], y[n-2], ...).
+'       - For example, for the ExtraBass filter:
+'         dim ExtraBassBufferX as float[3]  ' Buffer for input samples
+'         dim ExtraBassBufferY as float[3]  ' Buffer for output samples
+'       
+//?     3. Applying the filter:
+'       - For each new sample, the buffers are shifted to make room for the new value.
+'       - The output is calculated using the IIR filter equation.
+'       - For example, for the ExtraBass filter:
+'       ' ExtraBassBufferX[0] = Sample  ' Store the new input sample
+'       ' Output = b0*x[0] + b1*x[1] + b2*x
