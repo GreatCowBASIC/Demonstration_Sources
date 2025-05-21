@@ -17,8 +17,8 @@
 '''@date   	05.12.2015
 '''********************************************************************************
 
-#chip mega2560, 16
-#option explicit
+#CHIP MEGA2560, 16
+#OPTION EXPLICIT
 
 'Include files
 #include <glcd.h>

@@ -1,0 +1,267 @@
+/*
+A demonstration program for GCBASIC.  © 2025 Uwe Seifert
+--------------------------------------------------------
+
+This program shows how to use the Hardware Capacitive Voltage Divider (CVD) to obtain a value dependent on the capacitance
+of a touch sensor button. With a large surface area, it can also be used as a proximity sensor.
+
+Advanced ADCC functions such as burst average mode and automatic CVD are used. It also shows how to evaluate the measured
+value and use it to control a self calibrating switching function with Hysteresis, for example by switching a LED on and off.
+
+In addition, the values received from the ADCC are output on a four-digit seven-segment display for troubleshooting and
+easier tuning. This display is driven by an SAA1064 controlled via software I²C.
+
+The relevant information is commented on in detail. Some parameters may have to be adapted to the hardware conditions
+(e.g. size of the sensor surface, thickness of the overlying material, etc.). Notes on configuration are marked with ***.
+
+@name      CVD-Touch-ProximityAndSAA1064-Demo_PIC18F16Q41
+@author    Uwe Seifert
+@license   GPL
+@version   1.01
+@date      2025-04-12
+
+History
+-------
+1.00  2025-04-10  - First fully functional version.
+1.01  2025-04-12  - ADCON1.6=1 ("ADC Inverted Precharge Polarity Enable Bit") enabled, results in somewhat more stable measured values)
+                    + ADCON1.7=0 for same signal polarity as before.
+                  - Comments slightly extended and adapted for better compiler compatibility.
+*/
+
+#CHIP 18F16Q41,16
+#OPTION Explicit
+
+// I²C Settings:
+#DEFINE I2C_MODE Master
+#DEFINE I2C_DATA PORTB.6
+#DEFINE I2C_CLOCK PORTB.7
+#DEFINE I2C_DISABLE_INTERRUPTS ON
+
+// Prevent glitches at the port bits:
+#OPTION VOLATILE PortA.4
+#OPTION VOLATILE PortA.5
+#OPTION VOLATILE PortB.6
+#OPTION VOLATILE PortB.7
+
+// Port Definition:
+DIR PortA.0 IN  // ICSPDAT
+DIR PortA.1 IN  // ICSPCLK
+DIR PortA.2 OUT // unused
+DIR PortA.3 IN  // MCLR/VPP
+DIR PortA.4 IN  // touchkey input (directly connected to the otherwise isolated touch button surface, with a large surface it can also be used as a proximity sensor)
+DIR PortA.5 OUT // LED output (1 = LED on)
+DIR PortB.4 OUT // unused
+DIR PortB.5 OUT // unused
+DIR PortB.6 OUT // I2C-DAT
+DIR PortB.7 OUT // I2C-CLK
+DIR PortC OUT   // unused
+
+// Set unused I/O pins to Low, according to datasheet page 21:
+RA2=0
+RB4=0
+RB5=0
+PortC=0
+
+DIM BCD AS STRING*4
+DIM BCD1 AS BYTE
+DIM BCD2 AS BYTE
+DIM BCD3 AS BYTE
+DIM BCD4 AS BYTE
+DIM Hysteresis AS BYTE
+DIM LED AS BYTE
+DIM Threshold AS WORD
+DIM Touch AS WORD
+
+LED=0
+RA5=0
+
+/* Format of the register settings and description used below:
+--------------------------------------------------------------
+Name   = Value       // Addr.  Purpose
+         // Bit Description
+--------------------------------------------------------------
+           Name: Name of the register according to datasheet. Can be used as an alias in GCBASIC.
+          Value: Value written to the register. In binary notation due to the sake of clarity.
+          Addr.: Address of the register in the PIC.
+        Purpose: Purpose of the register.
+Bit Description: Desciption of the function of the individual bits.  */
+
+/*
+// Remove comments around this block if you want to use internal reference!
+// Switch on internal voltage reference and set to 4.096V (if necessary, provides sometimes a slightly better result than Vdd, see below):
+FVRCON = 0b10000011  // 0x3D7  Shared Fixed Voltage Reference (FVR) and Temperature Indicator Control Register
+         // FVRCON.EN          = FVRCON.7     = Fixed Voltage Reference Enable
+         // FVRCON.RDY         = FVRCON.6     = Fixed Voltage Reference Ready Flag
+         // FVRCON.TSEN        = FVRCON.5     = Temperature Indicator Enable
+         // FVRCON.TSRNG       = FVRCON.4     = Temperature Indicator Range Selection
+         // FVRCON.CDAFVR[1:0] = FVRCON.[3:2] = FVR Buffer 2 (DAC, Comp) Gain Selection, 11: Gain 4 (4.096V) / 10: Gain 2 (2.048V) / 01: Gain 1x (1.024V) / 00: Off
+         // FVRCON.ADFVR[1:0]  = FVRCON.[1:0] = FVR Buffer 1 (ADC) Gain Selection, 11: Gain 4 (4.096V) / 10: Gain 2 (2.048V) / 01: Gain 1x (1.024V) / 00: Off
+
+DO UNTIL FVRCON.6 // wait until reference voltage is stable
+LOOP
+*/
+
+// Initialization of ADCC and CVD:
+ADPCH  = 0b00000100  // 0x3EC  select RA4/ANA4
+ADRPT  = 0b00011111  // 0x3E7  Repeat Threshold Bits  *** Number of averaged measured values
+ADACQL = 0b00001010  // 0x3EE  Acquisition Time Control Register (Low)  *** Values >0 necessary for stable measured values.
+ADACQH = 0b00000000  // 0x3EF  Acquisition Time Control Register (High)
+ADCAP  = 0b00000010  // 0x3F0  Additional Sample and Hold Capacitance, 1-31pF according to the register value  *** Adjust for maximum sensitivity (if in doubt, try it out).
+ADPREL = 0b00001010  // 0x3F1  Pre-charge Time Control Register (Low)   *** Values >0 activate the CVD function (together with other necessary settings).
+ADPREH = 0b00000000  // 0x3F2  Pre-charge Time Control Register (High)
+ADCON1 = 0b01000001  // 0x3F4  Control Register 1
+         // ADCON1.PPOL = ADCON1.7 = Precharge Polarity Bit (0: IO=Vss, ADC=Vdd; 1: IO=Vdd, ADC=Vss)  *** 0: lower value if touched, 1: higher value if touched; but ADCON1.6=1 (next bit) inverts this
+         // ADCON1.IPEN = ADCON1.6 = ADC Inverted Precharge Polarity Enable Bit (1: second process with reversed polarity)  *** 1: maybe results in somewhat more stable measured values
+         // ADCON1.GPOL = ADCON1.5 = Guard Ring Polarity Selection Bit  *** unused
+         // ADCON1.DSEN = ADCON1.0 = Double Sample Enable Bit (1: Two measurements as a pair)  *** If active, the result can also be read from ADERR, otherwise ineffective with this config.
+ADCON2 = 0b11010011  // 0x3F5  Control Register 2
+         // ADCON2.PSIS     = ADCON2.7     = ADC Previous Sample Input Select
+         // ADCON2.CRS[2:0] = ADCON2.[6:4] = CRS[2:0] ADC Accumulated Calculation Right Shift Select
+         // ADCON2.ACLR     = ADCON2.3     = A/D Accumulator Clear Command
+         // ADCON2.MD[2:0]  = ADCON2.[2:0] = 100: Low-Pass Filter mode / 011: Burst Average mode / 010: Average mode / 001: Accumulate mode / 000: Basic (Legacy) mode
+ADCON3 = 0b00000000  // 0x3F6  Control Register 3
+         // ADCON3.CALC[2:0] = ADCON3.[6:4] = ADC Error Calculation Mode Select
+         // ADCON3.SOI       = ADCON3.3     = ADC Stop-on-Interrupt
+         // ADCON3.TMD[2:0]  = ADCON3.[2:0] = Threshold Interrupt Mode Select
+ADREF  = 0b00000000  // 0x3F8  Voltage Reference Selection Register  *** Sometimes slightly better with 4.096V than with Vdd.
+         // ADREF.NREF      = ADREF.4     = ADC Negative Voltage Reference Selection, 1: External VREF- / 0: AVSS
+         // ADREF.PREF[1:0] = ADREF.[1:0] = ADC Positive Voltage Reference Selection, 11: Internal Fixed Voltage Reference (FVR) / 10: External VREF+ / 01: Reserved / 00: VDD
+ADCLK  = 0b00000000  // 0x3FA  Clock Selection Register  *** Other values showed no improvement.
+         // ADCLK.CS[5:0] = ADCLK.CS[5:0] = ADC Clock Divider Select, ADCClockFrequency=FOSC/(2*(n+1)), only available if FOSC is selected as the ADC clock source (ADCON0.CS=0)
+ADCON0 = 0b10000100  // 0x3F3  Control Register 0
+         // ADCON0.ON   = ADCON0.7 = ADC Enable (= ADC Module On)
+         // ADCON0.CONT = ADCON0.6 = ADC Continuous Operation Enable
+         // ADCON0.CS   = ADCON0.4 = ADC Clock Selection  *** If 1 (=ADCRC): Measured value very unstable.
+         // ADCON0.FM   = ADCON0.2 = ADRES and ADPREV data are right justified
+         // ADCON0.GO   = ADCON0.0 = ADC Conversion Status + Start Command if set to 1
+ADACT  = 0b00000000  // 0x3F9  Auto Conversion Trigger Control Register
+
+// Automatic calibration, assuming that the "button" is not "pressed" during PowerOn:
+// -> Measure idle value and set threshold value accordingly.
+WAIT 10 ms         // wait a little until everything is stable
+Touch=ReadCVD      // function ReadCVD see below
+Threshold=Touch+90 // *** <- change this number to adjust the sensitivity, from approx. 20 for small buttons behind a thick material to approx. 1000 for large areas with a thin insulating layer
+Hysteresis=5       // *** <- change this number to adjust the switching hysteresis, is used doubled, 0 = no hysteresis
+
+DO
+  // Start measurement:
+  Touch=ReadCVD    // function ReadCVD see below
+
+  // Control of the 7-segment display:
+  GOSUB Display
+
+  // Switch the LED on RA5 on or off according to the "switch" status, with hysteresis:
+  IF LED=0 THEN                           // LED is off -> upper limit value must be exceeded to switch on
+     IF Touch>Threshold+Hysteresis THEN
+       LED=1
+     END IF
+  ELSE                                    // LED is on -> lower limit value must be undershot to switch off
+     IF Touch<Threshold-Hysteresis THEN
+       LED=0
+     END IF
+  END IF
+
+  // Set LED port bit according to switch status:
+  RA5=LED
+
+  WAIT 10 ms
+LOOP
+
+FUNCTION ReadCVD AS WORD
+  // Start ADC:
+  ADCON0.0=1        // start conversion
+  DO WHILE ADCON0.0 // wait while conversion runs
+  LOOP
+
+  // Read ADC value:
+  ReadCVD=ADRESL
+  ReadCVD_h=ADRESH
+
+  // // Alternatively, read error register (contains the result of the CVD, but only if double sampling is enabled (ADCON1.DSEN=1)):
+  // ReadCVD=ADERRL
+  // ReadCVD_h=ADERRH
+END FUNCTION
+
+Display:
+  // Display routine for four-digit seven-segment display with SAA1064. For segment assignment see below.
+  // ATTENTION! Only works up to 16MHz system clock!
+
+  /* SAA1064 communication (see data sheet pages 5 and 6):
+   1) Slave Address:
+      0b01110000  0x70  Write
+      0b01110000  0x71  Read
+   2) Instruction Byte (= Sub Address = Register no. in SAA1064):
+      0b00000000  0x00  Control Register
+      0b00000001  0x01  Digit 1
+      0b00000010  0x02  Digit 2
+      0b00000011  0x03  Digit 3
+      0b00000100  0x04  Digit 4
+      Rest unused
+      -> Is first set to register 0 and then all 5 bytes (1x control byte 4x digit data) are written because the registers are autoincremented.
+         If required, however, each register can also be addressed and written to individually.
+   3) Control Byte:
+      0b X C6 C5 C4 C3 C2 C1 C0
+        X  = unused
+        C0 = 0 static mode, i.e. continuous display of digits 1 and 2
+        C0 = 1 dynamic mode, i.e. alternating display of digit 1 + 3 and 2 + 4
+        C1 = 0/1 digits 1 + 3 are blanked/not blanked
+        C2 = 0/1 digits 2 + 4 are blanked/not blanked
+        C3 = 1 all segment outputs are switched-on for segment test(1)
+        C4 = 1 adds 3 mA to segment output current (beim Test-Modul eher 1,6mA)
+        C5 = 1 adds 6 mA to segment output current (beim Test-Modul eher 3,2mA)
+        C6 = 1 adds 12 mA to segment output current (beim Test-Modul eher 6,4mA)
+      -> e.g. 0b00010111 for 3mA, normal display, dynamic
+   4) 4 data bytes that control each of the 8 outputs, 1 = segment On
+
+   Existing segment assignment:
+   a  -           Bit  Segm.    Bit Segm.
+   f | | b         0    e        4   b
+   g  -            1    d        5   a
+   e | | c         2    c        6   f
+   d  -   *dp      3    dp       7   g
+
+   Disp    Bin     Hex   Dez
+    0   0111 0111   77   119
+    1   0001 0100   14    20
+    2   1011 0011   B3   179
+    3   1011 0110   B6   182
+    4   1101 0100   D4   212
+    5   1110 0110   E6   230
+    6   1110 0111   E7   231
+    7   0111 0100   74   116
+    8   1111 0111   F7   247
+    9   1111 0110   F6   246
+    A   1111 0101   F5   245
+    b   1100 0111   C7   199
+    C   0110 0011   63    99
+    d   1001 0111   97   151
+    E   1110 0011   E3   227
+    F   1110 0001   E1   225
+    -   1000 0000   80   128
+    _   0000 0010   02     2    */
+
+  Table SevenSeg
+  119,20,179,182,212,230,231,116,247,246
+  END TABLE
+
+  // Decode ADC value into seven-segment data bytes:
+  BCD=RIGHT("000"+WORDTOSTRING(Touch),4)
+  READTABLE SevenSeg,VAL(RIGHT(BCD,1))+1,BCD1
+  READTABLE SevenSeg,VAL(MID(BCD,3,1))+1,BCD2
+  READTABLE SevenSeg,VAL(MID(BCD,2,1))+1,BCD3
+  READTABLE SevenSeg,VAL(LEFT(BCD,1))+1,BCD4
+
+  // Send data to display:
+  I2CSTART
+  I2CSEND(0b01110000) // slave address for write mode = 0x70
+  I2CSEND(0b00000000) // sub address 0 = control register
+  I2CSEND(0b01010111) // control byte for real approx. 8mA, dynamic mode (4 digits), normal display
+  I2CSEND(BCD1)       // data byte digit 1
+  I2CSEND(BCD2)       // data byte digit 2
+  I2CSEND(BCD3)       // data byte digit 3
+  I2CSEND(BCD4)       // data byte digit 4
+  I2CSTOP
+
+RETURN
+
+END
