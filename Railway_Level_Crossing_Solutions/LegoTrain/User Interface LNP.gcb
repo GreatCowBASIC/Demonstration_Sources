@@ -1,0 +1,141 @@
+;Include files (Libraries)
+#include <UNO_mega328p.h>
+#include "lnp_rxpin.h"
+
+;Defines (Constants)
+#define LNP_REC_HANDLER ControllerLNPHandler
+#define USER_BUTTON DIGITAL_2
+#define DISP_COUNT 1
+#define DISP_SEG_A ANALOG_0
+#define DISP_SEG_B DIGITAL_13
+#define DISP_SEG_C DIGITAL_12
+#define DISP_SEG_D DIGITAL_11
+#define DISP_SEG_E DIGITAL_10
+#define DISP_SEG_F DIGITAL_9
+#define DISP_SEG_G DIGITAL_8
+#define COUNTING_LED DIGITAL_3
+#define DEF_BUTTON_TIMEOUT 1000
+#define DEF_COUNT_LIMIT 3
+
+;Variables
+Dim LapCount As byte
+Dim IsCounting As bit
+Dim WasPressed As bit
+Dim PressTimedOut As bit
+Dim DisplayBitmap As byte
+Dim TimeSincePress As word
+Dim ResendPressCountdown As byte
+Dim ButtonTimeout As word
+Dim LapCountLimit As byte
+Dim SawButtonPressed As byte
+
+'Set up
+LNPInitialise
+InitUI
+
+'Main loop
+Do Forever
+	If IsCounting Then
+		Set COUNTING_LED On
+		DoCounting
+	Else
+		Set COUNTING_LED Off
+		WasPressed = FALSE
+		TimeSincePress = 0
+	End If
+	UpdateDisplay
+	Wait 1 ms
+Loop
+
+Sub DoCounting
+	If TimeSincePress < ButtonTimeout Then
+		TimeSincePress = TimeSincePress + 1
+		PressTimedOut = FALSE
+	Else
+		PressTimedOut = TRUE
+		If ResendPressCountdown = 0 Then
+			SendPressCount
+			ResendPressCountdown = 250
+		Else
+			ResendPressCountdown = ResendPressCountdown - 1
+		End If
+	End If
+	If WasPressed Then
+		If USER_BUTTON = 0 Then
+
+			'Button was pressed, then released
+			TimeSincePress = 0
+			If LapCount < LapCountLimit Then
+				LapCount = LapCount + 1
+			End If
+			WasPressed = FALSE
+		End If
+	Else
+		If USER_BUTTON = 1 Then
+			SawButtonPressed = SawButtonPressed + 1
+			If SawButtonPressed > 20 Then
+				WasPressed = TRUE
+			End If
+		Else
+			SawButtonPressed = 0
+		End If
+	End If
+	ReadTable SevenSegDispDigit, LapCount + 1, DisplayBitmap
+End Sub
+
+Sub InitUI
+	IsCounting = TRUE
+	WasPressed = FALSE
+	LapCount = 0
+	TimeSincePress = 0
+	SawButtonPressed = 0
+	PressTimedOut = FALSE
+	DisplayBitmap = 64
+	ButtonTimeout = DEF_BUTTON_TIMEOUT
+	LapCountLimit = DEF_COUNT_LIMIT
+End Sub
+
+Sub SendPressCount
+	'Use address 6 to send press count
+	OutStatus = LapCount
+	OutStatus.7 = PressTimedOut
+	SendLNPPair 6, OutStatus
+End Sub
+
+Sub UpdateDisplay
+	DISP_SEG_A = DisplayBitmap.0
+	DISP_SEG_B = DisplayBitmap.1
+	DISP_SEG_C = DisplayBitmap.2
+	DISP_SEG_D = DisplayBitmap.3
+	DISP_SEG_E = DisplayBitmap.4
+	DISP_SEG_F = DisplayBitmap.5
+	DISP_SEG_G = DisplayBitmap.6
+End Sub
+
+Sub ControllerLNPHandler
+	'Process received LNP message
+	If LNPState = LNP_STATE_WAITING Then
+		If LNPInBytes = 2 Then
+			If LNPInBuffer(1) = 5 Then
+
+				'Command 5 is a command for this
+				If LNPInBuffer(2) = 0 Then
+					LapCount = 0
+				Else If LNPInBuffer(2) = 1 Then
+					IsCounting = FALSE
+				Else If LNPInBuffer(2) = 2 Then
+					IsCounting = TRUE
+				Else If LNPInBuffer(2).7 Then
+					DisplayBitmap = LNPInBuffer(2) And 127
+				End If
+			End If
+		Else If LNPInBytes = 4 Then
+			If LNPInBuffer(1) = 242 Then
+				ButtonTimeout_H = LNPInBuffer(2)
+				[byte]ButtonTimeout = LNPInBuffer(3)
+				LapCountLimit = LNPInBuffer(4)
+			End If
+		End If
+	End If
+End Sub
+

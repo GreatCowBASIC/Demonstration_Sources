@@ -1,0 +1,456 @@
+;Include files (Libraries)
+#include <UNO_mega328p.h>
+#include "lnp_rxpin.h"
+
+;Defines (Constants)
+#define PRESSED TRUE
+#define GREEN ON
+#define RED OFF
+#define PWM_Freq 38
+#define SECTION_1 AN0
+#define SECTION_4 AN1
+#define SECTION_2 AN2
+#define SECTION_3 AN3
+#define IR_OUT DIGITAL_4
+#define SIGNAL_DEPART DIGITAL_2
+#define SIGNAL_PASS DIGITAL_10
+#define DISP_B0 DIGITAL_5
+#define DISP_B1 DIGITAL_6
+#define DISP_B2 DIGITAL_7
+#define BUTTON DIGITAL_3
+#define USART_BLOCKING 
+#define PF_FWD_2 2
+#define PF_FWD_4 4
+#define PF_REV_4 12
+#define MAX_LAPS 3
+#define DRIVE_SPEED 11
+#define SLOW_SPEED 13
+#define LNP_REC_HANDLER LNPReceived
+#define LIGHT_RED 0
+#define LIGHT_YELLOW 1
+#define LIGHT_FLASHING 2
+#define LIGHT_GREEN 3
+#define TRACK_DIVERGE 4
+#define TRACK_STRAIGHT 0
+#define TRAIN_SENSOR_THRESHOLD 75
+
+;Variables
+Dim PFOutData As word
+Dim PFSendBuffer As word
+Dim calVal1, calVal2, calVal3, calVal4 As byte
+Dim TimeSincePress As word
+Dim EmersonCrossingState As byte
+Dim LapCounter As word
+Dim LapCountRequest As byte
+Dim RepeatEnableCount As byte
+
+'Good speeds: 5 drive, 3 slow
+'Sensors:
+'Sensor 1 near signal
+'Sensor 2 next
+'Sensor 3 next
+'Sensor 4 before station
+calVal1 = ReadAD(SECTION_1)
+calVal2 = ReadAD(SECTION_2)
+calVal3 = ReadAD(SECTION_3)
+calVal4 = ReadAD(SECTION_4)
+EmersonCrossingState = 0
+LapCountRequest = 255
+RepeatEnableCount = 0
+ResendLapCountdown = 0
+PointsState = 255
+Wait 100 ms
+ShowNumber 0
+State = 0
+LastState = 255
+
+'Main loop
+Do Forever
+	If State = 0 Then
+		If State <> LastState Then
+			PFSendSingleOutputPWM 4, 1, 0
+			LastState = 0
+
+			'Try delay before LNP, see if that fixes gate not opening issue 2024-04-20
+			Wait 50 ms
+			SendPointsLNP LIGHT_RED + TRACK_STRAIGHT
+
+			'Open Emerson Crossing
+			EmersonCrossingOpen
+
+			'Clear lap count if LNP button
+			If LapCountRequest <> 255 Then
+				Repeat 3
+					UIClearLapCount
+					Wait 10 ms
+					UIEnableCounting
+					Wait 10 ms
+				End Repeat
+				RepeatEnableCount = 0
+			End If
+		End If
+
+		'Signals to red
+		SIGNAL_DEPART = RED
+		SIGNAL_PASS = RED
+
+		'Get lap count from button
+		LoopsRemaining = 0
+
+		'Count locally if no lap count recieved over bus
+		If LapCountRequest = 255 Then
+			ShowNumber 0
+			LoopsRemaining = CountPresses
+		Else
+
+			'Request count from LNP button
+			If RepeatEnableCount > 250 Then
+				RepeatEnableCount = 0
+				UIEnableCounting
+			Else
+				RepeatEnableCount = RepeatEnableCount + 1
+			End If
+			If LapCountRequest.7 = 1 Then
+				LoopsRemaining = LapCountRequest And 127
+			End If
+		End If
+
+		'Resend lap counter?
+		If ResendLapCountdown = 0 Then
+			SendLapCount
+
+			'If LNP button not present, resend every time
+			'If LNP button is present, only resend every 250 loops
+			If LapCountRequest <> 255 Then
+				ResendLapCountdown = 250
+			End If
+		Else
+			ResendLapCountdown = ResendLapCountdown - 1
+		End If
+
+		'If laps requested, time to send train around
+		If LoopsRemaining > 0 Then
+			State = 1
+			IncrementLapCount LoopsRemaining
+
+			'Disable counting if train about to go
+			If LapCountRequest <> 255 Then
+				UIDisableCounting
+			End If
+		End If
+
+		'Make loop time at least 1 ms for timing
+		Wait 1 ms
+	Else If State = 1 Then
+		If State <> LastState Then
+
+			'Activate crossing
+			EmersonCrossingClose
+
+			'Wait until gates shut, if crossing present
+			If EmersonCrossingState <> 0 Then
+				Repeat 12
+					Wait 500 ms
+					If EmersonCrossingState = 7 Then
+						Goto GatesHaveClosed
+					End If
+					EmersonCrossingClose
+				End Repeat
+				GatesHaveClosed:
+			End If
+
+			'Start train
+			SIGNAL_DEPART = GREEN
+			Wait 250 ms
+			PFSendSingleOutputPWM 4, 1, DRIVE_SPEED
+			Wait 1 s
+			LastState = State
+		End If
+		If ReadAD(SECTION_2) < TRAIN_SENSOR_THRESHOLD Then
+			State = 2
+		End If
+	Else If State = 2 Then
+		If State <> LastState Then
+			SIGNAL_DEPART = RED
+			SIGNAL_PASS = RED
+			LoopsRemaining = LoopsRemaining - 1
+			ShowNumber LoopsRemaining
+			If LoopsRemaining > 0 Then
+
+				'Set points for main line
+				SIGNAL_PASS = GREEN
+				SendPointsLNP LIGHT_GREEN + TRACK_STRAIGHT
+			Else
+				SIGNAL_PASS = RED
+
+				'Set points for loop
+				SendPointsLNP LIGHT_FLASHING + TRACK_DIVERGE
+			End If
+			LastState = State
+		End If
+		If ReadAD(SECTION_3) < TRAIN_SENSOR_THRESHOLD Then
+			State = 3
+		End If
+	Else If State = 3 Then
+		LastState = 3
+		If ReadAD(SECTION_4) < TRAIN_SENSOR_THRESHOLD Then
+			State = 4
+		End If
+	Else If State = 4 Then
+		LastState = 4
+		If LoopsRemaining = 0 Then
+			State = 5
+		Else
+			If ReadAD(SECTION_2) < TRAIN_SENSOR_THRESHOLD Then
+				State = 2
+			End If
+		End If
+	Else If State = 5 Then
+		If State <> LastState Then
+			PFSendSingleOutputPWM 4, 1, SLOW_SPEED
+			LastState = State
+
+			'Try delay before LNP, see if that fixes gate not opening issue 2024-04-20
+			Wait 50 ms
+
+			'Open Emerson Crossing
+			EmersonCrossingOpen
+		End If
+		If ReadAD(SECTION_1) < TRAIN_SENSOR_THRESHOLD Then
+			State = 0
+		End If
+	End If
+Loop
+
+Sub ShowNumber (In numOut)
+	If LapCountRequest <> 255 Then
+		UIShowNumber numOut
+	Else
+		DISP_B0 = numOut.0
+		DISP_B1 = numOut.1
+		DISP_B2 = numOut.2
+	End If
+End Sub
+
+Sub WaitForButton
+	Wait Until BUTTON = PRESSED
+	Wait 10 ms
+	Wait Until BUTTON <> PRESSED
+	Wait 10 ms
+End Sub
+
+'''Counts button presses
+'''@param Timeout Stop counting if there are no more presses after this many milliseconds. Default value is 1000.
+Function CountPresses (Optional Timeout As word = 1000)
+	CountPresses = 0
+	TimeSincePress = 0
+	Do While TimeSincePress < Timeout
+		If Button = Pressed Then
+			Wait 25 ms
+			Wait Until Button <> PRESSED
+			Wait 25 ms
+			If CountPresses < MAX_LAPS Then
+				CountPresses = CountPresses + 1
+			End If
+			ShowNumber CountPresses
+			TimeSincePress = 0
+		End If
+		Wait 1 ms
+		TimeSincePress = TimeSincePress + 1
+	Loop
+End Function
+
+'''Send a low level command to the Power Functions receiver
+'''@param PFChannel Channel of receiver (1 to 4)
+'''@param PFOutput Output to operate (0 or 1)
+'''@param PFData Speed to send, 0 = float, 7 = full FWD, 8 = brake, 9 = full REV
+Sub PFSendSingleOutputPWM (In PFChannel, In PFOutput, In PFData)
+	'Format output data
+	'Clear all bits that aren't set yet
+	PFOutData = 0
+
+	'Channel bits (2 bits, 1-4)
+	PFChannel = PFChannel - 1
+	If PFChannel.1 = 1 then
+		PFOutData.13 = 1
+	end if
+	If PFChannel.0 = 1 then
+		PFOutData.12 = 1
+	end if
+	PFOutData.10 = 1
+
+	'Mode PWM selected by default (clear bit 9)
+	'Select output
+	If PFOutput <> 0 Then
+		PFOutData.8 = 1
+	End If
+
+	'Data bits (4 bits)
+	If PFData.3 = 1 then
+		PFOutData.7 = 1
+	end if
+	If PFData.2 = 1 then
+		PFOutData.6 = 1
+	end if
+	If PFData.1 = 1 then
+		PFOutData.5 = 1
+	end if
+	If PFData.0 = 1 then
+		PFOutData.4 = 1
+	end if
+
+	'Need to resend message at correct rate
+	For PFResendNo = 1 to 5
+
+		'Disable interrupts
+		IntOff
+
+		'Set Toggle bit
+		PFToggle = PFToggle + 1
+		PFOutData.15 = PFToggle.0
+
+		'Calc Checksum bits (4 bits)
+		PFChecksum = 0x0F XOR Swap4(PFOutData_H)
+		PFChecksum = PFChecksum XOR PFOutData_H
+		PFChecksum = PFChecksum XOR PFData
+		PFChecksum = PFChecksum And 0x0F
+		PFOutData = PFOutData And 0xFFF0
+		PFOutData = PFOutData Or PFChecksum
+
+		'Send command
+		'Start bit
+		Repeat 6
+			Set IR_OUT On
+			Wait 13 us
+			Set IR_OUT Off
+			Wait 13 us
+		End Repeat
+		Wait 1026 us
+
+		'Command
+		PFSendBuffer = PFOutData
+		Repeat 16
+
+			'HPWM 2, 38, 128
+			'Wait 158 us
+			'PWMOff 2
+			Repeat 6
+				Set IR_OUT On
+				Wait 13 us
+				Set IR_OUT Off
+				Wait 13 us
+			End Repeat
+			If PFSendBuffer.15 = 1 Then
+				Wait 552 us
+			Else
+				Wait 263 us
+			End If
+			Rotate PFSendBuffer Left
+		End Repeat
+
+		'Stop bit
+		'HPWM 2, 38, 128
+		'Wait 158 us
+		'PWMOff 2
+		Repeat 6
+			Set IR_OUT On
+			Wait 13 us
+			Set IR_OUT Off
+			Wait 13 us
+		End Repeat
+		Wait 1026 us
+
+		'Re-enable interrupts
+		IntOn
+
+		'Calculate appropriate delay
+		'(Depends on channel and resend count)
+		If PFResendNumber < 3 Then
+			Wait 80 ms
+		Else
+			PFChecksum = 8 + 2 * PFChannel
+			Repeat PFChecksum
+				Wait 16 ms
+			End Repeat
+		End If
+	Next
+End Sub
+
+Sub LNPReceived
+	'Process received LNP message
+	'Gate sends back pair of 2, status
+	'Status values: 4 = grey stopped, 2 = blue stopped
+	'status 7 means all stopped, gates closed ready for train
+	If LNPInBytes = 2 and LNPState = LNP_STATE_WAITING Then
+		If LNPInBuffer(1) = 2 Then
+			EmersonCrossingState = LNPInBuffer(2)
+		Else If LNPInBuffer(1) = 4 Then
+			PointsState = LNPInBuffer(2)
+		Else If LNPInBuffer(1) = 6 Then
+			LapCountRequest = LNPInBuffer(2)
+		Else If LNPInBuffer(1) = 241 Then
+			ClearLapCount
+		End If
+	End If
+End Sub
+
+Sub EmersonCrossingClose
+	SendLNPPair 1, 1
+End Sub
+
+Sub EmersonCrossingOpen
+	SendLNPPair 1, 0
+End Sub
+
+Sub UIEnableCounting
+	SendLNPPair 5, 2
+End Sub
+
+Sub UIDisableCounting
+	SendLNPPair 5, 1
+End Sub
+
+Sub UIClearLapCount
+	SendLNPPair 5, 0
+End Sub
+
+Sub UIShowNumber (In number)
+	ReadTable SevenSegDispDigit, number + 1, OutBitmap
+	OutBitmap.7 = 1
+	SendLNPPair 5, OutBitmap
+End Sub
+
+Sub SendPointsLNP (In PointCommand)
+	Repeat 5
+		SendLNPPair 3, PointCommand
+		Wait 75 ms
+		If PointCommand = PointsState Then
+			Exit Sub
+		End If
+	End Repeat
+End Sub
+
+'''Add to lap counter in EEPROM
+'''@param ExtraLaps Number of laps to add
+Sub IncrementLapCount (In ExtraLaps)
+	EPRead 10, LapCounter
+	EPRead 11, LapCounter_H
+	OldHighLaps = LapCounter_H
+	LapCounter = LapCounter + ExtraLaps
+	EPWrite 10, LapCounter
+	If OldHighLaps <> LapCounter_H Then
+		EPWrite 11, LapCounter_H
+	End If
+End Sub
+
+Sub ClearLapCount
+	EPWrite 10, 0
+	EPWrite 11, 0
+End Sub
+
+Sub SendLapCount
+	EPRead 10, LapCounter
+	EPRead 11, LapCounter_H
+	SendLNPPairWord 240, LapCounter
+End Sub
+

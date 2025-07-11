@@ -1,0 +1,77 @@
+Low level protocol:
+19200 bps
+8 data bits, odd parity
+All sent/received using RX pin on Arduino
+Code will drive pin low, or allow to float for high. USB to serial chip will pull pins high with 1k per Arduino.
+
+Changes to library 6/4/2024: SendLNPPair now quits after 2 successful sends, not 3 sends. Successful send is no write conflict detected.
+Write conflict is when a 1 is written (release bus) but something else is pulling it down.
+
+At 19200 bps, bit time is 52 us, so byte is 572 us. Pair would be 2.86 ms
+Maximum traffic is about 340 pairs/second
+
+If rate was 57600, bit time becomes about 17 us. Pair about 935 us
+Maximum traffic 1069 pairs/second
+Very unreliable at 56k, change back to 19.2k 18/5/2024
+
+Devices sending status:
+Emerson Crossing: pair for status every 500 ms
+Point controller: pair for status every 500 ms
+New button/7seg: pair for press count every 250 ms
+
+LNP protocol:
+Adapted from old BrickOS protocol for Lego RCX. (LegOS Network Protocol). Only integrity layer used.
+Packets start with 0xf0, then byte count, then data bytes and checksum.
+Parsing is done by a state machine, which notifies application after valid checksum received
+Incorrect parity from low level will cancel reception of packet and reset LNP parser
+
+Application protocol for train:
+Messages are sent in pairs of address, status.
+Application messages below
+
+Address 1: Crossing command (controller to crossing)
+Status 0: Open gates
+Status other than 0: Stop traffic, close gates
+
+Address 2: Status of crossing (crossing to controller)
+Status is bitmap:
+ bit 0: Set if gates are closed
+ bit 1: Set if blue road is stopped
+ bit 2: Set if grey road is stopped
+Typical values 7 (OK for train), 2 (grey road going), 4 (blue road going)
+
+Address 3: Points command (controller to points)
+Status is bitmap:
+ bits 1:0: 0 = red, 1 = yellow, 2 = flashing yellow, 3 = green
+ bit 2: Set if points diverging
+
+Address 4: Status of points (points to controller)
+Status is bitmap:
+ bits 1:0: 0 = red, 1 = yellow, 2 = flashing yellow, 3 = green
+ bit 2: Set if points diverging
+
+Address 5: UI command (controller to UI)
+ Bit 7: set if bitmap for 7-seg, clear for command
+ If command, then status is:
+ 0 clear count
+ 1 disable count
+ 2 enable count 
+
+Address 6: UI status (UI to controller)
+ bit 7: timed out
+ bits 6:0: lap count
+
+Address 240: Lap count (controller to PC)
+Two bytes follow, high then low
+
+Address 241: Clear lap count
+One byte follows, Status must be 0xC1 to clear
+
+Address 242: Configure UI (controller or PC to UI)
+Three bytes follow: timeout high byte, timeout low byte, lap count.
+
+Sample commands for RealTerm to send:
+Set max lap count to 5: 0xF0 4 242 0x03 0xE8 0x05 0xD5
+Make train do 9 laps: 0xF0 2 6 0x89 0x80
+Emerson Crossing train coming: 0xF0 2 1 1 0xF3
+Emerson Crossing stop the noise: 0xF0 2 1 0 0xF2

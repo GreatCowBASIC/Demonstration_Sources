@@ -1,0 +1,571 @@
+;Include files (Libraries)
+#include <UNO_mega328p.h>
+#include "lnp_rxpin.h"
+
+;Defines (Constants)
+#define RED_1 DIGITAL_11
+#define RED_2 DIGITAL_10
+#define RED_3_1 ShiftReg3.7
+#define RED_3_2 ShiftReg3.6
+#define GREEN_SR_B ShiftReg3.3
+#define YELLOW_SR_B ShiftReg3.4
+#define RED_SR_B ShiftReg3.5
+#define GREEN_SR_G ShiftReg3.0
+#define YELLOW_SR_G ShiftReg3.1
+#define RED_SR_G ShiftReg3.2
+#define GREEN_B DIGITAL_9
+#define YELLOW_B DIGITAL_8
+#define RED_B DIGITAL_7
+#define GREEN_G DIGITAL_4
+#define YELLOW_G DIGITAL_3
+#define RED_G DIGITAL_2
+#define GATE_1 ANALOG_4
+#define GATE_2 ANALOG_5
+#define GATE_3 ANALOG_2
+#define GATE_4 ANALOG_3
+#define USART_BLOCKING 
+#define GATE_1_UP 91
+#define GATE_1_DOWN 30
+#define GATE_2_UP 92
+#define GATE_2_DOWN 54
+#define GATE_3_OLD_UP 97
+#define GATE_3_UP 92
+#define GATE_3_OLD_DOWN 30
+#define GATE_3_DOWN 54
+#define GATE_4_UP 93
+#define GATE_4_DOWN 33
+#define STATE_RED_SAFE 0
+#define STATE_RED_NEW 1
+#define STATE_YELLOW 2
+#define STATE_GREEN 3
+#define CAR_GO_TIME 5000
+#define CAR_WARN_TIME 2000
+#define SoundOut DIGITAL_5
+#define HW_DUTY OCR0B
+#define SR_DATA ANALOG_0
+#define SR_CLOCK DIGITAL_13
+#define SR_LATCH DIGITAL_12
+
+;Variables
+Dim StateBlue As byte
+Dim StateGrey As byte
+Dim TrainArriving As byte
+Dim GatesStopped As byte
+Dim GreyStopped As byte
+Dim BlueStopped As byte
+Dim TimeBlue As word
+Dim TimeGrey As word
+Dim TimeTrainLights As word
+Dim SoundLength As word
+Dim SoundEnd As word
+Dim SoundPos As word
+Dim Sound2Length As word
+Dim Sound2End As word
+Dim Sound2Pos As word
+Dim BellsRinging As byte
+Dim SysReadA As word
+Dim SoundStart As word
+Dim Sound2Start As word
+Dim ShiftReg3 As byte
+Dim DebugTaskTimer As word
+Dim StatusSendTimer As word
+
+;Interrupt Handlers
+On Interrupt Timer1Overflow Call BellTimerInt
+On Interrupt UsartRX1Ready Call LNPSerInInt
+
+;Data tables
+Table BellWave From "Electronic bell 12k GS t2.raw"
+End Table
+
+Table MechBellWave From "Electronic bell 12k GS t3.raw"
+End Table
+
+'v12 - full lights added
+'Initial Setup
+'Issues: 5 second delay is about 6.5 s due to interrupt
+InitCrossing
+end
+
+Do Forever
+	CheckForTrain
+	RunLightsGrey
+	RunLightsBlue
+	RunTrainLights
+	RunGates
+	RunStatusTask
+	RunDebugTask
+	Wait 1 ms
+Loop
+
+Sub InitCrossing
+	StateGrey = STATE_RED_SAFE
+	StateBlue = STATE_RED_SAFE
+	TrainArriving = FALSE
+	Gate1Pos = GATE_1_UP
+	Gate2Pos = GATE_2_UP
+	Gate3Pos = GATE_3_UP
+	Gate4Pos = GATE_4_UP
+	GatesStopped = False
+	BlueStopped = False
+	GreyStopped = False
+	BellsRinging = False
+
+	'Shift reg off
+	ShiftReg3 = 0
+	UpdateShiftRegisters
+
+	'Set up PWM
+	Dir SoundOut Out
+	InitSoundPlayer
+
+	'Gates to up on reset
+	GatesStopped = FALSE
+	Repeat 25
+		DriveGates
+		Wait 20 ms
+	End Repeat
+End Sub
+
+'''Write byte to shift register
+'''@param SROutByte Byte to write
+Sub SRWrite (In SROutByte)
+	Repeat 8
+		If SROutByte.7 Then
+			Set SR_DATA On
+		Else
+			Set SR_DATA Off
+		End If
+		Set SR_CLOCK On
+		Rotate SROutByte Left
+		Set SR_CLOCK Off
+	End Repeat
+End Sub
+
+'''Write shift reg buffers to registers and update
+Sub UpdateShiftRegisters
+	SRWrite ShiftReg3
+	Set SR_LATCH On
+	Set SR_LATCH Off
+End Sub
+
+Sub InitSoundPlayer
+	ICRxTemp = 253
+	PWMPrescale = 1
+	AVRTimer = 0
+	AVRSetPrescale (AVRTimer)
+	[canskip]COM0B1 = 1
+	[canskip]COM0B0 = 0
+
+	'OCR0A is used as the period register
+	OCR0A = 253
+
+/* 	
+	It initializes a pointer to the start of the waveform data, reads the length of the waveform, and 
+	calculates the memory location for the actual sample data.
+	
+	Why << 1 is needed
+	
+	We use TABLEBELLWAVE << 1 to convert from:
+
+	Word address (as used by the assembler) → to  Byte address (as required by LPM)
+
+	For example:
+
+	If TABLEBELLWAVE = 0x0100 (word address)
+
+	Then TABLEBELLWAVE << 1 = 0x0200 (byte address)
+
+	This shift ensures you're reading from the correct byte-aligned address in flash memory.
+
+	 */
+	
+	'Set table pointers up - SoundPos at start of table, Pos at end
+
+	SoundPos = 0
+	ReadTable BellWave, SoundPos, SoundLength
+
+    // Original code
+        // asm ldi SysReadA, low(TABLEBELLWAVE<<1)
+        // asm ldi SysReadA_H, high(TABLEBELLWAVE<<1)
+        // SoundStart = SysReadA + 1
+
+    // Non ASM portable code
+    	SoundStart = ( ( @TABLEBELLWAVE) << 1 ) + 1
+
+	SoundEnd = SoundStart + SoundLength
+	SoundPos = SoundStart
+
+	'Set second bell table pointers up - SoundPos at start of table, Pos at end
+	Sound2Pos = 0
+	ReadTable MechBellWave, Sound2Pos, Sound2Length
+
+    // Original code
+        // asm ldi SysReadA, low(TABLEMECHBELLWAVE<<1)
+        // asm ldi SysReadA_H, high(TABLEMECHBELLWAVE<<1)
+	    // Sound2Start = SysReadA + 1 
+    // Non ASM portable code
+    	Sound2Start = ( ( @TABLEMECHBELLWAVE) << 1 ) + 1
+
+	Sound2End = Sound2Start + Sound2Length
+	Sound2Pos = Sound2Start
+
+	'Set timer 1 to run as fast as possible, counter mode
+	TCCR1A = 0
+	TCCR1B = 1
+End Sub
+
+Sub ServoTest
+	Do Forever
+		PotValue = ReadAD(AN0)
+		HSerPrint PotValue
+		HSerPrintCRLF
+		Gate4Pos = PotValue
+		Repeat 2
+			DriveGates
+			Wait 20 ms
+		End Repeat
+	Loop
+End Sub
+
+Sub RunGates
+	If TimeGates = 0 Then
+		GatesStopped = True
+		If TrainArriving Then
+
+			'Move gates down
+			If BlueStopped and GreyStopped Then
+				If Gate1Pos > GATE_1_DOWN then
+					Gate1Pos = Gate1Pos - 1
+					GatesStopped = False
+				end if
+				If Gate2Pos > GATE_2_DOWN then
+					Gate2Pos = Gate2Pos - 1
+					GatesStopped = False
+				end if
+				If Gate3Pos > GATE_3_DOWN then
+					Gate3Pos = Gate3Pos - 1
+					GatesStopped = False
+				end if
+				If Gate4Pos > GATE_4_DOWN then
+					Gate4Pos = Gate4Pos - 1
+					GatesStopped = False
+				end if
+			End If
+		Else
+
+			'Move gates up
+			If Gate1Pos < GATE_1_UP then
+				Gate1Pos = Gate1Pos + 1
+				GatesStopped = False
+			end if
+			If Gate2Pos < GATE_2_UP then
+				Gate2Pos = Gate2Pos + 1
+				GatesStopped = False
+			end if
+			If Gate3Pos < GATE_3_UP then
+				Gate3Pos = Gate3Pos + 1
+				GatesStopped = False
+			end if
+			If Gate4Pos < GATE_4_UP then
+				Gate4Pos = Gate4Pos + 1
+				GatesStopped = False
+			End If
+		End If
+	End If
+	TimeGates = TimeGates + 1
+	If TimeGates > 20 Then
+		DriveGates
+		TimeGates = 0
+	End If
+End Sub
+
+Function CheckGatesUp
+	CheckGatesUp = 255
+	If Gate1Pos <> GATE_1_UP Then
+		CheckGatesUp = 0
+	End If
+	If Gate2Pos <> GATE_2_UP Then
+		CheckGatesUp = 0
+	End If
+	If Gate3Pos <> GATE_3_UP Then
+		CheckGatesUp = 0
+	End If
+	If Gate4Pos <> GATE_4_UP Then
+		CheckGatesUp = 0
+	End If
+End Function
+
+Sub DriveGates
+	If GatesStopped Then
+		Exit Sub
+	End If
+	TCCR1A = 0
+	TCNT2 = 0
+	Set GATE_1 On
+	Set GATE_2 On
+	Set GATE_3 On
+	Set GATE_4 On
+
+	'Value of 5 (div 128) works, but limited range
+	TCCR2B = 6
+	Do While TCNT2 < 200
+		If TCNT2 > Gate1Pos Then
+			Set GATE_1 Off
+		End If
+		If TCNT2 > Gate2Pos Then
+			Set GATE_2 Off
+		End If
+		If TCNT2 > Gate3Pos Then
+			Set GATE_3 Off
+		End If
+		If TCNT2 > Gate4Pos Then
+			Set GATE_4 Off
+		End If
+	Loop
+	TCCR2B = 0
+End Sub
+
+Sub RunTrainLights
+	If TrainArriving Or Not CheckGatesUp Then
+		BellsRinging = True
+		If TimeTrainLights < 500 Then
+			Set RED_1 On
+			Set RED_2 Off
+			Set RED_3_1 On
+			Set RED_3_2 Off
+		Else If TimeTrainLights < 1000 Then
+			Set RED_1 Off
+			Set RED_2 On
+			Set RED_3_1 Off
+			Set RED_3_2 On
+		Else
+			TimeTrainLights = 0
+		End If
+		UpdateShiftRegisters
+		TimeTrainLights = TimeTrainLights + 1
+	Else
+		Set RED_1 Off
+		Set RED_2 Off
+		Set RED_3_1 Off
+		Set RED_3_2 Off
+		UpdateShiftRegisters
+		TimeTrainLights = 0
+		BellsRinging = False
+	End If
+End Sub
+
+Sub RunLightsGrey
+	TimeGrey = TimeGrey + 1
+	'Decide state
+	GreySafe = Not TrainArriving And BlueStopped And CheckGatesUp
+	If StateGrey = STATE_RED_SAFE Then
+		If GreySafe Then
+			StateGrey = STATE_GREEN
+			TimeGrey = 0
+		End If
+	Else If StateGrey = STATE_RED_NEW Then
+		If TimeGrey > CAR_WARN_TIME Then
+			StateGrey = STATE_RED_SAFE
+			TimeGrey = 0
+		End If
+	Else If StateGrey = STATE_GREEN Then
+		If TimeGrey > CAR_GO_TIME Then
+			StateGrey = STATE_YELLOW
+			TimeGrey = 0
+		End If
+		If TrainArriving Then
+			StateGrey = STATE_YELLOW
+			TimeGrey = 0
+		End If
+	Else If StateGrey = STATE_YELLOW Then
+		If TimeGrey > CAR_WARN_TIME Then
+			StateGrey = STATE_RED_NEW
+			TimeGrey = 0
+		End If
+	End If
+
+	'Update flags
+	GreyStopped = StateGrey = STATE_RED_SAFE
+
+	'Update lights
+	If StateGrey = STATE_GREEN Then
+		Set RED_G Off
+		Set YELLOW_G Off
+		Set GREEN_G On
+		Set RED_SR_G Off
+		Set YELLOW_SR_G Off
+		Set GREEN_SR_G On
+	Else If StateGrey = STATE_YELLOW Then
+		Set RED_G Off
+		Set YELLOW_G On
+		Set GREEN_G Off
+		Set RED_SR_G Off
+		Set YELLOW_SR_G On
+		Set GREEN_SR_G Off
+	Else
+		Set RED_G On
+		Set YELLOW_G Off
+		Set GREEN_G Off
+		Set RED_SR_G On
+		Set YELLOW_SR_G Off
+		Set GREEN_SR_G Off
+	End If
+	UpdateShiftRegisters
+End Sub
+
+Sub RunLightsBlue
+	TimeBlue = TimeBlue + 1
+	'Decide state
+	BlueSafe = Not TrainArriving And GreyStopped And CheckGatesUp
+	If StateBlue = STATE_RED_SAFE Then
+		If BlueSafe Then
+			StateBlue = STATE_GREEN
+			TimeBlue = 0
+		End If
+	Else If StateBlue = STATE_RED_NEW Then
+		If TimeBlue > CAR_WARN_TIME Then
+			StateBlue = STATE_RED_SAFE
+			TimeBlue = 0
+		End If
+	Else If StateBlue = STATE_GREEN Then
+		If TimeBlue > CAR_GO_TIME Then
+			StateBlue = STATE_YELLOW
+			TimeBlue = 0
+		End If
+		If TrainArriving Then
+			StateBlue = STATE_YELLOW
+			TimeBlue = 0
+		End If
+	Else If StateBlue = STATE_YELLOW Then
+		If TimeBlue > CAR_WARN_TIME Then
+			StateBlue = STATE_RED_NEW
+			TimeBlue = 0
+		End If
+	End If
+
+	'Update flags
+	BlueStopped = StateBlue = STATE_RED_SAFE
+
+	'Update lights
+	If StateBlue = STATE_GREEN Then
+		Set RED_B Off
+		Set YELLOW_B Off
+		Set GREEN_B On
+		Set RED_SR_B Off
+		Set YELLOW_SR_B Off
+		Set GREEN_SR_B On
+	Else If StateBlue = STATE_YELLOW Then
+		Set RED_B Off
+		Set YELLOW_B On
+		Set GREEN_B Off
+		Set RED_SR_B Off
+		Set YELLOW_SR_B On
+		Set GREEN_SR_B Off
+	Else
+		Set RED_B On
+		Set YELLOW_B Off
+		Set GREEN_B Off
+		Set RED_SR_B On
+		Set YELLOW_SR_B Off
+		Set GREEN_SR_B Off
+	End If
+	UpdateShiftRegisters
+End Sub
+
+Sub CheckForTrain
+	'Check LNP buffer for control message
+	'Control message will be 2 bytes long, first byte 1
+	'Second byte 0 (no train) or non-0 (train)
+	If LNPInBytes = 2 and LNPState = LNP_STATE_WAITING Then
+		If LNPInBuffer(1) = 1 Then
+			If LNPInBuffer(2) = 0 Then
+				TrainArriving = FALSE
+			Else
+				TrainArriving = TRUE
+			End If
+		End If
+	End If
+End Sub
+
+Sub BellTimerInt
+	If BellsRinging Then
+		'Play sound sample
+		'Get sample from table with ASM to avoid position check
+		SysReadA = SoundPos
+		lpm+ SysByteTempX
+		lsr SysByteTempX
+		SoundBuf = SysByteTempX
+
+		'SoundBuf = 0
+		'out OCR0B,SysByteTempX
+		'Increment pos. Can cut off tiny bit at end to improve speed
+		'SoundPos = SoundPos + 1
+		SoundPos = SysReadA
+		If SoundPos_H >= SoundEnd_H Then
+			SoundPos = SoundStart
+		End If
+
+		'Reload timer 1
+		'Mech bell 254:111 is OK, 254:200 faster
+		'Elec bell 12k 251:0
+		TCNT1H = 251
+		TCNT1L = 0
+
+		'Play sound 2 sample
+		'Get sample from table with ASM to avoid position check
+		SysReadA = Sound2Pos
+		lpm+ SysByteTempX
+		lsr SysByteTempX
+		lsr SysByteTempX
+		OCR0B = SysByteTempX + SoundBuf
+
+		'out OCR0B,SysByteTempX
+		'Increment pos. Can cut off tiny bit at end to improve speed
+		'SoundPos = SoundPos + 1
+		Sound2Pos = SysReadA
+		If Sound2Pos_H >= Sound2End_H Then
+			Sound2Pos = Sound2Start
+		End If
+	Else
+		OCR0B = 0
+	End If
+End Sub
+
+Sub RunStatusTask
+	If StatusSendTimer > 500 Then
+		If LNPState = LNP_STATE_WAITING And GatesStopped Then
+			StatusSendTimer = 0
+			OutStatus = 1
+			If CheckGatesUp Then
+				Set OutStatus.0 Off
+			End If
+			If BlueStopped Then
+				Set OutStatus.1 On
+			End If
+			If GreyStopped Then
+				Set OutStatus.2 On
+			End If
+			SendLNPPair 2, OutStatus
+		End If
+
+		'Check for crashed LNP code
+		If LNPState <> LNP_STATE_WAITING and StatusSendTimer > 1000 Then
+			LNPInitialise
+		End If
+	Else
+		StatusSendTimer = StatusSendTimer + 1
+	End If
+End Sub
+
+Sub RunDebugTask
+	If DebugTaskTimer > 1000 Then
+		'Run debug task every second
+		DebugTaskTimer = 0
+
+		'LNPDumpBuffer
+	Else
+		DebugTaskTimer = DebugTaskTimer + 1
+	End If
+End Sub
+
