@@ -1,3 +1,9 @@
+/* 	
+
+	See Lego train with points serial crossing v3.md for documentation
+	
+*/
+
 ;Include files (Libraries)
 #include <UNO_mega328p.h>
 #include "lnp_rxpin.h"
