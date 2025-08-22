@@ -1,0 +1,188 @@
+/*A program for GCBASIC.
+--------------------------------------------------------------------------------------------------------------------------------
+Attach a servo motor to the port specified in the constant SERVOOUTCHANNEL1 and SERVOOUTCHANNEL2
+This program will make the servo sweep back and forth
+This is also includes an adapted PulseOut to handle WORD time slices.
+
+Summary:
+
+This program controls two servo motors connected to an LGT8F328P microcontroller to operate a barrier system,
+such as a gate or crossing arm. It uses a reed switch (REEDSWITCH1) to detect the barrier's state (open/closed)
+and controls the servos to raise or lower the barrier simultaneously. The servos move within a shared pulse
+range (calculated from predefined constants) to ensure synchronized operation. A state machine, managed by
+HandleBarrierState, controls the barrier with states IDLE, TRIGGERED, WAITING, and RAISING: lowering when the
+switch is triggered, waiting for a timeout, and raising after a delay. An indicator on INDICATOR_LED reflects
+the switch state. The system enters low-power idle mode during IDLE and WAITING states, waking on REEDSWITCH1 interrupts.
+
+@author      	EvanV
+@licence	GPL
+@version	1.0g
+@date   	08.21.2025
+********************************************************************************/
+
+// ----- Configuration
+ #chip LGT8F328P                                // Specify the microcontroller model (LGT8F328P)
+ #option explicit                                // Enforce variable declaration for better code reliability
+
+
+// ----- Constants
+
+    // Define Serial parameters
+    #DEFINE USART_BAUD_RATE 115200                  // Set UART baud rate to 115200 for serial communication
+    #DEFINE USART_TX_BLOCKING                       // Enable blocking mode for UART transmission
+    #DEFINE USART_DELAY OFF                         // Disable additional USART delays
+
+
+    // Define I/O pins
+    #DEFINE SERVOOUTCHANNEL1 PORTC.0           // Servo 1 connected to PORTC.0
+    DIR SERVOOUTCHANNEL1 OUT                   // Set PORTC.0 as output
+    #DEFINE SERVOOUTCHANNEL2 PORTC.1           // Servo 2 connected to PORTC.1
+    DIR SERVOOUTCHANNEL2 OUT                   // Set PORTC.1 as output
+    #DEFINE REEDSWITCH1 PORTD.2                // Reed switch connected to PORTD.2
+    #DEFINE INDICATOR_LED PORTB.5              // Indicator LED connected to PORTB.5
+
+    // Define timeout
+    #DEFINE TIMEOUT_COUNT 30000                // Timeout count for ~3 seconds (30,000 × 100µs)
+
+    // Servo pulse width constants (in units of 10µs, specific to specfic servos - adjust to suit)
+    #DEFINE UPPER1         160                 // Maximum pulse width for servo 1 (vertical position, 1.6ms)
+    #DEFINE LOWER1         88                  // Minimum pulse width for servo 1 (horizontal position, 0.88ms)
+    #DEFINE UPPER2         153                 // Maximum pulse width for servo 2 (vertical position, 1.53ms)
+    #DEFINE LOWER2         88                  // Minimum pulse width for servo 2 (horizontal position, 0.88ms)
+
+    // Define barrier state machine states
+    ENUM BarrierState
+        IDLE                                   // Idle state, no action pending
+        TRIGGERED                              // Reed switch triggered, lower barrier
+        WAITING                                // Waiting for timeout after lowering
+        RAISING                                // Raising barrier after timeout
+    End Enum
+
+// ----- Variables
+    Dim PulseTime As WORD                      // Stores the current pulse width for servo control (in 10µs units)
+    Dim MinPulse As WORD                       // Stores the minimum pulse width across both servos
+    Dim MaxPulse As WORD                       // Stores the maximum pulse width across both servos
+    Dim BarrierState As Byte                   // Tracks the state of the barrier (IDLE, TRIGGERED, WAITING, RAISING)
+    Dim TimeCount As Word                      // Counter for timing delay in WAITING state
+    Dim InterruptState As Bit                  // Tracks if the interrupt is enabled (True) or disabled (False)
+
+// ----- Main body of program commences here.
+
+    Dir REEDSWITCH1 In                         // Configure REEDSWITCH1 as input for the reed switch
+    BarrierState = IDLE                        // Initialize barrier state to IDLE
+    TimeCount = 0                              // Initialize timer counter to 0
+    InterruptState = False                     // Initialize interrupt as disabled
+
+    // Calculate the pulse range for both servos once at startup to optimize performance
+    MinPulse = LOWER1                          // Start with LOWER1 as minimum
+    If LOWER2 < MinPulse Then MinPulse = LOWER2 // Update to LOWER2 if it's smaller
+    MaxPulse = UPPER1                          // Start with UPPER1 as maximum
+    If UPPER2 > MaxPulse Then MaxPulse = UPPER2 // Update to UPPER2 if it's larger
+
+    Dir INDICATOR_LED Out                      // Configure INDICATOR_LED as output for the indicator LED
+    INDICATOR_LED = False                      // Ensure LED is off after startup
+
+    // Check initial reed switch state to set barrier position
+    If REEDSWITCH1 = 1 Then                    // If reed switch is high (barrier closed)
+        LowerBarrier                           // Lower the barrier
+    Else                                       // If reed switch is low (barrier open)
+        RaiseBarrier                           // Raise the barrier
+    End If
+
+    // Main loop to monitor and control the barrier
+    Do  
+        If InterruptState = False Then
+            InterruptState = True               // Mark interrupt as enabled
+            On Interrupt ExtInt0 Call ISRBarrier // Enable interrupt on REEDSWITCH1 rising edge
+        End If
+
+        INDICATOR_LED = REEDSWITCH1            // Mirror reed switch state to INDICATOR_LED
+
+        HandleBarrierState                     // Process the barrier state machine
+
+        // Enter idle mode in IDLE or WAITING states to save power
+        If BarrierState = IDLE Or BarrierState = WAITING Then
+            Sleep                              // Enter idle mode, wake on REEDSWITCH1 interrupt (ExtInt0)
+        End If
+    Loop
+
+// Subroutine to handle the barrier state machine
+Sub HandleBarrierState
+    // State machine to handle barrier operation
+    Select Case BarrierState 
+        Case TRIGGERED                     // TRIGGERED: Reed switch triggered, lower barrier
+            LowerBarrier                   // Call subroutine to lower the barrier
+            TimeCount = 0                  // Reset timer counter
+            Wait While REEDSWITCH1 = 1     // Wait until reed switch goes low
+            BarrierState = WAITING         // Transition to WAITING state
+        
+        Case WAITING                       // WAITING: Wait for timeout while switch is low
+            Wait 100 us                    // Short delay to avoid excessive CPU use
+            If REEDSWITCH1 = 0 Then        // If reed switch is low
+                TimeCount++                // Increment timer counter
+            Else                           // If reed switch goes high (new signal detected)
+                TimeCount = 0              // Reset timer to restart timeout
+            End If
+            If TimeCount = TIMEOUT_COUNT Then // After ~3 seconds (TIMEOUT_COUNT × 100µs)
+                BarrierState = RAISING     // Transition to RAISING state
+            End If
+        Case RAISING                       // RAISING: Raise barrier if switch remains low
+            If REEDSWITCH1 = 0 Then        // Confirm switch is still low
+                RaiseBarrier               // Call subroutine to raise the barrier
+                BarrierState = IDLE        // Reset to IDLE state
+                InterruptState = False     // Set interrupt status
+            End If
+    End Select
+End Sub
+
+// Interrupt service routine for reed switch
+Sub ISRBarrier
+    If REEDSWITCH1 = 1 Then                    // If reed switch is high (barrier closed)
+        BarrierState = TRIGGERED               // Set state to TRIGGERED to lower barrier
+        On Interrupt ExtInt0 Ignore            // Disable further interrupts to prevent re-triggering
+    End If
+End Sub
+
+// Subroutine to raise both servos simultaneously
+Sub RaiseBarrier
+    // Move servos from minimum to maximum pulse width
+    For PulseTime = MinPulse To MaxPulse Step 1
+        // Send pulse to servo 1 if within its range
+        If PulseTime >= LOWER1 And PulseTime <= UPPER1 Then
+            PulseOut SERVOOUTCHANNEL1, PulseTime, 10us // Send pulse to servo 1
+        End If
+        // Send pulse to servo 2 if within its range
+        If PulseTime >= LOWER2 And PulseTime <= UPPER2 Then
+            PulseOut SERVOOUTCHANNEL2, PulseTime, 10us // Send pulse to servo 2
+        End If
+        Wait 1 ms                              // Delay between pulses for smooth servo movement
+    Next
+End Sub
+
+// Subroutine to lower both servos simultaneously
+Sub LowerBarrier
+    // Move servos from maximum to minimum pulse width
+    For PulseTime = MaxPulse To MinPulse Step -1
+        // Send pulse to servo 1 if within its range
+        If PulseTime >= LOWER1 And PulseTime <= UPPER1 Then
+            PulseOut SERVOOUTCHANNEL1, PulseTime, 10us // Send pulse to servo 1
+        End If
+        // Send pulse to servo 2 if within its range
+        If PulseTime >= LOWER2 And PulseTime <= UPPER2 Then
+            PulseOut SERVOOUTCHANNEL2, PulseTime, 10us // Send pulse to servo 2
+        End If
+        Wait 1 ms                              // Delay between pulses for smooth servo movement
+    Next
+End Sub
+
+End                                           // End of program
+
+// Macro to generate a pulse for servo control
+macro PulseOut (Pin, localPulseTime As WORD, localTimeUnit)
+    Set Pin On                                // Set the specified pin high
+    Repeat localPulseTime                     // Loop for the specified pulse duration
+        Wait 1 localTimeUnit                  // Wait for 1 unit of time (10µs)
+    End Repeat
+    Set Pin Off                               // Set the pin low to end the pulse
+End macro
+

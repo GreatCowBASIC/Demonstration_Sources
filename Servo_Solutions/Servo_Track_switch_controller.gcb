@@ -1,0 +1,206 @@
+/*
+A program for GCBASIC.
+--------------------------------------------------------------------------------------------------------------------------------
+This program controls a single GeekServo servo motor on an LGT8F328P microcontroller, connected to SERVOOUTCHANNEL
+(PORTC.0). It toggles the servo between full clockwise (FULL_CW, 1.25ms) and full counterclockwise (FULL_CCW, 1.75ms) positions
+based on a debounced switch input (SWITCHIN on PORTE.3). A state machine, managed by HandleServoState, uses states CLOCKWISE
+and COUNTERCLOCKWISE to control servo movement, triggered by polling the switch via funcKeyPressed in the main loop. Each switch
+press toggles the servo direction. The servo moves in 50µs steps (5 units) with a 100µs delay between pulses for smooth operation.
+An indicator LED on INDICATOR_LED (PORTB.5) is on for the clockwise position and off for the counterclockwise position. The
+system enters low-power idle mode when no switch press is detected, reducing power consumption. A configuration script ensures
+valid pulse widths for the selected POINTSET2 (AVR-specific values) and issues errors or warnings for invalid settings. USART is
+configured at 9600 baud but unused.
+
+Key Components:
+- Configuration:
+  - Microcontroller: LGT8F328P with #option Explicit for strict variable declaration.
+  - USART: Configured at 9600 baud with blocking transmission, but no serial output is used.
+  - I/O Pins:
+    - SWITCHIN (PORTE.3): Input for switch, active-high (DOWN = 1).
+    - INDICATOR_LED (PORTB.5): Output for LED indicating servo direction.
+    - SERVOOUTCHANNEL (PORTC.0): Output for the servo motor.
+  - Constants:
+    - SERVO_PULSE_DELAY (100µs): Delay between servo pulses.
+    - DEBOUNCE_DELAY (1ms): Delay for switch debouncing.
+    - FULL_CW (125, 1.25ms) and FULL_CCW (175, 1.75ms): Servo pulse widths for AVR under POINTSET2.
+  - Script: Ensures only one POINTSET is defined, sets pulse widths, and issues warnings or errors.
+  - ENUM: ServoState defines CLOCKWISE and COUNTERCLOCKWISE for the state machine.
+- Variables:
+  - PulseTime (WORD): Stores the current servo pulse width (in 10µs units).
+  - ServoState (Byte): Tracks the state machine state (CLOCKWISE or COUNTERCLOCKWISE).
+  - CurrentSwitchState and LastSwitchState (Bit, local to funcKeyPressed): Used for debouncing.
+- Main Loop:
+  - Polls funcKeyPressed to detect switch presses.
+  - On a valid press, toggles ServoState between CLOCKWISE and COUNTERCLOCKWISE and calls HandleServoState.
+  - Enters idle mode when no switch press is detected, waking on the next loop iteration.
+  - The state machine is handled in HandleServoState.
+- Functions and Subroutines:
+  - HandleServoState: Manages the state machine:
+    - CLOCKWISE: Moves servo from FULL_CW to FULL_CCW, sets INDICATOR_LED on.
+    - COUNTERCLOCKWISE: Moves servo from FULL_CCW to FULL_CW, sets INDICATOR_LED off.
+  - funcKeyPressed: Debounces the switch, returning TRUE on a rising edge (released to pressed) after a 1ms delay.
+  - PulseOut (macro): Generates a servo pulse for localPulseTime × 10µs.
+- Operation:
+  - On startup, the servo moves to the clockwise position (CLOCKWISE), and INDICATOR_LED blinks 10 times, then stays on.
+  - The main loop continuously polls funcKeyPressed.
+  - A switch press toggles ServoState between CLOCKWISE and COUNTERCLOCKWISE, calling HandleServoState to move the
+    servo and update the LED.
+  - When no switch press is detected, the system enters sleep mode to save power, waking on the next loop iteration.
+  - The servo moves smoothly between positions with 100µs delays.
+- Notes:
+  - Polling-Based Switch Handling: Uses polling with funcKeyPressed for simplicity.
+  - Power Management: Idle mode when no switch press is detected balances power savings with polling responsiveness.
+  - State Machine: The ServoState ENUM ensures proper toggling between CLOCKWISE and COUNTERCLOCKWISE positions.
+  - Debouncing: funcKeyPressed ensures robust switch detection with a 1ms delay.
+  
+@author 	EvanV
+@licence	GPL
+@version	1.0e
+@date   	08.21.2025
+********************************************************************************/
+
+// ----- Configuration
+#chip LGT8F328P                                // Specify the microcontroller model (LGT8F328P)
+#option Explicit                               // Enforce variable declaration for better code reliability
+
+#DEFINE USART_BAUD_RATE 9600                   // Set UART baud rate to 9600 for serial communication
+#DEFINE USART_TX_BLOCKING                      // Enable blocking mode for UART transmission
+#DEFINE USART_DELAY OFF                        // Disable additional USART delays
+
+// ----- Constants
+    // Define I/O pins
+    #DEFINE SWITCHIN      PORTE.3              // Switch input connected to PORTE.3
+    Dir SWITCHIN In                            // Set PORTE.3 as input
+    #DEFINE DOWN          1                    // Switch active state (high)
+    #DEFINE INDICATOR_LED PORTB.5              // Indicator LED connected to PORTB.5
+    DIR INDICATOR_LED OUT                      // Set PORTB.5 as output
+    #DEFINE SERVOOUTCHANNEL PORTC.0           // Servo connected to PORTC.0
+    DIR SERVOOUTCHANNEL OUT                   // Set PORTC.0 as output
+
+    // Servo pulse width constants (in units of 10µs, specific to GeekServo servo)
+    #DEFINE POINTSET2                          // Use POINTSET2 configuration for servo
+    #DEFINE DISABLE1173                        // Unused configuration flag
+    #DEFINE SERVO_PULSE_DELAY 100 us           // Delay between servo pulses for smooth movement
+    #DEFINE DEBOUNCE_DELAY 1 ms                // Delay for switch debouncing
+
+    // Define servo state machine states
+    ENUM ServoState
+        CLOCKWISE                              // Servo in full clockwise position
+        COUNTERCLOCKWISE                       // Servo in full counterclockwise position
+    End Enum
+
+#script
+    FULL_CW  = 0
+    FULL_CCW = 0
+
+    TITLE = ""
+    If DEF(POINTSET1) Then
+        FULL_CW  = 70                         // 0.7ms for clockwise (POINTSET1)
+        FULL_CCW = 120                        // 1.2ms for counterclockwise (POINTSET1)
+        TITLE = "POINTSET1"
+        Warning "POINTSET1 configuration"
+    End If
+    If DEF(POINTSET2) Then
+        If DEF(PIC) Then
+            FULL_CW  = 110                    // 1.1ms for clockwise (PIC, POINTSET2)
+            FULL_CCW = 160                    // 1.6ms for counterclockwise (PIC, POINTSET2)
+        End If
+        If DEF(AVR) Then
+            FULL_CW  = 125                    // 1.25ms for clockwise (AVR, POINTSET2)
+            FULL_CCW = 175                    // 1.75ms for counterclockwise (AVR, POINTSET2)
+        End If
+        TITLE = "POINTSET2"
+        Warning "POINTSET2 configuration"
+    End If
+    If DEF(POINTSET3) Then
+        FULL_CW  = 120                        // 1.2ms for clockwise (POINTSET3)
+        FULL_CCW = 170                        // 1.7ms for counterclockwise (POINTSET3)
+        Warning "POINTSET3 configuration"
+    End If
+
+    If FULL_CW = 0 and FULL_CCW = 0 Then
+        Error "No configuration"
+    End If
+#endscript
+
+// ----- Variables
+Dim PulseTime As WORD                          // Stores the current pulse width for servo control (in 10µs units)
+Dim ServoState As Byte                         // Tracks the servo state (CLOCKWISE, COUNTERCLOCKWISE)
+
+// ----- Main body of program commences here.
+ServoState = CLOCKWISE                         // Initialize servo state to CLOCKWISE
+
+Dir INDICATOR_LED Out                          // Configure INDICATOR_LED as output for the indicator LED
+Repeat 10                                      // Blink INDICATOR_LED 10 times to signal program start
+    INDICATOR_LED = !INDICATOR_LED             // Toggle INDICATOR_LED state
+    Wait 50 ms                                 // Wait 50ms between toggles
+End Repeat
+INDICATOR_LED = True                           // Set LED on for initial CLOCKWISE state
+
+// Initialize servo to clockwise position
+HandleServoState                               // Move servo to initial position (CLOCKWISE)
+
+// Main loop to monitor and control the servo
+Do
+    If funcKeyPressed() = TRUE Then            // Check for debounced switch press
+        If ServoState = CLOCKWISE Then         // Toggle state: CLOCKWISE to COUNTERCLOCKWISE
+            ServoState = COUNTERCLOCKWISE
+        Else
+            ServoState = CLOCKWISE             // Toggle state: COUNTERCLOCKWISE to CLOCKWISE
+        End If
+        HandleServoState                       // Move servo to new position
+    Else
+        Sleep                                  // Enter idle mode when no switch press is detected
+    End If
+Loop
+
+// Subroutine to handle the servo state machine
+Sub HandleServoState
+    Select Case ServoState
+        Case CLOCKWISE                         // CLOCKWISE: Move servo to full clockwise position
+            INDICATOR_LED = True               // Set LED on for clockwise
+            For PulseTime = FULL_CW To FULL_CCW Step 5
+                PulseOut SERVOOUTCHANNEL, PulseTime, 10us // Send pulse to servo
+                Wait SERVO_PULSE_DELAY         // Delay for smooth movement
+            Next
+        Case COUNTERCLOCKWISE                  // COUNTERCLOCKWISE: Move servo to full counterclockwise position
+            INDICATOR_LED = False              // Set LED off for counterclockwise
+            For PulseTime = FULL_CCW To FULL_CW Step -5
+                PulseOut SERVOOUTCHANNEL, PulseTime, 10us // Send pulse to servo
+                Wait SERVO_PULSE_DELAY         // Delay for smooth movement
+            Next
+    End Select
+End Sub
+
+// Function to debounce and detect switch press
+Function funcKeyPressed As Bit
+    Dim CurrentSwitchState As Bit              // Current state of the switch
+    Dim LastSwitchState As Bit                 // Previous state of the switch
+
+    Wait DEBOUNCE_DELAY                        // Wait for debounce period
+
+    // Check if switch is pressed
+    If SWITCHIN = DOWN Then
+        CurrentSwitchState = TRUE              // Switch is pressed
+    Else
+        CurrentSwitchState = FALSE             // Switch is released
+    End If
+
+    // Detect rising edge (switch pressed)
+    If CurrentSwitchState <> LastSwitchState AND CurrentSwitchState = TRUE Then
+        funcKeyPressed = TRUE                  // Return TRUE for valid press
+    Else
+        funcKeyPressed = FALSE                 // No valid press detected
+    End If
+
+    LastSwitchState = CurrentSwitchState       // Update last state
+End Function
+
+// Macro to generate a pulse for servo control
+macro PulseOut (Pin, localPulseTime As WORD, localTimeUnit)
+    Set Pin On                                // Set the specified pin high
+    Repeat localPulseTime                     // Loop for the specified pulse duration
+        Wait 1 localTimeUnit                  // Wait for 1 unit of time (10µs)
+    End Repeat
+    Set Pin Off                               // Set the pin low to end the pulse
+End macro

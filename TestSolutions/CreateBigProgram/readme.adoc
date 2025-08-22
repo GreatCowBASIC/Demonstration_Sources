@@ -1,0 +1,97 @@
+= AWK Script for Generating Test Table Program 
+
+== Overview
+
+This AWK script generates a test program for programming a target chip and sending large data tables to a terminal. The script creates a program with multiple tables, each containing a specified number of word elements, and outputs them at a baud rate of 256000 BPS while tracking execution time using the `millis()` function. The generated program is written in a format compatible with the GCBASIC compiler.
+
+The test program demonstrates the ability to handle a configurable number of tables, each with a configurable number of word elements, and completes successfully. The table size and number of tables can be adjusted via command-line arguments to fit within the program memory (PROGMEM) of the target chip.
+
+== Prerequisites
+
+- **GAWK**: The GNU AWK interpreter is required to run the script.
+- **Empty Input File (`t.txt`)**: An empty text file is needed as a placeholder for GAWK to process the script.  This is not important and just needs to exist.
+- **GCBASIC Compiler**: The output file (`test.gcb`) must be compiled using the GCBASIC compiler to program the target chip.
+
+== Usage
+
+To generate the test program, run the following command at a DOS prompt:
+
+[source,bash]
+----
+gawk -f tabletest.awk -v ELEMENTS=4010 -v TABLES=15 t.txt > test.gcb
+----
+
+- **`-f tabletest.awk`**: Specifies the AWK script file to execute.
+- **`-v ELEMENTS=4010`**: Sets the number of elements per table (this example: 4010). Adjust this value to fit within the PROGMEM
+- **`-v TABLES=15`**: Sets the number of tables to generate (this example: 15). Adjust this value to fit within the PROGMEM.
+- **`t.txt`**: An empty text file required for GAWK to process the script.
+- **`> test.gcb`**: Redirects the script output to a file named `test.gcb`, which is the test program in GCBASIC format.
+
+== Script Functionality
+
+The AWK script performs the following tasks:
+
+1. **Chip Configuration**:
+   - Configures the target chip as with explicit variable declarations (`#OPTION Explicit`) and low-voltage programming disabled (`#CONFIG LVP=OFF`).
+   - Sets PORTC.6 as the output pin for TX1 (`RC6PPS = 0x10`) for serial communication on the target chip.
+
+2. **Serial Communication Setup**:
+   - Configures the USART with a baud rate of 256000 BPS (`#DEFINE USART_BAUD_RATE 256000`).
+   - Enables blocking mode for USART transmission (`#DEFINE USART_TX_BLOCKING`).
+
+3. **Table Generation**:
+   - Creates a configurable number of tables (set via `TABLES`) with a configurable number of word elements per table (set via `ELEMENTS`).
+   - Table sizes and counts should be adjusted to fit within the PROGMEM of the target chip.
+   - Each table is named `START_CODE` followed by the table number (e.g., `START_CODE1`, `START_CODE2`, etc.).
+   - Tables are defined as byte arrays containing sequential values from 1 to `ELEMENTS`.
+
+4. **Data Output**:
+   - For each table, the script generates code to:
+     - Read the table length and display it via serial output (`HSerPrint data_length`).
+     - Output the current time in milliseconds (`HSerPrint millis()`).
+     - Iterate through each table element, printing it as a left-padded string of 4 characters (`HSerPrint leftpad(str(data_buf),4)`), followed by a comma (`HSerSend 0x2c`).
+     - Insert a carriage return and line feed every 50 elements (`if data_position % 50 = 0 then HSerPrintCRLF`).
+     - Print a newline after each table.
+
+5. **Program Termination**:
+   - Outputs "End of Test" to the terminal.
+   - Enters an infinite loop (`do...loop`) to keep the program running.
+
+6. **Table Definitions**:
+   - Defines each table as a byte array with sequential values from 1 to `ELEMENTS`.
+   - Each table is enclosed in `TABLE` and `END TABLE` directives for GCBASIC.
+
+== Example Output
+
+For the default settings (`ELEMENTS=4010`, `TABLES=15`), the generated program will:
+- Create 15 tables named `START_CODE1` to `START_CODE15`.
+- Each table contains 4010 word elements (values 1 to 4010).
+- Output each table's length, the current `millis()` value, and the table's elements to the terminal at 256000 BPS.
+- Format the output with commas between elements and newlines every 50 elements.
+- Conclude with "End of Test" and enter an infinite loop.
+
+== PROGMEM Considerations
+
+- The number of tables (`TABLES`) and elements per table (`ELEMENTS`) must be chosen to ensure the generated tables fit within this memory.
+- Each element in a table is a byte, so the total memory used by tables is approximately `TABLES * ELEMENTS` bytes, plus overhead for program code and table definitions.
+- To adjust table sizes, modify the `ELEMENTS` and `TABLES` parameters in the command-line invocation. For example, to reduce memory usage, you could use:
+  [source,bash]
+  ----
+  gawk -f tabletest.awk -v ELEMENTS=2000 -v TABLES=10 t.txt > test.gcb
+  ----
+  This generates 10 tables with 2000 elements each, using approximately 20,000 bytes of PROGMEM for the table data.
+
+== Notes
+
+- The empty file `t.txt` is required for GAWK to process the script, even though it does not contribute to the output.
+- The generated `test.gcb` file must be compiled with the GCBASIC compiler to produce a binary suitable for programming the target chip.
+- Ensure the target hardware is configured to receive serial data at 256000 BPS.
+- Verify that the total size of the tables and program code does not exceed the PROGMEM limit for the target chip.
+
+== Limitations
+
+- The script assumes the GCBASIC environment is set up correctly on the target system.
+- The script does not handle errors related to invalid input parameters (e.g., negative `ELEMENTS` or `TABLES`, or values that exceed PROGMEM capacity).
+- Users must manually calculate or estimate PROGMEM usage when setting `ELEMENTS` and `TABLES` to avoid memory overflow.... however, the compiler and programming utility will prevent using a HEX that is too large.
+
+Evan... Enjoy
