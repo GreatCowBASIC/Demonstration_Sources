@@ -1,0 +1,252 @@
+// USI_TWI_Slave
+// GCBASIC library for USI TWI (I2C) Slave driver on ATtiny84A
+// Implements TWI slave functionality using USI module
+// Based on Atmel AVR312: Using the USI module as an I2C slave
+// Created for ATtiny84A with SDA on PA6 and SCL on PA4
+// License: GNU General Public License v2 or later
+
+#chip tiny84A, 8
+#option explicit
+
+// USI pin definitions for ATtiny84A
+#define PORT_USI PORTA
+#define DDR_USI DDRA
+#define PIN_USI PINA
+#define PORT_USI_SDA PA6
+#define PORT_USI_SCL PA4
+#define PIN_USI_SDA PINA6
+#define PIN_USI_SCL PINA4
+
+// USI interrupt flags
+#define USI_START_INT USISIF
+#define USI_OVERFLOW_INT USIOIF
+
+// Buffer configuration
+#define TWI_BUFFER_SIZE 16
+#define TWI_BUFFER_MASK (TWI_BUFFER_SIZE - 1)
+
+// State machine states
+#define USI_SLAVE_CHECK_ADDR 0
+#define USI_SLAVE_SEND 1
+#define USI_SLAVE_ACK_SENT 2
+#define USI_SLAVE_CHECK_ACK 3
+#define USI_SLAVE_RECV 4
+#define USI_SLAVE_ACK_RECV 5
+
+// Global variables
+dim TWI_Slave_Addr as byte
+dim TWI_State as byte
+dim TWI_Active as byte
+dim TWI_RxBuf(TWI_BUFFER_SIZE) as byte
+dim TWI_RxHead as byte
+dim TWI_RxTail as byte
+dim TWI_RxCount as byte
+dim TWI_TxBuf(TWI_BUFFER_SIZE) as byte
+dim TWI_TxHead as byte
+dim TWI_TxTail as byte
+dim TWI_TxCount as byte
+
+// Main program
+
+    USI_TWI_Slave_Init ( 0x20 )
+    // Main loop 
+    do 
+        // Check for received data 
+        if USI_TWI_Available() then 
+            // Declare data variable 
+            dim outData as byte 
+            outData = USI_TWI_Read() 
+            // Echo data + 1 
+            USI_TWI_Write(outData + 1) 
+        end if 
+    loop
+
+
+
+
+// Library 
+// Initialize USI TWI Slave
+sub USI_TWI_Slave_Init(Addr as byte)
+    // Set slave address and reset variables
+    TWI_Slave_Addr = Addr
+    TWI_Active = 0
+    TWI_RxHead = 0
+    TWI_RxTail = 0
+    TWI_RxCount = 0
+    TWI_TxHead = 0
+    TWI_TxTail = 0
+    TWI_TxCount = 0
+    TWI_State = USI_SLAVE_CHECK_ADDR
+    
+    // Configure pins: SCL output, SDA input
+    Set DDR_USI.PORT_USI_SCL On
+    Set DDR_USI.PORT_USI_SDA Off
+    Set PORT_USI.PORT_USI_SCL On
+    Set PORT_USI.PORT_USI_SDA On
+    
+    // Configure USI for TWI mode: USISIE=1, USIWM1=1, USICS1=1
+    USICR = 0x28
+    
+    // Clear interrupt flags: USISIF=1, USIOIF=1, USIPF=1, USIDC=1
+    USISR = 0xF0
+    
+    // Enable interrupts
+    On Interrupt USIStart Call USI_TWI_Start
+    On Interrupt USIOverflow Call USI_TWI_Overflow
+end sub
+
+// Check available data in receive buffer
+function USI_TWI_Available() as byte
+    USI_TWI_Available = TWI_RxCount
+end function
+
+// Read byte from receive buffer
+function USI_TWI_Read() as byte
+    // Return 0 if buffer empty
+    if TWI_RxCount = 0 then
+        USI_TWI_Read = 0
+        exit function
+    end if
+    
+    // Read from buffer
+    TWI_RxTail = (TWI_RxTail + 1) & TWI_BUFFER_MASK
+    USI_TWI_Read = TWI_RxBuf(TWI_RxTail)
+    
+    // Update count safely
+    IntOff
+    TWI_RxCount = TWI_RxCount - 1
+    IntOn
+end function
+
+// Write byte to transmit buffer
+sub USI_TWI_Write(DataByte as byte)
+    // Declare temporary head variable
+    dim TempHead as byte
+    
+    // Wait for buffer space
+    TempHead = (TWI_TxHead + 1) & TWI_BUFFER_MASK
+    wait while TempHead = TWI_TxTail
+    
+    // Write to buffer
+    TWI_TxBuf(TempHead) = DataByte
+    
+    // Update head and count safely
+    IntOff
+    TWI_TxHead = TempHead
+    TWI_TxCount = TWI_TxCount + 1
+    IntOn
+end sub
+
+// USI Start Condition Interrupt Handler
+sub USI_TWI_Start
+    // Set initial state
+    TWI_State = USI_SLAVE_CHECK_ADDR
+    Set DDR_USI.PORT_USI_SDA Off
+    
+    // Wait for SCL low to complete start condition
+    wait while (PIN_USI.PORT_USI_SCL = On) and (PIN_USI.PORT_USI_SDA = Off)
+    
+    // Enable overflow interrupt: USISIE=1, USIOIE=1, USIWM1=1, USIWM0=1, USICS1=1
+    USICR = 0x2C
+    
+    // Set counter for address byte: USISIF=1, USIOIF=1, USIPF=1, USIDC=1, USICNT=0x0E
+    USISR = 0xFE
+end sub
+
+// USI Overflow Interrupt Handler
+sub USI_TWI_Overflow
+    // Declare temporary data variable
+    dim DataByte as byte
+    
+    select case TWI_State
+        case USI_SLAVE_CHECK_ADDR
+            // Check received address
+            DataByte = USIDR
+            if FnLSL(TWI_Slave_Addr,1) = (DataByte and 0xFE) then
+                TWI_Active = 1
+                if DataByte and 1 then
+                    TWI_State = USI_SLAVE_SEND
+                else
+                    TWI_State = USI_SLAVE_RECV
+                end if
+                USI_Set_Ack
+            else
+                USI_Set_Wait_Start
+            end if
+        
+        case USI_SLAVE_RECV
+            // Prepare to receive data
+            USI_Set_Read_Ack
+            TWI_State = USI_SLAVE_ACK_RECV
+        
+        case USI_SLAVE_ACK_RECV
+            // Store received data
+            if TWI_RxCount < TWI_BUFFER_SIZE then
+                TWI_RxHead = (TWI_RxHead + 1) & TWI_BUFFER_MASK
+                TWI_RxBuf(TWI_RxHead) = USIDR
+                TWI_RxCount = TWI_RxCount + 1
+            end if
+            USI_Set_Ack
+            TWI_State = USI_SLAVE_RECV
+        
+        case USI_SLAVE_SEND
+            // Send data from buffer
+            if TWI_TxCount = 0 then
+                USIDR = 0
+            else
+                TWI_TxTail = (TWI_TxTail + 1) & TWI_BUFFER_MASK
+                USIDR = TWI_TxBuf(TWI_TxTail)
+                IntOff
+                TWI_TxCount = TWI_TxCount - 1
+                IntOn
+            end if
+            USI_Set_Send
+            TWI_State = USI_SLAVE_ACK_SENT
+        
+        case USI_SLAVE_ACK_SENT
+            // Check master's ACK
+            USI_Set_Read_Ack
+            TWI_State = USI_SLAVE_CHECK_ACK
+        
+        case USI_SLAVE_CHECK_ACK
+            // Handle ACK/NACK
+            if USIDR then
+                USI_Set_Wait_Start
+                TWI_Active = 0
+            else
+                TWI_State = USI_SLAVE_SEND
+                USI_Set_Send
+            end if
+    end select
+end sub
+
+// Set USI to send ACK
+sub USI_Set_Ack
+    USIDR = 0
+    Set DDR_USI.PORT_USI_SDA On
+    // USIOIF=1, USIPF=1, USIDC=1, USICNT=0x0E
+    USISR = 0x7E
+end sub
+
+// Set USI to read ACK
+sub USI_Set_Read_Ack
+    Set DDR_USI.PORT_USI_SDA Off
+    USIDR = 0
+    // USIOIF=1, USIPF=1, USIDC=1, USICNT=0x0E
+    USISR = 0x7E
+end sub
+
+// Set USI to wait for start condition
+sub USI_Set_Wait_Start
+    // USISIE=1, USIWM1=1, USICS1=1
+    USICR = 0x28
+    // USISIF=1, USIOIF=1, USIPF=1, USIDC=1
+    USISR = 0xF0
+end sub
+
+// Set USI to send data
+sub USI_Set_Send
+    Set DDR_USI.PORT_USI_SDA On
+    // USIOIF=1, USIPF=1, USIDC=1, USICNT=0x00
+    USISR = 0x70
+end sub
