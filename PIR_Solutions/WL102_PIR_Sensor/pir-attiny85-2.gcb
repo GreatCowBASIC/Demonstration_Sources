@@ -1,0 +1,170 @@
+/* GCBASIC Code Documentation for PIR-ATTINY85-2
+   RomTEK 
+   Name: pir-attiny85-2
+   Micro: ATTINY85
+   Date: 08/17/2025
+   Version: 00.01
+   Description: It goes into sleep mode and as soon as the PIR triggers, it transmits characters to the WL102-341 module.
+   Overview
+   - Project Name: pir-attiny85-2
+   - Microcontroller: ATTINY85
+   - Date: 08/17/2025
+   - Version: 00.01
+   - Description: This code enables an ATTINY85 microcontroller to enter sleep mode and transmit a predefined ASCII message via a WL102-341 module when triggered by a PIR sensor. The circuit includes a PIR sensor, an LED, and the WL102 transmitter.
+   Circuit Components
+   - ATTINY85-20P: Main microcontroller.
+   - PIR Sensor: Connected to PB2 (pin 7), triggers the alarm.
+   - WL102-341: Transmitter module, enabled via PB0 (pin 5) and data sent via PB1 (pin 6).
+   - LED (D2): Connected to PB4 (pin 3), indicates activity.
+   - Capacitor (C3): 100nF, stabilizes 3.3V supply.
+   - Resistors (R1, R2, R3): 10kΩ, 470Ω, and 1kΩ respectively, for voltage division and current limiting.
+   - Transistor (Q1): BC107, controls the transmitter.
+   - Power Supply: 3.3V
+*/
+
+// Working phase
+#chip TINY85, 8
+#option EXPLICIT
+
+// ----- Definitions
+#define EN_TX PORTB.0        // Port enable TX pin 5
+#define TX    PORTB.1        // Data TX pin 6
+#define LED1  PORTB.4        // LED control pin 3
+DIR TX OUT
+
+// ----- Global Variables
+DIM BD AS WORD         // Baud rate
+DIM IX AS BYTE         // Loop index for message transmission
+DIM CH AS BYTE         // Character to transmit
+DIM BIT_INDEX AS BYTE  // Bit index for serial transmission
+DIM MASK(8) AS BYTE    // Bit mask array
+DIM MSG(12) AS BYTE    // ASCII message array (12 characters)
+DIM II AS BYTE         // Loop counter
+DIM TRIGGER AS BIT     // Trigger flag for PIR detection
+DIM PREV_STATE AS BIT  // Previous PIR state
+DIM ZZ AS BYTE         // Convenience variable for message repetition
+DIM CONTA AS BYTE      // Counter variable
+ZZ = 0
+
+DIR EN_TX OUT          // Set EN_TX as output
+DIR LED1 OUT           // Set LED1 as output
+DIR PORTB.2 IN         // Set PB2 as input for PIR sensor
+
+// ----- Initialization
+SET TX ON              // Set TX line active
+BD = 3333              // Default baud rate (3333µs for 300 baud)
+// Speed ASK/OOK
+// BAUD   RATE BIT DURATION (µs)   NOTE
+// 300    3333                     
+// 600    1666 
+// 1200   833                     Usage old modem
+// 2400   416                     
+// 4800   208                     
+// 9600   104                     Standard TTL 
+MASK(0) = 1
+MASK(1) = 2
+MASK(2) = 4
+MASK(3) = 8
+MASK(4) = 16
+MASK(5) = 32
+MASK(6) = 64
+MASK(7) = 128
+
+// ----- Load ASCII message
+MSG(0) = ASC("D")
+MSG(1) = ASC("R")
+MSG(2) = ASC("T")
+MSG(3) = ASC("e")
+MSG(4) = ASC("k")
+MSG(5) = ASC("T")
+MSG(6) = ASC("x")
+MSG(7) = ASC("1")
+MSG(8) = ASC("=")
+MSG(9) = ASC("1")
+MSG(10) = 13           // CR
+MSG(11) = 10           // LF
+
+// ----- Setup
+WAIT 100 MS            // Delay for stabilization
+// ----- Blink LED on start
+FOR II = 1 TO 10
+    SET LED1 ON
+    WAIT 10 MS
+    SET LED1 OFF
+    WAIT 100 MS
+NEXT II
+DIR LED1 IN            // Set LED1 as input for energy saving
+// ----- Disable unnecessary peripherals
+PRR = 0b00001111       // Off ADC, Timer0, Timer1, USI
+ADCSRA = 0             // Disable ADC
+
+// ----- Configure interrupt for PB2 (PCINT2)
+GIMSK = GIMSK OR 0b00100000   // Enable PCIE
+PCMSK = PCMSK OR 0b00000100   // Enable PCINT2
+SREG.7 = 1                    // Enable global interrupt
+
+ON INTERRUPT PINCHANGE0 CALL WakeUp   // Call wake-up routine on interrupt
+
+PREV_STATE = PORTB.2   // Initial PIR pin state
+
+// ----- Main Loop
+DO
+    MCUCR = MCUCR OR 0b00110000   // SM1:SM0 = 01
+    MCUCR = MCUCR OR 0b00100000   // SE = 1
+    ASM SLEEP                     // Enter sleep mode    
+
+    IF TRIGGER = 1 THEN
+        TRIGGER = 0
+        DIR LED1 OUT               // Set LED1 as output
+        SET LED1 ON
+        SET EN_TX ON               // Enable TX        
+        FOR IX = 0 TO 2            // Initial message transmission
+            CH = MSG(IX)
+            GOSUB SB               
+            WAIT 50 MS             // Do not change this delay
+        NEXT  
+        FOR ZZ = 0 TO 3            // Repeat message 3 times
+            FOR IX = 0 TO 11        // Full message transmission
+                CH = MSG(IX)
+                GOSUB SB         
+                WAIT 10 MS
+            NEXT
+            WAIT 10 MS
+        NEXT ZZ 
+        SET EN_TX OFF              // Disable TX        
+        SET LED1 OFF
+        DIR LED1 IN                // Set LED1 as input for low consumption
+    END IF
+
+LOOP
+
+// ----- Routines and Functions
+
+// ----- Routine to send a byte via ASK/OOK
+    SB:
+        // Start bit
+        SET TX OFF
+        WAIT BD US
+
+        // 8 data bits (LSB first)
+        FOR BIT_INDEX = 0 TO 7
+            IF (CH AND MASK(BIT_INDEX)) <> 0 THEN
+                SET TX ON
+            ELSE
+                SET TX OFF
+            END IF
+            WAIT BD US
+        NEXT
+
+        // Stop bit
+        SET TX ON
+        WAIT BD US
+    RETURN
+
+    // ----- Wake-up routine
+    SUB WakeUp
+        IF PREV_STATE = 0 AND PORTB.2 = 1 THEN
+            TRIGGER = 1
+        END IF
+        PREV_STATE = PORTB.2
+    END SUB
