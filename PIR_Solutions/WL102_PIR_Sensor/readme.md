@@ -27,8 +27,20 @@ The project, authored by user *Romtek*, showcases a low-power solution where an 
 - The WL102 module is enabled via PB0 and transmits data through PB1.
 - JP1 is currently unused.
 
-
 <img src="sensor-circuit.png" alt="Project Schematic" width="30%" height="30%">
+
+### PIR Modification Notes
+The PIR sensor is modified to operate at 3v3 ( not the default 5v0). 
+- Simply remove the stabilizer and jumper as shown below. The modifications are shown on the picture.
+
+<img src="pir-3v3_modification1.jpg" alt="PIR modification" width="10%" height="10%">
+
+
+**Be careful not to reverse the polarity of the circuit because the PIR has no reverse polarity protection.**  See the picture for the connections.
+
+<img src="pir-3v3_modification2.jpg" alt="PIR modification" width="30%" height="30%">
+
+
 
 ## Receiver Component
 The receiver implementation for the WL101 module, written for an Arduino Nano.

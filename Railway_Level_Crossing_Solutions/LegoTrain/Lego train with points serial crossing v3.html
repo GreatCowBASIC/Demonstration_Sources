@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Compilation Report</title>
+</head>
+<body>
+<h1>Compilation Report</h1>
+<p>Compiler Version (YYYY-MM-DD): 2025.05.16 (Windows 32 bit) : Build 1486)</p>
+<h2>Compilation time</h2>
+<p> (Compile time: 1.609375 seconds)</p>
+<p> (Assembly time: 0.125 seconds)</p>
+<p> (Download time: 0 seconds)</p>
+<p> (Total time: 1.734375 seconds)</p>
+<h2>Chip resource usage:</h2>
+<p>Chip Model: MEGA328P</p>
+<p>Program Memory: 1968/16384 words (12.01%)</p>
+<p>RAM: 97/2048 bytes (4.74%)</p>
+<p> OSC: 16Mhz</p>
+<h2>RAM Allocation</h2>
+<table border="1">
+</table>
+<h2>Subroutines</h2>
+<table border="1">
+<tr><th>Name</th><th>Code Size (lines)</th><th>Compiled Size (words)</th><th>Outgoing calls</th></tr>
+<tr><td>Main</td><td>168</td><td>469</td><td>INITRANDOM(1), LNPSERININT(1), LNPINITIALISE(27), Delay_S(1), Delay_MS(8), EMERSONCROSSINGCLOSE(2), UIDISABLECOUNTING(1), INCREMENTLAPCOUNT(1), SENDLAPCOUNT(1), COUNTPRESSES(1), INITUNO(29), UIENABLECOUNTING(2), UICLEARLAPCOUNT(1), EMERSONCROSSINGOPEN(2), SENDPOINTSLNP(3), PFSENDSINGLEOUTPUTPWM(3), SHOWNUMBER(3), READAD(9), INITSYS(50)</td></tr>
+<tr><td>SHOWNUMBER</td><td>7</td><td>27</td><td>UISHOWNUMBER(1)</td></tr>
+<tr><td>COUNTPRESSES</td><td>16</td><td>69</td><td>Delay_MS(3), SYSCOMPLESSTHAN16(1), SHOWNUMBER(1)</td></tr>
+<tr><td>PFSENDSINGLEOUTPUTPWM</td><td>73</td><td>318</td><td>Delay_MS(2), SWAP4(1)</td></tr>
+<tr><td>LNPRECEIVED</td><td>11</td><td>50</td><td>SYSCOMPEQUAL(2), CLEARLAPCOUNT(1)</td></tr>
+<tr><td>EMERSONCROSSINGCLOSE</td><td>1</td><td>8</td><td>SENDLNPPAIR(1)</td></tr>
+<tr><td>EMERSONCROSSINGOPEN</td><td>1</td><td>8</td><td>SENDLNPPAIR(1)</td></tr>
+<tr><td>UIENABLECOUNTING</td><td>1</td><td>8</td><td>SENDLNPPAIR(1)</td></tr>
+<tr><td>UIDISABLECOUNTING</td><td>1</td><td>8</td><td>SENDLNPPAIR(1)</td></tr>
+<tr><td>UICLEARLAPCOUNT</td><td>1</td><td>8</td><td>SENDLNPPAIR(1)</td></tr>
+<tr><td>UISHOWNUMBER</td><td>3</td><td>22</td><td>SENDLNPPAIR(1)</td></tr>
+<tr><td>SENDPOINTSLNP</td><td>7</td><td>30</td><td>Delay_MS(1), SENDLNPPAIR(1)</td></tr>
+<tr><td>INCREMENTLAPCOUNT</td><td>8</td><td>61</td><td>EPWRITE(2), SYSEPREAD(2)</td></tr>
+<tr><td>CLEARLAPCOUNT</td><td>2</td><td>16</td><td>EPWRITE(2)</td></tr>
+<tr><td>SENDLAPCOUNT</td><td>3</td><td>34</td><td>SENDLNPPAIRWORD(1), SYSEPREAD(2)</td></tr>
+<tr><td>INITUNO</td><td>2</td><td>3</td><td></td></tr>
+<tr><td>LNPINITIALISE</td><td>5</td><td>20</td><td></td></tr>
+<tr><td>LNPSERININT</td><td>36</td><td>125</td><td>LNPRECEIVED(1), HSERRECEIVE(1)</td></tr>
+<tr><td>SENDONREC</td><td>36</td><td>128</td><td></td></tr>
+<tr><td>SENDLNPPAIR</td><td>40</td><td>150</td><td>SYSDIVSUB(1), Delay_MS(1), Delay_10US(1), RANDOM(1), SENDONREC(6)</td></tr>
+<tr><td>SENDLNPPAIRWORD</td><td>18</td><td>92</td><td>SYSDIVSUB(1), Delay_MS(2), SENDONREC(6)</td></tr>
+<tr><td>READAD</td><td>74</td><td>46</td><td>Delay_10US(1)</td></tr>
+<tr><td>EPWRITE</td><td>67</td><td>5</td><td></td></tr>
+<tr><td>SYSEPREAD</td><td>45</td><td>2</td><td></td></tr>
+<tr><td>SWAP4</td><td>10</td><td>3</td><td></td></tr>
+<tr><td>INITSYS</td><td>1146</td><td>7</td><td></td></tr>
+<tr><td>SYSDIVSUB</td><td>48</td><td>16</td><td></td></tr>
+<tr><td>SYSCOMPEQUAL</td><td>20</td><td>5</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHAN16</td><td>38</td><td>10</td><td></td></tr>
+<tr><td>INITRANDOM</td><td>2</td><td>7</td><td></td></tr>
+<tr><td>RANDOM</td><td>8</td><td>68</td><td></td></tr>
+<tr><td>INITUSART</td><td>399</td><td>20</td><td></td></tr>
+<tr><td>HSERRECEIVE</td><td>2</td><td>7</td><td>HSERRECEIVE(1)</td></tr>
+<tr><td>HSERRECEIVE</td><td>450</td><td>20</td><td></td></tr>
+<tr><td>Delay_10US</td><td>0</td><td>7</td><td></td></tr>
+<tr><td>Delay_MS</td><td>0</td><td>12</td><td></td></tr>
+<tr><td>Delay_S</td><td>0</td><td>7</td><td>Delay_MS(1)</td></tr>
+<tr><td>SEVENSEGDISPDIGIT</td><td>0</td><td>20</td><td></td></tr>
+<tr><td>SysIntContextSave</td><td>0</td><td>22</td><td></td></tr>
+<tr><td>SysIntContextRestore</td><td>0</td><td>22</td><td></td></tr>
+<tr><td>IntUSART_RX</td><td>0</td><td>8</td><td></td></tr>
+</table>
+</body>
+</html>
