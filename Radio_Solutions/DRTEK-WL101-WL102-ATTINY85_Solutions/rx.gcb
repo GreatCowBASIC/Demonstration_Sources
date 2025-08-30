@@ -1,0 +1,135 @@
+/**************************************************************
+DRTEK  
+Name: ask-ook-rx-WL101-attiny85  
+Microcontroller: ATTINY85  
+Date: 29/08/2025  
+Version: 00.07  
+Description: Receives via ASK/OOK and turns on LED if it receives the string "DRTekTx1=1"  
+Notes: Baud rate 300, bit-banging decoding, string buffer  
+//!remember to configure the fuses in the programmer
+Low Fuse: E2  
+High Fuse: DF 
+Extended Fuse: FF
+//----------------------------------------------------
+//!ASK/OOK speed
+Baud   Rate Bit Duration (µs)   Note
+300    3333                     
+600    1666 
+1200    833                     
+2400    416                     
+4800    208                     
+9600    104                     
+14400   69                      
+19200   52  
+//! status = working
+**************************************************************/
+
+#chip tiny85,8
+#option explicit
+#include <SoftSerial.h>
+
+' ----- UART serial configuration
+#define SER1_BAUD 9600
+#define SER1_DATABITS 8
+#define SER1_STOPBITS 1
+#define SER1_INVERT Off
+#define SER1_TXPORT PORTB
+#define SER1_TXPIN 1       ' pin 6
+#define SER1_RXPORT PORTB
+#define SER1_RXPIN 2       ' pin 7
+#define SER1_RXNOWAIT Off
+
+' ----- Hardware definitions
+#define rx_pin pinb.0       ' ASK/OOK input (pin 5)
+#define led1   portb.4      ' Status LED (pin 3)
+
+dim BIT_DELAY as word 
+dim receivedByte as byte
+dim value as byte
+dim rxString as string
+
+BIT_DELAY = 3333     ' Baud 300
+
+' ----- Pin setup
+dir led1 out
+dir rx_pin in
+
+' ----- Initial blinking
+dim blink as byte
+for blink = 0 to 3
+    set led1 on
+    wait 100 ms
+    set led1 off
+    wait 100 ms
+next
+
+' ----- Send test message over serial
+Ser1Print "Ask-ook v0.1"
+Ser1Send 13   ' CR
+Ser1Send 10   ' LF
+
+' ----- Main loop
+do
+    if waitForStartBit() then
+        receivedByte = readByte()
+
+        ' Build string only with printable characters
+        if receivedByte >= 32 and receivedByte <= 126 then
+            rxString = rxString + chr(receivedByte)
+            /*  //debug
+            Ser1Print "Char: " & chr(receivedByte) & " | String: " & rxString
+            Ser1Send 13
+            Ser1Send 10
+            */
+        end if
+
+        ' If CR (13) or LF (10) is received, consider the string complete
+        if receivedByte = 13 or receivedByte = 10 then
+            if len(rxString) > 0 then
+
+                if rxString = "DRTekTx1=1" then
+                    Ser1Print "Received: " & rxString
+                    Ser1Send 13
+                    Ser1Send 10
+                    set led1 on
+                    wait 500 ms
+                    set led1 off
+                end if
+
+                rxString = ""   ' reset
+            end if
+        end if
+    end if
+loop
+
+' ----- Function to detect start bit
+function waitForStartBit() as bit
+    dim timeoutCounter as byte
+    timeoutCounter = 0
+
+    do
+        if rx_pin = 0 then
+            wait BIT_DELAY / 2 us
+            return true
+        end if
+
+        wait 1 ms
+        timeoutCounter = timeoutCounter + 1
+    loop until timeoutCounter > 5   ' timeout of about 5 ms
+
+    return false
+end function
+
+' ----- Function to read a byte via ASK/OOK
+function readByte() as byte
+    dim ii as byte
+    value = 0
+    for ii = 0 to 7
+        wait BIT_DELAY us
+        if rx_pin = 1 then
+            value = value or (1 << ii)
+        end if
+    next
+    wait BIT_DELAY us   ' stop bit
+    return value
+end function
