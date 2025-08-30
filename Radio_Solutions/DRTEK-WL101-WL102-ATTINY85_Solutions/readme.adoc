@@ -30,17 +30,16 @@ The transmitter, powered by a 3V battery, remains in a low-power state until act
 - **Button**: Connected to pin 7 (PB2) for triggering transmission
 
 === Operation
-1. In standby, the transmitter consumes minimal power.
-2. Pressing the button wakes the microcontroller.
-3. The microcontroller activates Q1, powering the WL102 module and LED.
-4. A predefined string (e.g., "DRTekTx1=1") is transmitted via pin 6.
+1. In standby, the transmitter consumes minimal power.{nbsp}{nbsp}
+2. Pressing the button wakes the microcontroller.{nbsp}{nbsp}
+3. The microcontroller activates Q1, powering the WL102 module and LED.{nbsp}{nbsp}
+4. A predefined string (e.g., "DRTekTx1=1") is transmitted via pin 6.{nbsp}{nbsp}
 5. The system returns to low-power standby mode after transmission.
 
 === Transmitter Diagram
 image::scheme-tx-ask.JPG[Transmitter Schematic, align="center"]
 
 *Physical Implementation*
-
 
 image::tx-ask-ook.jpg[Transmitter ASK-OOK Image, align="center", width="50%"]
 
@@ -57,9 +56,9 @@ The receiver operates at 12V, reduced to 5V via a voltage regulator.{nbsp}{nbsp}
 - **Optional Relay**: Configurable via JP1 for bistable operation (not used in demo)
 
 === Operation
-1. The receiver continuously monitors for ASK-OOK signals.
-2. Upon receiving the string "DRTekTx1=1", the LED on pin 3 lights layer for 500 ms.
-3. The string buffer is reset after processing.
+1. The receiver continuously monitors for ASK-OOK signals.{nbsp}{nbsp}
+2. Upon receiving the string "DRTekTx1=1", the LED on pin 3 lights for 500 ms.{nbsp}{nbsp}
+3. The string buffer is reset after processing.{nbsp}{nbsp}
 4. A jumper (JP1) allows for future bistable relay configurations.
 
 === Receiver Diagram
@@ -67,12 +66,12 @@ image::scheme-rx-ask.JPG[Receiver Schematic, align="center"]
 
 *Physical Implementation*
 
-
 image::rx-ask-ook.jpg[Receiver ASK-OOK Image, align="center", width="50%"]
 
 == Notes and Improvements
 - **Receiver**: The JP1 jumper supports future bistable relay configurations but is unused in this demo.
 - **Firmware**: The current implementation is basic.{nbsp}{nbsp}Enhancements could include error checking, advanced power management, or support for multiple message formats.
+- **GCBASIC Implementation**: The firmware leverages GCBASIC's Optimised Software Serial functions via the `SoftSerial.h` library, minimizing resource usage on the ATTINY85 by implementing efficient bit-banging for serial communication at 9600 baud for debugging and 300 baud for ASK-OOK.{nbsp}{nbsp}The transmitter uses a PinChange0 interrupt (PCINT2 on PB2) to detect button presses, enabling low-power sleep mode wake-up without continuous polling.{nbsp}{nbsp}Sleep mode is configured using direct register manipulation (e.g., `MCUCR` and `PRR` registers) to disable unnecessary peripherals like ADC and timers, reducing power consumption to microampere levels during standby.
 - **Extensibility**: The code serves as a foundation for applications like remote control systems or sensor data transmission.
 
 == ASK-OOK Baud Rate Reference
@@ -94,6 +93,5 @@ The following table lists common baud rates and their bit durations for ASK-OOK 
 This project offers a foundational example of ASK-OOK communication using low-cost hardware.{nbsp}{nbsp}The transmitter and receiver illustrate basic wireless communication principles, with potential for optimization and expansion.{nbsp}{nbsp}For complete schematics, code, and resources, refer to the project repository.
 
 == References
-- link:https://www.example.com/datasheets/wl101-wl102[WL101/WL102 Module Datasheets]
-- link:https://www.example.com/docs/attiny85[ATTINY85 Microcontroller Documentation]
-- link:https://www.example.com/repo/ask-ook-project[Project Repository]
+- link:https://ww1.microchip.com/downloads/en/devicedoc/atmel-2586-avr-8-bit-microcontroller-attiny25-attiny45-attiny85_datasheet.pdf[ATTINY85 Microcontroller Documentation]
+- link:https://github.com/GreatCowBASIC/Demonstration_Sources/tree/main/Radio_Solutions/DRTEK-WL101-WL102-ATTINY85_Solutions[Project Repository]
