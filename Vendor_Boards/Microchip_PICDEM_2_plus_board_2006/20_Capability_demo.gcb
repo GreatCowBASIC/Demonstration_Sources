@@ -1,18 +1,85 @@
-/*
-    A demonstration program for GCGB and GCB.
-    --------------------------------------------------------------------------------
+/* 
 
-    The program us designed for Microchip’s PICDEM 2 Plus Development Board. The PICDEM 2 Plus Demonstration Board is a simple board
-    which demonstrates the capabilities of the 18, 28 and 40-pin PIC16 and PIC18 devices.
 
-    GCBASIC for these devices can be downloaded from the GCBASIC web site at https://sourceforge.net/projects/gcbasic/
+### Overview of the GCBASIC Demonstration Program for PICDEM 2 Plus Development Board
 
-    This program comprises 18 demos utilizing the different peripherals and features of 8-bit PIC® MCUs
-    while demonstrating the different capabilities of the PICDEM 2 Plus Demonstration Board. Each lesson contains
-    a brief description of the lab, code snippets, and discussions to make you become easily acquainted with
-    the different peripherals and registers of PIC® MCUs. These demos also make use of the PPSTOOL, 
-    an easy-to-use tool that you can use to generate codes for a more efficient use of the CPU and memory resources. 
-    All labs are written in GCBASIC language and are compatible with the latest GCBASIC compilers.
+The "20_Capability_demo.gcb" program is a comprehensive demonstration suite written in GCBASIC, an open-source BASIC compiler for Microchip PIC microcontrollers. Designed specifically for the PICDEM 2 Plus Development Board, it showcases the capabilities of 8-bit PIC® MCUs (supporting 18-, 28-, and 40-pin PIC16 and PIC18 devices) through 18 interactive labs. These labs introduce users to fundamental and advanced MCU peripherals, registers, and programming concepts, making it an ideal educational tool for beginners and experienced developers alike. The program leverages the board's hardware features, such as LEDs, switches, a potentiometer, LCD display, EEPROM, temperature sensor, buzzer, and I2C/USART interfaces, while demonstrating efficient resource usage via tools like PPSTOOL for code generation.
+
+#### Purpose and Key Features
+- **Educational Focus**: Each lab builds progressively, starting with basic I/O operations and advancing to complex topics like interrupts, timers, PWM, and I2C communication. Labs include brief descriptions, code snippets, and discussions to facilitate learning about MCU internals.
+- **Navigation and Interaction**: Users navigate labs by pressing the S2 button on the board. The LCD provides real-time feedback (e.g., lab names, results, and status messages), while optional serial output (via USART at 9600 baud) allows debugging on a terminal. Labs run in a loop, with S2 advancing to the next one and S3 used in specific demos for input.
+- **Hardware Integration**: Tailored to the PICDEM 2 Plus board, the program configures ports for compatibility across pin counts. Key mappings include:
+  - LEDs (D2-D5) on RB3:RB0 for visual output.
+  - Switches (S2 on RA4, S3 on RB0) for user input.
+  - Potentiometer (R16 on RA0) for analog readings.
+  - LCD (4-bit mode on RD7:RD0 and RA3:RA1) for display.
+  - I2C (on RC4:RC3) for external EEPROM and temperature sensor (TC74).
+  - Buzzer on RC2 for audio demos.
+  - USART on RC7:RC6 for serial communication.
+- **Startup and Initialization**: On power-up, the program displays a welcome message, chip details (e.g., model and MHz), and GCBASIC credits on the LCD and serial terminal. It handles board-specific setups like LCD power-on delay and PPS (Peripheral Pin Select) for modules like CCP1, EUSART1, and I2C.
+- **Lab Highlights** (in order of navigation):
+  1. **Hello World**: Turns on an LED to demonstrate basic I/O.
+  2. **Blink**: Blinks an LED with timer-based delays.
+  3. **Rotate LEDs**: Shifts lights across LEDs.
+  4. **ADC**: Reads potentiometer and displays MSB on LEDs/LCD.
+  5. **Variable Speed Rotate**: Adjusts LED rotation speed via ADC.
+  6. **Debounce**: Handles button presses to shift LEDs reliably.
+  7. **PWM**: Controls LED brightness with duty cycle adjustment.
+  8. **Timer1**: Uses timers for LED sequencing and time tracking.
+  9. **Interrupts**: Reverses LED rotation direction on button press.
+  10. **Sleep/Wakeup**: Demonstrates low-power mode with WDT wakeup.
+  11. **EEPROM**: Stores and retrieves ADC values in on-chip EEPROM.
+  12. **LCD Operations**: Tests LCD cursor, flashing, and display modes.
+  13. **NVM Memory**: Logs ADC data to non-volatile program flash.
+  14. **I2C Discovery**: Scans for I2C devices (serial output).
+  15. **I2C Temperature**: Reads and displays TC74 sensor data.
+  16. **I2C EEPROM**: Writes/reads/validates data on external EEPROM.
+  17. **Clock**: Basic tick-tock using external 32.768 kHz oscillator.
+  18. **Buzzer**: Plays simple RTTTL melodies.
+- **Technical Notes**:
+  - Targets PIC18F47Q10 with specific configs (e.g., WDT, MCLRE).
+  - Workarounds for hardware errata (e.g., double ADC reads on Q10 series).
+  - Supports stateful lab management to reset states between demos.
+  - GPL-licensed, authored by Evan R. Venn, version 1.00 (dated 2024-10-28).
+
+#### Usage and Setup
+- **Requirements**: GCBASIC compiler from SourceForge, PICDEM 2 Plus board with a compatible PIC MCU, and optional serial terminal for enhanced output.
+- **Running the Demo**: Compile and program the MCU. Cycle through labs with S2; interact via S3 or potentiometer where applicable. Labs auto-run until S2 is pressed.
+- **Customization**: Users can modify labs or add features, as the code is modular with clear variable definitions, macros, and subroutines.
+
+This demo not only verifies board functionality but also serves as a practical tutorial for GCBASIC programming, emphasizing real-world MCU applications in embedded systems. For full details, refer to the source code comments and Microchip's board documentation.
+
+
+Program Capabilities:
+- Demonstrates 18 labs covering key MCU features such as LED control, ADC, PWM, timers, interrupts, EEPROM, NVM, 
+  I2C communication, LCD operations, and buzzer functionality.
+- Each lab is navigable via the S2 button, with descriptive output on the LCD and optional serial terminal output.
+- Utilizes the PPSTOOL for efficient code generation to optimize CPU and memory usage.
+- Includes hardware-specific configurations for the PICDEM 2 Plus board, such as port assignments for LEDs, switches, 
+  potentiometer, LCD, EEPROM, buzzer, and temperature sensor.
+- Supports serial communication (USART) for debugging and output display.
+- Handles specific hardware errata, such as the ADC issue on the PIC18F47Q10, with workarounds like double ADC reads.
+
+I/O Features and Equivalent Port Connections:
+--------------------------------------------------------------------------------
+Feature                | 18-pin         | 28-pin         | 40-pin
+-----------------------|----------------|----------------|----------------
+ LEDs (D2-D5)          | RB3:RB0        | RB3:RB0        | RB3:RB0
+ USART                 | SW Only        | RC6:RC7        | RC6:RC7
+ Master Reset          | (S1) MCLR      | (S1) MCLR      | (S1) MCLR
+ User-defined (S2)     | RA4            | RA4            | RA4
+ User-defined (S3)     | RB0            | RB0            | RB0
+ Potentiometer         | (R16) RA0      | (R16) RA0      | (R16) RA0
+ LCD1                  | N/A            | N/A            | RA3:RA1, RD3:RD0
+ EEPROM (Ux)           | N/A            | RC3/RC4        | RC3/RC4
+ Buzzer (P1)           | N/A            | RC2            | RC2
+ ICD Connector (J5)    | RB6:RB7        | RB6:RB7        | RB6:RB7
+ Temp sensor (Ux)      | N/A            | RC3/RC4        | RC3/RC4
+ Crystal OSC           | (Y1) OSC1, OSC2 | (Y1) OSC1, OSC2 | (Y1) OSC1, OSC2
+ External OSC          | (Y2) OSC1      | (Y2) OSC1      | (Y2) OSC1
+ --------------------------------------------------------------------------------
+Legend: N/A - feature not available for this device
+
 
     Demos
 
@@ -62,7 +129,7 @@
 '''@author    Evan R. Venn   
 '''@license   GPL
 '''@version   1.00   
-'''@date      08/01/2025
+'''@date      2025-09-04
 '''********************************************************************************
 
 
@@ -204,7 +271,7 @@
             HserPrintCRLF
             HserPrint "Welcome to PICDEM 2 Plus"
             HserPrintCRLF
-            HserPrint "GCBASIC - Anobium Jan 2025"
+            HserPrint "GCBASIC - Anobium Seo 2025"
             HserPrintCRLF
         #endif
 
@@ -221,7 +288,7 @@
         CLS
         Print "    GCBASIC     "
         Locate 1,0
-        Print "Anobium Jan 2025"
+        Print "Anobium Sep 2025"
         wait 5 s
         CLS
         Print "    Welcome     "

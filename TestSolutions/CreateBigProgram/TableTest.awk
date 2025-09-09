@@ -1,5 +1,5 @@
     BEGIN {
-  print "#CHIP 18f27q43"
+  print "#CHIP 18f47q43"
   print "#OPTION Explicit"
   print "#config  LVP=ON"
   print "'Elements = "ELEMENTS

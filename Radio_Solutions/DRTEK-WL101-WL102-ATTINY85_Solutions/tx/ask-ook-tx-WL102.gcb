@@ -1,0 +1,161 @@
+/**************************************************************
+DRTEK 
+Nome: ask-ook-tx-WL102
+Micro: ATTINY85
+Data: 29/08/2025
+Versione: 00.01
+descrizione: premendo il pulsante invia al modulo wl102-341 la stringa, dopo va in sleep mode fino alla prossima pressione del tasto 
+link e riferimenti
+rev.:        data:        note:
+//!ricordarsi di configurare i fuse nel programmatore
+Low Fuse: E2  
+High Fuse: DF 
+Extended Fuse: FF
+*************************************************************/
+//!fase funzionante
+#chip tiny85,8
+#option explicit
+
+' ----- Definizioni
+#define En_tx portb.0        // enable tx  pin 5
+#define tx    portb.1        // DATA pin 6
+//#define led1  portb.4 non usato 
+dir tx out
+
+' ----- Variabili globali
+dim bd as word
+dim ix as byte
+dim ch as byte
+dim bit_index as byte
+dim mask(8) as byte
+dim msg(12) as byte     //! "test DRTEK\r\n" = 12 caratteri !!mettere il numero di caratteri utilizzati
+dim ii as byte
+dim trigger as bit
+dim prev_state as bit
+dim zz as byte      //variabile di comodo per for ripetizione messaggio
+dim conta as byte
+zz=0
+' ----- Configura direzione pin
+dir En_tx out       //uscita per enable tx
+dir portb.2 in      //ingresso pulsante pin 7
+//set portb.2 on   // ingresso pulsante Pull-up su PB2 per risparmio energetico
+
+' ----- Inizializzazione
+set tx on              ' Linea inattiva
+bd = 3333                //833      //velocità
+/*velocità ask/ook
+Baud   Rate	Bit Duration (µs)	Note
+300	   3333	                    Molto lento, alta tolleranza
+600	   1666	
+1200	833	                    Usato in vecchi modem
+2400	416	                    Buon compromesso
+4800	208	                    Più veloce, ancora stabile
+9600	104	                    Standard TTL seriale
+*/
+' ----- Tabella bitmask
+mask(0) = 1
+mask(1) = 2
+mask(2) = 4
+mask(3) = 8
+mask(4) = 16
+mask(5) = 32
+mask(6) = 64
+mask(7) = 128
+
+' ----- Caricamento messaggio ASCII
+msg(0) = asc("D")
+msg(1) = asc("R")
+msg(2) = asc("T")
+msg(3) = asc("e")
+msg(4) = asc("k")
+msg(5) = asc("T")
+msg(6) = asc("x")
+msg(7) = asc("1")
+msg(8) = asc("=")
+msg(9) = asc("1")
+msg(10) = 13           ' CR
+msg(11) = 10           ' LF
+
+//--------------------setup ------------------------------------------------------------------------------------------------
+  wait 100 ms
+// ----- Lampeggio iniziale
+        for ii = 1 to 10
+            set EN_tx on    //led 
+            wait 10 ms
+            set EN_tx off   //led
+            wait 100 ms
+        next ii
+
+' ----- Disattiva periferiche non necessarie
+PRR = 0b00001111   ' Spegne ADC, Timer0, Timer1, USI
+ADCSRA = 0         ' Disabilita ADC
+
+' ----- Configura interrupt su PB2 (PCINT2)
+GIMSK = GIMSK or 0b00100000   ' Abilita PCIE
+PCMSK = PCMSK or 0b00000100   ' Abilita PCINT2
+SREG.7 = 1                    ' Abilita interrupt globali
+
+On Interrupt PinChange0 Call risveglio
+
+prev_state = portb.2   ' Stato iniziale del pin
+//-----------------------fine setup -----------------------------------------------------------------------------------------------
+
+' ----- Loop principale
+do
+    MCUCR = MCUCR or 0b00110000   ' SM1:SM0 = 01 (Power-down)
+    MCUCR = MCUCR or 0b00100000   ' SE = 1
+    asm sleep                      //va in sleep     
+    
+    if trigger = 1 then
+        trigger = 0
+  //      dir led1 out             //mette led come uscita
+  //      set led1 on
+        set EN_tx on        //abilito il tx        
+        for ix = 0 to 2            //! ix deve essere quanti sono i caratteri da inviare 
+            ch = msg(ix)            //invio = 
+            gosub sb               ' invia byte
+            wait 50 ms             //!non modificare il tempo
+        next  
+        for zz=0 to 3 //ripete il messaggio 3 volte
+            for ix = 0 to 11            //! ix deve essere quanti sono i caratteri da inviare 
+                ch = msg(ix)
+                gosub sb         ' invia byte
+                wait 10 ms
+            next
+            wait 10 ms
+        next zz 
+        set EN_tx off        //disabilito il tx        
+    //    set led1 off
+    //    dir led1 in              //mette led come ingresso per basso consumo
+    end if
+
+loop
+//---------------routine e funzioni-------------------------------------------------------------------------------------------------
+' ----- Routine per inviare un byte via ASK/OOK
+sb:
+    ' Bit di start
+    set tx off
+    wait bd us
+
+    ' 8 bit (LSB first)
+    for bit_index = 0 to 7
+        if (ch and mask(bit_index)) <> 0 then
+            set tx on
+        else
+            set tx off
+        end if
+        wait bd us
+    next
+
+    ' Bit di stop
+    set tx on
+    wait bd us
+return
+//-----------------------------------------------------------------------------------------
+sub risveglio
+    if prev_state = 0 and portb.2 = 1 then
+        trigger = 1
+    end if
+    prev_state = portb.2
+end sub
+//------------ fine programma --------------------------------------------------------------------------------------------------------------------

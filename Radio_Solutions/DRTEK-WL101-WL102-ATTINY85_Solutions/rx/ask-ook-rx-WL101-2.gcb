@@ -1,0 +1,148 @@
+/**************************************************************
+DRTEK 
+Name: ask-ook-rx-WL101-2   
+Micro: ATTINY85  
+Date: 29/08/2025  
+Ver: 00.07  
+Description: Receiving via ASK/OOK and turning on the LED if it receives the string "DRTekTx1=1"
+------------------------------------------------------------------------------------------------------------------------------------------
+rev.:2.00  date 03-09-2025 note:
+Added reset of buffer variable rxString = "", changed the serial number in the output string printout
+(removed Ser1Print "Received:" & rxString, separating the two printouts), removed the initial flashing, added ALIVE function for debugging
+-------------------------------------------------------------------------------------------------------------------------------------------
+//!remenber  the config fuse in to programmer
+Low Fuse: E2  
+High Fuse: DF 
+Extended Fuse: FF
+//-----------------------------------------------------------------------------------------------------------------------------------------
+//!speed ask/ook
+Baud   Rate Bit Duration (µs)   Note
+300    3333                     
+//!working release
+**************************************************************/
+
+#chip tiny85,8
+#option explicit
+#include <SoftSerial.h>
+
+// ----- config UART
+#define SER1_BAUD 9600
+#define SER1_DATABITS 8
+#define SER1_STOPBITS 1
+#define SER1_INVERT Off
+#define SER1_TXPORT PORTB
+#define SER1_TXPIN 1       // pin 6
+#define SER1_RXPORT PORTB
+#define SER1_RXPIN 2       // pin 7
+#define SER1_RXNOWAIT Off
+
+// ----- define hardware
+#define rx_pin pinb.0       // input ASK/OOK (pin 5)
+#define led1   portb.4      // LED out (pin 3)
+
+dim BIT_DELAY as word 
+dim receivedByte as byte
+dim value as byte
+dim rxString as string
+
+dim lb as word          //for debug 
+lb=0
+BIT_DELAY = 3333     //!! Baud 300
+
+// ----- Setup pin
+dir led1 out
+dir rx_pin in
+dim blink as byte
+
+//----- blink 
+/*  //for debug
+    set led1 on
+    wait 100 ms
+    set led1 off
+    wait 100 ms
+*/
+
+// ----- serial version
+Ser1Print "Ask-ook rx-v2.00"
+Ser1Send 13   // CR
+Ser1Send 10   // LF
+
+// ----- main loop 
+do
+    if waitForStartBit() then
+        receivedByte = readByte()
+        if receivedByte >= 32 and receivedByte <= 126 then
+           rxString = rxString + chr(receivedByte)
+        end if
+        //Overflow protection
+        if len(rxString) > 32 then
+            rxString = ""
+        end if
+
+        // If you receive CR or LF, consider the string complete
+        if receivedByte = 13 or receivedByte = 10 then
+            if len(rxString) > 0 then
+                Ser1Print "Received: "
+                Ser1Print rxString
+                Ser1Send 13
+                Ser1Send 10
+
+                if rxString = "DRTekTx1=1" then
+                    Ser1Print "rx....OK"
+                    Ser1Send 13
+                    Ser1Send 10 
+                    set led1 on
+                    wait 500 ms
+                    set led1 off
+                end if
+            end if
+            rxString = ""   // always reset after CR/LF
+        end if
+        receivedByte=0      
+    end if
+    //alive() //for debug
+loop
+
+// ----- Fuction for detect the start bit
+function waitForStartBit() as bit
+    dim timeoutCounter as byte
+    timeoutCounter = 0
+
+    do
+        if rx_pin = 0 then
+            wait BIT_DELAY / 2 us
+            return true
+        end if
+
+        wait 1 ms      //1ms
+        timeoutCounter = timeoutCounter + 1
+    loop until timeoutCounter > 20   // timeout of approximately 5 ... 20 ms
+
+    return false
+end function
+
+// ----- Function for read byte ASK/OOK
+function readByte() as byte
+    dim ii as byte
+    value = 0
+    for ii = 0 to 7
+        wait BIT_DELAY us
+        if rx_pin = 1 then
+            value = value or (1 << ii)
+        end if
+    next
+    wait BIT_DELAY us   ' bit  stop
+    return value
+end function
+
+
+function alive()
+    lb=lb+1
+    if lb >100 Then
+        lb=0
+        Ser1Print ".............Alive"
+        Ser1Send 13
+        Ser1Send 10
+    end if 
+
+end Function
