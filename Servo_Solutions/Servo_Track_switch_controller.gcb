@@ -98,7 +98,7 @@ Key Components:
         FULL_CW  = 70                         // 0.7ms for clockwise (POINTSET1)
         FULL_CCW = 120                        // 1.2ms for counterclockwise (POINTSET1)
         TITLE = "POINTSET1"
-        Warning "POINTSET1 configuration"
+        // Warning "POINTSET1 configuration"
     End If
     If DEF(POINTSET2) Then
         If DEF(PIC) Then
@@ -110,12 +110,12 @@ Key Components:
             FULL_CCW = 175                    // 1.75ms for counterclockwise (AVR, POINTSET2)
         End If
         TITLE = "POINTSET2"
-        Warning "POINTSET2 configuration"
+        // Warning "POINTSET2 configuration"
     End If
     If DEF(POINTSET3) Then
         FULL_CW  = 120                        // 1.2ms for clockwise (POINTSET3)
         FULL_CCW = 170                        // 1.7ms for counterclockwise (POINTSET3)
-        Warning "POINTSET3 configuration"
+        // Warning "POINTSET3 configuration"
     End If
 
     If FULL_CW = 0 and FULL_CCW = 0 Then
