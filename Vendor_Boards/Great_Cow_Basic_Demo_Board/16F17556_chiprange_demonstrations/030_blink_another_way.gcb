@@ -1,0 +1,66 @@
+/*
+ * A demonstration program for GCBASIC.
+ * --------------------------------------------------------------------------------
+ * This program shows toggling an LED attached to a PIC16F17556.
+ *
+ * One way to create a delay is to spend time decrementing to a value, but GCBASIC  has timers built in.
+ *
+ * The demonstration will use a GCBASIC method to toggle the LED using CONSTANTS rather than the port address.
+ *
+ * LED blinks at a rate of approximately 1.0 seconds, we use CONSTANTS to refer to the LED port.
+ *
+ * The LED is attached to PORTB.0 via a suitable resistor to 0V.
+ *
+ * We set one of the LEDs, you can try setting the other LED..  do not forget those appropriate resistors
+ *
+ * Notes:
+ *     All LEDs are attached via a suitable resistor, typically a 220R-330R.
+ *
+ * **********************************************************************
+ * @author  EvanV
+ * @licence GPL
+ * @version 1.00
+ * @date    12.11.2025
+ */
+// ----- Configuration
+
+// Chip Settings.
+#CHIP 16F17556
+#Option Explicit
+
+/*
+ * -------------------PORTA----------------
+ * Bit#:  -7---6---5---4---3---2---1---0---
+ * IO:    ---------------------------------
+ * -----------------------------------------
+ *
+ * -------------------PORTB----------------
+ * Bit#:  -7---6---5---4---3---2---1---0---
+ * IO:    ----------------------------OUT--
+ * -----------------------------------LED---
+ *
+ * ------------------PORTC-----------------
+ * Bit#:  -7---6---5---4---3---2---1---0---
+ * IO:    ---------------------------------
+ * -----------------------------------------
+ *
+ */
+
+// Define constants to make things easier. We can reuse a constant at any time.
+#DEFINE LEDD1 PORTB.0
+// #OPTION Volatile LEDD1
+
+// *****************************************************************************************************
+// Main program commences here.. everything before this is setup for the board.
+
+// Use a constant
+Dir LEDD1 Out
+
+Do
+
+    // wait for 1 second which is 1000 ms
+    Wait 1000 ms
+    // Set the port bit to NOT value from previous state but using the ! as an alternative to NOT
+    LEDD1 = !LEDD1
+
+Loop

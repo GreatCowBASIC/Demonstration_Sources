@@ -1,0 +1,245 @@
+/*
+@author Grok
+@license GPL
+@version 1.0
+@date 2025-10-23
+
+ ------------PORTA---------------
+Bit#: -7---6---5---4---3---2---1---0---
+IO: --NC--NC--NC--WE--D3--D2--D1--D0--
+IO: ----------I/O4--I/O3--I/O2--I/O1--
+
+ ------------PORTB----------------
+Bit#: -7---6---5---4---3---2---1---0---
+IO: --A7--A6--A5--A4--A3--A2--A1--A0--
+IO: ---------------------------------
+
+ ------------PORTC----------------
+Bit#: -7---6---5---4---3---2---1---0---
+IO: --CS--TX--SW--NC--NC--NC--A9--A8--
+IO: ---------------------------------
+
+*/
+
+' GCBASIC program for PIC16F886 to validate NTE2114 (1024x4 static RAM)
+' Assumptions:
+' - Clock: 4MHz internal oscillator
+' - Address: PORTB.0-7 = A0-A7 (output)
+' - NTE2114_A8 = A8 (output)
+' - NTE2114_A9 = A9 (output)
+' - NTE2114_CS = CS (low active)
+' - NTE2114_WE = WE (low active for write)
+' - PORTA.0-3 = Data I/O D0-D3 (bidirectional, connected to RAM I/O1-I/O4)
+' - Tests: Write/verify all 0x0, then all 0xF
+' - Serial output on RC6 (TX) at 9600 baud
+' - Switch on NTE2114_SW (active low) to start/repeat test
+
+#chip 16F886, 4
+#option explicit
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
+' Constants for NTE2114 interface
+#define NTE2114_A8 PORTC.0
+#define NTE2114_A9 PORTC.1
+#define NTE2114_CS PORTC.7
+#define NTE2114_WE PORTA.4
+#define NTE2114_SW PORTC.5
+#define NTE2114_DATA PORTA
+#define NTE2114_DATA_MASK 0x0F
+#define NTE2114_DATA_OUTPUT_MASK 0b11110000
+#define NTE2114_DATA_INPUT_MASK 0b00001111
+
+' Dimension variables
+Dim _addr As Word
+Dim _data As Byte
+Dim read_data As Byte
+Dim pass As Bit
+Dim col As Byte
+
+' Initialize directions
+Dir NTE2114_A8 Out
+Dir NTE2114_A9 Out
+Dir NTE2114_CS Out
+Dir NTE2114_WE Out
+Dir PORTB Out
+Dir NTE2114_DATA.0 Out
+Dir NTE2114_DATA.1 Out
+Dir NTE2114_DATA.2 Out
+Dir NTE2114_DATA.3 Out
+Dir NTE2114_DATA.5 In  ' Unused
+Dir PORTC.2 In         ' Unused
+Dir PORTC.3 In         ' Unused
+Dir PORTC.4 In         ' Unused
+Dir NTE2114_SW In      ' Switch input (active low)
+Dir PORTC.6 Out        ' TX for serial
+
+' Initial controls inactive (high)
+NTE2114_CS = ON  ' CS high
+NTE2114_WE = ON  ' WE high
+
+
+// Do
+
+//     PulseOut PORTB.7, 500 us
+//     wait 500 us
+
+// Loop
+
+' Subroutine to dump initial RAM contents via serial
+Sub DumpRam()
+  HSerPrintCRLF
+  HSerPrintStringCRLF "Initial RAM dump"
+  HSerPrintCRLF 2
+
+  HSerPrintCRLF 2
+
+  HSerPrint "     "
+  For col = 0 To 15
+    HSerPrint Hex(col)
+    HSerPrint " "
+  Next
+  HSerPrintCRLF
+
+  For _addr = 0 To 1023
+    Call ReadRam(_addr)
+    
+    If _addr Mod 16 = 0 Then
+      HSerPrint Hex(_addr)
+      HSerPrint ": "
+    End If
+    
+    HSerPrint " "
+    HSerPrint Hex(read_data)
+    
+    If (_addr + 1) Mod 16 = 0 Then
+      HSerPrintCRLF
+    End If
+  Next
+  
+  HSerPrintCRLF 2
+  HSerPrintStringCRLF "End of dump"
+  HSerPrintCRLF 2
+End Sub
+
+' Subroutine to write data to RAM
+Sub WriteRam(_addr, _data)
+  ' Set address
+  PORTB = _addr             ' A0-A7
+  NTE2114_A8 = _addr.8      ' A8
+  NTE2114_A9 = _addr.9      ' A9
+  
+  ' Ensure output direction for data
+  Dir NTE2114_DATA.0 Out
+  Dir NTE2114_DATA.1 Out
+  Dir NTE2114_DATA.2 Out
+  Dir NTE2114_DATA.3 Out
+  
+  ' Set data on bus (D0-D3 on PA0-PA3)
+  NTE2114_DATA = (NTE2114_DATA And NTE2114_DATA_OUTPUT_MASK) Or (_data And NTE2114_DATA_MASK)
+  
+  ' Data setup time
+  Wait 100 us
+  
+  ' Start write cycle
+  NTE2114_CS = OFF   ' CS low
+  NTE2114_WE = OFF   ' WE low
+  Wait 100 us     ' Write pulse width (>150ns)
+  
+  ' End write
+  NTE2114_WE = ON  ' WE high
+  Wait 100 us     ' Recovery
+  
+  NTE2114_CS = ON  ' CS high
+End Sub
+
+' Subroutine to read data from RAM
+Sub ReadRam(_addr)
+  ' Set address
+  PORTB = _addr             ' A0-A7
+  NTE2114_A8 = _addr.8      ' A8
+  NTE2114_A9 = _addr.9      ' A9
+  
+  ' Set input direction for data
+  Dir NTE2114_DATA.0 In
+  Dir NTE2114_DATA.1 In
+  Dir NTE2114_DATA.2 In
+  Dir NTE2114_DATA.3 In
+  
+  ' Address setup
+  Wait 100 us
+  
+  ' Start read cycle
+  NTE2114_CS = OFF   ' CS low (WE already high for read)
+  Wait 100 us     ' Access time (>300ns)
+  
+  ' Read data (from D0-D3 on PA0-PA3)
+  read_data = NTE2114_DATA And NTE2114_DATA_MASK
+  
+  ' End read
+  NTE2114_CS = ON  ' CS high
+End Sub
+
+' Main program
+HSerPrintCRLF
+HSerPrintStringCRLF "NTE2114 memory inspector"
+HSerPrintCRLF
+
+Do
+  HSerPrintStringCRLF "Press the button on NTE2114_SW to commence the test."
+  
+  ' Wait for switch press on NTE2114_SW (active low)
+  Wait While NTE2114_SW = 1
+  
+  ' Simple debounce
+  Wait 50 ms
+  
+  ' Wait for release
+  Wait While NTE2114_SW = 0
+
+  ' Dump initial RAM contents
+  Call DumpRam
+
+  pass = 1
+
+  ' Test 1: Write all locations to 0x0
+  For _addr = 0 To 1023
+    _data = 0
+    Call WriteRam(_addr, _data)
+  Next
+
+  ' Verify all 0x0
+  For _addr = 0 To 1023
+    Call ReadRam(_addr)
+    If read_data <> 0 Then
+      pass = 0
+    End If
+  Next
+
+  ' Test 2: Only if first test passed
+  If pass = 1 Then
+    ' Write all locations to 0xF
+    For _addr = 0 To 1023
+      _data = 0x0F
+      Call WriteRam(_addr, _data)
+    Next
+    
+    ' Verify all 0xF
+    For _addr = 0 To 1023
+      Call ReadRam(_addr)
+      If read_data <> 0x0F Then
+        pass = 0
+      End If
+    Next
+  End If
+
+  ' Serial output status
+  If pass = 1 Then
+    HSerPrintStringCRLF "Success"
+  Else
+    HSerPrintStringCRLF "Fail"
+  End If
+
+Loop

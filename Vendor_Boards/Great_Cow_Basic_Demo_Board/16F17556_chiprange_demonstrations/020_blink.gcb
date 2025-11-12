@@ -1,0 +1,61 @@
+/*
+ * A demonstration program for GCBASIC.
+ * --------------------------------------------------------------------------------
+ * This program shows toggling an LED attached to a PIC16F17556.
+ *
+ * One way to create a delay is to spend time decrementing a value. In GCBASIC the timing
+ * can be accurately programmed since the user has control on how the
+ * time delays are executed.
+ *
+ * The LED is attached to PORTB.0 via a suitable resistor to 0V.
+ *
+ * We set an LED, you can try setting the other LEDs. Do not forget those appropriate resistors
+ *
+ * Notes:
+ *     All LEDs are attached via a suitable resistor, typically a 220R-330R.
+ *
+ * **********************************************************************
+ * @author  EvanV
+ * @licence GPL
+ * @version 1.00
+ * @date    12.11.2025
+ */
+// ----- Configuration
+
+// Chip Settings.
+#CHIP 16F17556
+#Option Explicit
+
+/*
+ * -------------------PORTA----------------
+ * Bit#:  -7---6---5---4---3---2---1---0---
+ * IO:    ---------------------------------
+ * -----------------------------------------
+ *
+ * -------------------PORTB----------------
+ * Bit#:  -7---6---5---4---3---2---1---0---
+ * IO:    ----------------------------OUT--
+ * -----------------------------------LED---
+ *
+ * ------------------PORTC-----------------
+ * Bit#:  -7---6---5---4---3---2---1---0---
+ * IO:    ---------------------------------
+ * -----------------------------------------
+ *
+ * *****************************************************************************************************
+ * Main program commences here.. everything before this is setup for the board.
+ */
+
+    Dir PORTB.0 Out
+
+    Do
+        // wait for 1 second
+        Wait 1 s
+        // Set the port bit
+        PORTB.0 = 0
+        // wait for 1 second
+        Wait 1 s
+        // Set the port bit
+        PORTB.0 = 1
+
+    Loop

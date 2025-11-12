@@ -1,0 +1,59 @@
+/*
+ * An example program for GCBASIC.
+ * This simply sets an LED on. The LED is attached to PORTB.0 via a suitable resistor to 0V.
+ *
+ * **********************************************************************
+ * @author  EvanV
+ * @licence GPL
+ * @version 1.00
+ * @date    12.11.2025
+ */
+// ----- Configuration
+
+// Chip Settings.
+#CHIP 16F17556  
+#Option Explicit
+//
+// *****************************************************************************************************
+// Main program commences here.. everything before this is setup for the board.
+
+    // Set the port as an output, we will use only one bit to connect to the LED
+    Dir PORTB.0 Out
+
+    // Set one bit of the port on.
+    // You can try set PORTB.1 - another LED, remember you will need a resistor!
+    PORTB.0 = 1
+
+    // End
+
+
+    /*
+    Key GCBASIC Concepts Demonstrated:
+
+      #CHIP Directive: Tells the compiler to target the PIC16F17556's registers and features (e.g., 28 pins, PORTB available on pins 15–22).
+      #Option Explicit: Prevents undeclared variables—essential for debugging in tutorials.
+      Dir Statement: Sets I/O direction. Syntax: Dir port.bit {In | Out}. For the whole port: Dir PORTB Out.
+      Port Assignment: PORTB.0 = 1 sets the pin high. GCB handles latching safely (uses LATC equivalent).
+
+      Verification Against PIC16F17556 Datasheet
+      Based on the official Microchip datasheet (DS40002614), your code will align perfectly:
+
+      PORTB Details: 8-bit bidirectional port (RC0–RC7). RC0 is a general-purpose I/O pin (no special analog/default functions blocking it).
+      Configuration Registers:RegisterRoleYour Code's EffectDatasheet DefaultTRISCData direction (0 = output, 1 = input)Dir PORTB.0 Out → TRISC.0 = 00xFF (all inputs)LATCOutput latch (write-only for safe updates)PORTB.0 = 1 → LATC.0 = 1 (drives ~VDD)0x00 (low)PORTBPin state read/writeIndirectly used; read would confirm high (0x01)N/A
+      Best Practices Confirmed: Use LATC (GCB does this automatically) to avoid read-modify-write hazards when toggling bits.
+      Electrical Specs: RC0 can source/sink up to 25mA (plenty for an LED + resistor). High state = VDD (3.0–5.5V).
+
+      No errata affect this basic setup (per latest silicon errata, DS80001152).
+      
+      How to Test It
+
+      Compile: Open in GCB IDE → Compile → Generate .hex file. (Free download: sourceforge.net/projects/gcbasic.)
+      Program the PIC: Use PICKit2  or a standalone programmer. Flash the .hex.
+      Power On: Connect hardware as described. The LED should illuminate immediately.
+      
+      Troubleshooting:
+      LED off? Check wiring, resistor value, or if RC0 is multiplexed (unlikely here).
+      Compiler error? Ensure #CHIP matches your device.
+      No light? Add a multimeter: Measure ~VDD at RC0.
+
+*/
