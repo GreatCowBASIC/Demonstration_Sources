@@ -1,6 +1,6 @@
 # ACS758LCB-100B Hall-Effect Current Sensor Demo for GCBASIC
 
-<img src="IC.jpg" alt="ACS758LCB-100B Sensor" width="50%">  
+<img src="IC.jpeg" alt="ACS758LCB-100B Sensor" width="50%">  
 *Allegro ACS758LCB-100B Hall-Effect Linear Current Sensor IC (100A Bidirectional)*
 
 [![License: GPL](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)  
