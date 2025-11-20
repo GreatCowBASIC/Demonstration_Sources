@@ -1,0 +1,107 @@
+/*
+    ACS758LCB-100B Hall-Effect Current Sensor Demo - Sub Routine Version
+    ------------------------------------------------------------------
+    This program reads bidirectional DC current (±100 A) using the Allegro
+    ACS758LCB-100B Hall-effect linear current sensor with ~98% accuracy
+    after simple zero-point calibration.
+
+    The sensor output is connected to AN1 (RA1). A standard HD44780 LCD
+    in 4-bit mode displays the raw ADC value and the calculated current
+    with direction and two decimal places.
+
+    Averaging 50 samples per reading is essential for stable Hall sensor output.
+
+    @author  Samco (maker-brainy)
+    @licence GPL
+    @version 1.10
+    @date    20.11.2025
+*/
+/*
+           ------------PORTA---------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ---------------------------------
+    IO:    -------------------------I-------    // RA1/AN1 = ACS758 VOUT
+
+           ------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    O---O---O---O---O---O---------
+    IO:    DB7-DB6-DB5-DB4-E---RS---------    // LCD 4-bit
+
+           ------------PORTC----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ---------------------------------
+    IO:    ---------------------------------    // (not used)
+*/
+
+#chip 16F886, 20
+#option Explicit
+
+/* ============================= LCD Configuration ============================= */
+#define LCD_IO       4
+#define LCD_NO_RW
+#define LCD_SPEED    Slow          // Bullet-proof timing for any breadboard
+#define LCD_RS       PORTB.2
+#define LCD_ENABLE   PORTB.3
+#define LCD_DB4      PORTB.4
+#define LCD_DB5      PORTB.5
+#define LCD_DB6      PORTB.6
+#define LCD_DB7      PORTB.7
+
+/* =========================== Sensor Configuration =========================== */
+#define SENSOR_PIN   AN1
+Dir PORTA.1 In
+
+/* ============================= Variables ==================================== */
+Dim RawADC       As Word
+Dim AvgADC       As Word
+Dim ZeroPoint    As Word : ZeroPoint = 512   // <<< CHANGE AFTER 0 A CALIBRATION >>>
+Dim ADC_Diff     As Word
+Dim AmpsTenths   As Word
+Dim CalcTemp     As Long
+Dim indexCounter As Byte
+Dim Sign         As String * 1
+
+/* ============================= Initial Screen =============================== */
+Cls
+Print "ACS758-100B Demo"
+Locate 1,0
+Print "GCBASIC"
+Wait 1 s
+Cls
+
+/* =============================== Main Loop ================================== */
+Do
+    /* --- 50-sample averaging (removes Hall-sensor noise) --- */
+    CalcTemp = 0
+    For indexCounter = 1 To 50
+        RawADC   = ReadAD10(SENSOR_PIN)
+        CalcTemp = CalcTemp + RawADC
+        Wait 1 ms
+    Next
+    AvgADC = CalcTemp / 50
+
+    /* --- Direction detection --- */
+    If AvgADC >= ZeroPoint Then
+        ADC_Diff = AvgADC - ZeroPoint : Sign = "+"
+    Else
+        ADC_Diff = ZeroPoint - AvgADC : Sign = "-"
+    End If
+
+    /* --- Convert to 0.01 A resolution (integer math) --- */
+    CalcTemp   = ADC_Diff * 244
+    AmpsTenths = CalcTemp / 10
+
+    /* --- Display exactly as you requested --- */
+    Locate 0,0
+    Print "RAW ADC: "
+    Print AvgADC
+    
+    Locate 1,0
+    Print "I: " : Print Sign
+    Print AmpsTenths / 100 : Print "."
+    If (AmpsTenths % 100) < 10 Then Print "0"
+    Print AmpsTenths % 100
+    Print " A   "
+
+    Wait 200 ms
+Loop
