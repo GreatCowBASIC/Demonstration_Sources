@@ -20,13 +20,13 @@ Two code versions are provided:
 
 Tested on November 20, 2025, with real hardware setups including a bench power supply and clamp meter for verification.
 
-<img src="lcd_demo_1.jpg" alt="LCD Demo" width="50%">  
+<img src="image3.jpg" alt="LCD Demo" width="50%">  
 *LCD showing RAW ADC: 497 and I: -3.66 A*
 
-<img src="multimeter.jpg" alt="Multimeter Verification" width="50%">  
+<img src="image2" alt="Multimeter Verification" width="50%">  
 *Clamp meter confirming ~2.95A (matches LCD reading)*
 
-<img src="power_supply.jpg" alt="Power Supply Setup" width="50%">  
+<img src="image4.jpg" alt="Power Supply Setup" width="50%">  
 *ENA 72-1048 DC Power Supply set to 14.14V / 3.03A*
 
 ## Video Demo
