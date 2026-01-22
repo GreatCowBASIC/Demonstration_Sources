@@ -1,0 +1,1121 @@
+/*
+
+  * At build 1549 this wouuld fail with a page exceed.  The root cause was the packing of the subs etc into the page failed to take into account that words always start on an even number.
+  * So, this was the same issue that had to be resolved for PIC-AS support - that used a .S source instruction.  For GCASM it was a simple one liner fix.
+
+*/
+#chip 16F18346, 8 // Configuration 8MHz EXTERNAL xtal PIC16F18346
+'#option bootloader 0x200
+
+//*********************************************************************
+// (C) KAAKKOON Oy 2022..2026 Bluetooth Pedal Software
+// FS10 MiDi - Bluetooth
+// Version 2.0 11.9.2022    MCU = PIC16F18346
+// ORIGINAL 11.9.2022
+// Last Build 11.1.2026
+// Error: GCASM:Bad ORG overwriting location 2048 (0x800)
+// selvitetty ja korjattu
+
+/**********************************************************************
+GC Compiler
+Version: 1.76.2
+Release: 23074
+Commit: 22a808587994126e19125c6a1a03c00b990223f4
+Date: 2023-03-15T18:36:59.657Z
+Electron: 19.1.9
+Chromium: 102.0.5005.167
+Node.js: 16.14.2
+V8: 10.2.154.15-electron.0
+OS: Windows_NT ia32 10.0.19045
+Sandboxed: No
+***********************************************************************/
+
+// Cmajor => RESET jonka jälkeen pedaali toimii ilman HB??
+// sendcommand ja HB muutettu
+// HSerReceive muutettu funktiosta =>
+// REL 1 = first test for BT 9600b
+// serial ASCII for pedal FS10 MiDi
+// version to communicate with HC05 and HWUART
+// 14.9 SYNC + Pairing OK
+// 15.9 Soft UART working
+// 17.9 Command intepretter working
+// NEXT/ Toggle problem
+// 18.9 All functions work
+// Sync test added (3xF8)
+// Debug mode off ==> production version 1.0
+// Back to debug mode
+// PORT C read into init byte ???
+// 21.9 error_state1 for sync done
+// LoBatt errorstate lisätty AN1 ??
+// Blink lisätty
+// 24.9 Soft UART Rx poistettu, tilalle AN1 (akun jännitemittaus)
+// 25.9 AN1 Lobatt mittaus ja rutiini lisätty
+// SerPrint 1, "xxx" ongelmia jälleen
+// 26.9 SW Uart uusittu "Ser1Print" kirjasto
+// Ser1Print, ser1Send otettu käyttöön EI merkkiongelmia
+// EEPROM käyttöön BOX ver/Date sekä ohjelmointilaskuri (16bit)
+// 29.9 HC05 STATE ==> Reset ei toimi pitkien viiveiden takia
+// Jätetään reset pois käytöstä
+// 2.10 siivottu turhat RAM tavut
+// korjattu NEXT state alkutila vastaamaan kytkimen tilaa (aluksi = 0)
+// seuraavaksi HW suunnittelu (Akku/ lataus) NIMH 9,8v 2000mA
+// Next state vs Toggle ei toimi
+// 3.10 Korjattu Next/ Toggle. Valmis tuotantoversio (P)
+// turhat delayt poistettu
+// 11.10 Mittausjakso asennettu keskeytysrutiiniin. (10s)
+// Charge/ Discharge rajat määritetty
+// 13.10 toimivat lobatt & hibatt rajat sekä vastaavat Led sekvenssit
+// Mukana Keskeytys + RTC + upcounter (65k) sekä periodilaskuri 10 sec
+// XXX-0 Puuttuu alkuinit jolla voidaan valita akku/ poweri -käyttö ???
+// XXX-1 Charging analyysi: Laturi ON/OFF  ok
+// XXX-2 Analyysin jälkeen latausaikalaskuri käyntiin (max10h)
+// latauskertalaskuri EE prommiin
+// 9.11 Sync muutettu ikiluuppiin kunnes 3x hexF8 luettu
+// 10.11 EE Prom Word muuttuja käsittely korjattu
+// 13.11 lisätty Akun DC-taso ja latauskertalaskuri (puuttuu Slavestat)
+// Lisätty "alive" (0xF8) per 10 sec lähetys
+// 14.11 Tehty XXX-1. Korjattu SendeAlive. Sykli = 1sec
+// 16.11 Akun latauskertalaskuri tehty, korjattu StopCharge sub
+// 17.11 Lisätty EEprom init tavut 0..3 sekä version string
+// osoite = hex20. Startup tulostaa version EEPrommilta
+// 01.02.2023 korjattu Toggle toiminne. Uusi funktio 0x0C
+// 15.02.23 RxTxMode muuttuja = simplex / duplex. Simplex moodissa
+// pedaali lähettää eikä odota kuittausta. Myös käynnistys
+// rutiini 3xF8 puuttuu simplex moodissa.
+// 21.02.23 Lisätty Latauksen lopetus vilkkuun stoppi kun laturi on
+// irroitettu ja jännite pudonnut min 15mV.
+// muutettu Full Charged raja n. 11,3VDC
+// 4.3.2023 muutettu full charged logiikkaa ja lisätty AN1Ref debug
+// tulosteeseen = raja jossa akku on täynnä
+// 13.8.2023 Full CHARGED MUUTETTU N. 10,5v LATAUSPIIRI (HW)MUUTETTU
+// 24.8.2023 HeartBeat tehty molempisuuntaiseksi. Jos BT yhteys katoaa
+// jää pedaali ikiluuppiin odottamaan yhteyttä. NEXT blink sammuu ja
+// monitori tulostaa "E".
+// 31.8.2023 Tuotantoversio, EEPROM init
+// 14.2.2024 versio 2.0 ja 2.1 MCU= PIC16F18346.
+// Muutettu EEprom initialisointi. Keskeytys pois, pollaava luuppi.
+// Internal clock 8MHz käytössä. Testattu ja OK
+// Lisätään myöhemmin (jos tarvis) keskeytys ja Timer0
+// HW muutos (kide pois) RA4 ja RA5 käyttöön: RA5 on pollaava
+// HC05 ready tunnistus (POLL_BT)  Ei käytössä versiossa 2.2
+// RA4 on monitor/ debugger Tx
+// 24.3.2024 Midi If Cmajor lähettää 3x F9 Hex sync jos
+// kaapeli yhteys (CL)  valittu. Pedaali odottaa joko 3x f8 tai f9
+// Android sovellus odottaa vain 3xF8
+// 28.5.2024 Lopputestit tehty sekä CL että BT yhteyksillä.
+// CPU PIC16F18346 sekä Internal Midi & pedaali. Pedaali
+// kalenterikello edistää n.10sec/ tunti (ilman keskeytystä)
+// 30.09.2024 lisätty viivettä merkkien väliin jotta LOCK tilassa
+// CMidillä aikaa tulostaa monitorointi
+// 7.10. 2024 Siirretty "Full Charged" toiminne start rutiiniin
+// Rukattu RTC +4% nopeammaksi
+// Lisätty Cmidi softaan testi joka vaatii testiplugin virtasilmukkaan
+// Toimii vain Cmidi (vahvistimessa) komennolla F7-0D (HC05 monitori)
+// 17.12.2024 WD lähettää 0xF8 (sekunnin sykli) EI kaikua takaisin
+// HEX tallessa, testattu BT ja CL
+// 6.8.2025 Tallenetaqan RUN timw eeprommille ennen Sleep operaatiota
+// 6.1.2026 lisätty sanoma LO BATT F70D  (4 tasoa)
+// 17.1.2026 Fixattu LObatt komentoja
+//
+// EEPROM  Contents
+// Adrs   Description
+// -------------------------------------------------------
+// 0      Battery charging counter LSB
+// 1      Battery charging counter MSB
+// 2      Upcounter value at charging done LSB
+// 3      Upcounter value at charging done MSB
+// 4      Battery status: AA if lost dc last usage (forced sleep) 00 if OK
+// 5      LSB Runtime = ONTIME in minutes before Lobatt sleep
+// 6      MSB Runtime
+// 0x20   Version String
+
+// Version 1.0.17
+// 1.2   2023  REL 1.0.18
+// 15.2  2023  REL 1.0.19
+// 21.2  2023  REL 1.0.20
+// 3.4   2023  REL 1.0.20
+// 3.4   2023  REL 1.0.21
+// 13.8  2023  REL 1.0.22
+// 24.8  2023  REL 1.0.22
+// 28.12 2023  REL 1.1 SIMPLEX (Current Loop)
+// 12.2  2024  REL 2.0 MCU PIC16F18346
+// 14.2  2024  REL 2.1 MCU PIC16F18346
+// 15.2  2024  REL 2.2 BT-testattu, SWUART A.5
+// 24.3  2024  REL 2.3 Sync joko 3xF8 tai 3xF9
+// 3.4   2024  REL 2.5 Testattu versio CL/BT
+// 8.4   2024  REL 3.0 Disconnect Charger korjattu
+// 6.5   2024  REL 3.3 Lisätty statussanomaan versio
+// 28.5  2024  REL 3.4 CL debug done ==> F70DOK CL & BT
+// 6.6   2024  REL 3.5 L/R OD/REV toiminnat korjattu
+// 30.9  2024  REL 3.6 Viive Lock tilassa merkkien väliin Lockwait=5ms
+// 7.10  2024  REL 3.7 Reaaliaikakelloa rukattu 4% nopeammaksi
+// 7.10  2024  REL 3.8 Siirretty FULL CHARGED LED blink aloitukseen
+// 9.10  2024  REL 3.9 RTC 0,5% ++ (-33). Lisätty akun kesto arvio.
+// 12.11 2024  REL 4.0 bugifixejä ja timing muutoksia
+// 29.11 2024  REL 4.1 Lisätty status-sanomaan Trend ja Ontime
+// 02.12 2024  REL 4.2 testattu Trend ja Ontime COMPILER GC STUDIO
+// 17.12 2024  REL 4.3 REL 4.4 WD ei lue kaikua takaisin, GC versio lisätty
+// 9.3   2025  REL 5.0 Alert koodi = 00 Cmajorilta resetoi pedaalin
+// 4.5   2025  REL 5.1
+// 6.8   2025  REL 5.2 Lisätty Runtime eeprommille LSB= 5 ja MSB=6 kun Sleep tapahtuu (LOBATT)
+// 6.1   2026  REL 5.3 Korjattu "BAD ORG" muutoksella Main = aliohjelma. Lisätty pakotettu sanoma
+//                     kun akun jännite putoaa (lobatt) komento F70D
+// 11.1  2026  REL 5.3 ONTIME - lisätty päivät <dd>
+// 12.1  2026  REL 5.4 lisätty periodi (diff)  status update FS10 --> MIDI Internal
+// 17.1  2026  REL 5.5 Pakotettu lataaminen jos LOBatt level alitettu 
+
+#option explicit // variables are COMMON
+//#define debug1  // if debug mode SWUART on RA0 and  Analog in RA1
+
+#define VersionName " FS10 SW 5.6 Jan-20 2026 ** GC1.76.2 "
+#define BatteryName " BATTERY 5055323941450  2000mA NImH"  //2000mA NIMh VOLTZ
+#define Compilerver " GC Version: 1.76.2 ** "   // Great Cow Studio Version
+#define simplex 1 // simplex or duplex serial comm
+#define duplex 2
+
+
+#include <softserial.h>
+
+  // Define Hardware settings for software UART #1
+
+  #define SER1_BAUD 9600
+  #define SER1_TXPORT PORTA // SW Tx pin = A.4
+  #define SER1_TXPIN 4
+  #define TMR0_16bit
+  #define USART1_BLOCKING // SW Uart = Tx only
+  #define USART1_DELAY 1 ms
+
+//           Variables
+  Dim Version as string
+  Dim Battery as string
+  dim LoopCounter as Long // 32 binary bits, value from 0 to 4294967295
+  Dim AN1Value, AN1Ref, trend as Integer
+  Dim LO_BATDC, HI_BATDC, LO_BATTCNT, HI_BATTCNT, SaveFlag as Byte
+  Dim LO_TREND, HI_TREND, LO_ONTIME, HI_ONTIME as Byte
+  Dim Presec, UpCounter, BatCHRGcount, BATDC, ONTIME, ChrCnt, Nextvalue as Word
+  Dim oldStr, syncbyte, StateMachine as Byte
+  Dim toggle, i, EC, last_command, Sec10, DCmode, OKCnt as Byte
+  Dim strSW, ReplyByte1, ReplyByte2 as Byte
+  Dim Toggle_State, Lock_State, OldTglState as Byte
+  Dim typechar, led123 as Byte
+  Dim rightod_last, rightrev_last, leftod_last, leftrev_last as Byte
+  Dim tmpstr, tmpstr1, tmpstr2 as String
+  Dim Seconds, Minutes, Hours, Days, int_occurred, RxTxMode as Byte
+  Dim mode, verchar1, verchar2, verchar3, Connection  as Byte
+  Dim BatStatus, Infocounter, ACK_byte, Statack, first, icmd, istat as Byte
+  dim rxbyte as bit
+
+  // Generated by PIC PPS Tool for Great Cow Basic version: 0.0.6.2
+  // Generated for 16f18346
+  // Template comment at the start of the config file
+
+    #startup InitPPS, 85
+    #define PPSToolPart 16f18346
+
+    Sub InitPPS
+            'Module: EUSART
+            RB7PPS = 0x0014    'TX > RB7
+    End Sub
+
+  #CONFIG FEXTOSC=OFF, RSTOSC=HFINT32
+  #config PWRTE=OFF, BODEN=OFF
+  #config CP=OFF, CPD=OFF, MCLR=ON, WDT=OFF, DEBUG= OFF
+  NVMREGS=ON
+
+  INTOFF // NO interrupts
+
+ Version = VersionName // Fill up string with Version name ASCII
+ Battery = BatteryName // Fill up string with Battery type name ASCII
+
+  // PIC16F18346 Pin declarations
+
+  #define LED_TOGGLE PORTA.2 // LED 0-active on RA2 (pin 17)
+  #define LED_NEXT PORTC.2 // LED 0-active on RC2 (pin 14)
+  #define LED_ATOAB PORTB.4 // LED 0-active on RB4 (pin 13)
+  #define LED_STEREO PORTB.6 // LED 0-active on RB6 (pin 11)
+  #define TX PORTB.7  //  HW UART TX (pin 10)
+  #define RX PORTB.5  // HW UART RX (pin12)
+  #define od_left PORTC.5 // port C5 OD left (pin5)
+  #define od_right PORTC.0 // port C0 OD right (pin16)
+  #define rev_left PORTC.4 // port C4 REV left (pin6)
+  #define rev_right PORTC.1 // port C1 REV right (pin15)
+  #define sw_toggle PORTC.6 // port C6 KEY Toggle (pin8)
+  #define sw_next PORTC.3 // port C3 KEY Next (pin7)
+  #define sw_lock PORTC.7 // port C7 KEY Lock (pin9)
+  #define HC05_state PORTA.5 // port A5 HC05 STATE input (pin2)
+  #Define MonitorOut PORTA.4 // port A4 TTL-RS232 Monitor out (pin3)
+  #define BattDCin PORTA.1 // port RA1 Battery DC (pin18)
+  #define LoBattLevel 521 // app 7,7 VDC monitoring (3)level
+  #define HiCharged 713 // app 10,70VDC  app 4hrs @12vdc charger
+  #define MaxBlink 12 // nbr of blinks for LoBatt
+  #define BoxDateInit 20 // to build release date 2020 + YY
+  #define period 10 // 10 sec raporting rate
+  #define BT 1 // connection on HC05(1) or CL(2)
+  #define CL 2
+  #define Lockwait 100 // 100ms between Locked commands
+  #define diff 60 // status-upade cycle in seconds
+
+ #define debug1
+
+ #ifdef debug1
+ #define pollfrq 5500 // polled counter for one sec (NO DEBUG)
+ #endif
+
+
+ #ifndef debug1
+ #define pollfrq 6500 //  polled counter for one sec (Debug1 ON)
+ #endif
+
+// switches are inputs
+  Dir od_left In     // RC5 (pin5)
+  Dir od_right In    // RC0 (pin16)
+  Dir rev_left In    // RC4 (pin6)
+  Dir rev_right In   // RC1 (pin15)
+  Dir sw_toggle In   // RC6 (pin8)
+  Dir sw_next In     // RC3 (pin7)
+  Dir sw_lock In     // RC7 (pin9)
+  Dir BattDCin In    // RA1 (pin18)
+  Dir HC05_state In  // RA5 (pin2)
+
+// Leds for FS10-MiDi and RS232-TTL monitor and swuart Tx
+  Dir LED_TOGGLE Out  // RA2 (pin17)
+  Dir LED_NEXT Out    // RC2 (pin14) (BLINK)
+  Dir LED_ATOAB Out   // RB4 (pin13)
+  Dir LED_STEREO Out  // RB6 (pin11)
+  Dir MonitorOut Out  // RA4 (pin3)
+
+// Define Serial Hardware UART I/O settings by InitPPS
+  InitPPS      ' PPS bits set (UART Tx out)
+  Dir TX Out   ' Tx = Port PB.7
+  Dir RX In    ' Rx = Port PB.5
+
+
+// Config hardware UART 9600 8N1
+
+  #define USART_BAUD_RATE = 9600 // default HC05 rate
+
+  SYNC = 0   // ASYNC MODE
+  SPBRG = 51 // Bauderate1
+  SPBRGH = 0 // Baudrate2
+  BRGH = 0   //
+  BRG16 = 1  //
+  CREN = 1   //
+  TXEN = 1   // Transmit enable
+  SPEN = 1   //
+  SCKP = 0   // Negative logic, Free line id HI
+
+  #define USART_BLOCKING // NO Timeout: loops forever for Rx ready
+  #define USART_TX_BLOCKING
+  #define Comport = 1
+  wait 10 Ms // delay to setup UARTs
+
+  // Init Variables
+  strSW = 0 // port C switches
+  StateMachine = 0 // 0 > 1 > 2 > 0....
+  Toggle_State = 0
+  Lock_State = 0
+  syncbyte = 0 // read 0xF8
+  last_command = 10 // init out of range 0..7
+  OldTglState = 0
+  Presec = 0 //prescaler to get app. 260ms to 1 sec
+  seconds = 0
+  minutes = 0
+  hours = 0
+  days = 0
+  Sec10 = 0 // 10 sec printing interval
+  First = 0 // Lo battery level 1,2,3 
+  Nextvalue = diff // datasend update every  <diff> seconds
+  UpCounter = 0 // for dTdV etc.
+  int_occurred = 0 // 1 after timer-1 Overflow
+  DCmode = 0 //  0= battery-operated, 1= Charging, 2= CL - DC from amp
+  BATDC = 1234 // for aid debug
+  AN1Ref = 0 // Full charged ref set in "sendstatus"
+  SaveFlag = 0 // waiting next charging to increase up
+  RxTxMode = duplex // SIMPLEX or DUPLEX for Bluetooth and CL
+  Connection = BT // default BT
+  BatStatus = 0 // 0xAA if run to death last time
+  Infocounter = 0 // if disconnect charger message not yet sended
+
+  ReadEEPROM(0, BatCHRGcount) // Battery charge counter LSB Adrs = 0
+  ReadEEPROM(1, BatCHRGcount_H) // Battery charge counter MSB Adrs = 1
+  ReadEEPROM(4, BatStatus)  // 0 if OK 0xAA if lost power last usage
+
+  // Init NEXT button with state=0
+   oldstr = 0b11111011 // Port C historyByte: 0xFB
+   if PORTC.3 = 0 then
+    oldstr = oldstr and 0b11110111 // read button current state
+   end if
+
+INIT_LEDS() // as in start Init all LED's  (not NEXT) active light for sync
+
+EE_Init() // Call EE_Init => always check EE-prom status first
+
+BattChk() // Check battery voltage level 
+
+SyncRun() // sync with pedal 
+
+  
+
+// *************************************************************
+// ************************ MAIN *******************************
+// *************************************************************
+
+Main: // Main loop forever
+
+   'RunTimer1 // init clock if Interrupts used
+
+    #ASMRAW NOP // to override "BAD ORG"
+    #ASMRAW NOP // to override "BAD ORG"
+    #ASMRAW NOP // to override "BAD ORG"
+    #ASMRAW NOP // to override "BAD ORG"
+    #ASMRAW NOP // to override "BAD ORG"
+
+
+
+   StrSW = PORTC // read port c switches
+   StrSW = StrSW and 0b11111011 // mask out C.2 = LED output
+   RTC // polled clk service every round
+   AN1Value = ReadAD10(AN1)
+   if (Sec10 = period) then // raporting rate in sec
+      if DCmode < 2 then // CL connected to Cmajor
+        if AN1Value < LoBattLevel then
+           LoBatt // NiMH first Alarm level = 7,2VDC
+        end if
+        if AN1Value >= HiCharged then
+          if AN1Value >= AN1Ref then StopCharge // Hi level = 10,50VDC
+        end if
+      end if // DCmode
+      Sec10 = 0 // Allow Next round
+   end if // sec10
+   if strSW = oldStr then // no switch pressed - do other service
+       if RCIF = 1 then // unread chr available in RX
+          syncbyte = HserReceive // read chr
+          Ser1Print (" ERROR - CMAJOR Alert = ")
+          Ser1Print HEX(syncbyte)
+          CRLF()
+          if syncbyte = 0 then goto bootup // ==> alert from Cmajor => RESET
+        end if
+        if (upcounter = nextvalue) Then
+            Update() // status update data to Cmajor
+        End if
+        goto Main // roll until switch pressed
+   end if
+
+   // Check PORT C difference and execute accordingly
+   // will connect old & multiply states also (REV 3.5)
+
+     if (StrSw.0 <> oldStr.0) Then
+      last_command = 0  // RC0 = Right OD on
+      rightOD_last = 0
+      if StrSW.0 = 0 then
+        rightOD_last = 1
+        RightOD
+        if Lock_State = 1 then
+          LeftOD // L+R if lock_state
+        end if
+      else if StrSW.0 = 1 then
+        RightOD_off // RC0 = Right OD off state
+        if Lock_state = 1 then
+          LeftOD_off
+        end if
+      end if
+  end if
+
+  if StrSw.1 <> oldStr.1 Then
+      last_command = 1  // RC1 = Right REV
+      rightREV_last = 0
+      if StrSW.1 = 0 then
+        rightREV_last = 1
+        RightREV
+        if Lock_state = 1 then
+          LeftREV // L+R if lock_state
+        end if
+      else if StrSW.1 = 1 then
+        RightREV_off // RC1 = Right REV off
+        if Lock_state = 1 then
+          LeftREV_off
+        end if
+      end if
+  end if
+
+  if StrSw.3 <> oldStr.3 Then
+    last_command = 3
+    NextState // RC3 = NEXT
+  end if
+
+  if StrSw.4 <> oldStr.4 Then
+      last_command = 4 // RC4 = Left REV
+      leftREV_last = 0
+      if StrSW.4 = 0 then
+        leftREV_last = 1
+        LeftREV // RC4 = Left REV off
+        if Lock_state = 1 then
+          RightREV // L+R if lock_state
+        end if
+      else if StrSW.4 = 1 then
+        LeftREV_off
+        if Lock_state = 1 then
+          RightREV_off
+        end if
+      end if
+  end if
+
+  if StrSw.5 <> oldStr.5 Then
+      last_command = 5 // RC5 = Left OD
+      leftOD_last = 0
+      if StrSW.5 = 0 then
+        leftOD_last = 1
+        LeftOD // L+R if lock_state
+        if Lock_state = 1 then
+          RightOD
+        end if
+      else if StrSW.5 = 1 then
+        LeftOD_off // RC5 = Left OD off
+        if Lock_state = 1 then
+          RightOD_off
+        end if
+      end if
+  end if
+
+  if StrSw.6 <> oldStr.6 Then
+    last_command = 6
+    Toggle_T // RC6 = Toggle
+  end if
+
+  if StrSw.7 <> oldStr.7 Then
+    last_command = 7
+    Toggle_Lock // RC7 = Lock
+  end if
+
+   Debuginfo() // print status out
+   oldStr = StrSW //  next saved statusByte = current Port C state
+   ReplyByte1 = 0x20 // clear last command echo 1:st byte
+   ReplyByte2 = 0x20 // clear last command echo 2:nd byte
+Mainend:   
+   Goto Main// Loop forever
+
+
+//********************************************************************
+// ******************** SUBROUTINES **********************************
+//********************************************************************
+
+
+Sub CRLF
+    Ser1Send 13
+    Ser1Send 10
+End Sub
+
+
+sub INIT_LEDS // Init all LED's  (not NEXT) active light for sync
+
+    set LED_STEREO off //  0 ==> light
+    set LED_ATOAB off   //  0 ==> light
+    set LED_TOGGLE off  //  0 ==> light
+
+// Blink NEXT button LED for 100ms
+    set LED_NEXT off   //  0 = dark, 1 (on) ==> light
+    wait 100 ms
+    set LED_NEXT on
+    wait 100 ms
+    set LED_NEXT off
+End Sub
+
+sub Update
+      icmd = SendCommand(0x0E) // update status in <diff> minutes cycle
+      istat = SendStatus // send status to Cmajor
+      nextvalue = nextvalue + diff // rapport cycle minutes
+      if (istat <> 1) then         
+          Ser1Print (" ERROR - Status update Fail ")
+          ser1print ACK_byte
+          Goto bootup
+      End if
+end sub
+
+Sub BattChk // measure and process battery charging
+  AN1Value = ReadAD10(AN1)
+   AN1Ref = AN1Value
+   CRLF()
+   if AN1Value <=  LoBattLevel then // or BatStatus = 0xAA then
+      ser1Print " LO Battery - CONNECT CHARGER and wait Blink off "
+      CRLF()
+      Do 
+        AN1Value = ReadAD10(AN1)
+        Blink_Led(1) // visual warnig lo batt if BT selected
+        Blink_Led(2) // visual warnig lo batt
+        Blink_Led(3) // visual warnig lo batt
+      Loop Until (AN1Value > (LoBattLevel+50))
+   End if
+   if AN1Value >= HiCharged then // Hi level = 10,50VDC
+      ser1Print " Battery Full Charged - DISCONNECT CHARGER "
+   end if
+   CRLF()
+   Ser1Print " Estimated Battery life (HRS): "
+   trend =  (AN1Value - LoBattLevel)
+   trend = trend/7 // makes 200mV drop per Hour
+   Ser1Print trend
+   CRLF()
+End Sub
+
+
+Sub SyncRun
+ OKCnt = 0
+   ChrCnt = 0
+   Connection = BT // default is BlueTooth
+   DCmode = 0 // BT is Battery Powered
+   LoopCounter = 0 // causing reset if > 
+
+   Ser1Print " Waiting For SlaveSync (3x F8/F9)"
+   CRLF()
+   if RxTxMode = duplex Then
+     Do // read until 3x HEX F8(BT) or F9(CL) to sync and clear garbage
+        if RCIF = 1 then // unread chr available in RX
+          HSerReceive(syncbyte)
+            if (syncbyte = 0xF8 or syncbyte = 0xF9) Then
+                OKCnt++ // 65532 max (word)
+            end if
+        end if
+        ChrCnt++
+        LoopCounter++ // 32 binary bits, max value = 4294967295
+      Loop Until ((OKCnt = 3) OR (LoopCounter = 5000000)) // wait F8/F9 timeout = app 3minutes
+   end if
+   if OKCnt <> 3 Then Goto Bootup
+
+   if syncbyte = 0xF9 Then
+     Connection = CL // sync via CL cable
+     DCmode = 2 // no battery connected
+     wait 1 ms  // OK
+   end if
+   set LED_STEREO on //  all dark as SYNC succes
+   set LED_ATOAB on
+   set LED_TOGGLE on
+   HserSend(0x20) // I am Pedal (hex20) first byte out = 0x20
+   Statack = SendStatus // Send (Pedal ontime+battery info) 11 bytes to Cmajor
+   if Statack = 0 then
+       ser1Print " Status data pass Failed "
+       ser1Print Hex(Statack)
+       goto bootup // reset MPU
+    End if
+    if Connection = BT then ser1Print " HC05 SYNC and PAIRING Done: "
+    if Connection = CL then ser1print " CL SYNC Done "
+    ser1Print ChrCnt // NBR of reads until 3 F8 reached
+End Sub
+
+
+/*
+Sub RunTimer1
+    ON Interrupt Timer1Overflow Call ISR1  // Timer 0 INT routine ISR0
+    InitTimer1 Osc, PS1_8
+    TMR1H = 0x0B
+    TMR1L = 0xDC
+    StartTimer 1
+    Ser1Print " Interrupt "
+    INTON
+End Sub
+*/
+
+
+Sub EE_Init // Clear or init EE-Prom variables
+dim hit,t1,t2,batt0,batt1 as Byte
+
+  hit = 0
+  mode = 1 // default as new rev
+  ReadEEPROM(0x29, verchar1) // ASCII version first nbr "0..9"
+  ReadEEPROM(0x2A, verchar2) // ASCII version first nbr "."
+  ReadEEPROM(0x2B, verchar3) // ASCII version second nbr "0..9"
+  ReadEEPROM(0x00, batt0)    // charging count init first byte
+  ReadEEPROM(0x01, batt1)    // second byte of charging count
+  ReadEEPROM(0x04, BatStatus) // 0xAA if running lo batt last time
+
+  if (BatStatus = 0xAA) Then // battery under low value last time
+    Ser1Print " Battery Must be Charged before usage !! "
+    CRLF()
+  End If
+
+  if (batt0 = 0xFF and batt1 = 0xFF) then mode = 0 // first time init
+
+  if (verchar2 <> ".") then
+    Ser1Print " Version Corrupted "
+    mode = 0 // FORCE TO FIRST INIT
+  End If
+
+  if (verchar1 = "0" and verchar3 = "0") then
+    mode = 0 // First pwr up ver 0.0 ==> int EEprom
+  End If
+
+  t1 = ASC(Version, 10) // read string position 10
+  t2 = ASC(Version, 12) // position 12
+  if verchar1 = t1 then hit++ // compare version string and saved EE prom version
+  if verchar3 = t2 then hit++
+  if hit = 2 then
+    mode = 2 // match
+  End if
+  CRLF()
+  for i = 1 to len(Version)
+     ReadEEPROM(i+0x1F, EC)
+     ser1print CHR(EC) // version str from EEPROM
+  next
+
+  If mode = 0 then // first time init
+    WriteEEPROM(0, 5) // Battery Charging counter LSB = 5
+    WriteEEPROM(1, 0) // MSB = 0
+    WriteEEPROM(2, 0) // Up counter value as tag for
+    WriteEEPROM(3, 0) // book-keeping not to count in loop
+    WriteEEPROM(4, 0) // book-keeping lO battery ignored
+    for i = 1 to len(Version)
+      EC = ASC(Version, i) // Version String as ASCII to adrs 0x20
+      WriteEEPROM(i+0x1F, EC)
+    next
+  End If
+
+  If mode = 1 then
+    for i = 1 to len(Version)
+      EC = ASC(Version, i) // Version String as ASCII to adrs 0x20
+      WriteEEPROM(i+0x1F, EC)
+    next
+  End if
+
+#ifdef debug1
+  CRLF()
+  ser1send 0x20 // CRLF + space + version x.y
+  ser1send(verchar1)
+  ser1send(verchar2)
+  ser1send(verchar3)
+  if mode = 0 then Ser1Print " EE-Prom Initialised to zero "
+  if mode = 1 then Ser1Print " New Version "
+  If mode = 2 then Ser1Print " Existing Version  "
+  CRLF()
+    for i = 1 to len(Version) // string from code
+       Ser1Print mid(Version, i , 1)
+    next
+  CRLF()
+#endif
+End Sub // EEINIT
+
+Sub NextState // for toggle switch
+if StateMachine >= 3 then // check last position
+  StateMachine = 0 // Next State will be 0
+end if
+
+if StateMachine = 0 then // Stereo = default state (A/B)
+  set LED_STEREO OFF //  OFF = Light on
+  set LED_ATOAB ON
+  set LED_TOGGLE ON
+  blink // NEXT LED
+  i= SendCommand(0x09)
+end if
+if StateMachine = 1 then // A to AB
+   set LED_STEREO ON
+   set LED_ATOAB OFF
+   set LED_TOGGLE ON
+   blink
+   i= SendCommand(0x0A) // Mono A => AB
+end if
+if StateMachine = 2 then // Toggle position, position = mono
+   set LED_STEREO ON
+   set LED_ATOAB ON
+   set LED_TOGGLE OFF
+   blink
+   i= SendCommand(0x0A) // Toggle starts Mono position
+end if
+   StateMachine = StateMachine + 1 // unofficial state 3
+end sub // Statemachine
+
+sub Toggle_Lock
+if Lock_State = 0 then
+  Lock_State = 1 // Toggle Default state = active/ in active
+  goto done
+end if
+if Lock_state = 1 then
+  Lock_state = 0
+end if
+done:
+end sub // NextState
+
+Sub Toggle_T // Feb 1 2023
+  if (Statemachine = 3) then
+    i= SendCommand(0x0C) // toggle command as state=2
+    If OldTglState = 0 Then
+      OldTglState = 1
+    Else
+      OldTglState = 0
+    End If
+  Else
+    if (Statemachine = 2) then // send status as state = 2
+        i = SendCommand(0x0E)
+        i = SendStatus // send status to Cmajor
+    End if
+  End If
+end Sub
+
+sub LeftOD
+i = SendCommand(0x01)
+if Lock_state = 1 then
+  wait LockWait ms // minimum time for Cmidi if lock on
+End if
+end sub
+
+sub LeftOD_off
+i = SendCommand(0x02)
+if Lock_state = 1 then
+  wait LockWait ms // minimum time for Cmidi if lock on
+End if
+end sub
+
+sub LeftREV
+i = SendCommand(0x05)
+if Lock_state = 1 then
+  wait LockWait ms // minimum time for Cmidi if lock on
+End if
+end sub
+
+sub LeftREV_off
+i = SendCommand(0x06)
+if Lock_state = 1 then
+  wait LockWait ms // minimum time for Cmidi if lock on
+End if
+end sub
+
+sub RightREV
+i = SendCommand(0x07)
+if Lock_state = 1 then
+  wait LockWait ms // minimum time for Cmidi if lock on
+End if
+end sub
+
+sub RightREV_off
+i = SendCommand(0x08)
+if Lock_state = 1 then
+  wait LockWait ms // minimum time for Cmidi if lock on
+End if
+end sub
+
+sub RightOD
+i = SendCommand(0x03)
+if Lock_state = 1 then
+  wait LockWait ms // minimum time for Cmidi if lock on
+End if
+end sub
+
+sub RightOD_off
+  i = SendCommand(0x04)
+    if Lock_state = 1 then
+      wait LockWait ms // minimum time for Cmidi if lock on
+    End if
+end sub
+
+sub BattAlert // Battery LOW - Do something!!
+  i = SendCommand(0x0d)
+end sub
+
+Function SendCommand(cmd as byte)  // Muutos simplex toiminnalle tehty
+
+   ReplyByte1 = 0 // 0xF7 always
+   ReplyByte2 = 0 // 0x01..0x0C
+   HserSend 0xF7 // ID = 0xF7 always
+   wait 1 ms // minimum time for Cmidi to read command
+   HserSend(cmd)
+   if RxTxMode = duplex then
+        ReplyByte1 = HSerReceive // read until ecco if duplex
+        ReplyByte2 = HSerReceive // read until ecco if duplex
+   End if // if duplex
+   if (Replybyte1 = 0x00) then goto BootUp // errorhandler
+   if (ReplyByte2 = 0x00) then goto BootUp // errorhandler
+   if ReplyByte1 <> 0xF7 then goto ErrorState
+   if ReplyByte2 <> cmd Then goto ErrorState
+   if ReplyByte1 = 0xF8 Then wait 1 ms
+   SendCommand = 1 // if all tests passed
+end function
+
+Sub Blink // blink NEXT LED
+  set LED_NEXT ON // On=1 = Light
+  wait 150 ms
+  set LED_NEXT OFF
+  wait 150 ms
+End Sub
+
+Sub Blink_Led(led123 as byte)
+  i = 0 // loop-counter
+  if led123 = 1 then
+  Do
+    set LED_STEREO OFF // switch light all
+    set LED_ATOAB OFF
+    set LED_TOGGLE OFF
+    wait 100 ms
+    set LED_STEREO ON // switch off all
+    set LED_ATOAB ON
+    set LED_TOGGLE ON
+    wait 100 ms
+    i=i+1
+   Loop Until i = MaxBlink
+  end if
+  if led123 = 2 then
+  Do
+    set LED_STEREO OFF // switch light all
+    set LED_ATOAB OFF
+    wait 100 ms
+    set LED_STEREO ON // switch off all
+    set LED_ATOAB ON
+    wait 100 ms
+    i=i+1
+   Loop Until i= MaxBlink
+  end if
+  if led123 = 3 then
+  Do
+    set LED_STEREO OFF // switch light all
+    wait 100 ms
+    set LED_STEREO ON // switch off all
+    wait 100 ms
+    i=i+1
+   Loop Until i= MaxBlink
+  end if
+End Sub
+
+Sub FullChargeBlink // full charged battery -Blink
+  for i = 1 to MaxBlink // loop-counter
+    set LED_STEREO OFF // switch light stereo
+    set LED_ATOAB ON
+    set LED_TOGGLE ON
+    wait 100 ms
+    set LED_STEREO ON
+    set LED_ATOAB OFF // switch light ATOAB
+    set LED_TOGGLE ON
+    wait 100 ms
+    set LED_STEREO ON
+    set LED_ATOAB ON
+    set LED_TOGGLE OFF // switch light Toggle
+    wait 100 ms
+  Next
+End Sub
+
+Sub LoBatt // battery voltage dropped < 7,5VDC
+  DCmode = 1 // needs charging
+  set LED_STEREO ON // switch off all Led's for blink
+  set LED_ATOAB ON
+  set LED_TOGGLE ON
+  Ser1Print " Lo Battery Voltage Alarm =  "
+
+  if AN1Value < 550 and AN1Value >= 505 then // 8,4..7,8V  Case 1
+     Blink_Led(1)
+     ser1send 0x31
+     BattAlert
+  end if
+  if AN1Value < 505 and AN1Value >= 470 then // 7,8..7,0V  Case 2
+     Blink_Led(2)
+     ser1send 0x32
+     BattAlert
+  end if
+  if AN1Value < 470 and AN1Value >= 450 then // 7,0..6,5v  Case 3
+     Blink_Led(3)
+     ser1send 0x33
+     BattAlert
+  end if
+  if AN1Value < 450 then
+     ser1print " LO BATTERY SLEEP NOW!! "
+     BattAlert
+     WriteEEPROM(4, 0xAA) // LOST Battery info tag for next start
+     ONTIME = ((60*hours)+minutes) // ontime as minutes
+     LO_ONTIME = ONTIME
+     HI_ONTIME = ONTIME_H
+     WriteEEPROM(5, LO_ONTIME) // LSB runtime in minutes
+     WriteEEPROM(6, HI_ONTIME) // MSB
+     wait 100 ms
+     #ASMRAW SLEEP // goodbye, Sleep CPU as VDD < 6,5VDC
+  end if
+
+  if StateMachine = 1 then set LED_STEREO OFF // Recall old state
+  if StateMachine = 2 then set LED_ATOAB OFF
+  if StateMachine = 3 then set LED_TOGGLE OFF
+  CRLF()
+End Sub
+
+
+Sub StopCharge
+  DCmode = 0 // DISCONNECT CHARGER & update charge counter +1
+  if SaveFlag > 0 then return // BATT update allready done
+  FullChargeBlink // blink leds for full battery
+  AN1Ref = ReadAD10(AN1) // save reference as peak dc full charged
+  ReadEEPROM(0, BatCHRGcount) // allready saved charge nbr counter ??
+  ReadEEPROM(1, BatCHRGcount_H)
+  if SaveFlag = 0 then // Not yet saved
+    BatCHRGcount++ // charging counter update
+    LO_BATTCNT = BatCHRGcount // charging counter (16bitt)
+    HI_BATTCNT = BatCHRGcount_H
+    WriteEEPROM(0, LO_BATTCNT) // Write back Battery Charging counter
+    WriteEEPROM(1, HI_BATTCNT)
+    WriteEEPROM(2, UpCounter) // save current Upcounter value as tag for
+    WriteEEPROM(3, UpCounter_H) // book-keeping not to count in loop
+    WriteEEPROM(4, 0) // book-keeping = BATTERY Charged (0/AA hex)
+    SaveFlag++
+  end if
+
+  set LED_TOGGLE ON // old state clear
+  if StateMachine <= 1 then set LED_STEREO OFF // Recall old state
+  if StateMachine = 2 then set LED_ATOAB OFF
+  if StateMachine = 3 then set LED_TOGGLE OFF
+End Sub
+
+Function SendStatus
+  trend = (AN1Value - LoBattLevel) // recalculate trend
+  trend = trend/7 // 200mV drop per Hour
+  LO_TREND = trend // estimated battery life lo byte
+  HI_TREND = trend_H
+  BATDC = ReadAD10(AN1)
+  AN1Ref = BATDC // set ref to stopcharge function
+  LO_BATTCNT = BatCHRGcount // charging counter (16bitt) lo byte
+  HI_BATTCNT = BatCHRGcount_H // counter hi byte
+  LO_BATDC = BATDC // Battery DC as mV (16bitt)
+  HI_BATDC = BATDC_H
+  ONTIME = ((60*hours) + minutes) // ontime as minutes
+  LO_ONTIME = ONTIME
+  HI_ONTIME = ONTIME_H
+  ReadEEPROM(0, LO_BATTCNT) // Battery charge counter LSB Adrs = 0
+  ReadEEPROM(1, HI_BATTCNT) // Battery charge counter MSB Adrs = 1
+  HserSend LO_BATDC // send Batt DCV as mV
+  HserSend HI_BATDC //  send MSB
+  HserSend LO_BATTCNT // send Charging counter
+  HserSend HI_BATTCNT // send MSB
+  HserSend(verchar1) // send Pedal current SW BUILD "x"
+  HserSend(verchar2) // "."
+  HserSend(verchar3)  // "y"
+  HserSend LO_TREND // estimated battery life (hrs)
+  HSerSend HI_TREND
+  HserSend LO_ONTIME // Pedal ontime (in minutes)
+  HserSend HI_ONTIME
+  SendStatus = 0 // failed status at bottom
+  ACK_byte = HSerReceive // wait ACK (= 0x20) as data received OK
+  if ACK_byte = 0x20 then
+     SendStatus = 1 // 1 = OK
+  End if
+end Function
+
+Sub WriteEEPROM(Adrs_W as Byte, Wdata as Word)
+  EPWrite Adrs_W, Wdata
+end Sub
+
+Sub ReadEEPROM(Adrs_R as Byte, Result as Word)
+  EPRead Adrs_R, Result
+End Sub
+
+
+Sub RTC
+  Int_occurred = 0   ' clear the INT flag (if interrupt mode)
+  Presec++
+  If (Presec = pollfrq) then // 4=app 250ms = interrupt frq (pollfrq = poll)
+    seconds++
+    UpCounter++ // upcounter counts seconds to 65536
+    if (Sec10 < period) then
+       sec10++
+    end if
+    SendAlive()  // to keep Cmajor in BT control
+    Blink // VISIBLE debug only
+    Presec = 0 // next cycle init
+  End If
+
+  If seconds > 59 then
+    minutes++       'increment minutes
+    seconds = 0     'Sec rollover to 0
+  End if
+
+  If minutes > 59 then
+    hours++        ' increment hours
+    minutes = 0 ' minutes rollover to 0
+  End If
+
+  If hours > 23 then ' rollover to 0 for 24 hr clock
+    hours = 0
+    days++
+  End if
+End Sub
+
+Sub ISR1 // Timer 1 Interrupt routine
+   int_occurred = 1 // set flag after Timer1 overflow
+   //ser1print " INT "
+   //TMR1IF = 0
+End Sub
+
+
+Sub SendAlive
+  Dim RB1 As Byte // no HserSend function without this???
+  HserSend 0xF8 // Send Heart-Beat within 10 seconds NO ECHO read back
+End Sub
+
+
+Sub DebugInfo
+   #ASMRAW NOP // fit code to page Fixing "BAD ORG"
+   #ifdef debug1
+      AN1Value = ReadAD10(AN1) // +5.0V == 1023 (10bit ADC)
+      ser1Print " VDC Value: "
+      ser1Print (AN1Value*15) // positive integer value only (mV)
+      Ser1Print "mV   "
+      Ser1Print AN1Value
+      if DCmode = 0 and Saveflag = 1 then // Full charged and 15mV drop
+        Infocounter++
+        if Infocounter < 5 Then Ser1Print " (Disconnect Charger) "
+      End if
+      if DCmode = 1 then Ser1Print " (Connect Charger) "
+      if DCmode = 2 then
+        ser1print " Cmajor DC "
+        Else
+          Ser1Print " HI Ref = "
+          Ser1Print AN1Ref
+      End if
+      CRLF()
+      Ser1Print " Battery Charge Count: "
+      Ser1Print BatCHRGcount // 16 bit integer charging counter
+      CRLF()
+      tmpstr = VarToBin(StrSW)
+      tmpstr1 = VarToBin(oldStr)
+      ser1Print " PortC Active: "
+      ser1Print tmpstr
+      ser1Print "  Old: "
+      ser1Print tmpstr1
+      CRLF()
+      ser1Print " HC5 STATE = "
+      ser1Print HC05_state
+      CRLF()
+      ser1Print " ON Time <dd> <hrs> <min> <sec> : "
+      Ser1Print days
+      Ser1Print "  " // space
+      ser1Print Hours
+      Ser1Print ":"
+      Ser1Print  minutes
+      Ser1Print ":"
+      Ser1Print  seconds
+      CRLF()
+      Ser1Print " Command = "
+      Ser1Print last_command
+      Ser1send 0x20 // space
+      Ser1Print Hex(replybyte1)
+      Ser1Print "-"
+      Ser1print Hex(replybyte2)
+      CRLF()
+      CRLF()
+    #endif
+End Sub
+
+
+
+ErrorState:
+    INTOFF // deny ints
+    set LED_NEXT OFF // LED off FOR 300MS
+    wait 300 ms
+    set LED_NEXT ON
+    wait 300 ms
+    Ser1Print Hex(replybyte1)
+    Ser1Print " "
+    Ser1Print Hex(replybyte2)
+    Ser1Print " "
+    Goto ErrorState // Loop forever
+  '#ASMRAW NOP
+
+BootUp:
+  INTOFF // deny ints
+  Ser1Print " Restarting System !! "
+  CRLF()
+      for i = 1 to 10
+        Blink_Led(1) // visual warnig RESET
+        Blink_Led(2) // visual warnig RESET
+        Blink_Led(3) // visual warnig RESET
+      next
+  wait 1000 ms
+  #ASMRAW RESET //Restart CPU
