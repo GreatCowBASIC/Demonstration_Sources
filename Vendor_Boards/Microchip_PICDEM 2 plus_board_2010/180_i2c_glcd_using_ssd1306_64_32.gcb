@@ -1,3 +1,5 @@
+#SKIPTEST
+// Skip regression tesing as the GLCD_TYPE_SSD1306_64x32 in low memory mode not tested. So, this will issue an error.
 /*
 
     This demonstration program is a simple GLCD demonstration of the SSD1306 GLCD capabilities.
