@@ -1,0 +1,20 @@
+= Digital Clock Project by Ralf Pagel ( 2026 )
+
+This project presents a program for a digital clock that operates on a low‑cost LCD module featuring 4 lines of 20 characters each. The clock can be driven by an ATmega328p, an ATmega2560, or an AVR128DA28 microcontroller. Development was carried out using the corresponding Arduino boards.
+
+== Block Graphics Technique
+
+The program makes use of block‑graphics characters, a technique familiar from early home computers. At that time, limited processing power restricted graphical capabilities, so character sets often included special symbols that allowed users to construct simple on‑screen graphics. These characters enabled decorative borders, basic game graphics, and other visual elements on a standard television display.
+
+== Custom Characters on the LCD 2004
+
+The LCD 2004 module provides eight registers for user‑defined characters. When combined with two characters from the built‑in character set (codes 254 and 255), a total of ten characters becomes available. This set is sufficient to render six large, visually appealing digits and two separators that span the entire display. As a result, the clock remains easy to read even from a considerable distance.
+
+== Timekeeping Approach
+
+Since this project serves as a study rather than a precision instrument, the CPU clock frequency is used as the time base. A timer is configured to generate interrupts every 10 ms, and this interval is divided down to 1 Hz to update the displayed time once per second.
+
+Because the CPU clock does not provide the accuracy required for a reliable timekeeping device, a more stable reference—such as a TCXO—would be necessary for real‑world applications.
+
+
+See https://sourceforge.net/p/gcbasic/discussion/projects%26guides/thread/888bf7449d/?limit=25#489c 

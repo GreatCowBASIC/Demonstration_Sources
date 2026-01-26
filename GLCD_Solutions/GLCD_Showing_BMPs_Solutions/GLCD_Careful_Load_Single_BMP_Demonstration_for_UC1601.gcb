@@ -58,9 +58,9 @@
 
     GLCDCLS
 
-    #include "gcb.bmp"
+    #include "gcb1.bmp"
     ' Table Name. This is required.  Just means you can reuse the BMP load code but referring your BMP to TableData
-    #define TableData GCB
+    #define TableData GCB1
 
   ; ----- Variables
     ' These must be WORDs as this a large table.    These are required!!
