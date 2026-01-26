@@ -1,0 +1,100 @@
+'''********************************************************************************
+'''A demonstration program for GCBASIC.
+'''--------------------------------------------------------------------------------
+'''This program demonstrates the I2C LCD driver on AVR128DA28 using GCBASIC.
+'''
+'''The configuration is for a  LCD_IO 18 = PCF8574 a/joy-it adapter/Raspberry Pi
+'''
+'''@author    Ralf
+'''@license   GPL
+'''@version   1.0
+'''@date      2026-01-14
+'''********************************************************************************
+
+/*
+         ------------PORTA---------------
+  Bit#:  -7---6---5---4---3---2---1---0---
+  IO:    --- --- --- --- PA3 PA2 --- PA0
+  IO:    --- --- --- --- SCL SDA --- ---
+
+         ------------PORTC----------------
+  Bit#:  ---- ---- ---- ---- -3---2---1---0---
+  IO:    ---- ---- ---- ---- --- --- --- ---
+  IO:    ---- ---- ---- ---- --- --- --- ---
+
+         ------------PORTD----------------
+  Bit#:  -7---6---5---4---3---2---1---0---
+  IO:    --- --- --- --- --- --- --- ---
+  IO:    --- --- --- --- --- --- --- ---
+
+         ------------PORTF----------------
+  Bit#:  -7---6---5---4---3---2---1---0---
+  IO:    --- PF6 --- --- --- --- PF1 PF0
+  IO:    --- RST --- --- --- --- CLK CLK
+*/
+
+#chip AVR128DA28, 24
+#option explicit
+
+// Define Hardware I2C settings
+HI2CMode Master
+#define HI2C_DATA  PORTA.2
+#define HI2C_CLOCK PORTA.3
+
+#define LCD_IO 10
+// LCD_I2C_Address_1 is not required because default address
+//  #define LCD_I2C_Address_1 0x4E     
+
+// This settings are suited for a joy-it adapter. Its made for the Raspberry Pi.
+  #define i2c_lcd_e  i2c_lcd_byte.7
+  #define i2c_lcd_rw i2c_lcd_byte.5
+  #define i2c_lcd_rs i2c_lcd_byte.4
+  #define i2c_lcd_bl i2c_lcd_byte.6
+  #define i2c_lcd_d4 i2c_lcd_byte.0
+  #define i2c_lcd_d5 i2c_lcd_byte.1
+  #define i2c_lcd_d6 i2c_lcd_byte.2
+  #define i2c_lcd_d7 i2c_lcd_byte.3
+
+// ----- Constants
+
+//----- Variables
+
+// ----- Main body of program commences here.
+do forever
+
+  CLS
+  PRINT "GCBASIC"
+  Locate 1,0
+  PRINT "I2C LCD_IO 18"
+
+  CLS
+  PRINT "GCBASIC"
+  Locate 1,0
+  Print "I2C LCD Driver"
+  Locate 2,0
+  Print  "By Ralph"
+  Locate 3,0
+  Print  "Jan 2026"
+  Wait 3 s
+
+  Repeat 2
+    ClS
+    PRINT "GCBASIC"
+    locate 1,0
+    Print ChipNameStr + " @ "
+    Print str(ChipMHz) + "Mhz"
+  end repeat
+  wait 3 s
+
+  repeat 2
+    cls
+    Print "I2C address:"
+    locate 1,0
+    Print "0x": LCDHex(  LCD_I2C_Address_Current, 2)
+  end repeat
+
+  wait 3 s
+
+loop
+
+end

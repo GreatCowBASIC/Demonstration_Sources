@@ -10,7 +10,7 @@ REM	The script processing file can be adapted to process any TEXT file to a GCB 
 REM
 echo Processing %~n1.gcb
 cd  %~d1%~p1
-awk -f InfraredConvert.awk %1
+%GCBASIC_INSTALL_PATH%\G+Stools\GAWK -f InfraredConvert.awk %1
 del  %~d1%~p1%~n1.gcb
 ren  %~d1%~p1awk.out %~n1.gcb
 

@@ -1,0 +1,154 @@
+/*
+ * GCBASIC Program: Demonstration of Initialized Variable Declarations
+ * 
+ * This program showcases the new functionality introduced in GCBASIC change 1543,
+ * which allows assigning initial values directly in DIM statements. This feature
+ * supports efficient initialization of variables, bits, arrays, and typed data
+ * (e.g., Byte, Word, Long, Single, String) at declaration time.
+ * 
+ * Target: PIC16F721 microcontroller (8-bit PIC with 2KB Flash, 128 bytes RAM).
+ * 
+ * Key Features Demonstrated:
+ * - Implicit typing (e.g., dim myVar = 10 → defaults to Byte).
+ * - Explicit typing with initialization (e.g., dim myvar2 as byte = 20).
+ * - Bit variables (dim mybit as Bit = 1).
+ * - Negative values for Integer/Long (e.g., dim myint as Integer = -1000).
+ * - Floating-point for Single (dim mysingle as Single = 3.14159).
+ * - String initialization (dim mystring as string = "hello world").
+ * - Array initialization (dim test(5) = 1,2,3,4,5) – note: overridden below for testing.
+ * - At location. A specific memory location
+ * - Aliased to another memory variable
+ * 
+ * Program Behavior:
+ * - Toggles PORTA pins 0-3 rapidly in a loop (simple I/O test).
+ * - Increments counters (myVar, testvar – note: testvar undeclared for edge-case testing).
+ * - Blinks LedGreen and LedRed (defined as PORTB.4 and PORTB.5) every 500ms.
+ * 
+ * Notes:
+ * - Some variables (e.g., mysecond, myint, mylong, mysingle, myword, mystring, mybit) are
+ *   declared but unused to demonstrate syntax only.
+ * - Array 'test' is initialized then immediately overridden to verify reassignment.
+ * - Potential Issue: 'testvar' is used without declaration (tests error handling).
+ * - Compile with GCBASIC build 1543+ to enable this feature.
+ * - Output: Blinking LEDs; counters accumulate (observable via debugger or extensions).
+ */
+
+//----- Configuration
+// Chip selection: PIC16F721 – 28-pin, 8-bit MCU with USB, comparators, and 256 bytes EEPROM.
+#chip 16f721
+
+// Symbolic constants for LED pins on PORTB.
+// LedGreen: PORTB.4 (active high).
+// LedRed: PORTB.5 (active high).
+// These allow readable code instead of direct bit manipulation.
+#define LedRed portb.5
+#define LedGreen portb.4
+
+//----- Variables
+// New Feature: Initialized Declarations (Change 1543)
+// Syntax: dim <name> [as <type>] = <value>
+// - Defaults to Byte if no type// - Supports constants, expressions (evaluated at compile-time if possible).
+// - Arrays: dim <name>(<size>) = <val1>,<val2>,... (comma-separated).
+// - Types: Bit (1 bit), Byte (8-bit unsigned), Word (16-bit), Long/Integer (32-bit),
+//          Single (32-bit float), String (null-terminated).
+
+// Bit variable: 1-bit flag, initialized to 1 (true).
+dim mybit as Bit = 1
+
+// Bit variable: aliased 1-bit flag, initialized to 1 (true).
+dim mybitaliased0 as Bit alias myVar.0 = 0
+dim mybitaliased1 as Bit alias myVar.0 = 1
+
+mybitaliased1 = mybitaliased0
+
+
+// Implicit Byte: Defaults to Byte type, init to 10.
+dim myVar = 10
+
+// Explicit Byte with inline comment: Init to 20. Tests comment parsing post-init (=).
+dim myvar2 as byte = 20 //testing that a comment doesn't mess up the code
+
+// Explicit Byte with inline comment: At location 33: Init to 20. Tests comment parsing post-init (=).
+dim myvar3 as byte at 33 = 20 //testing that a comment doesn't mess up the code
+
+
+// Uninitialized Byte: Defaults to 0 (no = clause).
+dim mysecond as byte 
+
+// Integer (maps to Long in GCBASIC): 32-bit signed, init to -1000. Demonstrates negatives.
+dim myint as Integer = -1000
+
+// Integer (maps to Long in GCBASIC): 32-bit signed, at location 34: init to -1000. Demonstrates negatives.
+dim myint as Integer at 34 = -1000
+
+// Long: 32-bit signed, init to 2000.
+dim mylong as Long = 2000
+
+// Single: 32-bit IEEE 754 float, init to pi approx. Requires FP library if used in math.
+dim mysingle as Single = 3.14159
+
+// Word: 16-bit unsigned, init to 1000.
+dim myword as word = 1000
+
+// String: Null-terminated char array, init to "hello world". Length inferred +1 for null.
+dim mystring as string = "hello world"
+
+// Array Initialization: 6-element Byte array (indices 0-5), init with values 1-5 (index 0=1? – GCBASIC arrays 0-based).
+dim test (5)  = 1,2,3,4,5
+
+// Override array elements: Set all to 0 for testing reassignment after init.
+test (1) = 0
+test (2) = 0
+test (3) = 0
+test (4) = 0
+test (5) = 0
+
+// Note: test(0) remains 1 from init. Demonstrates partial override.
+
+// Undeclared Variable Test: 'testvar' used below without DIM – should flag error in compiler.
+// dim testvar as byte  /* Uncomment to fix */
+
+//----- Main program
+// Infinite DO/LOOP: Core event loop.
+// - Toggles PORTA.0-3: Simple digital output test (e.g., for LEDs or probes).
+// - Increments counters (myVar, testvar – note: testvar undeclared for edge-case testing).
+// - Blinks LedGreen and LedRed (defined as PORTB.4 and PORTB.5) every 500ms.
+// 
+// Execution Flow:
+// 1. Toggle PORTA pins rapidly (creates pulse train).
+// 2. Increment counters and perform addition.
+// 3. Blink Green LED (500ms).
+// 4. Blink Red LED (500ms).
+// 5. Repeat forever.
+// 
+// Expected Behavior: LEDs alternate blinking; PORTA pulses visible on oscilloscope.
+// RAM Usage: Minimal (~20 bytes for vars + array); Flash: <100 words.
+// Extensions: Add Print myVar for serial output, or use in conditions (e.g., if myVar > 50).
+do
+
+    // Rapid toggle PORTA.0-3: High then low; tests I/O speed (~few us per toggle).
+    porta.0 = 1
+    porta.0 = 0
+    porta.1 = 1
+    porta.1 = 0
+    porta.2 = 1
+    porta.2 = 0
+    porta.3 = 1
+    porta.3 = 0
+    
+    // Counter increments: Uses initialized myVar (starts at 10).
+    myVar = myVar + 1
+    testvar = testvar + 1  // Error: testvar undeclared – tests runtime/compile error.
+    myVar = myVar + testvar  // Accumulates; overflows at 255 (Byte limit).
+
+    // Blink Green LED: On for 500ms using built-in Delay_MS.
+    LedGreen = 1
+    wait 500 ms
+    LedGreen = 0
+    
+    // Blink Red LED: On for 500ms.
+    LedRed = 1
+    wait 500 ms
+    LedRed = 0
+
+loop  // End infinite loop; program runs until reset/power-off.

@@ -4,8 +4,9 @@
 *Allegro ACS758LCB-100B Hall-Effect Linear Current Sensor IC (100A Bidirectional)*
 
 [![License: GPL](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)  
-[![GCBASIC](https://img.shields.io/badge/GCBASIC-3.16-green)](https://sourceforge.net/projects/gcbasic/)  
-[![PIC16F886](https://img.shields.io/badge/MCU-PIC16F886-orange)](https://www.microchip.com/en-us/product/PIC16F886)
+[![GCBASIC](https://img.shields.io/badge/GCBASIC-2025.11.16-green)](https://sourceforge.net/projects/gcbasic/)  
+[![Microcontroller](https://img.shields.io/badge/MCU-PIC16/PIC18F/AVR/LGT-orange)](https://www.microchip.com/en-us/product/PIC16F886)
+
 
 ## Overview
 
@@ -20,23 +21,20 @@ Two code versions are provided:
 
 Tested on November 20, 2025, with real hardware setups including a bench power supply and clamp meter for verification.
 
-![LCD Demo](https://raw.githubusercontent.com/maker-brainy/ACS758-Demo/main/images/lcd_demo_1.jpg)  
+<img src="image2.jpg" alt="LCD Demo" width="50%"/>  
 *LCD showing RAW ADC: 497 and I: -3.66 A*
 
-![Multimeter Verification](https://raw.githubusercontent.com/maker-brainy/ACS758-Demo/main/images/multimeter.jpg)  
+![Multimeter Verification](image1.jpg)  
 *Clamp meter confirming ~2.95A (matches LCD reading)*
 
-![Power Supply Setup](https://raw.githubusercontent.com/maker-brainy/ACS758-Demo/main/images/power_supply.jpg)  
+![Power Supply Setup](image3.jpg)  
 *ENA 72-1048 DC Power Supply set to 14.14V / 3.03A*
 
 ## Video Demo
 
 Check out this short video demonstration of the ACS758LCB-100B sensor in action! It shows real-time current measurement with varying loads, LCD updates, and calibration verification using a clamp meter.
 
-[![ACS758LCB-100B Demo Video](https://img.youtube.com/vi/[VIDEO_ID]/0.jpg)](https://www.youtube.com/watch?v=[VIDEO_ID])  
-*Watch on YouTube: "ACS758 Hall-Effect Current Sensor Demo with PIC16F886 & GCBASIC" (Duration: 2:15)*
-
-*(Replace `[VIDEO_ID]` with your actual YouTube video ID, e.g., `dQw4w9WgXcQ`. Upload the video to YouTube/Vimeo and update the embed link for seamless playback.)*
+[![ACS758LCB-100B Demo Video](https://img.youtube.com/vi/[VIDEO_ID]/0.jpg)]*
 
 ## Features
 
@@ -84,8 +82,6 @@ Check out this short video demonstration of the ACS758LCB-100B sensor in action!
   - A (backlight anode): 5V via 220Ω resistor.
   - K (backlight cathode): GND.
 
-![Wiring Diagram](https://raw.githubusercontent.com/maker-brainy/ACS758-Demo/main/images/wiring_diagram.png)  
-*(Schematic: Sensor VOUT → RA1; LCD on PORTB. Full Eagle/ Fritzing file in `/hardware/` folder.)*
 
 **Notes**:
 - Sensor ground must be isolated from high currents.
@@ -95,9 +91,8 @@ Check out this short video demonstration of the ACS758LCB-100B sensor in action!
 ## Software Setup
 
 ### Prerequisites
-- **GCBASIC Compiler** (v3.16+): Download from [SourceForge](https://sourceforge.net/projects/gcbasic/).
-- **PICkit 3/4 or similar**: For flashing HEX to PIC16F886.
-- **MPLAB X IDE** (optional): For simulation/debugging.
+- **GCBASIC Compiler**: Download from [SourceForge](https://sourceforge.net/projects/gcbasic/).
+- **PICkitPlus or similar**: For flashing HEX to PIC16F886.
 
 ### Installation & Build
 1. Clone/Download this repo.
@@ -106,7 +101,7 @@ Check out this short video demonstration of the ACS758LCB-100B sensor in action!
 4. **Calibrate ZeroPoint**:
    - Run with no current: Note the stable `AvgADC` value.
    - Edit: `ZeroPoint = [your_value]` (e.g., 510 if offset).
-5. Compile: `F9` or command-line `gcbasic.exe Standalone_ACS758LCB-100B_Solution.gcb`.
+5. Compile: `F5` or command-line `gcbasic.exe Standalone_ACS758LCB-100B_Solution.gcb`.
 6. Flash: Use PICkit → `Standalone_ACS758LCB-100B_Solution.hex`.
 
 **Sensitivity Formula** (embedded in code):  
@@ -159,7 +154,3 @@ GPL v3.0 – Free to use/modify/share. See [LICENSE](LICENSE) for details.
 ## Author & Credits
 
 - **Samco (maker-brainy)**: Code & hardware design.  
-  *Date: 20 November 2025*
-
-
----
