@@ -1,0 +1,581 @@
+'''********************************************************************************
+'''
+'''@author  Ralf Pagel
+'''@licence GPL
+'''@date    21.01.2026
+'''
+'''********************************************************************************
+
+  #chip mega328p, 16  ; avr128da28, 24  ; mega2560, 16 ;
+  #option explicit
+
+  ' Define Hardware I2C settings
+  HI2CMode Master
+  #define LCD_SPEED FAST ;SLOW;
+  #define LCD_IO 10
+;  #define LCD_I2C_Address_1 0x4E     ; not required because default address
+
+; Modify the connections between the PCF8574 and the LCD as required.
+; Either change all of the connections or none of them.
+; (This settings are suited for a joy-it adapter. Its made for the raspberry pi.)
+;  #define i2c_lcd_e  i2c_lcd_byte.7
+;  #define i2c_lcd_rw i2c_lcd_byte.5
+;  #define i2c_lcd_rs i2c_lcd_byte.4
+;  #define i2c_lcd_bl i2c_lcd_byte.6
+;  #define i2c_lcd_d4 i2c_lcd_byte.0
+;  #define i2c_lcd_d5 i2c_lcd_byte.1
+;  #define i2c_lcd_d6 i2c_lcd_byte.2
+;  #define i2c_lcd_d7 i2c_lcd_byte.3
+
+
+  Dim count100 as Byte
+  Dim ButtonState as Byte
+  Dim ButtonFlag as Byte
+  Dim TempStd as Byte
+  Dim TempMin as Byte
+  Dim SetTimeState as Byte
+  ButtonFlag = 0
+  count100 = 0
+
+
+#IF CHIPNAME = mega2560
+  ; InitLEDControl
+  #define LED PORTB.7
+  ; Hardware I2C settings
+  #define HI2C_DATA  PORTD.1
+  #define HI2C_CLOCK PORTD.0
+  ; weak pull-ups
+  MCUCR.4 = 0     ; PUD
+  Dir PORTB.4 in
+  Set PORTB.4 on
+  Dir PORTB.5 in
+  Set PORTB.5 on
+  Dir PORTB.6 in
+  Set PORTB.6 on
+  ; button defines
+  #define GetButton     PINB
+  #define ButtonPin_s   PORTB.4
+  #define ButtonMask0   0b01110000
+  #define ButtonMask_s  0b01100000
+  #define ButtonMask_u  0b01010000
+  #define ButtonMask_d  0b00110000
+#ENDIF
+
+#IF CHIPNAME = mega328p
+  ; InitLEDControl
+  #define LED PORTB.5
+  ; Hardware I2C settings
+  #define HI2C_DATA  PORTC.4
+  #define HI2C_CLOCK PORTC.5
+  ; weak pull-ups
+  MCUCR.4 = 0     ; PUD
+  Dir PORTB.2 in
+  Set PORTB.2 on
+  Dir PORTB.3 in
+  Set PORTB.3 on
+  Dir PORTB.4 in
+  Set PORTB.4 on
+  ; button defines
+  #define GetButton     PINB
+  #define ButtonPin_s   PORTB.2
+  #define ButtonMask0   0b00011100
+  #define ButtonMask_s  0b00011000
+  #define ButtonMask_u  0b00010100
+  #define ButtonMask_d  0b00001100
+#ENDIF
+
+#IF CHIPNAME = avr128da28
+  ; InitLEDControl
+  #define LED PORTC.2
+  ; Hardware I2C settings
+  #define HI2C_DATA PORTA.2
+  #define HI2C_CLOCK PORTA.3
+  ; weak pull-ups
+  Set PORTC_PIN3CTRL.PORT_PULLUPEN_bp on
+  Set PORTC_PIN0CTRL.PORT_PULLUPEN_bp on
+  Set PORTC_PIN1CTRL.PORT_PULLUPEN_bp on
+  ; button defines
+  #define GetButton     PORTC_IN
+  #define ButtonPin_s   PORTC.3
+  #define ButtonMask0   0b00001011
+  #define ButtonMask_s  0b00000011  ; C3
+  #define ButtonMask_u  0b00001010  ; C0
+  #define ButtonMask_d  0b00001001  ; C1
+#ENDIF
+
+  Dir LED out
+
+  ; LCD CG bitmaps
+  #define topright  0
+  #define downright 1
+  #define downleft  2
+  #define topleft   3
+  #define topbar   4
+  #define downbar  5
+  #define dot1  6
+  #define dot2  7
+
+  ; display position of the digits
+  #define std10 0   ; tens of hour
+  #define std01 3   ; ones of hour
+  #define min10 7
+  #define min01 10
+  #define sec10 14
+  #define sec01 17
+
+  ; control printing
+  #define sec_z_f flags.0
+  #define min_e_f flags.1
+  #define clk_1s flags.7
+
+  ;----- Variables
+  'Create an array to store the character until it is copied
+  Dim CharArray(8)
+  Dim sek_e as Byte
+  Dim sek_z as Byte
+  Dim min_e as Byte
+  Dim min_z as Byte
+  Dim std_e as Byte
+  Dim std_z as Byte
+  Dim flags as Byte
+
+  sek_e = 0
+  sek_z = 0
+  min_e = 0
+  min_z = 0
+  std_e = 0
+  std_z = 0
+  flags = 0
+
+
+  ; prepare Timer1 for 10ms CTC Interrupts
+  initTimer()
+
+  ; prepare the LCD
+  setLCD_CG_RAM()
+  initDisplay()
+
+  ; main loop
+do forever
+  if clk_1s then countSeconds()
+  if ButtonFlag.7 then setTime()
+loop
+
+
+sub setTime()
+  ; sets the time
+  cli
+  cls
+  ; SetTime is a state machine
+  ; SetTimeState is moved to the left to point to the next state
+  SetTimeState = 1  ; clr all flags and set bit 0
+  ; The clock mechanism counts the digits separately.
+  ; However, here it is easier to process the minutes and hours as a whole.
+  TempStd = std_z * 10
+  TempStd += std_e
+  TempMin = min_z * 10
+  TempMin += min_e
+
+  ; show the 1. screen
+  print "Set the clock"
+  locate 1,0
+  Print "Hour: " : Print TempStd
+
+  do
+    ButtonState = GetButton & ButtonMask0
+    if ButtonState < ButtonMask0 then
+      wait 20 ms
+      if (GetButton & ButtonMask0) = ButtonState then ; if the same button is detected
+
+        select case ButtonState
+          case ButtonMask_s           ; set button is pressed
+            clc                       ; clr Carry Flag
+            rotate SetTimeState left  ; shift the h-bit left
+            if SetTimeState.1 then    ; show the 2. screen
+                locate 1,0
+                Print "Minute: " : Print TempMin
+            end if
+            if SetTimeState.2 then    ; show the 3. screen
+                cls
+                locate 0,0
+                Print "Wait for next minute"
+                locate 1,0
+                Print "Press and relaise "
+                locate 2,0
+                Print "the Set button start"
+                locate 3,0
+                Print "the second counting"
+            end if
+          case ButtonMask_u       ; up button is pressed
+            if SetTimeState.1 then
+              TempMin++
+              if TempMin = 60 then TempMin = 0
+              locate 1,8
+              Print TempMin : Print " "
+            else
+              TempStd++
+              if TempStd = 24 then TempStd = 0
+              locate 1,6
+              Print TempStd : Print " "
+            end if
+          case ButtonMask_d       ; down button is pressed
+            if SetTimeState.1 then
+              TempMin--
+              if TempMin = 255 then TempMin = 59
+              locate 1,8
+              Print TempMin : Print " "
+            else
+              TempStd--
+              if TempStd = 255 then TempStd = 23
+              locate 1,6
+              Print TempStd : Print " "
+            end if
+        end select
+
+        if ButtonState = ButtonMask_s then  ; at set is pressed ...
+          do : loop until (GetButton & ButtonMask0) = ButtonMask0  ; no button repeat
+        else
+          for count100 = 0 to 30 ; button repeat for up and down button
+            if (GetButton & ButtonMask0) = ButtonMask0 then exit for  ; wait for relaise the button
+            wait 10 ms
+          next
+          count100 = 0
+        end if
+      end if
+    end if
+  loop until SetTimeState.3
+  ; break down the minutes and hours into individual digits
+  std_z = TempStd / 10
+  std_e = TempStd % 10
+  min_z = TempMin / 10
+  min_e = TempMin % 10
+  sek_z = 0
+  sek_e = 0
+
+  ButtonFlag = 0  ; clr all flags
+  initDisplay()
+  sei
+end sub
+
+
+sub setLCD_CG_RAM()
+  ' Set the array that hold the character and copy
+  ' the character to the LCD CG RAM (8 items).
+  CharArray(1) = b'00010000'
+  CharArray(2) = b'00011000'
+  CharArray(3) = b'00011000'
+  CharArray(4) = b'00011100'
+  CharArray(5) = b'00011100'
+  CharArray(6) = b'00011110'
+  CharArray(7) = b'00011110'
+  CharArray(8) = b'00011111'
+  LCDCreateChar 0, CharArray()
+  CharArray(1) = b'00011111'
+  CharArray(2) = b'00011110'
+  CharArray(3) = b'00011110'
+  CharArray(4) = b'00011100'
+  CharArray(5) = b'00011100'
+  CharArray(6) = b'00011000'
+  CharArray(7) = b'00011000'
+  CharArray(8) = b'00010000'
+  LCDCreateChar 1, CharArray()
+  CharArray(1) = b'00011111'
+  CharArray(2) = b'00001111'
+  CharArray(3) = b'00001111'
+  CharArray(4) = b'00000111'
+  CharArray(5) = b'00000111'
+  CharArray(6) = b'00000011'
+  CharArray(7) = b'00000011'
+  CharArray(8) = b'00000001'
+  LCDCreateChar 2, CharArray()
+  CharArray(1) = b'00000001'
+  CharArray(2) = b'00000011'
+  CharArray(3) = b'00000011'
+  CharArray(4) = b'00000111'
+  CharArray(5) = b'00000111'
+  CharArray(6) = b'00001111'
+  CharArray(7) = b'00001111'
+  CharArray(8) = b'00011111'
+  LCDCreateChar 3, CharArray()
+  CharArray(1) = b'00011111'
+  CharArray(2) = b'00011111'
+  CharArray(3) = b'00011111'
+  CharArray(4) = b'00000000'
+  CharArray(5) = b'00000000'
+  CharArray(6) = b'00000000'
+  CharArray(7) = b'00000000'
+  CharArray(8) = b'00000000'
+  LCDCreateChar 4, CharArray()
+  CharArray(1) = b'00000000'
+  CharArray(2) = b'00000000'
+  CharArray(3) = b'00000000'
+  CharArray(4) = b'00000000'
+  CharArray(5) = b'00000000'
+  CharArray(6) = b'00011111'
+  CharArray(7) = b'00011111'
+  CharArray(8) = b'00011111'
+  LCDCreateChar 5, CharArray()
+  CharArray(1) = b'00000000'
+  CharArray(2) = b'00000000'
+  CharArray(3) = b'00000000'
+  CharArray(4) = b'00001110'
+  CharArray(5) = b'00001110'
+  CharArray(6) = b'00001110'
+  CharArray(7) = b'00000000'
+  CharArray(8) = b'00000000'
+  LCDCreateChar 6, CharArray()
+  CharArray(1) = b'00000000'
+  CharArray(2) = b'00000000'
+  CharArray(3) = b'00001110'
+  CharArray(4) = b'00001110'
+  CharArray(5) = b'00001110'
+  CharArray(6) = b'00000000'
+  CharArray(7) = b'00000000'
+  CharArray(8) = b'00000000'
+  LCDCreateChar 7, CharArray()
+end sub
+
+
+sub countSeconds()
+  ; the clock mechanism
+  if sek_e = 10 then
+    sek_e = 0
+    sek_z++
+    sec_z_f = 1
+    if sek_z = 6 then
+      sek_z = 0
+      min_e++
+      min_e_f = 1
+      if min_e = 10 then
+        min_e = 0
+        min_z++
+        if min_z = 6 then
+          min_z = 0
+          std_e++
+          if std_e = 10 then
+            std_e = 0
+            std_z++
+          end if
+          if (std_z = 2) & (std_e = 4) then
+            std_e = 0
+            std_z = 0
+          end if
+        end if
+      end if
+    end if
+  end if
+  ; The last digit of the seconds is incremented every second.
+  printDigit(sec01, sek_e)
+  ; The second tens digit displays will only change if the digit itself has been changed.
+  if sec_z_f then printDigit(sec10, sek_z)
+  ; Every minute renew the sceen to prevent LCD error over long time
+  if min_e_f then initDisplay()
+  flags = 0
+  sek_e++ ; inc. second.
+
+  PulseOut LED, 30 ms
+end sub
+
+
+sub initDisplay()
+  ; clr the LCD periodic to prevent LCD errors
+  ; and set the Display at start-up to 00:00:00
+  cls
+  printDigit(sec01, sek_e)
+  printDigit(sec10, sek_z)
+  printDigit(min01, min_e)
+  printDigit(min10, min_z)
+  printDigit(std01, std_e)
+  printDigit(std10, std_z)
+  ' set the dots
+  Locate 1, 6 : LCDWriteChar dot1
+  Locate 1, 13 : LCDWriteChar dot1
+  Locate 2, 6 : LCDWriteChar dot2
+  Locate 2, 13 : LCDWriteChar dot2
+end sub
+
+
+sub printDigit(pos, dig)
+  ; delete the digit selected by pos
+  Put 0, pos + 0, 254
+  Put 0, pos + 1, 254
+  Put 0, pos + 2, 254
+  Put 1, pos + 0, 254
+  Put 1, pos + 1, 254
+  Put 1, pos + 2, 254
+  Put 2, pos + 0, 254
+  Put 2, pos + 1, 254
+  Put 2, pos + 2, 254
+  Put 3, pos + 0, 254
+  Put 3, pos + 1, 254
+  Put 3, pos + 2, 254
+  ; set the digit at pos
+  select case dig
+    case 0
+      Locate 0, pos + 0 : LCDWriteChar topleft
+      Put 0, pos + 1, 255
+      Locate 0, pos + 2 : LCDWriteChar topright
+      Put 1, pos + 0, 255
+      Put 1, pos + 2, 255
+      Put 2, pos + 0, 255
+      Put 2, pos + 2, 255
+      Locate 3, pos + 0 : LCDWriteChar downleft
+      Put 3, pos + 1, 255
+      Locate 3, pos + 2 : LCDWriteChar downright
+    case 1
+      Locate 0, pos + 1 : LCDWriteChar topleft
+      Put 0, pos + 2, 255
+      Locate 1, pos + 1 : LCDWriteChar topbar
+      Put 1, pos + 2, 255
+      Put 2, pos + 2, 255
+      Put 3, pos + 2, 255
+    case 2
+      Locate 0, pos + 0 : LCDWriteChar topleft
+      Put 0, pos + 1, 255
+      Locate 0, pos + 2 : LCDWriteChar topright
+      Locate 1, pos + 1 : LCDWriteChar topleft
+      Locate 1, pos + 2 : LCDWriteChar downright
+      Locate 2, pos + 0 : LCDWriteChar topleft
+      Locate 2, pos + 1 : LCDWriteChar downright
+      Put 3, pos + 0, 255
+      Put 3, pos + 1, 255
+      Put 3, pos + 2, 255
+    case 3
+      Locate 0, pos + 0 : LCDWriteChar topleft
+      Put 0, pos + 1, 255
+      Locate 0, pos + 2 : LCDWriteChar topright
+      Locate 1, pos + 1 : LCDWriteChar downbar
+      Locate 1, pos + 2 : LCDWriteChar downright
+      Locate 2, pos + 1 : LCDWriteChar topbar
+      Locate 2, pos + 2 : LCDWriteChar topright
+      Locate 3, pos + 0 : LCDWriteChar downleft
+      Put 3, pos + 1, 255
+      Locate 3, pos + 2 : LCDWriteChar downright
+    case 4
+      Locate 0, pos + 1 : LCDWriteChar topleft
+      Put 0, pos + 2, 255
+      Locate 1, pos + 0 : LCDWriteChar topleft
+      Locate 1, pos + 1 : LCDWriteChar downright
+      Put 1, pos + 2, 255
+      Put 2, pos + 0, 255
+      Put 2, pos + 1, 255
+      Put 2, pos + 2, 255
+      Put 3, pos + 2, 255
+    case 5
+      Put 0, pos + 0, 255
+      Put 0, pos + 1, 255
+      Put 0, pos + 2, 255
+      Put 1, pos + 0, 255
+      Locate 1, pos + 1 : LCDWriteChar downbar
+      Locate 2, pos + 0 : LCDWriteChar topbar
+      Locate 2, pos + 1 : LCDWriteChar topbar
+      Put 2, pos + 2, 255
+      Locate 3, pos + 0 : LCDWriteChar downleft
+      Put 3, pos + 1, 255
+      Locate 3, pos + 2 : LCDWriteChar downright
+    case 6
+      Locate 0, pos + 0 : LCDWriteChar topleft
+      Locate 0, pos + 1 : LCDWriteChar downright
+      Put 1, pos + 0, 255
+      Locate 1, pos + 1 : LCDWriteChar downbar
+      Put 2, pos + 0, 255
+      Locate 2, pos + 1 : LCDWriteChar topbar
+      Locate 2, pos + 2 : LCDWriteChar topright
+      Locate 3, pos + 0 : LCDWriteChar downleft
+      Put 3, pos + 1, 255
+      Locate 3, pos + 2 : LCDWriteChar downright
+    case 7
+      Put 0, pos + 0, 255
+      Put 0, pos + 1, 255
+      Put 0, pos + 2, 255
+      Locate 1, pos + 1 : LCDWriteChar topleft
+      Locate 1, pos + 2 : LCDWriteChar downright
+      Put 2, pos + 1, 255
+      Put 3, pos + 1, 255
+    case 8
+      Locate 0, pos + 0 : LCDWriteChar topleft
+      Put 0, pos + 1, 255
+      Locate 0, pos + 2 : LCDWriteChar topright
+      Locate 1, pos + 0 : LCDWriteChar downleft
+      Locate 1, pos + 1 : LCDWriteChar downbar
+      Locate 1, pos + 2 : LCDWriteChar downright
+      Locate 2, pos + 0 : LCDWriteChar topleft
+      Locate 2, pos + 1 : LCDWriteChar topbar
+      Locate 2, pos + 2 : LCDWriteChar topright
+      Locate 3, pos + 0 : LCDWriteChar downleft
+      Put 3, pos + 1, 255
+      Locate 3, pos + 2 : LCDWriteChar downright
+    case 9
+      Locate 0, pos + 0 : LCDWriteChar topleft
+      Put 0, pos + 1, 255
+      Locate 0, pos + 2 : LCDWriteChar topright
+      Locate 1, pos + 0 : LCDWriteChar downleft
+      Locate 1, pos + 1 : LCDWriteChar downbar
+      Put 1, pos + 2, 255
+      Locate 2, pos + 1 : LCDWriteChar topbar
+      Put 2, pos + 2, 255
+      Locate 3, pos + 1 : LCDWriteChar topleft
+      Locate 3, pos + 2 : LCDWriteChar downright
+  end select
+end sub
+
+
+Sub InterruptHandler
+  ; This routine will be called in 10ms interval by Timer1
+  count100++
+  If count100 = 100 Then
+    count100 = 0
+    clk_1s = 1      ; inc. second and show the Time
+  end if
+  ; detect set-button-press and debounce
+  if ButtonPin_s = 0 then       ; if SW0 pressed
+    If ButtonFlag.0 = 0 then
+      ButtonFlag.0 = 1          ; at T0 -> set flag 0
+    else
+      ButtonFlag.1 = 1          ; at T0 + 10ms -> set flag 1
+    end if
+  else                          ; if SW0 released
+    if ButtonFlag.1 = 1 then ButtonFlag.7 = 1  ; triggers the time setting routine ; PulseOut LED, 30 ms
+    ButtonFlag.0 = 0
+    ButtonFlag.1 = 0
+  end if
+End Sub
+
+
+sub initTimer()
+  ; prepare Timer1 for 10ms CTC Interrupts
+  #if CHIPNAME = avr128da28
+    InitTimer0 Osc, PS_8
+    SetTimer 0, osSCR1TMP
+    StartTimer 0
+    On Interrupt Timer0Overflow Call InterruptHandler
+  #endif
+  #IF CHIPNAME = mega328p or CHIPNAME = mega2560
+    ; 100 Hz (16000000/((624+1)*256))
+    OCR1AH = osCMP0H
+    OCR1AL = osCMP0L
+    ; CTC = Clear Timer on Compare + Prescaler = 256
+    TCCR1B = 0b00001100 ; WGM12, CS11
+    ; interupt vector selection 'TIMER1_COMPA' and set TIMSK1.OCIE1A
+    On Interrupt Timer1Match1 Call InterruptHandler
+  #ENDIF
+end sub
+
+
+#script
+  ; calculate the value for Timer
+  IF CHIPNAME = avr128da28 THEN
+    Prescaler = 8
+  END IF
+  IF CHIPNAME = mega328p or CHIPNAME = mega2560 THEN
+    Prescaler = 256
+  END IF
+  osTick = 100
+  osSCR1TMP = Int(((ChipMhz * 1000000) - (Prescaler * osTick)) / (Prescaler * osTick))
+  osCMP0L = low(osSCR1TMP)
+  osCMP0H = high(osSCR1TMP)
+#endscript
+
+
+
+end
