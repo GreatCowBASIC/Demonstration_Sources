@@ -1,0 +1,39 @@
+/*
+
+Also, check Arduino to PIC wiring
+This uses an Interrupt handler. 
+Here is the working code below, and It may help someone who need the assistance in case.
+
+*/
+
+#chip 16F877A, 4
+
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+
+dir PORTA.5 in  'SS
+dir PORTC.4 in  'SDI
+dir PORTC.5 out 'SDO
+dir PORTC.3 in  'SCK
+
+dim dat, receivedbyte as byte
+
+
+receivedbyte = 0
+SPIMode (Slave)
+On Interrupt SSP1Ready Call SPI_ISR
+
+do
+    
+    If receivedbyte = 1 then
+        HserPrint dat
+        HSerPrintCRLF
+        receivedbyte = 0
+    End If`
+
+loop
+
+sub SPI_ISR
+    receivedbyte = 1
+    dat = SSPBUF
+end sub

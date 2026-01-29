@@ -1,0 +1,53 @@
+#skip
+/*
+
+Another project that communicate two PICs together. 
+Here is the MASTER and SLAVE code below.
+
+*/
+
+
+// SPI Master program
+
+#chip 16F877A, 4
+
+dir PORTC.5 out 'SDO
+dir PORTC.3 out 'SCK
+
+dim inbyte as byte
+
+SPIMode (Master)
+
+do
+    SPITransfer ( 0x55, inbyte)
+    wait 1 s
+loop
+
+
+
+
+// SPI Slave program
+
+
+#chip 16F877A, 4
+
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+
+dir PORTC.4 in  'SDI
+dir PORTC.3 in  'SCK
+
+dim dat as byte
+
+SPIMode (Slave)
+On Interrupt SSP1Ready Call SPI_ISR
+
+do
+wait 1 s
+    HserPrint dat
+    HSerPrintCRLF
+loop
+
+sub SPI_ISR
+    dat = SSPBUF
+end sub
