@@ -2,7 +2,7 @@
 
 This project presents a program for a digital clock that operates on a low‑cost LCD module featuring 4 lines of 20 characters each. The clock can be driven by an ATmega328p, an ATmega2560, or an AVR128DA28 microcontroller. Development was carried out using the corresponding Arduino boards.
 
-image::Clock_LCD2004.jpg
+image::Clock_LCD2004.jpg[Clock display on LCD2004]
 
 == Block Graphics Technique
 
