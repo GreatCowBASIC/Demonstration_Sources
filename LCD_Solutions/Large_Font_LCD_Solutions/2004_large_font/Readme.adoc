@@ -2,6 +2,8 @@
 
 This project presents a program for a digital clock that operates on a low‑cost LCD module featuring 4 lines of 20 characters each. The clock can be driven by an ATmega328p, an ATmega2560, or an AVR128DA28 microcontroller. Development was carried out using the corresponding Arduino boards.
 
+https://github.com/GreatCowBASIC/Demonstration_Sources/blob/main/LCD_Solutions/Large_Font_LCD_Solutions/2004_large_font/Clock_LCD2004.jpg
+
 == Block Graphics Technique
 
 The program makes use of block‑graphics characters, a technique familiar from early home computers. At that time, limited processing power restricted graphical capabilities, so character sets often included special symbols that allowed users to construct simple on‑screen graphics. These characters enabled decorative borders, basic game graphics, and other visual elements on a standard television display.
