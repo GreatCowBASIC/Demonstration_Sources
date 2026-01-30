@@ -6,8 +6,14 @@
 '''
 '''********************************************************************************
 
-  #chip mega328p, 16  ; avr128da28, 24  ; mega2560, 16 ;
+  #chip mega328pb, 16  ; mega328p, 16  ; avr128da28, 24  ; mega2560, 16 ;
   #option explicit
+
+  #script
+    IF CHIPNAME = mega328p THEN
+      WARNING "This program has not been tested on an ATmega328p, but it should work."
+    END IF
+  #endscript
 
   ' Define Hardware I2C settings
   HI2CMode Master
@@ -61,7 +67,7 @@
   #define ButtonMask_d  0b00110000
 #ENDIF
 
-#IF CHIPNAME = mega328p
+#IF CHIPNAME = mega328p or CHIPNAME = mega328pb
   ; InitLEDControl
   #define LED PORTB.5
   ; Hardware I2C settings
@@ -550,8 +556,9 @@ sub initTimer()
     StartTimer 0
     On Interrupt Timer0Overflow Call InterruptHandler
   #endif
-  #IF CHIPNAME = mega328p or CHIPNAME = mega2560
+  #IF CHIPNAME = mega328p or CHIPNAME = mega328pb or CHIPNAME = mega2560
     ; 100 Hz (16000000/((624+1)*256))
+    ; the high byte must be written before the low byte !
     OCR1AH = osCMP0H
     OCR1AL = osCMP0L
     ; CTC = Clear Timer on Compare + Prescaler = 256
@@ -567,7 +574,7 @@ end sub
   IF CHIPNAME = avr128da28 THEN
     Prescaler = 8
   END IF
-  IF CHIPNAME = mega328p or CHIPNAME = mega2560 THEN
+  IF CHIPNAME = mega328p or CHIPNAME = mega328pb or CHIPNAME = mega2560 THEN
     Prescaler = 256
   END IF
   osTick = 100

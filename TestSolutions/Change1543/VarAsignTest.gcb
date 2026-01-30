@@ -22,7 +22,7 @@
  * Program Behavior:
  * - Toggles PORTA pins 0-3 rapidly in a loop (simple I/O test).
  * - Increments counters (myVar, testvar – note: testvar undeclared for edge-case testing).
- * - Blinks LedGreen and LedRed (defined as PORTB.4 and PORTB.5) every 500ms.
+ * - Blinks LEDGREEN and LEDRED (defined as PORTB.4 and PORTB.5) every 500ms.
  * 
  * Notes:
  * - Some variables (e.g., mysecond, myint, mylong, mysingle, myword, mystring, mybit) are
@@ -37,12 +37,14 @@
 // Chip selection: PIC16F721 – 28-pin, 8-bit MCU with USB, comparators, and 256 bytes EEPROM.
 #chip 16f721
 
+// #option Explicit  - this is NOT DEFINED as part of the testing -  for this case only!
+
 // Symbolic constants for LED pins on PORTB.
-// LedGreen: PORTB.4 (active high).
-// LedRed: PORTB.5 (active high).
+// LEDGREEN: PORTB.4 (active high).
+// LEDRED: PORTB.5 (active high).
 // These allow readable code instead of direct bit manipulation.
-#define LedRed portb.5
-#define LedGreen portb.4
+#define LEDRED portb.5
+#define LEDGREEN portb.4
 
 //----- Variables
 // New Feature: Initialized Declarations (Change 1543)
@@ -57,7 +59,7 @@ dim mybit as Bit = 1
 
 // Bit variable: aliased 1-bit flag, initialized to 1 (true).
 dim mybitaliased0 as Bit alias myVar.0 = 0
-dim mybitaliased1 as Bit alias myVar.0 = 1
+dim mybitaliased1 as Bit alias myVar.1 = 1
 
 mybitaliased1 = mybitaliased0
 
@@ -112,7 +114,7 @@ test (5) = 0
 // Infinite DO/LOOP: Core event loop.
 // - Toggles PORTA.0-3: Simple digital output test (e.g., for LEDs or probes).
 // - Increments counters (myVar, testvar – note: testvar undeclared for edge-case testing).
-// - Blinks LedGreen and LedRed (defined as PORTB.4 and PORTB.5) every 500ms.
+// - Blinks LEDGREEN and LEDRED (defined as PORTB.4 and PORTB.5) every 500ms.
 // 
 // Execution Flow:
 // 1. Toggle PORTA pins rapidly (creates pulse train).
@@ -142,13 +144,13 @@ do
     myVar = myVar + testvar  // Accumulates; overflows at 255 (Byte limit).
 
     // Blink Green LED: On for 500ms using built-in Delay_MS.
-    LedGreen = 1
+    LEDGREEN = 1
     wait 500 ms
-    LedGreen = 0
+    LEDGREEN = 0
     
     // Blink Red LED: On for 500ms.
-    LedRed = 1
+    LEDRED = 1
     wait 500 ms
-    LedRed = 0
+    LEDRED = 0
 
 loop  // End infinite loop; program runs until reset/power-off.
