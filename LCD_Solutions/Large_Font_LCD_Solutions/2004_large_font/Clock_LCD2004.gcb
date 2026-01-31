@@ -1,10 +1,164 @@
-'''********************************************************************************
-'''
-'''@author  Ralf Pagel
-'''@licence GPL
-'''@date    21.01.2026
-'''
-'''********************************************************************************
+
+/**********************************************************************************************
+
+   Project:     Big 7-Segment LCD Clock with I²C interface (PCF8574)
+                Supports multiple AVR chips with different pin mappings
+
+   Target MCUs:
+                • ATmega328P   / ATmega328PB    (classic Arduino Uno / Nano style)
+                • ATmega2560   (Arduino Mega)
+                • AVR128DA28   (modern AVR Dx series – 28-pin)
+
+   Display:     20×4 character LCD via I²C backpack (PCF8574 based)
+                Custom large 3×4 digits made from user-defined characters
+
+   Features:
+                • HH:MM:SS display using big 7-segment style digits
+                • Three-button user interface (Set / Up / Down)
+                • Time setting mode (hours → minutes → sync-to-next-minute)
+                • Debounced button reading in 10 ms interrupt
+                • LED heartbeat / activity indicator
+                • Periodic LCD refresh to prevent long-term display glitches
+
+   Hardware notes:
+                Different pin assignments depending on target chip
+                Internal pull-ups used (where available)
+                Hardware I²C used (TWI module)
+
+   Author:      Ralf Pagel
+   Date:        January 2026
+   License:     GPL
+
+   Version info:
+                2026-01   initial multi-chip support version
+                2026-xx   (possible future: alarm, date, DS3231 support, ...)
+
+**********************************************************************************************
+
+ Supported chips (select exactly one)
+  #chip mega328p,   16
+  #chip mega328pb,  16
+  #chip mega2560,   16
+  #chip avr128da28, 24
+
+
+
+───────────────────────────────────────────────────────────────────────────────
+  Choose only ONE chip family – comment out the others
+───────────────────────────────────────────────────────────────────────────────
+#define CHIPNAME mega328pb      ; ← most common choice for small boards
+#define CHIPNAME mega328p
+#define CHIPNAME mega2560
+#define CHIPNAME avr128da28
+
+───────────────────────────────────────────────────────────────────────────────
+  Quick hardware map reference (for documentation & debugging)
+ ───────────────────────────────────────────────────────────────────────────────
+
+    ┌───────────────────────┐
+    │     mega328P / PB     │
+    ├───────┬───────────────┤
+    │ LED   │ PB5 (pin 13)  │
+    │ Set   │ PB2           │
+    │ Up    │ PB3           │
+    │ Down  │ PB4           │
+    │ SDA   │ PC4 (A4)      │
+    │ SCL   │ PC5 (A5)      │
+    └───────┴───────────────┘
+
+    ┌───────────────────────┐
+    │      mega2560         │
+    ├───────┬───────────────┤
+    │ LED   │ PB7           │
+    │ Set   │ PB4           │
+    │ Up    │ PB5           │
+    │ Down  │ PB6           │
+    │ SDA   │ PD1 (pin 20)  │
+    │ SCL   │ PD0 (pin 21)  │
+    └───────┴───────────────┘
+
+    ┌───────────────────────┐
+    │     AVR128DA28        │
+    ├───────┬───────────────┤
+    │ LED   │ PC2           │
+    │ Set   │ PC3           │
+    │ Up    │ PC0           │
+    │ Down  │ PC1           │
+    │ SDA   │ PA2           │
+    │ SCL   │ PA3           │
+    └───────┴───────────────┘
+*/
+
+//* CHIPNAME = mega328p or CHIPNAME = mega328pb
+  /*
+         ------------PORTA---------------
+  Bit#:  -7---6---5---4---3---2---1---0---
+  IO:    ---------------------------------
+  IO:    ---------------------------------   (PORTA not used in this program)
+
+         ------------PORTB----------------
+  Bit#:  -7---6---5---4---3---2---1---0---
+  IO:    --  --  LED  Btn-d Btn-u Btn-s --  --
+  IO:    PB7 PB6 PB5  PB4   PB3   PB2  PB1 PB0
+         LED on PB5 (Arduino pin 13)
+         Buttons: PB2=Set, PB3=Up, PB4=Down (active low, internal pull-ups)
+
+         ------------PORTC----------------
+  Bit#:  -7---6---5---4---3---2---1---0---
+  IO:    --  --  SCL  SDA  --  --  --  --
+  IO:    PC6 PC5 PC5  PC4  PC3 PC2 PC1 PC0
+         I2C:   PC4=SDA, PC5=SCL  (Arduino A4/A5)
+  */
+
+
+//* CHIPNAME = mega2560
+  /*
+         ------------PORTA---------------
+  Bit#:  -7---6---5---4---3---2---1---0---
+  IO:    ---------------------------------
+  IO:    ---------------------------------   (PORTA not used in this program)
+
+         ------------PORTB----------------
+  Bit#:  -7---6---5---4---3---2---1---0---
+  IO:    --  --  --  LED  Btn-d Btn-u Btn-s -- 
+  IO:    PB7 PB6 PB5  PB4   PB3   PB2   PB1 PB0
+         LED on PB7
+         Buttons: PB4=Set, PB5=Up, PB6=Down (active low, internal pull-ups)
+
+         ------------PORTC----------------
+  Bit#:  -7---6---5---4---3---2---1---0---
+  IO:    ---------------------------------
+  IO:    PC7 PC6 PC5  PC4  PC3 PC2 PC1 PC0    (PORTC not used)
+
+         ------------PORTD----------------   (extra port used for I2C)
+  Bit#:  -7---6---5---4---3---2---1---0---
+  IO:    --  --  --  --  --  --  SCL  SDA
+  IO:    PD7 PD6 PD5 PD4 PD3 PD2 PD1  PD0
+         I2C: PD0=SCL, PD1=SDA   (Arduino Mega pins 21/20)
+  */
+
+
+//* CHIPNAME = avr128da28
+  /*
+         ------------PORTA----------------   (I2C here)
+  Bit#:  -7---6---5---4---3---2---1---0---
+  IO:    --  --  --  --  --  SCL  SDA  --
+  IO:    PA7 PA6 PA5 PA4 PA3 PA2  PA1 PA0
+         I2C: PA2=SDA, PA3=SCL
+
+         ------------PORTB----------------
+  Bit#:  -7---6---5---4---3---2---1---0---
+  IO:    ---------------------------------
+  IO:    PB7 PB6 PB5 PB4 PB3 PB2 PB1 PB0    (PORTB not used)
+
+         ------------PORTC----------------   (LED + buttons)
+  Bit#:  -7---6---5---4---3---2---1---0---
+  IO:    --  --  --  -- Btn-s LED  Btn-d Btn-u
+  IO:    PC7 PC6 PC5 PC4  PC3  PC2   PC1  PC0
+         LED on PC2
+         Buttons: PC3=Set, PC0=Up, PC1=Down (active low, pull-ups enabled via PORTC_PINxCTRL)
+  */
+
 
   #chip mega328pb, 16  ; mega328p, 16  ; avr128da28, 24  ; mega2560, 16 ;
   #option explicit
