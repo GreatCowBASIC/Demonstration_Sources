@@ -1,0 +1,81 @@
+'================================================================================
+'  MINIMAL UserCodeOnly Skeleton – AVR128DA28
+'  File:     AVR_UserCode_Example2.gcb  (example name)
+'  Target:   AVR128DA28 (or other any AVR and AVRx / Dx / Ex series)
+'  Purpose:  The absolute smallest possible starting point for bare-metal /
+'            full-control programs using GCBASIC syntax.
+'
+'  What this program intentionally DOES NOT include:
+'  • No automatic interrupt vector table generation
+'  • No automatic stack initialisation (ldi ... out SPH/SPL or CPU_SPH/SPL)
+'  • No automatic call to INITSYS / InitSys (chip configuration)
+'  • No automatic sei (global interrupts enabled)
+'  • No hidden GCBASIC runtime or startup code of any kind
+'
+'  What you MUST add yourself (if needed):
+'  1. Manual stack initialisation (highly recommended as first action)
+'  2. Call to InitSys / INITSYS if you need clock/peripheral setup
+'  3. sei instruction if you plan to use interrupts
+'  4. Any interrupt vectors you require (placed BEFORE USER_CODE_START)
+'  5. Your actual application logic
+'
+'  Key directives explained:
+'  • #option UserCodeOnly INITMCU:   → Disables ALL automatic startup behaviour
+'  • ORG USER_CODE_START             → Places code at the first safe address
+'                                      after the (empty) vector table
+'  • INITMCU:                        → Mandatory label – this is your true
+'                                      program entry point in UserCodeOnly mode
+'================================================================================
+
+#chip avr128da28
+#option explicit
+#option UserCodeOnly  INITMCU:     ' ← Critical: disables all automatic startup code, vectors, INITSYS call, etc.
+
+ORG USER_CODE_START                ' Recommended safe starting address
+
+'================================================================================
+' MANDATORY LABEL when using UserCodeOnly INITMCU:
+' This label MUST exist – GCBASIC uses it as the true entry point / jump target
+' for user code in this mode.
+'================================================================================
+
+INITMCU:
+
+'================================================================================
+' Place code at the first safe / predictable address after any interrupt vectors.
+' USER_CODE_START is an automatically created constant in UserCodeOnly mode.
+' It equals the byte address immediately following the last defined vector
+' (or address 0 if no vectors are placed).
+'================================================================================
+
+
+    '─────────────────────────────────────────────
+    '  ←←←  Your real program starts here  →→→
+    '─────────────────────────────────────────────
+
+    ' Example placeholder: infinite loop (replace with your logic)
+    Do
+        NOP                        ' Do-nothing instruction (for testing/breakpoint)
+    Loop
+
+    ' Typical additions you will almost always make (uncomment & adapt as needed):
+    '
+    ' ' 1. Manually initialise the stack (essential!)
+    ' #IFDEF CHIPAVRDX
+    '     ldi SysValueCopy, high(RAMEND)
+    '     out CPU_SPH, SysValueCopy
+    '     ldi SysValueCopy, low(RAMEND)
+    '     out CPU_SPL, SysValueCopy
+    '     InitSys                ' Modern AVRx / Dx-series chip init
+    ' #ELSE
+    '     ldi SysValueCopy, high(RAMEND)
+    '     out SPH, SysValueCopy
+    '     ldi SysValueCopy, low(RAMEND)
+    '     out SPL, SysValueCopy
+    '     INITSYS                ' Legacy call for classic AVRs
+    ' #ENDIF
+    '
+    ' ' 2. Enable global interrupts (if using any ISRs)
+    ' sei
+    '
+    ' ' 3. Your application code here...

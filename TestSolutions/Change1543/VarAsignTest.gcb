@@ -93,7 +93,7 @@ dim mysingle as Single = 3.14159
 dim myword as word = 1000
 
 // String: Null-terminated char array, init to "hello world". Length inferred +1 for null.
-dim mystring as string = "hello world"
+dim mystring as string * 11 = "hello world"
 
 // Array Initialization: 6-element Byte array (indices 0-5), init with values 1-5 (index 0=1? – GCBASIC arrays 0-based).
 dim test (5)  = 1,2,3,4,5
