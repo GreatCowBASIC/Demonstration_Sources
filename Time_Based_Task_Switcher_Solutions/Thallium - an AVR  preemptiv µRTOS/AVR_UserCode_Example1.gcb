@@ -1,0 +1,129 @@
+'================================================================================
+'  GCBASIC - Bare Metal / User Code Only Example for AVR128DA28
+'  Target:   AVR128DA28 - supports all AVRs
+'  Purpose:  Demonstrate full manual control of startup, interrupt vectors,
+'            stack initialization and program placement using UserCodeOnly mode
+'
+'  Key Features Demonstrated:
+'  - #option UserCodeOnly INITMCU:   → No automatic startup code, vectors, INITSYS call, etc.
+'  - Manual placement of interrupt vectors using ORG, .ORG and #ASMRAW
+'  - Use of automatic constants: CHIPVECTORS_END and USER_CODE_START
+'  - Correct stack initialization for modern AVRx/Dx series (CPU_SPH/SPL vs legacy SPH/SPL)
+'  - REQUIRED_ prefix to force compilation of ISR subs
+'  - Shows that unused subs are NOT compiled unless called or REQUIRED_
+'================================================================================
+
+#chip avr128da28
+#option explicit
+#option UserCodeOnly  INITMCU:     ' ← Critical: Tells GCBASIC to skip ALL automatic startup code
+
+'================================================================================
+' INTERRUPT VECTORS - Must be placed FIRST (before any user code)
+' Do NOT try to overwrite ORG 0 (Reset vector is handled by fuses/bootloader)
+'================================================================================
+
+' Place INT0 vector at word address 1 (byte address 2)
+ORG 2
+rjmp REQUIRED_ISR_INT0             ; REQUIRED_ prefix forces GCBASIC to compile this sub
+
+' AVR-style .ORG for INT1 vector
+.ORG 4
+reti                               ; Dummy handler for INT1 (just return from interrupt)
+
+' Completely raw assembly block (no GCBASIC processing/transformations)
+' Useful for precise control but not recommended unless totally necessary
+#ASMRAW[
+.ORG 6
+reti        ; Handle PCINT0 (dummy)
+.ORG 8
+reti        ; Handle PCINT1 (dummy)
+#ASMRAW]
+
+'================================================================================
+' New constants automatically created in UserCodeOnly mode:
+'   CHIPVECTORS_END     → Last address used by any vector
+'   USER_CODE_START     → Safe starting address right after the vector table
+' Use USER_CODE_START to place your real program code
+'================================================================================
+
+ORG USER_CODE_START                ' Jump here after vectors (recommended safe location)
+
+'================================================================================
+' MANDATORY LABEL - This is the true entry point of your user program
+'================================================================================
+
+INITMCU:
+
+    '================================================================================
+    ' Manually initialise the stack (ABSOLUTELY REQUIRED in UserCodeOnly mode!)
+    ' SysValueCopy is a GCBASIC system register (typically R21) used for safe transfers
+    '================================================================================
+
+    #IFDEF CHIPAVRDX
+        ' Modern AVRx / Dx / Ex series use CPU_ prefixed I/O registers
+        ldi SysValueCopy, high(RAMEND)
+        out CPU_SPH, SysValueCopy
+        ldi SysValueCopy, low(RAMEND)
+        out CPU_SPL, SysValueCopy
+        ' Call chip initialisation routines (clocks, peripherals, etc.)
+        InitSys
+    #ELSE
+        ' Legacy/classic AVR naming (mega/tiny old series)
+        ldi SysValueCopy, high(RAMEND)
+        out SPH, SysValueCopy
+        ldi SysValueCopy, low(RAMEND)
+        out SPL, SysValueCopy
+        ' Legacy call to initialisation (may differ on older chips)
+        INITSYS
+    #ENDIF
+
+    '================================================================================
+    ' Your real application code starts here
+    '================================================================================
+
+    ' Call a used subroutine → will be compiled
+    MySub
+
+    ' This sub is never called → will NOT be compiled unless it has REQUIRED_ prefix
+    ' UnUsed
+
+    ' Example main loop (or your actual program logic)
+    Do
+        ' Your application code here...
+        NOP                    ' Placeholder
+    Loop
+
+    ' End of program (can loop forever, sleep, or jump elsewhere)
+
+'================================================================================
+' INTERRUPT SERVICE ROUTINES
+' Use REQUIRED_ prefix if you want GCBASIC to compile them even if they appear unused
+'================================================================================
+
+Sub REQUIRED_ISR_INT0
+    ' Real ISR code would go here
+    Dim myByte as Byte = 0
+    ' ... handle interrupt ...
+End Sub
+
+Sub MySub
+    ' Example user subroutine that IS called from main code
+    NOP
+End Sub
+
+Sub UnUsed
+    ' This sub exists only to demonstrate:
+    '   - Normal subs are NOT compiled if never called
+    '   - Add REQUIRED_ prefix (e.g. REQUIRED_UnUsed) to force inclusion
+    NOP
+    NOP
+End Sub
+
+'================================================================================
+' Summary - Why use this style?
+' - Full control over vector table layout
+' - No hidden GCBASIC runtime/startup code
+' - Predictable program start address via USER_CODE_START
+' - Still use high-level GCBASIC syntax for most logic
+' - Ideal for bootloaders, minimal firmware, or projects needing maximum control
+'================================================================================
