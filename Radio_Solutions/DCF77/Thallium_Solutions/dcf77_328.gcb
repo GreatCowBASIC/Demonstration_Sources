@@ -38,6 +38,11 @@ Here you will find information about the DCF77: https://en.wikipedia.org/wiki/DC
 
 '''********************************************************************************
 
+//! If the program cannot be compiled, and your build is greater than 1555 please post to the thread 
+; https://sourceforge.net/p/gcbasic/discussion/629990/thread/6f5a09cea7/#02ba and report the issue
+
+//! This required the Thallium library please ensure you download the support .h libraries from 
+; https://github.com/GreatCowBASIC/Demonstration_Sources/tree/main/Time_Based_Task_Switcher_Solutions/Thallium%20-%20an%20AVR%20%20preemptiv%20%C2%B5RTOS
 
 ; ----- Configuration
   #chip   mega328pb, 16
