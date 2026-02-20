@@ -1,0 +1,591 @@
+'       $formattagcb
+'       -
+'       -
+'       ========================================================================
+//!     MODULE PCF8574_V2.GCB
+//*     Drives a PCF8574 and also reads the inputs.
+//*     Can manage an interrupt on input change
+//?     Important notes:
+'       The PCF8574 has no configuration registers - pins become input when you write 1
+'       Internal pull-ups - Writing 1 enables internal pull-ups (~100μA)
+'       Input/output separation - Keep separate variables for input and output
+'       Reading - To read inputs, you must first write 1 on the pins configured as inputs
+//*     The interrupt occurs when one of the input pins goes LOW.
+'       Pins configured as OUTPUT -> NO INTERRUPT
+'       Pins configured as INPUT  -> INTERRUPT only on 1→0 transition
+'       ========================================================================
+'       -
+'       -
+//*     UNCOMMENT IF USING INTERRUPT
+'       #DEFINE USAINTERRUPT
+'       -
+'       -
+'       ========================================================================
+//*     Addresses of the PCF8574 from first to fourth
+'       Max 8 addressable with 3 Bits
+'       The base address of PCF8574A is 112.
+'       ------------------------------------------------------------------------
+//*     Standard PCF8574 addresses
+        #Define PCF1  = 64
+        #Define PCF2  = 66
+        #Define PCF3  = 68
+        #Define PCF4  = 70
+        #Define PCF1A = 112
+        #Define PCF2A = 114
+        #Define PCF3A = 116
+        #Define PCF4A = 118
+'       -
+'       -
+//*     --- Global variable for the state of the relays ---
+        Dim RelaysState As Byte ' This variable will contain the current state of the 8 outputs (relays)
+'       -
+//*     --- Mask for non-programmable relays ---
+'       Each bit set to '1' in this mask indicates a relay that MUST NOT be modified
+'       Example: if bit 7 (MSB) is 1, relay 7 (or 8 if 1-indexed) will not be programmable.
+        Dim RlNonProgrammati As Byte ' = 0b10000000 ' Example: The most significant relay (Bit 7) is not programmable
+'       -
+//*     --- Flag for inverted logic ---
+'       Set to 0 for direct logic (1=ON, 0=OFF)
+'       Set to 1 for inverted logic (0=ON, 1=OFF)
+        Dim InvertedLogicFlag As Byte ' = 0 ' Initially set to direct logic
+'       -
+//*     --- Additional Global Variables to handle inputs ---
+        Dim InputMask As Byte ' Mask defining which pins are Input (1=Input, 0=Output)
+        Dim LastInputState As Byte ' Previous state of the Inputs to detect changes
+'       -
+//!     Only if using interrupt
+        #IfDef USAINTERRUPT
+           Dim InterruptEnabled As Byte ' Flag to enable/disable Interrupt
+'          -
+'          --- Constants for interrupt configuration ---
+'          Modify and define these constants according to specific hardware
+           #Define INT_PIN  PORTB.2 ' Pin where PCF8574 INT is connected
+           #Define INT_TRIS TRISB.2 ' TRIS register for Interrupt pin
+           #Define INT_EDGE 0       ' 0 = falling edge, 1 = rising edge
+        #EndIf
+'       -
+//*     --- Relay index configuration ---
+//*     --- Can start from 0 or from 1 ---
+        #Define RELAY_INDEX_OFFSET = 0 ' <--- CHANGE THIS VALUE TO DECIDE (0 for 0-indexed, 1 for 1-indexed)
+'       -
+'       -
+//*     Address of PCF8574 to program
+        Dim IndirizzoPCF As Byte
+'       -
+'       -
+'       -
+//*     =====================================================================================
+//*     Address of PCF8574 to program/read
+//*     -------------------------------------------------------------------------------------
+Sub PCF8574_SetAddress (In Indirizzo As Byte)
+        IndirizzoPCF = Indirizzo
+End Sub
+'       -
+'       -
+//*     =====================================================================================
+//*     This routine sets relays that CANNOT be programmed in any way.
+//*     These are the relays for opening and closing the gate (1 and 2).
+//*     They can only be programmed by the main program, not by external commands.
+//*     -------------------------------------------------------------------------------------
+Sub PCF8574_SetReleNonProgrammabili (In RlNonProg As Byte)
+        RlNonProgrammati = RlNonProg
+End Sub
+'       -
+'       -
+//*     =====================================================================================
+//*     --- Routine to set logic (direct or inverted) ---
+//*     Parameters:
+//*     Inverted: 0 for direct logic (default), any other value for inverted logic
+//*     -------------------------------------------------------------------------------------
+Sub PCF8574_SetInvertedLogic (Inverted As Byte)
+        InvertedLogicFlag = Inverted
+End Sub
+'       -
+'       -
+//*     =====================================================================================
+//*     --- Routine to configure pins as input ---
+//*     Parameters:
+//*     inputPins: Mask where each bit set to 1 indicates a pin to configure as input
+//*     Note: Pins configured as input cannot be used as output
+//*     -------------------------------------------------------------------------------------
+Sub PCF8574_ConfigureInputs (InputPins As Byte)
+        InputMask = InputPins
+'       Set pins as input by writing 1 to the corresponding bits
+        RelaysState = RelaysState Or InputPins
+        Call PCF8574_WriteAllOutputs (IndirizzoPCF, RelaysState)
+End Sub
+'       -
+'       -
+//*     =====================================================================================
+//*     --- Routine to enable interrupts ---
+//*     Enables interrupt detection on the INT pin of PCF8574
+//*     -------------------------------------------------------------------------------------
+        #IfDef USAINTERRUPT
+Sub PCF8574_EnableInterrupt()
+        InterruptEnabled = 1
+        INT_TRIS = 1 ' Set INT pin as Input
+'       Configure interrupt on the pin (depends on MCU)
+        OnInterrupt INT_PIN, HandlePCFInterrupt
+        EnableInterrupts
+End Sub
+'       -
+'       -
+//*     =====================================================================================
+//*     --- Routine to disable interrupts ---
+//*     -------------------------------------------------------------------------------------
+Sub PCF8574_DisableInterrupt()
+        InterruptEnabled = 0
+        DisableInterrupts
+End Sub
+'       -
+'       -
+//*     =====================================================================================
+//*     --- Interrupt handler ---
+//*     This routine is called automatically when an input state changes
+//*     -------------------------------------------------------------------------------------
+Sub HandlePCFInterrupt()
+        If InterruptEnabled = 0 Then Exit Sub
+        
+        Dim CurrentInputState As Byte
+        Dim ChangedInputs As Byte
+        
+'       Read current input state
+        CurrentInputState = PCF8574_ReadInputs(IndirizzoPCF)
+        
+'       Detect which inputs changed
+        ChangedInputs = CurrentInputState Xor LastInputState
+        ChangedInputs = ChangedInputs And InputMask ' Filter only configured inputs
+        
+'       Update previous state
+        LastInputState = CurrentInputState
+        
+'       Handle detected changes
+        If ChangedInputs <> 0 Then
+'          Input 0 changed
+           If (ChangedInputs And 0x01) <> 0 Then
+              SerOut 0, 9600, "Input 0 changed: ", #(CurrentInputState And 0x01), 13, 10
+           End If
+           
+'          Input 1 changed
+           If (ChangedInputs And 0x02) <> 0 Then
+              SerOut 0, 9600, "Input 1 changed: ", #((CurrentInputState And 0x02) >> 1), 13, 10
+           End If
+           
+'          Add additional handlers for more inputs here
+'          If (ChangedInputs And 0x04) <> 0 Then ... ' Input 2
+'          If (ChangedInputs And 0x08) <> 0 Then ... ' Input 3
+'          ... etc.
+        End If
+End Sub
+        #EndIf
+'       -
+'       -
+//*     =====================================================================================
+//*     --- Routine to read inputs ---
+//*     Parameters:
+//*     pcfAddress: I2C address of PCF8574
+//*     Returns: Current state of all pins (input and output)
+//*     -------------------------------------------------------------------------------------
+Function PCF8574_ReadInputs (PcfAddress As Byte) As Byte
+        Dim InputValue As Byte
+'       -
+        HI2CStart
+        HI2CSend PcfAddress Or 0x01 ' Read mode
+        HI2CReceive InputValue, NAck
+        HI2CStop
+'       -
+        PCF8574_ReadInputs = InputValue
+End Function
+'       -
+'       -
+//*     =====================================================================================
+//*     --- Routine to read the state of a single input ---
+//*     Parameters:
+//*     pcfAddress: I2C address of PCF8574
+//*     inputNumber: Input number to read (0-7 for 0-indexed, 1-8 for 1-indexed)
+//*     Returns: 0 or 1 if pin is input, 255 if configured as output
+//*     -------------------------------------------------------------------------------------
+Function PCF8574_ReadSingleInput (PcfAddress As Byte, InputNumber As Byte) As Byte
+        Dim AdjustedInputNumber As Byte
+        Dim MaskBit             As Byte
+        Dim InputState          As Byte
+'       -
+'       Convert input number to 0-indexed
+        If RELAY_INDEX_OFFSET = 1 Then
+           AdjustedInputNumber = InputNumber - 1
+        Else
+           AdjustedInputNumber = InputNumber
+        End If
+        
+'       Validate input number
+        If AdjustedInputNumber > 7 Then
+           PCF8574_ReadSingleInput = 255
+           Exit Function
+        End If
+        
+        MaskBit = (1 << AdjustedInputNumber)
+        
+'       Check if pin is configured as input
+        If (InputMask And MaskBit) = 0 Then
+           PCF8574_ReadSingleInput = 255 ' Pin configured as Output
+           Exit Function
+        End If
+        
+'       Read all inputs
+        InputState = PCF8574_ReadInputs (PcfAddress)
+        
+'       Extract and return only the requested bit
+        If (InputState And MaskBit) <> 0 Then
+           PCF8574_ReadSingleInput = 1
+        Else
+           PCF8574_ReadSingleInput = 0
+        End If
+End Function
+'       -
+'       -
+//*     =====================================================================================
+//*     --- Routine 1: Set all 8 PCF8574 outputs ---
+//*     Parameters:
+//*     pcfAddress: I2C address (e.g. 0x40)
+//*     outputValue: Decimal value for the 8 outputs (0-255)
+//*     Note: Pins configured as input remain at 1
+//*     -------------------------------------------------------------------------------------
+Sub PCF8574_WriteAllOutputs (PcfAddress As Byte, OutputValue As Byte)
+        Dim TempRelaysState As Byte
+        Dim FinalOutput     As Byte
+        
+'       Keep inputs at their current state (1 for inputs)
+        TempRelaysState = (OutputValue And Not InputMask) Or (RelaysState And InputMask)
+        
+'       Keep state of non-programmable relays
+        TempRelaysState = (TempRelaysState And Not RlNonProgrammati) Or (RelaysState And RlNonProgrammati)
+        
+        RelaysState = TempRelaysState ' Update global variable
+        
+'       Apply inverted logic only for outputs
+        If InvertedLogicFlag <> 0 Then
+           FinalOutput = (Not RelaysState) And Not InputMask ' Invert only outputs
+           FinalOutput = FinalOutput Or (RelaysState And InputMask) ' Keep Inputs at 1
+        Else
+           FinalOutput = RelaysState
+        End If
+        
+        HI2CStart
+        HI2CSend PcfAddress
+        HI2CSend FinalOutput
+        HI2CStop
+End Sub
+'       -
+'       -
+//*     =====================================================================================
+//*     --- Routine 2: Activate a single relay ---
+//*     Parameters:
+//*     pcfAddress
+//*     relayNumber: Relay number to activate (0-7 or 1-8 depending on indexing)
+//*     Note: If pin is input, operation is ignored
+//*     -------------------------------------------------------------------------------------
+Sub PCF8574_ActivateRelay (pcfAddress As Byte, RelayNumber As Byte)
+        Dim AdjustedRelayNumber As Byte
+        Dim MaskBit             As Byte
+        Dim FinalOutput         As Byte
+        
+        If RELAY_INDEX_OFFSET = 1 Then
+           AdjustedRelayNumber = RelayNumber - 1
+        Else
+           AdjustedRelayNumber = RelayNumber
+        End If
+        
+        MaskBit = (1 << AdjustedRelayNumber)
+        
+'       Check if pin is input
+        If (InputMask And MaskBit) <> 0 Then Exit Sub
+        
+'       Check if relay is programmable
+        If (RlNonProgrammati And MaskBit) = 0 Then
+           If AdjustedRelayNumber >= 0 And AdjustedRelayNumber <= 7 Then
+              RelaysState = RelaysState Or MaskBit
+              
+'             Apply inverted logic if needed
+              If InvertedLogicFlag <> 0 Then
+                 FinalOutput = Not RelaysState
+              Else
+                 FinalOutput = RelaysState
+              End If
+              
+              HI2CStart
+              HI2CSend pcfAddress
+              HI2CSend FinalOutput
+              HI2CStop
+           End If
+        End If
+End Sub
+'       -
+'       -
+//*     =====================================================================================
+//*     --- Routine 3: Deactivate a single relay ---
+'       Parameters:
+'       pcfAddress: I2C address
+'       relayNumber: Relay number to deactivate
+'       Note: If pin is input, operation is ignored
+//*     -------------------------------------------------------------------------------------
+Sub PCF8574_DeactivateRelay(pcfAddress As Byte, relayNumber As Byte)
+        Dim AdjustedRelayNumber As Byte
+        Dim MaskBit As Byte
+        Dim FinalOutput As Byte
+        
+        If RELAY_INDEX_OFFSET = 1 Then
+           AdjustedRelayNumber = relayNumber - 1
+        Else
+           AdjustedRelayNumber = relayNumber
+        End If
+        
+        MaskBit = (1 << AdjustedRelayNumber)
+        
+'       Check if pin is input
+        If (InputMask And MaskBit) <> 0 Then Exit Sub
+        
+'       Check if relay is programmable
+        If (RlNonProgrammati And MaskBit) = 0 Then
+           If AdjustedRelayNumber >= 0 And AdjustedRelayNumber <= 7 Then
+              RelaysState = RelaysState And Not MaskBit
+              
+'             Apply inverted logic if needed
+              If InvertedLogicFlag <> 0 Then
+                 FinalOutput = Not RelaysState
+              Else
+                 FinalOutput = RelaysState
+              End If
+              
+              HI2CStart
+              HI2CSend pcfAddress
+              HI2CSend FinalOutput
+              HI2CStop
+           End If
+        End If
+End Sub
+'       -
+'       -
+//*     =====================================================================================
+//*     --- Routine 4: Toggle a single relay ---
+//*     Parameters:
+//*     pcfAddress
+//*     relayNumber: Relay number to toggle
+//*     Note: If pin is input, operation is ignored
+//*     -------------------------------------------------------------------------------------
+Sub PCF8574_ToggleRelay (pcfAddress As Byte, relayNumber As Byte)
+        Dim AdjustedRelayNumber As Byte
+        Dim MaskBit As Byte
+        Dim FinalOutput As Byte
+        
+        If RELAY_INDEX_OFFSET = 1 Then
+           AdjustedRelayNumber = relayNumber - 1
+        Else
+           AdjustedRelayNumber = relayNumber
+        End If
+        
+        MaskBit = (1 << AdjustedRelayNumber)
+        
+'       Check if pin is input
+        If (InputMask And MaskBit) <> 0 Then Exit Sub
+        
+'       Check if relay is programmable
+        If (RlNonProgrammati And MaskBit) = 0 Then
+           If AdjustedRelayNumber >= 0 And AdjustedRelayNumber <= 7 Then
+              RelaysState = RelaysState Xor MaskBit
+              
+'             Apply inverted logic if needed
+              If InvertedLogicFlag <> 0 Then
+                 FinalOutput = Not RelaysState
+              Else
+                 FinalOutput = RelaysState
+              End If
+              
+              HI2CStart
+              HI2CSend pcfAddress
+              HI2CSend FinalOutput
+              HI2CStop
+           End If
+        End If
+End Sub
+'       -
+'       -
+//*     =====================================================================================
+//*     --- Routine 5: Reset all relays ---
+//*     Parameters:
+//*     pcfAddress
+//*     Note: Pins configured as input remain at 1
+//*     -------------------------------------------------------------------------------------
+Sub PCF8574_AzzeraTutto (PcfAddress As Byte)
+'       Reset only outputs, keep inputs at 1
+        RelaysState = RelaysState And InputMask
+        
+        If InvertedLogicFlag <> 0 Then
+           FinalOutput = Not RelaysState
+        Else
+           FinalOutput = RelaysState
+        End If
+        
+        HI2CStart
+        HI2CSend PcfAddress
+        HI2CSend FinalOutput
+        HI2CStop
+End Sub
+'       -
+'       -
+'       -
+        /*
+'       --- Usage example (to include in main program) ---
+'       Define I2C pins if not already done
+'       #define I2C_SDA_PIN PortB.0
+'       #define I2C_SCL_PIN PortB.1
+        
+'       Constants:
+        Const IndirizzoPCF As Byte = 0x40 ' Example PCF8574 address (check datasheet) NOT USED
+        
+'       Initialize global variable to initial state (e.g. all relays OFF)
+        RelaysState = 0 ' Initially all relays are "off" in internal logic
+        
+'       Configure pins 0 and 1 as input, others as output
+        Call PCF8574_ConfigureInputs(0b00000011)
+        
+'       Enable interrupts to detect changes on inputs
+        Call PCF8574_EnableInterrupt()
+        
+'       Set initial PCF8574 state
+        Call PCF8574_WriteAllOutputs(IndirizzoPCF, RelaysState)
+        
+'       Main program loop
+        Do
+'          Your main code here...
+'          Interrupts handle input changes automatically
+           
+           Wait 100 MS
+        Loop
+        */
+'       -
+'       -
+//!     ============================================================================
+//!     READING A ROTARY ENCODER CONNECTED TO THE LAST 4 BITS
+//!     3 OF THEM ARE USED FROM BIT 4 TO 6
+//!     ============================================================================
+'       -
+//*     --- GLOBAL VARIABLES FOR ENCODER USE ---
+        Dim EncoderValue As Word         ' Encoder value
+        Dim LastState    As Byte         ' Previous encoder state
+        Dim CurrentState As Byte         ' Current encoder state
+        Dim Movement     As Integer      ' Encoder movement
+'       -
+'       -
+//*     --- FUNCTION TO READ ENCODER ---
+Function ReadEncoder () As Byte
+        Dim RawData As Byte
+        
+'       Read all 8 bits from PCF8574
+        I2CStart()
+        I2CSend(PCF_ADDRESS)
+        I2CReceive(RawData, NAck)
+        I2CStop()
+        
+'       Extract only upper 4 bits (bit 4-7)
+'       and invert logic (PCF8574 has internal pull-ups)
+        ReadEncoder = (RawData >> 4) Xor 0x0F
+End Function
+'       -
+'       -
+//*     --- FUNCTION TO PROCESS ENCODER ---
+Sub ProcessEncoder ()
+'       Decode movement based on previous and current states
+        Select Case LastState
+           Case 0
+              If CurrentState = 1 Then
+                 Movement = 1    ' Clockwise rotation
+              Else If CurrentState = 2 Then
+                 Movement = -1   ' Counterclockwise rotation
+              Else
+                 Movement = 0    ' No valid movement
+              End If
+              
+           Case 1
+              If CurrentState = 3 Then
+                 Movement = 1
+              Else If CurrentState = 0 Then
+                 Movement = -1
+              Else
+                 Movement = 0
+              End If
+              
+           Case 2
+              If CurrentState = 0 Then
+                 Movement = 1
+              Else If CurrentState = 3 Then
+                 Movement = -1
+              Else
+                 Movement = 0
+              End If
+              
+           Case 3
+              If CurrentState = 2 Then
+                 Movement = 1
+              Else If CurrentState = 1 Then
+                 Movement = -1
+              Else
+                 Movement = 0
+              End If
+        End Select
+'       -
+'       Update encoder value
+        EncoderValue = EncoderValue + Movement
+'       -
+'       Save current state for next reading
+        LastState = CurrentState
+End Sub
+'       -
+'       -
+        /*
+//*     --- MAIN PROGRAM ---
+        Init()
+        
+        Do
+'          The main program can use EncoderValue
+'          Encoder is updated automatically by interrupt
+           
+'          Example: show value on display
+'          LCDOut(1,1, "Encoder: ", #EncoderValue)
+           
+           Wait 100 MS
+//*        IN INTERRUPT:
+'          Read current encoder state
+           CurrentState = ReadEncoder()
+           
+'          Handle encoder movement
+           ProcessEncoder()
+        Loop
+        */
+'       -
+'       -
+        
+//*     Alternative, more compact version
+        
+//*     --- FUNCTION TO PROCESS ENCODER (compact version) ---
+Sub ProcessEncoder2 ()
+'       Compute movement using bit operations
+        Dim Temp As Byte
+        Temp = (LastState << 2) Or CurrentState
+        
+        Select Case Temp
+           Case 0b0001, 0b0111, 0b1110, 0b1000
+              Movement = 1    ' Clockwise rotation
+              
+           Case 0b0010, 0b1011, 0b1101, 0b0100
+              Movement = -1   ' Counterclockwise rotation
+              
+           Case Else
+              Movement = 0    ' No valid movement
+        End Select
+        
+'       Update encoder value
+        EncoderValue = EncoderValue + Movement
+        
+'       Save current state for next reading
+        LastState = CurrentState
+End Sub
