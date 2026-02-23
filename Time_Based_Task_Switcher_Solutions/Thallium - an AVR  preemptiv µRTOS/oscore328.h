@@ -40,6 +40,10 @@
 ''' date          12.02.2026
 '''********************************************************************************
 
+''' Updated 02/26 - a bug in the 'signal' and 'passed' macros has been corrected
+''' Updated 02/26 - the command in the interrupt handler to toggle the LED has been Commented out 
+
+
 ; ----- OS Variables -----------------
   Dim osStackTemp   as Word
   Dim osStackTempL  as Byte alias osStackTemp     ; this is a temporary cache for the ...
@@ -167,41 +171,44 @@ end macro
 
 macro signal (osTaskNbr, osSignalNbr)
 ; If the signal is already set, it set the P-Flag to its own flags and suspend it self.
-; Otherwise, it clear the P-Flag from its own flags, sets the signal, and continues.
+; Otherwise, it sets the signal and continues.
 ; valid osSignalNbr = 1...15
+  asm showdebug ; test signal 3
 ;->
-  asm showdebug ; macro signal
-  cli
-  lds   r16, osSignalTable+osSignalNbr
+	lds   r16, osSignalTable+osSignalNbr  ; check if this signal number is open
   tst   r16
-  breq  PC+11          ; branch if passage is unlock  (r16 <> 0)
-  asm showdebug ; if the task must wait:
+  breq  PC+11 ; Warning: Skips 4-byte instructions - - jump if r16 = 0
   lds   r16, osFlagsStore+osTaskNbr
-  sbr   r16, 0b00001000                 ; set the P-Flag of own flags byte
+  sbr   r16, 0b00001000                 ; set the P-Flag in own flags byte
   sts   osFlagsStore+osTaskNbr, r16
-  ldi   r16, 1
-  sts   osSuspendFlag, r16              ; set suspend bit
-  rcall REQUIRED_ISR_TIMER1_COMPA       ; let another task run
-  rjmp  PC-14                           ; here the task restarts if the scheduler will free it
+  asm showdebug ; if the task must wait
+	ldi	  R16, 1
+	sts	  osSuspendFlag, R16
+	rcall	REQUIRED_ISR_TIMER1_COMPA
+	rjmp	PC-13 ; Warning: Skips 4-byte instructions
 ;->
-  asm showdebug ; if the task can go:
+  asm showdebug ; if the task can go
   ldi   r16,  1
   sts   osSignalTable+osSignalNbr, r16  ; lock the passage for all other task
-  lds   r16, osFlagsStore+osTaskNbr
-  andi  r16, 0b11110111                 ; clr the P-Flag of own flags byte
-  sts   osFlagsStore+osTaskNbr, r16
-  sei
 end macro
 
 
 macro passed (osSignalNbr)
-; delete the signal at entrance
+; delete the signal number
+; clr the P-Flag in all flags byte
 ; valid osSignalNbr = 1...15
   asm showdebug ; macro passed
-  cli
   clr   r16
   sts   osSignalTable+osSignalNbr, r16
-  sei
+  ldi   r16,  osNumberOfTask
+  ldi   XH,   HIGH(osFlagsStore)
+  ldi   XL,   LOW(osFlagsStore)
+;-> 
+  ld    r17,  X
+  andi  r17,  0b11110111
+  st    X+,   r17
+  subi  r16,  1
+  brne  PC-4  
 end macro
 
 
@@ -316,7 +323,7 @@ Sub REQUIRED_ISR_TIMER1_COMPA
     sts   osTickCountH,  r21
 
 ; toggle a Pin to see the OS is running (use a oscilloscope)
-    LEDge = !LEDge
+;    LEDge = !LEDge
 
 osIntLab0:                        ; here jump in if suspend a task
     clr   r16                   ;
