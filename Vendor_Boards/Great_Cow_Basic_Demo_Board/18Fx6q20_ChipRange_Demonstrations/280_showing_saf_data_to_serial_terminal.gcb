@@ -49,6 +49,7 @@
 '''@version 1.00
 '''@date    31.11.2022
 ' ----- Configuration
+#skiptest
 
 'Chip Settings.
 #CHIP 18F16Q20

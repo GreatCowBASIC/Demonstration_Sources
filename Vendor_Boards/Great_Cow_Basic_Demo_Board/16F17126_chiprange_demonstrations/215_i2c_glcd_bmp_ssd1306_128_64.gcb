@@ -16,7 +16,7 @@
 '''@version 1.00
 '''@date    31.10.2022
 ' ----- Configuration
-
+#skiptest
 
 'Chip Settings.
 #CHIP 16F17126
