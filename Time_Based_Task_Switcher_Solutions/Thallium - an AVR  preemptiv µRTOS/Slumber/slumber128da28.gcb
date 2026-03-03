@@ -1,0 +1,149 @@
+'''********************************************************************************
+''' Thallium - a preemptiv µRTOS
+'''--------------------------------------------------------------------------------
+''' This shows the use of 'slumber' as a replacement for 'wait'.
+'''
+'''
+''' author        Ralf Pagel
+''' licence       GPL
+''' version       1.3
+''' date          12.02.2026
+'''********************************************************************************
+
+/*
+Three tasks are initialized. Each task alternately switches an LED on and off.
+The pause time between the switching moments of the LEDs is a multiple of one millisecond.
+This allows the LEDs to blink almost independently of each other.
+*/
+
+'''********************************************************************************
+
+
+; ----- Configuration
+  #chip avr128da28, 24
+  #OPTION EXPLICIT
+
+  #option UserCodeOnly  INITMCU2:
+  ; insert the interrupt vectors here
+
+	.ORG 14
+	rjmp  REQUIRED_ISR_TCA0_CMP0 ;TCA0_LUNF
+
+
+//! ORG statement uses Constant
+  .ORG USER_CODE_START
+
+//! Mandated Label
+INITMCU2:
+
+  #include "oscore128da28.h"           ; include the OS
+
+; ----- OS Dashboard -----------------
+  #define osTick 1000             ; Task switching frequency 46Hz .. ~24000Hz (@ 24MHz / DIV8)
+  #define osNumberOfTask 3        ; Number of existing tasks including Task0
+  #define osStackSpace 128        ; Memory size for the stack of each task in bytes
+  #define osMemAddrStrt = 0x4040  ; Start address of the operating system memory space
+
+
+; ----- OS Hardware settings
+  initOS
+
+
+; ----- Common Constants -----------------
+  #define LEDgn PORTC.0 ; Arduino Pin13
+  #define LEDrt PORTC.1 ; Arduino Pin12
+  #define LEDge PORTC.2 ; Arduino Pin11
+  #define LEDbl PORTC.3 ; Arduino Pin10
+
+
+; ----- Common Hardware settings
+  Dir LEDgn out
+  Dir LEDrt out
+  Dir LEDge out
+  Dir LEDbl out
+
+
+; ----- Common Variables -----------------
+
+
+
+; **********************************************************************************
+
+; The setup process configures the stacks and context for all tasks.
+; It is important to set up Task0 last.
+;
+; The following parameters must be specified:
+; TaskNumber: Is a number of the Task (currently 0...7 are possible).
+; Label: The label (=address) of the task code written below it.
+; Priority: Values ??from 0 to 7 are possible. Task0 must always have the lowest priority.
+;
+; Flags:  X X X X P Y S B
+; X = do not use, set by os
+; P = task wait for passage a unique area, set by os
+; Y = allowed all other executable tasks to run at least one time
+; S = task slumber (the task waits for the time to weak up)
+; B = task is blocked (switched off)
+; Any flag that is set prevents the task from running. Flags are specified as a bitmask.
+;
+; setupTask(TaskNumber, Label, Priority, Flags)
+  setupTask(2, Task2, 0, 0)
+  setupTask(1, Task1, 0, 0)
+  setupTask(0, Task0, 0, 0)
+
+; **********************************************************************************
+
+; do not write any code here
+
+; **********************************************************************************
+; Task 0 must be entered first, directly after the task setup.
+; Each task must end in a loop or be blocked at the end.
+; Wait loops (wait, pulseout, etc.) are only allowed in Task0.
+; However, the delays increase because CPU time is used for
+; other tasks that are not included in the count.
+; The other tasks must hand off the baton as quickly as possible.
+; Instead, the macros slumber, suspend, and yield should be used.
+; All tasks entered below behave like independent programs.
+; Each task "thinks" that it owns the CPU exclusively, while it
+; naturally has to share the peripheral devices with the other tasks.
+; A supervisor (the interrupt handler) can switch them off
+; and on again at any time (other tasks will run in the meantime).
+; And the interrupted task "doesn't notice" its blackout.
+; **********************************************************************************
+
+Task0: ; (IdleTask)
+; Do not block, suspend, yield or slumber Task0.
+; Task0 must run nonstop and at lowest priority.
+  Do
+
+    LEDrt = !LEDrt
+    wait 162 ms
+
+  Loop
+
+; **********************************************************************************
+
+Task1:
+
+  Do
+
+    LEDgn = !LEDgn
+    slumber(262) ; wait 262 ms
+
+  Loop
+
+; **********************************************************************************
+
+Task2:
+
+  Do
+
+    LEDbl = !LEDbl
+    slumber(424) ; wait 424 ms
+
+  Loop
+
+; **********************************************************************************
+
+
+
+end

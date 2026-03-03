@@ -1,0 +1,258 @@
+'''============================================================
+''' GCBASIC I2C Bus Scanner
+''' Uses:   Software I2C + softserial.h (bit-banged serial TX)
+''' Target: PIC, AVR or LGT -- change #chip for your device
+''' Author: EvanV   Licence: GPL   Version: 1.1a
+'''============================================================
+'''
+''' OVERVIEW
+''' --------
+''' This program scans the full I2C address space (0x00 to 0xFF)
+''' and prints a formatted map to a serial terminal showing every
+''' device that responds.  No hardware USART is required -- both
+''' I2C and serial are fully bit-banged in software.
+'''
+''' The scan runs once on power-up, prints the result, and halts.
+''' Reset or re-program the chip to run again.
+'''
+'''------------------------------------------------------------
+''' EXAMPLE OUTPUT (devices found at 0xA0 and 0xA1):
+'''
+'''   Software I2C   Live Demo
+'''
+'''        00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
+'''   00:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+'''   10:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+'''   20:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+'''   30:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+'''   40:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+'''   50:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+'''   60:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+'''   70:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+'''   80:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+'''   90:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+'''   A0:  A0 A1 -- -- -- -- -- -- -- -- -- -- -- -- -- --
+'''   B0:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+'''   C0:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+'''   D0:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+'''   E0:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+'''   F0:  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+'''
+'''   End of Search
+'''
+'''------------------------------------------------------------
+''' WHAT YOU NEED
+''' -------------
+'''   - Microcontroller
+'''   - 4.7k pull-up resistor on SDA to Vdd
+'''   - 4.7k pull-up resistor on SCL to Vdd
+'''   - I2C device(s) to scan
+'''   - USB-TTL serial adapter (FTDI, CP2102, CH340 etc.)
+'''   - GCBASIC IDE with a programmer (PICkit, SNAP etc.)
+'''   - Terminal software (PuTTY, TeraTerm, CoolTerm etc.)
+'''
+'''------------------------------------------------------------
+''' DEFAULT WIRING  (change the defines below to match yours)
+'''
+'''   PIC pin          Connects to
+'''   --------         ------------------------------------------
+'''   PORTC.5 (SDA)    I2C device SDA  +  4.7k to Vdd
+'''   PORTC.4 (SCL)    I2C device SCL  +  4.7k to Vdd
+'''   PORTC.6 (TX)     RX pin of USB-serial adapter
+'''   GND              GND of USB-serial adapter
+'''
+'''   NOTE: Do NOT use a MAX232 between the PIC and a USB adapter.
+'''         Connect TTL TX directly to the adapter RX pin.
+'''         Match voltage: use 3.3V adapter for a 3.3V PIC.
+'''
+'''------------------------------------------------------------
+''' BEFORE YOU COMPILE -- CHECKLIST
+'''
+'''   HARDWARE CHECKS (do these before touching the software):
+'''
+'''   1. Power off.  Install 4.7k from SDA to Vdd. 
+'''   2. Install 4.7k from SCL to Vdd.
+'''   3. Power on.  Measure SDA to GND -- should be close to Vdd.
+'''   4. Measure SCL to GND -- should be close to Vdd.
+'''      If either reads 0V: pull-up missing or line shorted. FIX FIRST.
+'''   5. Connect I2C device(s).  Re-measure -- both lines still near Vdd?
+'''      If a line is pulled low a device may be wired wrong.
+'''   6. Connect PORTC.6 to RX of your USB-serial adapter.
+'''   7. Connect GND to GND of adapter.  Note the COM port.
+'''
+'''   SOFTWARE CHANGES (make these in the #define section below):
+'''
+'''   1. Change #chip to your exact PIC part number.
+'''   2. Change I2C_DATA to the port.pin you wired SDA to.
+'''   3. Change I2C_CLOCK to the port.pin you wired SCL to.
+'''   4. Change SER1_TXPORT to the port letter of your TX pin.
+'''   5. Change SER1_TXPIN to the bit number of your TX pin.
+'''   6. Change SER1_BAUD to match your terminal baud rate.
+'''   7. Increase 'wait 500 ms' if your terminal misses the opening lines.
+'''
+'''------------------------------------------------------------
+''' TERMINAL SETTINGS
+'''   Baud:     9600 (or whatever SER1_BAUD is set to)
+'''   Data:     8 bits
+'''   Stop:     1 bit
+'''   Parity:   None
+'''   Flow:     None
+'''   ASCII text
+'''
+'''------------------------------------------------------------
+''' READING THE OUTPUT
+'''   The grid is 16 columns wide.  Each row covers 16 addresses.
+'''   The row label (left) is the high nibble of the address range.
+'''   -- means no device responded at that address.
+'''   A hex value (e.g. A0) means a device ACK'd at that address.
+'''   To get the standard 7-bit address: divide the displayed value by 2,
+'''   or check the device datasheet for the 8-bit write address.
+'''
+'''------------------------------------------------------------
+''' TROUBLESHOOTING
+'''   No output:
+'''     - Wrong COM port or baud rate mismatch.
+'''     - SER1_TXPORT / SER1_TXPIN pointing to wrong pin.
+'''     - Measure TX pin at idle -- should read close to Vdd.
+'''     - Increase startup delay.
+'''   Garbled output:
+'''     - Baud rate mismatch between source and terminal.
+'''     - Check chip oscillator configuration.
+'''   All cells filled (every address shows a device):
+'''     - Pull-up resistors missing.  Repeat hardware checks.
+'''   All cells '--' but device is connected:
+'''     - Wrong I2C pin definitions.
+'''     - Pull-ups to GND instead of Vdd.
+'''     - Floating address-select pins on the device.
+'''============================================================
+
+
+; =============================================================
+; STEP 1 -- CHIP SELECTION
+; Change 16F17556 to your exact PIC part number.
+; =============================================================
+  #chip 16F17556
+  #option explicit           ; all variables must be declared
+
+
+; =============================================================
+; STEP 2 -- INCLUDE OPTIMISED SOFTWARE SERIAL LIBRARY
+; =============================================================
+  #include <softserial.h>
+
+
+; =============================================================
+; STEP 3 -- I2C PIN CONFIGURATION
+; Change PORTC.5 (SDA) and PORTC.4 (SCL) to your wired pins.
+; Format: PORT<letter>.<bit>   e.g.  PORTB.3  or  PORTA.0
+; Both lines need 4.7k pull-up resistors to Vdd.
+; =============================================================
+  #define I2C_MODE Master
+  #define I2C_DATA  PORTC.5         ; SDA -- CHANGE IF NEEDED
+  #define I2C_CLOCK PORTC.4         ; SCL -- CHANGE IF NEEDED
+  #define I2C_DISABLE_INTERRUPTS ON
+
+
+; =============================================================
+; STEP 4 -- SERIAL TX PIN CONFIGURATION
+; SER1_TXPORT = port letter only (no .bit number)
+; SER1_TXPIN  = bit number of the TX pin
+; Example for PORTB.1:  SER1_TXPORT PORTB  and  SER1_TXPIN 1
+; Change SER1_BAUD to match your terminal software.
+; SER1_INVERT Off = idle HIGH (correct for USB-TTL adapters).
+; =============================================================
+  #define SER1_BAUD     9600        ; CHANGE TO MATCH TERMINAL
+  #define SER1_DATABITS 8           ; 8 data bits (standard)
+  #define SER1_STOPBITS 1           ; 1 stop bit  (standard)
+  #define SER1_INVERT   Off         ; Off = idle HIGH (normal TTL)
+  #define SER1_TXPORT   PORTC       ; TX port -- CHANGE IF NEEDED
+  #define SER1_TXPIN    6           ; TX pin  -- CHANGE IF NEEDED
+
+
+; =============================================================
+; STEP 5 -- STARTUP DELAY
+; Gives your terminal time to connect before output begins.
+; Increase to 'wait 2000 ms' if you miss the opening lines.
+; =============================================================
+  wait 500 ms
+
+
+; =============================================================
+; VARIABLES
+; =============================================================
+  Dim DeviceID       as Byte   ; current address being tested
+  Dim DisplayNewLine as Byte   ; used to detect start of each row
+
+
+; =============================================================
+; SENDCRLF SUBROUTINE
+; softserial.h uses Ser1Send for raw byte output.
+; ASCII 13 = Carriage Return (CR)
+; ASCII 10 = Line Feed (LF)
+; Both are needed for most terminal software to start a new line.
+; =============================================================
+Sub SendCRLF
+  Ser1Send 13    ' CR
+  Ser1Send 10    ' LF
+End Sub
+
+
+; =============================================================
+; MAIN PROGRAM
+; Runs once then halts at END.  Reset chip to repeat the scan.
+; =============================================================
+
+  ' Opening banner
+  SendCRLF
+  Ser1Print "Software I2C   Live Demo"
+  SendCRLF
+  SendCRLF
+
+  ' Print column header row: 00 01 02 03 ... 0F
+  Ser1Print "     "
+  for DeviceID = 0 to 15
+    Ser1Print hex(DeviceID)
+    Ser1Send 32              ' ASCII 32 = space character
+  next
+
+  ' -------------------------------------------------------
+  ' Main scan loop: test all 256 addresses
+  ' -------------------------------------------------------
+  for DeviceID = 0 to 255
+
+    ' Every 16 addresses start a new row with a row label
+    DisplayNewLine = DeviceID % 16
+    if DisplayNewLine = 0 Then
+      SendCRLF
+      Ser1Print hex(DeviceID)   ' row label e.g. "A0"
+      Ser1Print ": "
+    end if
+
+    Ser1Send 32                 ' space before each cell result
+
+    ' Send I2C START and the address byte
+    I2CStart
+    I2CSend ( DeviceID )        ' address byte (8-bit including R/W)
+
+    ' I2CSendState = True if the device ACK'd (it exists)
+    if I2CSendState = True then
+      Ser1Print hex(DeviceID)   ' device found -- show its address
+    else
+      Ser1Print "--"             ' no response at this address
+    end if
+
+    ' Send a dummy byte then release the bus with STOP
+    I2CSend ( 0 )
+    I2CStop
+
+  Next
+  ' -------------------------------------------------------
+  ' End of scan
+  ' -------------------------------------------------------
+
+  SendCRLF
+  SendCRLF
+  Ser1Print "End of Search"
+  SendCRLF
+  SendCRLF
+  END
