@@ -1,0 +1,198 @@
+'''********************************************************************************
+''' Thallium - a preemptiv µRTOS
+'''--------------------------------------------------------------------------------
+''' This demonstrates the use of a button as a step switch.
+''' The state is switched to the next level as soon as the button is pressed.
+'''
+''' author        Ralf Pagel
+''' licence       GPL
+''' version       1.0
+''' date          28.02.2026
+'''********************************************************************************
+#skiptest
+/*
+
+A push button and four LEDs are used to simulate the function of a step switch.
+Such a step switch could be used, for example, to adjust the brightness of a lamp 
+or to select the speed of a motor.
+
+Two tasks are initialized. Depending on the value in 'cntr', Task0 either turns 
+one of the four LEDs on or all of them off. Task1 continuously checks if Button0 
+is pressed. If this occurs, Task1 first waits for the bounce time to expire before 
+incrementing the variable 'cntr'. Button0 must then be released before the variable 
+'cntr' can be incremented again.
+
+Specifically for Thallium:
+To handle a button press within a loop, you need two flags to store states. 
+One flag stores that the bounce time has started, and a second flag stores that 
+the bounce time has ended and the desired action has already been triggered. 
+Both flags are reset as soon as the button is released.
+
+*/
+
+'''********************************************************************************
+
+
+; ----- Configuration
+  #chip avr128da28, 24
+  #OPTION EXPLICIT
+
+  #option UserCodeOnly  INITMCU2:
+; insert the interrupt vectors here
+
+  .ORG 14
+  rjmp  REQUIRED_ISR_TCA0_CMP0 ;TCA0_LUNF
+
+
+// ORG statement uses Constant
+  .ORG USER_CODE_START
+
+// Mandated Label
+INITMCU2:
+
+  #include "oscore128da28.h"      ; include the OS
+
+; ----- OS Dashboard -----------------
+  #define osTick 100              ; Task switching frequency
+  #define osNumberOfTask 2        ; Number of existing tasks including Task0
+  #define osStackSpace 128        ; Memory size for the stack of each task in bytes
+  #define osMemAddrStrt = 0x4040  ; Start address of the operating system memory space
+
+
+; ----- OS Hardware settings
+  initOS  ; this macro initializes Timer for periodic interrupts, clr SRAM and ports 
+
+
+; ----- Common Constants -----------------
+  #define LEDgn PORTC.0 ; Arduino Pin11
+  #define LEDrt PORTC.1 ; Arduino Pin12
+  #define LEDge PORTC.2 ; Arduino Pin13, LED 
+  #define LEDbl PORTC.3 ; Arduino Pin10
+
+  #define Button0 PORTD.6 ; Arduino Pin8
+
+
+; ----- Common Hardware settings
+  Dir LEDgn out
+  Dir LEDrt out
+  Dir LEDge out
+  Dir LEDbl out
+
+
+  ; switch on weak pull-ups
+  Set PORTD_PIN6CTRL.PORT_PULLUPEN_bp on
+
+
+; ----- Common Variables -----------------
+
+  Dim state as Byte
+  Dim flag_1 as Bit 
+  Dim flag_2 as Bit 
+
+
+; **********************************************************************************
+
+; The setup process configures the stacks and context for all tasks.
+; It is important to set up Task0 at last.
+;
+; The following parameters must be specified:
+; TaskNumber: Is a number of the Task (currently 0...7 are possible).
+; Label: The label (=address) of the task code written below it.
+; Priority: Values from 0 to 7 are possible. Task0 must always have the lowest priority.
+;
+; flags:  X X X X P Y S B
+; X = do not use, set by os
+; P = task wait for passage a unique area, set by os
+; Y = allowed all other executable tasks to run at least one time
+; S = task slumber (the task waits for the time to weak up)
+; B = task is blocked (switched off)
+; Any flag that is set prevents the task from running. flags are specified as a bitmask.
+;
+; setupTask(TaskNumber, Label, Priority, flags)
+;  setupTask(2, Task2, 0, 0)
+  setupTask(1, Task1, 0, 0)
+  setupTask(0, Task0, 0, 0)
+
+; **********************************************************************************
+
+; do not write any code here
+
+; **********************************************************************************
+
+; Task 0 must be entered first, directly after the task setup.
+; Each task must end in a loop or be blocked at the end.
+; Wait loops (wait, pulseout, etc.) are only allowed in Task0.
+; However, the delays increase because CPU time is used for
+; other tasks that are not included in the count.
+; The other tasks must hand off the baton as quickly as possible.
+; Instead, the macros slumber, suspend, and yield should be used.
+; All tasks entered below behave like independent programs.
+; Each task "thinks" that it owns the CPU exclusively, while it
+; naturally has to share the peripheral devices with the other tasks.
+; A supervisor (the interrupt handler) can switch them off
+; and on again at any time (other tasks will run in the meantime).
+; And the interrupted task "doesn't notice" its blackout.
+
+; ************************
+
+Task0: ; (IdleTask)
+; Do not block, suspend, yield or slumber Task0.
+; Task0 must run nonstop and at lowest priority.
+  Do
+
+    PORTC = PORTC & 0b11110000 ; clr all LEDs
+    select case state
+      case 1
+        LEDbl = 1
+      case 2
+        LEDgn = 1
+      case 3
+        LEDrt = 1
+      case 4
+        LEDge = 1
+    end select
+
+    wait 100 ms
+
+  Loop
+
+; ************************
+
+Task1:
+
+  Do
+
+    if Button0 = 0 then             ; if button is pressed
+      if flag_1 = 0 then            ; if the first time
+        flag_1 = 1
+        slumber(2)                  ; wait 20 ms
+      else                          ; after the bounce period
+        if flag_2 = 0 then          ; if the second time
+          call doAction()
+          flag_2 = 1
+        end if
+      end if
+    else                            ; if Button0 released
+      flag_1 = 0
+      flag_2 = 0
+    end if
+
+  Loop
+
+; ************************
+
+
+sub doAction()
+
+    state += 1
+    if state = 5 then state = 0   ; state overflow
+
+end sub
+
+
+; **********************************************************************************
+
+
+
+
+end

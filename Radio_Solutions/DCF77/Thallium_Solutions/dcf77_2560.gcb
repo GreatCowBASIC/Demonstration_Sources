@@ -1,0 +1,376 @@
+#skiptest
+'''********************************************************************************
+''' DCF77 decoder, using Thallium - a preemptiv µRTOS
+'''--------------------------------------------------------------------------------
+/*
+
+This software decodes the time signals from the DCF77 time signal transmitter
+(location: Germany, near Frankfurt) and displays them on an LCD1602.
+An Arduino UNO 3 board with an ATmega328pb, an LCD1602 with the I2C chip PCF8574
+and a DCF77 receiver are used. For large distances to the transmitter or in
+noisy environments, the use of a high-quality DCF receiver, such as 
+the “DCF-1060N-MAS”, which is available from about 4 euros, is recommended.
+The voltage at the “DCF-1060N-MAS” receiver must not exceed 3.3V and it takes 
+approximately 45 seconds after switching on until the first signals are output.
+
+This example is limited to displaying the received characters and any errors. 
+To use it as a clock, you would add an RTC chip, e.g. the DS3231, and only 
+switch on the DCF77 receiver once a day (preferably at night) to synchronize 
+the time in the RTC chip.
+
+I wrote this program to demonstrate the use of Thallium. One might think that 
+a periodic interrupt would have sufficed in this case. Yes, that's true. 
+However, many other events could occur that a controller needs to respond to. 
+For example, an alarm clock requires a keypad to be used to set the desired 
+wake-up time. Or it might need to measure the ambient brightness so the display 
+backlight can be adjusted accordingly. At the wake-up time, an MP3 file should 
+play from an SD card, and the bedside lamp should gradually increase in 
+brightness. When using Thallium, you essentially have separate little programs 
+that are best used to communicate with each other only via flags. 
+Using interrupts alone, on the other hand, quickly becomes very unwieldy.
+
+Here you will find information about the DCF77: https://en.wikipedia.org/wiki/DCF77
+*/
+''' author        Ralf Pagel
+''' licence       GPL
+''' version       1.0
+''' date          25.02.2026
+
+'''********************************************************************************
+
+
+; ----- Configuration
+  #chip   mega2560, 16
+  #OPTION EXPLICIT
+ 
+  #option STARTUPMETHODSDISABLED      ; need 'mpk_build_1565.mpk'
+  #option UserCodeOnly  INITMCU2:
+; insert the interrupt vectors here
+
+  .ORG  34
+  #asmraw jmp REQUIRED_ISR_TIMER1_COMPA ; jumps to the interrupt handler
+
+// ORG statement uses Constant
+  .ORG USER_CODE_START
+
+// Mandated Label
+INITMCU2:
+
+
+  #include "oscore2560.h"        ; include the OS
+
+
+; ----- OS Dashboard -----------------
+  #define osTick 1000             ; Task switching frequency
+  #define osNumberOfTask 3        ; Number of existing tasks including Task0
+  #define osStackSpace 128        ; Memory size for the stack of each task in bytes
+  #define osMemAddrStrt = 0x400   ; Start address of the operating system memory space
+
+; ----- OS Hardware settings
+  initOS
+
+
+; ----- Common Constants -----------------
+  #define LEDrt PORTB.7 ; Arduino Pin13, board LED
+  #define DCF77 PORTH.5 ; Arduino Pin8
+
+; ----- Common Hardware settings
+  Dir LEDrt out
+  Dir DCF77 in
+
+; ----- Common Variables -----------------
+  Dim HighTimeCount as Byte
+  Dim LowTimeCount as Byte
+  Dim SecCount as Byte
+  Dim SecHi as Byte
+  Dim SecLo as Byte
+  Dim MinHex as Byte
+  Dim HorHex as Byte
+  Dim DayHex as Byte
+  Dim MonHex as Byte
+  Dim YeaHex as Byte
+  Dim DayWee as Byte
+  Dim Parity as Byte
+
+  Dim FirstTimeHight as Bit
+  Dim SecBitOccur as Bit
+  Dim MinBitOccur as Bit
+  Dim LastBitState as Bit
+  Dim SecUpdate as Bit
+  Dim MinUpdate as Bit
+  Dim Error as Bit
+  Dim MESZ as Bit
+
+  ' Define Hardware I2C settings
+  #define HI2C_DATA  PORTD.1
+  #define HI2C_CLOCK PORTD.0
+  ' Set up LCD
+  #define LCD_IO 10
+
+
+; **********************************************************************************
+
+; The setup process configures the stacks and context for all tasks.
+; It is important to set up Task0 at last.
+;
+; The following parameters must be specified:
+; TaskNumber: Is a number of the Task (currently 0...7 are possible).
+; Label: The label (=address) of the task code written below it.
+; Priority: Values ??from 0 to 7 are possible. Task0 must always have the lowest priority.
+;
+; Flags:  X X X X P Y S B
+; X = do not use, set by os
+; P = task wait for passage a unique area, set by os
+; Y = allowed all other executable tasks to run at least one time
+; S = task slumber (the task waits for the time to weak up)
+; B = task is blocked (switched off)
+; Any flag that is set prevents the task from running. Flags are specified as a bitmask.
+;
+; setupTask(TaskNumber, Label, Priority, Flags)
+  setupTask(2, Task2, 1, 0)
+  setupTask(1, Task1, 2, 0)
+  setupTask(0, Task0, 0, 0)
+
+; **********************************************************************************
+
+; do not write any code here
+
+; **********************************************************************************
+
+; Task 0 must be entered first, directly after the task setup.
+; Each task must end in a loop or be blocked at the end.
+; Wait loops (wait, pulseout, etc.) are only allowed in Task0.
+; However, the delays increase because CPU time is used for
+; other tasks that are not included in the count.
+; The other tasks must handing over the baton as quickly as possible.
+; Instead, the macros slumber, suspend, and yield should be used.
+; All tasks entered below behave like independent programs.
+; Each task "thinks" that it owns the CPU exclusively, while it
+; naturally has to share the peripheral devices with the other tasks.
+; A supervisor (the interrupt handler) can switch them off
+; and on again at any time (other tasks will run in the meantime).
+; And the interrupted task "doesn't notice" its blackout.
+
+; ************************
+
+Task0: ; (Idle task – is executed when no other task is being executed.)
+; This task controls the output on the LCD1602.
+
+;------------------
+; Declare the I2C and LCD settings after setting up the Task. 
+; The OS has now configured the stack.
+	rcall	HI2CINIT
+	rcall	INITLCD
+  HI2CMode Master
+
+;------------------
+  Cls
+  locate 1,4
+  Print "search"
+  Do
+   if MinUpdate then
+      Cls
+      LCDHex(HorHex, 2) : Print ":" : LCDHex(MinHex, 2) : Print ":00"
+      locate 0,11
+      select case DayWee
+        case 1 : Print "Mo" ; "Mon"
+        case 2 : Print "Di" ; "Tue"
+        case 3 : Print "Mi" ; "Wed"
+        case 4 : Print "Do" ; "Thu"
+        case 5 : Print "Fr" ; "Fri"
+        case 6 : Print "Sa" ; "Sat"
+        case 7 : Print "So" ; "Sun"
+      end select
+      if MESZ then Put 0, 15, "s"   ; Central European Summer Time
+      locate 1,0
+      LCDHex(DayHex, 2) : Print "." : LCDHex(MonHex, 2) : Print ".20" : LCDHex(YeaHex, 2)
+      MinUpdate = 0
+    end if 
+    if SecUpdate then
+      SecHi = SecCount / 10
+      SecLo = SecCount % 10
+      locate 0,6
+      Print SecHi : Print SecLo
+      SecUpdate = 0
+    end if
+    if Error then
+      locate 1,13
+      Print "err"
+    end if 
+;    PulseOut LEDrt, 10 ms
+    wait 120 ms
+  Loop
+
+; ************************
+
+Task1:
+; This task receives the DCF77 pulses and measure their duration.
+  Do
+    if DCF77 = 0 then
+      HighTimeCount = 0
+      LowTimeCount++
+      FirstTimeHight = 1
+      LEDrt = 1
+    else                          ; if DCF77-Pin is high
+      if FirstTimeHight = 1 then  ; execute the actions once per impulse
+        SecBitOccur = 1           ; this flag reports that a second-bit is received   <---
+        select case LowTimeCount
+          case 6 to 15
+            LastBitState = 0
+          case 16 to 25
+            LastBitState = 1
+          case else
+            Error = 1
+        end select 
+        LowTimeCount = 0
+        FirstTimeHight = 0
+        SecCount++
+        LEDrt = 0
+        clrFlags (2, 0b00000001)  ; reactivate Task2 
+      end if
+      HighTimeCount++
+      if HighTimeCount > 120 then ; if a minute pulse has occurred
+        MinBitOccur = 1           ; this flag reports that a minute-bit is received   <---
+        HighTimeCount = 0         ; now it was only one time reported 
+        clrFlags (2, 0b00000001)  ; reactivate Task2 
+      end if
+    end if
+;    LEDrt = !LEDrt
+    slumber(10) ; os-macro = wait 10 ms
+  Loop
+
+; ************************
+
+Task2:
+; This task evaluates the received bits and calculates the time.
+  Do
+    if SecBitOccur then
+      if LastBitState then
+        Parity += 1
+        select case (SecCount - 1)   ; the second counter determines the action
+          case 17       ; Central European Time
+            MESZ = 1
+          case 18       ; Central European Summer Time
+            MESZ = 0
+          case 20       ; the 20th secound is always "1"
+            MinHex = 0
+            HorHex = 0
+            DayHex = 0
+            DayWee = 0
+            MonHex = 0
+            YeaHex = 0
+            Parity = 0
+            Error = 0
+    ;-------------  minutes    
+          case 21
+            MinHex += 1
+          case 22
+            MinHex += 2
+          case 23
+            MinHex += 4
+          case 24
+            MinHex += 8
+          case 25
+            MinHex += 16
+          case 26
+            MinHex += 32
+          case 27
+            MinHex += 64
+    ;-------------
+          case 28
+            if Parity or 0b00000001 = 0 then Error = 1
+            Parity = 0 
+    ;-------------  hours
+          case 29
+            HorHex += 1
+          case 30
+            HorHex += 2
+          case 31
+            HorHex += 4
+          case 32
+            HorHex += 8
+          case 33
+            HorHex += 16
+          case 34
+            HorHex += 32
+    ;-------------
+          case 35
+            if Parity or 0b00000001 = 0 then Error = 1
+            Parity = 0 
+    ;-------------  date day of month
+          case 36
+            DayHex += 1
+          case 37
+            DayHex += 2
+          case 38
+            DayHex += 4
+          case 39
+            DayHex += 8
+          case 40
+            DayHex += 16
+          case 41
+            DayHex += 32
+    ;-------------  date day of week
+          case 42
+            DayWee += 1
+          case 43
+            DayWee += 2
+          case 44
+            DayWee += 4
+    ;-------------  date number of month 
+          case 45
+            MonHex += 1
+          case 46
+            MonHex += 2
+          case 47
+            MonHex += 4
+          case 48
+            MonHex += 8
+          case 49
+            MonHex += 16
+    ;-------------  date year
+          case 50
+            YeaHex += 1
+          case 51
+            YeaHex += 2
+          case 52
+            YeaHex += 4
+          case 53
+            YeaHex += 8
+          case 54
+            YeaHex += 16
+          case 55
+            YeaHex += 32
+          case 56
+            YeaHex += 64
+          case 57
+            YeaHex += 128
+    ;-------------
+          case 58
+            if Parity or 0b00000001 = 0 then Error = 1
+    ;-------------
+        end select
+      end if  ; end LastBitState
+      SecBitOccur = 0
+      SecUpdate = 1
+    end if  ; end SecBitOccur
+    if MinBitOccur = 1 then
+      if SecCount = 59 then
+        if Error = 0 then
+          MinUpdate = 1
+        else
+        end if
+      end if
+      SecCount = 0
+      MinBitOccur = 0
+    end if   
+;    LEDrt = !LEDrt
+    setFlags (2, 0b00000001)  ; block Task2 - the scheduler will not let him run anymore
+    suspend                   ; handing over the baton
+  Loop
+
+; ************************
+
+; **********************************************************************************
+
+end
