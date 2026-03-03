@@ -1,7 +1,7 @@
 # 8-Voice Polyphonic Music Box  
 **PIC18F57Q84 • GCBASIC • Single-sample Pitch Shifting**
 
-<img src="https://en.wikipedia.org/wiki/Maple_Leaf_Rag#/media/File:Maple_Leaf_Rag.PNG" alt="Music Box hardware playing Scott Joplin" width="800">
+<img src="https://upload.wikimedia.org/wikipedia/commons/a/a6/Maple_Leaf_Rag.PNG" alt="Maple Leaf Rag sheet music cover" width="800">
 
 A retro-inspired **8-voice polyphonic synthesizer** on the **PIC18F57Q84**.  
 Plays Scott Joplin's **Maple Leaf Rag** (public domain) using **one shared 5566-byte 8-bit waveform** — a single-cycle plucked string sound originally tuned to ≈C4 at 32 kHz.  
