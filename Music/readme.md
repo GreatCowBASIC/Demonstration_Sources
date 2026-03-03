@@ -1,7 +1,7 @@
 # 8-Voice Polyphonic Music Box  
 **PIC18F57Q84 • GCBASIC • Single-sample Pitch Shifting**
 
-![Maple Leaf Rag sheet music cover](Maple_Leaf_Rag.PNG)
+![Maple Leaf Rag sheet music cover]([Maple_Leaf_Rag.PNG](https://github.com/GreatCowBASIC/Demonstration_Sources/blob/main/Music/Maple_Leaf_Rag.png))
 
 
 A retro-inspired **8-voice polyphonic synthesizer** on the **PIC18F57Q84**.  
