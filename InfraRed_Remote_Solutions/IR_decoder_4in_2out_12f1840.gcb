@@ -1,0 +1,656 @@
+''===============================================================================
+'' IR remote control signature decoder for PIC12F1840
+''-------------------------------------------------------------------------------
+'' Purpose:
+''   This program learns up to four IR remote-control buttons and stores their
+''   captured timing signatures in internal EEPROM. During normal operation,
+''   each received IR packet is compared against the stored signatures.
+''
+'' Supported signal type:
+''   This is not a strict NEC/Sony/RC5 protocol decoder. It is a timing-based
+''   signature matcher. The program samples the demodulated output of a
+''   TSOP-type IR receiver (e.g. TSOP-4348, active-low output) and compares
+''   the sampled bit pattern with previously learned signatures.
+''   It works best with NEC-like remotes or similar protocols where the full
+''   button frame fits within the sampling window.
+''
+'' Outputs:
+''   Learned buttons CH1..CH4 generate logic outputs IR_out_1..IR_out_4.
+''   In this example, CH1 or CH2 controls out_1, and CH3 or CH4 controls out_2.
+''
+'' Learning procedure:
+''   1) Press the LEARN button once. The LED turns ON and the decoder waits
+''      for the first IR packet.
+''   2) Press the IR remote buttons in the desired order: CH1, CH2, CH3, CH4.
+''   3) After each successfully learned button, the LED blinks as confirmation:
+''      CH1 = 1 blink, CH2 = 2 blinks, CH3 = 3 blinks, CH4 = 5 blinks.
+''   4) After the fourth button is learned, the LED turns OFF and the decoder
+''      returns to normal operation.
+''   5) If learning mode was entered by mistake, press the LEARN button again.
+''      Learning will be cancelled, the LED will turn OFF, and existing EEPROM
+''      data will remain unchanged (unless a new IR signature has already been saved).
+''
+'' LED behaviour in normal mode:
+''   - LED stays ON continuously while a learned IR button is detected and held.
+''   - LED gives a short blink when an IR packet is received but not recognized.
+''
+'' Notes:
+''   - External pull-up resistors are recommended for both the IR receiver input
+''     and the LEARN button input, even if internal pull-ups are enabled.
+''   - Ensure clean power for the TSOP receiver. Place a 100 nF capacitor close
+''     to the receiver and preferably add a small electrolytic capacitor as well.
+''     receiver and preferably also a small electrolytic capacitor.
+''===============================================================================
+'' Mērķis:
+''   Šī programma iemācās līdz četrām IR pults pogām un saglabā to
+''   uztvertos IR signālu parakstus (signature) iekšējā EEPROM atmiņā.
+''   Normālas darbības laikā katra saņemtā IR pakete tiek salīdzināta
+''   ar iepriekš iemācītajiem parakstiem.
+''
+'' Atbalstītais signāla tips:
+''   Šis nav stingrs NEC/Sony/RC5 protokola dekoders. Tas ir laika
+''   paraksta (timing signature) salīdzinātājs. Tas veic demodulētā
+''   signāla paraugu ņemšanu no TSOP tipa IR uztvērēja
+''   (piemēram, TSOP-4348, aktīvs LOW līmenis) un salīdzina iegūto
+''   bitu karti ar iepriekš iemācītajiem parakstiem.
+''   Vislabāk darbojas ar NEC tipa pultīm vai līdzīgiem protokoliem,
+''   kur pilns pogas signāls ietilpst paraugu logā.
+''
+'' Izejas:
+''   Iemācītās pogas CH1..CH4 ģenerē loģiskos signālus IR_out_1..IR_out_4.
+''   Šajā piemērā CH1 vai CH2 ieslēdz out_1, bet CH3 vai CH4 ieslēdz out_2.
+''
+'' Programmēšanas (learning) procedūra:
+''   1) Nospied LEARN pogu vienu reizi. LED iedegas, un dekoders gaida
+''      pirmo IR pogas signālu.
+''   2) Spied IR pults pogas vajadzīgajā secībā: CH1, CH2, CH3, CH4.
+''   3) Pēc katras iemācītās pogas LED nomirgo kā apstiprinājums:
+''      CH1 = 1 mirgojums, CH2 = 2 mirgojumi, CH3 = 3 mirgojumi,
+''      CH4 = 5 mirgojumi.
+''   4) Pēc ceturtās pogas iemācīšanas LED nodziest, un dekoders
+''      atgriežas normālā režīmā.
+''   5) Ja programmēšanas režīms tika ieslēgts nejauši, nospied LEARN
+''      pogu vēlreiz. Programmēšana tiks atcelta, LED nodzisīs, un
+''      esošie EEPROM dati netiks dzēsti vai mainīti (ja vien jauns
+''      IR signāls jau nav ticis saglabāts).
+''
+'' LED darbība normālā režīmā:
+''   - LED deg nepārtraukti, kamēr tiek uztverta un turēta iemācīta
+''     IR poga.
+''   - LED īsi nomirgo, ja tiek uztverta IR pakete, bet tā netiek
+''     atpazīta (nav iemācīta).
+''
+'' Piezīmes:
+''   - Ieteicams izmantot ārējos pull-up rezistorus IR uztvērēja ieejai
+''     un LEARN pogas ieejai, pat ja kodā ir ieslēgti iekšējie pull-up.
+''   - Nodrošini tīru barošanu TSOP uztvērējam; pievieno 100 nF
+''     kondensatoru pēc iespējas tuvāk uztvērējam un vēlams arī
+''     nelielu elektrolītisko kondensatoru.
+
+
+#chip 12F1840, 8' šim nav GPIO !!!!!!!!!!!!!!!!!!!!
+
+#config MCLRE = ON ' LV: MCLR ir ieslegts; sis pins nav pieejams ka parasta DI ieeja. / EN: MCLR is enabled; this pin is not available as a normal digital input.
+'' LV: nWPUEN=0 atlaauj ieksejos weak pull-up globali; skatit GCB dokumentaciju. / EN: nWPUEN=0 enables internal weak pull-ups globally; see GCB documentation.
+
+''=========== LV: IR sekcijas iestatijumi / EN: IR section settings
+SET WPUEN = 0  ' LV: globali atlautas vajas pull-up ieejas; prakse ieteicami arejie 10k rezistori. / EN: weak pull-ups enabled globally; external 10k resistors are recommended in practice.
+ANSELA = 0        ' LV: visi analogie pini parslegti uz digitalu rezimu. / EN: all analog-capable pins are switched to digital mode.
+
+#define learn_button porta.2
+dir porta.2 in
+SET WPUA2 = 1 ' LV: learn pogas pull-up; prakse vajag arejo 10k rezistoru. / EN: learn button pull-up; in practice use an external 10k resistor.
+#define IR_sens porta.0 ' LV: IR uztvereja TSOP-4348 izeja, aktiva LOW. / EN: TSOP-4348 IR receiver output, active LOW.
+dir porta.0 in
+SET WPUA0 = 1  ' LV: IR ieejas pull-up; prakse vajag arejo 10k rezistoru. / EN: IR input pull-up; in practice use an external 10k resistor.
+#define learn_LED porta.1
+dir porta.1 out
+#define out_1 porta.5
+dir porta.5 out
+#define out_2 porta.4
+dir porta.4 out
+
+' LV: Logiskie IR izejas biti; tos var izmantot talak RGB vai cita kontroles koda. / EN: logical IR output bits; these can be used later by RGB or other control code.
+Dim IR_out_1, IR_out_2, IR_out_3, IR_out_4 As Bit
+
+'==================== LV: IR signature uztvere / EN: IR signature capture ====================
+#define SAMPLE_US        80       ' LV: paraugosanas solis mikrosekundes. / EN: sampling interval in microseconds.
+#define SAMPLE_COUNT     320      ' LV: paraugu skaits; 320 * 80 us ir apmeram 25.6 ms uztveres logs. / EN: number of samples; 320 * 80 us is about a 25.6 ms capture window.
+#define SIG_BYTES        40       ' LV: ciets skaitlis; 320 / 8 = 40 baiti, lai GCB For cikli strada korekti. / EN: fixed value; 320 / 8 = 40 bytes, required for reliable GCB loops.
+
+'==================== LV: Salidzinasanas logs / EN: Comparison window ====================
+#define SKIP_SAMPLES     64       ' LV: salidzinasana izlaiz sakuma header dalu. / EN: comparison skips the initial header part.
+#define CMP_BYTES        20       ' LV: salidzina tikai so signature dalu. / EN: only this part of the signature is compared.
+#define MAX_DIFF_BITS    14        ' LV: pielaujamo atskirigo bitu skaits; lielaka vertiba ir tolerantaka. / EN: allowed number of different bits; higher value is more tolerant.
+
+'==================== LV: Laika konstantes / EN: Timing constants ====================
+#define LED_BLINK_MS      80      ' LV: LED mirgosanas ON/OFF laiks learning rezima. / EN: LED blink ON/OFF time in learning mode.
+#define POST_IR_WAIT_MS   20      ' LV: neliela pauze pec IR paketes apstrades. / EN: small delay after IR packet processing.
+#define LEARN_DEBOUNCE_MS 30      ' LV: learn pogas kontaktu atleksanas filtrs. / EN: debounce time for the learn button.
+
+'==================== LV: Learning aizsardziba pret repeat paketem / EN: Learning protection against repeat packets ====================
+#define LEARN_RELEASE_STABLE_MS  120
+
+'==================== LV: Neblokejosa pogas turesana / EN: Non-blocking button hold ====================
+#define HOLD_RELEASE_LOOPS  500
+
+'==================== LV: Starta warm-up, TSOP stabilizacija / EN: Start-up warm-up, TSOP stabilization ====================
+#define IR_BOOT_STABLE_MS   250   ' LV: IR_sens jabut stabili HIGH, lai TSOP uzskatitu par gatavu. / EN: IR_sens must stay HIGH to treat the TSOP as ready.
+#define IR_BOOT_MAXWAIT_MS  1500  ' LV: maksimalais gaidisanas laiks pec ieslegsanas. / EN: maximum wait time after power-up.
+
+
+'==================== LV: EEPROM izkartojums / EN: EEPROM layout ====================
+' LV: Visi 4 signature bloki atrodas viena EEPROM datu bloka. / EN: All four signature blocks are stored in one EEPROM data block.
+' LV: CH1: 0..39, CH2: 40..79, CH3: 80..119, CH4: 120..159; kopa 160 baiti. / EN: CH1: 0..39, CH2: 40..79, CH3: 80..119, CH4: 120..159; total 160 bytes.
+#define EE_SIG_BASE        0
+
+' LV: Deriguma markeri sakas aiz signature datu bloka. / EN: Validity markers start after the signature data block.
+#define EE_MRK_BASE        (EE_SIG_BASE + (SIG_BYTES * 4))   ' LV: markeru sakums aiz 4 signature blokiem; 0 + 160 = 160. / EN: marker area starts after four signature blocks; 0 + 160 = 160.
+
+#define EE_MAGIC1          161     ' LV: CH1 deriguma markeris. / EN: CH1 validity marker.
+#define EE_MAGIC2          162     ' LV: CH2 deriguma markeris. / EN: CH2 validity marker.
+#define EE_MAGIC3          163     ' LV: CH3 deriguma markeris. / EN: CH3 validity marker.
+#define EE_MAGIC4          164     ' LV: CH4 deriguma markeris. / EN: CH4 validity marker.
+
+
+'==================== LV: Mainigie / EN: Variables ====================
+Dim learnMode As Bit          ' LV: 1 = learning rezims ir aktivs. / EN: 1 = learning mode is active.
+Dim learnStep As Byte         ' LV: 1..4 norada, kuru IR pogu sobrid macam. / EN: 1..4 indicates which IR button is being learned.
+
+' LV: haveMask bit0=CH1, bit1=CH2, bit2=CH3, bit3=CH4; 1 nozime, ka kanals ir iemacits. / EN: haveMask bit0=CH1, bit1=CH2, bit2=CH3, bit3=CH4; 1 means the channel is learned.
+Dim haveMask As Byte
+
+Dim idx As Word
+Dim quietLoops As Word        ' LV: cik galvenos ciklus IR_sens ir HIGH, t.i. klusums. / EN: number of main loops with IR_sens HIGH, meaning silence.
+Dim diffBits As Word
+
+Dim byteIdx As Byte
+Dim bitIdx As Byte
+
+' LV: RX signature ir pedejais uztvertais IR paraugu logs. / EN: RX signature is the last captured IR sample window.
+Dim sigRx(SIG_BYTES) As Byte
+
+' LV: Visi 4 iemacitie signature bloki viena masiva. / EN: all four learned signature blocks in one array.
+Dim sigLearnAll(160) As Byte   ' LV: visi 4 iemacitie signature bloki viena masiva; 4 * 40 = 160. / EN: all four learned signature blocks in one array; 4 * 40 = 160.
+
+Dim maskVal As Byte
+Dim loopCnt As Byte
+Dim xorVal As Byte
+Dim bitLoop As Byte
+
+Dim startByte As Word          ' LV: bazes adrese masiva attiecigajam kanalam, 0/40/80/120. / EN: base array address for selected channel, 0/40/80/120.
+Dim endByte As Byte
+
+Dim blinkCount As Byte         ' LV: cik reizes LED mirgo pec learning apstiprinajuma. / EN: how many times the LED blinks after learning confirmation.
+
+'==================== LV: Neblokejosa pogas turesana / EN: Non-blocking button hold ====================
+Dim IR_holdCh As Byte          ' LV: 0 = nav turetas pogas, 1..4 = kurs kanals sobrid tiek turets. / EN: 0 = no held button, 1..4 = currently held channel.
+
+' LV: Paligmainigais IR atlaisanas stabilitates parbaudei. / EN: Helper variable for stable IR release detection.
+Dim relCnt As Byte
+
+' LV: Pirmais neatpazitais signals pec reset netiek radits ka kluda, jo TSOP var vel stabilizeeties. / EN: The first unknown signal after reset is ignored because the TSOP may still be stabilizing.
+Dim bootIgnoreUnknown As Bit
+
+' LV: chSel izmanto kopigajas subrutinas, lai izveletos kanalu 1..4. / EN: chSel selects channel 1..4 for shared subroutines.
+Dim chSel As Byte
+
+' LV: EEPROM paligmainigie lasisanai un rakstisanai. / EN: EEPROM helper variables for read and write operations.
+Dim eeA As Byte
+Dim eeB As Byte
+Dim eeTmp As Byte              ' LV: obligats EPRead/EPWrite starpnieks. / EN: required temporary variable for EPRead/EPWrite.
+Dim eeAdr As Word              ' LV: EEPROM adrese. / EN: EEPROM address.
+
+
+'==================== LV: Inicializacija, lai pec reset nav nejausu stavoklu / EN: Initialization to avoid random states after reset ====================
+learnMode = 0
+learnStep = 0
+IR_holdCh = 0
+quietLoops = 0
+haveMask = 0
+IR_out_1 = 0
+IR_out_2 = 0
+IR_out_3 = 0
+IR_out_4 = 0
+learn_LED = 0
+bootIgnoreUnknown = 1
+
+
+'==================== LV: EEPROM ielade starta / EN: Load learned data from EEPROM at start-up ====================
+Call EEPROM_LoadLearned()
+
+' LV: Pec ieslegsanas pagaidam, kamer TSOP izeja ir mieriga. / EN: after power-up, wait until the TSOP output is stable.
+Call IR_BootWarmup()
+
+main:
+  '===== LV: IR_Service jaizsauc ari learning rezima. / EN: IR_Service must also be called while learning mode is active.
+ If (learnMode = 1) Or (IR_sens = 0) Or (learn_button = 0)  Then
+    Call IR_Service()
+ End If
+
+  '==================== LV: Neblokejosa pogas turesana / EN: Non-blocking button hold ====================
+ Call IR_HoldUpdate()
+
+''======= LV: IR pults logiskie biti IR_out_1..IR_out_4 / EN: IR remote logic bits IR_out_1..IR_out_4 ===configure according to application.=======
+''==============================================================================================
+if IR_out_1 or IR_out_2 then set out_1 ON else set out_1 off
+if IR_out_3 or IR_out_4 then set out_2 ON else set out_2 off
+
+
+goto main
+
+
+'==============================================================================================
+' LV: IR apkalposana: learning rezims un normalas atpazisanas rezims. / EN: IR service: learning mode and normal recognition mode.
+'==============================================================================================
+Sub IR_Service()
+
+  ' ---- LV: Learn poga: ieiet learning rezima vai iziet no ta. / EN: Learn button: enter learning mode or cancel it. ----
+  ' LV: Ja learning rezims ieslegts nejausi, otrais learn_button spiediens iziet ara bez reset un bez EEPROM bojasanas. / EN: If learning mode was entered by mistake, a second learn_button press exits without reset and without damaging EEPROM.
+  ' LV: Sis bloks ari atcel learning rezimu, ja poga nospiesta otru reizi. / EN: this block also cancels learning mode when the button is pressed a second time.
+  If learn_button = 0 Then
+     Wait LEARN_DEBOUNCE_MS ms
+     If learn_button = 0 Then
+
+        If learnMode = 0 Then
+           ' LV: Ieiet learning rezima un gaida pirmo IR pogu. / EN: enter learning mode and wait for the first IR button.
+           learnMode = 1
+           learnStep = 1
+           IR_holdCh = 0
+           quietLoops = 0
+           learn_LED = 1
+
+           Do While learn_button = 0
+           Loop
+           Wait LEARN_DEBOUNCE_MS ms
+
+        Else
+           ' ---------------------------------------------
+           ' LV: Izejam no learning rezima (CANCEL). / EN: exit learning mode (CANCEL).
+           ' ---------------------------------------------
+           learnMode = 0
+           learnStep = 0
+           IR_holdCh = 0
+           quietLoops = 0
+           learn_LED = 0  ' LV: LED izsledz, jo learning rezims tiek atcelts. / EN: turn LED off because learning mode is cancelled.
+             ' LV: Gaidam, kamer learn poga ir atlaista. / EN: wait until the learn button is released.
+           Do While learn_button = 0
+           Loop
+           Wait LEARN_DEBOUNCE_MS ms
+          ' LV: Svarigi: saja cikla talak vairs neko neapstradajam. / EN: important: do not process anything else in this service call.
+           Exit Sub
+        End If
+
+     End If
+  End If
+
+  ' LV: Ja jau ir atpazita un tureta poga, normalaja rezima vairs nedekodejam, lai LED nestrobe. / EN: If a learned button is already held, do not decode again in normal mode to avoid LED strobing.
+  ' LV: Kamēr poga tureta, izejas tiek uzturetas IR_HoldUpdate subrutina. / EN: while the button is held, outputs are maintained by IR_HoldUpdate.
+  If (learnMode = 0) And (IR_holdCh <> 0) Then
+     quietLoops = 0
+     Exit Sub
+  End If
+
+  If IR_sens <> 0 Then Exit Sub
+
+  ' ---- LV: Uztver signature, apmeram 25.6 ms logs. / EN: capture signature, about a 25.6 ms window. ----
+  Call IR_CaptureSignature()
+
+  If learnMode = 1 Then
+
+     ' LV: Learning seciba ir CH1 -> CH2 -> CH3 -> CH4. / EN: learning order is CH1 -> CH2 -> CH3 -> CH4.
+     chSel = learnStep
+
+     ' LV: RX signature ir pedejais uztvertais IR paraugu logs. / EN: RX signature is the last captured IR sample window.
+     Call IR_CopyRxToLearnSelected()
+
+     ' LV: 2) Atzimejam, ka kanals ir iemacits. / EN: 2) mark the channel as learned.
+     eeA = 1
+     Call Have_Set()
+
+     ' LV: 3) Saglabajam EEPROM: vispirms dati, pec tam markeri. / EN: 3) save to EEPROM: data first, markers afterwards.
+     Call EEPROM_Save_Selected()
+
+     ' LV: 4) LED apstiprinajuma mirgosana: CH1=1x, CH2=2x, CH3=3x, CH4=5x. / EN: 4) LED confirmation blink: CH1=1x, CH2=2x, CH3=3x, CH4=5x.
+     If learnStep = 1 Then
+        blinkCount = 1
+     Else If learnStep = 2 Then
+        blinkCount = 2
+     Else If learnStep = 3 Then
+        blinkCount = 3
+     Else
+        blinkCount = 5
+     End If
+     Call LedBlink_Do()
+
+     ' LV: 5) Parejam uz nakamo learning soli vai beidzam learning rezimu. / EN: 5) move to the next learning step or finish learning mode.
+     If learnStep < 4 Then
+        learn_LED = 1
+        learnStep = learnStep + 1
+     Else
+        learn_LED = 0
+        learnMode = 0
+        learnStep = 0
+     End If
+
+     ' LV: 5) Parejam uz nakamo learning soli vai beidzam learning rezimu. / EN: 5) move to the next learning step or finish learning mode.
+     Call WaitIrReleaseStable()
+
+  Else
+     ' ---- LV: Normalais atpazisanas rezims. / EN: normal recognition mode. ----
+     chSel = 1
+     Do While chSel <= 4
+
+        Call Have_Get()
+        If eeA = 1 Then
+           Call IR_CompareWithLearnSelected()
+           If diffBits <= MAX_DIFF_BITS Then Exit Do
+        End If
+
+        chSel = chSel + 1
+     Loop
+
+     If chSel <= 4 Then
+        IR_holdCh = chSel
+        quietLoops = 0
+        bootIgnoreUnknown = 0
+     Else
+        If bootIgnoreUnknown = 1 Then
+           bootIgnoreUnknown = 0
+           Exit Sub
+        End If
+
+        learn_LED = 1
+        Wait 30 ms
+        learn_LED = 0
+     End If
+
+  End If
+
+  Wait POST_IR_WAIT_MS ms
+
+End Sub
+
+
+'------------------------------------------------------------
+'==================== LV: Starta warm-up, TSOP stabilizacija / EN: Start-up warm-up, TSOP stabilization ====================
+'------------------------------------------------------------
+Sub IR_BootWarmup()
+
+  idx = 0
+  Do While (IR_sens = 0) And (idx < IR_BOOT_MAXWAIT_MS)
+     Wait 1 ms
+     idx = idx + 1
+  Loop
+
+  relCnt = 0
+  idx = 0
+  Do While (relCnt < IR_BOOT_STABLE_MS) And (idx < IR_BOOT_MAXWAIT_MS)
+     If IR_sens = 1 Then
+        relCnt = relCnt + 1
+     Else
+        relCnt = 0
+     End If
+     Wait 1 ms
+     idx = idx + 1
+  Loop
+
+End Sub
+
+
+'------------------------------------------------------------
+' LV: Gaidam, lidz IR_sens ir HIGH nepartraukti noteiktu laiku. / EN: wait until IR_sens stays HIGH continuously for the required time.
+'------------------------------------------------------------
+Sub WaitIrReleaseStable()
+
+  relCnt = 0
+  Do
+     If IR_sens = 1 Then
+        relCnt = relCnt + 1
+        If relCnt >= LEARN_RELEASE_STABLE_MS Then Exit Do
+     Else
+        relCnt = 0
+     End If
+     Wait 1 ms
+  Loop
+
+End Sub
+
+
+'------------------------------------------------------------
+'==================== LV: Neblokejosa pogas turesana / EN: Non-blocking button hold ====================
+' LV: learn_LED deg stabili, ja poga ir atpazita un tureta. / EN: learn_LED stays ON when a learned button is recognized and held.
+'------------------------------------------------------------
+Sub IR_HoldUpdate()
+
+  IR_out_1 = 0
+  IR_out_2 = 0
+  IR_out_3 = 0
+  IR_out_4 = 0
+
+  If IR_holdCh = 0 Then Exit Sub
+
+  learn_LED = 1
+
+  If IR_sens = 0 Then
+     quietLoops = 0
+  Else
+     quietLoops = quietLoops + 1
+     If quietLoops >= HOLD_RELEASE_LOOPS Then
+        IR_holdCh = 0
+        learn_LED = 0
+        Exit Sub
+     End If
+  End If
+
+  If IR_holdCh = 1 Then
+     IR_out_1 = 1
+  Else If IR_holdCh = 2 Then
+     IR_out_2 = 1
+  Else If IR_holdCh = 3 Then
+     IR_out_3 = 1
+  Else If IR_holdCh = 4 Then
+     IR_out_4 = 1
+  End If
+
+End Sub
+
+
+'------------------------------------------------------------
+' LV: 4) LED apstiprinajuma mirgosana: CH1=1x, CH2=2x, CH3=3x, CH4=5x. / EN: 4) LED confirmation blink: CH1=1x, CH2=2x, CH3=3x, CH4=5x.
+'------------------------------------------------------------
+Sub LedBlink_Do()
+
+  For loopCnt = 1 To blinkCount
+     learn_LED = 1
+     Wait LED_BLINK_MS ms
+     learn_LED = 0
+     Wait LED_BLINK_MS ms
+  Next
+
+End Sub
+
+
+'------------------------------------------------------------
+' LV: Signature uztvere; Wait us ir obligats vienmerigai paraugosanai. / EN: signature capture; Wait us is required for regular sampling.
+' LV: Svarigi: uz paraugosanas bridi apturam Timer1, lai overflow interrupti nesajauc timing. / EN: important: stop Timer1 during sampling so overflow interrupts do not disturb timing.
+' LV: Pec paraugosanas Timer1 tiek palaists atpakal. / EN: after sampling, Timer1 is started again.
+'------------------------------------------------------------
+Sub IR_CaptureSignature()
+
+  StopTimer 1     ' LV: galvenais stabilitatei; PWM/Timer1 netrauce IR paraugosanu. / EN: key for stability; PWM/Timer1 does not disturb IR sampling.
+
+  For byteIdx = 0 To SIG_BYTES - 1
+     sigRx(byteIdx) = 0
+  Next
+
+  For idx = 0 To SAMPLE_COUNT - 1
+     byteIdx = idx / 8
+     bitIdx  = idx And 7
+
+     maskVal = 1
+     If bitIdx > 0 Then
+        For loopCnt = 1 To bitIdx
+           maskVal = maskVal * 2
+        Next
+     End If
+
+     If IR_sens = 0 Then
+        sigRx(byteIdx) = sigRx(byteIdx) Or maskVal
+     End If
+
+     Wait SAMPLE_US us
+  Next
+
+  StartTimer 1
+
+End Sub
+
+
+'------------------------------------------------------------
+' LV: RX signature ir pedejais uztvertais IR paraugu logs. / EN: RX signature is the last captured IR sample window.
+'------------------------------------------------------------
+Sub IR_CopyRxToLearnSelected()
+
+  startByte = (chSel - 1) * SIG_BYTES   ' LV: kanala sakuma nobide: CH1=0, CH2=40, CH3=80, CH4=120. / EN: channel start offset: CH1=0, CH2=40, CH3=80, CH4=120.
+
+  For byteIdx = 0 To SIG_BYTES - 1
+     sigLearnAll(startByte + byteIdx) = sigRx(byteIdx)
+  Next
+
+End Sub
+
+
+'------------------------------------------------------------
+'==================== LV: Salidzinasanas logs / EN: Comparison window ====================
+' LV: XOR parbaude un atskirigo bitu skaitisana, rezultats diffBits. / EN: XOR check and different-bit counting, result in diffBits.
+'------------------------------------------------------------
+Sub IR_CompareWithLearnSelected()
+
+  diffBits = 0
+
+  startByte = (chSel - 1) * SIG_BYTES
+  endByte = (SKIP_SAMPLES / 8) + CMP_BYTES - 1
+
+  byteIdx = SKIP_SAMPLES / 8
+
+  Do While byteIdx <= endByte
+     xorVal = sigRx(byteIdx) Xor sigLearnAll(startByte + byteIdx)
+     For bitLoop = 0 To 7
+        If (xorVal And 1) = 1 Then diffBits = diffBits + 1
+        xorVal = xorVal / 2
+     Next
+     byteIdx = byteIdx + 1
+  Loop
+
+End Sub
+
+
+'------------------------------------------------------------
+' LV: haveMask bit0=CH1, bit1=CH2, bit2=CH3, bit3=CH4; 1 nozime, ka kanals ir iemacits. / EN: haveMask bit0=CH1, bit1=CH2, bit2=CH3, bit3=CH4; 1 means the channel is learned.
+' LV: Have_Set ievade: chSel=1..4 un eeA=0/1. / EN: Have_Set input: chSel=1..4 and eeA=0/1.
+' LV: Have_Get ievade: chSel=1..4, izvade: eeA=0/1. / EN: Have_Get input: chSel=1..4, output: eeA=0/1.
+'------------------------------------------------------------
+Sub Have_Set()
+
+  maskVal = 1
+  For loopCnt = 1 To (chSel - 1)
+     maskVal = maskVal * 2
+  Next
+
+  If eeA = 1 Then
+     haveMask = haveMask Or maskVal
+  Else
+     haveMask = haveMask And (maskVal Xor 255)
+  End If
+
+End Sub
+
+
+Sub Have_Get()
+
+  maskVal = 1
+  For loopCnt = 1 To (chSel - 1)
+     maskVal = maskVal * 2
+  Next
+
+  If (haveMask And maskVal) <> 0 Then
+     eeA = 1
+  Else
+     eeA = 0
+  End If
+
+End Sub
+
+
+'------------------------------------------------------------
+' LV: EEPROM saglabasana izveletajam kanalam, chSel=1..4. / EN: EEPROM save for selected channel, chSel=1..4.
+' LV: 2) Markeri; tie sakas no EE_MRK_BASE (=160), nevis 128. / EN: 2) markers; they start from EE_MRK_BASE (=160), not 128.
+'------------------------------------------------------------
+Sub EEPROM_Save_Selected()
+
+  startByte = (chSel - 1) * SIG_BYTES
+
+  ' LV: 1) Signature baiti. / EN: 1) signature bytes.
+  For byteIdx = 0 To SIG_BYTES - 1
+     eeAdr = EE_SIG_BASE + startByte + byteIdx
+     eeTmp = sigLearnAll(startByte + byteIdx)
+     EPWrite eeAdr, eeTmp
+     Wait 5 ms
+  Next
+
+  ' LV: 2) Markeri; tie sakas no EE_MRK_BASE (=160), nevis 128. / EN: 2) markers; they start from EE_MRK_BASE (=160), not 128.
+  eeAdr = EE_MRK_BASE + (chSel - 1) * 2
+
+  eeA = 160 + chSel     ' LV: magic markeris 161..164. / EN: magic marker 161..164.
+
+  eeTmp = eeA
+  EPWrite eeAdr, eeTmp
+  Wait 5 ms
+
+  eeTmp = (eeA Xor 255)
+  EPWrite (eeAdr + 1), eeTmp
+  Wait 5 ms
+
+End Sub
+
+
+'------------------------------------------------------------
+'==================== LV: EEPROM ielade starta / EN: Load learned data from EEPROM at start-up ====================
+' LV: 2) Markeri; tie sakas no EE_MRK_BASE (=160), nevis 128. / EN: 2) markers; they start from EE_MRK_BASE (=160), not 128.
+'------------------------------------------------------------
+Sub EEPROM_LoadLearned()
+
+  haveMask = 0
+
+  chSel = 1
+  Do While chSel <= 4
+
+     eeAdr = EE_MRK_BASE + (chSel - 1) * 2
+
+     EPRead eeAdr, eeA
+     EPRead (eeAdr + 1), eeB
+
+     xorVal = 160 + chSel   ' LV: sagaidamais magic markeris 161..164. / EN: expected magic marker 161..164.
+
+     If (eeA = xorVal) And (eeB = (xorVal Xor 255)) Then
+
+        startByte = (chSel - 1) * SIG_BYTES
+        For byteIdx = 0 To SIG_BYTES - 1
+           eeAdr = EE_SIG_BASE + startByte + byteIdx
+           EPRead eeAdr, eeTmp
+           sigLearnAll(startByte + byteIdx) = eeTmp
+        Next
+
+        eeA = 1
+        Call Have_Set()
+
+     Else
+        eeA = 0
+        Call Have_Set()
+     End If
+
+     chSel = chSel + 1
+  Loop
+
+End Sub
