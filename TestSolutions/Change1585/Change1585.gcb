@@ -1,0 +1,470 @@
+// ************************************************************************
+
+//  ----- Configuration
+#OPTION Explicit
+#CHIP tiny841, 1
+#DEFINE LED1 PortA.5
+#DEFINE S1 PinA.2
+
+' Define I2C settings
+#DEFINE I2C_DATA PORTA.0
+#DEFINE I2C_CLOCK PORTA.1
+#define I2C_BAUD_RATE 400
+#define I2C_MODE Master
+#define I2C_END_DELAY   0 us 'setting these delays to zero saves flash memory
+#define I2C_CLOCK_DELAY 0 us
+#define I2C_BIT_DELAY   0 us
+' OLED settings
+#DEFINE OLED_i2c_adr = 0x78
+#DEFINE OLED_contrast = 0x30
+
+#DEFINE CRC8Poly = 0x31 'CRC-8-Maxim  
+
+'outputs to microcontroller that is being programmed
+#DEFINE TARGET_RES PORTB.0
+#DEFINE TARGET_SCK PORTB.1
+#DEFINE TARGET_MOSI PORTB.2
+#DEFINE TARGET_MISO PINA.7
+
+'inputs connected to phototransistors
+#DEFINE CLKpin PinB.3
+#DEFINE D1pin PinA.4
+#DEFINE D2pin PinA.6
+
+DIM CMD(4) AS BYTE
+DIM signature(3) AS BYTE       'holds device signature 
+DIM MISObyte AS BYTE
+DIM bout as Byte
+DIM byteIdx As BYTE
+DIM bitIdx AS BYTE
+DIM I1 AS BYTE 'loop variable
+DIM I2 AS BYTE 'loop variable
+DIM fuse(4) AS BYTE
+DIM fuseLo AS BYTE ALIAS fuse(1)
+DIM fuseHi AS BYTE ALIAS fuse(2)
+DIM fuseEx AS BYTE ALIAS fuse(3)
+DIM lockbits AS BYTE ALIAS fuse(4)
+DIM fuse_verify(4) AS BYTE
+DIM curs AS BYTE
+DIM buttonPressLong AS BYTE
+DIM page_y_old AS BYTE
+
+DIM text As String * 10
+DIM oled_page As Byte
+DIM oled_col As Byte
+DIM inversion_mask As Byte
+DIM temp_byte As Byte
+DIM temp_word As Word
+
+Dir LED1 Out
+LED1 = 1   'LED is active low
+Dir PortA.2 In
+PueA.2 = 1  'activate pull-up for S1
+
+// InitTimer0 Osc, PS_1024
+// StopTimer 0 : ClearTimer 0
+// InitTimer1 Osc, PS_1024
+// StopTimer 1 : ClearTimer 1
+
+GOSUB StartUpOk
+Oled_init
+Oled_cls
+// ----- check if we are entering the fuse bit editor
+Wait 50 ms
+If S1 = 0 Then 
+    Wait 25 ms
+    GOSUB EnterProgramMode
+
+    Oled_string(ByteToHex(MISObyte), 0, 0, 0)
+    If MISObyte = 0x53 Then
+        Oled_string("OK",0,1,0)
+        GOSUB ReadFuseBits
+    Else
+        GOTO Error
+    End If
+
+    //GOSUB ResetBumping
+    
+    GOSUB DrawAllBits
+
+Else
+    Oled_string("PROG MODE",0,0,0)
+End If
+END
+
+SUB SendCmd(In rb AS BYTE) 'a four byte command sent out via SCK and MOSI
+    FOR I1=1 TO 4
+        SendByte(CMD(I1),bout)
+        IF I1=rb THEN MISObyte = bout
+    NEXT
+    TARGET_SCK = 0
+END SUB
+
+SUB SendByte(In bb AS BYTE, Out bo AS BYTE)
+    REPEAT 8
+        TARGET_SCK = 0
+        If bb.7 = 1 Then
+          TARGET_MOSI = 1
+        Else
+          TARGET_MOSI = 0
+        End If
+        TARGET_SCK = 1
+        SET C OFF
+        ROTATE bo left
+        IF TARGET_MISO=1 THEN bo.0 = 1
+        ROTATE bb left
+    END REPEAT
+END SUB
+
+
+EnterProgramMode:
+    Dir TARGET_RES Out
+    Dir TARGET_SCK Out
+    Dir TARGET_MOSI Out
+   TARGET_SCK = 0
+   TARGET_RES = 0
+   Wait 5 ms
+   GOSUB ResetBumping
+   CMD(1) = 0xAC : CMD(2) = 0x53 : CMD(3) = 0x00 : CMD(4) = 0x00 'program enable 0xAC,0x53,0x00,0x00
+   SendCmd(3)
+RETURN
+
+ReadFuseBits:
+   CMD(1) = 0x50 : CMD(2) = 0x00 : CMD(3) = 0x00 : CMD(4) = 0x00
+   SendCmd(4)
+   fuseLo = MISObyte
+
+   CMD(1) = 0x58 ': CMD(2) = 0x00 : CMD(3) = 0x00 : CMD(4) = 0x00
+   SendCmd(4)
+   lockbits = MISObyte
+
+                CMD(2) = 0x08 ': CMD(3) = 0x00 : CMD(4) = 0x00
+   SendCmd(4)
+   fuseHi = MISObyte
+
+   CMD(1) = 0x50 ': CMD(2) = 0x08 : CMD(3) = 0x00 : CMD(4) = 0x00
+   SendCmd(4)
+   fuseEx = MISObyte
+
+   CMD(1) = 0x30 : CMD(2) = 0x00 ': CMD(4) = 0x00
+   FOR I2=0 TO 2
+      CMD(3) = I2
+      SendCmd(4)
+      signature(I2) = MISObyte
+   NEXT
+RETURN
+
+
+DrawBit:
+    oled_page = curs AND 0x0F
+    oled_col = curs AND 0xF0
+    SET C OFF                   //multiply by 4 to get to pixel column 64 for the rest of fuse and lock bits
+    ROTATE oled_col Left
+    SET C OFF
+    ROTATE oled_col Left
+
+    'EVAN
+    text = ReadBitNameString(curs)
+    Oled_string(text, oled_col, oled_page, inversion_mask)
+    IF curs < 26 THEN
+        byteIdx = curs
+        Repeat 3    //divide by 8
+            SET C OFF
+            ROTATE byteIdx right
+        End Repeat
+        bitIdx = curs AND 0x07
+        IF (fuse(byteIdx).bitIdx = 0) THEN
+            text = "0"
+        ELSE
+            text = "1"
+        END IF
+        Oled_string(text, oled_col+52, oled_page, inversion_mask)
+    END IF
+RETURN
+
+DrawAllBits:
+    inversion_mask = 0
+    FOR curs=1 TO 27
+        GOSUB DrawBit
+    NEXT
+    curs = 0
+    inversion_mask = 0xFF
+    GOSUB DrawBit
+
+    Oled_string("SIG:", 64, 15, 0)
+    FOR I2=0 TO 2
+        Oled_string(ByteToHex(signature(I2)), I2*14+90, 15, 0)
+    NEXT
+RETURN
+
+// DrawMessage:
+//     Oled_string(text,96,7,0)
+// RETURN
+
+'----------------------------------
+'Write string or column pattern to OLED.
+'text: if empty string then xor_mask is printed; 1x8 pixel
+'page_y: 0-7
+'col: 0-127
+'xor_mask: 0 normal, 0xFF inverted text
+'          if text is empty string, xor_mask will be printed
+'----------------------------------
+Sub Oled_string(In txt As String, In col As Byte, In page_y As Byte, In xor_mask As Byte)
+    DIM Q1 As Byte
+    DIM txtLength as Byte
+
+    'page_y = page_y + 176 '+176 to make higher nibble hex-B and turn it into page command
+    I2cstart
+    I2csend OLED_i2c_adr
+    I2csend 0x00
+    I2csend page_y + 176 '+176 to make higher nibble hex-B and turn it into page command
+                         'page 0-7 (one page are 8 consecutive lines; there are 8 pages: 0-7)
+
+    'send lower nibble of column address
+    temp_byte = col AND 0x0F 'isolate lower nibble of col
+    I2csend temp_byte
+
+    'send upper nibble of column address
+    Repeat 4
+        SET C OFF
+        ROTATE col RIGHT
+    End Repeat
+    col.4 = 1
+    I2csend col
+    I2cstop
+
+    I2cstart
+    I2csend OLED_i2c_adr
+    I2csend 0x40
+
+    txtLength = txt(0)
+    IF txtLength = 0 THEN 'if no text string provided output one column of pixels; for drawing vertical lines
+        I2csend xor_mask
+    ELSE
+        For Q1 = 1 To txtLength
+            'change character to ASCII and the bitmap data
+            temp_word = [word]txt(Q1) * 5 - 159
+            'I2csend xor_mask 'one column space before the character
+            Repeat 5
+                ReadTable Asciitab, temp_word, temp_byte
+                I2csend temp_byte XOR xor_mask
+                temp_word += 1
+            End Repeat
+            I2csend xor_mask 'one column space after the character
+        Next Q1
+    END IF
+    I2cstop
+End Sub
+
+'----------------------------------
+'Clear OLED
+'----------------------------------
+Sub Oled_cls
+   For oled_page=176 To 191
+      I2cstart
+      I2csend OLED_i2c_adr
+      I2csend 0x80
+      I2csend oled_page
+      I2csend 0x40
+      Repeat 128
+         I2csend 0x00
+      End Repeat
+      I2cstop
+   Next oled_page
+End Sub
+
+'----------------------------------
+'Initialize OLED
+'----------------------------------
+Sub Oled_init
+   I2cstart
+   I2csend OLED_i2c_adr
+   I2csend 0x00          ' command stream
+
+   I2csend 0x8D          ' charge pump (can be left out for SH1106)
+   I2csend 0x14          ' enable
+
+   I2csend 0xA0          ' SEG remap          A0 -> A1 for 180-degree display rotation
+   I2csend 0xC0          ' COM scan direction C0 -> C8 for 180-degree display rotation
+
+   I2csend 0x20          ' memory addressing (can be left out for SH1106)
+   I2csend 0x02          ' page mode
+
+   I2csend 0x81          ' contrast
+   I2csend OLED_contrast
+
+   I2csend 0xAF          ' display ON
+   I2cstop
+End Sub
+
+ResetBumping:
+   TARGET_RES = 1
+   Wait 25 ms
+   TARGET_RES = 0
+   Wait 50 ms
+RETURN
+
+Error:
+DO : GOSUB OneFastBlink : LOOP
+
+OneFastBlink:
+    PulseOutInv LED1, 200 ms
+    Wait 200 ms
+RETURN
+
+OneSlowBlink:
+    PulseOutInv LED1, 600 ms
+    Wait 200 ms
+RETURN
+
+StartUpOk:
+    GOSUB OneSlowBlink
+    GOSUB OneFastBlink
+    GOSUB OneFastBlink
+RETURN
+
+Table BitNames
+    'EVAN
+    "CKSEL0\0","CKSEL1\0","CKSEL2\0","CKSEL3\0","SUT0\0","SUT1\0","CKOUT\0","CKDIV8\0",
+    "RSTDIS\0","BOD0\0","BOD1\0","BOD2\0","WDTON\0","SPIEN\0","EESAVE\0","DWEN\0",
+    "SELFPR\0","\0","\0","\0","\0","\0","\0","\0",
+    "LB1\0","LB2\0"," SAVE\0"
+End Table
+
+Table Asciitab
+   0x00,0x00,0x00,0x00,0x00   ' 32 space
+   0x00,0x06,0x5F,0x06,0x00   ' 33 !
+   0x07,0x03,0x00,0x07,0x03   ' 34 double quote
+   0x24,0x7E,0x24,0x7E,0x24   ' 35 #
+   0x24,0x2B,0x6A,0x12,0x00   ' 36 $
+   0x63,0x13,0x08,0x64,0x63   ' 37 %
+   0x36,0x49,0x56,0x20,0x50   ' 38 &
+   0x00,0x07,0x03,0x00,0x00   ' 39 '
+   0x00,0x3E,0x41,0x00,0x00   ' 40 (
+   0x00,0x41,0x3E,0x00,0x00   ' 41 )
+   0x08,0x3E,0x1C,0x3E,0x08   ' 42 *
+   0x08,0x08,0x3E,0x08,0x08   ' 43 +
+   0x00,0xE0,0x60,0x00,0x00   ' 44 ,
+   0x08,0x08,0x08,0x08,0x08   ' 45 -
+   0x00,0x60,0x60,0x00,0x00   ' 46 .
+   0x20,0x10,0x08,0x04,0x02   ' 47 /
+   0x3E,0x51,0x49,0x45,0x3E   ' 48 0
+   0x00,0x42,0x7F,0x40,0x00   ' 49 1
+   0x62,0x51,0x49,0x49,0x46   ' 50 2
+   0x22,0x49,0x49,0x49,0x36   ' 51 3
+   0x18,0x14,0x12,0x7F,0x10   ' 52 4
+   0x2F,0x49,0x49,0x49,0x31   ' 53 5
+   0x3C,0x4A,0x49,0x49,0x30   ' 54 6
+   0x01,0x71,0x09,0x05,0x03   ' 55 7
+   0x36,0x49,0x49,0x49,0x36   ' 56 8
+   0x06,0x49,0x49,0x29,0x1E   ' 57 9
+   0x00,0x6C,0x6C,0x00,0x00   ' 58 :
+   0x00,0xEC,0x6C,0x00,0x00   ' 59 ;
+   0x08,0x14,0x22,0x41,0x00   ' 60 <
+   0x24,0x24,0x24,0x24,0x24   ' 61 =
+   0x00,0x41,0x22,0x14,0x08   ' 62 >
+   0x02,0x01,0x59,0x09,0x06   ' 63 ?
+   0x3E,0x41,0x5D,0x55,0x1E   ' 64 @
+   0x7E,0x11,0x11,0x11,0x7E   ' 65 A
+   0x7F,0x49,0x49,0x49,0x36   ' 66 B
+   0x3E,0x41,0x41,0x41,0x22   ' 67 C
+   0x7F,0x41,0x41,0x41,0x3E   ' 68 D
+   0x7F,0x49,0x49,0x49,0x41   ' 69 E
+   0x7F,0x09,0x09,0x09,0x01   ' 70 F
+   0x3E,0x41,0x49,0x49,0x7A   ' 71 G
+   0x7F,0x08,0x08,0x08,0x7F   ' 72 H
+   0x00,0x41,0x7F,0x41,0x00   ' 73 I
+   0x30,0x40,0x40,0x40,0x3F   ' 74 J
+   0x7F,0x08,0x14,0x22,0x41   ' 75 K
+   0x7F,0x40,0x40,0x40,0x40   ' 76 L
+   0x7F,0x02,0x04,0x02,0x7F   ' 77 M
+   0x7F,0x02,0x04,0x08,0x7F   ' 78 N
+   0x3E,0x41,0x41,0x41,0x3E   ' 79 O
+   0x7F,0x09,0x09,0x09,0x06   ' 80 P
+   0x3E,0x41,0x51,0x21,0x5E   ' 81 Q
+   0x7F,0x09,0x09,0x19,0x66   ' 82 R
+   0x26,0x49,0x49,0x49,0x32   ' 83 S
+   0x01,0x01,0x7F,0x01,0x01   ' 84 T
+   0x3F,0x40,0x40,0x40,0x3F   ' 85 U
+   0x1F,0x20,0x40,0x20,0x1F   ' 86 V
+   0x3F,0x40,0x3C,0x40,0x3F   ' 87 W
+   0x63,0x14,0x08,0x14,0x63   ' 88 X
+   0x07,0x08,0x70,0x08,0x07   ' 89 Y
+   0x71,0x49,0x45,0x43,0x00   ' 90 Z
+//    0x00,0x7F,0x41,0x41,0x00   ' 91 [
+//    0x02,0x04,0x08,0x10,0x20   ' 92 \
+//    0x00,0x41,0x41,0x7F,0x00   ' 93 ]
+//    0x04,0x02,0x01,0x02,0x04   ' 94 ^
+//    0x80,0x80,0x80,0x80,0x80   ' 95 underscore
+//    0x00,0x03,0x07,0x00,0x00   ' 96 backtick
+//    0x20,0x54,0x54,0x54,0x78   ' 97 a
+//    0x7F,0x44,0x44,0x44,0x38   ' 98 b
+//    0x38,0x44,0x44,0x44,0x28   ' 99 c
+//    0x38,0x44,0x44,0x44,0x7F   '100 d
+//    0x38,0x54,0x54,0x54,0x08   '101 e
+//    0x08,0x7E,0x09,0x09,0x00   '102 f
+//    0x18,0xA4,0xA4,0xA4,0x7C   '103 g
+//    0x7F,0x04,0x04,0x78,0x00   '104 h
+//    0x00,0x00,0x7D,0x40,0x00   '105 i
+//    0x40,0x80,0x84,0x7D,0x00   '106 j
+//    0x7F,0x10,0x28,0x44,0x00   '107 k
+//    0x00,0x00,0x7F,0x40,0x00   '108 l
+//    0x7C,0x04,0x18,0x04,0x78   '109 m
+//    0x7C,0x04,0x04,0x78,0x00   '110 n
+//    0x38,0x44,0x44,0x44,0x38   '111 o
+//    0xFC,0x44,0x44,0x44,0x38   '112 p
+//    0x38,0x44,0x44,0x44,0xFC   '113 q
+//    0x44,0x78,0x44,0x04,0x08   '114 r
+//    0x08,0x54,0x54,0x54,0x20   '115 s
+//    0x04,0x3E,0x44,0x24,0x00   '116 t
+//    0x3C,0x40,0x20,0x7C,0x00   '117 u
+//    0x1C,0x20,0x40,0x20,0x1C   '118 v
+//    0x3C,0x60,0x30,0x60,0x3C   '119 w
+//    0x6C,0x10,0x10,0x6C,0x00   '120 x
+//    0x9C,0xA0,0x60,0x3C,0x00   '121 y
+//    0x64,0x54,0x54,0x4C,0x00   '122 z
+//    0x08,0x3E,0x41,0x41,0x00   '123 {
+//    0x00,0x00,0x77,0x00,0x00   '124 |
+//    0x00,0x41,0x41,0x3E,0x08   '125 }
+//    0x02,0x01,0x02,0x01,0x00   '126 ~
+//    0x3C,0x26,0x23,0x26,0x3C   '127 square plus pointer down
+End Table
+
+'EVAN
+Function ReadBitNameString( rbns_index As Byte ) As String
+
+    Dim rbns_currentIndex As Byte
+    Dim rbns_char As Byte
+    Dim rbns_ptr As Word
+
+    rbns_currentIndex = 1
+    rbns_ptr = 0
+    ReadBitNameString = ""
+
+    Do
+
+        If rbns_currentIndex = rbns_index Then
+
+            ReadBitNameString = ""
+
+            Do
+                ReadTable BitNames, rbns_ptr, rbns_char
+                rbns_ptr++
+                If rbns_char = 0 Then Exit Do
+
+                ReadBitNameString = ReadBitNameString + Chr(rbns_char)
+            Loop
+
+            Exit Function
+        End If
+
+        Do
+            ReadTable BitNames, rbns_ptr, rbns_char
+            rbns_ptr++
+        Loop Until rbns_char = 0
+
+        rbns_currentIndex++
+
+    Loop
+
+End Function

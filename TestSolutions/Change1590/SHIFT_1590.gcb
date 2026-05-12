@@ -1,0 +1,351 @@
+' Test routine for SHIFT command
+' Tests Byte, Word and Long for both LEFT and RIGHT shifts
+' Results are printed via serial so connect a terminal at 9600 baud
+'
+' Expected results are shown in comments for each test
+
+#chip mega328p, 16
+#option explicit
+
+' Serial for output
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+' Variables
+Dim TestByte As Byte
+Dim TestWord As Word
+Dim TestLong As Long
+Dim PassCount As Byte
+Dim FailCount As Byte
+
+PassCount = 0
+FailCount = 0
+
+
+wait 3 s
+
+HSerPrintCRLF
+HSerPrint "SHIFT Command Test Suite"
+HSerPrintCRLF
+HSerPrint "========================"
+HSerPrintCRLF
+
+' -------------------------------------------------------
+' BYTE TESTS
+' -------------------------------------------------------
+HSerPrint "--- Byte Tests ---"
+HSerPrintCRLF
+
+' Byte LEFT: 1 -> 2
+TestByte = 1
+Shift TestByte, LEFT
+If TestByte = 2 Then
+    HSerPrint "PASS: Byte LEFT  1->2 got "
+    HSerPrint TestByte
+    HSerPrintCRLF
+    PassCount = PassCount + 1
+Else
+    HSerPrint "FAIL: Byte LEFT  1->2 got "
+    HSerPrint TestByte
+    HSerPrintCRLF
+    FailCount = FailCount + 1
+End If
+
+' Byte LEFT: 64 -> 128
+TestByte = 64
+Shift TestByte, LEFT
+If TestByte = 128 Then
+    HSerPrint "PASS: Byte LEFT  64->128 got "
+    HSerPrint TestByte
+    HSerPrintCRLF
+    PassCount = PassCount + 1
+Else
+    HSerPrint "FAIL: Byte LEFT  64->128 got "
+    HSerPrint TestByte
+    HSerPrintCRLF
+    FailCount = FailCount + 1
+End If
+
+' Byte LEFT: 128 -> 0 (bit falls off the end, no carry back)
+TestByte = 128
+Shift TestByte, LEFT
+If TestByte = 0 Then
+    HSerPrint "PASS: Byte LEFT  128->0 got "
+    HSerPrint TestByte
+    HSerPrintCRLF
+    PassCount = PassCount + 1
+Else
+    HSerPrint "FAIL: Byte LEFT  128->0 got "
+    HSerPrint TestByte
+    HSerPrintCRLF
+    FailCount = FailCount + 1
+End If
+
+' Byte RIGHT: 128 -> 64
+TestByte = 128
+Shift TestByte, RIGHT
+If TestByte = 64 Then
+    HSerPrint "PASS: Byte RIGHT 128->64 got "
+    HSerPrint TestByte
+    HSerPrintCRLF
+    PassCount = PassCount + 1
+Else
+    HSerPrint "FAIL: Byte RIGHT 128->64 got "
+    HSerPrint TestByte
+    HSerPrintCRLF
+    FailCount = FailCount + 1
+End If
+
+' Byte RIGHT: 2 -> 1
+TestByte = 2
+Shift TestByte, RIGHT
+If TestByte = 1 Then
+    HSerPrint "PASS: Byte RIGHT 2->1 got "
+    HSerPrint TestByte
+    HSerPrintCRLF
+    PassCount = PassCount + 1
+Else
+    HSerPrint "FAIL: Byte RIGHT 2->1 got "
+    HSerPrint TestByte
+    HSerPrintCRLF
+    FailCount = FailCount + 1
+End If
+
+' Byte RIGHT: 1 -> 0 (bit falls off the end, no carry back)
+TestByte = 1
+Shift TestByte, RIGHT
+If TestByte = 0 Then
+    HSerPrint "PASS: Byte RIGHT 1->0 got "
+    HSerPrint TestByte
+    HSerPrintCRLF
+    PassCount = PassCount + 1
+Else
+    HSerPrint "FAIL: Byte RIGHT 1->0 got "
+    HSerPrint TestByte
+    HSerPrintCRLF
+    FailCount = FailCount + 1
+End If
+
+' -------------------------------------------------------
+' WORD TESTS
+' -------------------------------------------------------
+HSerPrint "--- Word Tests ---"
+HSerPrintCRLF
+
+' Word LEFT: 1 -> 2
+TestWord = 1
+Shift TestWord, LEFT
+If TestWord = 2 Then
+    HSerPrint "PASS: Word LEFT  1->2 got "
+    HSerPrint TestWord
+    HSerPrintCRLF
+    PassCount = PassCount + 1
+Else
+    HSerPrint "FAIL: Word LEFT  1->2 got "
+    HSerPrint TestWord
+    HSerPrintCRLF
+    FailCount = FailCount + 1
+End If
+
+' Word LEFT: 128 -> 256 (carry from byte 0 into byte 1)
+TestWord = 128
+Shift TestWord, LEFT
+If TestWord = 256 Then
+    HSerPrint "PASS: Word LEFT  128->256 got "
+    HSerPrint TestWord
+    HSerPrintCRLF
+    PassCount = PassCount + 1
+Else
+    HSerPrint "FAIL: Word LEFT  128->256 got "
+    HSerPrint TestWord
+    HSerPrintCRLF
+    FailCount = FailCount + 1
+End If
+
+' Word LEFT: 32768 -> 0 (MSB falls off, no carry back)
+TestWord = 32768
+Shift TestWord, LEFT
+If TestWord = 0 Then
+    HSerPrint "PASS: Word LEFT  32768->0 got "
+    HSerPrint TestWord
+    HSerPrintCRLF
+    PassCount = PassCount + 1
+Else
+    HSerPrint "FAIL: Word LEFT  32768->0 got "
+    HSerPrint TestWord
+    HSerPrintCRLF
+    FailCount = FailCount + 1
+End If
+
+' Word RIGHT: 256 -> 128 (carry from byte 1 into byte 0)
+TestWord = 256
+Shift TestWord, RIGHT
+If TestWord = 128 Then
+    HSerPrint "PASS: Word RIGHT 256->128 got "
+    HSerPrint TestWord
+    HSerPrintCRLF
+    PassCount = PassCount + 1
+Else
+    HSerPrint "FAIL: Word RIGHT 256->128 got "
+    HSerPrint TestWord
+    HSerPrintCRLF
+    FailCount = FailCount + 1
+End If
+
+' Word RIGHT: 32768 -> 16384
+TestWord = 32768
+Shift TestWord, RIGHT
+If TestWord = 16384 Then
+    HSerPrint "PASS: Word RIGHT 32768->16384 got "
+    HSerPrint TestWord
+    HSerPrintCRLF
+    PassCount = PassCount + 1
+Else
+    HSerPrint "FAIL: Word RIGHT 32768->16384 got "
+    HSerPrint TestWord
+    HSerPrintCRLF
+    FailCount = FailCount + 1
+End If
+
+' Word RIGHT: 1 -> 0 (LSB falls off, no carry back)
+TestWord = 1
+Shift TestWord, RIGHT
+If TestWord = 0 Then
+    HSerPrint "PASS: Word RIGHT 1->0 got "
+    HSerPrint TestWord
+    HSerPrintCRLF
+    PassCount = PassCount + 1
+Else
+    HSerPrint "FAIL: Word RIGHT 1->0 got "
+    HSerPrint TestWord
+    HSerPrintCRLF
+    FailCount = FailCount + 1
+End If
+
+' -------------------------------------------------------
+' LONG TESTS
+' -------------------------------------------------------
+HSerPrint "--- Long Tests ---"
+HSerPrintCRLF
+
+' Long LEFT: 1 -> 2
+TestLong = 1
+Shift TestLong, LEFT
+If TestLong = 2 Then
+    HSerPrint "PASS: Long LEFT  1->2 got "
+    HSerPrint TestLong
+    HSerPrintCRLF
+    PassCount = PassCount + 1
+Else
+    HSerPrint "FAIL: Long LEFT  1->2 got "
+    HSerPrint TestLong
+    HSerPrintCRLF
+    FailCount = FailCount + 1
+End If
+
+' Long LEFT: 128 -> 256 (carry from byte 0 into byte 1)
+TestLong = 128
+Shift TestLong, LEFT
+If TestLong = 256 Then
+    HSerPrint "PASS: Long LEFT  128->256 got "
+    HSerPrint TestLong
+    HSerPrintCRLF
+    PassCount = PassCount + 1
+Else
+    HSerPrint "FAIL: Long LEFT  128->256 got "
+    HSerPrint TestLong
+    HSerPrintCRLF
+    FailCount = FailCount + 1
+End If
+
+' Long LEFT: 32768 -> 65536 (carry from byte 1 into byte 2)
+TestLong = 32768
+Shift TestLong, LEFT
+If TestLong = 65536 Then
+    HSerPrint "PASS: Long LEFT  32768->65536 got "
+    HSerPrint TestLong
+    HSerPrintCRLF
+    PassCount = PassCount + 1
+Else
+    HSerPrint "FAIL: Long LEFT  32768->65536 got "
+    HSerPrint TestLong
+    HSerPrintCRLF
+    FailCount = FailCount + 1
+End If
+
+' Long LEFT: 8388608 -> 16777216 (carry from byte 2 into byte 3)
+TestLong = 8388608
+Shift TestLong, LEFT
+If TestLong = 16777216 Then
+    HSerPrint "PASS: Long LEFT  8388608->16777216 got "
+    HSerPrint TestLong
+    HSerPrintCRLF
+    PassCount = PassCount + 1
+Else
+    HSerPrint "FAIL: Long LEFT  8388608->16777216 got "
+    HSerPrint TestLong
+    HSerPrintCRLF
+    FailCount = FailCount + 1
+End If
+
+' Long RIGHT: 256 -> 128 (carry from byte 1 into byte 0)
+TestLong = 256
+Shift TestLong, RIGHT
+If TestLong = 128 Then
+    HSerPrint "PASS: Long RIGHT 256->128 got "
+    HSerPrint TestLong
+    HSerPrintCRLF
+    PassCount = PassCount + 1
+Else
+    HSerPrint "FAIL: Long RIGHT 256->128 got "
+    HSerPrint TestLong
+    HSerPrintCRLF
+    FailCount = FailCount + 1
+End If
+
+' Long RIGHT: 65536 -> 32768 (carry from byte 2 into byte 1)
+TestLong = 65536
+Shift TestLong, RIGHT
+If TestLong = 32768 Then
+    HSerPrint "PASS: Long RIGHT 65536->32768 got "
+    HSerPrint TestLong
+    HSerPrintCRLF
+    PassCount = PassCount + 1
+Else
+    HSerPrint "FAIL: Long RIGHT 65536->32768 got "
+    HSerPrint TestLong
+    HSerPrintCRLF
+    FailCount = FailCount + 1
+End If
+
+' Long RIGHT: 16777216 -> 8388608 (carry from byte 3 into byte 2)
+TestLong = 16777216
+Shift TestLong, RIGHT
+If TestLong = 8388608 Then
+    HSerPrint "PASS: Long RIGHT 16777216->8388608 got "
+    HSerPrint TestLong
+    HSerPrintCRLF
+    PassCount = PassCount + 1
+Else
+    HSerPrint "FAIL: Long RIGHT 16777216->8388608 got "
+    HSerPrint TestLong
+    HSerPrintCRLF
+    FailCount = FailCount + 1
+End If
+
+' -------------------------------------------------------
+' SUMMARY
+' -------------------------------------------------------
+HSerPrintCRLF
+HSerPrint "========================"
+HSerPrintCRLF
+HSerPrint "PASS: "
+HSerPrint PassCount
+HSerPrintCRLF
+HSerPrint "FAIL: "
+HSerPrint FailCount
+HSerPrintCRLF
+
+Do
+Loop

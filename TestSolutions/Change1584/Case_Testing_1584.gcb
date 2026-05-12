@@ -1,0 +1,75 @@
+'''Test program Bit Display
+
+#chip mega32u4, 16
+#option explicit
+
+    
+    #include <SoftSerial.h>
+
+
+    #script
+        Z = 1
+        SER1_BAUD    = 9600     ; baudrate must be defined
+        SER1_TXPORT  = PORTD    ; I/O port (without .bit) must be defined
+        SER1_TXPIN   = 4        ; portbit  must be defined
+    #endscript
+
+    Sub Ser1PrintLn ( in Ser1PrintStringOut as String )
+        Ser1Print Ser1PrintStringOut
+        Ser1Send 13: Ser1Send 10
+    End Sub
+
+' ----- Variables
+
+Dim Test_Value as Byte
+
+Dim Port_Index  as Byte
+Dim Byte_LCD    as Byte
+Dim Bin_String  as String
+
+; ----- Main body of program
+
+Test_Value = 0b0000001
+Repeat 8
+
+    Bin_String = ByteToBin (Test_Value)
+    Ser1Print "BIT " : Ser1PrintLn Bin_String
+
+    For Port_Index = 0 to 7
+        
+        Ser1Print Port_Index
+        Ser1Print " "
+        
+        Dim foundBitState as Byte = 0
+        Dim testByte = Test_value
+        Repeat Port_Index
+            rotate testByte right
+        End Repeat
+        If testByte.0 = 1 Then 
+            foundBitState =  1
+            Ser1Print "*"
+        Else
+            Ser1Print "!"
+        End If
+        Ser1Print foundBitState    
+        Ser1Print " "     
+
+        foundBitState =  Test_Value.Port_Index
+        If foundBitState =  1 Then
+            Ser1Print "$"
+        Else
+            Ser1Print "!"
+        End If
+
+        Ser1Print Test_Value.Port_Index
+        Ser1Print " "
+        Ser1Print Test_Value.3
+        Ser1Print Test_Value.2
+        Ser1Print Test_Value.1
+        Ser1Print Test_Value.0
+        Ser1PrintLN ""
+        
+    Next
+    Set C Off
+    Rotate Test_Value Left
+End Repeat

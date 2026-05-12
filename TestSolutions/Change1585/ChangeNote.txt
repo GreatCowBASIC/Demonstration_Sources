@@ -1,0 +1,241 @@
+There are multiple things going on in this change.
+
+1. A bug I introduced in build 1863 — **R Handling**
+2. **String handling in Tables**
+3. Trying to use a **string** in `ReadTable` operations
+4. **Bit test on an array element**
+
+Build **1585** resolves these issues.
+
+---
+
+## **1. R Handling**
+
+The issue with `RB` as a parameter had nothing to do with the way parameters are handled by GCBASIC ( from an architectural point of view ).
+
+It was caused by a error, by me, in build 1863: Sorry.
+
+Any variable starting with **"R"** and **two or more characters long** was incorrectly treated as a **register**, not RAM, when ASM was generated.
+
+This was an error introduced during an unrelated improvement to pure ASM support.
+
+Correct behaviour is now restored:
+
+- **Valid registers:** `"R0"` through `"R31"`
+- **Never treated as registers:** `"RB"`, `"Rfoo"`, `"R32"`, `"R1B"`, `"R"`
+
+Only strings that:
+
+- start with `R`
+- contain only digits after the `R`
+- and fall within the valid register range
+
+…are treated as registers.
+
+Everything else correctly fails the numeric test and is treated as a normal variable.
+
+---
+
+## **2. String Handling in Tables (Expanded)**
+
+Your table layout exposed a use case that had never been tested:
+
+```
+Table BitNames
+    "CKSEL0", "CKSEL1","CKSEL2","CKSEL3","SUT0","SUT1","CKOUT","CKDIV8"
+    "RSTDIS","BOD0","BOD1","BOD2","WDTON","SPIEN","EESAVE","DWEN"
+    "SELFPR","","","","","","",""
+    "LB1","LB2"," SAVE"
+End Table
+```
+
+### **2.1 What the compiler used to do**
+
+The compiler historically supported **string continuation**, where multiple quoted fragments were merged into one long string:
+
+```
+"Hello "
+"world"
+"!"
+```
+
+→ `"Hello world!"`
+
+This behaviour was intentional.
+
+However, the parser did **not** distinguish between:
+
+- continuation of the same string  
+- a new table entry  
+
+So it treated commas, whitespace, and line breaks as irrelevant.
+
+This caused your entire table to collapse into one long string:
+
+```
+CKSEL0CKSEL1CKSEL2CKSEL3SUT0SUT1CKOUTCKDIV8RSTDISBOD0BOD1BOD2WDTONSPIENEE SAVEDWENSELFP RLB1LB2 SAVE
+```
+
+### **2.2 Why this happened**
+
+The parser logic was:
+
+1. Read a quoted string  
+2. Append it to a buffer  
+3. Skip whitespace, commas, tabs  
+4. If the next non‑whitespace character is `"`, treat it as continuation  
+5. Repeat  
+
+This worked for multi‑line string literals, but not for multi‑string tables.
+
+### **2.3 Fix: The compiler now supports your use case**
+
+The parser has been updated so that:
+
+- A **comma ends a string entry**
+- A new quoted string after a comma is a **new table element**
+- Whitespace no longer causes accidental merging
+- Multi‑line tables with multiple strings now behave correctly
+
+Your original layout is now supported.
+
+### **2.4 But your use case requires explicit `\0` terminators**
+
+Because you are reading the table at runtime using `ReadTable`, each string must be **null‑terminated**.
+
+Corrected table:
+
+```
+"CKSEL0\0","CKSEL1\0","CKSEL2\0","CKSEL3\0","SUT0\0","SUT1\0","CKOUT\0","CKDIV8\0",
+"RSTDIS\0","BOD0\0","BOD1\0","BOD2\0","WDTON\0","SPIEN\0","EESAVE\0","DWEN\0",
+"SELFPR\0","\0","\0","\0","\0","\0","\0","\0",
+"LB1\0","LB2\0"," SAVE\0"
+```
+
+This assembles as:
+
+```
+TABLEBITNAMES:
+    .DB 125,67,75,83,69,76,48,0,67,75,83,69,76,49,0,67,75,83,69,76,50,0,67,75,83,69,76,51
+    .DB 0,83,85,84,48,0,83,85,84,49,0,67,75,79,85,84,0,67,75,68,73,86,56,0,82,83,84,68
+    .DB 73,83,0,66,79,68,48,0,66,79,68,49,0,66,79,68,50,0,87,68,84,79,78,0,83,80,73,69
+    .DB 78,0,69,69,83,65,86,69,0,68,87,69,78,0,83,69,76,70,80,82,0,0,0,0,0,0,0,0,76,66
+    .DB 49,0,76,66,50,0,32,83,65,86,69
+```
+
+### **2.5 Safety behaviour**
+
+If the pointer reads beyond the table (≥127 bytes), `ReadTable` returns **0**, which safely terminates the string.
+
+---
+
+## **3. Trying to Use a String in ReadTable Operations**
+
+This is now correctly flagged as a syntax error:
+
+```
+ReadTable BitNames, curs, text
+```
+
+Produces:
+
+```
+Error: Syntax: Cannot read table value into string
+```
+
+This is correct behaviour.
+
+---
+
+## **4. Bit Test on an Array Element**
+
+Array‑element bit tests are now supported.
+
+`IF (fuse(byteIdx).bitIdx = 0) THEN`
+
+The compiler now:
+
+- Detects array element usage
+- Loads the element into a temporary variable
+- Performs the bit test on that temporary
+- Emits correct ASM
+- Uses the errorlog handler for any future issues
+
+Example of corrected ASM:
+
+```
+;IF (fuse(byteIdx).bitIdx = 0) THEN
+    lds SysTemp1,BYTEIDX
+    ldi SysTemp2,low(FUSE)
+    add SysTemp1,SysTemp2
+    mov SysStringA,SysTemp1
+    ldi SysTemp2,0
+    ldi SysTemp3,high(FUSE)
+    adc SysTemp2,SysTemp3
+    mov SysStringA_H,SysTemp2
+    ld SysValueCopy,X+
+    sts SysArrayTemp1,SysValueCopy
+    ldi SysStringA, low(SYSARRAYTEMP1)
+    ldi SysStringA_H, high(SYSARRAYTEMP1)
+    lds SysReadA,BITIDX
+    andi SysReadA, 7
+    rcall SysReadBit
+    clr SysValueCopy
+    brbc 1,ELSE7_1
+```
+
+---
+
+## **Working Function to Read Table Strings**
+
+```
+Function ReadBitNameString( rbns_index As Byte ) As String
+
+    Dim rbns_currentIndex As Byte
+    Dim rbns_char As Byte
+    Dim rbns_ptr As Word
+
+    rbns_currentIndex = 1
+    rbns_ptr = 0
+    ReadBitNameString = ""
+
+    Do
+
+        If rbns_currentIndex = rbns_index Then
+
+            ReadBitNameString = ""
+
+            Do
+                ReadTable BitNames, rbns_ptr, rbns_char
+                rbns_ptr++
+                If rbns_char = 0 Then Exit Do
+
+                ReadBitNameString = ReadBitNameString + Chr(rbns_char)
+            Loop
+
+            Exit Function
+        End If
+
+        Do
+            ReadTable BitNames, rbns_ptr, rbns_char
+            rbns_ptr++
+        Loop Until rbns_char = 0
+
+        rbns_currentIndex++
+
+    Loop
+
+End Function
+```
+
+Example:
+
+```
+Print ReadBitNameString(1)   'CKSEL0
+Print ReadBitNameString(2)   'CKSEL1
+Print ReadBitNameString(8)   'CKDIV8
+Print ReadBitNameString(9)   'RSTDIS
+Print ReadBitNameString(17)  'SELFPR
+Print ReadBitNameString(18)  '' empty string
+```
+
