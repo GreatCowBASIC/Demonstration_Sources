@@ -128,7 +128,7 @@
                 PCA9685_WriteChannel ( PCA9685_ALL_CHANNELS, 0x0000, myLocalVariable )
             next
 
-            for myLocalVariable = 4094 to 1
+            for myLocalVariable = 4094 to 1 Step -1
                 PCA9685_WriteChannel ( PCA9685_ALL_CHANNELS, 0x0000, myLocalVariable )
             next
 

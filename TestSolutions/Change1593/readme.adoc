@@ -1,0 +1,136 @@
+= GCBASIC TABLE Support - Comprehensive Test Suite
+
+== Document Information
+* **Created:** May 2026
+* **Compiler Version:** GCBASIC Build 1587
+* **Target:** PIC18F26Q84 (64 MHz)
+* **Source File:** `table_test_18F26Q84.gcb`
+
+== Overview
+
+This document presents a complete test suite for GCBASIC's `TABLE` functionality. The test program exercises virtually all supported table features. Source definitions were cross-verified against the generated assembly.
+
+**Conclusion:** All tables compile correctly with accurate data.
+
+== Key Features Tested
+
+* Decimal, Hex (`0x`, `H'`), Binary (`b'`), and mixed literals
+* `AS BYTE` / `AS WORD` declarations
+* Automatic type upgrade to WORD
+* String handling (single-line, multi-line, CSV merging)
+* Escape sequences (`\n`, `\t`, `\r`, `\0`, `\"`, `\\`, `\&nnn`)
+* Trailing comma stripping on non-string lines
+* Compile-time arithmetic and `#define` constants
+* Leading zeros handling
+* Inline comments
+* `STORE DATA` (EEPROM) vs Program Memory
+* Large tables (stress test)
+
+== Table Size Constants
+
+[source,gcbasic]
+----
+#define DecimalBytes_SIZE       12
+#define HexBytes_SIZE           10
+#define WordValues_SIZE          9
+#define DataEETable_SIZE         6
+#define TrailingCommaTable_SIZE  5
+// ... (and so on for all tables)
+----
+
+== Verified Tables
+
+[cols="1,2,1,1,1,2", options="header"]
+|===
+| #  | Table Name                | Size   | Type   | Status     | Notes
+| 1  | `DecimalBytes`            | 12     | Byte   | ✅ Match   | Basic decimal
+| 2  | `HexBytes`                | 10     | Byte   | ✅ Match   | 0x notation
+| 3  | `WordValues`              | 9      | Word   | ✅ Match   | WORD table
+| 5  | `DataEETable`             | 6      | Byte   | ✅ Match   | STORE DATA (EEPROM)
+| 6  | `BinaryTable`             | 8      | Byte   | ✅ Match   | b'...' literals
+| 7  | `HexPrimeTable`           | 10     | Byte   | ✅ Match   | H'xx' format
+| 8  | `CStyleHexTable`          | 10     | Byte   | ✅ Match   | ASCII '0'-'9'
+| 9  | `MixedFormats`            | 4      | Byte   | ✅ Match   | All values = 10
+| 10 | `StringAsBytes`           | 5      | Byte   | ✅ Match   | "Hello"
+| 11 | `MultiLineString`         | 18     | Byte   | ✅ Match   | Null-terminated strings
+| 12 | `EscapeChars`             | 53     | Byte   | ✅ Match   | Escape sequences
+| 13 | `AsciiCodes`              | 8      | Byte   | ✅ Match   | \&nnn escapes
+| 14 | `CsvStrings`              | 16     | Byte   | ✅ Match   | **Merged** strings
+| 15 | `ConstantTable`           | 5      | Byte   | ✅ Match   | #define constants
+| 16 | `CalcTable`               | 7      | Byte   | ✅ Match   | Arithmetic
+| 17 | `WordCalcTable`           | 5      | Word   | ✅ Match   | WORD arithmetic
+| 18 | `LeadingZeroTable`        | 5      | Byte   | ✅ Match   | Leading zeros
+| 19 | `CommentedTable`          | 6      | Byte   | ✅ Match   | Inline comments
+| 20 | `AutoUpgradeTable`        | 7      | Word   | ✅ Match   | Auto-upgrade
+| 27 | `SinglePerLine`           | 8      | Byte   | ✅ Match   | One per line
+| 28 | `BaudTable`               | 6      | Byte   | ✅ Match   | Mixed
+| 29 | `LargeTable`              | 80     | Byte   | ✅ Match   | Stress test
+| 30 | `Corrected_BitNames`      | 117    | Byte   | ✅ Match   | Proper null-terminated
+| 31 | `BitNames`                | 97     | Byte   | ✅ Match   | CSV merge demo
+| 34 | `TwoBackSlashes`          | -      | Byte   | ✅ Match   | Double backslash
+| 35 | `TrailingCommaTable`      | 5      | Byte   | ✅ Match   | Trailing comma stripped per line
+|===
+
+== Debugging Table Transformations
+
+To troubleshoot how the preprocessor transforms table data, you can enable a specific debug mode in the compiler settings. This will output the **"In"** (source) and **"Out"** (processed ASCII bytes) for each data line to the console.
+
+=== Configuration
+
+Edit the `use.ini` file in your GCBASIC installation directory:
+
+[source,ini]
+----
+[gcbasic]
+; 2048 = cSHOWTABLESTRINGHANDLER
+compilerdebug = 2048
+----
+
+This debug option is especially useful when debugging complex string tables, escape sequences, or CSV merging behavior.
+
+== Important Behaviors
+
+=== Trailing Commas on Numeric Lines
+A lone `,` at the end of a trimmed line that contains no string literal (and is
+not a string continuation) is silently removed by the preprocessor.  This
+prevents a stray empty token from being emitted as a phantom byte.
+
+[source,gcbasic]
+----
+Table TrailingCommaTable AS BYTE
+    10,            ' trailing comma stripped → one byte: 10
+    0x1E,          ' trailing comma stripped → one byte: 30
+    b'00110000',   ' trailing comma stripped → one byte: 48
+    H'46',         ' trailing comma stripped → one byte: 70
+    200,           ' trailing comma stripped → one byte: 200
+End Table
+----
+
+NOTE: The strip only applies when the *last non-whitespace character* of the
+expanded byte stream is a bare `,`.  String content is already converted to
+numeric bytes at that point, so quoted data is never affected.
+
+=== String Merging
+Multiple quoted strings on the **same line** are merged without separators.  
+**Recommended safe method** for multiple strings:
+```gcbasic
+Table MyStrings AS BYTE
+    "String1", 0
+    "String2", 0
+    "String3", 0
+End Table
+```
+
+=== Leading Zeros
+Treated as **decimal**, not octal (`008` = 8).
+
+=== Storage Options
+* Default → Program Memory (Flash)
+* `STORE DATA` → EEPROM
+
+== Test Program Output
+
+The main program prints headings and all values for each table over USART1 at 9600 baud.  
+At completion it prints:
+
+**`=== ALL TESTS COMPLETE ===`**

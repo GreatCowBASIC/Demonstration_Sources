@@ -1,0 +1,107 @@
+'===========================================================
+'   Project: 3× DS18B20 Temperature Monitor (ATmega328P @16MHz)
+'   Notes : I2C LCD + Multi‑Port DS18B20 Reader
+'===========================================================
+
+#chip mega328p, 16
+#option Explicit
+
+'-------------------------
+' I2C Configuration
+'-------------------------
+#define I2C_MODE                Master
+#define I2C_DATA                PORTC.4
+#define I2C_CLOCK               PORTC.5
+#define I2C_DISABLE_INTERRUPTS  ON
+
+'-------------------------
+' LCD Configuration
+'-------------------------
+#define LCD_IO          10
+#define LCD_I2C_Address 0x3F
+
+#include <ds18b20mulltiportRes.h>
+
+'-------------------------
+' DS18B20 Sensor Pins
+'-------------------------
+#define DQ1 PortC.1
+#define DQ2 PortC.2
+#define DQ3 PortC.3
+
+'-------------------------
+' DS18B20 Resolution Setup
+'-------------------------
+DS18B20SetResolution(DQ1, DS18B20_TEMP_9_BIT)
+DS18B20SetResolution(DQ2, DS18B20_TEMP_9_BIT)
+DS18B20SetResolution(DQ3, DS18B20_TEMP_9_BIT)
+
+'-------------------------
+' Temperature Variables
+'-------------------------
+Dim T_1 As Integer
+Dim T_2 As Integer
+Dim T_3 As Integer
+
+Dim SIGNBIT      As Bit
+
+'===========================================================
+' Main Loop
+'===========================================================
+Do
+
+    '-------------------------
+    ' Read Sensor 1
+    '-------------------------
+    readtempfromPort(DQ1)
+
+    If SIGNBIT = True Then
+        T_1 = 128 - readTemp
+    Else
+        T_1 = readTemp
+    End If
+
+    Locate 0, 0
+    Print "                    "
+    Locate 0, 0
+    Print "Temp1: "
+    Print T_1
+    Print Chr(223) + "C"
+
+    '-------------------------
+    ' Read Sensor 2
+    '-------------------------
+    readtempfromPort(DQ2)
+
+    If SIGNBIT = True Then
+        T_2 = 128 - readTemp
+    Else
+        T_2 = readTemp
+    End If
+
+    Locate 1, 0
+    Print "                    "
+    Locate 1, 0
+    Print "Temp2: "
+    Print T_2
+    Print Chr(223) + "C"
+
+    '-------------------------
+    ' Read Sensor 3
+    '-------------------------
+    readtempfromPort(DQ3)
+
+    If SIGNBIT = True Then
+        T_3 = 128 - readTemp
+    Else
+        T_3 = readTemp
+    End If
+
+    Locate 2, 0
+    Print "                    "
+    Locate 2, 0
+    Print "Temp3: "
+    Print T_3
+    Print Chr(223) + "C"
+
+Loop

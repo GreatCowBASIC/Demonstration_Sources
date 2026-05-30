@@ -130,9 +130,9 @@
 
     Do Forever
         'Show how to turn channel on and off
-            PCA9685_WriteChannel ( PCA9685_ALL_CHANNELS, PCA9685_LED_ON )
+            PCA9685_WriteChannel ( PCA9685_ALL_CHANNELS, PCA9685_LED_ON, PCA9685_LED_OFF )
             wait 100 ms
-            PCA9685_WriteChannel ( PCA9685_ALL_CHANNELS, PCA9685_LED_OFF )
+            PCA9685_WriteChannel ( PCA9685_ALL_CHANNELS, PCA9685_LED_OFF, PCA9685_LED_OFF )
             wait 100 ms
     Loop
 

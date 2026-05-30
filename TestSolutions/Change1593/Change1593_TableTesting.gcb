@@ -1,0 +1,692 @@
+'*******************************************************************************
+' GCBASIC TABLE Capability - Complete Test Program
+' Target:  Microchip PIC 18F26Q84
+' Clock:   64 MHz (internal HFINTOSC)
+' Output:  USART1 @ 9600 baud  (TX = RC6)
+'
+' Comprehensive test of all TABLE features in GCBASIC.
+' Each table is read back and printed via serial for verification.
+'
+' TABLE index is 1-based.
+' _SIZE constants must be maintained manually.
+'*******************************************************************************
+
+#chip   16F886, 64
+#option Explicit
+
+'-------------------------------------------------------------------------------
+' Serial port
+'-------------------------------------------------------------------------------
+#define USART_BAUD_RATE  9600
+#define USART_TX_BLOCKING
+
+'===============================================================================
+' TABLE SIZE CONSTANTS
+'===============================================================================
+#define DecimalBytes_SIZE       12
+#define HexBytes_SIZE           10
+#define WordValues_SIZE          9
+#define DataEETable_SIZE         6
+#define BinaryTable_SIZE         8
+#define HexPrimeTable_SIZE      10
+#define CStyleHexTable_SIZE     10
+#define MixedFormats_SIZE        4
+#define StringAsBytes_SIZE       5
+#define MultiLineString_SIZE    18
+#define EscapeChars_SIZE        53
+#define AsciiCodes_SIZE          8
+#define CsvStrings_SIZE         16
+#define ConstantTable_SIZE       5
+#define CalcTable_SIZE           7
+#define WordCalcTable_SIZE       5
+#define LeadingZeroTable_SIZE    5
+#define CommentedTable_SIZE      6
+#define AutoUpgradeTable_SIZE    7
+#define SinglePerLine_SIZE       8
+#define BaudTable_SIZE           6
+#define LargeTable_SIZE         80
+#define Corrected_BitNames_SIZE 117
+#define BitNames_SIZE           97
+#define TrailingCommaTable_SIZE  5
+
+
+'===============================================================================
+' TABLE DECLARATIONS
+'===============================================================================
+
+' 1. Basic decimal BYTE table
+Table DecimalBytes
+    10, 20, 30, 40, 50
+    60, 70, 80, 90, 100
+    200, 255
+End Table
+
+' 2. Hex BYTE table
+Table HexBytes AS BYTE
+    0x00, 0x0F, 0x1A, 0x2B, 0x3C
+    0x4D, 0x5E, 0x6F, 0x7F, 0xFF
+End Table
+
+' 3. WORD table
+Table WordValues AS WORD
+    256, 512, 1024, 2048, 4096
+    8192, 16384, 32767, 65535
+End Table
+
+' 5. BYTE table stored in EEPROM
+Table DataEETable AS BYTE STORE DATA
+    0xA0, 0xB1, 0xC2, 0xD3, 0xE4, 0xF5
+End Table
+
+' 6. Binary literals
+Table BinaryTable AS BYTE
+    b'00000001', b'00000010', b'00000100', b'00001000'
+    b'00010000', b'00100000', b'01000000', b'10000000'
+End Table
+
+' 7. H'xx' hex literals - primes
+Table HexPrimeTable AS BYTE
+    H'02', H'03', H'05', H'07', H'0B'
+    H'0D', H'11', H'13', H'17', H'1D'
+End Table
+
+' 8. C-style 0x (ASCII '0'-'9')
+Table CStyleHexTable AS BYTE
+    0x30, 0x31, 0x32, 0x33, 0x34
+    0x35, 0x36, 0x37, 0x38, 0x39
+End Table
+
+' 9. Mixed formats - all equal 10
+Table MixedFormats AS BYTE
+    10
+    0x0A
+    b'00001010'
+    H'0A'
+End Table
+
+' 10. String as bytes
+Table StringAsBytes AS BYTE
+    "Hello"
+End Table
+
+' 11. Multiple null-terminated strings
+Table MultiLineString AS BYTE
+    "Line1", 0
+    "Line2", 0
+    "Line3", 0
+End Table
+
+' 12. Escape sequences
+Table EscapeChars AS BYTE
+    "Tab:\there", 0
+    "LF:\nhere", 0
+    "CR:\rhere", 0
+    "NUL:\0end", 0
+    "DQ:\"hi\"", 0
+    "BS:\\end", 0
+End Table
+
+' 13. Decimal escape \&nnn
+Table AsciiCodes AS BYTE
+    "\&065\&066\&067", 0
+    "\&048\&049\&050", 0
+End Table
+
+' 14. CSV strings (merged behaviour)
+Table CsvStrings AS BYTE
+    "Cat", "Dog", 0
+    "Bird", "Fish", 0
+End Table
+
+' 15. Constants
+#define MY_CONST1  42
+#define MY_CONST2  100
+#define MY_CONST3  200
+
+Table ConstantTable AS BYTE
+    MY_CONST1, MY_CONST2, MY_CONST3
+    MY_CONST1 + 1, MY_CONST2 - 1
+End Table
+
+' 16. Arithmetic expressions
+Table CalcTable AS BYTE
+    2 * 10, 3 * 10, 4 * 10
+    100 / 4, 100 / 2
+    (255 - 128), (128 + 64)
+End Table
+
+' 17. WORD arithmetic
+Table WordCalcTable AS WORD
+    256 * 1, 256 * 2, 256 * 3
+    1000 + 500, 2000 - 300
+End Table
+
+' 18. Leading zeros
+Table LeadingZeroTable AS BYTE
+    008, 009, 010, 011, 012
+End Table
+
+' 19. Inline comments
+Table CommentedTable AS BYTE
+    10,  20,  30
+    0xAA, 0xBB
+    b'11110000'
+    0xAA, 0x55
+End Table
+
+' 20. Auto-upgrade to WORD
+Table AutoUpgradeTable
+    10, 50, 100, 200
+    256, 1000, 5000
+End Table
+
+' 27. One value per line
+Table SinglePerLine AS BYTE
+    0x01
+    0x02
+    0x04
+    0x08
+    0x10
+    0x20
+    0x40
+    0x80
+End Table
+
+' 28. Baud rate constants
+#define BAUD_9600   103
+#define BAUD_19200   51
+#define BAUD_38400   25
+
+Table BaudTable AS BYTE
+    BAUD_9600, BAUD_19200, BAUD_38400
+    51, 25, 12
+End Table
+
+' 29. Large table
+Table LargeTable AS BYTE
+     1,  2,  3,  4,  5,  6,  7,  8,  9, 10
+    11, 12, 13, 14, 15, 16, 17, 18, 19, 20
+    21, 22, 23, 24, 25, 26, 27, 28, 29, 30
+    31, 32, 33, 34, 35, 36, 37, 38, 39, 40
+    41, 42, 43, 44, 45, 46, 47, 48, 49, 50
+    51, 52, 53, 54, 55, 56, 57, 58, 59, 60
+    61, 62, 63, 64, 65, 66, 67, 68, 69, 70
+    71, 72, 73, 74, 75, 76, 77, 78, 79, 80
+End Table
+
+' 30. One string per line with null terminator (recommended)
+Table Corrected_BitNames AS BYTE
+    "CKSEL0", 0
+    "CKSEL1", 0
+    "CKSEL2", 0
+    "CKSEL3", 0
+    "SUT0",   0
+    "SUT1",   0
+    "CKOUT",  0
+    "CKDIV8", 0
+    "RSTDIS", 0
+    "BOD0",   0
+    "BOD1",   0
+    "BOD2",   0
+    "WDTON",  0
+    "SPIEN",  0
+    "EESAVE", 0
+    "DWEN",   0
+    "SELFPR", 0
+    "", 0 : "", 0 : "", 0 : "", 0 : "", 0 : "", 0 : "", 0
+    "LB1",    0
+    "LB2",    0
+    "SAVE",   0
+End Table
+
+' 31. CSV on one line (strings merge)
+Table BitNames AS BYTE
+    "CKSEL0", "CKSEL1","CKSEL2","CKSEL3","SUT0","SUT1","CKOUT","CKDIV8"
+    "RSTDIS","BOD0","BOD1","BOD2","WDTON","SPIEN","EESAVE","DWEN"
+    "SELFPR","","","","","","",""
+    "LB1","LB2"," SAVE"
+End Table
+
+' 34. Double backslash test
+Table TwoBackSlashes
+    13,10
+    "               /      |      \\               /      |       \\              /      |     \\"
+End Table
+
+' 35. Trailing comma on non-string lines
+' Each line ends with a stray "," that the preprocessor must silently strip.
+' Five numeric entries; the trailing commas must NOT create phantom zero bytes.
+Table TrailingCommaTable AS BYTE
+    10,
+    0x1E,
+    b'00110000',
+    H'46',
+    200,
+End Table
+
+
+'===============================================================================
+' HELPER SUBS
+'===============================================================================
+
+Sub PrintHeading(_tt As String)
+    HSerPrint "--- " : HSerPrint _tt : HSerPrintCRLF
+End Sub
+
+
+'===============================================================================
+' TEST SUBS
+'===============================================================================
+
+'-------------------------------------------------------------------------------
+' Test 1 - DecimalBytes
+'-------------------------------------------------------------------------------
+Sub Test01_DecimalBytes
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T01 DecimalBytes"
+    For idx = 1 To DecimalBytes_SIZE
+        ReadTable DecimalBytes, idx, bVal
+        HSerPrint idx : HSerPrint "=" : HSerPrint bVal : HSerPrint "  "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 2 - HexBytes
+'-------------------------------------------------------------------------------
+Sub Test02_HexBytes
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T02 HexBytes"
+    For idx = 1 To HexBytes_SIZE
+        ReadTable HexBytes, idx, bVal
+        HSerPrint idx : HSerPrint "=" : HSerPrint bVal : HSerPrint "  "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 3 - WordValues
+'-------------------------------------------------------------------------------
+Sub Test03_WordValues
+    Dim idx  As Byte
+    Dim wVal As Word
+    PrintHeading "T03 WordValues"
+    For idx = 1 To WordValues_SIZE
+        ReadTable WordValues, idx, wVal
+        HSerPrint idx : HSerPrint "=" : HSerPrint wVal : HSerPrint "  "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 5 - DataEETable (EEPROM)
+'-------------------------------------------------------------------------------
+Sub Test05_DataEETable
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T05 DataEETable (EEPROM)"
+    For idx = 1 To DataEETable_SIZE
+        ReadTable DataEETable, idx, bVal
+        HSerPrint idx : HSerPrint "=" : HSerPrint bVal : HSerPrint "  "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 6 - BinaryTable
+'-------------------------------------------------------------------------------
+Sub Test06_BinaryTable
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T06 BinaryTable"
+    For idx = 1 To BinaryTable_SIZE
+        ReadTable BinaryTable, idx, bVal
+        HSerPrint idx : HSerPrint "=" : HSerPrint bVal : HSerPrint "  "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 7 - HexPrimeTable
+'-------------------------------------------------------------------------------
+Sub Test07_HexPrimeTable
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T07 HexPrimeTable"
+    For idx = 1 To HexPrimeTable_SIZE
+        ReadTable HexPrimeTable, idx, bVal
+        HSerPrint idx : HSerPrint "=" : HSerPrint bVal : HSerPrint "  "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 8 - CStyleHexTable
+'-------------------------------------------------------------------------------
+Sub Test08_CStyleHexTable
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T08 CStyleHexTable"
+    For idx = 1 To CStyleHexTable_SIZE
+        ReadTable CStyleHexTable, idx, bVal
+        HSerPrint idx : HSerPrint "=" : HSerPrint bVal : HSerPrint "  "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 9 - MixedFormats
+'-------------------------------------------------------------------------------
+Sub Test09_MixedFormats
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T09 MixedFormats (all=10)"
+    For idx = 1 To MixedFormats_SIZE
+        ReadTable MixedFormats, idx, bVal
+        HSerPrint idx : HSerPrint "=" : HSerPrint bVal : HSerPrint "  "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 10 - StringAsBytes
+'-------------------------------------------------------------------------------
+Sub Test10_StringAsBytes
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T10 StringAsBytes"
+    For idx = 1 To StringAsBytes_SIZE
+        ReadTable StringAsBytes, idx, bVal
+        HSerPrint bVal : HSerPrint " "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 11 - MultiLineString
+'-------------------------------------------------------------------------------
+Sub Test11_MultiLineString
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T11 MultiLineString"
+    For idx = 1 To MultiLineString_SIZE
+        ReadTable MultiLineString, idx, bVal
+        If bVal = 0 Then HSerPrint "|" Else HSerPrint Chr(bVal)
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 12 - EscapeChars
+'-------------------------------------------------------------------------------
+Sub Test12_EscapeChars
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T12 EscapeChars"
+    For idx = 1 To EscapeChars_SIZE
+        ReadTable EscapeChars, idx, bVal
+        If bVal = 0 Then HSerPrint " | " Else HSerPrint Chr(bVal) : HSerPrint " "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 13 - AsciiCodes
+'-------------------------------------------------------------------------------
+Sub Test13_AsciiCodes
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T13 AsciiCodes"
+    For idx = 1 To AsciiCodes_SIZE
+        ReadTable AsciiCodes, idx, bVal
+        HSerPrint Chr(bVal) : HSerPrint " "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 14 - CsvStrings (merged)
+'-------------------------------------------------------------------------------
+Sub Test14_CsvStrings
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T14 CsvStrings (merged)"
+    For idx = 1 To CsvStrings_SIZE
+        ReadTable CsvStrings, idx, bVal
+        HSerPrint bVal : HSerPrint " "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 15 - ConstantTable
+'-------------------------------------------------------------------------------
+Sub Test15_ConstantTable
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T15 ConstantTable"
+    For idx = 1 To ConstantTable_SIZE
+        ReadTable ConstantTable, idx, bVal
+        HSerPrint idx : HSerPrint "=" : HSerPrint bVal : HSerPrint "  "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 16 - CalcTable
+'-------------------------------------------------------------------------------
+Sub Test16_CalcTable
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T16 CalcTable"
+    For idx = 1 To CalcTable_SIZE
+        ReadTable CalcTable, idx, bVal
+        HSerPrint idx : HSerPrint "=" : HSerPrint bVal : HSerPrint "  "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 17 - WordCalcTable
+'-------------------------------------------------------------------------------
+Sub Test17_WordCalcTable
+    Dim idx  As Byte
+    Dim wVal As Word
+    PrintHeading "T17 WordCalcTable"
+    For idx = 1 To WordCalcTable_SIZE
+        ReadTable WordCalcTable, idx, wVal
+        HSerPrint idx : HSerPrint "=" : HSerPrint wVal : HSerPrint "  "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 18 - LeadingZeroTable
+'-------------------------------------------------------------------------------
+Sub Test18_LeadingZeroTable
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T18 LeadingZeroTable"
+    For idx = 1 To LeadingZeroTable_SIZE
+        ReadTable LeadingZeroTable, idx, bVal
+        HSerPrint idx : HSerPrint "=" : HSerPrint bVal : HSerPrint "  "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 19 - CommentedTable
+'-------------------------------------------------------------------------------
+Sub Test19_CommentedTable
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T19 CommentedTable"
+    For idx = 1 To CommentedTable_SIZE
+        ReadTable CommentedTable, idx, bVal
+        HSerPrint idx : HSerPrint "=" : HSerPrint bVal : HSerPrint "  "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 20 - AutoUpgradeTable
+'-------------------------------------------------------------------------------
+Sub Test20_AutoUpgradeTable
+    Dim idx  As Byte
+    Dim wVal As Word
+    PrintHeading "T20 AutoUpgradeTable"
+    For idx = 1 To AutoUpgradeTable_SIZE
+        ReadTable AutoUpgradeTable, idx, wVal
+        HSerPrint idx : HSerPrint "=" : HSerPrint wVal : HSerPrint "  "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 27 - SinglePerLine
+'-------------------------------------------------------------------------------
+Sub Test27_SinglePerLine
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T27 SinglePerLine"
+    For idx = 1 To SinglePerLine_SIZE
+        ReadTable SinglePerLine, idx, bVal
+        HSerPrint idx : HSerPrint "=" : HSerPrint bVal : HSerPrint "  "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 28 - BaudTable
+'-------------------------------------------------------------------------------
+Sub Test28_BaudTable
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T28 BaudTable"
+    For idx = 1 To BaudTable_SIZE
+        ReadTable BaudTable, idx, bVal
+        HSerPrint idx : HSerPrint "=" : HSerPrint bVal : HSerPrint "  "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 29 - LargeTable
+'-------------------------------------------------------------------------------
+Sub Test29_LargeTable
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T29 LargeTable (80 entries)"
+    For idx = 1 To LargeTable_SIZE
+        ReadTable LargeTable, idx, bVal
+        HSerPrint bVal : HSerPrint " "
+        If idx Mod 10 = 0 Then HSerPrintCRLF
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 30 - Corrected_BitNames
+'-------------------------------------------------------------------------------
+Sub Test30_Corrected_BitNames
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T30 Corrected_BitNames"
+    For idx = 1 To Corrected_BitNames_SIZE
+        ReadTable Corrected_BitNames, idx, bVal
+        If bVal = 0 Then
+            HSerPrintCRLF
+        Else
+            HSerPrint Chr(bVal)
+        End If
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 31 - BitNames (CSV merged)
+'-------------------------------------------------------------------------------
+Sub Test31_BitNames
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T31 BitNames (CSV merged)"
+    For idx = 1 To BitNames_SIZE
+        ReadTable BitNames, idx, bVal
+        HSerPrint bVal : HSerPrint " "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 34 - TwoBackSlashes
+'-------------------------------------------------------------------------------
+Sub Test34_TwoBackSlashes
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T34 Two BackSlashes"
+    For idx = 1 To 91
+        ReadTable TwoBackSlashes, idx, bVal
+        HSerPrint bVal : HSerPrint " "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+'-------------------------------------------------------------------------------
+' Test 35 - TrailingCommaTable
+' Each source line ends with a stray trailing comma.
+' Expected: 5 entries = 10, 30, 48, 70, 200 (no phantom zeros between them).
+'-------------------------------------------------------------------------------
+Sub Test35_TrailingCommaTable
+    Dim idx  As Byte
+    Dim bVal As Byte
+    PrintHeading "T35 TrailingCommaTable (trailing commas stripped)"
+    For idx = 1 To TrailingCommaTable_SIZE
+        ReadTable TrailingCommaTable, idx, bVal
+        HSerPrint idx : HSerPrint "=" : HSerPrint bVal : HSerPrint "  "
+    Next idx
+    HSerPrintCRLF
+End Sub
+
+
+'===============================================================================
+' MAIN PROGRAM
+'===============================================================================
+
+HSerPrintCRLF
+HSerPrint "=== GCBASIC TABLE TEST : 18F26Q84 ==="
+HSerPrintCRLF : HSerPrintCRLF
+
+Test01_DecimalBytes
+Test02_HexBytes
+Test03_WordValues
+Test05_DataEETable
+Test06_BinaryTable
+Test07_HexPrimeTable
+Test08_CStyleHexTable
+Test09_MixedFormats
+Test10_StringAsBytes
+Test11_MultiLineString
+Test12_EscapeChars
+Test13_AsciiCodes
+Test14_CsvStrings
+Test15_ConstantTable
+Test16_CalcTable
+Test17_WordCalcTable
+Test18_LeadingZeroTable
+Test19_CommentedTable
+Test20_AutoUpgradeTable
+Test27_SinglePerLine
+Test28_BaudTable
+Test29_LargeTable
+Test30_Corrected_BitNames
+Test31_BitNames
+Test34_TwoBackSlashes
+Test35_TrailingCommaTable
+
+HSerPrintCRLF
+HSerPrint "=== ALL TESTS COMPLETE ==="
+HSerPrintCRLF
+
+End
