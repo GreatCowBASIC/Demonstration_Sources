@@ -55,6 +55,7 @@
   Dim DSint as integer 'need this to return minus sign (set bit 15 = 1 (= negative))
   dim readtemp as Integer ' need this return the temperature
   dim readtemp12 as Integer
+  Dim Signbit As Bit
   dim tempc_100
   dim whole
 
@@ -132,6 +133,7 @@ macro readtempfromPort ( DQPort )
       readtemp =  Whole
    end if
 
+If Signbit = true Then readTemp = 128- readTemp 
 
 end macro
 
