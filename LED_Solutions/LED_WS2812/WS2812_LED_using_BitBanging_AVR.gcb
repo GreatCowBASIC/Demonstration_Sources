@@ -1,0 +1,239 @@
+' A demonstration of GCBASIC driving WS2812 LEDs on an AVR device.
+'
+' This demonstration contains:
+'   • Two demo modes:
+'         1. Chaser – LEDs light in sequence
+'         2. Flash All – all LEDs set to the same colour
+'
+'   • One WS2812 drive method:
+'         • Bit‑banged SPI‑style timing (WS2812BitBangSendData)
+'
+' Speed Control:
+'   • A potentiometer adjusts the delay between LED updates.
+'
+' Operation:
+'   • On power‑up, the Chaser mode is active.
+'   • Pressing the switch toggles between Chaser and Flash‑All modes.
+'
+' Hardware Connections (ATmega32U4):
+'   • WS2812 DIN        → PORTC.2
+'   • Potentiometer     → PORTF.7  (Arduino A0)
+'   • Switch (active‑low) → PORTB.4 (Arduino D8)
+'
+'************************************************************************
+' MCU:      ATmega32U4
+' Clock:    16 MHz
+' Compiler: GCBASIC
+' IDE:      GCCode
+' Author:   EvanV
+' Licence:  GPL
+' Version:  1.00
+' Date:     02‑09‑2026
+'************************************************************************
+
+
+'----- Configuration -----
+#chip mega32u4, 16
+#option explicit
+
+#define WS2812SendData WS2812BitBangSendData
+
+
+'----- Hardware Definitions -----
+
+#define DIN PORTC.2
+dir DIN out
+
+#define Potentiometer PORTF.7
+dir Potentiometer in
+
+#define SWITCH PORTB.4
+dir SWITCH in
+
+#define SWITCH_DOWN 0
+#define SWITCH_UP   1
+
+' Debug LEDs (optional)
+#define DS2 PORTC.0
+#define DS3 PORTC.1
+#define DS4 PORTC.2
+#define DS5 PORTC.3
+dir DS2 out
+dir DS3 out
+dir DS4 out
+dir DS5 out
+
+
+'----- Variables -----
+
+dim PixelCount as byte
+dim YLoop as byte
+dim XLoop as byte
+dim TimeoutOccurred as byte
+dim DisplayState as byte
+dim SwitchState as byte
+dim CurrentAddressedLED as byte
+dim CurrentLEDColorSequence as byte
+
+dim ColorOfLED as long
+dim ColorToSend as long
+
+
+'----- Main Program -----
+
+MainCode:
+
+    PixelCount = 16
+    CurrentAddressedLED = 1
+    CurrentLEDColorSequence = 0
+    DisplayState = 1
+    SwitchState = SWITCH_UP
+
+    WS2812_Init
+
+    ' Array of 5 colours (long values)
+    dim ColorArray(20)
+
+    SetLongArrayValueHandler(ColorArray, 0, 0x00FF00)   ' Red
+    SetLongArrayValueHandler(ColorArray, 1, 0xFFFF00)   ' Yellow
+    SetLongArrayValueHandler(ColorArray, 2, 0xFF0000)   ' Green
+    SetLongArrayValueHandler(ColorArray, 3, 0xFFFFFF)   ' White
+    SetLongArrayValueHandler(ColorArray, 4, 0x000000)   ' Black
+
+    do
+
+        ColorOfLED = GetLongArrayValueHandler(ColorArray, CurrentLEDColorSequence)
+
+        for YLoop = 1 to PixelCount
+
+            wait while TimeoutOccurred = 0
+            intoff
+
+            for XLoop = 1 to PixelCount
+
+                if XLoop = CurrentAddressedLED then
+                    ColorToSend = ColorOfLED
+                else
+                    if DisplayState = 1 then
+                        ColorToSend = 0x000000
+                    else
+                        ColorToSend = ColorOfLED
+                    end if
+                end if
+
+                WS2812SendData(ColorToSend)
+
+            next
+
+            CurrentAddressedLED++
+
+            dim mydelay as word
+            mydelay = [byte]readad(AN0, true)
+            mydelay = scale(mydelay, 0, 255, 0, 1023)
+
+            if mydelay > 0 then
+                wait mydelay ms
+            else
+                wait while [byte]readad(AN0, true) = 0
+            end if
+
+            if mydelay > 1015 then
+                do
+                loop while [byte]readad(AN0, true) > 250
+            end if
+
+            if SWITCH = SWITCH_DOWN and SwitchState = SWITCH_UP then
+                DisplayState = !DisplayState
+                SwitchState = SWITCH_DOWN
+            end if
+
+            if SWITCH = SWITCH_UP then
+                SwitchState = SWITCH_UP
+            end if
+
+            SetTimer(0, [word]period_us)
+            TimeoutOccurred = 0
+            inton
+
+        next
+
+        CurrentAddressedLED = 1
+        CurrentLEDColorSequence = (CurrentLEDColorSequence + 1) mod 4
+
+    loop
+
+end
+
+
+'----- Subroutines -----
+
+sub WS2812_Init
+
+    set DIN off
+
+    TimeoutOccurred = 0
+    #define period_us 0x0038
+
+    InitTimer0(Osc, PS_8)
+    SetTimer(0, [word]period_us)
+    StartTimer 0
+    On Interrupt Timer0Overflow call ISR0
+
+    set DIN on
+    set DIN off
+    wait 500 us
+
+end sub
+
+
+sub WS2812BitBangSendData(in ColorToSend as long)
+
+    repeat 24
+
+        if ColorToSend.23 on then
+            set DIN on
+        else
+            set DIN on
+            nop
+            nop
+            set DIN off
+        end if
+
+        rotate ColorToSend left
+        set DIN off
+
+    end repeat
+
+end sub
+
+
+function GetLongArrayValueHandler(in AddressArray(), ElementPointer) as long
+
+    ElementPointer = (ElementPointer * 4) + ElementPointer
+
+    GetLongArrayValueHandler     = AddressArray(ElementPointer)
+    GetLongArrayValueHandler_H   = AddressArray(ElementPointer+1)
+    GetLongArrayValueHandler_U   = AddressArray(ElementPointer+2)
+    GetLongArrayValueHandler_E   = AddressArray(ElementPointer+3)
+
+end function
+
+
+sub SetLongArrayValueHandler(in AddressArray(), ElementPointer, in ElementValue as long)
+
+    ElementPointer = (ElementPointer * 4) + ElementPointer
+
+    AddressArray(ElementPointer)   = ElementValue
+    AddressArray(ElementPointer+1) = ElementValue_H
+    AddressArray(ElementPointer+2) = ElementValue_U
+    AddressArray(ElementPointer+3) = ElementValue_E
+
+end sub
+
+
+sub ISR0
+
+    SetTimer(0, [word]period_us)
+    TimeoutOccurred = 1
+
+end sub
