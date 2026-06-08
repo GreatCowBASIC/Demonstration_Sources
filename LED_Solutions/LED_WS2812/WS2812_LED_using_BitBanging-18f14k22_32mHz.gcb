@@ -47,10 +47,9 @@
 '''
 '----- Configuration
     'Chip Settings.
-    #chip 18f14k22, 16
+    #chip 18f26k22, 32
     #option explicit
-   #config MCLRE_OFF    'We need the switch to operate on this demo board
-
+   
 
 Setup:
 
@@ -82,7 +81,7 @@ Setup:
 
     #define SWITCH_DOWN         0
     #define SWITCH_UP           1
-    #define SWITCH              PORTA.3
+    #define SWITCH              PORTA.2
     Dir     SWITCH              In
 
     'WS2812 SPECIFIC CONSTANTS
@@ -160,16 +159,7 @@ MainCode:
               dim mydelay as word
               mydelay =  readad10( AN0 )
 
-              if mydelay > 0 then
-                wait mydelay ms
-              Else
-                wait while readad10( AN0 ) = 0
-              end if
-              if mydelay > 1015 then
-                do
-
-                loop while readad10( AN0 ) > 1000
-              end if
+              Wait scale( mydelay, 0, 1023, 1, 1000) ms
 
               if Switch = SWITCH_DOWN and SwitchState = SWITCH_UP Then
                   DSisplayState = !DSisplayState
@@ -206,12 +196,13 @@ sub WS2812_Init
 
     timeoutocurred =  0
     #define period_us   0x38  'Period for LED internal processing
-    InitTimer0(Osc, PS0_4)
+    InitTimer0(Osc, PS0_8)
     SetTimer(0, period_us)  ' Preload Count
     StartTimer 0
     On Interrupt Timer0Overflow call ISR0
 
     SET DIN On
+    nop:nop
     SET DIN OFF
     wait 500 us
 
@@ -259,7 +250,6 @@ end sub
 
 sub ISR0
 
-    TMR0IF = 0
     'Set InterPacketDelay running
     SetTimer(0, period_us)  ' Preload Count
     timeoutocurred =  1
