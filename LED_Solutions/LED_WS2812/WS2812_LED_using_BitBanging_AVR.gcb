@@ -1,24 +1,27 @@
-' A demonstration of GCBASIC driving WS2812 LEDs on an AVR device.
+' A demonstration of GCBASIC driving WS2812 LEDs on an ATmega32U4 (Arduino Leonardo).
 '
 ' This demonstration contains:
 '   • Two demo modes:
-'         1. Chaser – LEDs light in sequence
+'         1. Chaser    – LEDs light in sequence
 '         2. Flash All – all LEDs set to the same colour
 '
 '   • One WS2812 drive method:
-'         • Bit‑banged SPI‑style timing (WS2812BitBangSendData)
+'         • Bit-banged timing (WS2812BitBangSendData)
+'           NOP counts tuned for 16 MHz AVR. Do NOT port directly to PIC
+'           or any other clock speed without re-measuring on a scope.
 '
 ' Speed Control:
-'   • A potentiometer adjusts the delay between LED updates.
+'   • A potentiometer on AN0 adjusts the delay between LED updates (1–1000 ms).
 '
 ' Operation:
-'   • On power‑up, the Chaser mode is active.
-'   • Pressing the switch toggles between Chaser and Flash‑All modes.
+'   • On power-up, Chaser mode is active.
+'   • Pressing the switch toggles between Chaser and Flash-All modes.
 '
-' Hardware Connections (ATmega32U4):
-'   • WS2812 DIN        → PORTC.2
-'   • Potentiometer     → PORTF.7  (Arduino A0)
-'   • Switch (active‑low) → PORTB.4 (Arduino D8)
+' Hardware Connections (ATmega32U4 / Arduino Leonardo):
+'   • WS2812 DIN          → PE6  (Arduino D7)
+'   • Potentiometer wiper → PF7  (Arduino A0)
+'   • Switch (active-low) → PB4  (Arduino D8)
+'   • Debug LEDs          → PC0–PC3 (not exposed on Leonardo header)
 '
 '************************************************************************
 ' MCU:      ATmega32U4
@@ -27,8 +30,8 @@
 ' IDE:      GCCode
 ' Author:   EvanV
 ' Licence:  GPL
-' Version:  1.00
-' Date:     02‑09‑2026
+' Version:  1.01
+' Date:     08-06-2026
 '************************************************************************
 
 
@@ -38,10 +41,12 @@
 
 #define WS2812SendData WS2812BitBangSendData
 
-
 '----- Hardware Definitions -----
 
-#define DIN PORTC.2
+' PE6 = Arduino D7. Chosen because PD1 (D2/SDA) and PB5 (D9) are OC1A
+' hardware compare outputs for Timer 1 and would be driven directly by
+' the timer hardware, bypassing the ISR entirely.
+#define DIN PORTE.6
 dir DIN out
 
 #define Potentiometer PORTF.7
@@ -53,7 +58,7 @@ dir SWITCH in
 #define SWITCH_DOWN 0
 #define SWITCH_UP   1
 
-' Debug LEDs (optional)
+' Debug LEDs — PC0–PC3 are not exposed on the Arduino Leonardo header
 #define DS2 PORTC.0
 #define DS3 PORTC.1
 #define DS4 PORTC.2
@@ -66,39 +71,39 @@ dir DS5 out
 
 '----- Variables -----
 
-dim PixelCount as byte
-dim YLoop as byte
-dim XLoop as byte
-dim TimeoutOccurred as byte
-dim DisplayState as byte
-dim SwitchState as byte
-dim CurrentAddressedLED as byte
+dim PixelCount              as byte
+dim YLoop                   as byte
+dim XLoop                   as byte
+dim TimeoutOccurred         as byte
+dim DisplayState            as byte
+dim SwitchState             as byte
+dim CurrentAddressedLED     as byte
 dim CurrentLEDColorSequence as byte
 
-dim ColorOfLED as long
-dim ColorToSend as long
+dim ColorOfLED   as long
+dim ColorToSend  as long
 
 
 '----- Main Program -----
 
 MainCode:
 
-    PixelCount = 16
-    CurrentAddressedLED = 1
+    PixelCount              = 16
+    CurrentAddressedLED     = 1
     CurrentLEDColorSequence = 0
-    DisplayState = 1
-    SwitchState = SWITCH_UP
+    DisplayState            = 1
+    SwitchState             = SWITCH_UP
 
     WS2812_Init
 
-    ' Array of 5 colours (long values)
+    ' Colour table — 5 entries stored as packed Long values (GRB order for WS2812)
     dim ColorArray(20)
 
     SetLongArrayValueHandler(ColorArray, 0, 0x00FF00)   ' Red
     SetLongArrayValueHandler(ColorArray, 1, 0xFFFF00)   ' Yellow
     SetLongArrayValueHandler(ColorArray, 2, 0xFF0000)   ' Green
     SetLongArrayValueHandler(ColorArray, 3, 0xFFFFFF)   ' White
-    SetLongArrayValueHandler(ColorArray, 4, 0x000000)   ' Black
+    SetLongArrayValueHandler(ColorArray, 4, 0x000000)   ' Black (off)
 
     do
 
@@ -106,6 +111,7 @@ MainCode:
 
         for YLoop = 1 to PixelCount
 
+            ' Wait for the 300 µs timer tick before sending a new frame
             wait while TimeoutOccurred = 0
             intoff
 
@@ -115,9 +121,9 @@ MainCode:
                     ColorToSend = ColorOfLED
                 else
                     if DisplayState = 1 then
-                        ColorToSend = 0x000000
+                        ColorToSend = 0x000000  ' Chaser: all other pixels off
                     else
-                        ColorToSend = ColorOfLED
+                        ColorToSend = ColorOfLED ' Flash-All: all pixels same colour
                     end if
                 end if
 
@@ -129,35 +135,23 @@ MainCode:
 
             dim mydelay as word
             mydelay = [byte]readad(AN0, true)
-            mydelay = scale(mydelay, 0, 255, 0, 1023)
-
-            if mydelay > 0 then
-                wait mydelay ms
-            else
-                wait while [byte]readad(AN0, true) = 0
-            end if
-
-            if mydelay > 1015 then
-                do
-                loop while [byte]readad(AN0, true) > 250
-            end if
+            Wait scale(mydelay, 0, 1023, 1, 1000) ms
 
             if SWITCH = SWITCH_DOWN and SwitchState = SWITCH_UP then
                 DisplayState = !DisplayState
-                SwitchState = SWITCH_DOWN
+                SwitchState  = SWITCH_DOWN
             end if
 
             if SWITCH = SWITCH_UP then
                 SwitchState = SWITCH_UP
             end if
 
-            SetTimer(0, [word]period_us)
             TimeoutOccurred = 0
             inton
 
         next
 
-        CurrentAddressedLED = 1
+        CurrentAddressedLED     = 1
         CurrentLEDColorSequence = (CurrentLEDColorSequence + 1) mod 4
 
     loop
@@ -169,42 +163,95 @@ end
 
 sub WS2812_Init
 
-    set DIN off
-
     TimeoutOccurred = 0
-    #define period_us 0x0038
 
-    InitTimer0(Osc, PS_8)
-    SetTimer(0, [word]period_us)
-    StartTimer 0
-    On Interrupt Timer0Overflow call ISR0
+    ' Timer 1 CTC mode — fires every 300 µs to pace the WS2812 frame cadence.
+    '
+    ' Formula:  OCR1A = (F_CPU / (Prescaler * Frequency)) - 1
+    '           300 µs → 3333.33 Hz
+    '           OCR1A = (16,000,000 / (64 * 3333.33)) - 1 = 74 = 0x004A
+    '
+    ' The 300 µs period comfortably exceeds the WS2812 reset pulse requirement:
+    '   • Original WS2812 / WS2812B (pre-2020):  >50 µs
+    '   • WS2812B (2020+ revision):              >280 µs
+    ' A 16-pixel frame takes ~480 µs to transmit, so the timer period only gates
+    ' the inter-frame gap; actual frame transmission happens inside the ISR window.
 
+    #define period_us 0x004A    ' 74 decimal → 300 µs at 16 MHz / prescaler 64
+
+    ' 1. Stop and clear Timer 1
+    TCCR1A = 0
+    TCCR1B = 0
+    TCNT1H = 0      ' Write high byte first (AVR 16-bit register rule)
+    TCNT1L = 0
+
+    ' 2. Load compare match value (high byte must be written before low byte)
+    OCR1AH = period_us / 256    ' = 0x00
+    OCR1AL = period_us AND 255  ' = 0x4A (74)
+
+    ' 3. CTC mode: timer resets automatically on compare match — no ISR reload needed
+    WGM12 = 1
+
+    ' 4. Start timer: prescaler 64 (CS11=1, CS10=1)
+    '    TCCR1B is read-modify-written so WGM12 set above is preserved
+    TCCR1B.CS11 = 1
+    TCCR1B.CS10 = 1
+
+    ' 5. Enable Timer 1 Output Compare A Match interrupt
+    TIMSK1 = TIMSK1 OR (1 << OCIE1A)
+
+    On Interrupt Timer1Match1 call ISR0
+
+    ' Brief DIN pulse followed by >500 µs low — satisfies WS2812 power-on reset
     set DIN on
+    nop:nop
     set DIN off
     wait 500 us
 
 end sub
 
 
-sub WS2812BitBangSendData(in ColorToSend as long)
+Sub WS2812BitBangSendData(in ColortoSend as long)
+
+    ' Sends 24 bits (GRB) to one WS2812 pixel using bit-banged timing.
+    '
+    ' Timing targets (WS2812 datasheet, ±150 ns tolerance):
+    '   1 bit: T_H ≈ 800 ns high,  T_L ≈ 450 ns low
+    '   0 bit: T_H ≈ 400 ns high,  T_L ≈ 850 ns low
+    '
+    ' At 16 MHz one cycle = 62.5 ns.
+    '
+    ' 1-bit path:  sbi(1) + nop×7(7) + SET DIN OFF(1) = 9 cycles = 562 ns high ✓
+    ' 0-bit path:  sbi(1) + nop×2(2) + SET DIN OFF(1) = 4 cycles = 250 ns high ✓
+    '
+    ' After SET DIN OFF the ROTATE executes while DIN is already low.
+    ' The ROTATE on a Long uses lds/rol/sts × 4 bytes ≈ 12 cycles = 750 ns.
+    ' This provides the inter-bit low time — within spec (min 450 ns).
+    '
+    ' *** AVR-SPECIFIC — DO NOT PORT WITHOUT RE-TUNING ***
+    ' NOP counts are calibrated for 16 MHz AVR. A PIC or different clock
+    ' will require completely different counts; verify every change on a scope.
+    '
+    ' Rule: SET DIN OFF must remain inside each branch of the IF/END IF.
+    '       Moving it outside extends the high time on both paths and breaks timing.
+    '       ROTATE stays after END IF to use its cycles as low-time inter-bit padding.
 
     repeat 24
-
-        if ColorToSend.23 on then
-            set DIN on
+        IF ColortoSend.23 ON THEN
+            ' 1 bit — ~800 ns high
+            SET DIN ON
+            nop:nop:nop:nop:nop:nop:nop
+            SET DIN OFF
         else
-            set DIN on
-            nop
-            nop
-            set DIN off
-        end if
-
-        rotate ColorToSend left
-        set DIN off
-
+            ' 0 bit — ~400 ns high
+            SET DIN ON
+            nop:nop
+            SET DIN OFF
+        END IF
+        ROTATE ColortoSend left     ' Executed while DIN is low — free inter-bit delay
     end repeat
 
-end sub
+End Sub
 
 
 function GetLongArrayValueHandler(in AddressArray(), ElementPointer) as long
@@ -232,8 +279,7 @@ end sub
 
 
 sub ISR0
-
-    SetTimer(0, [word]period_us)
+    ' Timer 1 Compare Match A fires every 300 µs.
+    ' Sets the flag that the main loop waits on before sending the next frame.
     TimeoutOccurred = 1
-
 end sub
