@@ -1,12 +1,14 @@
-# WS2812 LED Demonstration — ATmega32U4 (Arduino Leonardo)
+# AVR WS2812 LED Demonstration — ATmega32U4 (Arduino Leonardo)
 
 A GCBASIC demonstration driving WS2812 RGB LEDs using bit-banged timing on an AVR microcontroller.
+
+This readme me applies to the PIC solutions, but, you have to exchange ports etc.
 
 ---
 
 ## Video
 
-[▶ Watch WS2812_AVR.mp4](WS2812_AVR.mp4)
+![WS2812 AVR Demo](WS2812_AVR.gif)
 
 ---
 
@@ -101,7 +103,7 @@ The `ROTATE ColorToSend left` executes after `END IF` while DIN is already low, 
 |---|---|
 | `WS2812_LED_using_BitBanging_AVR.gcb` | GCBASIC source |
 | `WS2812_LED_using_BitBanging_AVR.asm` | Compiled AVR assembly (reference) |
-| `WS2812_AVR.mp4` | Video of the demonstration running on hardware |
+| `WS2812_AVR.gif` | Animated demo of the demonstration running on hardware |
 
 ---
 
