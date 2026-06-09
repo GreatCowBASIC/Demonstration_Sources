@@ -181,7 +181,7 @@ MainCode:
             for XLoop = 1 to PixelCount
 
                 if XLoop = CurrentAddressedLED then
-                    ColorToSend = WS2812_Color_BLACK
+                    ColorToSend = WS2812_Color_RED
                 else
                     ColorToSend = WS2812_Color_BLUE 
                 end if
@@ -195,7 +195,7 @@ MainCode:
             wait while TimeoutOccurred = 0
 
             'Now so your eye can see it...
-            wait 25 ms
+            wait 50 ms
             CurrentAddressedLED++
 
         next
