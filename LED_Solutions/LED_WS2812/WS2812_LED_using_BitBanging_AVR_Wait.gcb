@@ -1,0 +1,274 @@
+//! This shows how to use a Wait xxx us.  And, why it is bad practice.
+
+' A demonstration of GCBASIC driving WS2812 LEDs on an ATmega32U4 (Arduino Leonardo).
+'
+' This demonstration contains:
+'   • Two demo modes:
+'         1. Chaser    – LEDs light in sequence
+'         2. Flash All – all LEDs set to the same colour
+'
+'   • One WS2812 drive method:
+'         • Bit-banged timing (WS2812BitBangSendData)
+'           NOP counts tuned for 16 MHz AVR. Do NOT port directly to PIC
+'           or any other clock speed without re-measuring on a scope.
+'
+' Speed Control:
+'   • A potentiometer on AN0 adjusts the delay between LED updates (1–1000 ms).
+'
+' Operation:
+'   • On power-up, Chaser mode is active.
+'   • Pressing the switch toggles between Chaser and Flash-All modes.
+'
+' Hardware Connections (ATmega32U4 / Arduino Leonardo):
+'   • WS2812 DIN          → PE6  (Arduino D7)
+'   • Potentiometer wiper → PF7  (Arduino A0)
+'   • Switch (active-low) → PB4  (Arduino D8)
+'   • Debug LEDs          → PC0–PC3 (not exposed on Leonardo header)
+'
+'************************************************************************
+' MCU:      ATmega32U4
+' Clock:    16 MHz
+' Compiler: GCBASIC
+' IDE:      GCCode
+' Author:   EvanV
+' Licence:  GPL
+' Version:  1.01
+' Date:     08-06-2026
+'************************************************************************
+
+
+'----- Configuration -----
+#chip mega32u4, 16
+#option explicit
+
+#define WS2812SendData WS2812BitBangSendData
+
+'----- Hardware Definitions -----
+
+' PE6 = Arduino D7
+
+#define DIN PORTE.6
+dir DIN out
+
+#define Potentiometer PORTF.7
+dir Potentiometer in
+
+#define SWITCH PORTB.4
+dir SWITCH in
+
+#define SWITCH_DOWN 0
+#define SWITCH_UP   1
+
+' Debug LEDs — PC0–PC3 are not exposed on the Arduino Leonardo header
+#define DS2 PORTC.0
+#define DS3 PORTC.1
+#define DS4 PORTC.2
+#define DS5 PORTC.3
+dir DS2 out
+dir DS3 out
+dir DS4 out
+dir DS5 out
+
+
+'----- Variables -----
+
+dim PixelCount              as byte
+dim YLoop                   as byte
+dim XLoop                   as byte
+dim TimeoutOccurred         as byte
+dim DisplayState            as byte
+dim SwitchState             as byte
+dim CurrentAddressedLED     as byte
+dim CurrentLEDColorSequence as byte
+
+dim ColorOfLED   as long
+dim ColorToSend  as long
+
+
+'----- Main Program -----
+
+MainCode:
+
+    PixelCount              = 16
+    CurrentAddressedLED     = 1
+    CurrentLEDColorSequence = 0
+    DisplayState            = 1
+    SwitchState             = SWITCH_UP
+
+    WS2812_Init
+
+    ' Colour table — 5 entries stored as packed Long values (GRB order for WS2812)
+    dim ColorArray(20)
+
+    SetLongArrayValueHandler(ColorArray, 0, 0x00FF00)   ' Red
+    SetLongArrayValueHandler(ColorArray, 1, 0xFFFF00)   ' Yellow
+    SetLongArrayValueHandler(ColorArray, 2, 0xFF0000)   ' Green
+    SetLongArrayValueHandler(ColorArray, 3, 0xFFFFFF)   ' White
+    SetLongArrayValueHandler(ColorArray, 4, 0x000000)   ' Black (off)
+
+    do
+
+        ColorOfLED = GetLongArrayValueHandler(ColorArray, CurrentLEDColorSequence)
+
+        for YLoop = 1 to PixelCount
+
+
+
+
+            /*
+
+            Analysis: Why using a fixed `wait 300 us` is considered bad practice
+
+            ### Main Reasons:
+
+            1. **Blocking the Main Loop**  
+            The CPU is completely stalled for 300 µs every frame. This reduces overall system responsiveness:
+            - Switch presses are only checked once per full frame update.
+            - Potentiometer reads are delayed.
+            - You cannot easily add other time-sensitive tasks (sensor reading, serial, etc.) without affecting LED timing.
+
+            2. **Very Poor Scalability**  
+            - Fixed delay assumes a constant number of LEDs. If you change to 8 or 60 LEDs, the transmission time changes, but your inter-frame reset gap stays the same → you may need to manually adjust the delay.
+            - Harder to maintain consistent reset timing across different LED counts or future modifications.
+
+            3. **Debugging and Maintenance**  
+            Hardware-timed gaps (original timer method) are easier to verify on an oscilloscope and are more portable/reliable across projects. A magic number `300` is less self-documenting than a timer configured for a specific period.
+
+            4. **Missed Opportunity for Non-Blocking Design**  
+            Good embedded practice prefers using hardware timers for periodic events. It keeps the CPU free for other work and makes the timing independent of the main code execution path.
+
+            ### Bottom Line:
+            For a **simple 16-LED demo**, `wait 300 us` is **perfectly acceptable** and will likely work fine.  
+            However, in professional or more complex firmware, relying on long software delays for critical timing (especially for protocols like WS2812) is generally avoided in favor of hardware timers.
+
+            Used a timer + flag approach — it’s the cleaner, more robust embedded pattern.
+
+            */
+
+            //! === Replaced timer wait with fixed delay ===
+            //! === While this works this is not good practice.  
+            wait 300 us
+
+            for XLoop = 1 to PixelCount
+
+                if XLoop = CurrentAddressedLED then
+                    ColorToSend = ColorOfLED
+                else
+                    if DisplayState = 1 then
+                        ColorToSend = 0x000000  ' Chaser: all other pixels off
+                    else
+                        ColorToSend = ColorOfLED ' Flash-All: all pixels same colour
+                    end if
+                end if
+
+                WS2812SendData(ColorToSend)
+
+            next
+
+            CurrentAddressedLED++
+
+            dim mydelay as word
+            mydelay = [byte]readad(AN0, true)
+            Wait scale(mydelay, 0, 1023, 1, 1000) ms
+
+            if SWITCH = SWITCH_DOWN and SwitchState = SWITCH_UP then
+                DisplayState = !DisplayState
+                SwitchState  = SWITCH_DOWN
+            end if
+
+            if SWITCH = SWITCH_UP then
+                SwitchState = SWITCH_UP
+            end if
+
+            TimeoutOccurred = 0
+            inton
+
+        next
+
+        CurrentAddressedLED     = 1
+        CurrentLEDColorSequence = (CurrentLEDColorSequence + 1) mod 4
+
+    loop
+
+end
+
+
+'----- Subroutines -----
+
+sub WS2812_Init
+
+    ' Brief DIN pulse followed by >500 µs low — power-on reset
+    set DIN on
+    nop:nop
+    set DIN off
+    wait 500 us
+
+end sub
+
+
+Sub WS2812BitBangSendData(in ColortoSend as long)
+
+    ' Sends 24 bits (GRB) to one WS2812 pixel using bit-banged timing.
+    '
+    ' Timing targets (WS2812 datasheet, ±150 ns tolerance):
+    '   1 bit: T_H ≈ 800 ns high,  T_L ≈ 450 ns low
+    '   0 bit: T_H ≈ 400 ns high,  T_L ≈ 850 ns low
+    '
+    ' At 16 MHz one cycle = 62.5 ns.
+    '
+    ' 1-bit path:  sbi(1) + nop×7(7) + SET DIN OFF(1) = 9 cycles = 562 ns high ✓
+    ' 0-bit path:  sbi(1) + nop×2(2) + SET DIN OFF(1) = 4 cycles = 250 ns high ✓
+    '
+    ' After SET DIN OFF the ROTATE executes while DIN is already low.
+    ' The ROTATE on a Long uses lds/rol/sts × 4 bytes ≈ 12 cycles = 750 ns.
+    ' This provides the inter-bit low time — within spec (min 450 ns).
+    '
+    ' *** AVR-SPECIFIC — DO NOT PORT WITHOUT RE-TUNING ***
+    ' NOP counts are calibrated for 16 MHz AVR. A PIC or different clock
+    ' will require completely different counts; verify every change on a scope.
+    '
+    ' Rule: SET DIN OFF must remain inside each branch of the IF/END IF.
+    '       Moving it outside extends the high time on both paths and breaks timing.
+    '       ROTATE stays after END IF to use its cycles as low-time inter-bit padding.
+
+    repeat 24
+        IF ColortoSend.23 ON THEN
+            ' 1 bit — ~800 ns high
+            SET DIN ON
+            nop:nop:nop:nop:nop:nop:nop
+            SET DIN OFF
+        else
+            ' 0 bit — ~400 ns high
+            SET DIN ON
+            nop:nop
+            SET DIN OFF
+        END IF
+        ROTATE ColortoSend left     ' Executed while DIN is low — free inter-bit delay
+    end repeat
+
+End Sub
+
+
+function GetLongArrayValueHandler(in AddressArray(), ElementPointer) as long
+
+    ElementPointer = (ElementPointer * 4) + ElementPointer
+
+    GetLongArrayValueHandler     = AddressArray(ElementPointer)
+    GetLongArrayValueHandler_H   = AddressArray(ElementPointer+1)
+    GetLongArrayValueHandler_U   = AddressArray(ElementPointer+2)
+    GetLongArrayValueHandler_E   = AddressArray(ElementPointer+3)
+
+end function
+
+
+sub SetLongArrayValueHandler(in AddressArray(), ElementPointer, in ElementValue as long)
+
+    ElementPointer = (ElementPointer * 4) + ElementPointer
+
+    AddressArray(ElementPointer)   = ElementValue
+    AddressArray(ElementPointer+1) = ElementValue_H
+    AddressArray(ElementPointer+2) = ElementValue_U
+    AddressArray(ElementPointer+3) = ElementValue_E
+
+end sub
+
