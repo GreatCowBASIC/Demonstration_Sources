@@ -173,22 +173,34 @@ MainCode:
 #define WS2812_Color_MIDNIGHT_BLUE  0x0000A0
 #define WS2812_Color_DODGER_BLUE    0x0080FF
 
+#define WS2812_Color_VERY_DIM_WHITE     0x050505    ' Very dim white/grey - lowest noticeable white
+#define WS2812_Color_DIM_GREY           0x0A0A0A    ' Low power grey
+#define WS2812_Color_DARK_GREY          0x1A1A1A    ' Slightly brighter but still low power
+
+' Single color very low power (even lower consumption)
+#define WS2812_Color_VERY_DIM_RED       0x000A00
+#define WS2812_Color_VERY_DIM_GREEN     0x0A0000
+#define WS2812_Color_VERY_DIM_BLUE      0x00000A
+
 
     do
 
         for YLoop = 1 to PixelCount
 
+            //! Turn off the interrupt to ensure the timing is good.
+            intoff
             for XLoop = 1 to PixelCount
 
                 if XLoop = CurrentAddressedLED then
                     ColorToSend = WS2812_Color_RED
                 else
-                    ColorToSend = WS2812_Color_BLUE 
+                    ColorToSend = WS2812_Color_VERY_DIM_RED 
                 end if
 
                 WS2812SendData(ColorToSend)
 
             next
+            inton
 
             ' Wait for the 300 µs timer tick before sending a new frame
             TimeoutOccurred = 0
