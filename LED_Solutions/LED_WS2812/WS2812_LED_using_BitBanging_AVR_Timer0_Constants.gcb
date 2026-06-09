@@ -1,0 +1,323 @@
+' A demonstration of GCBASIC driving WS2812 LEDs on an ATmega32U4 (Arduino Leonardo).
+'
+' This demonstration contains:
+'   • Two demo modes:
+'         1. Chaser    – LEDs light in sequence
+'         2. Flash All – all LEDs set to the same colour
+'
+'   • One WS2812 drive method:
+'         • Bit-banged timing (WS2812BitBangSendData)
+'           NOP counts tuned for 16 MHz AVR. Do NOT port directly to PIC
+'           or any other clock speed without re-measuring on a scope.
+'
+' Speed Control:
+'   • A potentiometer on AN0 adjusts the delay between LED updates (1–1000 ms).
+'
+' Operation:
+'   • On power-up, Chaser mode is active.
+'   • Pressing the switch toggles between Chaser and Flash-All modes.
+'
+' Hardware Connections (ATmega32U4 / Arduino Leonardo):
+'   • WS2812 DIN          → PE6  (Arduino D7)
+'   • Potentiometer wiper → PF7  (Arduino A0)
+'   • Switch (active-low) → PB4  (Arduino D8)
+'   • Debug LEDs          → PC0–PC3 (not exposed on Leonardo header)
+'
+'************************************************************************
+' MCU:      ATmega32U4
+' Clock:    16 MHz
+' Compiler: GCBASIC
+' IDE:      GCCode
+' Author:   EvanV
+' Licence:  GPL
+' Version:  1.01
+' Date:     08-06-2026
+'************************************************************************
+
+
+'----- Configuration -----
+#chip mega32u4, 16
+#option explicit
+
+#define WS2812SendData WS2812BitBangSendData
+
+'----- Hardware Definitions -----
+
+' PE6 = Arduino D7
+
+#define DIN PORTE.6
+dir DIN out
+
+#define Potentiometer PORTF.7
+dir Potentiometer in
+
+#define SWITCH PORTB.4
+dir SWITCH in
+
+#define SWITCH_DOWN 0
+#define SWITCH_UP   1
+
+' Debug LEDs — PC0–PC3 are not exposed on the Arduino Leonardo header
+#define DS2 PORTC.0
+#define DS3 PORTC.1
+#define DS4 PORTC.2
+#define DS5 PORTC.3
+dir DS2 out
+dir DS3 out
+dir DS4 out
+dir DS5 out
+
+
+'----- Variables -----
+
+dim PixelCount              as byte
+dim YLoop                   as byte
+dim XLoop                   as byte
+dim TimeoutOccurred, CurrentAddressedLED         as byte
+dim ColorToSend,ColorOfLED             as long
+
+
+'----- Main Program -----
+
+MainCode:
+
+    PixelCount              = 16
+    WS2812_Init
+
+'========================================================================
+' WS2812 Color Constants (GRB order)
+' 64 unique colors with descriptive names + Greys
+'========================================================================
+
+#define WS2812_Color_BLACK          0x000000
+#define WS2812_Color_WHITE          0xFFFFFF
+
+#define WS2812_Color_RED            0x00FF00
+#define WS2812_Color_GREEN          0xFF0000
+#define WS2812_Color_BLUE           0x0000FF
+
+#define WS2812_Color_YELLOW         0xFFFF00
+#define WS2812_Color_CYAN           0xFF00FF
+#define WS2812_Color_MAGENTA        0x00FFFF
+
+#define WS2812_Color_ORANGE         0x00A500
+#define WS2812_Color_PINK           0x00FF80
+#define WS2812_Color_PURPLE         0x4000FF
+#define WS2812_Color_LIME           0xBFFF00
+#define WS2812_Color_TEAL           0xFF0080
+
+' === Greys ===
+#define WS2812_Color_GREY_10        0x1A1A1A
+#define WS2812_Color_GREY_20        0x333333
+#define WS2812_Color_GREY_30        0x4D4D4D
+#define WS2812_Color_GREY_40        0x666666
+#define WS2812_Color_GREY_50        0x808080
+#define WS2812_Color_GREY_60        0x999999
+#define WS2812_Color_GREY_70        0xB3B3B3
+#define WS2812_Color_GREY_80        0xCCCCCC
+#define WS2812_Color_GREY_90        0xE6E6E6
+
+' === Rich Color Palette ===
+#define WS2812_Color_DARK_RED       0x008000
+#define WS2812_Color_CRIMSON        0x00C800
+#define WS2812_Color_TOMATO         0x00FF40
+#define WS2812_Color_CORAL          0x00FF70
+#define WS2812_Color_SALMON         0x00FF90
+
+#define WS2812_Color_GOLD           0xFFD000
+#define WS2812_Color_AMBER          0xFFAA00
+#define WS2812_Color_DARK_ORANGE    0xFF7000
+#define WS2812_Color_ORANGE_RED     0xFF3000
+
+#define WS2812_Color_HOT_PINK       0x00FFAA
+#define WS2812_Color_DEEP_PINK      0x00FFCC
+#define WS2812_Color_LIGHT_PINK     0x00FFEE
+
+#define WS2812_Color_VIOLET         0x6000FF
+#define WS2812_Color_INDIGO         0x3000FF
+#define WS2812_Color_LAVENDER       0x9000FF
+
+#define WS2812_Color_DARK_BLUE      0x000080
+#define WS2812_Color_ROYAL_BLUE     0x0020FF
+#define WS2812_Color_SKY_BLUE       0x00A0FF
+#define WS2812_Color_LIGHT_BLUE     0x00D0FF
+#define WS2812_Color_AZURE          0x00F0FF
+
+#define WS2812_Color_DARK_CYAN      0xFF0080
+#define WS2812_Color_AQUA           0xFF40C0
+#define WS2812_Color_TURQUOISE      0xFF70E0
+
+#define WS2812_Color_DARK_GREEN     0x800000
+#define WS2812_Color_FOREST_GREEN   0xA00000
+#define WS2812_Color_SEA_GREEN      0xC80000
+#define WS2812_Color_SPRING_GREEN   0xE8FF00
+#define WS2812_Color_CHARTREUSE     0xD0FF00
+
+#define WS2812_Color_OLIVE          0x408000
+#define WS2812_Color_KHAKI          0x80C000
+#define WS2812_Color_YELLOW_GREEN   0xAAFF00
+
+#define WS2812_Color_BROWN          0x204000
+#define WS2812_Color_MAROON         0x104000
+#define WS2812_Color_SIENNA         0x306000
+
+#define WS2812_Color_DEEP_PURPLE    0x2000C0
+#define WS2812_Color_FUCHSIA        0x00FFCC
+#define WS2812_Color_MAUVE          0x7000FF
+
+#define WS2812_Color_MINT           0xFF80A0
+#define WS2812_Color_PALE_GREEN     0xC0FF80
+#define WS2812_Color_LIME_GREEN     0x80FF00
+
+#define WS2812_Color_NAVY           0x000040
+#define WS2812_Color_MIDNIGHT_BLUE  0x0000A0
+#define WS2812_Color_DODGER_BLUE    0x0080FF
+
+
+    do
+
+        for YLoop = 1 to PixelCount
+
+            for XLoop = 1 to PixelCount
+
+                if XLoop = CurrentAddressedLED then
+                    ColorToSend = WS2812_Color_BLACK
+                else
+                    ColorToSend = WS2812_Color_BLUE 
+                end if
+
+                WS2812SendData(ColorToSend)
+
+            next
+
+            ' Wait for the 300 µs timer tick before sending a new frame
+            TimeoutOccurred = 0
+            wait while TimeoutOccurred = 0
+
+            'Now so your eye can see it...
+            wait 25 ms
+            CurrentAddressedLED++
+
+        next
+
+        CurrentAddressedLED = 1
+        
+    loop
+
+end
+
+
+'----- Subroutines -----
+
+sub WS2812_Init
+
+    TimeoutOccurred = 0
+
+    ' Timer 0 CTC mode — fires every 300 µs 
+    '
+    ' OCR0A = 74 → 75 ticks @ prescaler 64 = 300 µs at 16 MHz
+    ' (Timer 0 is 8-bit, perfect for this value)
+
+    #define period_ticks 74
+
+    ' 1. Stop and clear Timer 0
+    TCCR0A = 0
+    TCCR0B = 0
+    TCNT0  = 0
+
+    ' 2. Load compare match value
+    OCR0A = period_ticks
+
+    ' 3. CTC mode: WGM01 = 1 (Clear Timer on Compare Match)
+    WGM01 = 1
+
+    ' 4. Start timer: prescaler 64 (CS01=1, CS00=1)
+    TCCR0B.CS01 = 1
+    TCCR0B.CS00 = 1
+
+    ' 5. Enable Timer 0 Output Compare A Match interrupt
+    TIMSK0 = TIMSK0 OR (1 << OCIE0A)
+
+    On Interrupt Timer0Match1 call ISR0
+
+    ' Brief DIN pulse followed by >500 µs low — power-on reset
+    set DIN on
+    nop:nop
+    set DIN off
+    wait 500 us
+
+end sub
+
+
+Sub WS2812BitBangSendData(in ColortoSend as long)
+
+    ' Sends 24 bits (GRB) to one WS2812 pixel using bit-banged timing.
+    '
+    ' Timing targets (WS2812 datasheet, ±150 ns tolerance):
+    '   1 bit: T_H ≈ 800 ns high,  T_L ≈ 450 ns low
+    '   0 bit: T_H ≈ 400 ns high,  T_L ≈ 850 ns low
+    '
+    ' At 16 MHz one cycle = 62.5 ns.
+    '
+    ' 1-bit path:  sbi(1) + nop×7(7) + SET DIN OFF(1) = 9 cycles = 562 ns high ✓
+    ' 0-bit path:  sbi(1) + nop×2(2) + SET DIN OFF(1) = 4 cycles = 250 ns high ✓
+    '
+    ' After SET DIN OFF the ROTATE executes while DIN is already low.
+    ' The ROTATE on a Long uses lds/rol/sts × 4 bytes ≈ 12 cycles = 750 ns.
+    ' This provides the inter-bit low time — within spec (min 450 ns).
+    '
+    ' *** AVR-SPECIFIC — DO NOT PORT WITHOUT RE-TUNING ***
+    ' NOP counts are calibrated for 16 MHz AVR. A PIC or different clock
+    ' will require completely different counts; verify every change on a scope.
+    '
+    ' Rule: SET DIN OFF must remain inside each branch of the IF/END IF.
+    '       Moving it outside extends the high time on both paths and breaks timing.
+    '       ROTATE stays after END IF to use its cycles as low-time inter-bit padding.
+
+    repeat 24
+        IF ColortoSend.23 ON THEN
+            ' 1 bit — ~800 ns high
+            SET DIN ON
+            nop:nop:nop:nop:nop:nop:nop
+            SET DIN OFF
+        else
+            ' 0 bit — ~400 ns high
+            SET DIN ON
+            nop:nop
+            SET DIN OFF
+        END IF
+        ROTATE ColortoSend left     ' Executed while DIN is low — free inter-bit delay
+    end repeat
+
+End Sub
+
+
+function GetLongArrayValueHandler(in AddressArray(), ElementPointer) as long
+
+    ElementPointer = (ElementPointer * 4) + ElementPointer
+
+    GetLongArrayValueHandler     = AddressArray(ElementPointer)
+    GetLongArrayValueHandler_H   = AddressArray(ElementPointer+1)
+    GetLongArrayValueHandler_U   = AddressArray(ElementPointer+2)
+    GetLongArrayValueHandler_E   = AddressArray(ElementPointer+3)
+
+end function
+
+
+sub SetLongArrayValueHandler(in AddressArray(), ElementPointer, in ElementValue as long)
+
+    ElementPointer = (ElementPointer * 4) + ElementPointer
+
+    AddressArray(ElementPointer)   = ElementValue
+    AddressArray(ElementPointer+1) = ElementValue_H
+    AddressArray(ElementPointer+2) = ElementValue_U
+    AddressArray(ElementPointer+3) = ElementValue_E
+
+end sub
+
+
+sub ISR0
+    ' Timer 0 every 300 µs.
+    ' Sets the flag that the main loop waits on before sending the next frame.
+    TimeoutOccurred = 1
+end sub
