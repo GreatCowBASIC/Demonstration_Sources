@@ -152,6 +152,11 @@ MainCode:
 
               next
 
+              'Set InterPacketDelay running
+              SetTimer(0, period_us)  ' Preload Count
+              timeoutocurred =  0
+              Inton
+
               'Increment the LED being addressed
               CurrentAddessedLED++
 
@@ -169,11 +174,6 @@ MainCode:
               if Switch = SWITCH_UP Then
                   SwitchState = SWITCH_UP
               end if
-
-              'Set InterPacketDelay running
-              SetTimer(0, period_us)  ' Preload Count
-              timeoutocurred =  0
-              Inton
 
             next
 

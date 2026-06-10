@@ -131,6 +131,9 @@ MainCode:
 
             next
 
+            TimeoutOccurred = 0
+            inton
+
             CurrentAddressedLED++
 
             dim mydelay as word
@@ -145,9 +148,6 @@ MainCode:
             if SWITCH = SWITCH_UP then
                 SwitchState = SWITCH_UP
             end if
-
-            TimeoutOccurred = 0
-            inton
 
         next
 

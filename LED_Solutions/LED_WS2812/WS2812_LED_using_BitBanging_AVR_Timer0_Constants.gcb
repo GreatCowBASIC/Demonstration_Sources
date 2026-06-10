@@ -187,6 +187,9 @@ MainCode:
 
         for YLoop = 1 to PixelCount
 
+            ' Wait for the 300 µs timer tick before sending a new frame
+            wait while TimeoutOccurred = 0
+
             //! Turn off the interrupt to ensure the timing is good.
             intoff
             for XLoop = 1 to PixelCount
@@ -200,11 +203,10 @@ MainCode:
                 WS2812SendData(ColorToSend)
 
             next
+
+            TimeoutOccurred = 0
             inton
 
-            ' Wait for the 300 µs timer tick before sending a new frame
-            TimeoutOccurred = 0
-            wait while TimeoutOccurred = 0
 
             'Now so your eye can see it...
             wait 50 ms
@@ -295,7 +297,7 @@ Sub WS2812BitBangSendData(in ColortoSend as long)
         else
             ' 0 bit — ~400 ns high
             SET DIN ON
-            nop:nop
+            nop
             SET DIN OFF
         END IF
         ROTATE ColortoSend left     ' Executed while DIN is low — free inter-bit delay

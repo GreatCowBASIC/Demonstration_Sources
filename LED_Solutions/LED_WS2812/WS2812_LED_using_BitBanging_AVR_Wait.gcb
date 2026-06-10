@@ -75,7 +75,6 @@ dir DS5 out
 dim PixelCount              as byte
 dim YLoop                   as byte
 dim XLoop                   as byte
-dim TimeoutOccurred         as byte
 dim DisplayState            as byte
 dim SwitchState             as byte
 dim CurrentAddressedLED     as byte
@@ -179,9 +178,6 @@ MainCode:
             if SWITCH = SWITCH_UP then
                 SwitchState = SWITCH_UP
             end if
-
-            TimeoutOccurred = 0
-            inton
 
         next
 

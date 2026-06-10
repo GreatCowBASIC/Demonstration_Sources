@@ -1,27 +1,22 @@
-' A demonstration of GCBASIC driving WS2812 LEDs on an ATmega32U4 (Arduino Leonardo).
+' A demonstration of GCBASIC driving WS2815 LEDs on an ATmega32U4
 '
 ' This demonstration contains:
 '   • Two demo modes:
 '         1. Chaser    – LEDs light in sequence
 '         2. Flash All – all LEDs set to the same colour
 '
-'   • One WS2812 drive method:
-'         • Bit-banged timing (WS2812BitBangSendData)
+'   • One WS2815 drive method:
+'         • Bit-banged timing (WS2815BitBangSendData)
 '           NOP counts tuned for 16 MHz AVR. Do NOT port directly to PIC
 '           or any other clock speed without re-measuring on a scope.
-'
-' Speed Control:
-'   • A potentiometer on AN0 adjusts the delay between LED updates (1–1000 ms).
 '
 ' Operation:
 '   • On power-up, Chaser mode is active.
 '   • Pressing the switch toggles between Chaser and Flash-All modes.
 '
-' Hardware Connections (ATmega32U4 / Arduino Leonardo):
-'   • WS2812 DIN          → PE6  (Arduino D7)
-'   • Potentiometer wiper → PF7  (Arduino A0)
-'   • Switch (active-low) → PB4  (Arduino D8)
-'   • Debug LEDs          → PC0–PC3 (not exposed on Leonardo header)
+' Hardware Connections (ATmega32U4):
+'   • WS2815 DIN          → PB7
+'   • Switch (active-low) → PD4
 '
 '************************************************************************
 ' MCU:      ATmega32U4
@@ -39,34 +34,18 @@
 #chip mega32u4, 16
 #option explicit
 
-#define WS2812SendData WS2812BitBangSendData
+#define WS2815SendData WS2815BitBangSendData
 
 '----- Hardware Definitions -----
 
-' PE6 = Arduino D7
-
-#define DIN PORTE.6
+#define DIN PORTB.7
 dir DIN out
 
-#define Potentiometer PORTF.7
-dir Potentiometer in
-
-#define SWITCH PORTB.4
+#define SWITCH PORTD.4
 dir SWITCH in
 
-#define SWITCH_DOWN 0
 #define SWITCH_UP   1
-
-' Debug LEDs — PC0–PC3 are not exposed on the Arduino Leonardo header
-#define DS2 PORTC.0
-#define DS3 PORTC.1
-#define DS4 PORTC.2
-#define DS5 PORTC.3
-dir DS2 out
-dir DS3 out
-dir DS4 out
-dir DS5 out
-
+#define SWITCH_DOWN 0
 
 '----- Variables -----
 
@@ -79,9 +58,8 @@ dim SwitchState             as byte
 dim CurrentAddressedLED     as byte
 dim CurrentLEDColorSequence as byte
 
-dim ColorOfLED   as long
-dim ColorToSend  as long
-
+dim ColorOfLED              as long
+dim ColorToSend             as long
 
 '----- Main Program -----
 
@@ -93,9 +71,11 @@ MainCode:
     DisplayState            = 1
     SwitchState             = SWITCH_UP
 
-    WS2812_Init
+    WS2815_Init
 
-    ' Colour table — 5 entries stored as packed Long values (GRB order for WS2812)
+    ' Colour table — 5 entries stored as packed Long values (GRB order for WS2815)
+    ' For additional colors: see WS2815_LED_Primalume_Demo.gcb
+
     dim ColorArray(20)
 
     SetLongArrayValueHandler(ColorArray, 0, 0x00FF00)   ' Red
@@ -110,7 +90,7 @@ MainCode:
 
         for YLoop = 1 to PixelCount
 
-            ' Wait for the 300 µs timer tick before sending a new frame
+            'Wait for the 300 µs timer tick before sending a new frame
             wait while TimeoutOccurred = 0
             intoff
 
@@ -120,24 +100,17 @@ MainCode:
                     ColorToSend = ColorOfLED
                 else
                     if DisplayState = 1 then
-                        ColorToSend = 0x000000  ' Chaser: all other pixels off
+                        ColorToSend = 0x000000   ' Chaser: all other pixels off
                     else
                         ColorToSend = ColorOfLED ' Flash-All: all pixels same colour
                     end if
                 end if
 
-                WS2812SendData(ColorToSend)
+                WS2815SendData(ColorToSend)
 
             next
 
-            TimeoutOccurred = 0
-            inton
-
             CurrentAddressedLED++
-
-            dim mydelay as word
-            mydelay = [byte]readad(AN0, true)
-            Wait scale(mydelay, 0, 1023, 1, 1000) ms
 
             if SWITCH = SWITCH_DOWN and SwitchState = SWITCH_UP then
                 DisplayState = !DisplayState
@@ -148,7 +121,8 @@ MainCode:
                 SwitchState = SWITCH_UP
             end if
 
-
+            TimeoutOccurred = 0
+            inton
 
         next
 
@@ -162,7 +136,7 @@ end
 
 '----- Subroutines -----
 
-sub WS2812_Init
+sub WS2815_Init
 
     TimeoutOccurred = 0
 
@@ -202,18 +176,18 @@ sub WS2812_Init
 end sub
 
 
-Sub WS2812BitBangSendData(in ColortoSend as long)
+Sub WS2815BitBangSendData(in ColortoSend as long)
 
-    ' Sends 24 bits (GRB) to one WS2812 pixel using bit-banged timing.
+    ' Sends 24 bits (GRB) to one WS2815 pixel using bit-banged timing.
     '
-    ' Timing targets (WS2812 datasheet, ±150 ns tolerance):
-    '   1 bit: T_H ≈ 800 ns high,  T_L ≈ 450 ns low
-    '   0 bit: T_H ≈ 400 ns high,  T_L ≈ 850 ns low
+    ' Timing targets (WS2815 datasheet, variable tolerance):
+    '   1 bit: T_H ≈ 580-1600 ns high,  T_L ≈ 220-420  ns low
+    '   0 bit: T_H ≈ 220-380  ns high,  T_L ≈ 580-1600 ns low
     '
     ' At 16 MHz one cycle = 62.5 ns.
     '
-    ' 1-bit path:  sbi(1) + nop×7(7) + SET DIN OFF(1) = 9 cycles = 562 ns high ✓
-    ' 0-bit path:  sbi(1) + nop×2(2) + SET DIN OFF(1) = 4 cycles = 250 ns high ✓
+    ' 1-bit path:  sbi(1) + nop×14(14) + SET DIN OFF(1) = 16 cycles = 1000 ns high
+    ' 0-bit path:  sbi(1) + nop×2(2)   + SET DIN OFF(1) = 4  cycles = 250  ns high
     '
     ' After SET DIN OFF the ROTATE executes while DIN is already low.
     ' The ROTATE on a Long uses lds/rol/sts × 4 bytes ≈ 12 cycles = 750 ns.
@@ -228,18 +202,22 @@ Sub WS2812BitBangSendData(in ColortoSend as long)
     '       ROTATE stays after END IF to use its cycles as low-time inter-bit padding.
 
     repeat 24
+        
         IF ColortoSend.23 ON THEN
-            ' 1 bit — ~800 ns high
+            ' 1 bit — ~1000 ns high
             SET DIN ON
+            nop:nop:nop:nop:nop:nop:nop
             nop:nop:nop:nop:nop:nop:nop
             SET DIN OFF
         else
-            ' 0 bit — ~400 ns high
+            ' 0 bit — ~250 ns high
             SET DIN ON
             nop:nop
             SET DIN OFF
         END IF
+        
         ROTATE ColortoSend left     ' Executed while DIN is low — free inter-bit delay
+    
     end repeat
 
 End Sub
@@ -267,7 +245,6 @@ sub SetLongArrayValueHandler(in AddressArray(), ElementPointer, in ElementValue 
     AddressArray(ElementPointer+3) = ElementValue_E
 
 end sub
-
 
 sub ISR0
     ' Timer 0 every 300 µs.
