@@ -196,9 +196,9 @@ MainCode:
             for XLoop = 1 to PixelCount
 
                 if XLoop = CurrentAddressedLED then
-                    ColorToSend = WS2812_Color_RED
+                    ColorToSend = WS2812_Color_GREEN
                 else
-                    ColorToSend = WS2812_Color_BLUE
+                    ColorToSend = WS2812_Color_VERY_DIM_GREEN
                 end if
 
                 WS2812SendData(ColorToSend)
@@ -307,50 +307,53 @@ Macro WS2812SendByte(in Value as byte)
 end Macro
 
 
-//! Ultra fast!!
+//! Ultra fast!! Increases NOPs STATE as the code is faster.
 
 
-#define WS2812_1_STATE set DIN on : nop:nop:nop:nop:nop:nop:nop : set DIN off
-#define WS2812_0_STATE set DIN on : nop:nop:nop : set DIN off 
-
+#define WS2812_1_STATE set DIN on : nop:nop:nop:nop:nop:nop:nop:nop : set DIN off  
+#define WS2812_0_STATE set DIN on : nop:nop:nop:nop:nop : set DIN off 
 
 
 sub WS2812SendUltraFast(in ColorToSend as long)
 
-    ' ----- BYTE 1: ColorToSend_U (R) -----
+    dim WS2812_CurrentByte as byte alias SYSBITTEST
 
-    if ColorToSend_U.7 then WS2812_1_STATE else WS2812_0_STATE
-    if ColorToSend_U.6 then WS2812_1_STATE else WS2812_0_STATE
-    if ColorToSend_U.5 then WS2812_1_STATE else WS2812_0_STATE
-    if ColorToSend_U.4 then WS2812_1_STATE else WS2812_0_STATE
-    if ColorToSend_U.3 then WS2812_1_STATE else WS2812_0_STATE
-    if ColorToSend_U.2 then WS2812_1_STATE else WS2812_0_STATE
-    if ColorToSend_U.1 then WS2812_1_STATE else WS2812_0_STATE
-    if ColorToSend_U.0 then WS2812_1_STATE else WS2812_0_STATE
+    ' ----- BYTE 1: ColorToSend_U (R) -----
+    WS2812_CurrentByte = ColorToSend_U
+
+    if WS2812_CurrentByte.7 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.6 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.5 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.4 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.3 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.2 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.1 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.0 then WS2812_1_STATE else WS2812_0_STATE
 
 
     ' ----- BYTE 2: ColorToSend_H (G) -----
+    WS2812_CurrentByte = ColorToSend_H
 
-    if ColorToSend_H.7 then WS2812_1_STATE else WS2812_0_STATE
-    if ColorToSend_H.6 then WS2812_1_STATE else WS2812_0_STATE
-    if ColorToSend_H.5 then WS2812_1_STATE else WS2812_0_STATE
-    if ColorToSend_H.4 then WS2812_1_STATE else WS2812_0_STATE
-    if ColorToSend_H.3 then WS2812_1_STATE else WS2812_0_STATE
-    if ColorToSend_H.2 then WS2812_1_STATE else WS2812_0_STATE
-    if ColorToSend_H.1 then WS2812_1_STATE else WS2812_0_STATE
-    if ColorToSend_H.0 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.7 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.6 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.5 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.4 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.3 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.2 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.1 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.0 then WS2812_1_STATE else WS2812_0_STATE
 
 
-    ' ----- BYTE 3: ColorToSend (B) -----
+    ' ----- BYTE 3: ColorToSend_E (B) -----
+    WS2812_CurrentByte = ColorToSend
 
-    if ColorToSend.7 then WS2812_1_STATE else WS2812_0_STATE
-    if ColorToSend.6 then WS2812_1_STATE else WS2812_0_STATE
-    if ColorToSend.5 then WS2812_1_STATE else WS2812_0_STATE
-    if ColorToSend.4 then WS2812_1_STATE else WS2812_0_STATE
-    if ColorToSend.3 then WS2812_1_STATE else WS2812_0_STATE
-    if ColorToSend.2 then WS2812_1_STATE else WS2812_0_STATE
-    if ColorToSend.1 then WS2812_1_STATE else WS2812_0_STATE
-    if ColorToSend.0 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.7 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.6 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.5 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.4 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.3 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.2 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.1 then WS2812_1_STATE else WS2812_0_STATE
+    if WS2812_CurrentByte.0 then WS2812_1_STATE else WS2812_0_STATE
 
 end sub
-
