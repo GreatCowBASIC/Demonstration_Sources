@@ -110,7 +110,8 @@ MainCode:
                 if XLoop = CurrentAddressedLED then
                     ColorToSend = ColorOfLED
                 else
-                    ColorToSend = 0x000000
+                    ColorToSend = 0x000000 // to Black
+                    // ColorToSend = ColorOfLED and 0x010101  // to low level of same color
                 end if
             end if
 
