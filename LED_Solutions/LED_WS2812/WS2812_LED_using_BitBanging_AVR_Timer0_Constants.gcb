@@ -18,7 +18,7 @@
 '   • Pressing the switch toggles between Chaser and Flash-All modes.
 '
 ' Hardware Connections (ATmega32U4 / Arduino Leonardo):
-'   • WS2812 DIN          → PE6  (Arduino D7)
+'   • WS2812 DIN          → PB7
 '   • Potentiometer wiper → PF7  (Arduino A0)
 '   • Switch (active-low) → PB4  (Arduino D8)
 '   • Debug LEDs          → PC0–PC3 (not exposed on Leonardo header)
@@ -43,9 +43,9 @@
 
 '----- Hardware Definitions -----
 
-' PE6 = Arduino D7
 
-#define DIN PORTE.6
+
+#define DIN PORTB.7
 dir DIN out
 
 #define Potentiometer PORTF.7
@@ -304,31 +304,6 @@ Sub WS2812BitBangSendData(in ColortoSend as long)
     end repeat
 
 End Sub
-
-
-function GetLongArrayValueHandler(in AddressArray(), ElementPointer) as long
-
-    ElementPointer = (ElementPointer * 4) + ElementPointer
-
-    GetLongArrayValueHandler     = AddressArray(ElementPointer)
-    GetLongArrayValueHandler_H   = AddressArray(ElementPointer+1)
-    GetLongArrayValueHandler_U   = AddressArray(ElementPointer+2)
-    GetLongArrayValueHandler_E   = AddressArray(ElementPointer+3)
-
-end function
-
-
-sub SetLongArrayValueHandler(in AddressArray(), ElementPointer, in ElementValue as long)
-
-    ElementPointer = (ElementPointer * 4) + ElementPointer
-
-    AddressArray(ElementPointer)   = ElementValue
-    AddressArray(ElementPointer+1) = ElementValue_H
-    AddressArray(ElementPointer+2) = ElementValue_U
-    AddressArray(ElementPointer+3) = ElementValue_E
-
-end sub
-
 
 sub ISR0
     ' Timer 0 every 300 µs.

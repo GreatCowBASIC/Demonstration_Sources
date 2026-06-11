@@ -18,7 +18,7 @@
 '   • Pressing the switch toggles between Chaser and Flash-All modes.
 '
 ' Hardware Connections (ATmega32U4 / Arduino Leonardo):
-'   • WS2812 DIN          → PE6  (Arduino D7)
+'   • WS2812 DIN          → PB7
 '   • Potentiometer wiper → PF7  (Arduino A0)
 '   • Switch (active-low) → PB4  (Arduino D8)
 '   • Debug LEDs          → PC0–PC3 (not exposed on Leonardo header)
@@ -44,16 +44,16 @@
 
 '----- Hardware Definitions -----
 
-' PE6 = Arduino D7
 
-#define DIN PORTE.6
+
+#define DIN PORTB.7
 dir DIN out
 
-#define Potentiometer PORTF.7
-dir Potentiometer in
+// #define Potentiometer PORTF.7
+// dir Potentiometer in
 
-#define SWITCH PORTB.4
-dir SWITCH in
+// #define SWITCH PORTB.4
+// dir SWITCH in
 
 #define SWITCH_DOWN 0
 #define SWITCH_UP   1
@@ -86,102 +86,102 @@ MainCode:
     WS2812_Init
 
 '========================================================================
-' WS2812 Color Constants (GRB order)
+' WS28xx Color Constants (GRB order)
 ' 64 unique colors with descriptive names + Greys
 '========================================================================
 
-#define WS2812_Color_BLACK          0x000000
-#define WS2812_Color_WHITE          0xFFFFFF
+#define WS28xx_Color_BLACK          0x000000
+#define WS28xx_Color_WHITE          0xFFFFFF
 
-#define WS2812_Color_RED            0x00FF00
-#define WS2812_Color_GREEN          0xFF0000
-#define WS2812_Color_BLUE           0x0000FF
+#define WS28xx_Color_RED            0x00FF00
+#define WS28xx_Color_GREEN          0xFF0000
+#define WS28xx_Color_BLUE           0x0000FF
 
-#define WS2812_Color_YELLOW         0xFFFF00
-#define WS2812_Color_CYAN           0xFF00FF
-#define WS2812_Color_MAGENTA        0x00FFFF
+#define WS28xx_Color_YELLOW         0xFFFF00
+#define WS28xx_Color_CYAN           0xFF00FF
+#define WS28xx_Color_MAGENTA        0x00FFFF
 
-#define WS2812_Color_ORANGE         0x00A500
-#define WS2812_Color_PINK           0x00FF80
-#define WS2812_Color_PURPLE         0x4000FF
-#define WS2812_Color_LIME           0xBFFF00
-#define WS2812_Color_TEAL           0xFF0080
+#define WS28xx_Color_ORANGE         0x00A500
+#define WS28xx_Color_PINK           0x00FF80
+#define WS28xx_Color_PURPLE         0x4000FF
+#define WS28xx_Color_LIME           0xBFFF00
+#define WS28xx_Color_TEAL           0xFF0080
 
 ' === Greys ===
-#define WS2812_Color_GREY_10        0x1A1A1A
-#define WS2812_Color_GREY_20        0x333333
-#define WS2812_Color_GREY_30        0x4D4D4D
-#define WS2812_Color_GREY_40        0x666666
-#define WS2812_Color_GREY_50        0x808080
-#define WS2812_Color_GREY_60        0x999999
-#define WS2812_Color_GREY_70        0xB3B3B3
-#define WS2812_Color_GREY_80        0xCCCCCC
-#define WS2812_Color_GREY_90        0xE6E6E6
+#define WS28xx_Color_GREY_10        0x1A1A1A
+#define WS28xx_Color_GREY_20        0x333333
+#define WS28xx_Color_GREY_30        0x4D4D4D
+#define WS28xx_Color_GREY_40        0x666666
+#define WS28xx_Color_GREY_50        0x808080
+#define WS28xx_Color_GREY_60        0x999999
+#define WS28xx_Color_GREY_70        0xB3B3B3
+#define WS28xx_Color_GREY_80        0xCCCCCC
+#define WS28xx_Color_GREY_90        0xE6E6E6
 
 ' === Rich Color Palette ===
-#define WS2812_Color_DARK_RED       0x008000
-#define WS2812_Color_CRIMSON        0x00C800
-#define WS2812_Color_TOMATO         0x00FF40
-#define WS2812_Color_CORAL          0x00FF70
-#define WS2812_Color_SALMON         0x00FF90
+#define WS28xx_Color_DARK_RED       0x008000
+#define WS28xx_Color_CRIMSON        0x00C800
+#define WS28xx_Color_TOMATO         0x00FF40
+#define WS28xx_Color_CORAL          0x00FF70
+#define WS28xx_Color_SALMON         0x00FF90
 
-#define WS2812_Color_GOLD           0xFFD000
-#define WS2812_Color_AMBER          0xFFAA00
-#define WS2812_Color_DARK_ORANGE    0xFF7000
-#define WS2812_Color_ORANGE_RED     0xFF3000
+#define WS28xx_Color_GOLD           0xFFD000
+#define WS28xx_Color_AMBER          0xFFAA00
+#define WS28xx_Color_DARK_ORANGE    0xFF7000
+#define WS28xx_Color_ORANGE_RED     0xFF3000
 
-#define WS2812_Color_HOT_PINK       0x00FFAA
-#define WS2812_Color_DEEP_PINK      0x00FFCC
-#define WS2812_Color_LIGHT_PINK     0x00FFEE
+#define WS28xx_Color_HOT_PINK       0x00FFAA
+#define WS28xx_Color_DEEP_PINK      0x00FFCC
+#define WS28xx_Color_LIGHT_PINK     0x00FFEE
 
-#define WS2812_Color_VIOLET         0x6000FF
-#define WS2812_Color_INDIGO         0x3000FF
-#define WS2812_Color_LAVENDER       0x9000FF
+#define WS28xx_Color_VIOLET         0x6000FF
+#define WS28xx_Color_INDIGO         0x3000FF
+#define WS28xx_Color_LAVENDER       0x9000FF
 
-#define WS2812_Color_DARK_BLUE      0x000080
-#define WS2812_Color_ROYAL_BLUE     0x0020FF
-#define WS2812_Color_SKY_BLUE       0x00A0FF
-#define WS2812_Color_LIGHT_BLUE     0x00D0FF
-#define WS2812_Color_AZURE          0x00F0FF
+#define WS28xx_Color_DARK_BLUE      0x000080
+#define WS28xx_Color_ROYAL_BLUE     0x0020FF
+#define WS28xx_Color_SKY_BLUE       0x00A0FF
+#define WS28xx_Color_LIGHT_BLUE     0x00D0FF
+#define WS28xx_Color_AZURE          0x00F0FF
 
-#define WS2812_Color_DARK_CYAN      0xFF0080
-#define WS2812_Color_AQUA           0xFF40C0
-#define WS2812_Color_TURQUOISE      0xFF70E0
+#define WS28xx_Color_DARK_CYAN      0xFF0080
+#define WS28xx_Color_AQUA           0xFF40C0
+#define WS28xx_Color_TURQUOISE      0xFF70E0
 
-#define WS2812_Color_DARK_GREEN     0x800000
-#define WS2812_Color_FOREST_GREEN   0xA00000
-#define WS2812_Color_SEA_GREEN      0xC80000
-#define WS2812_Color_SPRING_GREEN   0xE8FF00
-#define WS2812_Color_CHARTREUSE     0xD0FF00
+#define WS28xx_Color_DARK_GREEN     0x800000
+#define WS28xx_Color_FOREST_GREEN   0xA00000
+#define WS28xx_Color_SEA_GREEN      0xC80000
+#define WS28xx_Color_SPRING_GREEN   0xE8FF00
+#define WS28xx_Color_CHARTREUSE     0xD0FF00
 
-#define WS2812_Color_OLIVE          0x408000
-#define WS2812_Color_KHAKI          0x80C000
-#define WS2812_Color_YELLOW_GREEN   0xAAFF00
+#define WS28xx_Color_OLIVE          0x408000
+#define WS28xx_Color_KHAKI          0x80C000
+#define WS28xx_Color_YELLOW_GREEN   0xAAFF00
 
-#define WS2812_Color_BROWN          0x204000
-#define WS2812_Color_MAROON         0x104000
-#define WS2812_Color_SIENNA         0x306000
+#define WS28xx_Color_BROWN          0x204000
+#define WS28xx_Color_MAROON         0x104000
+#define WS28xx_Color_SIENNA         0x306000
 
-#define WS2812_Color_DEEP_PURPLE    0x2000C0
-#define WS2812_Color_FUCHSIA        0x00FFCC
-#define WS2812_Color_MAUVE          0x7000FF
+#define WS28xx_Color_DEEP_PURPLE    0x2000C0
+#define WS28xx_Color_FUCHSIA        0x00FFCC
+#define WS28xx_Color_MAUVE          0x7000FF
 
-#define WS2812_Color_MINT           0xFF80A0
-#define WS2812_Color_PALE_GREEN     0xC0FF80
-#define WS2812_Color_LIME_GREEN     0x80FF00
+#define WS28xx_Color_MINT           0xFF80A0
+#define WS28xx_Color_PALE_GREEN     0xC0FF80
+#define WS28xx_Color_LIME_GREEN     0x80FF00
 
-#define WS2812_Color_NAVY           0x000040
-#define WS2812_Color_MIDNIGHT_BLUE  0x0000A0
-#define WS2812_Color_DODGER_BLUE    0x0080FF
+#define WS28xx_Color_NAVY           0x000040
+#define WS28xx_Color_MIDNIGHT_BLUE  0x0000A0
+#define WS28xx_Color_DODGER_BLUE    0x0080FF
 
-#define WS2812_Color_VERY_DIM_WHITE     0x050505    ' Very dim white/grey - lowest noticeable white
-#define WS2812_Color_DIM_GREY           0x0A0A0A    ' Low power grey
-#define WS2812_Color_DARK_GREY          0x1A1A1A    ' Slightly brighter but still low power
+#define WS28xx_Color_VERY_DIM_WHITE     0x050505    ' Very dim white/grey - lowest noticeable white
+#define WS28xx_Color_DIM_GREY           0x0A0A0A    ' Low power grey
+#define WS28xx_Color_DARK_GREY          0x1A1A1A    ' Slightly brighter but still low power
 
 ' Single color very low power (even lower consumption)
-#define WS2812_Color_VERY_DIM_RED       0x000A00
-#define WS2812_Color_VERY_DIM_GREEN     0x0A0000
-#define WS2812_Color_VERY_DIM_BLUE      0x00000A
+#define WS28xx_Color_VERY_DIM_RED       0x000A00
+#define WS28xx_Color_VERY_DIM_GREEN     0x0A0000
+#define WS28xx_Color_VERY_DIM_BLUE      0x00000A
 
 
     do
@@ -196,9 +196,9 @@ MainCode:
             for XLoop = 1 to PixelCount
 
                 if XLoop = CurrentAddressedLED then
-                    ColorToSend = WS2812_Color_GREEN
+                    ColorToSend = WS28xx_Color_YELLOW
                 else
-                    ColorToSend = WS2812_Color_VERY_DIM_GREEN
+                    ColorToSend = WS28xx_Color_BLACK
                 end if
 
                 WS2812SendData(ColorToSend)

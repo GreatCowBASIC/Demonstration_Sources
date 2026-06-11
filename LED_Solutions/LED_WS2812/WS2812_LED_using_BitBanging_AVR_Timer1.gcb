@@ -18,7 +18,7 @@
 '   • Pressing the switch toggles between Chaser and Flash-All modes.
 '
 ' Hardware Connections (ATmega32U4 / Arduino Leonardo):
-'   • WS2812 DIN          → PE6  (Arduino D7)
+'   • WS2812 DIN          → PB7
 '   • Potentiometer wiper → PF7  (Arduino A0)
 '   • Switch (active-low) → PB4  (Arduino D8)
 '   • Debug LEDs          → PC0–PC3 (not exposed on Leonardo header)
@@ -43,10 +43,10 @@
 
 '----- Hardware Definitions -----
 
-' PE6 = Arduino D7. Chosen because PD1 (D2/SDA) and PB5 (D9) are OC1A
+' Chosen because PD1 (D2/SDA) and PB5 (D9) are OC1A
 ' hardware compare outputs for Timer 1 and would be driven directly by
 ' the timer hardware, bypassing the ISR entirely.
-#define DIN PORTE.6
+#define DIN PORTB.7
 dir DIN out
 
 #define Potentiometer PORTF.7

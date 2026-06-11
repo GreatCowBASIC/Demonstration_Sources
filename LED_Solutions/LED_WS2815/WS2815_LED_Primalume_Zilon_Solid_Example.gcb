@@ -34,114 +34,21 @@
 #chip mega32u4, 16
 #option explicit
 
-#define WS2815SendData WS2815BitBangSendData
-// #define WS2815SendData WS2812SendUltraFast
+// #define WS2815SendData WS2815BitBangSendData 
+//! or
+#define WS2815SendData WS2812SendUltraFast
+
+
 '----- Hardware Definitions -----
 
 #define DIN PORTB.7
 dir DIN out
 
+#define SWITCH PORTD.4
+dir SWITCH in
 
-
-'========================================================================
-' WS2812 Color Constants (GRB order)
-' 64 unique colors with descriptive names + Greys
-'========================================================================
-
-#define WS28xx_Color_BLACK          0x000000
-#define WS28xx_Color_WHITE          0xFFFFFF
-
-#define WS28xx_Color_RED            0x00FF00
-#define WS28xx_Color_GREEN          0xFF0000
-#define WS28xx_Color_BLUE           0x0000FF
-
-#define WS28xx_Color_YELLOW         0xFFFF00
-#define WS28xx_Color_CYAN           0xFF00FF
-#define WS28xx_Color_MAGENTA        0x00FFFF
-
-#define WS28xx_Color_ORANGE         0x00A500
-#define WS28xx_Color_PINK           0x00FF80
-#define WS28xx_Color_PURPLE         0x4000FF
-#define WS28xx_Color_LIME           0xBFFF00
-#define WS28xx_Color_TEAL           0xFF0080
-
-' === Greys ===
-#define WS28xx_Color_GREY_10        0x1A1A1A
-#define WS28xx_Color_GREY_20        0x333333
-#define WS28xx_Color_GREY_30        0x4D4D4D
-#define WS28xx_Color_GREY_40        0x666666
-#define WS28xx_Color_GREY_50        0x808080
-#define WS28xx_Color_GREY_60        0x999999
-#define WS28xx_Color_GREY_70        0xB3B3B3
-#define WS28xx_Color_GREY_80        0xCCCCCC
-#define WS28xx_Color_GREY_90        0xE6E6E6
-
-' === Rich Color Palette ===
-#define WS28xx_Color_DARK_RED       0x008000
-#define WS28xx_Color_CRIMSON        0x00C800
-#define WS28xx_Color_TOMATO         0x00FF40
-#define WS28xx_Color_CORAL          0x00FF70
-#define WS28xx_Color_SALMON         0x00FF90
-
-#define WS28xx_Color_GOLD           0xFFD000
-#define WS28xx_Color_AMBER          0xFFAA00
-#define WS28xx_Color_DARK_ORANGE    0xFF7000
-#define WS28xx_Color_ORANGE_RED     0xFF3000
-
-#define WS28xx_Color_HOT_PINK       0x00FFAA
-#define WS28xx_Color_DEEP_PINK      0x00FFCC
-#define WS28xx_Color_LIGHT_PINK     0x00FFEE
-
-#define WS28xx_Color_VIOLET         0x6000FF
-#define WS28xx_Color_INDIGO         0x3000FF
-#define WS28xx_Color_LAVENDER       0x9000FF
-
-#define WS28xx_Color_DARK_BLUE      0x000080
-#define WS28xx_Color_ROYAL_BLUE     0x0020FF
-#define WS28xx_Color_SKY_BLUE       0x00A0FF
-#define WS28xx_Color_LIGHT_BLUE     0x00D0FF
-#define WS28xx_Color_AZURE          0x00F0FF
-
-#define WS28xx_Color_DARK_CYAN      0xFF0080
-#define WS28xx_Color_AQUA           0xFF40C0
-#define WS28xx_Color_TURQUOISE      0xFF70E0
-
-#define WS28xx_Color_DARK_GREEN     0x800000
-#define WS28xx_Color_FOREST_GREEN   0xA00000
-#define WS28xx_Color_SEA_GREEN      0xC80000
-#define WS28xx_Color_SPRING_GREEN   0xE8FF00
-#define WS28xx_Color_CHARTREUSE     0xD0FF00
-
-#define WS28xx_Color_OLIVE          0x408000
-#define WS28xx_Color_KHAKI          0x80C000
-#define WS28xx_Color_YELLOW_GREEN   0xAAFF00
-
-#define WS28xx_Color_BROWN          0x204000
-#define WS28xx_Color_MAROON         0x104000
-#define WS28xx_Color_SIENNA         0x306000
-
-#define WS28xx_Color_DEEP_PURPLE    0x2000C0
-#define WS28xx_Color_FUCHSIA        0x00FFCC
-#define WS28xx_Color_MAUVE          0x7000FF
-
-#define WS28xx_Color_MINT           0xFF80A0
-#define WS28xx_Color_PALE_GREEN     0xC0FF80
-#define WS28xx_Color_LIME_GREEN     0x80FF00
-
-#define WS28xx_Color_NAVY           0x000040
-#define WS28xx_Color_MIDNIGHT_BLUE  0x0000A0
-#define WS28xx_Color_DODGER_BLUE    0x0080FF
-
-#define WS28xx_Color_VERY_DIM_WHITE     0x050505    ' Very dim white/grey - lowest noticeable white
-#define WS28xx_Color_DIM_GREY           0x0A0A0A    ' Low power grey
-#define WS28xx_Color_DARK_GREY          0x1A1A1A    ' Slightly brighter but still low power
-
-' Single color very low power (even lower consumption)
-#define WS28xx_Color_VERY_DIM_RED       0x000A00
-#define WS28xx_Color_VERY_DIM_GREEN     0x0A0000
-#define WS28xx_Color_VERY_DIM_BLUE      0x00000A
-
-
+#define SWITCH_UP   1
+#define SWITCH_DOWN 0
 
 '----- Variables -----
 
@@ -149,10 +56,11 @@ dim PixelCount              as byte
 dim YLoop                   as byte
 dim XLoop                   as byte
 dim TimeoutOccurred         as byte
-dim DisplayState            as byte
+dim DemoMode            as byte
 dim SwitchState             as byte
 dim CurrentAddressedLED     as byte
 dim CurrentLEDColorSequence as byte
+dim LEDZilon as Byte = 1
 
 dim ColorOfLED              as long
 dim ColorToSend             as long
@@ -161,52 +69,125 @@ dim ColorToSend             as long
 
 MainCode:
 
-    PixelCount              = 16
-    CurrentAddressedLED     = 1
+    PixelCount              = 8
+    CurrentAddressedLED     = 0  // Zero offset
     CurrentLEDColorSequence = 0
-    DisplayState            = 1
+    //! Change this 0 or 1
+    DemoMode            = 1
 
+    SwitchState             = SWITCH_Down
 
     WS2815_Init
 
+    ' Colour table — 5 entries stored as packed Long values 
+    
+
+    dim ColorArray(24)
+
+    SetLongArrayValueHandler(ColorArray, 0, 0x00FF00)   ' Red
+    SetLongArrayValueHandler(ColorArray, 1, 0x0000FF)   ' Blue
+    SetLongArrayValueHandler(ColorArray, 2, 0xFF0000)   ' Green
+    SetLongArrayValueHandler(ColorArray, 3, 0xFFFFFF)   ' White
+    SetLongArrayValueHandler(ColorArray, 4, 0x000000)   ' Black (off)
+
     do
 
-        for YLoop = 1 to PixelCount
+        ColorOfLED = GetLongArrayValueHandler(ColorArray, CurrentLEDColorSequence)
 
-            ' Wait for the 300 µs timer tick before sending a new frame
-            wait while TimeoutOccurred = 0
+        'Wait for the 300 µs timer tick before sending a new frame
+        wait while TimeoutOccurred = 0
+        intoff
 
-            //! Turn off the interrupt to ensure the timing is good.
-            intoff
-            for XLoop = 1 to PixelCount
+        for XLoop = 1 to PixelCount
 
+            ' === Determine color for this pixel ===
+            if DemoMode = 0 then
+                ' Flash-All Mode: Every LED shows the same color
+                ColorToSend = ColorOfLED
+                
+            else
+                ' Chaser Mode: Only the active LED is lit
                 if XLoop = CurrentAddressedLED then
-                    ColorToSend = WS28xx_Color_RED
+                    ColorToSend = ColorOfLED
                 else
-                    ColorToSend = WS28xx_Color_VERY_DIM_RED
+                    ColorToSend = 0x000000
                 end if
+            end if
 
-                WS2815SendData(ColorToSend)
-
-            next
-
-            TimeoutOccurred = 0
-            inton
-
-
-            'Now so your eye can see it...
-            wait 50 ms
-            CurrentAddressedLED++
-
+            WS2815SendData(ColorToSend)
+            
         next
 
-        CurrentAddressedLED = 1
+        /*if SWITCH = SWITCH_DOWN and SwitchState = SWITCH_UP then
+            DemoMode = !DemoMode
+            SwitchState  = SWITCH_DOWN
+        end if
+
+        if SWITCH = SWITCH_UP then
+            SwitchState = SWITCH_UP
+        end if*/
+
+        TimeoutOccurred = 0
+        inton
+
         
+        ' ===================================================================
+        ' Advance Animation State - Mode-Specific Logic
+        ' ===================================================================
+        ' This section updates the animation after each frame is sent.
+        ' The behavior is completely different depending on the current demo mode.
+
+        If DemoMode = 0 then 
+            ' ==================== FLASH-ALL MODE ====================
+            ' All 8 LEDs show the same color.
+            ' We change color every 1 second.
+
+            wait 1 s                                ' Hold current color for 1 second
+            
+            CurrentLEDColorSequence++               ' Move to next color in list/array
+            
+            If CurrentLEDColorSequence = 5 then 
+                CurrentLEDColorSequence = 0         ' Wrap around (use 4 colors total)
+            End If
+
+        Else
+            ' ==================== CHASER MODE ====================
+            ' Only one LED is lit at a time.
+            ' The lit LED moves back and forth along the strip.
+            ' Color changes only after completing a full back-and-forth pass.
+
+            ' Read next position from the movement table
+            ReadTable LEDSequence, LEDZilon, CurrentAddressedLED
+            
+            LEDZilon++                              ' Move to next step in the path
+
+            ' Check if we have reached the end of the movement table
+            If LEDZilon = 17 then                   ' We have this many data points plus one as we have indexed LEDZilon
+                LEDZilon = 1                        ' Reset to start of table
+                CurrentAddressedLED = 1             ' First LED
+                
+                CurrentLEDColorSequence++           ' Now Advance to next color
+                
+                ' Skip black (index 4) in Chaser mode for better visual effect
+                If CurrentLEDColorSequence = 4 then 
+                    CurrentLEDColorSequence = 0     
+                End If
+                ' No delay as the additional processes hold the eye for long enough
+                // wait 5 ms                              ' Controls animation speed (step delay)
+            Else
+                wait 100 ms                              ' Controls animation speed (step delay)
+            End If
+
+
+        End If
+
     loop
 
 end
 
-
+Table LEDSequence
+    1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1
+End Table
 '----- Subroutines -----
 
 sub WS2815_Init
@@ -294,6 +275,30 @@ Sub WS2815BitBangSendData(in ColortoSend as long)
     end repeat
 
 End Sub
+
+
+function GetLongArrayValueHandler(in AddressArray(), ElementPointer) as long
+
+    ElementPointer = (ElementPointer * 4) + ElementPointer
+
+    GetLongArrayValueHandler     = AddressArray(ElementPointer)
+    GetLongArrayValueHandler_H   = AddressArray(ElementPointer+1)
+    GetLongArrayValueHandler_U   = AddressArray(ElementPointer+2)
+    GetLongArrayValueHandler_E   = AddressArray(ElementPointer+3)
+
+end function
+
+
+sub SetLongArrayValueHandler(in AddressArray(), ElementPointer, in ElementValue as long)
+
+    ElementPointer = (ElementPointer * 4) + ElementPointer
+
+    AddressArray(ElementPointer)   = ElementValue
+    AddressArray(ElementPointer+1) = ElementValue_H
+    AddressArray(ElementPointer+2) = ElementValue_U
+    AddressArray(ElementPointer+3) = ElementValue_E
+
+end sub
 
 sub ISR0
     ' Timer 0 every 300 µs.

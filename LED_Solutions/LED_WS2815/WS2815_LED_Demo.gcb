@@ -40,6 +40,8 @@ dim CurrentAddressedLED as byte
 
 dim ColorToSend         as long
 
+
+
 '----- Main Program -----
 
 MainCode:
@@ -158,7 +160,7 @@ MainCode:
             for XLoop = 1 to PixelCount
 
                 if XLoop = CurrentAddressedLED then
-                    ColorToSend = WS2815_Color_RED
+                    ColorToSend = WS2815_Color_BLUE
                 else
                     ColorToSend = WS2815_Color_VERY_DIM_RED 
                 end if
