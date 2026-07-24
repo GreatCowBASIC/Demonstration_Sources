@@ -1,0 +1,1185 @@
+'*****************************************************
+' Lottozahlengenerator Long - GCBASIC version
+' Converted from CodeVisionAVR C source
+' Chip: ATmega8 @ 8 MHz (internal RC-OSC - set via fuses,
+'       not controllable from GCBASIC source)
+'
+' Based on the Franzis-Pingpong platform
+' http://www.elo-web.de/ping-pong-start
+'
+' NOTE: This is a semantic, best-effort conversion. Fixed against
+' compiler feedback from GCBASIC 2026.07.01. Register-level blocks
+' (multiplexing ISR, sleep/power-down handling) use direct SFR
+' access, which GCBASIC supports; double-check bit positions
+' against your GCBASIC version's ATmega8 device file before flashing.
+'*****************************************************
+
+#chip mega8, 8
+#option explicit
+#option removeAVRvectors
+
+#define SHOWLOTTO
+// #define SHOWADC
+
+'-----------------------------------------------------
+' Pin assignments
+'-----------------------------------------------------
+#define P_CLK    PORTB.3
+#define P_DATA   PORTB.4
+#define P_STROBE PORTB.2
+
+'-----------------------------------------------------
+' Display orientation.
+' These affect BOTH the startup chase animations
+' (ChaseColumnsRightToLeft / ChaseRowsBottomToTop) AND the
+' normal number/selection display (ShowDecimal,
+' ShowSelection), via the PhysCol()/ReverseBits7() helpers
+' defined below. The multiplexing ISR itself is orientation
+' agnostic and needs no changes either way.
+'
+' These are resolved by the preprocessor (#IFDEF), not at
+' runtime, so the choice is baked in at compile time with
+' no ambiguity: LEAVE a line in place to enable that
+' inversion, COMMENT IT OUT (or delete it) to disable it.
+'
+' invertX: column index 1 is wired to the physical RIGHT
+'          edge of the matrix on THIS hardware (confirmed),
+'          so with invertX defined, the sweep runs index
+'          1 -> 12 to move right-to-left on screen, and
+'          PhysCol() mirrors columns left/right so numbers
+'          are placed on the correct physical columns.
+'          Comment out invertX if your board instead wires
+'          column index 1 to the LEFT edge (the "natural"
+'          assumption).
+'
+' invertY: which bit is physically the TOP vs. BOTTOM row
+'          isn't knowable from the source, only from your
+'          board's wiring. With invertY defined, the startup
+'          row-chase runs bit 0 -> 9, and ReverseBits7()
+'          mirrors each font glyph vertically so digits still
+'          read right-side up on the flipped wiring. Flip
+'          this if digits or the row animation render upside
+'          down / in the wrong direction on your hardware.
+'-----------------------------------------------------
+#define invertX
+#define invertY
+
+'-----------------------------------------------------
+' Physical row/column origin of the display, so the font
+' table's row-0/column-1-flush glyph data can be placed
+' wherever the matrix's first illuminated row/column
+' actually is on real hardware.
+'
+' Confirmed by hardware measurement: the left/tens digit's
+' top-left pixel sits at physical row 1, column 1; the
+' right/units digit's top-left pixel sits at physical
+' row 1, column 7.
+'
+' LED_TOP_POSITION: physical row of the glyph's top pixel
+'   row (font bit 0). Used as a left-shift amount, so the
+'   whole 7-bit glyph byte moves up by this many rows at
+'   once - e.g. LED_TOP_POSITION=1 reproduces the historical
+'   "fontByte * 2" placement, but as a named, adjustable value
+'   instead of a magic number.
+' LED_LEFT_CHAR_POSITION: column offset added to colIdx
+'   (1..5) for the left/tens digit. 0 means no adjustment -
+'   colIdx already lands on columns 1..5 as-is.
+' LED_RIGHT_CHAR_POSITION: physical column of the right/units
+'   digit's first (leftmost) pixel column - used directly as
+'   the base column, with colIdx-1 added across the 5 columns.
+'-----------------------------------------------------
+#define LED_TOP_POSITION        2
+#define LED_LEFT_CHAR_POSITION  0
+#define LED_RIGHT_CHAR_POSITION 8
+
+'-----------------------------------------------------
+' Row placement for ShowCreditText's scrolling line, kept
+' separate from LED_TOP_POSITION (which is LOTTO's own row
+' offset, rows 1..4). CREDIT_TOP_POSITION=6 places this
+' second, 4-row-tall line at rows 6..9 - one blank row (5)
+' below LOTTO, using the matrix's last row (9) exactly, with
+' row 0 left spare above LOTTO. Both bands are within the 10
+' row bits (0..9) the multiplexing ISR actually drives.
+'-----------------------------------------------------
+#define CREDIT_TOP_POSITION 6
+
+'-----------------------------------------------------
+' Character codes into the smallFont table below (1-based,
+' matching that table's row order). FONT_SPACE is a sentinel,
+' not a real table row - ShowCreditText treats it as "advance
+' the cursor, draw nothing" rather than reading the table.
+'-----------------------------------------------------
+#define FONT_SPACE 0
+#define FONT_L     1
+#define FONT_O     2
+#define FONT_T     3
+#define FONT_A     4
+#define FONT_B     5
+#define FONT_C     6
+#define FONT_E     7
+#define FONT_G     8
+#define FONT_I     9
+#define FONT_N     10
+#define FONT_R     11
+#define FONT_S     12
+#define FONT_U     13
+#define FONT_V     14
+#define FONT_Y     15
+#define FONT_0     16
+#define FONT_2     17
+#define FONT_6     18
+#define FONT_DOT   19
+
+'-----------------------------------------------------
+' Switch (K1/K2 connector). K1 = 0V0 (ground), K2 = PORTD.2 -
+' shared with connector pins D2 and P4, which is the same
+' net the ADC6/ADC7 pot connector rides on. Because of that,
+' this pin is driven as an OUTPUT, held LOW, by default (it's
+' the pots' ground reference) - NOT held as a permanent input,
+' unlike a normal dedicated button pin. It's only switched to
+' an input with pull-up momentarily, via ReadKeySwitch(), to
+' actually sense a press, then immediately switched back to
+' output-low.
+'-----------------------------------------------------
+#define KEY_SWITCH_PIN     PIND.2   ' read the switch state (only valid while DDRD.2 = 0)
+#define KEY_SWITCH_PULLUP  PORTD.2  ' write 1/0 to enable/disable its pull-up
+
+'-----------------------------------------------------
+' Piezo buzzer, wired across D1 and D3 (confirmed working on
+' real hardware - supersedes earlier documentation, which had
+' this pair reversed). SoundOut (used by GCBASIC's ShortTone)
+' drives D1. PIEZO_GROUND (D3) is the piezo's other leg, held
+' as an input with pull-up rather than a driven-low output -
+' also confirmed working as-is.
+'-----------------------------------------------------
+#define SoundOut     PORTD.1
+#define PIEZO_GROUND PORTD.3
+
+'-----------------------------------------------------
+' Global state
+'-----------------------------------------------------
+Dim leds(12)      As Word     ' current state of each LED column (1..12 = C's 0..11)
+Dim ledsBlink(12) As Word     ' blink state of each LED column
+Dim lotto(6)      As Byte     ' 6 random values (1..49), 1-based
+
+Dim muxCount   As Byte        ' multiplex column counter (mirrors C's static "count")
+Dim cBlink     As Byte        ' blink phase byte (mirrors C's static "cBlink")
+Dim cBlinkCnt  As Byte        ' blink phase counter (mirrors C's static "cBlinkcnt")
+
+Dim selX      As Byte         ' selected x-position, used in main loop
+
+Dim adcTestLeftRaw    As Word ' raw 10-bit ADC reading, left-digit test channel
+Dim adcTestRightRaw   As Word ' raw 10-bit ADC reading, right-digit test channel
+Dim adcTestLeftDigit  As Byte ' adcTestLeftRaw scaled to 0..9
+Dim adcTestRightDigit As Byte ' adcTestRightRaw scaled to 0..9
+Dim adcTestLastLeftDigit  As Byte ' last value ShowAdcTest actually drew on the left digit
+Dim adcTestLastRightDigit As Byte ' last value ShowAdcTest actually drew on the right digit
+Dim keySwitchTestPressed  As Byte ' ReadKeySwitch() test: 0 = not pressed, 1 = pressed
+
+'-----------------------------------------------------
+' Font table: 5 columns x 10 digits (0-9), same bitmap
+' data as the original "decimals" flash array.
+' Index = value*5 + col (col = 1..5), giving 1..50.
+'-----------------------------------------------------
+Table decimals
+  0x3E, 0x51, 0x49, 0x45, 0x3E   ' 0
+  0x00, 0x42, 0x7F, 0x40, 0x00   ' 1
+  0x42, 0x61, 0x51, 0x49, 0x46   ' 2
+  0x22, 0x41, 0x49, 0x49, 0x36   ' 3
+  0x18, 0x14, 0x12, 0x7F, 0x10   ' 4
+  0x27, 0x45, 0x45, 0x45, 0x39   ' 5
+  0x3C, 0x4A, 0x49, 0x49, 0x30   ' 6
+  0x01, 0x71, 0x09, 0x05, 0x03   ' 7
+  0x36, 0x49, 0x49, 0x49, 0x36   ' 8
+  0x06, 0x49, 0x49, 0x29, 0x1E   ' 9
+End Table
+
+
+'-----------------------------------------------------
+' Small font table: 3 columns x 4 rows per character, same
+' bit-per-row convention as the decimals table (bit0 = top
+' row), using only the bottom 4 bits since this font is
+' shorter. A minimal blocky uppercase font covering just
+' what LOTTO and the credit line need - not a full alphabet.
+' At 3x4 some letters are necessarily approximate (B and R in
+' particular only differ by one pixel; 2 and S are also close)
+' - this is a real limitation of the resolution, not a bug.
+' Index = (FONT_x - 1)*3 + col (col = 1..3). Row order below
+' matches the FONT_x constants defined above (FONT_L=1 is
+' table row 1, and so on) - FONT_SPACE=0 is a sentinel with
+' no table row, handled separately by ShowCreditText.
+'-----------------------------------------------------
+Table smallFont
+  0x0F, 0x08, 0x08   ' 1  = L
+  0x0F, 0x09, 0x0F   ' 2  = O
+  0x01, 0x0F, 0x01   ' 3  = T
+  0x0E, 0x05, 0x0E   ' 4  = A
+  0x0F, 0x09, 0x06   ' 5  = B
+  0x0F, 0x09, 0x00   ' 6  = C
+  0x0F, 0x0D, 0x09   ' 7  = E
+  0x0F, 0x09, 0x0C   ' 8  = G
+  0x09, 0x0F, 0x09   ' 9  = I
+  0x0F, 0x06, 0x0F   ' 10 = N
+  0x0F, 0x05, 0x02   ' 11 = R
+  0x0B, 0x09, 0x0D   ' 12 = S
+  0x0F, 0x08, 0x0F   ' 13 = U
+  0x03, 0x0C, 0x03   ' 14 = V
+  0x01, 0x0E, 0x01   ' 15 = Y
+  0x0F, 0x09, 0x0F   ' 16 = 0 (same shape as O at this size)
+  0x0D, 0x0D, 0x0B   ' 17 = 2
+  0x0E, 0x05, 0x0D   ' 18 = 6
+  0x00, 0x08, 0x00   ' 19 = . (period)
+End Table
+
+
+'-----------------------------------------------------
+' Map a logical column (1..12, left-to-right as authored
+' by ShowDecimal/ShowSelection) to the physical column
+' index used in leds()/ledsBlink(), honoring invertX.
+' Self-inverse: PhysCol(PhysCol(x)) = x, so it's safe to
+' use for both reading and writing the same slot.
+'-----------------------------------------------------
+Function PhysCol(logCol As Byte) As Byte
+  #IFDEF invertX
+    PhysCol = 13 - logCol
+  #ELSE
+    PhysCol = logCol
+  #ENDIF
+End Function
+
+
+'-----------------------------------------------------
+' Reverse the 7 significant bits (bit0..bit6) of a font
+' glyph byte, i.e. mirror the character vertically. Used
+' when invertY is defined so digits still read right-side
+' up after the row bits land on physically flipped wiring.
+'-----------------------------------------------------
+Function ReverseBits7(inByte As Byte) As Byte
+  Dim tmpIn   As Byte
+  Dim outByte As Byte
+  Dim bitIdx  As Byte
+  tmpIn = inByte
+  outByte = 0
+  For bitIdx = 1 To 7
+    outByte = FnLSL(outByte, 1)
+    If (tmpIn And 0x01) = 0x01 Then
+      outByte = outByte Or 0x01
+    End If
+    tmpIn = FnLSR(tmpIn, 1)
+  Next
+  ReverseBits7 = outByte
+End Function
+
+
+'-----------------------------------------------------
+' Reverse the 4 significant bits (bit0..bit3) of a letters
+' font glyph byte, i.e. mirror the character vertically.
+' NOT the same operation as ReverseBits7 - the letters table
+' is only 4 rows tall, so reversing across 7 bit positions
+' (as ReverseBits7 does) would scatter the glyph across rows
+' it doesn't use. Used when invertY is defined, same purpose
+' as ReverseBits7 but sized for this shorter font.
+'-----------------------------------------------------
+Function ReverseBits4(inByte As Byte) As Byte
+  Dim tmpIn   As Byte
+  Dim outByte As Byte
+  Dim bitIdx  As Byte
+  tmpIn = inByte
+  outByte = 0
+  For bitIdx = 1 To 4
+    outByte = FnLSL(outByte, 1)
+    If (tmpIn And 0x01) = 0x01 Then
+      outByte = outByte Or 0x01
+    End If
+    tmpIn = FnLSR(tmpIn, 1)
+  Next
+  ReverseBits4 = outByte
+End Function
+
+
+'-----------------------------------------------------
+' clear the whole screen, all LEDs off
+'-----------------------------------------------------
+Sub ClearScreen
+  Dim idx As Byte
+  For idx = 1 To 12
+    leds(idx) = 0
+  Next
+End Sub
+
+
+'-----------------------------------------------------
+' Momentarily switch KEY_SWITCH_PIN's pin (PORTD.2) to an
+' input with pull-up, read it, then immediately restore it
+' to output-low - its default resting state, since that pin
+' doubles as the pots' ground reference (see InitPorts). The
+' brief toggle only costs a couple of instructions, well
+' inside one ADC conversion's settling time.
+' return: 0 = not pressed, 1 = pressed
+'-----------------------------------------------------
+Function ReadKeySwitch() As Byte
+  Dim result As Byte
+  Dir KEY_SWITCH_PULLUP In              ' input, briefly
+  KEY_SWITCH_PULLUP = 1
+  If KEY_SWITCH_PIN = 0 Then
+    result = 1
+  Else
+    result = 0
+  End If
+  Dir KEY_SWITCH_PULLUP Out             ' back to output-low (pot ground reference)
+  KEY_SWITCH_PULLUP = 0
+  ReadKeySwitch = result
+End Function
+
+
+'-----------------------------------------------------
+' wait until key is pressed
+'-----------------------------------------------------
+Sub WaitUntilKeypressed
+  Do While ReadKeySwitch() = 0
+  Loop
+  Wait 20 ms
+End Sub
+
+
+'-----------------------------------------------------
+' wait until key is released
+'-----------------------------------------------------
+Sub WaitUntilKeyreleased
+  Do While ReadKeySwitch() = 1
+  Loop
+  Wait 20 ms
+End Sub
+
+
+'-----------------------------------------------------
+' check if key is pressed
+' return: 0 = not pressed, 1 = pressed
+'-----------------------------------------------------
+Function KeyPressed() As Byte
+  Dim result As Byte
+  result = ReadKeySwitch()
+  Wait 20 ms
+  KeyPressed = result
+End Function
+
+
+'-----------------------------------------------------
+' Timer2 overflow handler (LED multiplexing, ~1 ms).
+' Wired directly to the TIMER2_OVF hardware vector via
+' On Interrupt, so GCBASIC generates a lean, dedicated ISR
+' instead of a full-context-save dispatcher. The overflow
+' flag is cleared automatically by hardware on vector entry.
+'-----------------------------------------------------
+Sub Timer2Isr
+  Dim cValue   As Byte
+  Dim cValue2  As Byte
+  Dim curLeds  As Word
+  Dim curBlink As Word
+
+  cBlinkCnt = cBlinkCnt + 1
+  If cBlinkCnt >= 250 Then
+    cBlinkCnt = 0
+    cBlink = Not cBlink
+  End If
+
+  muxCount = muxCount + 1
+  If muxCount >= 12 Then
+    muxCount = 0
+    P_DATA = 0
+  Else
+    P_DATA = 1
+  End If
+  P_CLK = 1
+  P_CLK = 0
+  PORTC = PORTC And 0xF0
+  PORTD = PORTD And 0x0F
+  PORTB = PORTB And 0xFC
+  P_STROBE = 1
+  P_STROBE = 0
+
+  ' Read each array element once and reuse it, instead of
+  ' recomputing the array address on every access (this was
+  ' happening 3x for leds() and 2x for ledsBlink() before).
+  curLeds  = leds(muxCount + 1)
+  curBlink = ledsBlink(muxCount + 1)
+
+  cValue  = curLeds And 0x0F
+  cValue2 = curBlink And cBlink
+  cValue  = cValue And (Not cValue2)
+  PORTC   = PORTC Or cValue
+
+  cValue = curLeds And 0xF0
+  cValue = cValue And (Not cValue2)
+  PORTD  = PORTD Or cValue
+
+  ' FnLSR(x, 8) instead of "x / 256" - both extract the high
+  ' byte of the word, but "/ 256" was compiling to a call into
+  ' GCBASIC's generic subtract-based 16-bit division routine.
+  cValue  = FnLSR(curLeds, 8) And 0x03
+  cValue2 = FnLSR(curBlink, 8) And cBlink
+  cValue  = cValue And (Not cValue2)
+  PORTB   = PORTB Or cValue
+End Sub
+
+
+'-----------------------------------------------------
+' INT0 wake handler (K1/K2 switch press). Only enabled while
+' the MCU is in power-down sleep (see SetStandbyMode); its
+' sole purpose is to end sleep, matching the original's empty
+' ISR. Wired to the dedicated INT0 vector via On Interrupt.
+'-----------------------------------------------------
+Sub WakeIsr
+End Sub
+
+
+'-----------------------------------------------------
+' initialization of Timer0 and Timer2
+'-----------------------------------------------------
+Sub InitTimers
+  ' Timer2: normal mode, prescale so overflow ~ every 1 ms at 8 MHz
+  TCCR2 = 0x03
+  ' Timer0: no prescale, used purely as a free-running random seed source
+  TCCR0 = 0x01
+  ' Note: the Timer2 overflow interrupt (TOIE2) is enabled by the
+  ' "On Interrupt Timer2Overflow Call Timer2Isr" registration in
+  ' the main routine below, not here.
+End Sub
+
+
+'-----------------------------------------------------
+' put controller into power-down sleep mode
+'-----------------------------------------------------
+Sub SetStandbyMode
+  TCCR2  = TCCR2 And 0xF8       ' stop Timer2
+  PORTC  = 0
+  PORTD  = 0
+  PORTB  = 0
+  ADCSRA = ADCSRA And 0x7F      ' stop ADC (clear ADEN)
+
+  Dir KEY_SWITCH_PULLUP In      ' switch/wake pin as input while asleep
+  KEY_SWITCH_PULLUP = 1         ' enable pull-up so INT0 sees an idle-high level
+
+  On Interrupt EXTINT0 Call WakeIsr   ' enable INT0 as the wake source
+
+  ' Power-down sleep mode: SM2=0, SM1=1, SM0=0 (preserve SE/ISC bits)
+  MCUCR = (MCUCR And 0x8F) Or 0x20
+  Set MCUCR.7 On                ' SE = 1 (sleep enable)
+  sleep
+  Set MCUCR.7 Off               ' SE = 0
+
+  On Interrupt EXTINT0 Ignore         ' disable INT0 again after waking
+
+  PIEZO_GROUND = 1               ' re-enable pull-up on piezo ground leg, cleared by "PORTD = 0" above
+  Dir KEY_SWITCH_PULLUP Out     ' back to output - resumes driving the pot ground reference
+  KEY_SWITCH_PULLUP = 0
+
+  ADCSRA = ADCSRA Or 0x80       ' restart ADC (set ADEN)
+  TCCR2  = TCCR2 Or 0x03        ' restart Timer2
+End Sub
+
+
+'-----------------------------------------------------
+' initialization of INT0 trigger mode (low level).
+' INT0 itself stays disabled until SetStandbyMode enables
+' it via "On Interrupt EXTINT0 Call WakeIsr" as a wake source.
+'-----------------------------------------------------
+Sub InitInt0
+  MCUCR = MCUCR And 0xFC        ' INT0 mode: low level
+End Sub
+
+
+'-----------------------------------------------------
+' initialization of ports
+'-----------------------------------------------------
+Sub InitPorts
+  PORTB = 0
+  DDRB  = 0x1F
+  PORTC = 0
+  DDRC  = 0x0F
+  PORTD = 0
+  ' bit7-4: LED row driver outputs (Timer2Isr) - unchanged
+  ' bit3:   PIEZO_GROUND - input with pull-up (confirmed working as-is)
+  ' bit2:   KEY_SWITCH / P4 - output, held LOW by default (pot ground
+  '         reference); only flipped to input momentarily by
+  '         ReadKeySwitch() to sense a press
+  ' bit1:   SoundOut - output (piezo drive leg)
+  ' bit0:   spare - input
+  DDRD  = 0xF6
+  PORTD.2 = 0                   ' drive the pot ground reference low
+
+  Dir SoundOut Out
+  SoundOut = 0
+  Dir PIEZO_GROUND In
+  PIEZO_GROUND = 1               ' pull-up on the piezo's other leg
+
+  ACSR   = 0x80                 ' Analog Comparator off
+  SFIOR  = 0
+End Sub
+
+
+'-----------------------------------------------------
+' select x-position (0..5) from the potentiometer on ADC7
+'-----------------------------------------------------
+Function SelectX() As Byte
+  Dim adcValue As Word
+  adcValue = ReadAD10(AN7, TRUE)   ' full 10-bit result (0-1023)
+  SelectX = 5 - (adcValue / 171)   ' 171 = 1023/6 + 1
+End Function
+
+
+'-----------------------------------------------------
+' set blinking status for the LED columns
+' blinkVal: 0 = blinking off, 0xFF = blinking on
+'-----------------------------------------------------
+Sub BlinkScreen(blinkVal As Byte)
+  Dim idx As Byte
+  For idx = 1 To 12
+    ledsBlink(idx) = blinkVal
+  Next
+End Sub
+
+
+'-----------------------------------------------------
+' clear the blink mask for every column. Nothing in this
+' program currently calls BlinkScreen, but ledsBlink() must
+' still be put into a known (all-zero) state explicitly -
+' it is never touched by ClearScreen, and leaving it to
+' whatever SRAM happens to contain at power-up can leave
+' stray bits set, which the multiplexing ISR will then
+' periodically blank - visible as random LEDs flickering.
+'-----------------------------------------------------
+Sub ClearBlink
+  Dim idx As Byte
+  For idx = 1 To 12
+    ledsBlink(idx) = 0
+  Next
+End Sub
+
+
+'-----------------------------------------------------
+' show a decimal value (0..99) on the display, placed at
+' the hardware-measured origin: the left/tens digit starts
+' at LED_LEFT_CHAR_POSITION+1..+5, the right/units digit
+' starts at LED_RIGHT_CHAR_POSITION, and every glyph's row
+' bits are shifted up by LED_TOP_POSITION so row 0 of the
+' font lands on the matrix's actual top row. A single-digit
+' value (tens digit = 0) is drawn flush at the left position
+' with no separator/right slot used. Columns are then written
+' to (and read back from, for the marker bit) their PhysCol()
+' physical slot, so invertX mirrors the whole number left/
+' right when defined. Each font byte is run through
+' ReverseBits7() before being OR'd in when invertY is
+' defined, so digits stay right-side up on flipped row
+' wiring instead of just moving column.
+'-----------------------------------------------------
+Sub ShowDecimal(dVal As Byte)
+  Dim colIdx   As Byte
+  Dim destCol  As Byte
+  Dim fontByte As Byte
+  Dim tensVal  As Byte
+  Dim unitsVal As Byte
+  Dim ledsLocal(12) As Word
+
+  For colIdx = 1 To 12
+    ledsLocal(colIdx) = leds(PhysCol(colIdx)) And 0x200      ' preserve selection-marker bit
+  Next
+
+  tensVal  = dVal / 10
+  unitsVal = dVal Mod 10
+
+  If tensVal > 0 Then
+    ' two digits: tens at LED_LEFT_CHAR_POSITION, units at LED_RIGHT_CHAR_POSITION
+    For colIdx = 1 To 5
+      ReadTable decimals, (tensVal * 5 + colIdx), fontByte
+      #IFDEF invertY
+        fontByte = ReverseBits7(fontByte)
+      #ENDIF
+      destCol = LED_LEFT_CHAR_POSITION + colIdx
+      ledsLocal(destCol) = ledsLocal(destCol) Or FnLSL([Word]fontByte, LED_TOP_POSITION)
+    Next
+    For colIdx = 1 To 5
+      ReadTable decimals, (unitsVal * 5 + colIdx), fontByte
+      #IFDEF invertY
+        fontByte = ReverseBits7(fontByte)
+      #ENDIF
+      destCol = LED_RIGHT_CHAR_POSITION + (colIdx - 1)
+      ledsLocal(destCol) = ledsLocal(destCol) Or FnLSL([Word]fontByte, LED_TOP_POSITION)
+    Next
+  Else
+    ' single digit: right-justified at LED_RIGHT_CHAR_POSITION, left/tens slot left blank
+    For colIdx = 1 To 5
+      ReadTable decimals, (unitsVal * 5 + colIdx), fontByte
+      #IFDEF invertY
+        fontByte = ReverseBits7(fontByte)
+      #ENDIF
+      destCol = LED_RIGHT_CHAR_POSITION + colIdx - 1
+      ledsLocal(destCol) = ledsLocal(destCol) Or FnLSL([Word]fontByte, LED_TOP_POSITION)
+    Next
+  End If
+
+  For colIdx = 1 To 12
+    leds(PhysCol(colIdx)) = ledsLocal(colIdx)
+  Next
+End Sub
+
+
+'-----------------------------------------------------
+' Scroll the word "LOTTO" across the full 12-column display,
+' right to left, using the letters font table above (3
+' columns x 4 rows per letter).
+'
+' 5 letters at 3 columns each plus 1-column gaps still need
+' more width than the 12-column matrix has, so the whole
+' message is built into an off-screen buffer first, padded
+' with 12 blank columns on each side (so it scrolls smoothly
+' on and back off the display), then swept across leds() one
+' column at a time - the same technique ChaseColumnsRightToLeft
+' uses for the startup animation, just with letter glyphs
+' instead of solid columns.
+'
+' Buffer layout (1-based column index within lottoBuffer):
+'   1..12    blank lead-in padding
+'   13..15   L
+'   16       gap
+'   17..19   O
+'   20       gap
+'   21..23   T
+'   24       gap
+'   25..27   T
+'   28       gap
+'   29..31   O
+'   32..44   blank trail-off padding
+'
+' Padding both ends means every scroll frame's source index is
+' already in range, so no bounds checking is needed in the
+' scroll loop itself. Writes go through PhysCol() same as
+' ShowDecimal, so invertX mirrors the whole banner correctly.
+' Unlike ShowDecimal/ShowAdcTest, the selection-marker bit
+' (0x200) is not preserved here - this is a full-screen banner,
+' not a number display, so there is nothing to preserve.
+'
+' Exits early if the switch is pressed mid-scroll (debounced
+' via WaitUntilKeyreleased before returning), matching how the
+' rest of the program treats the switch as a "cancel" input.
+'-----------------------------------------------------
+Sub ShowLottoText
+  Dim lottoBuffer(44) As Word
+  Dim bufIdx     As Byte
+  Dim letterCol  As Byte
+  Dim fontByte   As Word
+  Dim scrollPos  As Byte
+  Dim frameCol   As Byte
+  Dim srcIdx     As Byte
+
+  INTOFF
+
+  For bufIdx = 1 To 44
+    lottoBuffer(bufIdx) = 0
+  Next
+
+  ' L (letterCode 1) at columns 13..15
+  For letterCol = 1 To 3
+    ReadTable smallFont, (0 * 3 + letterCol), fontByte
+    #IFDEF invertY
+      fontByte = ReverseBits4(fontByte)
+    #ENDIF
+    lottoBuffer(12 + letterCol) = fontByte
+  Next
+
+  ' O (letterCode 2) at columns 17..19
+  For letterCol = 1 To 3
+    ReadTable smallFont, (1 * 3 + letterCol), fontByte
+    #IFDEF invertY
+      fontByte = ReverseBits4(fontByte)
+    #ENDIF
+    lottoBuffer(16 + letterCol) = fontByte
+  Next
+
+  ' T (letterCode 3) at columns 21..23
+  For letterCol = 1 To 3
+    ReadTable smallFont, (2 * 3 + letterCol), fontByte
+    #IFDEF invertY
+      fontByte = ReverseBits4(fontByte)
+    #ENDIF
+    lottoBuffer(20 + letterCol) = fontByte
+  Next
+
+  ' T (letterCode 3) at columns 25..27
+  For letterCol = 1 To 3
+    ReadTable smallFont, (2 * 3 + letterCol), fontByte
+    #IFDEF invertY
+      fontByte = ReverseBits4(fontByte)
+    #ENDIF
+    lottoBuffer(24 + letterCol) = fontByte
+  Next
+
+  ' O (letterCode 2) at columns 29..31
+  For letterCol = 1 To 3
+    ReadTable smallFont, (1 * 3 + letterCol), fontByte
+    #IFDEF invertY
+      fontByte = ReverseBits4(fontByte)
+    #ENDIF
+    lottoBuffer(28 + letterCol) = fontByte
+  Next
+
+
+  INTON
+
+  ' Scroll: srcIdx = scrollPos + frameCol - 1 always lands in
+  ' 1..44 for scrollPos 1..33 and frameCol 1..12 (max 33+12-1=44),
+  ' so every column of every frame reads a valid buffer slot,
+  ' blank padding included, with no separate bounds check needed.
+  For scrollPos = 1 To 33
+    INTOFF
+    For frameCol = 1 To 12
+      srcIdx = scrollPos + frameCol - 1
+      leds(PhysCol(frameCol)) = FnLSL(lottoBuffer(srcIdx), LED_TOP_POSITION)
+    Next
+    INTON
+    If ReadKeySwitch() = 1 Then
+      WaitUntilKeyreleased
+      ClearScreen
+      Exit Sub
+    End If
+    Wait 200 ms
+  Next
+
+  ClearScreen
+End Sub
+
+
+'-----------------------------------------------------
+' Scroll "BY EVAN R. VENN USING GCBASIC 2026" across the
+' display at rows CREDIT_TOP_POSITION..+3 (rows 6..9), below
+' where ShowLottoText draws (rows 1..4). A separate sub, not
+' called together with ShowLottoText automatically - call
+' them one after another (or just this one on its own) from
+' wherever you want the credit line shown.
+'
+' Unlike ShowLottoText's fixed 5-letter word, this message has
+' 34 characters including spaces, so letters aren't unrolled
+' by hand - creditCodes() holds one FONT_x constant per
+' character (FONT_SPACE for a blank), and a single loop walks
+' it, advancing a running column cursor: 4 columns per letter
+' (3-column glyph + 1-column gap), 2 columns for a space. That
+' keeps the letter-placement code to one loop instead of 34
+' near-duplicate blocks.
+'
+' Buffer sizing: 28 letters * 4 cols + 6 spaces * 2 cols = 124
+' columns of content, plus 12 blank columns padding each side
+' (same smooth on/off-screen scroll technique as
+' ShowLottoText) = 148 columns total. Scroll frames = 148 - 12
+' + 1 = 137, so at 80ms/frame this takes a while (~11 seconds)
+' to fully scroll past - shorten the Wait below if that's too
+' slow for how you're using it.
+'
+' Same as ShowLottoText: no selection-marker-bit preservation
+' (full-screen banner, not a number display), and pressing the
+' switch mid-scroll exits early (debounced).
+'-----------------------------------------------------
+Sub ShowCreditText
+  Dim creditBuffer(148) As Word
+  Dim creditCodes(34)   As Byte
+  Dim bufIdx    As Byte
+  Dim msgIdx    As Byte
+  Dim letterCol As Byte
+  Dim fontByte  As Word
+  Dim cursorCol As Byte
+  Dim scrollPos As Byte
+  Dim frameCol  As Byte
+  Dim srcIdx    As Byte
+  Dim charCode  As Byte
+
+  For bufIdx = 1 To 148
+    creditBuffer(bufIdx) = 0
+  Next
+
+  ' "BY EVAN R. VENN USING GCBASIC 2026", one FONT_x code per character
+  creditCodes(1)  = FONT_B
+  creditCodes(2)  = FONT_Y
+  creditCodes(3)  = FONT_SPACE
+  creditCodes(4)  = FONT_E
+  creditCodes(5)  = FONT_V
+  creditCodes(6)  = FONT_A
+  creditCodes(7)  = FONT_N
+  creditCodes(8)  = FONT_SPACE
+  creditCodes(9)  = FONT_R
+  creditCodes(10) = FONT_DOT
+  creditCodes(11) = FONT_SPACE
+  creditCodes(12) = FONT_V
+  creditCodes(13) = FONT_E
+  creditCodes(14) = FONT_N
+  creditCodes(15) = FONT_N
+  creditCodes(16) = FONT_SPACE
+  creditCodes(17) = FONT_U
+  creditCodes(18) = FONT_S
+  creditCodes(19) = FONT_I
+  creditCodes(20) = FONT_N
+  creditCodes(21) = FONT_G
+  creditCodes(22) = FONT_SPACE
+  creditCodes(23) = FONT_G
+  creditCodes(24) = FONT_C
+  creditCodes(25) = FONT_B
+  creditCodes(26) = FONT_A
+  creditCodes(27) = FONT_S
+  creditCodes(28) = FONT_I
+  creditCodes(29) = FONT_C
+  creditCodes(30) = FONT_SPACE
+  creditCodes(31) = FONT_2
+  creditCodes(32) = FONT_0
+  creditCodes(33) = FONT_2
+  creditCodes(34) = FONT_6
+
+  cursorCol = 13   ' first column after the 12-column lead-in pad
+  For msgIdx = 1 To 34
+    charCode = creditCodes(msgIdx)
+    If charCode = FONT_SPACE Then
+      cursorCol = cursorCol + 2
+    Else
+      For letterCol = 1 To 3
+        ReadTable smallFont, ((charCode - 1) * 3 + letterCol), fontByte
+        #IFDEF invertY
+          fontByte = ReverseBits4(fontByte)
+        #ENDIF
+        creditBuffer(cursorCol + letterCol - 1) = fontByte
+      Next
+      cursorCol = cursorCol + 4
+    End If
+  Next
+
+  ' Scroll: srcIdx = scrollPos + frameCol - 1 always lands in
+  ' 1..148 for scrollPos 1..137 and frameCol 1..12 (max
+  ' 137+12-1=148), so no bounds check is needed here either.
+  For scrollPos = 1 To 137
+    For frameCol = 1 To 12
+      srcIdx = scrollPos + frameCol - 1
+      leds(PhysCol(frameCol)) = FnLSL(creditBuffer(srcIdx), CREDIT_TOP_POSITION)
+      wait 5 ms
+    Next
+    If ReadKeySwitch() = 1 Then
+      WaitUntilKeyreleased
+      ClearScreen
+      Exit Sub
+    End If
+    Wait 80 ms
+  Next
+
+  ClearScreen
+End Sub
+
+'-----------------------------------------------------
+' Hardware test utility: draws (or clears) a full-width
+' horizontal line at row LED_TOP_POSITION+8, to visually
+' confirm ReadKeySwitch() is sensing the button correctly.
+' Row 8 (0-based, within the 0..9 row field) is the second
+' row from the bottom, offset the same way font rows are via
+' LED_TOP_POSITION, so it stays clear of the digit glyphs
+' (which only use rows 0..6 relative to that same origin).
+' All 12 columns are set identically, so PhysCol() mirroring
+' doesn't change the result either way.
+'-----------------------------------------------------
+Sub ShowKeySwitchLine(pressed As Byte)
+  Dim colIdx   As Byte
+  Dim lineMask As Word
+  lineMask = FnLSL([Word]1, LED_TOP_POSITION + 8)
+  For colIdx = 1 To 12
+    If pressed = 1 Then
+      leds(PhysCol(colIdx)) = leds(PhysCol(colIdx)) Or lineMask
+    Else
+      leds(PhysCol(colIdx)) = leds(PhysCol(colIdx)) And (Not lineMask)
+    End If
+  Next
+End Sub
+
+
+'-----------------------------------------------------
+' Hardware test utility: draws two independent 0..9 digits,
+' one at LED_LEFT_CHAR_POSITION and one at LED_RIGHT_CHAR_POSITION.
+' Unlike ShowDecimal, there is no leading-zero suppression here -
+' a reading of 0 on either channel is shown as "0", not left
+' blank - so each ADC channel's scaling/wiring can be verified
+' independently.
+'
+' Each digit is only re-read from the font table and rewritten
+' to leds() when its value differs from the last call (tracked
+' via adcTestLastLeftDigit/adcTestLastRightDigit) - an unchanged
+' digit's columns are left completely untouched. This avoids
+' needless writes to leds() while Timer2Isr is concurrently
+' reading it at multiplexing speed; touching only the columns
+' that actually changed shrinks that race window instead of
+' rewriting all 12 columns (changed or not) every call.
+'
+' Plays a single ShortTone (via SoundOut) once per call if the
+' screen was actually redrawn (either digit changed) - silent
+' when polled and nothing changed.
+'
+' Not used by the normal lottery display flow.
+'-----------------------------------------------------
+Sub ShowAdcTest(leftDigit As Byte, rightDigit As Byte)
+  Dim colIdx    As Byte
+  Dim destCol   As Byte
+  Dim fontByte  As Byte
+  Dim markerBit As Word
+  Dim screenUpdated As Bit
+
+  screenUpdated = 0
+
+  If leftDigit <> adcTestLastLeftDigit Then
+    For colIdx = 1 To 5
+      destCol = LED_LEFT_CHAR_POSITION + colIdx
+      markerBit = leds(PhysCol(destCol)) And 0x200        ' preserve selection-marker bit
+      ReadTable decimals, (leftDigit * 5 + colIdx), fontByte
+      #IFDEF invertY
+        fontByte = ReverseBits7(fontByte)
+      #ENDIF
+      INTOFF
+        leds(PhysCol(destCol)) = markerBit Or FnLSL([Word]fontByte, LED_TOP_POSITION)
+      INTON
+    Next
+    adcTestLastLeftDigit = leftDigit
+    screenUpdated = 1
+  End If
+
+  If rightDigit <> adcTestLastRightDigit Then
+    For colIdx = 1 To 5
+      destCol = LED_RIGHT_CHAR_POSITION + (colIdx - 1)
+      markerBit = leds(PhysCol(destCol)) And 0x200        ' preserve selection-marker bit
+      ReadTable decimals, (rightDigit * 5 + colIdx), fontByte
+      #IFDEF invertY
+        fontByte = ReverseBits7(fontByte)
+      #ENDIF
+      INTOFF
+        leds(PhysCol(destCol)) = markerBit Or FnLSL([Word]fontByte, LED_TOP_POSITION)
+      INTON
+    Next
+    adcTestLastRightDigit = rightDigit
+    screenUpdated = 1
+  End If
+
+  If screenUpdated = 1 Then
+    ShortTone 200, 50          ' audible confirmation the screen was actually redrawn
+  End If
+End Sub
+
+
+'-----------------------------------------------------
+' generate 6 random values (1..49), no duplicates
+'-----------------------------------------------------
+Sub GenerateLotto
+  Dim idx As Byte
+  Dim jdx As Byte
+  Dim bReady As Bit
+
+  Do
+    For idx = 1 To 6
+      Randomize TCNT0                     ' reseed from free-running Timer0
+      lotto(idx) = (Random Mod 49) + 1
+    Next
+    INTOFF
+      ShowDecimal(lotto(1))
+    INTON
+    wait scale( ReadAD10( AN7 ), 0, 1023, 20, 500 ) ms
+  Loop Until KeyPressed() = 1
+  WaitUntilKeyreleased
+
+  For idx = 2 To 6                        ' ensure no duplicate values
+    For jdx = 1 To 6
+      Do
+        If (lotto(idx) = lotto(jdx)) And (idx <> jdx) Then
+          lotto(idx) = (Random Mod 49) + 1
+          bReady = 0
+        Else
+          bReady = 1
+        End If
+      Loop Until bReady = 1
+    Next
+  Next
+End Sub
+
+
+'-----------------------------------------------------
+' Startup step 1: turn every LED on (all 12 columns, all
+' 10 rows) for a full-screen flash.
+'-----------------------------------------------------
+Sub ShowAllOn
+  Dim idx As Byte
+  For idx = 1 To 12
+    leds(idx) = 0x3FF          ' all 10 rows lit in this column
+  Next
+End Sub
+
+
+'-----------------------------------------------------
+' Startup step 2: sweep one fully-lit column from the
+' RIGHT edge to the LEFT edge, blanking the previous
+' column as it moves. Direction is controlled by the
+' invertX constant defined near the top of this file.
+'-----------------------------------------------------
+Sub ChaseColumnsRightToLeft
+  Dim col As Byte
+
+  ClearScreen
+  #IFDEF invertX
+    For col = 1 To 12
+      If col > 1 Then
+        leds(col - 1) = 0        ' blank the column we just left
+      End If
+      leds(col) = 0x3FF          ' light the current column (all rows)
+      Wait 150 ms
+    Next
+    leds(12) = 0                 ' blank the final column before moving on
+  #ELSE
+    For col = 12 To 1 Step -1
+      If col < 12 Then
+        leds(col + 1) = 0        ' blank the column we just left
+      End If
+      leds(col) = 0x3FF          ' light the current column (all rows)
+      Wait 150 ms
+    Next
+    leds(1) = 0                  ' blank the final column before moving on
+  #ENDIF
+End Sub
+
+
+'-----------------------------------------------------
+' Startup step 3: sweep one fully-lit row from the BOTTOM
+' row to the TOP row, blanking the previous row as it
+' moves. Direction is controlled by the invertY constant
+' defined near the top of this file.
+'-----------------------------------------------------
+Sub ChaseRowsBottomToTop
+  Dim rowBit  As Byte
+  Dim rowMask As Word
+  Dim baseOne As Word
+  Dim col     As Byte
+
+  baseOne = 1
+  ClearScreen
+  #IFDEF invertY
+    For rowBit = 0 To 9
+      rowMask = FnLSL(baseOne, rowBit)   ' bit mask for the current row
+      For col = 1 To 12
+        leds(col) = rowMask              ' replaces the previous row entirely
+      Next
+      Wait 150 ms
+    Next
+  #ELSE
+    For rowBit = 9 To 0 Step -1
+      rowMask = FnLSL(baseOne, rowBit)   ' bit mask for the current row
+      For col = 1 To 12
+        leds(col) = rowMask              ' replaces the previous row entirely
+      Next
+      Wait 150 ms
+    Next
+  #ENDIF
+  ClearScreen
+End Sub
+
+
+'-----------------------------------------------------
+' show selected position with a 2-pixel wide horizontal line.
+' xPos: selected position (0..5). Writes through PhysCol()
+' so invertX places the marker on the correct physical pair
+' of columns.
+'-----------------------------------------------------
+Sub ShowSelection(xPos As Byte)
+  Dim idx As Byte
+  Dim col As Byte
+  col = 1
+  For idx = 0 To 5
+    If idx = xPos Then
+      leds(PhysCol(col)) = leds(PhysCol(col)) Or 0x200
+      col = col + 1
+      leds(PhysCol(col)) = leds(PhysCol(col)) Or 0x200
+      col = col + 1
+    Else
+      leds(PhysCol(col)) = leds(PhysCol(col)) And (Not 0x200)
+      col = col + 1
+      leds(PhysCol(col)) = leds(PhysCol(col)) And (Not 0x200)
+      col = col + 1
+    End If
+  Next
+End Sub
+
+
+'=======================================================
+' Main routine
+'=======================================================
+InitPorts
+InitTimers
+InitInt0
+
+' Put every piece of shared state into a known value explicitly,
+' rather than assuming SRAM is pre-zeroed at power-up. leds() gets
+' zeroed by ClearScreen anyway further down, but ledsBlink() and
+' the multiplexing/blink counters used by Timer2Isr are not
+' touched anywhere else, so they are set here, before interrupts
+' are enabled (so Timer2Isr can never observe them mid-init).
+ClearScreen
+ClearBlink
+muxCount  = 0
+cBlink    = 0
+cBlinkCnt = 0
+selX      = 0
+
+On Interrupt Timer2Overflow Call Timer2Isr   ' wires + enables TIMER2_OVF vector
+
+' --- Initialisation display sequence ---
+  ClearScreen
+  ShowAllOn
+  Wait 2 s                       ' 1. all LEDs on for 2 seconds
+  ClearScreen
+
+  ChaseColumnsRightToLeft        ' 2. one column, right to left
+  ChaseRowsBottomToTop           ' 3. one row, bottom to top
+  ClearScreen
+
+
+
+
+  #IFDEF SHOWLOTTO
+
+    ShowLottoText
+    Wait 1 s
+    ClearScreen
+
+    ' --- LOTO gen code (commented out for ADC channel test) ---
+    Randomize TCNT0
+    GenerateLotto
+    
+    Do
+      selX = SelectX()
+      #IFDEF invertX
+        selX = 5 - selX
+      #ENDIF
+      ShowDecimal(lotto(selX + 1))
+      ShowSelection(selX)
+    Loop Until KeyPressed() = 1
+    WaitUntilKeyreleased
+    
+    SetStandbyMode
+    End
+
+  #ELSE
+
+    ' --- ADC channel test: LEFT digit from AN6, RIGHT digit from AN7 ---
+    ' Also exercises ReadKeySwitch(): holding the button draws a full-
+    ' width line at row LED_TOP_POSITION+8, released clears it. Runs
+    ' continuously - since the switch is the thing under test here, it
+    ' can no longer double as the loop's exit condition, so this build
+    ' just runs until reflashed/power-cycled.
+    adcTestLastLeftDigit  = 10   ' out of the valid 0..9 range, forces the first draw
+    adcTestLastRightDigit = 10
+    Do
+      adcTestLeftRaw    = ReadAD10(AN7, TRUE)
+      adcTestRightRaw   = ReadAD10(AN6, TRUE)
+      adcTestLeftDigit  = Scale(adcTestLeftRaw,  0, 1010, 0, 9)
+      adcTestRightDigit = Scale(adcTestRightRaw, 0, 1010, 0, 9)
+      ShowAdcTest(adcTestLeftDigit, adcTestRightDigit)
+      keySwitchTestPressed = ReadKeySwitch()
+      ShowKeySwitchLine(keySwitchTestPressed)
+      Wait 100 ms
+    Loop
+
+  #ENDIF

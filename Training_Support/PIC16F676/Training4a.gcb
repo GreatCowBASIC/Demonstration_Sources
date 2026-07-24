@@ -7,7 +7,6 @@
   #define LED4 RA5
 
   #define SWITCH  RA3
-  #define VR1  RA0
 
   Dir LED1 out
   Dir LED2 out

@@ -8,7 +8,6 @@
 
 
     #script
-        Z = 1
         SER1_BAUD    = 9600     ; baudrate must be defined
         SER1_TXPORT  = PORTD    ; I/O port (without .bit) must be defined
         SER1_TXPIN   = 4        ; portbit  must be defined

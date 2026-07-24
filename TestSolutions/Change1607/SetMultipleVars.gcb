@@ -1,0 +1,106 @@
+#CHIP 18F27Q84, 64
+#OPTION Explicit
+
+'==============================================================================
+' TC01 - Single variable, no initializer
+'==============================================================================
+Dim TemperatureReading As Byte
+' Expected: no synthetic assignment line generated (no "=" present)
+
+
+// '==============================================================================
+// ' TC02 - Single variable, with initializer
+// '==============================================================================
+Dim TemperatureReading As Byte = 72
+// ' Expected DataSource after strip: Dim TemperatureReading As Byte
+// ' Expected generated line:         TemperatureReading = 72
+
+
+// '==============================================================================
+// ' TC03 - Multiple variables, no initializer
+// '==============================================================================
+Dim RedChannel, GreenChannel, BlueChannel As Byte
+// ' Expected: no synthetic assignment line generated (no "=" present)
+
+
+// '==============================================================================
+// ' TC04 - Multiple variables, shared initializer (core regression case)
+// '==============================================================================
+Dim RedChannel, GreenChannel, BlueChannel As word = 512
+// ' Expected DataSource after strip: Dim RedChannel, GreenChannel, BlueChannel As Byte
+// ' Expected generated lines:
+// '   RedChannel = 512
+// '   GreenChannel = 512
+// '   BlueChannel = 512
+
+
+// '==============================================================================
+// ' TC05 - Location only, no type, no initializer
+// '==============================================================================
+Dim WatchdogFlag1 At 0x500
+// ' Expected: no synthetic assignment line generated (no "=" present)
+
+
+// '==============================================================================
+// ' TC06 - Type and location, no initializer
+// '==============================================================================
+Dim WatchdogFlag2 As Byte At 0x501
+// ' Expected: no synthetic assignment line generated (no "=" present)
+
+
+// '==============================================================================
+// ' TC07 - Type, location, and initializer together
+// '==============================================================================
+Dim WatchdogFlag3 As Byte At 0x502 = 1
+// ' Expected DataSource after strip: Dim WatchdogFlag As Byte At $100
+// ' Expected generated line:         WatchdogFlag = 1
+
+
+
+
+// '==============================================================================
+// ' TC09 - Array declaration (GCBASIC does NOT support an inline array
+// ' initializer -- arrays are declared, then loaded on a separate line)
+// '==============================================================================
+Dim PixelBuffer(10)
+PixelBuffer = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+// ' Expected: the Dim line generates no synthetic assignment line.
+// ' The "PixelBuffer = ..." line does not start with "Dim ", so it never
+// ' enters the Dim parser at all -- it's handled by ordinary assignment
+// ' parsing elsewhere in the preprocessor.
+
+
+// '==============================================================================
+// ' TC10 - Metadata marker present after the initializer
+// ' (";?F...L...S...I...?" is preprocessor-internal line metadata, appended
+// ' automatically -- shown here to confirm it's correctly separated from the
+// ' initializer value rather than swallowed into it)
+// '==============================================================================
+Dim LoopCounter As Byte = 0 
+// ' Expected DataSource after strip: Dim LoopCounter As Byte 
+// ' Expected generated line:         LoopCounter = 0
+
+
+// '==============================================================================
+// ' TC11 - Initializer value itself contains "=" (string literal)
+// '==============================================================================
+// Dim StatusMessage As String = "Code=Ready"
+// ' Expected DataSource after strip: Dim StatusMessage As String
+// ' Expected generated line:         StatusMessage = "Code=Ready"
+
+
+// '==============================================================================
+// ' TC12 - Negative numeric initializer
+// '==============================================================================
+Dim TemperatureOffset As Integer = -5
+// ' Expected DataSource after strip: Dim TemperatureOffset As Integer
+// ' Expected generated line:         TemperatureOffset = -5
+
+
+// '==============================================================================
+// ' TC13 - Variable name containing "As"/"At" as a substring (not a keyword)
+// '==============================================================================
+Dim DataTableIndex As Byte = 0
+// ' Expected DataSource after strip: Dim DataTableIndex As Byte
+// ' Expected generated line:         DataTableIndex = 0
+
