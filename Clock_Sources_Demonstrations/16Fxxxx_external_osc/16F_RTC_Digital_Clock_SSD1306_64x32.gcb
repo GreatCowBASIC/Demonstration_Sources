@@ -1,0 +1,159 @@
+'==============================================================================
+' Digital clock with hardware RTC-grade timing
+'
+' Chip:     PIC16F1937 @ 32MHz (internal osc + PLL)
+' Display:  SSD1306 64x32 OLED, I2C (software bit-bang), character mode
+'
+' Timekeeping is driven entirely by hardware: Timer1 is clocked from a
+' 32.768kHz watch crystal instead of the main system clock, so the clock
+' keeps accurate time independent of Fosc and needs no software delay
+' loop. The main Do/Loop is free to do other work between seconds.
+'
+' Crystal wiring (PIC16F1937, 40-pin DIP):
+'   T1OSO = RC0 = pin 15   --\
+'   T1OSI = RC1 = pin 16   --/  32.768kHz crystal across these two pins
+'   Each pin also gets a load capacitor (~12-15pF, check your crystal's
+'   datasheet) to ground. Keep the crystal and caps close to the chip
+'   with short leads/traces, and away from switching signals (e.g. the
+'   I2C lines below) to avoid disturbing the oscillator.
+'   Once T1OSCEN is enabled, RC0/RC1 are no longer usable as general
+'   I/O, T1CKI, or CCP2.
+'==============================================================================
+
+#Chip 16F1937, 32
+#Option Explicit
+#include <glcd.h>
+
+// Display configuration
+#DEFINE GLCD_TYPE         GLCD_TYPE_SSD1306_64x32
+#DEFINE GLCD_I2C_Address  0x78
+
+// I2C Software settings
+#DEFINE I2C_MODE Master
+#DEFINE I2C_DATA    PORTC.4
+#DEFINE I2C_CLOCK   PORTC.5
+#DEFINE I2C_DISABLE_INTERRUPTS ON
+
+    #define GLCD_TYPE_SSD1306_CHARACTER_MODE_ONLY
+    #define GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+
+// ---- 32.768kHz Timer1 clock source ----
+// Wire the watch crystal (32.768kHz) with its two ~12-15pF load caps
+// across T1OSI/T1OSO (RC0/RC1 on the 16F1937). Timer1 then runs
+// asynchronously from the main system clock and is preloaded so it
+// overflows exactly once per second (65536 - 32768 = 32768 -> 0x8000).
+
+// ---- Clock variables ----
+Dim Hours   As Byte    // 0-23
+Dim Minutes As Byte    // 0-59
+Dim Seconds As Byte    // 0-59
+Dim SecondTick As Bit  // Set by the ISR once per second, cleared by main loop
+
+Dim TimeString As String   // Assembled "HH:MM:SS" string for display
+Dim HH As String           // Zero-padded hours
+Dim MM As String           // Zero-padded minutes
+Dim SS As String           // Zero-padded seconds
+
+// ---- Set the starting time here ----
+Hours   = 12
+Minutes = 10
+Seconds = 0
+SecondTick = 0
+
+Sub InitClockTimer
+    // TMR1CS = 10 (Timer1 clock source = T1OSC), T1CKPS = 00 (1:1 prescale),
+    // T1OSCEN = 1 (enable crystal driver), nT1SYNC = 1 (don't sync to Fosc/4),
+    // TMR1ON = 1 (start the timer)
+    T1CON = 0b10001101
+
+    // Preload so the 16-bit timer overflows after exactly 32768 ticks (1 s)
+    TMR1H = 0x80
+    TMR1L = 0x00
+
+    // Register the ISR against the Timer1 overflow interrupt. GCBasic
+    // wires up TMR1IE/PEIE/GIE and the interrupt vector automatically.
+    On Interrupt Timer1Overflow Call ISR
+
+End Sub
+
+// Fires once per second, exactly on each Timer1 overflow.
+Sub ISR
+
+        // Reload immediately so the next second is timed from here, not
+        // from whenever we get around to servicing the ISR
+        TMR1H = 0x80
+        TMR1L = 0x00
+
+        // Cascade the seconds/minutes/hours counters with rollover
+        Seconds = Seconds + 1
+        If Seconds = 60 Then
+            Seconds = 0
+            Minutes = Minutes + 1
+            If Minutes = 60 Then
+                Minutes = 0
+                Hours = Hours + 1
+                If Hours = 24 Then
+                    Hours = 0
+                End If
+            End If
+        End If
+
+        SecondTick = 1   // tell the main loop a new second has ticked
+
+End Sub
+
+InitClockTimer
+
+// ---- Startup splash screens ----
+GLCD_Open_PageTransaction 0,3
+    GLCDPrint 12,10, "GCBASIC"
+    GLCDPrint 22,20, "RTC"
+    Box 0,0,63,31
+GLCD_Close_PageTransaction
+Wait 4 s
+GLCD_Open_PageTransaction 0,3
+    GLCDPrint 12,10, "CLOCK"
+    GLCDPrint 8,20, "STARTING"
+    Box 0,0,63,31
+GLCD_Close_PageTransaction
+
+// ---- Main loop ----
+// Nothing here is time-critical: the clock keeps itself accurate via
+// the Timer1 ISR above, so this loop only needs to notice SecondTick
+// and refresh the display -- it never blocks waiting on a delay.
+Do
+
+    If SecondTick = 1 Then
+        SecondTick = 0
+
+        // Build zero-padded strings for each field
+        If Hours < 10 Then
+            HH = "0" + Str(Hours)
+        Else
+            HH = Str(Hours)
+        End If
+
+        If Minutes < 10 Then
+            MM = "0" + Str(Minutes)
+        Else
+            MM = Str(Minutes)
+        End If
+
+        If Seconds < 10 Then
+            SS = "0" + Str(Seconds)
+        Else
+            SS = Str(Seconds)
+        End If
+
+        TimeString = HH + ":" + MM + ":" + SS
+
+        GLCD_Open_PageTransaction 0,3
+          GLCDPrint 8,10, TimeString
+          Box 0,0,63,31
+        GLCD_Close_PageTransaction
+    End If
+
+    // Free to do other work here between ticks -- the clock now
+    // keeps time itself in the background via the Timer1 interrupt.
+
+Loop

@@ -1,3 +1,12 @@
+/* ----------------------------------------------------------------------------
+ * Project:          Dynamic LED Sequencer with Interrupt-Driven Direction Control
+ * Microcontroller:  PIC16F18014
+ * Compiler:         GCBASIC (Great Cow BASIC)
+ * Description:      Controls a 4-LED sequential chaser pattern. Speed is dynamically 
+ *                   adjusted via an analog potentiometer (VR1), and the scan direction 
+ *                   is toggled via a push-button using Interrupt-on-Change (IOC).
+ * ---------------------------------------------------------------------------- */
+
 #chip 16F18014
 #option Explicit
 
@@ -19,8 +28,8 @@
 -------------------LATA-----------------
 Bit#:  -7---6---5---4---3---2---1---0---
 Type:   -------|LED|LED|SW |LED|LED|ADC
-Real:           RA5 RA4 RA3 RA2 RA1
-Name:   -------| 4 | 3 |SW | 2 | 1 |ANA0
+Real:          RA5 RA4 RA3 RA2 RA1
+Name:  -------| 4 | 3 |SW | 2 | 1 |ANA0
 -----------------------------------------
 */
 
@@ -38,9 +47,11 @@ STATE 5       | 1 | 0 |   | 0 | 0 |   |
 
 */
 
+  /* Configure Interrupt-on-Change for the push-button switch on RA3 */
   On Interrupt PORTChange call MyISR
   IOCAN3 = 1
 
+  /* Initialize LED sequence tracking variables */
   Dim LEDState as Integer
   'Initilize the variable to zero
   LEDState = 0
@@ -52,6 +63,7 @@ STATE 5       | 1 | 0 |   | 0 | 0 |   |
   // ----- Main body of program commences here.
   Do Forever
 
+    /* Update active LED outputs based on the current sequence state */
     Select Case LEDState
       case 0
         'Set one LED on... could 1 or ON
@@ -76,14 +88,20 @@ STATE 5       | 1 | 0 |   | 0 | 0 |   |
         LED4 = 1
     end select
 
+    /* Progress the sequence step and handle boundary rollovers */
     LEDState = LEDState + Direction
     If LEDState = 4  then LEDState = 0
     If LEDState = -1 then LEDState = 3
 
-    wait ReadAD10( ANA0 ) ms
+    /* Dynamically adjust loop delay using 10-bit ADC reading from potentiometer VR1 */
+    wait Scale( ReadAD10( ANA0 ), 0, 1023, 50, 1000 ) ms
+
+    // or, you can use this but when the ADC is ZERO... see what happens.  :-)
+    // wait ReadAD10( ANA0 ) ms
 
   Loop
 
+  /* Interrupt Service Routine: Toggles scan direction on button press and clears flag */
   Sub MyISR
 
         if Direction = 1 then
@@ -94,4 +112,3 @@ STATE 5       | 1 | 0 |   | 0 | 0 |   |
         IOCAF3 = 0
 
   End Sub
-

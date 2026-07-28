@@ -1,0 +1,91 @@
+/*
+
+​[gcbasic:discussion]​
+Here is simple clock on the 64x32.
+
+How it works: Hours/Minutes/Seconds are plain bytes that get incremented once per loop iteration, gated by Wait 1 s — same tick mechanism as your example. 
+Each pass builds a zero-padded HH:MM:SS string and redraws it inside a GLCD_Open_PageTransaction/Close block.
+
+Since there's no RTC here — it's a free-running software clock that will drift over time.
+
+If you have a real RTC (DS1307/DS3231 etc.) wired up, it'd be more accurate to read the time from that each loop instead of incrementing in software — you can adapt this if you're using one.
+
+*/
+
+#Chip 16F1937, 32
+#Option Explicit
+#include <glcd.h>
+
+// Display configuration
+#DEFINE GLCD_TYPE         GLCD_TYPE_SSD1306_64x32
+#DEFINE GLCD_I2C_Address  0x78
+
+// I2C Software settings
+#DEFINE I2C_MODE Master
+#DEFINE I2C_DATA    PORTC.4
+#DEFINE I2C_CLOCK   PORTC.5
+#DEFINE I2C_DISABLE_INTERRUPTS ON
+
+    #define GLCD_TYPE_SSD1306_CHARACTER_MODE_ONLY
+    #define GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+
+// ---- Clock variables ----
+Dim Hours   As Byte
+Dim Minutes As Byte
+Dim Seconds As Byte
+
+Dim TimeString As String
+Dim HH As String
+Dim MM As String
+Dim SS As String
+
+// ---- Set the starting time here ----
+Hours   = 12
+Minutes = 0
+Seconds = 0
+
+Do
+
+    // Build zero-padded strings for each field
+    If Hours < 10 Then
+        HH = "0" + Str(Hours)
+    Else
+        HH = Str(Hours)
+    End If
+
+    If Minutes < 10 Then
+        MM = "0" + Str(Minutes)
+    Else
+        MM = Str(Minutes)
+    End If
+
+    If Seconds < 10 Then
+        SS = "0" + Str(Seconds)
+    Else
+        SS = Str(Seconds)
+    End If
+
+    TimeString = HH + ":" + MM + ":" + SS
+
+    GLCD_Open_PageTransaction 0,3
+      GLCDPrint 10,10, TimeString
+      Box 0,0,63,31
+    GLCD_Close_PageTransaction
+
+    Wait 1 s
+
+    // ---- Increment the clock by one second ----
+    Seconds = Seconds + 1
+    If Seconds = 60 Then
+        Seconds = 0
+        Minutes = Minutes + 1
+        If Minutes = 60 Then
+            Minutes = 0
+            Hours = Hours + 1
+            If Hours = 24 Then
+                Hours = 0
+            End If
+        End If
+    End If
+
+Loop

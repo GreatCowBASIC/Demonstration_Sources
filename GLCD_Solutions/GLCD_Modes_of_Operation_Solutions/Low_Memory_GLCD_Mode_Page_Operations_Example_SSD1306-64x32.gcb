@@ -1,0 +1,33 @@
+
+#Chip 16F1937, 32
+#Option Explicit
+#include <glcd.h>
+
+// Display configuration
+#DEFINE GLCD_TYPE         GLCD_TYPE_SSD1306_64x32 
+#DEFINE GLCD_I2C_Address  0x78 
+
+// I2C Software settings
+#DEFINE I2C_MODE Master
+#DEFINE I2C_DATA    PORTC.4
+#DEFINE I2C_CLOCK   PORTC.5
+#DEFINE I2C_DISABLE_INTERRUPTS ON
+
+    #define GLCD_TYPE_SSD1306_CHARACTER_MODE_ONLY
+    #define GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+
+    GLCD_Open_PageTransaction 0,3
+      GLCDPrint 2,2, "GCBASIC"
+      GLCDPrint 2,15, "2026"
+      Box 0,0,63,31
+      line 0,0,63,31
+    GLCD_Close_PageTransaction
+
+    Wait 2 s
+    // GLCDCLS   //! GLCDCLS is not really needed as the Transactions will clear the screen anyway
+
+    GLCD_Open_PageTransaction 0,3
+      GLCDPrint 2,2, "GCBASIC"
+      GLCDPrint 2,15, "Page 2"
+      Box 0,0,63,31
+    GLCD_Close_PageTransaction
