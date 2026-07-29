@@ -1,0 +1,286 @@
+'==============================================================================
+' Digital clock with hardware RTC-grade timing + manual time set
+'
+' Chip:     PIC16F1937 @ 32MHz (internal osc + PLL)
+' Display:  SSD1306 64x32 OLED, I2C (software bit-bang), character mode
+'
+' Timekeeping is driven entirely by hardware: Timer1 is clocked from a
+' 32.768kHz watch crystal instead of the main system clock, so the clock
+' keeps accurate time independent of Fosc and needs no software delay
+' loop. The main Do/Loop is free to do other work between seconds.
+'
+' Crystal wiring (PIC16F1937, 40-pin DIP):
+'   T1OSO = RC0 = pin 15   --\
+'   T1OSI = RC1 = pin 16   --/  32.768kHz crystal across these two pins
+'   Each pin also gets a load capacitor (~12-15pF, check your crystal's
+'   datasheet) to ground. Keep the crystal and caps close to the chip
+'   with short leads/traces, and away from switching signals (e.g. the
+'   I2C lines below) to avoid disturbing the oscillator.
+'   Once T1OSCEN is enabled, RC0/RC1 are no longer usable as general
+'   I/O, T1CKI, or CCP2.
+'
+' Time-set controls:
+'   Pot     -> AN0 / RA0 (ADC channel 0)  -- scrolls the value being edited
+'   SW_MODE -> RA4                        -- press to cycle RUN -> SET HOUR ->
+'                                             SET MIN -> RUN (commits & syncs
+'                                             seconds to :00)
+'   SW_EXIT -> RB0                        -- press at any time to commit the
+'                                             current values immediately and
+'                                             return to RUN with seconds
+'                                             synced to :00 (handy for lining
+'                                             up with a time signal/reference)
+'   Both switches are active-high (pressed = pulled to ground), using
+'   external pull-ups to Vdd -- no internal weak pull-ups are enabled.
+'   If your switches are wired the other way (active-high, external
+'   pull-down), swap the "= 0" comparisons below for "= 1".
+'
+'   NOTE: InitSetControls() below sets RA4/RB0/RA0 as inputs explicitly,
+'   but the call to it is currently commented out in this build (the
+'   pins already default to inputs at reset, so it's redundant here).
+'   Uncomment the call if any of these pins get repurposed as outputs
+'   elsewhere and need to be forced back to inputs at startup.
+'==============================================================================
+
+#Chip 16F1937, 32
+#Option Explicit
+#include <glcd.h>
+
+// Display configuration
+#DEFINE GLCD_TYPE         GLCD_TYPE_SSD1306_64x32
+#DEFINE GLCD_I2C_Address  0x78
+
+// I2C Software settings
+#DEFINE I2C_MODE Master
+#DEFINE I2C_DATA    PORTC.4
+#DEFINE I2C_CLOCK   PORTC.5
+#DEFINE I2C_DISABLE_INTERRUPTS ON
+
+    #define GLCD_TYPE_SSD1306_CHARACTER_MODE_ONLY
+    #define GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+
+// ---- 32.768kHz Timer1 clock source ----
+// Wire the watch crystal (32.768kHz) with its two ~12-15pF load caps
+// across T1OSI/T1OSO (RC0/RC1 on the 16F1937). Timer1 then runs
+// asynchronously from the main system clock and is preloaded so it
+// overflows exactly once per second (65536 - 32768 = 32768 -> 0x8000).
+
+// ---- Clock variables ----
+Dim Hours   As Byte    // 0-23
+Dim Minutes As Byte    // 0-59
+Dim Seconds As Byte    // 0-59
+Dim SecondTick As Bit  // Set by the ISR once per second, cleared by main loop
+
+Dim TimeString As String   // Assembled "HH:MM:SS" string for display
+Dim HH As String           // Zero-padded hours
+Dim MM As String           // Zero-padded minutes
+Dim SS As String           // Zero-padded seconds
+
+// ---- Time-set variables ----
+Dim ClockMode  As Byte  // 0 = RUN, 1 = SET_HOURS, 2 = SET_MINUTES
+Dim ADCValue   As Word  // Raw 10-bit reading from the pot (0-1023)
+Dim LastShown  As Byte  // Last value drawn in set mode, to avoid re-painting every loop
+
+// ---- Set the starting time here (used until adjusted by the pot) ----
+Hours   = 12
+Minutes = 10
+Seconds = 0
+SecondTick = 0
+ClockMode = 0
+
+Sub InitClockTimer
+    // TMR1CS = 10 (Timer1 clock source = T1OSC), T1CKPS = 00 (1:1 prescale),
+    // T1OSCEN = 1 (enable crystal driver), nT1SYNC = 1 (don't sync to Fosc/4),
+    // TMR1ON = 1 (start the timer)
+    T1CON = 0b10001101
+
+    // Preload so the 16-bit timer overflows after exactly 32768 ticks (1 s)
+    TMR1H = 0x80
+    TMR1L = 0x00
+
+    // Register the ISR against the Timer1 overflow interrupt. GCBasic
+    // wires up TMR1IE/PEIE/GIE and the interrupt vector automatically.
+    On Interrupt Timer1Overflow Call ISR
+
+End Sub
+
+// Fires once per second, exactly on each Timer1 overflow.
+// Disabled (PIE1.TMR1IE = 0) while the user is setting the time, so the
+// clock is frozen during editing instead of racing the pot input.
+Sub ISR
+
+        // Reload immediately so the next second is timed from here, not
+        // from whenever we get around to servicing the ISR
+        TMR1H = 0x80
+        TMR1L = 0x00
+
+        // Cascade the seconds/minutes/hours counters with rollover
+        Seconds = Seconds + 1
+        If Seconds = 60 Then
+            Seconds = 0
+            Minutes = Minutes + 1
+            If Minutes = 60 Then
+                Minutes = 0
+                Hours = Hours + 1
+                If Hours = 24 Then
+                    Hours = 0
+                End If
+            End If
+        End If
+
+        SecondTick = 1   // tell the main loop a new second has ticked
+
+End Sub
+
+Sub InitSetControls
+    // Digital inputs for the two switches (RA4, RB0) and the pot (RA0).
+    // External pull-ups are already on the switches, so no internal weak
+    // pull-ups are enabled here -- an unpressed switch reads high, a
+    // press pulls it low.
+
+    Dir PORTA.4 In
+    Dir PORTB.0 In
+
+    // AN0 input for the pot
+    Dir PORTA.0 In
+End Sub
+
+// Reads the pot and maps it to 0..(Range-1)
+Function PotToRange(Range As Byte) As Byte
+    ADCValue = ReadAD10(AN0)                 // 0-1023
+    PotToRange = ADCValue * Range / 1024
+End Function
+
+// Draws a "SET HOUR"/"SET MIN" screen with the live value, only
+// repainting when the value actually changes (keeps the pot feeling
+// responsive without flooding the I2C bus every loop pass).
+Sub ShowSetScreen(Label As String, Value As Byte)
+    If Value <> LastShown Then
+        LastShown = Value
+
+        If Value < 10 Then
+            SS = "0" + Str(Value)
+        Else
+            SS = Str(Value)
+        End If
+
+        GLCD_Open_PageTransaction 0,3
+          GLCDPrint 2,2,  Label
+          GLCDPrint 20,18, SS
+          Box 0,0,63,31
+        GLCD_Close_PageTransaction
+    End If
+End Sub
+
+// Freeze the running clock and go into set mode for a given field
+Sub EnterSetMode(Mode As Byte)
+    ClockMode = Mode
+    PIE1.TMR1IE = 0   // stop the tick interrupt while editing
+    LastShown = 255   // force the next ShowSetScreen call to repaint
+End Sub
+
+// Commit whatever is currently set, sync seconds to :00, resume ticking
+Sub CommitAndRun
+    ClockMode = 0
+    Seconds = 0
+    TMR1H = 0x80
+    TMR1L = 0x00
+    PIR1.TMR1IF = 0
+    PIE1.TMR1IE = 1   // resume ticking, timed from right now
+End Sub
+
+InitClockTimer
+// InitSetControls
+
+// ---- Startup splash screens ----
+GLCD_Open_PageTransaction 0,3
+    GLCDPrint 12,10, "GCBASIC"
+    GLCDPrint 22,20, "RTC"
+    Box 0,0,63,31
+GLCD_Close_PageTransaction
+Wait 4 s
+GLCD_Open_PageTransaction 0,3
+    GLCDPrint 12,10, "CLOCK"
+    GLCDPrint 8,20, "STARTING"
+    Box 0,0,63,31
+GLCD_Close_PageTransaction
+
+// ---- Main loop ----
+Do
+
+    // --- SW_MODE (RA4): cycle RUN -> SET_HOURS -> SET_MINUTES -> RUN ---
+    If PORTA.4 = 0 Then
+        Wait 20 ms                    // debounce
+        If PORTA.4 = 0 Then
+            If ClockMode = 0 Then
+                EnterSetMode(1)
+            Else If ClockMode = 1 Then
+                EnterSetMode(2)
+            Else
+                CommitAndRun
+            End If
+            Do While PORTA.4 = 0       // wait for release before continuing
+            Loop
+            Wait 20 ms
+        End If
+    End If
+
+    // --- SW_EXIT (RB0): commit immediately from either set state ---
+    If PORTB.0 = 0 Then
+        Wait 20 ms                    // debounce
+        If PORTB.0 = 0 Then
+            If ClockMode <> 0 Then
+                CommitAndRun
+            End If
+            Do While PORTB.0 = 0       // wait for release before continuing
+            Loop
+            Wait 20 ms
+        End If
+    End If
+
+    If ClockMode = 1 Then
+        // --- Setting hours: pot maps 0-1023 -> 0-23 ---
+        Hours = PotToRange(24)
+        ShowSetScreen("SET HOUR", Hours)
+
+    Else If ClockMode = 2 Then
+        // --- Setting minutes: pot maps 0-1023 -> 0-59 ---
+        Minutes = PotToRange(60)
+        ShowSetScreen("SET MIN", Minutes)
+
+    Else
+        // --- Normal run mode: redraw once per second off the ISR flag ---
+        If SecondTick = 1 Then
+            SecondTick = 0
+
+            // Build zero-padded strings for each field
+            If Hours < 10 Then
+                HH = "0" + Str(Hours)
+            Else
+                HH = Str(Hours)
+            End If
+
+            If Minutes < 10 Then
+                MM = "0" + Str(Minutes)
+            Else
+                MM = Str(Minutes)
+            End If
+
+            If Seconds < 10 Then
+                SS = "0" + Str(Seconds)
+            Else
+                SS = Str(Seconds)
+            End If
+
+            TimeString = HH + ":" + MM + ":" + SS
+
+            GLCD_Open_PageTransaction 0,3
+              GLCDPrint 8,10, TimeString
+              Box 0,0,63,31
+            GLCD_Close_PageTransaction
+        End If
+    End If
+
+    // add code here.
+
+
+Loop
