@@ -29,7 +29,7 @@
 '                                             return to RUN with seconds
 '                                             synced to :00 (handy for lining
 '                                             up with a time signal/reference)
-'   Both switches are active-high (pressed = pulled to ground), using
+'   Both switches are active-low (pressed = pulled to ground), using
 '   external pull-ups to Vdd -- no internal weak pull-ups are enabled.
 '   If your switches are wired the other way (active-high, external
 '   pull-down), swap the "= 0" comparisons below for "= 1".
@@ -39,6 +39,13 @@
 '   pins already default to inputs at reset, so it's redundant here).
 '   Uncomment the call if any of these pins get repurposed as outputs
 '   elsewhere and need to be forced back to inputs at startup.
+'
+' Display niceties:
+'   Pad2(Value)     -- shared zero-padding helper ("7" -> "07"), used by
+'                        both the HH:MM:SS run display and the set screens.
+'   ColonVisible     -- toggled once per second in run mode so the ":"
+'                        blinks, giving a visible heartbeat even during
+'                        the 59 seconds where only the seconds digits move.
 '==============================================================================
 
 #Chip 16F1937, 32
@@ -50,13 +57,13 @@
 #DEFINE GLCD_I2C_Address  0x78
 
 // I2C Software settings
-#DEFINE I2C_MODE Master
+#DEFINE I2C_MODE    Master
 #DEFINE I2C_DATA    PORTC.4
 #DEFINE I2C_CLOCK   PORTC.5
 #DEFINE I2C_DISABLE_INTERRUPTS ON
 
-    #define GLCD_TYPE_SSD1306_CHARACTER_MODE_ONLY
-    #define GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
+#DEFINE GLCD_TYPE_SSD1306_CHARACTER_MODE_ONLY
+#DEFINE GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE
 
 // ---- 32.768kHz Timer1 clock source ----
 // Wire the watch crystal (32.768kHz) with its two ~12-15pF load caps
@@ -80,12 +87,16 @@ Dim ClockMode  As Byte  // 0 = RUN, 1 = SET_HOURS, 2 = SET_MINUTES
 Dim ADCValue   As Word  // Raw 10-bit reading from the pot (0-1023)
 Dim LastShown  As Byte  // Last value drawn in set mode, to avoid re-painting every loop
 
+// ---- Display variables ----
+Dim ColonVisible As Bit  // Toggled once per second so the ":" blinks
+
 // ---- Set the starting time here (used until adjusted by the pot) ----
 Hours   = 12
 Minutes = 10
 Seconds = 0
 SecondTick = 0
 ClockMode = 0
+ColonVisible = 1
 
 Sub InitClockTimer
     // TMR1CS = 10 (Timer1 clock source = T1OSC), T1CKPS = 00 (1:1 prescale),
@@ -150,18 +161,22 @@ Function PotToRange(Range As Byte) As Byte
     PotToRange = ADCValue * Range / 1024
 End Function
 
+// Zero-pads a 0-99 value to a 2-character string ("7" -> "07")
+Function Pad2(Value As Byte) As String
+    If Value < 10 Then
+        Pad2 = "0" + Str(Value)
+    Else
+        Pad2 = Str(Value)
+    End If
+End Function
+
 // Draws a "SET HOUR"/"SET MIN" screen with the live value, only
 // repainting when the value actually changes (keeps the pot feeling
 // responsive without flooding the I2C bus every loop pass).
 Sub ShowSetScreen(Label As String, Value As Byte)
     If Value <> LastShown Then
         LastShown = Value
-
-        If Value < 10 Then
-            SS = "0" + Str(Value)
-        Else
-            SS = Str(Value)
-        End If
+        SS = Pad2(Value)
 
         GLCD_Open_PageTransaction 0,3
           GLCDPrint 2,2,  Label
@@ -252,26 +267,23 @@ Do
         If SecondTick = 1 Then
             SecondTick = 0
 
-            // Build zero-padded strings for each field
-            If Hours < 10 Then
-                HH = "0" + Str(Hours)
+            // Flip the colon on/off each second so the display visibly
+            // "ticks" even between digit changes
+            If ColonVisible = 1 Then
+                ColonVisible = 0
             Else
-                HH = Str(Hours)
+                ColonVisible = 1
             End If
 
-            If Minutes < 10 Then
-                MM = "0" + Str(Minutes)
-            Else
-                MM = Str(Minutes)
-            End If
+            HH = Pad2(Hours)
+            MM = Pad2(Minutes)
+            SS = Pad2(Seconds)
 
-            If Seconds < 10 Then
-                SS = "0" + Str(Seconds)
+            If ColonVisible = 1 Then
+                TimeString = HH + ":" + MM + ":" + SS
             Else
-                SS = Str(Seconds)
+                TimeString = HH + " " + MM + " " + SS
             End If
-
-            TimeString = HH + ":" + MM + ":" + SS
 
             GLCD_Open_PageTransaction 0,3
               GLCDPrint 8,10, TimeString
@@ -279,8 +291,5 @@ Do
             GLCD_Close_PageTransaction
         End If
     End If
-
-    // add code here.
-
 
 Loop

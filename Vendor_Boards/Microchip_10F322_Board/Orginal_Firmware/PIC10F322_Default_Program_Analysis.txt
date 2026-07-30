@@ -1,0 +1,117 @@
+; ==============================================================================
+; Disassembly and Documentation for Microchip PIC10F322
+; Architecture: 14-bit Mid-Range Core
+; Configuration Word: 0x1CE0 (MCLRE=0, FOSC=INTOSC, WDTE=OFF, etc.)
+;
+; --- Main Registers Used ---
+; Address | Name    | Description
+; --------|---------|----------------------------------------------------
+; 0x05    | -       | General RAM / Working storage
+; 0x06    | PORTA   | PORTA Data Latch / I/O Control (RA3 has external pull-up switch)
+; 0x07    | TRISA   | Tri-State Control (Data Direction)
+; 0x08    | IOCONA  | Interrupt-on-Change Control
+; 0x0E    | APFCON  | Alternate Pin Function Control
+; 0x10    | OSCCON  | Oscillator Control Register
+; 0x12    | -       | Peripheral / Timer Control Register
+; 0x13    | -       | Peripheral Enable Control
+; 0x14    | -       | General Data Storage / Low-byte Variable Buffer
+; 0x15    | PWM1DCL | PWM1 Duty Cycle Low Register (holds fractional bits)
+; 0x16    | PWM1DCH | PWM1 Duty Cycle High Register (holds integer bits)
+; 0x1E    | -       | Variable Register (ADC Result Source)
+; 0x1F    | -       | Status / Operational Flag Register
+; 0x25    | -       | Working Buffer Register
+; ==============================================================================
+
+    org     0x0000
+
+    ; --- Reset and Initialization Vector ---
+RESET_VECTOR:
+    GOTO    MAIN_INIT       ; 0000: Jump to main application entry point
+    NOP                     ; 0001: Reserved / Pad
+    NOP                     ; 0002: Reserved / Pad
+    NOP                     ; 0003: Reserved / Pad
+
+    ; --- Core Registers & RAM Initialization Sequence ---
+MAIN_INIT:
+    CLRF    0x16            ; 0004: Clear RAM location 0x16 (PWM1DCH)
+    CLRF    0x15            ; 0005: Clear RAM location 0x15 (PWM1DCL)
+    CLRF    0x14            ; 0006: Clear RAM location 0x14
+    CLRF    0x0C            ; 0007: Clear RAM location 0x0C
+    CLRF    PORTA           ; 0008: Clear PORTA data latch (0x06)
+    CLRF    TRISA           ; 0009: Clear TRISA I/O direction control (0x07)
+    CLRF    0x05            ; 000A: Clear RAM location 0x05
+    CLRF    IOCONA          ; 000B: Clear Interrupt-on-Change control (0x08)
+    CLRF    0x1E            ; 000C: Clear general variable register 0x1E
+    CLRF    0x12            ; 000D: Clear peripheral control register 0x12
+
+    ; --- Configuration and Setup Block ---
+    MOVLW   0x0C            ; 000E: W = 0x0C
+    MOVWF   PORTA           ; 000F: Store to PORTA configuration (0x06)
+    MOVLW   0x00            ; 0010: W = 0x00
+    MOVWF   TRISA           ; 0011: Store to TRISA direction setup (0x07)
+    MOVLW   0x60            ; 0012: W = 0x60
+    MOVWF   OSCCON          ; 0013: Store to Oscillator Control register (0x10)
+    MOVLW   0x04            ; 0014: W = 0x04
+    MOVWF   IOCONA          ; 0015: Store to Interrupt-on-Change control (0x08)
+    MOVLW   0xA9            ; 0016: W = 0xA9
+    MOVWF   0x1F            ; 0017: Store to control flag shadow/status register (0x1F)
+    MOVLW   0x4B            ; 0018: W = 0x4B
+    MOVWF   0x12            ; 0019: Store to register 0x12
+    MOVLW   0xDF            ; 001A: W = 0xDF
+    MOVWF   APFCON          ; 001B: Store to Alternate Pin Function Control (0x0E)
+
+    ; --- Operational Flag Adjustments ---
+    BCF     0x1F, 2         ; 001C: Clear bit 2 of status/flag register (0x1F)
+    BSF     0x13, 4         ; 001D: Set bit 4 of peripheral register (0x13)
+    MOVLW   0xC0            ; 001E: W = 0xC0
+    MOVWF   0x16            ; 001F: Store to RAM location 0x16 (PWM1DCH)
+
+    ; --- Main Execution Loop & Polling Logic ---
+POLL_LOOP:
+    ; Note: RA3 is configured via configuration word 0x1CE0 as a digital input 
+    ; (MCLRE = 0) with an external switch pulled up to 5.0V. Pressing the switch 
+    ; pulls or releases the line, which the firmware inspects or manipulates 
+    ; during execution flow.
+    BSF     TRISA, 1        ; 0020: Configure pin 1 of TRISA as input (0x07)
+    BSF     0x1F, 2         ; 0021: Set bit 2 of flag register (0x1F)
+    NOP                     ; 0022: Delay cycle / Synchronization pad
+    NOP                     ; 0023: Delay cycle / Synchronization pad
+    NOP                     ; 0024: Delay cycle / Synchronization pad
+
+    BTFSC   0x1F, 2         ; 0025: Test bit 2 of flag register (0x1F); skip if clear
+    GOTO    HANDLER_ALT     ; 0026: Branch out of loop if flag is set
+
+    ; --- ADC Read & PWM Duty Cycle Update Sequence ---
+    MOVF    0x1E, W         ; 0027: Read converted ADC result / variable register 0x1E into W
+    MOVWF   0x25            ; 0028: Mirror W to RAM location 0x25 (Working buffer)
+    MOVWF   0x15            ; 0029: Update hardware PWM duty cycle low register (PWM1DCL)
+    GOTO    POLL_LOOP       ; 002A: Loop back to polling routine sequence
+
+    ; --- Subroutine / Look-Up Table Return Constants ---
+LOOKUP_TABLE:
+    RETLW   0x00            ; 002B: Return with literal 0x00
+    RETLW   0x00            ; 002C: Return with literal 0x00
+
+    ; --- Unprogrammed / Flash Padding Area ---
+FLASH_PADDING:
+    ADDLW   0xFF            ; 002D: Unprogrammed space (0x3FFF fill)
+    ADDLW   0xFF            ; 002E: Unprogrammed space
+    ADDLW   0xFF            ; 002F: Unprogrammed space
+    ADDLW   0xFF            ; 0030: Unprogrammed space
+    ADDLW   0xFF            ; 0031: Unprogrammed space
+    ADDLW   0xFF            ; 0032: Unprogrammed space
+    ADDLW   0xFF            ; 0033: Unprogrammed space
+    ADDLW   0xFF            ; 0034: Unprogrammed space
+    ADDLW   0xFF            ; 0035: Unprogrammed space
+    ADDLW   0xFF            ; 0036: Unprogrammed space
+
+    ; --- External Branch Targets (Out of direct bounds view) ---
+MAIN_INIT_EXT:
+    ; (Target at 0x104 referenced by reset vector)
+    NOP
+
+HANDLER_ALT:
+    ; (Target at 0x125 referenced by BTFSC check)
+    NOP
+
+    END

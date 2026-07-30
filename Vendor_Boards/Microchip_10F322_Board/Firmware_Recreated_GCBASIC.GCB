@@ -1,0 +1,151 @@
+'==============================================================================
+' PIC10F322 - ADC-Controlled PWM LED Dimmer
+'------------------------------------------------------------------------------
+' Function : Reads a potentiometer/analog voltage on AN2 (RA2) and uses the
+'            8-bit result to directly set PWM duty cycle, driving an LED (or
+'            other load) at a brightness proportional to the ADC reading.
+'
+' PWM output : RA0  (PWM1 peripheral output pin on the 10F322)
+' ADC input  : AN2  (RA2) - configured as analog input
+' Heartbeat  : RA1 toggles opposite of RA3 each loop (visual "alive" indicator
+'              / debug pin - has no effect on the PWM/ADC function itself)
+'
+' Clock      : Forced to 16 MHz HFINTOSC via custom MyInitSys (see bottom)
+' PWM freq   : ~25.97 kHz (target: 26 kHz)
+'==============================================================================
+
+#chip 10F322, 16
+#config MCLRE = OFF, FOSC = INTOSC, WDTE = OFF, PWRTE = ON, CP = OFF, BOREN = OFF
+' MCLRE = OFF  -> RA3 is a general I/O pin, not a Reset input
+' FOSC = INTOSC-> internal oscillator used as system clock (no external crystal)
+' WDTE = OFF   -> Watchdog Timer disabled (no auto-reset if code hangs)
+' PWRTE = ON   -> Power-up Timer enabled (short delay after power-on for
+'                 supply voltage to stabilise before code starts)
+' CP = OFF     -> Code protection off (flash is readable/programmable)
+' BOREN = OFF  -> Brown-out Reset disabled
+
+'------------------------------------------------------------------------------
+' I/O DIRECTION SETUP
+'------------------------------------------------------------------------------
+Dir PORTA Out        ' All PORTA pins default to outputs...
+Dir PORTA.2 In        ' ...except RA2, which is overridden to input (for AN2)
+                       ' Note: compiles to CLRF TRISA + BSF TRISA,2 (2 instructions).
+                       ' Functionally fine here since ANSELA is configured
+                       ' immediately after, before any analog reading occurs.
+
+    '--------------------------------------------------------------------------
+    ' ADC CONFIGURATION
+    '--------------------------------------------------------------------------
+    ' ANSELA: Analog Select register - controls whether a PORTA pin's digital
+    ' input buffer is disabled in favour of analog function.
+    ANSELA = 0b00000100     ' ANSA2 = 1 -> RA2 (AN2) set to analog mode
+                             ' (all other ANSELx bits = 0 -> RA0/RA1/RA3 stay digital)
+
+    ' ADCON (single combined register on the 10F322, address 0x1F):
+    '   bit7:5 = ADCS<2:0>  A/D conversion clock select
+    '   bit4:2 = CHS<2:0>   Analog channel select
+    '   bit1   = GO/DONE    Conversion start/status flag
+    '   bit0   = ADON       ADC module enable
+    '
+    ' ADCON = 0x01 | (0b010 << 2)
+    '       = 0b00000001 | 0b00001000
+    '       = 0b00001001  (0x09)
+    '
+    ' Decoded:
+    '   ADCS<2:0> = 000  -> Fosc/2 conversion clock (16MHz/2 = 8MHz,
+    '                       i.e. Tad = 125ns - fast but still within the
+    '                       chip's minimum Tad spec at this clock speed)
+    '   CHS<2:0>  = 010  -> Channel 2 = AN2 (RA2)  <- the pot input
+    '                       (the inline comment "CHS AN0" in the source is
+    '                       a mislabel; the math actually selects AN2,
+    '                       matching the RA2 pin wired for the pot)
+    '   GO/DONE   = 0    -> no conversion in progress yet
+    '   ADON      = 1    -> ADC module powered on
+    ' GO_nDONE stop; ADON enabled; ADCS FOSC/2; CHS AN0;
+    ADCON = 0x01 | ( 0b010 << 2)
+
+    '--------------------------------------------------------------------------
+    ' PWM CONFIGURATION (PWM1 peripheral, output on RA0)
+    '--------------------------------------------------------------------------
+    ' PWM1CON: bit7 PWM1EN, bit6 PWM1OE, bit5 PWM1OUT(read-only), bit4 PWM1POL
+    ' PWM1CON = 0xC0 = 0b11000000
+    '   PWM1EN  = 1  -> PWM1 module enabled
+    '   PWM1OE  = 1  -> PWM1 output driver enabled onto its pin (RA0)
+    '   PWM1POL = 0  -> Active-high output (duty cycle = % time HIGH)
+    // PWM1POL active_hi; PWM1OE enabled; PWM1EN enabled;
+    PWM1CON = 0xC0;
+
+    ' PWM1DCH/PWM1DCL together form the 10-bit PWM duty cycle value:
+    '   PWM1DCH<7:0> = 8 MSBs  (this is what gets updated every loop from ADRES)
+    '   PWM1DCL<7:6> = 2 LSBs  (fractional bits, set once here and left fixed)
+    PWM1DCH = 0;       ' Duty cycle MSBs start at 0 (LED off at power-up)
+    PWM1DCL = 0x15;    ' 0x15 = 0b00010101 -> only bits 7:6 matter (=00),
+                        ' so the 2 fractional LSBs are effectively 0.
+                        ' The lower 6 bits of this register are unimplemented.
+
+    ' PR2: Timer2 Period Register - sets the PWM period (and therefore the
+    ' usable resolution of PWM1DCH, since duty cycle range = 0 to PR2).
+    ' --- PR2 = 153 -> Fpwm = 16MHz / (4 x (153+1) x 1) = 25.97 kHz (~26 kHz) ---
+    ' --- Note: duty resolution is now 0-153, not the full 0-255, so the ---
+    ' --- ADC's 8-bit result (0-255) must be scaled down to fit this range ---
+    PR2 = 153
+
+    ' T2CON: Timer2 Control register - clocks Timer2, which the PWM module
+    ' uses as its period/duty-cycle time base.
+    ' T2CON = 0b00000100
+    '   TOUTPS<3:0> = 0000  -> Postscaler 1:1
+    '   TMR2ON      = 1     -> Timer2 running
+    '   T2CKPS<1:0> = 00    -> Prescaler 1:1
+    // T2CKPS 1:1; TOUTPS 1:1; TMR2ON on;
+    T2CON = 0b00000100
+
+    '--------------------------------------------------------------------------
+    ' MAIN LOOP
+    '--------------------------------------------------------------------------
+    Do
+        ' --- Start ADC conversion ---
+        SET GO_NOT_DONE ON   ' Sets ADCON bit1 (GO/DONE) = 1, triggering a
+                              ' new A/D conversion on the selected channel (AN2)
+
+        NOP                  ' 3 NOP delay: gives the conversion a couple of
+        NOP                  ' instruction cycles' head start before polling,
+        NOP                  ' reducing wasted polling cycles
+
+        Wait While GO_NOT_DONE ON
+                              ' Poll ADCON bit1: hardware clears GO/DONE
+                              ' automatically the instant conversion completes.
+                              ' Loop here until that happens (~9 Tad cycles
+                              ' total from start, per datasheet spec).
+
+        PWM1DCH = ADRES       ' Copy the completed 8-bit ADC result (0-255)
+                              ' directly into the PWM duty MSB register.
+                              ' NOTE: since PR2=153, any ADRES value above 153
+                              ' saturates the PWM at 100% duty - the pot's
+                              ' upper range simply pins the LED at full
+                              ' brightness rather than scaling smoothly across
+                              ' its whole travel. (If perfectly linear 0-255
+                              ' response across the pot's full range is
+                              ' wanted, scale here: PWM1DCH = ADRES * 153 / 255)
+
+        PORTA.1 = !PORTA.3    ' Heartbeat/debug toggle - inverts RA1 relative
+                              ' to RA3's current state each pass through the
+                              ' loop, giving a visible sign the loop is
+                              ' running. Not required for PWM/ADC operation.
+    Loop
+
+End
+
+'------------------------------------------------------------------------------
+' CLOCK OVERRIDE
+'------------------------------------------------------------------------------
+' #chip 10F322 was declared with a 16mhz clock speed argument.
+' This custom InitSys override replaces that default startup routine and
+' explicitly sets the oscillator to run at 16 MHz before Main begins,
+' guaranteeing the Fpwm/Tad calculations above are accurate.
+#define  InitSys MyInitSys
+Sub MyInitSys
+    ' OSCCON = 112 = 0b01110000
+    '   bit7      = 0    -> 4x PLL disabled
+    '   IRCF<2:0> = 111  -> HFINTOSC = 16 MHz (bits 6:4)
+    OSCCON = 112
+End Sub
