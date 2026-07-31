@@ -1,0 +1,155 @@
+'''A demonstration program for GCBASIC
+'''---------------------------------------------------------------------------------
+''' Rotates a single lit LED across PORTB.5/4/3/2 (a 4-LED "Larson scanner" /
+''' Cylon-eye style chase effect), one direction at a time.
+'''
+''' Speed control: the wait between steps is derived from an analog input on
+''' AN0 (e.g. a potentiometer), scaled to a range of 25 ms (fastest) to
+''' 500 ms (slowest).
+'''
+''' Direction control: a push-button on PORTB.1 reverses the direction of
+''' rotation. The button is wired active-LOW (pressed = 0), which implies
+''' an external or internal pull-up resistor holding the pin high when the
+''' button is not pressed.
+'''
+''' Sound: a short 5 us pulse is sent to PORTD.5 each step to drive a
+''' piezo/speaker for an audible "tick" as the LED moves.
+'''
+''' LED position is tracked with an explicit counter (Pos) and converted to
+''' a bit pattern via Select Case, rather than using the ROTATE command.
+''' ROTATE rotates through the carry flag, and a stray carry bit left over
+''' from an unrelated operation (e.g. Scale, ReadAD, a comparison) could
+''' occasionally be shifted into the LED nibble - especially noticeable
+''' right after a direction change, where two LEDs would briefly light at
+''' once instead of one. Using a counter avoids the carry flag entirely.
+'''
+'''@author  Evan Venn
+'''@licence GPL
+'''@version 1.5
+'''@date    08/10/2020
+'''********************************************************************************
+
+; ----- Configuration
+#chip LGT8F328P  // MEGA328P
+#option Explicit
+
+' ----- Pin assignments ------------------------------------------------------
+' PORTB.5, PORTB.4, PORTB.3, PORTB.2 : LED outputs (chase sequence, MSB to LSB)
+' PORTC.0 (AN0)                      : Analog input (e.g. potentiometer wiper)
+' PORTB.1                            : Direction button (active-low, needs pull-up)
+' PORTD.5 (SoundOut)                 : Piezo/speaker output, pulsed each step
+
+' Set pins 5-2 of PORTB as outputs, leave the rest of PORTB untouched
+Dir PORTB.5 Out
+Dir PORTB.4 Out
+Dir PORTB.3 Out
+Dir PORTB.2 Out
+
+' Set the physical pin behind AN0 (PORTC.0) as an input
+Dir PORTC.0 In
+
+' Set the direction-change button as an input
+Dir PORTB.1 In
+
+Dim LEDs As Byte         ' Bit pattern written into the PORTB LED nibble each step
+Dim ADValue As Byte      ' Raw ADC reading, 0-255 (see note below on ADC resolution)
+Dim WaitTime As Word     ' Scaled delay between chase steps, in ms (25-500)
+Dim GoingRight As Bit    ' Current direction: 1 = toward LSB (PORTB.2), 0 = toward MSB (PORTB.5)
+Dim Pos As Byte          ' Current LED position: 0=PORTB.2, 1=PORTB.3, 2=PORTB.4, 3=PORTB.5
+
+#define SoundOut PORTD.5
+Dir SoundOut Out
+
+' Start with the lit LED at PORTB.5 (Pos = 3), moving right (toward PORTB.2)
+Pos = 3
+GoingRight = 1
+
+' Build the initial LED pattern and write it out before entering the loop,
+SetLEDS
+
+Do
+
+    ' Read the analog value from AN0 into an 8-bit variable.
+    ' NOTE (corrected): this variable and the Scale range below (0-255) treat
+    ' the reading as an 8-bit result. The AVR core ADC on this chip is
+    ' natively 10-bit (0-1023) unless configured for left-adjusted / 8-bit
+    ' result mode (ADLAR). If ADValue is genuinely receiving only 0-255,
+    ' confirm the ADC is configured for 8-bit results; otherwise change
+    ' ADValue to a Word and the Scale range to 0, 1023 to avoid discarding
+    ' resolution.
+    ADValue = ReadAD(AN0)
+
+    ' Scale the ADC reading down to a wait time of 25-500 ms
+    WaitTime = Scale(ADValue, 0, 255, 25, 500)
+
+    ' Wait for the scaled amount of time - this sets the chase speed
+    Wait WaitTime ms
+
+    ' Check the direction button.
+    ' Wired active-low: pin reads 0 when pressed (requires pull-up).
+    If PORTB.1 = 0 Then
+        ' Flip direction
+        GoingRight = Not GoingRight
+        ' Debounce: hold here until the button is released, so one physical
+        ' press only registers as one direction change
+        Do While PORTB.1 = 0
+            Wait 10 ms
+        Loop
+    End If
+
+    ' Advance the LED position according to the current direction, wrapping
+    ' at the ends of the 4-LED range (0-3) instead of shifting bits directly
+    If GoingRight = 1 Then
+        If Pos = 0 Then
+            Pos = 3
+        Else
+            Pos = Pos - 1
+        End If
+    Else
+        If Pos = 3 Then
+            Pos = 0
+        Else
+            Pos = Pos + 1
+        End If
+    End If
+
+    SetLEDS
+
+    ' Audible tick: brief pulse to the piezo/speaker each step
+    PulseOut SoundOut, 5 us
+
+
+Loop
+
+
+Macro SetLEDS
+
+    ' Set each LED pin explicitly for the current position.
+    ' Only PORTB.2, PORTB.3, PORTB.4 and PORTB.5 are touched here -
+    ' no other bits of PORTB are read or written.
+    Select Case Pos
+        Case 0
+            PORTB.2 = 1   ' LED on
+            PORTB.3 = 0
+            PORTB.4 = 0
+            PORTB.5 = 0
+        Case 1
+            PORTB.2 = 0
+            PORTB.3 = 1   ' LED on
+            PORTB.4 = 0
+            PORTB.5 = 0
+        Case 2
+            PORTB.2 = 0
+            PORTB.3 = 0
+            PORTB.4 = 1   ' LED on
+            PORTB.5 = 0
+        Case 3
+            PORTB.2 = 0
+            PORTB.3 = 0
+            PORTB.4 = 0
+            PORTB.5 = 1   ' LED on
+    End Select
+
+End Macro
+
+End

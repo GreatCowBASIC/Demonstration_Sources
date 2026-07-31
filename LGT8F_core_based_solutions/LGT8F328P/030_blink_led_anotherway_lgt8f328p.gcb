@@ -30,7 +30,7 @@
         ' Toggle LED off
         LED0 = NOT LED0
         ' Wait in a timer loop for a while
-        Wait 100 ms
+        Wait 500 ms
 
         ' Return to the top and do it again
     Loop
