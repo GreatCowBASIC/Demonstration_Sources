@@ -1,4 +1,4 @@
-# Great-Cow-BASIC
+# GCBASIC
 
 This GIT contains the latest user contributed demonstrations. 
 
