@@ -1,0 +1,242 @@
+/*
+    ************************************************************************
+    Q35 Series LED Chaser / Serial Terminal Demonstration
+    ************************************************************************
+
+    This demonstration shows values on a serially attached terminal, and
+    drives a 4-bit LED "chaser" pattern (left/right shift) on PORTB, with
+    direction controlled by a push-button input and speed controlled by
+    a potentiometer on the ADC input.
+
+    Target device : PIC18F46Q35 (Q35 family)
+    Compiler      : GCBASIC 2026 (or later)
+
+    ------------------------------------------------------------------------
+    Hardware summary
+    ------------------------------------------------------------------------
+    - PORTA.0        : Potentiometer (ADC input, speed control)
+    - PORTA.4        : Direction switch input (active low)
+    - PORTB.0..3     : LEDs (chaser output)
+    - PORTC.6        : UART1 TX (serial terminal output, 9600 baud)
+    - PORTC.5        : UART1 RX
+    - PORTE.3        : Reset button input (input only pin)
+    - PORTD          : LCD-style I/O header (PWR-EN, RW, RS, DB4-DB7)
+                        reserved/unused by this demo but mapped for reference
+
+    ------------------------------------------------------------------------
+    IMPORTANT - Power configuration
+    ------------------------------------------------------------------------
+    !! VDDIO2 IS CRITICAL FOR OPERATION !!
+    On the PIC18F46Q35 (and related Q43/Q35 family parts), the VDDIO2 pin
+    supplies power to a secondary I/O bank on the device. If VDDIO2 is not
+    correctly connected to the supply rail (per the datasheet electrical
+    and pin-out specifications), the associated I/O pins will not function
+    correctly and the chip may not operate reliably, even though the
+    primary VDD/VSS pins are powered correctly.
+    Always verify VDDIO2 is wired to VDD (or the correct supply level) on
+    your board before troubleshooting "dead" I/O or unexpected resets.
+
+    ------------------------------------------------------------------------
+    @author  EvanV
+    @licence GPL
+    @version 1.00
+    @date    01.08.2026
+    ------------------------------------------------------------------------
+    ----- Configuration
+*/
+// Chip Settings.
+#CHIP 18F46Q35
+
+#OPTION Explicit
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+    //! Optional verification of auto baud rate calculation
+        //! #DEFINE ISSUE_CHECK_USART_BAUD_RATE_WARNING
+
+
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #define PPSToolPart 18F46Q43
+
+    Sub InitPPS
+            
+            // Module: UART pin directions
+            Dir PORTC.6 Out    ' Make TX1 pin an output
+            // Module: UART1
+            U1RXPPS = 0x15; //RC5->UART1:RX1;
+            RC6PPS = 0x12;  //RC6->UART1:TX1;
+        
+        End Sub
+
+/*
+            ------------PORTA---------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ------------SW--------------ADC--
+    IO:    ---------------------------------
+
+            ------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    IO:    ---------------------------------
+
+            ------------PORTC----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----TX---------------------------
+    IO:    ---------------------------------
+
+            ------------PORTD----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    PWR-EN--RW--RS--DB7-DB6-DB5-DB4--
+    IO:    ---------------------------------
+
+            ------------PORTE----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------RST---------------
+    IO:    ---------------------------------
+    */
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.4
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+//*****************************************************************************************************
+//Main program commences here.. everything before this is setup for the board.
+
+    #DEFINE SYSDEFAULTCONCATSTRING   16
+   
+    HSerPrintCRLF
+    HSerPrint "GCBASIC 2026"
+    HSerPrintCRLF
+    HSerPrint ChipNameStr
+    HSerPrint " at "
+    HSerPrint ChipMHz
+    HSerPrint "mHz"
+    HSerPrintCRLF
+    Wait 2 s
+
+
+    Dim direction As Bit
+    Dim mydelay As Word
+    Dim LEDportState as Byte
+    
+    //  Control Constants 
+        #DEFINE LED_RIGHT 0
+        #DEFINE LED_LEFT  1
+
+    //Start from left direction
+        direction = LED_LEFT
+
+    //Set the initial LED states - change to suit your configuration
+        LEDportState = 1
+
+
+    // Main loop
+    Do
+
+        //Get a value for the ADC port
+            mydelay = ReadAD( ANA0 )
+            mydelay = scale( mydelay, 0, 255, 50, 1000 )
+
+        //Set the port and only the state of our LEDs
+            LATB = LEDportState AND 0b00001111
+
+        //Wait, and then check the switch has been pressed
+            Wait mydelay ms
+
+        // Manage the direction
+            If  funcKeyPressed() = TRUE Then
+                //  change the direction
+                direction = !direction
+            End If
+
+        //Set the LEDs
+            If  direction = LED_LEFT  Then
+
+                HSerPrint "<L:"
+
+                If LEDportState.3 = 1 then 
+                    LEDportState = 0
+                    C = 1
+                Else
+                    C = 0
+                End If
+                'shift the contents of LEDportState
+                Rotate LEDportState Left
+            Else
+
+                HSerPrint ">R:"
+
+                'shift the contents of LEDportState
+                C = 0
+                Rotate LEDportState Right
+                If C = 1 Then LEDportState.3 = 1
+            End If
+
+            HSerSend 9
+            HSerPrint ByteToBin ( LEDPORT )
+            HSerSend 9
+            HSerPrint [word]mydelay
+            HSerPrintCRLF
+
+    Loop
+
+
+        
+
+
+
+// This is function, it returns the state of the switch
+    Function  funcKeyPressed as Bit
+    
+        // Define some variables
+        Dim CurrentSwitchState As Bit
+        Dim LastSwitchState As Bit
+
+        wait 1 ms
+
+        // Is the switch pressed down ?
+        If ( SWITCHIN = DOWN ) Then
+            // Set the state
+            CurrentSwitchState = TRUE
+        Else
+            // So, switch is therefore UP/released
+            CurrentSwitchState = FALSE
+        End If
+
+        // This check ensures the state of the switch ....
+        // ensure the switch has changed state
+        If ( CurrentSwitchState <> LastSwitchState ) AND ( CurrentSwitchState = TRUE ) Then
+            // Return the state value - returns TRUE
+            funcKeyPressed = TRUE
+        Else      
+            // Switch is not down
+            funcKeyPressed = FALSE
+        End If
+
+        LastSwitchState = CurrentSwitchState
+
+    End Function

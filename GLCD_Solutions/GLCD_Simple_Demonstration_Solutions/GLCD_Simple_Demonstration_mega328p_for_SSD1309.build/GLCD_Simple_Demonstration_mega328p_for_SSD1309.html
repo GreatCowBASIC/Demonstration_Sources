@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Compilation Report</title>
+<style>
+    body {
+        font-family: monospace;
+        line-height: 1.4;
+        margin: 20px;
+        max-width: 1400px;
+    }
+    h1, h2 {
+        font-family: monospace;
+    }
+    table {
+        font-family: monospace;
+        border-collapse: collapse;
+        width: 100%;
+        margin: 1em 0;
+    }
+    th, td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+    }
+    thead tr {
+        background-color: #e0e0e0;
+    }
+    .summary p {
+        margin: 0.4em 0;
+    }
+    .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 1em 0;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    .table-wrapper table {
+        min-width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    .table-wrapper th, .table-wrapper td {
+        white-space: nowrap;
+    }
+    .table-wrapper::-webkit-scrollbar {
+        height: 8px;
+    }
+    .table-wrapper::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    .table-wrapper::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+    .table-wrapper::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+    details {
+        margin: 1em 0;
+    }
+    details > summary {
+        cursor: pointer;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 0.4em;
+        user-select: none;
+    }
+    details > summary::-webkit-details-marker { display: none; }
+    details > summary::marker { display: none; }
+    .toggle-icon {
+        width: 1em; height: 1em;
+        transition: transform 0.2s;
+        flex-shrink: 0;
+    }
+    details[open] .toggle-icon {
+        transform: rotate(90deg);
+    }
+    details > summary h2 {
+        display: inline;
+        margin: 0;
+    }
+    th { cursor: pointer; }
+    th.sort-asc::after  { content: ' \25B2'; font-size: 0.75em; }
+    th.sort-desc::after { content: ' \25BC'; font-size: 0.75em; }
+</style>
+</head>
+<body>
+<h1>Compilation Report</h1>
+<p>Compiler Version (YYYY-MM-DD): 2026.07.24 (Windows 64 bit) : Build 1610)</p>
+<h2>Compilation time</h2>
+<p> Compile time: 5.53125 seconds</p>
+<p> Assembly time: 0.53125 seconds</p>
+<p> Download time: 0 seconds</p>
+<p> Total time: 6.0625 seconds</p>
+<h2>Chip resource usage:</h2>
+<p>Chip Model: MEGA328P</p>
+<p>Program Memory: 6410/16384 words (39.12%)</p>
+<p>RAM: 1307/2048 bytes (63.82%)</p>
+<p> OSC: 16Mhz</p>
+<script>
+function sortTableById(tableId, numericCols, n) {
+  var table = document.getElementById(tableId);
+  if (!table) return;
+  var tbody = table.tBodies[0];
+  var rows = Array.from(tbody.rows);
+  var th = table.tHead.rows[0].cells[n];
+  var asc = th.classList.contains('sort-desc');
+  var ths = table.tHead.rows[0].cells;
+  for (var k = 0; k < ths.length; k++) {
+    ths[k].classList.remove('sort-asc','sort-desc');
+  }
+  th.classList.add(asc ? 'sort-asc' : 'sort-desc');
+  var isNum = numericCols.indexOf(n) >= 0;
+  rows.sort(function(a, b) {
+    var x = a.cells[n].textContent.trim();
+    var y = b.cells[n].textContent.trim();
+    if (isNum) { x = parseFloat(x) || 0; y = parseFloat(y) || 0; }
+    else { x = x.toLowerCase(); y = y.toLowerCase(); }
+    if (x < y) return asc ? -1 : 1;
+    if (x > y) return asc ? 1 : -1;
+    return 0;
+  });
+  rows.forEach(function(r) { tbody.appendChild(r); });
+}
+</script>
+<details><summary><svg class="toggle-icon" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><polygon points="4,2 12,8 4,14"/></svg><h2>Variable Memory Map</h2></summary>
+<div class="table-wrapper">
+<table id="varTable">
+<thead><tr>
+<th onclick="sortTableById('varTable',[1,3],0)">Variable Name</th>
+<th onclick="sortTableById('varTable',[1,3],1)">Address (Dec)</th>
+<th onclick="sortTableById('varTable',[1,3],2)">Address (Hex)</th>
+<th onclick="sortTableById('varTable',[1,3],3)">Size (bytes)</th>
+<th onclick="sortTableById('varTable',[1,3],4)">Bank / Location</th>
+</tr></thead><tbody>
+<tr>
+<td>BYTENUMBER</td>
+<td>1393</td>
+<td>0x0571</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>CCOUNT</td>
+<td>1394</td>
+<td>0x0572</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>CHARCODE</td>
+<td>1395</td>
+<td>0x0573</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>CHARCOL</td>
+<td>1396</td>
+<td>0x0574</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>CHARCOLS</td>
+<td>1398</td>
+<td>0x0576</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>CHARLOCX</td>
+<td>1399</td>
+<td>0x0577</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>CHARLOCY</td>
+<td>1401</td>
+<td>0x0579</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>CHARROW</td>
+<td>1403</td>
+<td>0x057B</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>CHARROWS</td>
+<td>1405</td>
+<td>0x057D</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>COL</td>
+<td>1406</td>
+<td>0x057E</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>CURRCHARCOL</td>
+<td>1407</td>
+<td>0x057F</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>CURRCHARROW</td>
+<td>1408</td>
+<td>0x0580</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>CURRCHARVAL</td>
+<td>1409</td>
+<td>0x0581</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>DDF_X</td>
+<td>1410</td>
+<td>0x0582</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>DDF_Y</td>
+<td>1412</td>
+<td>0x0584</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>DIM_STATE</td>
+<td>1414</td>
+<td>0x0586</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>DRAWLINE</td>
+<td>1415</td>
+<td>0x0587</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>FF</td>
+<td>1417</td>
+<td>0x0589</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>FILLCIRCLEXX</td>
+<td>1419</td>
+<td>0x058B</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>FILLCIRCLEYY</td>
+<td>1420</td>
+<td>0x058C</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>FIRSTPASS</td>
+<td>1421</td>
+<td>0x058D</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>GLCDBACKGROUND</td>
+<td>1422</td>
+<td>0x058E</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>GLCDBITNO</td>
+<td>1424</td>
+<td>0x0590</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>GLCDCHANGE</td>
+<td>1425</td>
+<td>0x0591</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>GLCDCOLOUR</td>
+<td>1426</td>
+<td>0x0592</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>GLCDDATATEMP</td>
+<td>1428</td>
+<td>0x0594</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>GLCDFNTDEFAULT</td>
+<td>1429</td>
+<td>0x0595</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>GLCDFNTDEFAULTHEIGHT</td>
+<td>1430</td>
+<td>0x0596</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>GLCDFNTDEFAULTSIZE</td>
+<td>1431</td>
+<td>0x0597</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>GLCDFONTWIDTH</td>
+<td>1432</td>
+<td>0x0598</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>GLCDFOREGROUND</td>
+<td>1433</td>
+<td>0x0599</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>GLCDPRINTLEN</td>
+<td>1435</td>
+<td>0x059B</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>GLCDPRINTLOC</td>
+<td>1436</td>
+<td>0x059C</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>GLCDPRINT_STRING_COUNTER</td>
+<td>1438</td>
+<td>0x059E</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>GLCDTEMP</td>
+<td>1439</td>
+<td>0x059F</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>GLCDX</td>
+<td>1441</td>
+<td>0x05A1</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>GLCDY</td>
+<td>1442</td>
+<td>0x05A2</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>GLCD_YORDINATE</td>
+<td>1443</td>
+<td>0x05A3</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>HEIGHTOFPICTURE</td>
+<td>1445</td>
+<td>0x05A5</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>I2CACK</td>
+<td>1446</td>
+<td>0x05A6</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>I2CACKPOLLSTATE</td>
+<td>1447</td>
+<td>0x05A7</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>I2CBYTE</td>
+<td>1448</td>
+<td>0x05A8</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>I2CMATCH</td>
+<td>1449</td>
+<td>0x05A9</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>I2CSTATE</td>
+<td>1450</td>
+<td>0x05AA</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>INXRADIUS</td>
+<td>1451</td>
+<td>0x05AB</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>LCDVALUE</td>
+<td>1453</td>
+<td>0x05AD</td>
+<td>4</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>LENGTHOFPICTURE</td>
+<td>1457</td>
+<td>0x05B1</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>LINECOLOUR</td>
+<td>1459</td>
+<td>0x05B3</td>
+<td>4</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>LINEDIFFX</td>
+<td>1463</td>
+<td>0x05B7</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>LINEDIFFX_X2</td>
+<td>1465</td>
+<td>0x05B9</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>LINEDIFFY</td>
+<td>1467</td>
+<td>0x05BB</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>LINEDIFFY_X2</td>
+<td>1469</td>
+<td>0x05BD</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>LINEERR</td>
+<td>1471</td>
+<td>0x05BF</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>LINESTEPX</td>
+<td>1473</td>
+<td>0x05C1</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>LINESTEPY</td>
+<td>1475</td>
+<td>0x05C3</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>LINEX1</td>
+<td>1477</td>
+<td>0x05C5</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>LINEX2</td>
+<td>1479</td>
+<td>0x05C7</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>LINEY1</td>
+<td>1481</td>
+<td>0x05C9</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>LINEY2</td>
+<td>1483</td>
+<td>0x05CB</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>LOCX</td>
+<td>1485</td>
+<td>0x05CD</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>LOCY</td>
+<td>1486</td>
+<td>0x05CE</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>LONGNUMBER</td>
+<td>1487</td>
+<td>0x05CF</td>
+<td>4</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>ORGCHARLOCX</td>
+<td>1491</td>
+<td>0x05D3</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>OUTSTRING</td>
+<td>1281</td>
+<td>0x0501</td>
+<td>40</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>PAD</td>
+<td>1322</td>
+<td>0x052A</td>
+<td>40</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>POSCHARX</td>
+<td>1492</td>
+<td>0x05D4</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>POSCHARY</td>
+<td>1494</td>
+<td>0x05D6</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>PRINTLOCX</td>
+<td>1495</td>
+<td>0x05D7</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>PRINTLOCY</td>
+<td>1497</td>
+<td>0x05D9</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>RADIUSERR</td>
+<td>1499</td>
+<td>0x05DB</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>RAM_INDEX</td>
+<td>1501</td>
+<td>0x05DD</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>ROW</td>
+<td>1503</td>
+<td>0x05DF</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SSD1309SENDBYTE</td>
+<td>1504</td>
+<td>0x05E0</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SSD1309_BUFFERALIAS</td>
+<td>256</td>
+<td>0x0100</td>
+<td>1024</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SSD1309_BUFFERLOCATIONCALC</td>
+<td>1505</td>
+<td>0x05E1</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SSD1309_SCROLLSPEED</td>
+<td>1507</td>
+<td>0x05E3</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SSD1309_START</td>
+<td>1508</td>
+<td>0x05E4</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SSD1309_STOP</td>
+<td>1509</td>
+<td>0x05E5</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>STR</td>
+<td>1383</td>
+<td>0x0567</td>
+<td>5</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>STRINGLOCX</td>
+<td>1510</td>
+<td>0x05E6</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>STRINGPOINTER</td>
+<td>1511</td>
+<td>0x05E7</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SYSARRAYTEMP1</td>
+<td>1512</td>
+<td>0x05E8</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SYSARRAYTEMP2</td>
+<td>1513</td>
+<td>0x05E9</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SYSCHARCOUNT</td>
+<td>1514</td>
+<td>0x05EA</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SYSCHARSHANDLER</td>
+<td>1515</td>
+<td>0x05EB</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SYSFORLOOPABSVALUE14</td>
+<td>1517</td>
+<td>0x05ED</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SYSFORLOOPSTEP13</td>
+<td>1519</td>
+<td>0x05EF</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SYSLCDPRINTDATAHANDLER</td>
+<td>1521</td>
+<td>0x05F1</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SYSLONGDIVMULTA</td>
+<td>1523</td>
+<td>0x05F3</td>
+<td>4</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SYSLONGDIVMULTB</td>
+<td>1527</td>
+<td>0x05F7</td>
+<td>4</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SYSLONGDIVMULTX</td>
+<td>1531</td>
+<td>0x05FB</td>
+<td>4</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SYSPRINTBUFFER</td>
+<td>1363</td>
+<td>0x0553</td>
+<td>10</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SYSPRINTBUFFLEN</td>
+<td>1535</td>
+<td>0x05FF</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SYSREPEATTEMP1</td>
+<td>1536</td>
+<td>0x0600</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SYSREPEATTEMP4</td>
+<td>1537</td>
+<td>0x0601</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SYSREPEATTEMP6</td>
+<td>1538</td>
+<td>0x0602</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SYSSTRDATA</td>
+<td>1539</td>
+<td>0x0603</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SYSSTRINGPARAM1</td>
+<td>1374</td>
+<td>0x055E</td>
+<td>8</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SYSSTRINGTEMP</td>
+<td>1540</td>
+<td>0x0604</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SYSSTRLEN</td>
+<td>1541</td>
+<td>0x0605</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SYSSYSINSTRING3HANDLER</td>
+<td>1542</td>
+<td>0x0606</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SYSSYSINSTRINGHANDLER</td>
+<td>1544</td>
+<td>0x0608</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>SYSVALTEMP</td>
+<td>1546</td>
+<td>0x060A</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>WIDTHOFPICTURE</td>
+<td>1548</td>
+<td>0x060C</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>WORDNUMBER</td>
+<td>1549</td>
+<td>0x060D</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>XCHAR</td>
+<td>1551</td>
+<td>0x060F</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>XOFFSET</td>
+<td>1552</td>
+<td>0x0610</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>XRADIUS</td>
+<td>1554</td>
+<td>0x0612</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>YCALC1</td>
+<td>1556</td>
+<td>0x0614</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>YCALC2</td>
+<td>1558</td>
+<td>0x0616</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>YOFFSET</td>
+<td>1560</td>
+<td>0x0618</td>
+<td>2</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>YORDINATE</td>
+<td>1562</td>
+<td>0x061A</td>
+<td>1</td>
+<td>AVR Register / SRAM</td>
+</tr>
+<tr>
+<td>_HEXPICAS</td>
+<td>1389</td>
+<td>0x056D</td>
+<td>3</td>
+<td>AVR Register / SRAM</td>
+</tr>
+</tbody></table>
+</div>
+</details>
+<details><summary><svg class="toggle-icon" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><polygon points="4,2 12,8 4,14"/></svg><h2>Subroutines</h2></summary>
+<div class="table-wrapper">
+<table id="subTable">
+<thead>
+<tr><th onclick="sortTableById('subTable',[1,2],0)">Name</th><th onclick="sortTableById('subTable',[1,2],1)">Code Size (lines)</th><th onclick="sortTableById('subTable',[1,2],2)">Compiled Size (words)</th><th onclick="sortTableById('subTable',[1,2],3)">Outgoing calls</th></tr>
+</thead><tbody>
+<tr><td>Main</td><td>92</td><td>1109</td><td>INITI2C ×21, INITGLCD_SSD1309 ×32, SYSCOPYSTRING ×1, SYSREADSTRING ×8, SYSMULTSUB16 ×1, SYSCOMPLESSTHAN ×2, SYSCOMPEQUAL ×1, SYSCOMPEQUAL16 ×1, SYSDIVSUB16 ×2, SYSCOMPLESSTHAN16 ×4, Delay_S ×6, FILLEDCIRCLE ×1, FILLEDBOX_SSD1309 ×1, GLCDDRAWCHAR_SSD1309 ×1, STR ×3, PAD ×3, _HEXPICAS ×4, _LINE ×2, CIRCLE ×1, BOX ×3, GLCDDRAWSTRING ×2, GLCDPRINT ×1, GLCDPRINT ×10, STOPSCROLL_SSD1309 ×1, STARTSCROLLDIAGLEFT_SSD1309 ×1, STARTSCROLLDIAGRIGHT_SSD1309 ×1, STARTSCROLLLEFT_SSD1309 ×1, STARTSCROLLRIGHT_SSD1309 ×1, SETCONTRAST_SSD1309 ×1, PSET_SSD1309 ×2, GLCDCLS_SSD1309 ×3, INITSYS ×52</td></tr>
+<tr><td>GLCDPRINT</td><td>19</td><td>111</td><td>GLCDDRAWCHAR_SSD1309 ×1</td></tr>
+<tr><td>GLCDPRINT</td><td>22</td><td>159</td><td>SYSDIVSUB32 ×1, SYSCOMPEQUAL32 ×1, GLCDDRAWCHAR_SSD1309 ×1</td></tr>
+<tr><td>GLCDDRAWSTRING</td><td>13</td><td>79</td><td>GLCDDRAWCHAR_SSD1309 ×1</td></tr>
+<tr><td>BOX</td><td>20</td><td>239</td><td>SYSCOMPLESSTHAN16 ×6, PSET_SSD1309 ×4</td></tr>
+<tr><td>CIRCLE</td><td>20</td><td>314</td><td>SYSMULTSUBINT ×1, SYSDIVSUBINT ×1, SYSCOMPLESSTHANINT ×2, PSET_SSD1309 ×8</td></tr>
+<tr><td>FILLEDCIRCLE</td><td>24</td><td>397</td><td>SYSMULTSUBINT ×1, SYSCOMPLESSTHANINT ×1, _LINE ×5</td></tr>
+<tr><td>_HEXPICAS</td><td>15</td><td>67</td><td></td></tr>
+<tr><td>_LINE</td><td>55</td><td>437</td><td>SYSMULTSUBINT ×4, SYSCOMPLESSTHANINT ×5, SYSCOMPEQUAL16 ×2, PSET_SSD1309 ×4</td></tr>
+<tr><td>_LINE</td><td>55</td><td>437</td><td>SYSMULTSUBINT ×4, SYSCOMPLESSTHANINT ×5, SYSCOMPEQUAL16 ×2, PSET_SSD1309 ×4</td></tr>
+<tr><td>INITSYS</td><td>1172</td><td>7</td><td></td></tr>
+<tr><td>SYSCOPYSTRING</td><td>118</td><td>13</td><td></td></tr>
+<tr><td>SYSREADSTRING</td><td>114</td><td>24</td><td></td></tr>
+<tr><td>SYSMULTSUB16</td><td>73</td><td>32</td><td>SYSCOMPLESSTHAN16 ×1</td></tr>
+<tr><td>SYSMULTSUBINT</td><td>13</td><td>38</td><td>SYSMULTSUB16 ×1</td></tr>
+<tr><td>SYSDIVSUB16</td><td>38</td><td>47</td><td>SYSCOMPEQUAL16 ×1</td></tr>
+<tr><td>SYSDIVSUBINT</td><td>14</td><td>47</td><td>SYSDIVSUB16 ×1</td></tr>
+<tr><td>SYSDIVSUB32</td><td>40</td><td>175</td><td>SYSCOMPEQUAL32 ×1</td></tr>
+<tr><td>SYSCOMPEQUAL</td><td>20</td><td>5</td><td></td></tr>
+<tr><td>SYSCOMPEQUAL16</td><td>34</td><td>7</td><td></td></tr>
+<tr><td>SYSCOMPEQUAL32</td><td>52</td><td>11</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHAN</td><td>23</td><td>6</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHAN16</td><td>38</td><td>10</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHANINT</td><td>48</td><td>42</td><td></td></tr>
+<tr><td>STR</td><td>36</td><td>192</td><td>SYSDIVSUB16 ×4, SYSCOMPLESSTHAN16 ×4</td></tr>
+<tr><td>PAD</td><td>16</td><td>188</td><td>SYSREADSTRING ×1, SYSCOMPLESSTHAN ×1</td></tr>
+<tr><td>INITI2C</td><td>8</td><td>6</td><td></td></tr>
+<tr><td>I2CSTART</td><td>34</td><td>7</td><td></td></tr>
+<tr><td>I2CSTOP</td><td>19</td><td>7</td><td></td></tr>
+<tr><td>I2CSEND</td><td>127</td><td>53</td><td></td></tr>
+<tr><td>WRITE_COMMAND_SSD1309</td><td>29</td><td>15</td><td>I2CSTOP ×1, I2CSEND ×3, I2CSTART ×1</td></tr>
+<tr><td>WRITE_DATA_SSD1309</td><td>29</td><td>15</td><td>I2CSTOP ×1, I2CSEND ×3, I2CSTART ×1</td></tr>
+<tr><td>INITGLCD_SSD1309</td><td>84</td><td>131</td><td>Delay_MS ×1, GLCDCLS_SSD1309 ×1, WRITE_COMMAND_SSD1309 ×29</td></tr>
+<tr><td>GLCDCLS_SSD1309</td><td>26</td><td>196</td><td>SYSCOMPLESSTHAN16 ×3, I2CSTOP ×1, I2CSEND ×3, I2CSTART ×1, CURSOR_POSITION_SSD1309 ×2</td></tr>
+<tr><td>GLCDDRAWCHAR_SSD1309</td><td>245</td><td>345</td><td>SYSCOMPLESSTHAN ×2, SYSCOMPEQUAL16 ×1, PSET_SSD1309 ×3, CURSOR_POSITION_SSD1309 ×1</td></tr>
+<tr><td>FILLEDBOX_SSD1309</td><td>17</td><td>98</td><td>PSET_SSD1309 ×1</td></tr>
+<tr><td>PSET_SSD1309</td><td>82</td><td>181</td><td>WRITE_DATA_SSD1309 ×1, CURSOR_POSITION_SSD1309 ×1</td></tr>
+<tr><td>CURSOR_POSITION_SSD1309</td><td>19</td><td>90</td><td>WRITE_COMMAND_SSD1309 ×3</td></tr>
+<tr><td>STOPSCROLL_SSD1309</td><td>1</td><td>4</td><td>WRITE_COMMAND_SSD1309 ×1</td></tr>
+<tr><td>STARTSCROLLRIGHT_SSD1309</td><td>8</td><td>35</td><td>WRITE_COMMAND_SSD1309 ×8</td></tr>
+<tr><td>STARTSCROLLLEFT_SSD1309</td><td>8</td><td>35</td><td>WRITE_COMMAND_SSD1309 ×8</td></tr>
+<tr><td>STARTSCROLLDIAGRIGHT_SSD1309</td><td>10</td><td>43</td><td>WRITE_COMMAND_SSD1309 ×10</td></tr>
+<tr><td>STARTSCROLLDIAGLEFT_SSD1309</td><td>10</td><td>43</td><td>WRITE_COMMAND_SSD1309 ×10</td></tr>
+<tr><td>SETCONTRAST_SSD1309</td><td>2</td><td>9</td><td>WRITE_COMMAND_SSD1309 ×2</td></tr>
+<tr><td>Delay_MS</td><td>0</td><td>12</td><td></td></tr>
+<tr><td>Delay_S</td><td>0</td><td>6</td><td>Delay_MS ×1</td></tr>
+<tr><td>SysStringTables</td><td>0</td><td>15</td><td></td></tr>
+<tr><td>GLCDCHARCOL3</td><td>0</td><td>68</td><td></td></tr>
+<tr><td>GLCDCHARCOL4</td><td>0</td><td>68</td><td></td></tr>
+<tr><td>GLCDCHARCOL5</td><td>0</td><td>68</td><td></td></tr>
+<tr><td>GLCDCHARCOL6</td><td>0</td><td>68</td><td></td></tr>
+<tr><td>GLCDCHARCOL7</td><td>0</td><td>68</td><td></td></tr>
+<tr><td>ANOBIUMFULL</td><td>0</td><td>490</td><td></td></tr>
+<tr><td>ANOBIUMFULL_H</td><td>0</td><td>15</td><td></td></tr>
+</tbody></table>
+</div>
+</details>
+</body>
+</html>

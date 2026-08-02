@@ -1,0 +1,65 @@
+/*
+    A demonstration program for GCBASIC
+    --------------------------------------------------------------------------------
+    This program shows toggling the LEDs attached
+
+    ------------------------------------------------------------------------
+    IMPORTANT - Power configuration
+    ------------------------------------------------------------------------
+    !! VDDIO2 IS CRITICAL FOR OPERATION !!
+    On this device family, VDDIO2 supplies power to a secondary I/O bank.
+    If VDDIO2 is not correctly connected to the supply rail (per the
+    datasheet electrical and pin-out specifications), the associated I/O
+    pins will not function correctly, and the chip may not operate
+    reliably even though the primary VDD/VSS pins are powered correctly.
+    Always verify VDDIO2 is wired to VDD (or the correct supply level) on
+    your board before troubleshooting "dead" I/O or unexpected resets.
+    ------------------------------------------------------------------------
+
+@author 	EvanV
+@licence	GPL
+@version	1.0a
+@date   	01.08.2026
+********************************************************************************/
+
+//Set microcontroller required
+#chip 18F46Q35
+#option Explicit
+
+/*
+        ------------PORTA---------------
+Bit#:  -7---6---5---4---3---2---1---0---
+IO:    ---------------------------------
+IO:    ---------------------------------
+
+        ------------PORTB----------------
+Bit#:  -7---6---5---4---3---2---1---0---
+IO:    ----------------LED-LED-LED-LED--
+IO:    ---------------------------------
+
+        ------------PORTC----------------
+Bit#:  -7---6---5---4---3---2---1---0---
+IO:    ---------------------------------
+IO:    ---------------------------------
+
+        ------------PORTD----------------
+Bit#:  -7---6---5---4---3---2---1---0---
+IO:    ---------------------------------
+IO:    ---------------------------------
+*/
+
+    // Main program commences here.. everything before this is setup for the board.
+
+    DIR PORTB Out
+
+    Do
+
+        // Set the LEDs on
+        PORTB = 255
+        wait 500 ms
+        
+        // Set the LEDs off
+        PORTB = 0
+        wait 500 ms
+
+    Loop
