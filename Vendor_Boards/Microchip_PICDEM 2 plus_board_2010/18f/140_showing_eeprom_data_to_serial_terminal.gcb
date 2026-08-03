@@ -1,15 +1,17 @@
 /*
-    This demonstration flashes an LED to show the use of a Timer 0 overflow event
+    This demonstration shows the EEProm values on the Serial Terminal.
 
-    Timer0 is a counter implemented in the processor. It may be used to count instruction
-    cycles or external events, that occur at or below the instruction cycle rate.
-    In thE pic, Timer0 can be used as either an 8-bit or 16-bit counter, or timer. The
-    enhanced mid-range core implements only an 8-bit counter.
-    This lesson configures Timer0 to count instruction cycles and to set a flag when it rolls
-    over. This frees up the processor to do meaningful work rather than wasting instruction
-    cycles in a timing loop.
-    Using a counter provides a convenient method of measuring time or delay loops as it
-    allows the processor to work on other tasks rather than counting instruction cycles.
+    This lesson will provide code for writing and reading a single byte onto
+    the on-board EEPROM. EEPROM is non-volatile memory, meaning that it does
+    not lose its value when power is shut off. This is unlike RAM, which will
+    lose its value when no power is applied. The EEPROM is useful for storing
+    variables that must still be present during no power.
+    It is also convenient to use if the entire RAM space is used up.
+    Writes and reads to the EEPROM are practically instant and are much faster
+    than program memory operations.
+
+    This will show the value of the EEPROM on the serial Terminal.
+    You can experiment by changing the variable // Outdata//  from Random function to a specific range.  Enjoy.
 
     ------------------------------------------------------------------------
     IMPORTANT - Power configuration
@@ -24,16 +26,16 @@
     your board before troubleshooting "dead" I/O or unexpected resets.
     ------------------------------------------------------------------------
 
+
     ************************************************************************
     @author  EvanV
     @licence GPL
     @version 1.00
     @date    02-08-2026
 */
-' ----- Configuration
+//  ----- Configuration
 
-//Set microcontroller required
-#chip 18F46Q35, 16
+#chip 18F46Q35
 #option Explicit
 #CONFIG MCLRE=ON
 
@@ -50,7 +52,7 @@
 
             ------------PORTC----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    VDD------------------------------
+    IO:    VDD--TX--------------------------
     IO:    ---------------------------------
 
             ------------PORTD----------------
@@ -128,87 +130,70 @@
     #DEFINE LCD_DB7     PORTD.3
 
     //! Required for OCULAR LCD driver
-    #DEFINE LCD_POWER   PORTD.7 
-    
-//*****************************************************************************************************
+    #DEFINE LCD_POWER   PORTD.7
+
+// *****************************************************************************************************
 // Main program commences here.. everything before this is setup for the board.
+// Now assumes Serial Terminal is operational
 
+Dim DisplayNewLine, Outdata, Indata  As Byte
+Dim EEPromAddress as Word
 
-HserPrintCRLF
-HSerPrintStringCRLF "Started"
+Wait 3 s
 
-//! Initialise the timer.
+Do Forever
 
-    '     For this we need the following:
-    '       Prescaler with the FOSC/4
-    '           1:256 which is the constant PRE0_256
-    '       Prescaler with the FOSC/4 with a post scaler
-    '           1:1 which is the constant POST0_1
+    // Terminal Preparation and Table header
+        HSerPrintCRLF
+        HSerPrint "EEPROM Test and Show Results "
+        HSerPrintCRLF 2
 
-    InitTimer0 Osc, PRE0_256 + TMR0_FOSC4 ,  POST0_1
+        HSerPrint "      "
+        For EEPromAddress = 0 To 15
+            HSerPrint Hex(EEPromAddress)
+            HSerPrint " "
+        Next
 
-    '   Start the Timer
-    StartTimer 0
+        For EEPromAddress = 0 To ChipEEProm -1
+            // Table formatting
+                DisplayNewLine = EEPromAddress % 16
+                If DisplayNewLine = 0 Then
+                    HSerPrintCRLF
+                    HSerPrint right(Hex(EEPromAddress_H),1)
+                    HSerPrint Hex(EEPromAddress)
+                    HSerPrint ": "
+                End If
+                HSerPrint " "
 
-    'Every 10 msec, we will count 100 to make 1 second
-    SetTimer ( 0 , 0x9b  )
+            // Prepare some data to send    
 
-    // Support variables
-    // Create variable as a flag
-    Dim TimeOut As Word
-    TimeOut = 0
+                // Outdata = Random
+                // Outdata = 0x55    // If you DON'T believe put your own value here!
+                Outdata = 255 - EEPromAddress    // If you DON'T believe put your own value here!
 
-    //Now setup the Interrupt Service Routine
-    On Interrupt Timer0Overflow Call blink
+            // Write
 
-    // Initialize a variable to hold the LED states
-    DIM LEDs AS BYTE
-    LEDs = 0B0001  // Start with the first LED on
+                EPWrite ( EEPromAddress, Outdata )
 
-    // Initialize a counter for rotations
-    DIM RotateCount AS BYTE
-    RotateCount = 0
+            // Reads, clear indata, just for good practice
 
-    // Initialize a variable for LCD
-    DIM LcdChar as Byte
+                Indata = 0
+                EPRead  ( EEPromAddress, Indata )
 
-    Do Forever
-
-        //! We need many interrupts for 1 second!!
-        If TimeOut = 100 Then
-            
-            // Print on LCD and Terminal - I will let you figure out what GET() does... toggles the character
-            LcdChar = Get ( 0,0 )
-            LcdChar = !LcdChar
-            Locate 0,0
-            Print Chr( LcdChar )
-            HSerPrintStringCRLF "."
-            
-            //! Same code as previous demo 040
-            // Output the current state to PORTB
-            LATB = LEDs
-            
-            // Rotate the LEDs to the left
-            Rotate LEDs Left Simple
-            
-            // Increment the rotation counter
-            RotateCount = RotateCount + 1
-            
-            // Reset the LEDs after 4 rotations
-            If RotateCount >= 4 Then
-                LEDs = 0B0001  // Reset to initial state
-                RotateCount = 0  // Reset counter
+            // Show result
+            If Outdata = Indata Then
+                HSerPrint  Hex(Indata)
+            Else
+                // Show -- as an error condition
+                HSerPrint  "--"
             End If
-            
-            TimeOut= 0
+        Next
 
-        End If
+    // End formating
+    HSerPrintCRLF 2
+    HSerPrint   "End of EEProm Program and Display"
+    HSerPrintCRLF 2
 
-    Loop
-
-
-Sub blink
-
-    TimeOut = TimeOut + 1
-    
-End Sub
+    Wait While SwitchIn = DOWN
+Loop
+End

@@ -1,0 +1,165 @@
+/*
+    ************************************************************************
+    Q35 Series External Interrupt (INT0) Demonstration
+    ************************************************************************
+
+    This demonstration shows the use of the external interrupt input INT0
+    to trigger an ISR, running alongside a simple polled main-loop blink.
+
+    - PORTA.4 is routed via PPS (INT0PPS) to the INTERRUPT MANAGER's INT0
+      input, configured for a falling (negative-going) edge (INT0EDG = 0).
+    - On each qualifying edge, `InterruptHandler` fires and toggles LEDD2.
+    - Independently, the main loop polls nothing but time: it toggles
+      LEDD3 every 100 ms using a plain `Wait`.
+
+    This contrasts a hardware-interrupt-driven output (LEDD2, event-driven,
+    asynchronous to the main loop) against a software-timed polled output
+    (LEDD3, synchronous, blocking `Wait`) on the same device.
+    
+    ------------------------------------------------------------------------
+    IMPORTANT - Power configuration
+    ------------------------------------------------------------------------
+    !! VDDIO2 IS CRITICAL FOR OPERATION !!
+    On this device family, VDDIO2 supplies power to a secondary I/O bank.
+    If VDDIO2 is not correctly connected to the supply rail (per the
+    datasheet electrical and pin-out specifications), the associated I/O
+    pins will not function correctly, and the chip may not operate
+    reliably even though the primary VDD/VSS pins are powered correctly.
+    Always verify VDDIO2 is wired to VDD (or the correct supply level) on
+    your board before troubleshooting "dead" I/O or unexpected resets.
+    ------------------------------------------------------------------------       
+
+*/
+'''************************************************************************
+'''@author  EvanV
+'''@licence GPL
+'''@version 1.00
+'''@date    02-08-2026
+' ----- Configuration
+#chip 18F46Q35
+#option Explicit
+#CONFIG MCLRE=ON
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #define PPSToolPart 18F46Q43
+
+    Sub InitPPS
+            
+            // Module: UART pin directions
+            Dir PORTC.6 Out    ' Make TX1 pin an output
+            // Module: UART1
+            U1RXPPS = 0x15; //RC5->UART1:RX1;
+            RC6PPS = 0x12;  //RC6->UART1:TX1;
+        
+            INT0PPS = 0x4; //RA4->INTERRUPT MANAGER:INT0;
+        End Sub
+
+
+/*
+            ------------PORTA---------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ------------SW--------------ADC--
+    IO:    ---------------------------------
+
+            ------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-INT--
+    IO:    ---------------------------------
+
+    ------------------PORTC-----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ---------------------------------
+    ---------------------------------------- 
+
+            ------------PORTD----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    PWR-EN--RW--RS--DB7-DB6-DB5-DB4--
+    IO:    ---------------------------------
+
+            ------------PORTE----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------RST---------------
+    IO:    ---------------------------------
+    */
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.4
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+    //! Specify explicit OCULAR_OM1614 support!!
+    #DEFINE LCD_OCULAR_OM1614
+
+    // Setup LCD Parameters
+    #DEFINE LCD_IO 4
+
+    // Define LCD Hardware settings
+    #DEFINE LCD_RS      PORTD.4
+    #DEFINE LCD_RW      PORTD.5
+    #DEFINE LCD_Enable  PORTD.6
+
+    #DEFINE LCD_DB4     PORTD.0
+    #DEFINE LCD_DB5     PORTD.1
+    #DEFINE LCD_DB6     PORTD.2
+    #DEFINE LCD_DB7     PORTD.3
+
+    //! Required for OCULAR LCD driver
+    #DEFINE LCD_POWER   PORTD.7
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF  
+
+//*****************************************************************************************************
+// Main program commences here.. everything before this is setup for the board.
+
+/* Interrupt-on-change enabled on the IOCx pin for a negative-going edge. Associated Status bit 
+    and interrupt flag will be set upon detecting an edge. */
+    INT0EDG = 0
+
+
+// Setup the handler
+On Interrupt ExtInt0 Call InterruptHandler
+
+'Loop forever
+Do
+    LEDD3 = !LEDD3
+    wait 100 ms
+Loop
+
+
+Sub InterruptHandler
+
+    'Toggle the LED
+    LEDD2 = !LEDD2
+
+End Sub

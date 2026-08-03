@@ -1,0 +1,168 @@
+/*
+    This demonstration flashes an LED to show the use of CCP PWM operations
+
+    Uses variable mode PWM operations
+
+
+    ************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.00
+    @date    02-08-2026
+    */
+
+//  ----- Configuration
+// Chip Settings.
+#chip 18F46Q35
+#option Explicit
+#CONFIG MCLRE=ON
+
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #define PPSToolPart 18F46Q43
+    #startup InitPPS, 85
+    Sub InitPPS
+            
+            // Module: UART pin directions
+            Dir PORTC.6 Out    ' Make TX1 pin an output
+            // Module: UART1
+            U1RXPPS = 0x15; //RC5->UART1:RX1;
+            RC6PPS = 0x12;  //RC6->UART1:TX1;
+
+            // Modile: CCP1
+            RB0PPS = 0x0D;  //RB0->CCP1:CCP1;
+            RB1PPS = 0x0D;  //RB1->CCP1:CCP1;
+            RB2PPS = 0x0D;  //RB2->CCP1:CCP1;
+            RB3PPS = 0x0D;  //RB3->CCP1:CCP1;
+
+        End Sub
+
+
+/*
+            ------------PORTA---------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ------------SW--------------ADC--
+    IO:    ---------------------------------
+
+            ------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    IO:    ---------------------------------
+
+    ------------------PORTC-----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    --------------------CCP1---------
+    ---------------------------------------- 
+
+            ------------PORTD----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    PWR-EN--RW--RS--DB7-DB6-DB5-DB4--
+    IO:    ---------------------------------
+
+            ------------PORTE----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------RST---------------
+    IO:    ---------------------------------
+    */
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.4
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+    //! Specify explicit OCULAR_OM1614 support!!
+    #DEFINE LCD_OCULAR_OM1614
+
+    // Setup LCD Parameters
+    #DEFINE LCD_IO 4
+
+    // Define LCD Hardware settings
+    #DEFINE LCD_RS      PORTD.4
+    #DEFINE LCD_RW      PORTD.5
+    #DEFINE LCD_Enable  PORTD.6
+
+    #DEFINE LCD_DB4     PORTD.0
+    #DEFINE LCD_DB5     PORTD.1
+    #DEFINE LCD_DB6     PORTD.2
+    #DEFINE LCD_DB7     PORTD.3
+
+    //! Required for OCULAR LCD driver
+    #DEFINE LCD_POWER   PORTD.7
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF  
+
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
+
+    #DEFINE CCP1_PORT   PORTC.2
+    DIR CCP1_PORT       OUT 
+
+    HPWM 1, 38, 127
+
+    Do
+
+        // HPWM CCPchannel, frequency, duty cycle
+            // Uncomment to use ADC to change Duty 
+                Dim ADCVal as Byte
+                ADCVal = ReadAD( ANA0 )
+                Wait 10 ms
+                HPWM 1, 38, ADCVal
+
+    Loop
+
+
+
+/* GCBASIC Optimisation file - this will optimise PWM operations by disabling the PWM operations on the PWM channel and Timer that is set to FALSE
+                             to enable PWM and Timer operations set to FALSE
+
+           Optimise CCP/PWM    
+*/
+           #DEFINE USE_HPWMCCP1 TRUE
+           #DEFINE USE_HPWMCCP2 FALSE
+           #DEFINE USE_HPWMCCP3 FALSE           
+           #DEFINE USE_HPWMCCP4 FALSE
+           #DEFINE USE_HPWMCCP5 FALSE
+
+//         Optimise PWM
+           #DEFINE USE_HPWM1 TRUE
+           #DEFINE USE_HPWM2 FALSE
+           #DEFINE USE_HPWM3 FALSE
+           #DEFINE USE_HPWM4 FALSE
+           #DEFINE USE_HPWM5 FALSE
+           #DEFINE USE_HPWM6 FALSE
+           #DEFINE USE_HPWM7 FALSE
+           #DEFINE USE_HPWM8 FALSE
+
+//         Optimise Timers associated with PWM operations
+           #DEFINE USE_HPWM_TIMER2 TRUE
+           #DEFINE USE_HPWM_TIMER4 FALSE
+           #DEFINE USE_HPWM_TIMER6 FALSE

@@ -1,15 +1,12 @@
 /*
-    This demonstration flashes an LED to show the use of a Timer 0 overflow event
+    This demonstration shows the I2C devices attached the microcontroller, this program supports the Microchip I2C module.
 
-    Timer0 is a counter implemented in the processor. It may be used to count instruction
-    cycles or external events, that occur at or below the instruction cycle rate.
-    In thE pic, Timer0 can be used as either an 8-bit or 16-bit counter, or timer. The
-    enhanced mid-range core implements only an 8-bit counter.
-    This lesson configures Timer0 to count instruction cycles and to set a flag when it rolls
-    over. This frees up the processor to do meaningful work rather than wasting instruction
-    cycles in a timing loop.
-    Using a counter provides a convenient method of measuring time or delay loops as it
-    allows the processor to work on other tasks rather than counting instruction cycles.
+    I2C device required a data bus and a clock bus, devices also required an input voltage and 0v.
+    I2C data bus is connected to PortC.4
+    I2C clock bus is connected to PortC.3
+    Serial output is connected, as previously, to PortC.6
+
+    Connect your IC2 devices and see the results on the serial terminal.
 
     ------------------------------------------------------------------------
     IMPORTANT - Power configuration
@@ -22,18 +19,18 @@
     reliably even though the primary VDD/VSS pins are powered correctly.
     Always verify VDDIO2 is wired to VDD (or the correct supply level) on
     your board before troubleshooting "dead" I/O or unexpected resets.
-    ------------------------------------------------------------------------
+    ------------------------------------------------------------------------       
 
     ************************************************************************
     @author  EvanV
     @licence GPL
-    @version 1.00
+    @version 1.02
     @date    02-08-2026
-*/
-' ----- Configuration
+    */
+// ----- Configuration
 
 //Set microcontroller required
-#chip 18F46Q35, 16
+#chip 18F46Q35
 #option Explicit
 #CONFIG MCLRE=ON
 
@@ -50,7 +47,7 @@
 
             ------------PORTC----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    VDD------------------------------
+    IO:    VDD-TX-----SDA-SCL---------------
     IO:    ---------------------------------
 
             ------------PORTD----------------
@@ -80,6 +77,12 @@
             // Module: UART1
             U1RXPPS = 0x15; //RC5->UART1:RX1;
             RC6PPS = 0x12;  //RC6->UART1:TX1;
+
+            // Module: I2C1
+            I2C1SCLPPS = 0x13;  //RC3->I2C1:SCL1;
+            RC3PPS = 0x1D;  //RC3->I2C1:SCL1;
+            I2C1SDAPPS = 0x14;  //RC4->I2C1:SDA1;
+            RC4PPS = 0x1E;  //RC4->I2C1:SDA1;
         
         End Sub
 
@@ -128,87 +131,84 @@
     #DEFINE LCD_DB7     PORTD.3
 
     //! Required for OCULAR LCD driver
-    #DEFINE LCD_POWER   PORTD.7 
+    #DEFINE LCD_POWER   PORTD.7   
     
-//*****************************************************************************************************
-// Main program commences here.. everything before this is setup for the board.
+// Define I2C settings
+    #DEFINE HI2C_DATA       PORTC.4
+    #DEFINE HI2C_CLOCK      PORTC.3
+    #DEFINE HI2C_BAUD_RATE  100
+    HI2CMode (Master)
 
+// I2C Controls specific to 18FxxQ2x and Q35 chips
+    //! Optional the default is 128
+    #DEFINE HIC2Q2XBUFFERSIZE 16
+    //! Optional the default is to issue a warning
+    #DEFINE MUTE_HIC2Q2XBUFFERSIZE_WARNING
 
-HserPrintCRLF
-HSerPrintStringCRLF "Started"
+    
+'*****************************************************************************************************
+'Main program commences here.. everything before this is setup for the board.
 
-//! Initialise the timer.
+    Dim DeviceID As Byte
+    Dim DISPLAYNEWLINE As Byte
+    Dim HI2CWaitMSSPTimeout As Byte
+    Dim DumpI2CRead as Byte
 
-    '     For this we need the following:
-    '       Prescaler with the FOSC/4
-    '           1:256 which is the constant PRE0_256
-    '       Prescaler with the FOSC/4 with a post scaler
-    '           1:1 which is the constant POST0_1
+    Wait 1 s
+    HserSend 255
 
-    InitTimer0 Osc, PRE0_256 + TMR0_FOSC4 ,  POST0_1
+    Do
+        HSerPrintCRLF
+        HSerPrint "Hardware I2C"
+        HSerPrintCRLF 2
 
-    '   Start the Timer
-    StartTimer 0
+        // Now assumes Serial Terminal is operational
+        HSerPrintCRLF
+        HSerPrint "   "
+        // Create a horizontal row of numbers
+        For DeviceID = 0 To 15
+            HSerPrint Hex(deviceID)
+            HSerPrint " "
+        Next
 
-    'Every 10 msec, we will count 100 to make 1 second
-    SetTimer ( 0 , 0x9b  )
-
-    // Support variables
-    // Create variable as a flag
-    Dim TimeOut As Word
-    TimeOut = 0
-
-    //Now setup the Interrupt Service Routine
-    On Interrupt Timer0Overflow Call blink
-
-    // Initialize a variable to hold the LED states
-    DIM LEDs AS BYTE
-    LEDs = 0B0001  // Start with the first LED on
-
-    // Initialize a counter for rotations
-    DIM RotateCount AS BYTE
-    RotateCount = 0
-
-    // Initialize a variable for LCD
-    DIM LcdChar as Byte
-
-    Do Forever
-
-        //! We need many interrupts for 1 second!!
-        If TimeOut = 100 Then
-            
-            // Print on LCD and Terminal - I will let you figure out what GET() does... toggles the character
-            LcdChar = Get ( 0,0 )
-            LcdChar = !LcdChar
-            Locate 0,0
-            Print Chr( LcdChar )
-            HSerPrintStringCRLF "."
-            
-            //! Same code as previous demo 040
-            // Output the current state to PORTB
-            LATB = LEDs
-            
-            // Rotate the LEDs to the left
-            Rotate LEDs Left Simple
-            
-            // Increment the rotation counter
-            RotateCount = RotateCount + 1
-            
-            // Reset the LEDs after 4 rotations
-            If RotateCount >= 4 Then
-                LEDs = 0B0001  // Reset to initial state
-                RotateCount = 0  // Reset counter
+        'Create a vertical column of numbers
+        For DeviceID = 0 to 255
+            DisplayNewLine = DeviceID % 16
+            If DisplayNewLine = 0 Then
+                HSerPrintCRLF
+                HSerPrint Hex(DeviceID)
+                If DisplayNewLine > 0 Then
+                    HSerPrint " "
+                End If
             End If
+            HSerPrint " "
+
+            //Do an initial Start
+            HI2CStart
             
-            TimeOut= 0
+            // Send address
+            HI2CSend ( DeviceID )
+            
+            // Send a byte to prevent any potential read address lockup
+            HI2CSend ( 0x00 )
+            
+            // Stop the I2C
+            HI2CStop    
 
-        End If
+            'Did device fail to respond?
+            If HI2CAckpollState = FALSE Then
+                HSerPrint Hex(DeviceID)
+            Else
+                HSerPrint "--"
+            End If
 
+        Next
+
+        HSerPrintCRLF 2
+        HSerPrint   "End of Search"
+        HSerPrintCRLF 2
+
+        Wait While SwitchIn = DOWN
+        
     Loop
 
-
-Sub blink
-
-    TimeOut = TimeOut + 1
-    
-End Sub

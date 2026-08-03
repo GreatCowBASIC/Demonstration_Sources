@@ -1,10 +1,11 @@
 /*
-    This demonstration flashes an LED to show the use of a Timer 0 overflow event
+    This demonstration flashes an LED to show the use of an 8Bit Timer 0
 
     Timer0 is a counter implemented in the processor. It may be used to count instruction
     cycles or external events, that occur at or below the instruction cycle rate.
-    In thE pic, Timer0 can be used as either an 8-bit or 16-bit counter, or timer. The
+    In the PIC18, Timer0 can be used as either an 8-bit or 16-bit counter, or timer. The
     enhanced mid-range core implements only an 8-bit counter.
+
     This lesson configures Timer0 to count instruction cycles and to set a flag when it rolls
     over. This frees up the processor to do meaningful work rather than wasting instruction
     cycles in a timing loop.
@@ -24,13 +25,14 @@
     your board before troubleshooting "dead" I/O or unexpected resets.
     ------------------------------------------------------------------------
 
+
     ************************************************************************
     @author  EvanV
     @licence GPL
     @version 1.00
     @date    02-08-2026
-*/
-' ----- Configuration
+    */
+
 
 //Set microcontroller required
 #chip 18F46Q35, 16
@@ -50,7 +52,7 @@
 
             ------------PORTC----------------
     Bit#:  -7---6---5---4---3---2---1---0---
-    IO:    VDD------------------------------
+    IO:    VDD--TX--------------------------
     IO:    ---------------------------------
 
             ------------PORTD----------------
@@ -128,16 +130,20 @@
     #DEFINE LCD_DB7     PORTD.3
 
     //! Required for OCULAR LCD driver
-    #DEFINE LCD_POWER   PORTD.7 
+    #DEFINE LCD_POWER   PORTD.7
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
     
+
 //*****************************************************************************************************
 // Main program commences here.. everything before this is setup for the board.
 
-
-HserPrintCRLF
-HSerPrintStringCRLF "Started"
-
 //! Initialise the timer.
+
+    // Tweak the oscillator
+    OSCTUNE = 0b00000000
 
     '     For this we need the following:
     '       Prescaler with the FOSC/4
@@ -153,38 +159,42 @@ HSerPrintStringCRLF "Started"
     'Every 10 msec, we will count 100 to make 1 second
     SetTimer ( 0 , 0x9b  )
 
-    // Support variables
-    // Create variable as a flag
-    Dim TimeOut As Word
-    TimeOut = 0
 
-    //Now setup the Interrupt Service Routine
-    On Interrupt Timer0Overflow Call blink
+    'we will use this to count the number of times the event happens
+    Dim TimerCounter As Byte
+    TimerCounter = 0
 
-    // Initialize a variable to hold the LED states
-    DIM LEDs AS BYTE
-    LEDs = 0B0001  // Start with the first LED on
+    //! Support variables
 
-    // Initialize a counter for rotations
-    DIM RotateCount AS BYTE
-    RotateCount = 0
+        // Initialize a variable to hold the LED states
+        DIM LEDs AS BYTE
+        LEDs = 0B0001  // Start with the first LED on
 
-    // Initialize a variable for LCD
-    DIM LcdChar as Byte
+        // Initialize a counter for rotations
+        DIM RotateCount AS BYTE
+        RotateCount = 0
 
-    Do Forever
 
-        //! We need many interrupts for 1 second!!
-        If TimeOut = 100 Then
-            
-            // Print on LCD and Terminal - I will let you figure out what GET() does... toggles the character
-            LcdChar = Get ( 0,0 )
-            LcdChar = !LcdChar
-            Locate 0,0
-            Print Chr( LcdChar )
+Do
+    'wait for the event
+    Wait While TMR0IF = 0
+
+    ' Clearing Timer flag will reset event
+    TMR0IF = 0
+
+    ' Set the Timer start value
+    SetTimer ( 0 , 0x9b  )
+
+
+    TimerCounter = TimerCounter + 1
+
+    'When at 100 we are at 1 s
+    If TimerCounter = 100 Then
+
+        //! Same code as previous demo 040
+
             HSerPrintStringCRLF "."
             
-            //! Same code as previous demo 040
             // Output the current state to PORTB
             LATB = LEDs
             
@@ -199,16 +209,8 @@ HSerPrintStringCRLF "Started"
                 LEDs = 0B0001  // Reset to initial state
                 RotateCount = 0  // Reset counter
             End If
-            
-            TimeOut= 0
 
-        End If
+        TimerCounter = 0
 
-    Loop
-
-
-Sub blink
-
-    TimeOut = TimeOut + 1
-    
-End Sub
+    End If
+Loop

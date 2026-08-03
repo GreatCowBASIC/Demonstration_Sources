@@ -1,17 +1,15 @@
 /*
-    This demonstration flashes an LED to show the use of a Timer 0 overflow event
+    This demonstration flashes an LED to show the use of a 16Bit Timer 1
 
-    Timer0 is a counter implemented in the processor. It may be used to count instruction
-    cycles or external events, that occur at or below the instruction cycle rate.
-    In thE pic, Timer0 can be used as either an 8-bit or 16-bit counter, or timer. The
-    enhanced mid-range core implements only an 8-bit counter.
     This lesson configures Timer0 to count instruction cycles and to set a flag when it rolls
     over. This frees up the processor to do meaningful work rather than wasting instruction
-    cycles in a timing loop.
+    cycles in a timing loop using a 16bit timer.
     Using a counter provides a convenient method of measuring time or delay loops as it
     allows the processor to work on other tasks rather than counting instruction cycles.
 
-    ------------------------------------------------------------------------
+    LEDs should flash  ~1 second.
+
+        ------------------------------------------------------------------------
     IMPORTANT - Power configuration
     ------------------------------------------------------------------------
     !! VDDIO2 IS CRITICAL FOR OPERATION !!
@@ -24,18 +22,16 @@
     your board before troubleshooting "dead" I/O or unexpected resets.
     ------------------------------------------------------------------------
 
-    ************************************************************************
-    @author  EvanV
-    @licence GPL
-    @version 1.00
-    @date    02-08-2026
-*/
-' ----- Configuration
+*/ 
 
+// Chip Settings 
+//! The timer calculations are based on 16mHz.  
+//! You would need to recalculate the timer values if 16mHz is not used
 //Set microcontroller required
 #chip 18F46Q35, 16
 #option Explicit
-#CONFIG MCLRE=ON
+// #CONFIG MCLRE=ON
+
 
 /*
             ------------PORTA---------------
@@ -81,7 +77,7 @@
             U1RXPPS = 0x15; //RC5->UART1:RX1;
             RC6PPS = 0x12;  //RC6->UART1:TX1;
         
-        End Sub
+        End Sub    
 
     // Define constants to make things easier. We can reuse a constant at any time.
     #DEFINE LEDD0 PORTB.0
@@ -128,38 +124,39 @@
     #DEFINE LCD_DB7     PORTD.3
 
     //! Required for OCULAR LCD driver
-    #DEFINE LCD_POWER   PORTD.7 
-    
+    #DEFINE LCD_POWER   PORTD.7
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
 //*****************************************************************************************************
 // Main program commences here.. everything before this is setup for the board.
 
+// Initialise the timer.
+    // Firstly tell the compiler to use a 16bit timer for this program
+    #DEFINE TMR0_16BIT
 
-HserPrintCRLF
-HSerPrintStringCRLF "Started"
+    // For this we need the following for timer0
+    //       Prescaler with the FOSC/4 with no post scaler
+    //          1:64
+    //
+    // Fosc = 16 MHz → instruction clock = Fosc/4 = 4 MHz → Tcy = 250 ns
+    // Prescaler 1:64 → each Timer0 tick = 64 × 250 ns = 16 µs
+    // 16-bit mode, preload = 3036 (0x0BDC)
+    // Counts to overflow = 65536 − 3036 = 62,500
+    // Period = 62,500 × 16 µs = 1,000,000 µs = 1.000 s
 
-//! Initialise the timer.
+    InitTimer0 Osc, PRE0_64 + TMR0_FOSC4 ,  POST0_1
 
-    '     For this we need the following:
-    '       Prescaler with the FOSC/4
-    '           1:256 which is the constant PRE0_256
-    '       Prescaler with the FOSC/4 with a post scaler
-    '           1:1 which is the constant POST0_1
+    // Every 1 sec.  0x0bdc is calculated value using a tool like Mr E. Timer Helper
+    SetTimer ( 0 , 3036  )
 
-    InitTimer0 Osc, PRE0_256 + TMR0_FOSC4 ,  POST0_1
-
-    '   Start the Timer
+    //    Start the Timer
     StartTimer 0
 
-    'Every 10 msec, we will count 100 to make 1 second
-    SetTimer ( 0 , 0x9b  )
-
-    // Support variables
-    // Create variable as a flag
-    Dim TimeOut As Word
-    TimeOut = 0
-
-    //Now setup the Interrupt Service Routine
-    On Interrupt Timer0Overflow Call blink
+    // Create byte variable as a flag
+    Dim TIMEOUT As Bit
 
     // Initialize a variable to hold the LED states
     DIM LEDs AS BYTE
@@ -169,46 +166,32 @@ HSerPrintStringCRLF "Started"
     DIM RotateCount AS BYTE
     RotateCount = 0
 
-    // Initialize a variable for LCD
-    DIM LcdChar as Byte
+Do
 
-    Do Forever
+    // wait for the event
+    Wait While TMR0IF = 0
 
-        //! We need many interrupts for 1 second!!
-        If TimeOut = 100 Then
-            
-            // Print on LCD and Terminal - I will let you figure out what GET() does... toggles the character
-            LcdChar = Get ( 0,0 )
-            LcdChar = !LcdChar
-            Locate 0,0
-            Print Chr( LcdChar )
-            HSerPrintStringCRLF "."
-            
-            //! Same code as previous demo 040
-            // Output the current state to PORTB
-            LATB = LEDs
-            
-            // Rotate the LEDs to the left
-            Rotate LEDs Left Simple
-            
-            // Increment the rotation counter
-            RotateCount = RotateCount + 1
-            
-            // Reset the LEDs after 4 rotations
-            If RotateCount >= 4 Then
-                LEDs = 0B0001  // Reset to initial state
-                RotateCount = 0  // Reset counter
-            End If
-            
-            TimeOut= 0
+    // Clearing Timer 0 flag will reset event
+    TMR0IF = 0
 
-        End If
+    HSerPrintStringCRLF "."
 
-    Loop
-
-
-Sub blink
-
-    TimeOut = TimeOut + 1
+    // Output the current state to PORTB
+    LATB = LEDs
     
-End Sub
+    // Rotate the LEDs to the left
+    Rotate LEDs Left Simple
+    
+    // Increment the rotation counter
+    RotateCount = RotateCount + 1
+    
+    // Reset the LEDs after 4 rotations
+    If RotateCount >= 4 Then
+        LEDs = 0B0001  // Reset to initial state
+        RotateCount = 0  // Reset counter
+    End If
+        
+    // Set timer. This value as close as you can get to 1s
+    SetTimer ( 0 , 3036 )
+
+Loop

@@ -1,0 +1,182 @@
+/*
+ This demonstration will show how you can control a motor using a PWM signal.
+
+ Pulse-Width Modulation (PWM) is a scheme that provides power to a load by switching
+ quickly between fully on and fully off states. The PWM signal resembles a square wave
+ where the high portion of the signal is considered the on state and the low portion of
+ the signal is considered the off state. The high portion, also known as the pulse width,
+ can vary in time and is defined in steps. A longer, high on time will illuminate the LED
+ brighter. The frequency or period of the PWM does not change.
+
+ This program demostrates a method where the number of steps applied,
+ which lengthens the pulse width are calculated in an Interrupt routine.
+ The PWM period defined as the duration of one complete cycle or the total
+ amount of on and off time combined is based on a simple counter.
+
+ The demo varies the PWM to the IO Port.  We are pretending the motor is connected to the IO port, via a suitable motor control device.
+
+    ------------------------------------------------------------------------
+    IMPORTANT - Power configuration
+    ------------------------------------------------------------------------
+    !! VDDIO2 IS CRITICAL FOR OPERATION !!
+    On this device family, VDDIO2 supplies power to a secondary I/O bank.
+    If VDDIO2 is not correctly connected to the supply rail (per the
+    datasheet electrical and pin-out specifications), the associated I/O
+    pins will not function correctly, and the chip may not operate
+    reliably even though the primary VDD/VSS pins are powered correctly.
+    Always verify VDDIO2 is wired to VDD (or the correct supply level) on
+    your board before troubleshooting "dead" I/O or unexpected resets.
+    ------------------------------------------------------------------------    
+
+
+************************************************************************
+@author  EvanV
+@licence GPL
+@version 1.00
+@date    02-08-2026
+*/
+' ----- Configuration
+#chip 18F46Q35
+#option Explicit
+#CONFIG MCLRE=ON
+
+/*
+            ------------PORTA---------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ------------SW--------------ADC--
+    IO:    ---------------------------------
+
+            ------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    IO:    ---------------------------------
+
+    ------------------PORTC-----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    VDD-TX---------------------------
+    ---------------------------------------- 
+
+            ------------PORTD----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    PWR-EN--RW--RS--DB7-DB6-DB5-DB4--
+    IO:    ---------------------------------
+
+            ------------PORTE----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------RST---------------
+    IO:    ---------------------------------
+    */
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE SWITCHIN      PORTA.4
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+    //! Specify explicit OCULAR_OM1614 support!!
+    #DEFINE LCD_OCULAR_OM1614
+
+    // Setup LCD Parameters
+    #DEFINE LCD_IO 4
+
+    // Define LCD Hardware settings
+    #DEFINE LCD_RS      PORTD.4
+    #DEFINE LCD_RW      PORTD.5
+    #DEFINE LCD_Enable  PORTD.6
+
+    #DEFINE LCD_DB4     PORTD.0
+    #DEFINE LCD_DB5     PORTD.1
+    #DEFINE LCD_DB6     PORTD.2
+    #DEFINE LCD_DB7     PORTD.3
+
+    //! Required for OCULAR LCD driver
+    #DEFINE LCD_POWER   PORTD.7
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF  
+
+'*****************************************************************************************************
+// Main program commences here.. everything before this is setup for the board.
+
+Dim speed, MotorSpeed, PWMCounter As Byte
+
+'We are pretending the motor is connected to the IO port, via a suitable motor control device.
+#DEFINE MOTOR LEDD0
+Dir MOTOR Out
+
+'Call the initialisation routine
+InitMotorControl
+
+'Main routine
+Do
+    'Increase speed to full over 2.5 seconds
+    For Speed = 0 To 100
+        MotorSpeed = Speed
+        Wait 25 ms
+    Next
+    'Hold speed
+    Wait 1 s
+    'Decrease speed to zero over 2.5 seconds
+    For Speed = 100 To 0
+        MotorSpeed = Speed
+        Wait 25 ms
+    Next
+    'Hold speed
+    Wait 1 s
+Loop
+
+'Setup routine
+Sub InitMotorControl
+    'Clear variables
+    MotorSpeed = 0
+    PWMCounter = 0
+
+    'Add a handler for the interrupt
+    On Interrupt Timer0Overflow Call PWMHandler
+    'Set up the timer using the internal oscillator with a prescaler of 1/2 (Equates to 0)
+    'Timer 0 starts automatically on a Microchip PIC microcontroller, therefore, StartTimer is not required.
+    InitTimer0 Osc, PRE0_2 + TMR0_HFINTOSC ,  POST0_1
+    StartTimer 0
+
+End Sub
+
+'PWM sub
+'This will be called when Timer 0 overflows
+Sub PWMHandler
+
+    If MotorSpeed > PWMCounter Then
+        Set MOTOR On
+    Else
+        Set MOTOR Off
+    End If
+    PWMCounter += 1
+    If PWMCounter = 100 Then PWMCounter = 0
+
+End Sub

@@ -130,8 +130,6 @@ Do
     // Clearing Timer 0 flag will reset event
     TMR0IF = 0
 
-//! Same rotate code as 040
-
     HSerPrintStringCRLF "."
 
     // Output the current state to PORTB
