@@ -8,6 +8,8 @@
 
     This has been tested using the hardware and software SPI option.
 
+    !!Software ILI9341 are 3v3 operating voltage. Just be careful.
+
     ------------------------------------------------------------------------
     IMPORTANT - Power configuration
     ------------------------------------------------------------------------
