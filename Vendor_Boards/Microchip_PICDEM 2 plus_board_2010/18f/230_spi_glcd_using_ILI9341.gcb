@@ -108,7 +108,7 @@
 
     // ******************* GLCD setup and configuratio ******************
     #INCLUDE <glcd.h>
-    #define GLCD_TYPE GLCD_TYPE_SSD1331
+    #define GLCD_TYPE GLCD_TYPE_ILI9341
 
     // This is NOT a PPS chip, so, needs to make the phyiscal hardware
     #DEFINE GLCD_DO     portC.5
