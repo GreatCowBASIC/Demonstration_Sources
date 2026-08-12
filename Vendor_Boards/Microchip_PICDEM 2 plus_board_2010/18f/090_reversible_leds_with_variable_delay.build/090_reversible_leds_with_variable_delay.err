@@ -1,0 +1,12 @@
+::: warning: (1311) missing configuration setting for config word 0x300010; using default
+::: warning: (1311) missing configuration setting for config word 0x300014; using default
+
+Psect Usage Map:
+
+ Psect    | Contents                   | Memory Range      | Size
+----------|----------------------------|-------------------|--------------
+ config   | Device configuration words | 300000h - 300014h |   15 bytes  
+----------|----------------------------|-------------------|--------------
+ RESETVEC |                            | 000000h - 000537h |  538 units  
+----------|----------------------------|-------------------|--------------
+

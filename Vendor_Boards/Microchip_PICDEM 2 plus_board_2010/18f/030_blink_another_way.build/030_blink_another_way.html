@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Compilation Report</title>
+<style>
+    body {
+        font-family: monospace;
+        line-height: 1.4;
+        margin: 20px;
+        max-width: 1400px;
+    }
+    h1, h2 {
+        font-family: monospace;
+    }
+    table {
+        font-family: monospace;
+        border-collapse: collapse;
+        width: 100%;
+        margin: 1em 0;
+    }
+    th, td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+    }
+    thead tr {
+        background-color: #e0e0e0;
+    }
+    .summary p {
+        margin: 0.4em 0;
+    }
+    .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 1em 0;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    .table-wrapper table {
+        min-width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    .table-wrapper th, .table-wrapper td {
+        white-space: nowrap;
+    }
+    .table-wrapper::-webkit-scrollbar {
+        height: 8px;
+    }
+    .table-wrapper::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    .table-wrapper::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+    .table-wrapper::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+    details {
+        margin: 1em 0;
+    }
+    details > summary {
+        cursor: pointer;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 0.4em;
+        user-select: none;
+    }
+    details > summary::-webkit-details-marker { display: none; }
+    details > summary::marker { display: none; }
+    .toggle-icon {
+        width: 1em; height: 1em;
+        transition: transform 0.2s;
+        flex-shrink: 0;
+    }
+    details[open] .toggle-icon {
+        transform: rotate(90deg);
+    }
+    details > summary h2 {
+        display: inline;
+        margin: 0;
+    }
+    th { cursor: pointer; }
+    th.sort-asc::after  { content: ' \25B2'; font-size: 0.75em; }
+    th.sort-desc::after { content: ' \25BC'; font-size: 0.75em; }
+</style>
+</head>
+<body>
+<h1>Compilation Report</h1>
+<p>Compiler Version (YYYY-MM-DD): 2026.08.05 (Windows 64 bit) : Build 1616)</p>
+<h2>Compilation time</h2>
+<p> Compile time: 0.875 seconds</p>
+<p> Assembly time: 0.25 seconds</p>
+<p> Download time: 6.25 seconds</p>
+<p> Total time: 7.375 seconds</p>
+<h2>Chip resource usage:</h2>
+<p>Chip Model: 18F46Q35</p>
+<p>Program Memory: 70/32768 words (.21%)</p>
+<p>RAM: 1/4096 bytes (.02%)</p>
+<p> OSC: HFINTOSC_1MHZ, 64Mhz (Internal oscillator)</p>
+<script>
+function sortTableById(tableId, numericCols, n) {
+  var table = document.getElementById(tableId);
+  if (!table) return;
+  var tbody = table.tBodies[0];
+  var rows = Array.from(tbody.rows);
+  var th = table.tHead.rows[0].cells[n];
+  var asc = th.classList.contains('sort-desc');
+  var ths = table.tHead.rows[0].cells;
+  for (var k = 0; k < ths.length; k++) {
+    ths[k].classList.remove('sort-asc','sort-desc');
+  }
+  th.classList.add(asc ? 'sort-asc' : 'sort-desc');
+  var isNum = numericCols.indexOf(n) >= 0;
+  rows.sort(function(a, b) {
+    var x = a.cells[n].textContent.trim();
+    var y = b.cells[n].textContent.trim();
+    if (isNum) { x = parseFloat(x) || 0; y = parseFloat(y) || 0; }
+    else { x = x.toLowerCase(); y = y.toLowerCase(); }
+    if (x < y) return asc ? -1 : 1;
+    if (x > y) return asc ? 1 : -1;
+    return 0;
+  });
+  rows.forEach(function(r) { tbody.appendChild(r); });
+}
+</script>
+<details><summary><svg class="toggle-icon" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><polygon points="4,2 12,8 4,14"/></svg><h2>Variable Memory Map</h2></summary>
+<div class="table-wrapper">
+<table id="varTable">
+<thead><tr>
+<th onclick="sortTableById('varTable',[1,3],0)">Variable Name</th>
+<th onclick="sortTableById('varTable',[1,3],1)">Address (Dec)</th>
+<th onclick="sortTableById('varTable',[1,3],2)">Address (Hex)</th>
+<th onclick="sortTableById('varTable',[1,3],3)">Size (bytes)</th>
+<th onclick="sortTableById('varTable',[1,3],4)">Bank / Location</th>
+</tr></thead><tbody>
+<tr>
+<td>DELAYTEMP</td>
+<td>1280</td>
+<td>0x0500</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>DELAYTEMP2</td>
+<td>1281</td>
+<td>0x0501</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSTEMP1</td>
+<td>1284</td>
+<td>0x0504</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSWAITTEMPMS</td>
+<td>1282</td>
+<td>0x0502</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+</tbody></table>
+</div>
+</details>
+<details><summary><svg class="toggle-icon" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><polygon points="4,2 12,8 4,14"/></svg><h2>Subroutines</h2></summary>
+<div class="table-wrapper">
+<table id="subTable">
+<thead>
+<tr><th onclick="sortTableById('subTable',[1,2],0)">Name</th><th onclick="sortTableById('subTable',[1,2],1)">Code Size (lines)</th><th onclick="sortTableById('subTable',[1,2],2)">Compiled Size (words)</th><th onclick="sortTableById('subTable',[1,2],3)">Outgoing calls</th></tr>
+</thead><tbody>
+<tr><td>Main</td><td>12</td><td>23</td><td>Delay_MS ×1, INITSYS ×4</td></tr>
+<tr><td>INITSYS</td><td>1172</td><td>30</td><td></td></tr>
+<tr><td>Delay_MS</td><td>0</td><td>14</td><td></td></tr>
+</tbody></table>
+</div>
+</details>
+</body>
+</html>
