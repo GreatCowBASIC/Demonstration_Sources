@@ -48,6 +48,9 @@ IO:    ---------------------------------
 IO:    ---------------------------------
 */
 
+
+
+
 // Define constants to make things easier. We can reuse a constant at any time.
 #DEFINE LEDD0 PORTB.0
 #DEFINE LEDD1 PORTB.1
@@ -67,8 +70,11 @@ Dir     LEDD3 Out
     // Program to rotate LEDs on a PIC16 microcontroller with a 100 ms delay
 
     // Initialize a variable to hold the LED states
-    DIM LEDs AS BYTE
-    LEDs = 0B0001  // Start with the first LED on
+        DIM LEDs AS BYTE
+        LEDs = 0B0001  // Start with the first LED on
+
+    // Another way to initialize a variable to hold the LED states
+        //! DIM LEDs AS BYTE = 0B0001
 
     // Initialize a counter for rotations
     DIM RotateCount AS BYTE
@@ -91,5 +97,5 @@ Dir     LEDD3 Out
             RotateCount = 0  // Reset counter
         End If
         
-        WAIT 100 ms  // Wait 100 milliseconds
+        WAIT 1 s  // Wait 100 milliseconds
     Loop

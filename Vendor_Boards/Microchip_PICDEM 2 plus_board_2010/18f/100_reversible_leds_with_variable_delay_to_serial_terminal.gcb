@@ -39,38 +39,40 @@
     ------------------------------------------------------------------------
     @author  EvanV
     @licence GPL
-    @version 1.00
-    @date    01.08.2026
+    @version 1.01
+    @date    09.08.2026
     ------------------------------------------------------------------------
     ----- Configuration
 */
 // Chip Settings.
 #CHIP 18F46Q35
-
 #OPTION Explicit
+#CONFIG MCLRE=EXTMCLR
+
+
 
     #DEFINE USART_BAUD_RATE 9600
     #DEFINE USART_TX_BLOCKING
     #DEFINE USART_DELAY OFF
-    
-    //! Optional verification of auto baud rate calculation
-        //! #DEFINE ISSUE_CHECK_USART_BAUD_RATE_WARNING
 
+    //! Optional verification of auto baud rate calculation
+    #DEFINE ISSUE_CHECK_USART_BAUD_RATE_WARNING
 
     // PIC PPS Tool version: 0.0.6.5
     
     #startup InitPPS, 85
-    #define PPSToolPart 18F46Q43
+    #define PPSToolPart 18F46Q35
 
     Sub InitPPS
             
             // Module: UART pin directions
             Dir PORTC.6 Out    ' Make TX1 pin an output
             // Module: UART1
-            U1RXPPS = 0x15; //RC5->UART1:RX1;
-            RC6PPS = 0x12;  //RC6->UART1:TX1;
+            RC6PPS = 0x0012    // TX1 > RC6
         
         End Sub
+    // Add this code segment to your GCBASIC source program
+
 
 /*
             ------------PORTA---------------
@@ -118,7 +120,29 @@
 
     #DEFINE SWITCHIN      PORTA.4
     Dir     SWITCHIN      In
-    #DEFINE DOWN          1
+
+    ' ------------------------------------------------------------------------
+    ' IMPORTANT - Switch polarity
+    ' ------------------------------------------------------------------------
+    ' DOWN must equal whatever SWITCHIN reads WHEN THE BUTTON IS PHYSICALLY
+    ' PRESSED, not when it's at rest. Get this backwards and the "press" edge
+    ' detection in funcKeyPressed() will fire on release instead of on press,
+    ' even though the debounce/edge-detection logic itself is correct.
+    '
+    ' Most switch circuits use a pull-up resistor to VDD with the switch
+    ' connecting the pin to ground when pressed. In that layout:
+    '     - At rest (not pressed):  SWITCHIN reads 1 (HIGH)
+    '     - Pressed:                SWITCHIN reads 0 (LOW)
+    ' That is the wiring assumed below (DOWN = 0), and matches the "active
+    ' low" note in the hardware summary above.
+    '
+    ' If your circuit instead pulls the pin LOW at rest and the switch pulls
+    ' it HIGH when pressed, change this to #DEFINE DOWN 1.
+    '
+    ' To verify: probe PORTA.4 with a meter, or just try one polarity - if
+    ' direction reverses on release instead of press, flip this value.
+    ' ------------------------------------------------------------------------
+    #DEFINE DOWN          0
 
     #DEFINE RSTBUTTON     PORTE.3
     Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
@@ -142,6 +166,11 @@
     Dim direction As Bit
     Dim mydelay As Word
     Dim LEDportState as Byte
+
+    ' Declare LastSwitchState globally so it persists between calls to
+    ' funcKeyPressed(). 
+    Dim LastSwitchState As Bit
+    LastSwitchState = FALSE
     
     //  Control Constants 
         #DEFINE LED_RIGHT 0
@@ -168,6 +197,10 @@
             Wait mydelay ms
 
         // Manage the direction
+        // funcKeyPressed() returns TRUE only once per press - at the instant
+        // the switch transitions from released to pressed (the rising edge).
+        // It will not re-trigger while the switch is held down, and it
+        // never triggers on release.
             If  funcKeyPressed() = TRUE Then
                 //  change the direction
                 direction = !direction
@@ -197,7 +230,7 @@
             End If
 
             HSerSend 9
-            HSerPrint ByteToBin ( LEDPORT )
+            HSerPrint Right(ByteToBin ( LEDPORT ), 4)
             HSerSend 9
             HSerPrint [word]mydelay
             HSerPrintCRLF
@@ -208,13 +241,46 @@
         
 
 
+/*
+    Explanation:
 
-// This is function, it returns the state of the switch
+        Variable Definition:
+            `CurrentSwitchState` is declared locally as a Bit to store the current state.
+            `LastSwitchState` is declared globally, above the main Do loop, so it retains
+            its value between function calls (GCBASIC local variables do NOT persist
+            between calls - declaring it inside the function, as in earlier versions of
+            this code, caused it to reset to FALSE every time and re-trigger on every
+            iteration while the button was held down).
+
+        Debouncing:
+            A small delay (wait 1 ms) is introduced to debounce the switch,
+            filtering out mechanical contact bounce before the pin is sampled.
+
+        Switch State Reading:
+            The state of the switch is read using SWITCHIN = DOWN.
+            If the switch is pressed, CurrentSwitchState is set to TRUE; otherwise, it is set to FALSE.
+
+        Press (Rising-Edge) Detection:
+            The function only reports TRUE at the exact moment the switch goes
+            from released (FALSE) to pressed (TRUE) - i.e. CurrentSwitchState = TRUE
+            AND LastSwitchState = FALSE. This means a press is detected once, and
+            once only, when it happens: never on release, and never repeatedly
+            while the switch is held down.
+
+        State Tracking:
+            LastSwitchState is updated on every call (whether or not a press was
+            detected) so the next call always has an accurate previous state to
+            compare against.
+*/
+
+// This function returns TRUE only at the instant the switch is pressed
+// (i.e. on the rising edge, when the switch transitions from released to
+// pressed). It ignores the release transition entirely, and requires
+// LastSwitchState to be declared globally (see above) to work correctly.
     Function  funcKeyPressed as Bit
     
-        // Define some variables
+        // Define local variable
         Dim CurrentSwitchState As Bit
-        Dim LastSwitchState As Bit
 
         wait 1 ms
 
@@ -227,16 +293,19 @@
             CurrentSwitchState = FALSE
         End If
 
-        // This check ensures the state of the switch ....
-        // ensure the switch has changed state
-        If ( CurrentSwitchState <> LastSwitchState ) AND ( CurrentSwitchState = TRUE ) Then
+        // Only report a "press" on the rising edge: switch was up last time,
+        // and is down now. This deliberately excludes the release transition
+        // (down -> up), so direction changes on press, not on release.
+        If ( CurrentSwitchState = TRUE ) AND ( LastSwitchState = FALSE ) Then
             // Return the state value - returns TRUE
             funcKeyPressed = TRUE
         Else      
-            // Switch is not down
+            // Switch is not newly pressed
             funcKeyPressed = FALSE
         End If
 
+        // Always update the last known state so the next call can correctly
+        // detect the next press edge.
         LastSwitchState = CurrentSwitchState
 
     End Function

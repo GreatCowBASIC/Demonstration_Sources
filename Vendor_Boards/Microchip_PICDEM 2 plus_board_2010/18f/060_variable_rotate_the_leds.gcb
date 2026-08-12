@@ -82,13 +82,13 @@ Dim ADCVal As Word
 Dim LEDportState as Byte
 
   // Set one bit of the port on, where 1 equates to ON
-    LEDportState = 0b10000
+    LEDportState = 0b1000
 
     Do
 
         //ReadAD10 can return values of 0 to 1023 (max)
-        ADCVal = ReadAD10 ( AN0 )  
-        ADCVal = Scale ( ADCVal, 0, 1023, 100, 500 )
+        ADCVal = ReadAD10 ( ANA0 )  
+        ADCVal = Scale ( ADCVal, 0, 1023, 50, 1000 )
 
         //Wait for the number of milliseconds
         Wait ADCVal ms
@@ -112,6 +112,7 @@ Dim LEDportState as Byte
 End
 
     
+
     
 
 

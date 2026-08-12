@@ -26,6 +26,7 @@ This program demonstrates the capabilities of a PICDEM 2 Board
 #chip 18F46Q35
 #option Explicit
 
+
 /*
                 ------------PORTA---------------
         Bit#:  -7---6---5---4---3---2---1---0---
@@ -58,8 +59,8 @@ DIR PORTB.2 OUT
 DIR PORTB.3 OUT
 
 PORTB.0 = 1
-PORTB.1 = 0
+PORTB.1 = 1
 PORTB.2 = 1
-PORTB.3 = 0
+PORTB.3 = 1
 
 End

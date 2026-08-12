@@ -82,7 +82,7 @@ Dir     LEDD3 Out
 
     Do
 
-        adcVal =  ReadAD ( AN0 )
+        adcVal =  ReadAD ( ANA0 )
 
         // One method
             // Select Case adcVal
@@ -159,10 +159,6 @@ Dir     LEDD3 Out
     Loop
 
 
-
-
-
-
 /* GCBASIC Optimisation file - this will optimise ADC operations by disabling the ADC operations on the AD channel that is set to FALSE
                              to enable ADC operations on a specific AD channel set to TRUE
 
@@ -170,7 +166,6 @@ Dir     LEDD3 Out
  */
             #DEFINE USE_AD0 TRUE
             #DEFINE USE_AD1 FALSE
-            #DEFINE USE_AD2 FALSE
             #DEFINE USE_AD2 FALSE
             #DEFINE USE_AD3 FALSE
             #DEFINE USE_AD4 FALSE
@@ -240,3 +235,6 @@ Dir     LEDD3 Out
             #DEFINE USE_ADE0 FALSE
             #DEFINE USE_ADE1 FALSE
             #DEFINE USE_ADE2 FALSE
+
+
+

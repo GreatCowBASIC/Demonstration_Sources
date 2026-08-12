@@ -1,7 +1,7 @@
 '==============================================================================
 ' Digital clock with hardware RTC-grade timing + manual time set
 '
-' Chip:     PIC16F1937 @ 32MHz (internal osc + PLL)
+' Chip:     PIC16F1937 @ 32MHz (internal osc + PLLw)
 ' Display:  SSD1306 64x32 OLED, I2C (software bit-bang), character mode
 '
 ' Timekeeping is driven entirely by hardware: Timer1 is clocked from a

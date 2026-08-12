@@ -79,6 +79,6 @@ Dir     LEDD3 Out
         'wait for 1 second which is 1000 ms
         Wait 1000 ms
         'Set the port bit to NOT value from previous state but using the ! as an alternative to NOT
-        LEDD1 = NOT LEDD1
+        LEDD2 = NOT LEDD2
 
     loop

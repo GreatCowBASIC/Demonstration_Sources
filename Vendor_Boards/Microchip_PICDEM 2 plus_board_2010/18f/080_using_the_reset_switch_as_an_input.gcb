@@ -7,7 +7,7 @@
     @author  EvanV
     @licence GPL
     @version 1.00
-    @date    01.08.2026
+    @date    08.08.2026
 */
 
 // ----- Configuration
@@ -15,7 +15,7 @@
 #CHIP 18F46Q35
 #OPTION Explicit
 
-#CONFIG MCLRE=OFF    // Options are MCLRE = ON or OFF
+#CONFIG MCLRE=INTMCLR    // Options are MCLRE = EXTMCLR or INTMCLR
                          // MCLRE the Enable bit->If LVP = 0, MCLRE pin is MCLRE; If LVP = 1, RE3 pin function is MCLRE
 
 /*
@@ -73,9 +73,9 @@
 // *****************************************************************************************************
 // Main program commences here.. everything before this is setup for the board.
 
-    // Flash an LED to show a reset has happened
+    // Flash LEDs to show a reset has happened
     Repeat 20
-        LEDD0 = !LEDD0
+        LEDPORT = !LEDPORT
         wait 100 ms
     End Repeat
 
@@ -87,22 +87,22 @@
         If  RSTBUTTON = 0 Then
 
             // push button pressed
-            LEDD1 = 1
+            LEDD2 = 1
 
         Else
 
-            LEDD1 = 0
+            LEDD2 = 0
 
         End If
 
         If  SWITCHIN = 0 Then
 
             // Switch pressed
-            LEDD2 = 1
+            LEDD1 = 1
 
         Else
 
-            LEDD2 = 0
+            LEDD1 = 0
 
         End If
 

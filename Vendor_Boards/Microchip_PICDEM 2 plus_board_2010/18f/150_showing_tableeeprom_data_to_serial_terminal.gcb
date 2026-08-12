@@ -160,6 +160,10 @@
         0x16
     End EEPROM
 
+    EEPROM TestDataSource3 0x40
+        "ABCDE\0"
+        "\&235\0"
+    End EEPROM
 
 Sub ShowEEProm
 
