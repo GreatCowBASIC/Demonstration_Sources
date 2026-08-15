@@ -1,0 +1,89 @@
+'===============================================================================
+' Title       : Supersimplified DMA-to-DAC Staircase Generator
+' Target MCU  : PIC18F27Q84 @ 64 MHz
+' Compiler    : GCBASIC
+' Author      : Roger Jönsson
+' Forum Topic : [DMA one-shot simple demo](https://sourceforge.net/p/gcbasic/discussion/629990/thread/7c0703a173/#2912)
+'
+' Description : Demonstrates minimal DMA (Direct Memory Access) transfers to 
+'               drive the internal 8-bit DAC module. Populates a 16-byte array 
+'               with a 4-bit staircase pattern and uses Timer0 hardware 
+'               triggers (7.8125 kHz) to push data to DAC1DATL. Features DMA 
+'               auto-stopping (SSTP) upon completing the 16-byte source reload, 
+'               re-enabled periodically inside the main execution loop.
+'
+' Hardware Setup:
+'   - MCU: PIC18F27Q84 running at 64 MHz internal oscillator
+'   - Output Pin: RA2 - DACOUT1 configured via DAC1CON
+'
+' Peripheral Configuration:
+'   - DAC1   : Enabled, 8-bit output mode, VDD/VSS references
+'   - Timer0 : 8 kHz sample clock source for DMA hardware triggers
+'   - DMA1   : Transferring RAM array (SignalArray) to DAC1DATL destination
+'===============================================================================
+
+
+#chip 18F27Q84, 64
+#option Explicit
+
+Dim myloop as byte
+Dim SignalArray(16)
+
+//Fill the array with a 4bit stair case slope
+    for myloop =  0 to 15
+      SignalArray( myloop ) = myloop*16 'Building the 4 bit stair case slope
+    next
+
+DAC1CON = 0xA0 'DAC SETUP: OE DACOUT1 Enabled and DACOUT2 Disabled; DAC1EN enabled; NSS VSS; PSS VDD;
+
+InitTimer0 Osc, PRE0_1024 + TMR0_FOSC4 ,  POST0_1 // 7.8125kHz sample frequency
+SetTimer 0, 1   'a value of ZERO will not generated the Interrupt!!
+StartTimer 0
+
+'Mandatory Hardware Unlock Sequence. Unlocks the Priority Lock (PRLOCK) register
+    PRLOCK = 0x55
+    PRLOCK = 0xAA
+    '3. Lock the priorities in place
+    PRLOCK.PRLOCKED = 1 
+
+'Setup DMA    
+     DMASELECT = 0x00 ' Select DMA1 by setting DMASELECT register to 0x00
+    ' Select DMODE unchanged, DSTP not cleared, SMR GPR, SMODE incremented, SSTP not cleared
+     DMAnCON1 = 0x02 //RAM etc, räknar upp av sig själv
+
+  ' Source registers
+     DMAnSSZL=16 //16 bytes ' Source size - use an alias to ease use MAX 4096b bytes
+     //Dim DMAnSSize as Word alias  DMAnSSZH, DMAnSSZL
+     //DMAnSSize = SignalArraySize
+     
+    ' Source start address
+     Dim addressdummy as byte
+     Dim DMAnSS as long ALIAS addressdummy, DMAnSSAU, DMAnSSAH, DMAnSSAL
+     ' Source address using @
+     DMAnSS = @SignalArray
+
+  ' Destination registers   
+     DMAnDSZH = 0x00    'Destination size (max 4096 bytes for this chip)
+     DMAnDSZL = 0x01  //1byte
+    ' Destination start address
+     Dim DMAnDS as word ALIAS  DMAnDSAH, DMAnDSAL
+     DMAnDS = @DAC1DATL   //Adress to DAC1 (8-bit DAC so could use: DMAnDSAL=@DAC1DATL)
+
+  ' Start trigger source. Refer the datasheet for the correct code
+     DMAnSIRQ = 0x1F //1F = timer0 - DMA Start Interrupt Request Source Selection Register   
+    //  DMAnAIRQ = 0x00 //DMA Abort Interrupt Request Source Selection Register
+
+'Start DMA 
+     PRLOCK = 0x55  '  This sequence     Priority Unlock Sequence
+     PRLOCK = 0xAA  '  is mandatory
+     PRLOCK.PRLOCKED = 1  '  for DMA operation
+     ' Enable the DMA & the trigger to start DMA transfer
+     DMAnCON0 = 0xC0 //b'11000000 Enable DMA MODULE, Hardware triggers are allowed to start DMA transfers 
+
+    Do                   //DMA will be repeatedly triggered and every time self stopping:
+        ClearTimer 0     // Syncs the timer and DMA transfer start
+        DMAnCON0.6=1     //SIRQUEN bit- Hardware triggers are allowed to start DMA transfers p302 (SSTP stopped it)
+        DMAnSIRQ = 0x1F  // Use Timer0
+        DMAnCON1.0=1     // Bit 0 is SSTP Source Counter Reload Stop, SIRQEN bit is cleared when source counter reloads
+        wait 4 ms        //Twice the time for DMA to start, run and finish
+    Loop
