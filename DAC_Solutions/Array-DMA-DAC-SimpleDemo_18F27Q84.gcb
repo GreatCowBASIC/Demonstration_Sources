@@ -12,6 +12,9 @@
 '               auto-stopping (SSTP) upon completing the 16-byte source reload, 
 '               re-enabled periodically inside the main execution loop.
 '
+' One of the reasons using the DAC with a waveform like the one demonstrated, is that
+     it easy to visualise and verify what the DMA did, with an oscilloscope.
+'
 ' Hardware Setup:
 '   - MCU: PIC18F27Q84 running at 64 MHz internal oscillator
 '   - Output Pin: RA2 - DACOUT1 configured via DAC1CON
