@@ -108,11 +108,7 @@
 
     #DEFINE RSTBUTTON     PORTE.3
     Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
-
-    #DEFINE USART_BAUD_RATE 9600
-    #DEFINE USART_TX_BLOCKING
-    #DEFINE USART_DELAY OFF
-    
+  
     //! Specify explicit OCULAR_OM1614 support!!
     #DEFINE LCD_OCULAR_OM1614
 

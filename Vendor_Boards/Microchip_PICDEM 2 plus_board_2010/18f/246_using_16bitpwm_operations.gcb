@@ -1,0 +1,182 @@
+/*
+    This demonstration flashes an LED to show the use of CCP PWM operations
+
+    Uses 16bit PWM operations
+
+
+    ************************************************************************
+    @author  EvanV
+    @licence GPL
+    @version 1.00
+    @date    17/08/2026
+    */
+//  ----- Configuration
+// Chip Settings.
+#CHIP 18F46Q35
+#OPTION Explicit
+
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #define PPSToolPart 18F46Q35
+
+    Sub InitPPS
+
+            // Module: UART pin directions
+            Dir PORTC.6 Out    ' Make TX1 pin an output
+            // Module: UART1
+            U1RXPPS = 0x15; //RC5->UART1:RX1;
+            RC6PPS = 0x12;  //RC6->UART1:TX1;
+            
+            // Module: PWM1_16BIT
+            RB0PPS = 0x000E    // PWM11 > RB0
+            RB1PPS = 0x000E    // PWM11 > RB1
+            RB2PPS = 0x000E    // PWM11 > RB2
+            RB3PPS = 0x000E    // PWM11 > RB3
+
+        End Sub
+    // Add this code segment to your GCBASIC source program
+
+    #DEFINE USART_BAUD_RATE 9600
+    #DEFINE USART_TX_BLOCKING
+    #DEFINE USART_DELAY OFF
+    
+/*
+    Hardware
+    -------------------PORTA----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------SW----------ADC-- 
+    ----------------------------------------
+
+    -------------------PORTB----------------
+    Bit#:  -7---6---5---4---3---2---1---0---
+    IO:    ----------------LED-LED-LED-LED--
+    ----------------------------------------
+    
+    ------------------PORTC-----------------
+    Bit#:  -X---6---5---4---3---2---1---0---
+    IO:    -^--TX---------------------------
+    -----VDDIO2----------------------------- You must apply correct Voltage
+
+    -------------------PORTE----------------
+    Bit#:  -----------------3---------------
+    IO:---------------------SW-------------- INTMCLR or EXTMCLR
+    
+  */
+
+    // Define constants to make things easier. We can reuse a constant at any time.
+    #DEFINE LEDD0 PORTB.0
+    #DEFINE LEDD1 PORTB.1
+    #DEFINE LEDD2 PORTB.2
+    #DEFINE LEDD3 PORTB.3
+
+    #DEFINE LEDPORT LATB
+
+    Dir     LEDD0 Out
+    Dir     LEDD1 Out
+    Dir     LEDD2 Out
+    Dir     LEDD3 Out
+
+    #DEFINE POTENTIOMETER PORTA.0
+    //This is the PORTA.0 port
+    Dir POTENTIOMETER In
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+    #DEFINE SWITCHIN      PORTA.3
+    Dir     SWITCHIN      In
+    #DEFINE DOWN          1
+
+    #DEFINE RSTBUTTON     PORTE.3
+    Dir     RSTBUTTON     In  // this is set automatically - and, you cannot set as an output
+
+//*****************************************************************************************************
+// Main program commences here.. everything before this is setup for the board.
+
+    //PWMERS External Reset Disabled; 
+    PWM1ERS = 0x0;
+
+    //PWMCLK FOSC; 
+    PWM1CLK = 0x2;
+
+    //PWMLDS Autoload disabled; 
+    PWM1LDS = 0x0;
+
+    //PWMPRL 147; 
+    PWM1PRL = 0x93;
+
+    //PWMPRH 6; 
+    PWM1PRH = 0x6;
+
+    //PWMCPRE No prescale; 
+    PWM1CPRE = 0x0;
+
+    //PWMPIPOS No postscale; 
+    PWM1PIPOS = 0x0;
+
+    //PWMS1P1IF PWM1 output match did not occur; PWMS1P2IF PWM2 output match did not occur; 
+    PWM1GIR = 0x0;
+
+    //PWMS1P1IE disabled; PWMS1P2IE disabled; 
+    PWM1GIE = 0x0;
+
+    //PWMPOL1 disabled; PWMPOL2 disabled; PWMPPEN disabled; PWMMODE Left aligned mode; 
+    PWM1S1CFG = 0x0;
+
+    //PWMS1P1L 74; 
+    PWM1S1P1L = 0x4A;
+
+    //PWMS1P1H 3; 
+    PWM1S1P1H = 0x3;
+
+    //PWMS1P2L 148; 
+    PWM1S1P2L = 0x94;
+
+    //PWMS1P2H 6; 
+    PWM1S1P2H = 0x6;
+    
+    //Clear PWM1_16BIT period interrupt flag
+    PIR4.PWM1PIF = 0;
+    
+    //Clear PWM1_16BIT interrupt flag
+    PIR4.PWM1IF = 0;
+    
+    //Clear PWM1_16BIT slice 1, output 1 interrupt flag
+    PWM1GIR.S1P1IF = 0;
+    
+    //Clear PWM1_16BIT slice 1, output 2 interrupt flag
+    PWM1GIR.S1P2IF = 0;
+    
+    //PWM1_16BIT interrupt enable bit
+    PIE4.PWM1IE = 0;
+    
+    //PWM1_16BIT period interrupt enable bit
+    PIE4.PWM1PIE = 0;
+    
+    //PWMEN enabled; PWMLD disabled; PWMERSPOL disabled; PWMERSNOW disabled; 
+    PWM1CON = 0x80;
+
+// Main program commences here.. everything before this is setup for the board.
+
+
+    // PWM16 is operational as specified above... 38kHz at 50% duty
+    Dim myDuty as Word Alias PWM1S1P1H, PWM1S1P1L
+    Dim myFrequency as Word Alias PWM1S1P2H, PWM1S1P2L
+    Dim ADCVal, OldADCVal as Word
+    
+
+    Do
+
+        // Use ADC to change Duty 
+            ADCVal = ReadAD10( ANA0 )
+            myDuty = Scale ( ADCVal, 0, 1023, 0, myFrequency)
+
+            If OldADCVal <> ADCVal Then
+                //Load the period and duty cycle register.bit on the next period event
+                LD_PWM1CON = 1
+                OldADCVal = ADCVal           
+            End If
+            Wait 10 ms
+
+    Loop

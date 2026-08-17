@@ -20,22 +20,9 @@
 ;Set up the assembler options (Chip type, clock source, other bits and pieces)
  LIST p=18F46Q35, r=DEC
  TITLE       "D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb"
- SUBTITLE    "08-12-2026 07:47:57"
+ SUBTITLE    "08-14-2026 10:59:44"
 #include <P18F46Q35.inc>
- CONFIG  CPD = OFF
- CONFIG  CP = OFF
- CONFIG  WRTSAF = OFF
- CONFIG  WRTD = OFF
- CONFIG  WRTB = OFF
- CONFIG  WDTE = OFF
- CONFIG  XINST = OFF
- CONFIG  LVP = OFF
- CONFIG  MVECEN = OFF
- CONFIG  MCLRE = INTMCLR
- CONFIG  FCMEN = ON
- CONFIG  CLKOUTEN = OFF
- CONFIG  RSTOSC = HFINTOSC_1MHZ
- CONFIG  FEXTOSC = OFF
+ CONFIG CPD = OFF, CP = OFF, WRTSAF = OFF, WRTD = OFF, WRTB = OFF, WDTE = OFF, XINST = OFF, LVP = OFF, MVECEN = OFF, MCLRE = INTMCLR, FCMEN = ON, CLKOUTEN = OFF, RSTOSC = EXTOSC, FEXTOSC = OFF
 
 ;********************************************************************************
 
@@ -117,7 +104,6 @@ BASPROGRAMSTART
 ;! The timer calculations are based on 16mHz.
 ;! You would need to recalculate the timer values if 16mHz is not used
 ;Set microcontroller required
-;#CONFIG MCLRE=ON
 ;
 ;------------PORTA---------------
 ;Bit#:  -7---6---5---4---3---2---1---0---
@@ -338,7 +324,7 @@ SysWaitLoop2
 
 ;********************************************************************************
 
-;Source: 130_rotate_the_leds_using_16bit_timer0_.gcb (72)
+;Source: 130_rotate_the_leds_using_16bit_timer0_.gcb (88)
 INITPPS
 ;Module: UART pin directions
 ;Dir PORTC.6 Out    ' Make TX1 pin an output
@@ -382,8 +368,8 @@ INITSYS
 ;OSCCON1 = 0x60          // Setting OSCCON1 implies clearing Clear NDIV3:0
 	movlw	96
 	movwf	OSCCON1,BANKED
-;OSCFRQ = 0b00000101   '16mhz
-	movlw	5
+;OSCFRQ = 0b00000010    '4mhz
+	movlw	2
 	movwf	OSCFRQ,BANKED
 ;_Complete_the_chip_setup_of_BSR_ADCs_ANSEL_and_other_key_setup_registers_or_register_bits
 ;Clear TBLPTRU on MCUs with this bit as this must be zero
@@ -490,11 +476,10 @@ INITUSART
 	movwf	COMPORT,ACCESS
 ;PIC USART 1 Init
 ;U1BRGH=SPBRGH_TEMP
-	movlw	1
 	banksel	U1BRGH
-	movwf	U1BRGH,BANKED
+	clrf	U1BRGH,BANKED
 ;U1BRGL=SPBRGL_TEMP
-	movlw	159
+	movlw	103
 	movwf	U1BRGL,BANKED
 ;U1BRGS = BRGS1_SCRIPT
 	bsf	U1CON0,U1BRGS,BANKED

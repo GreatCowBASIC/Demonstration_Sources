@@ -1,2 +1,0 @@
-D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM\ 2\ plus_board_2010\18f\090_reversible_leds_with_variable_delay.build\090_reversible_leds_with_variable_delay.i: \
-  D:/GreatCowBASICGits/Demonstration_Sources.git/Vendor_Boards/Microchip_PICDEM\ 2\ plus_board_2010/18f/090_reversible_leds_with_variable_delay.build/090_reversible_leds_with_variable_delay.S

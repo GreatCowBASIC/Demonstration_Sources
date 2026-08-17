@@ -116,26 +116,30 @@
     //! Required for OCULAR LCD driver
     #DEFINE LCD_POWER   PORTD.7
 
-    #DEFINE USART_BAUD_RATE 9600
-    #DEFINE USART_TX_BLOCKING
-    #DEFINE USART_DELAY OFF  
-
 '*****************************************************************************************************
 'Main program commences here.. everything before this is setup for the board.
 
-    #DEFINE CCP1_PORT   PORTC.2
-    DIR CCP1_PORT       OUT 
+    Dim ADCVal, OldADCVal as Byte = 0
 
+
+    #DEFINE HPWM_FAST
+    
     HPWM 1, 38, 127
 
     Do
 
         // HPWM CCPchannel, frequency, duty cycle
             // Uncomment to use ADC to change Duty 
-                Dim ADCVal as Byte
+                
                 ADCVal = ReadAD( ANA0 )
+                //! If you want to see the ADC value on the terminal
+                //  HSerPrintStringCRLF ByteToString(ADCVal)
+
+                If ADCVal <> OldADCVal Then                
+                    HPWM 1, 38, ADCVal
+                    OldADCVal = ADCVal
+                End If
                 Wait 10 ms
-                HPWM 1, 38, ADCVal
 
     Loop
 

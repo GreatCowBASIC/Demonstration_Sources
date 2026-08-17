@@ -1,9 +1,0 @@
-[p ASM ]
-[d version 1.1 ]
-[d edition pro ]
-[d chip 18F46Q35 ]
-"1 .\\070_debounce_the_switch.S
-"1 C:\\Users\\admin\\.mchp_packs\\8bit PIC\\PIC18F-Q_DFP\\1.30.487\\xc8\\pic\\include/pic18.inc
-"1 C:\\GCstudio\\picas\\v4.00\\pic\\include/xc.inc
-"1 C:\\Users\\admin\\.mchp_packs\\8bit PIC\\PIC18F-Q_DFP\\1.30.487\\xc8\\pic\\include\\proc/pic18f46q35.inc
-"1 C:\\Users\\admin\\.mchp_packs\\8bit PIC\\PIC18F-Q_DFP\\1.30.487\\xc8\\pic\\include/pic18_chip_select.inc

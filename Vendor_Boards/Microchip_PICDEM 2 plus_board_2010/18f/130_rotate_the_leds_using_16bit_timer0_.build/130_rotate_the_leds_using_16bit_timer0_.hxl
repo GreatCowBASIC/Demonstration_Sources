@@ -8,9 +8,9 @@ C:\GCstudio\gcbasic\GCBASIC.EXE D:\GreatCowBASICGits\Demonstration_Sources.git\V
 
 ### Memory Usage ###
  Input file ranges:
-  0h-3h; 8h-9h; Ch-21Dh; 300000h-30000Dh
+  0h-3h; 8h-9h; Ch-21Bh; 300000h-30000Dh
  Unused ranges:
-  4h-7h; Ah-Bh; 21Eh-2FFFFFh
+  4h-7h; Ah-Bh; 21Ch-2FFFFFh
 
 ### Hex Memory Map ###
  Legend:
@@ -52,7 +52,7 @@ C:\GCstudio\gcbasic\GCBASIC.EXE D:\GreatCowBASICGits\Demonstration_Sources.git\V
 000001E0 | H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1
 000001F0 | H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1
 00000200 | H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1
-00000210 | H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 -- --
+00000210 | H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 -- -- -- --
 ----------------------------------------------------------
 00300000 | H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 -- --
 ----------------------------------------------------------

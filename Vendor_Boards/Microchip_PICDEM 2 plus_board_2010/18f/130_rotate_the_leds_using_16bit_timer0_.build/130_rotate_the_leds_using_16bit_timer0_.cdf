@@ -9,36 +9,36 @@ HELP:
      Remainder of report is the user program or libaries code remaining post conditional processing
 *********************************************************************************************************************************
 
-              CODE/Constant:     Line 63 USART_BAUD_RATE                         	9600                            	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              CODE/Constant:     Line 64 USART_TX_BLOCKING                       	                                	
-              CODE/Constant:     Line 65 USART_DELAY                             	OFF                             	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              CODE/Constant:     Line 70 PPSTOOLPART                             	18F46Q43                        	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              CODE/Constant:     Line 83 LEDD0                                   	PORTB.0                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              CODE/Constant:     Line 84 LEDD1                                   	PORTB.1                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              CODE/Constant:     Line 85 LEDD2                                   	PORTB.2                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              CODE/Constant:     Line 86 LEDD3                                   	PORTB.3                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              CODE/Constant:     Line 88 LEDPORT                                 	LATB                            	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              CODE/Constant:     Line 95 POTENTIOMETER                           	PORTA.0                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              CODE/Constant:     Line 99 SWITCHIN                                	PORTA.4                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              CODE/Constant:     Line 101 DOWN                                    	1                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              CODE/Constant:     Line 103 RSTBUTTON                               	PORTE.3                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              SCRIPT/CurrentValue: Line 106 USART_BAUD_RATE                         	9600                            	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              SCRIPT/CurrentValue: Line 107 USART_TX_BLOCKING                       	                                	
-              SCRIPT/CurrentValue: Line 108 USART_DELAY                             	OFF                             	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              CODE/Constant:     Line 111 LCD_OCULAR_OM1614                       	                                	
-              CODE/Constant:     Line 114 LCD_IO                                  	4                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              CODE/Constant:     Line 117 LCD_RS                                  	PORTD.4                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              CODE/Constant:     Line 118 LCD_RW                                  	PORTD.5                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              CODE/Constant:     Line 119 LCD_ENABLE                              	PORTD.6                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              CODE/Constant:     Line 121 LCD_DB4                                 	PORTD.0                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              CODE/Constant:     Line 122 LCD_DB5                                 	PORTD.1                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              CODE/Constant:     Line 123 LCD_DB6                                 	PORTD.2                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              CODE/Constant:     Line 124 LCD_DB7                                 	PORTD.3                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              CODE/Constant:     Line 127 LCD_POWER                               	PORTD.7                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              SCRIPT/CurrentValue: Line 129 USART_BAUD_RATE                         	9600                            	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              SCRIPT/CurrentValue: Line 130 USART_TX_BLOCKING                       	                                	
-              SCRIPT/CurrentValue: Line 131 USART_DELAY                             	OFF                             	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
-              CODE/Constant:     Line 138 TMR0_16BIT                              	                                	
+              CODE/Constant:     Line 79 USART_BAUD_RATE                         	9600                            	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              CODE/Constant:     Line 80 USART_TX_BLOCKING                       	                                	
+              CODE/Constant:     Line 81 USART_DELAY                             	OFF                             	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              CODE/Constant:     Line 86 PPSTOOLPART                             	18F46Q43                        	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              CODE/Constant:     Line 99 LEDD0                                   	PORTB.0                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              CODE/Constant:     Line 100 LEDD1                                   	PORTB.1                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              CODE/Constant:     Line 101 LEDD2                                   	PORTB.2                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              CODE/Constant:     Line 102 LEDD3                                   	PORTB.3                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              CODE/Constant:     Line 104 LEDPORT                                 	LATB                            	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              CODE/Constant:     Line 111 POTENTIOMETER                           	PORTA.0                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              CODE/Constant:     Line 115 SWITCHIN                                	PORTA.4                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              CODE/Constant:     Line 117 DOWN                                    	1                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              CODE/Constant:     Line 119 RSTBUTTON                               	PORTE.3                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              SCRIPT/CurrentValue: Line 122 USART_BAUD_RATE                         	9600                            	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              SCRIPT/CurrentValue: Line 123 USART_TX_BLOCKING                       	                                	
+              SCRIPT/CurrentValue: Line 124 USART_DELAY                             	OFF                             	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              CODE/Constant:     Line 127 LCD_OCULAR_OM1614                       	                                	
+              CODE/Constant:     Line 130 LCD_IO                                  	4                               	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              CODE/Constant:     Line 133 LCD_RS                                  	PORTD.4                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              CODE/Constant:     Line 134 LCD_RW                                  	PORTD.5                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              CODE/Constant:     Line 135 LCD_ENABLE                              	PORTD.6                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              CODE/Constant:     Line 137 LCD_DB4                                 	PORTD.0                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              CODE/Constant:     Line 138 LCD_DB5                                 	PORTD.1                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              CODE/Constant:     Line 139 LCD_DB6                                 	PORTD.2                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              CODE/Constant:     Line 140 LCD_DB7                                 	PORTD.3                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              CODE/Constant:     Line 143 LCD_POWER                               	PORTD.7                         	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              SCRIPT/CurrentValue: Line 145 USART_BAUD_RATE                         	9600                            	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              SCRIPT/CurrentValue: Line 146 USART_TX_BLOCKING                       	                                	
+              SCRIPT/CurrentValue: Line 147 USART_DELAY                             	OFF                             	D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_.gcb
+              CODE/Constant:     Line 154 TMR0_16BIT                              	                                	
               CODE/Constant:     Line 5 HEX                                     	_HEXPICAS                       	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\picas.h
               CODE/Constant:     Line 510 FORMAT_LEFT                             	0                               	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\a-d.h
               CODE/Constant:     Line 511 FORMAT_RIGHT                            	255                             	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\a-d.h
@@ -394,17 +394,17 @@ HELP:
               CODE/Constant:     Line 70 KEY_STAR                                	14                              	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\keypad.h
               CODE/Constant:     Line 71 KEY_HASH                                	15                              	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\keypad.h
               CODE/Constant:     Line 72 KEY_NONE                                	255                             	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\keypad.h
-              CODE/Constant:     Line 32 RANDSTART                               	7608                            	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\random.h
+              CODE/Constant:     Line 32 RANDSTART                               	12432                           	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\random.h
               CODE/Constant:     Line 122 BYTETOSTRING                            	STR                             	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\string.h
               CODE/Constant:     Line 123 WORDTOSTRING                            	STR                             	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\string.h
               CODE/Constant:     Line 175 LONGTOSTRING                            	STR32                           	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\string.h
-              CODE/Constant:     Line 288 INTEGERTOSTRING                         	STRINTEGER                      	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\string.h
-              CODE/Constant:     Line 349 VAL16                                   	VAL                             	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\string.h
-              CODE/Constant:     Line 375 STRINGTOBYTE                            	STRINGTOWORD                    	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\string.h
-              CODE/Constant:     Line 402 VAL32                                   	STRINGTOLONG                    	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\string.h
-              CODE/Constant:     Line 454 MAXDECIMAL                              	100000000                       	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\string.h
-              CODE/Constant:     Line 890 BYTETOHEX                               	HEX                             	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\string.h
-              CODE/Constant:     Line 909 INTEGERTOHEX                            	WORDTOHEX                       	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\string.h
+              CODE/Constant:     Line 319 INTEGERTOSTRING                         	STRINTEGER                      	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\string.h
+              CODE/Constant:     Line 380 VAL16                                   	VAL                             	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\string.h
+              CODE/Constant:     Line 406 STRINGTOBYTE                            	STRINGTOWORD                    	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\string.h
+              CODE/Constant:     Line 433 VAL32                                   	STRINGTOLONG                    	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\string.h
+              CODE/Constant:     Line 485 MAXDECIMAL                              	100000000                       	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\string.h
+              CODE/Constant:     Line 921 BYTETOHEX                               	HEX                             	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\string.h
+              CODE/Constant:     Line 940 INTEGERTOHEX                            	WORDTOHEX                       	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\string.h
               CODE/Constant:     Line 170 HSERPRINTBYTE                           	HSERPRINT                       	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
               CODE/Constant:     Line 145 I2C_DATA_HIGH                           	DIR I2C_DATA IN                 	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\i2c.h
               CODE/Constant:     Line 146 I2C_DATA_LOW                            	DIR I2C_DATA OUT: SET I2C_DATA O	C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\i2c.h
@@ -611,8 +611,8 @@ HELP:
               SCRIPT/AddConstant:   Line 390 __LCD_PERIOD                            100                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
               SCRIPT/AddConstant:   Line 391 __LCD_DELAYS                            5                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
               SCRIPT/AddConstant:   Line 392 __LCD_INSTRUCTIONS                      74                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
-              SCRIPT/AddConstant:   Line 402 __LCD_CALC                              76                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
-              SCRIPT/AddConstant:   Line 409 SCRIPT_LCD_POSTWRITEDELAY               76 US                                   C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
+              SCRIPT/AddConstant:   Line 402 __LCD_CALC                              21                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
+              SCRIPT/AddConstant:   Line 409 SCRIPT_LCD_POSTWRITEDELAY               21 US                                   C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
               SCRIPT/AddConstant:   Line 411 SCRIPT_LCD_BF                           PORTD.3                                 C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\lcd.h
               SCRIPT/AddConstant:   Line 307 OSC                                     1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
               SCRIPT/AddConstant:   Line 315 FOSC4                                   1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
@@ -676,14 +676,14 @@ HELP:
               SCRIPT/AddConstant:   Line 864 PS8_4                                   1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
               SCRIPT/AddConstant:   Line 865 PS8_16                                  2                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
               SCRIPT/AddConstant:   Line 866 PS8_64                                  3                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\timer.h
-              SCRIPT/AddConstant:   Line 166 SYS_CLOCK_DIV_NEEDED                    4                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\system.h
+              SCRIPT/AddConstant:   Line 166 SYS_CLOCK_DIV_NEEDED                    16                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\system.h
               SCRIPT/AddConstant:   Line 167 SYS_CLOCK_INT_PLL_USED                  0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\system.h
               SCRIPT/AddConstant:   Line 105 HWSPICLOCKMODESCRIPT                    0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 111 USERSPECIFIEDHWSPIMODE                  0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 118 HWSPIMODESCRIPT                         13                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 123 USERSPECIFIEDHWSPIMODE                  1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 127 USERHASDEFINETHESPI_BAUD_RATE           0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
-              SCRIPT/AddConstant:   Line 132 SPI_BAUD_RATE                           4000                                    C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
+              SCRIPT/AddConstant:   Line 132 SPI_BAUD_RATE                           1000                                    C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 136 SPIBAUDRATE_SCRIPT                      3                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 139 SPIBAUDRATE_SCRIPT_MASTER               9                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 142 SPIBAUDRATE_SCRIPT_MASTERSLOW           33                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
@@ -692,15 +692,13 @@ HELP:
               SCRIPT/AddConstant:   Line 160 HWSPI2MODESCRIPT                        13                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 165 USERSPECIFIEDHWSPIMODE                  1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 169 USERHASDEFINETHESPI2_BAUD_RATE          0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
-              SCRIPT/AddConstant:   Line 174 SPI2_BAUD_RATE                          4000                                    C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
+              SCRIPT/AddConstant:   Line 174 SPI2_BAUD_RATE                          1000                                    C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 178 SPI2BAUDRATE_SCRIPT                     3                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 181 SPI2BAUDRATE_SCRIPT_MASTER              9                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 184 SPI2BAUDRATE_SCRIPT_MASTERSLOW          33                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 189 SPI1DELAY_SCRIPT                        1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 191 SPI1DELAY_SCRIPT                        30                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 195 SPI1DELAY_SCRIPT                        20                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
-              SCRIPT/AddConstant:   Line 199 SPI1DELAY_SCRIPT                        10                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
-              SCRIPT/AddConstant:   Line 203 SPI1DELAY_SCRIPT                        8                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\hwspi.h
               SCRIPT/AddConstant:   Line 27 RANDOMIZE_SEED                          TIMER0                                  C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\random.h
               SCRIPT/AddConstant:   Line 255 USART2_DELAY                            1 MS                                    C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
               SCRIPT/AddConstant:   Line 260 USART3_DELAY                            1 MS                                    C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
@@ -716,13 +714,13 @@ HELP:
               SCRIPT/AddConstant:   Line 496 USARTHASDATA                            U1RXIF = On                             C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
               SCRIPT/AddConstant:   Line 500 USART2HASDATA                           U2RXIF = On                             C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
               SCRIPT/AddConstant:   Line 519 SPBRG_TEMP                              0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
-              SCRIPT/AddConstant:   Line 547 SPBRG_TEMP                              103.1667                                C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
+              SCRIPT/AddConstant:   Line 547 SPBRG_TEMP                              25.04167                                C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
               SCRIPT/AddConstant:   Line 550 BRGH_TEMP                               1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
-              SCRIPT/AddConstant:   Line 565 SPBRG_TEMP                              415.6668                                C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
+              SCRIPT/AddConstant:   Line 565 SPBRG_TEMP                              103.1667                                C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
               SCRIPT/AddConstant:   Line 566 BRGH_TEMP                               1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
               SCRIPT/AddConstant:   Line 567 BRGS1_SCRIPT                            1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
-              SCRIPT/AddConstant:   Line 590 SPBRGL_TEMP                             159                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
-              SCRIPT/AddConstant:   Line 591 SPBRGH_TEMP                             1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
+              SCRIPT/AddConstant:   Line 590 SPBRGL_TEMP                             103                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
+              SCRIPT/AddConstant:   Line 591 SPBRGH_TEMP                             0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
               SCRIPT/AddConstant:   Line 681 SPBRG                                   SPBRGL                                  C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
               SCRIPT/AddConstant:   Line 1246 SCRIPT_SET_DEFAULTUSART1RETURNVALUE     0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
               SCRIPT/AddConstant:   Line 1247 SCRIPT_SET_DEFAULTUSART2RETURNVALUE     0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\usart.h
@@ -788,31 +786,30 @@ HELP:
               SCRIPT/AddConstant:   Line 307 CCP5M1                                  CCP5MODE1                               C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
               SCRIPT/AddConstant:   Line 308 CCP5M2                                  CCP5MODE2                               C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
               SCRIPT/AddConstant:   Line 309 CCP5M3                                  CCP5MODE3                               C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 342 PR2_CPP_PWM_TEMP                        105                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 344 PWMCCP1MAXDUTYVALUE                     105                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 346 PR2_CPP_PWM_TEMP_10BIT_POTENTIALLY      421                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 348 PWMCCP1MAXDUTYVALUE                     421                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 342 PR2_CPP_PWM_TEMP                        26                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 344 PWMCCP1MAXDUTYVALUE                     26                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 346 PR2_CPP_PWM_TEMP_10BIT_POTENTIALLY      105                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
               SCRIPT/AddConstant:   Line 351 TXPR                                    1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 367 PRXPERIODREGISTER                       105                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 367 PRXPERIODREGISTER                       26                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
               SCRIPT/AddConstant:   Line 368 TIMERXPRESCALESELECTVALUE               1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
               CHECKSYSVARDEF:       DEF(DEVELOPER_PWM_DEBUG) OR DEF(SHOWPWMCCPCALCULATIONRESULTS): Additional EQUAL condition: 0=1 OR 0=1
-              SCRIPT/AddConstant:   Line 389 DUTYCYCLE                               212                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 390 DUTYCYCLEH                              53                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 391 DUTYCYCLEL                              0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 399 PWMOSC1                                 4000                                    C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 400 PWMOSC4                                 1000                                    C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 401 PWMOSC16                                250                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 389 DUTYCYCLE                               54                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 390 DUTYCYCLEH                              13                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 391 DUTYCYCLEL                              2                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 399 PWMOSC1                                 1000                                    C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 400 PWMOSC4                                 250                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
+              SCRIPT/AddConstant:   Line 401 PWMOSC16                                62                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
               SCRIPT/AddConstant:   Line 2328 _V9081PATCH                             2                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm.h
-              SCRIPT/AddConstant:   Line 258 HPWM16F_PRPS_REQ                        421.0526                                C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
-              SCRIPT/AddConstant:   Line 261 HPWM16F_DCY                             210.5263                                C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
+              SCRIPT/AddConstant:   Line 258 HPWM16F_PRPS_REQ                        105.2632                                C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
+              SCRIPT/AddConstant:   Line 261 HPWM16F_DCY                             52.6316                                 C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
               SCRIPT/AddConstant:   Line 262 HPWM16F_DCH_SCRIPT                      0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
               SCRIPT/AddConstant:   Line 263 HPWM16F_DCL_SCRIPT                      0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
               SCRIPT/AddConstant:   Line 264 HPWM16F_PRH_SCRIPT                      0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
               SCRIPT/AddConstant:   Line 265 HPWM16F_PRL_SCRIPT                      0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
               SCRIPT/AddConstant:   Line 268 HPWM16F_DCH_SCRIPT                      0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
-              SCRIPT/AddConstant:   Line 269 HPWM16F_DCL_SCRIPT                      210                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
-              SCRIPT/AddConstant:   Line 270 HPWM16F_PRH_SCRIPT                      1                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
-              SCRIPT/AddConstant:   Line 271 HPWM16F_PRL_SCRIPT                      165                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
+              SCRIPT/AddConstant:   Line 269 HPWM16F_DCL_SCRIPT                      52                                      C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
+              SCRIPT/AddConstant:   Line 270 HPWM16F_PRH_SCRIPT                      0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
+              SCRIPT/AddConstant:   Line 271 HPWM16F_PRL_SCRIPT                      105                                     C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
               SCRIPT/AddConstant:   Line 290 HPWM16F_PRPS_REQ                        0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
               SCRIPT/AddConstant:   Line 293 HPWM16F_DCY                             0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
               SCRIPT/AddConstant:   Line 294 HPWM16_1_HPWM16F_DCH_SCRIPT             0                                       C:\GCstudio\gcbasic\INCLUDE\LOWLEVEL\pwm16.h
@@ -1823,12 +1820,12 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               486: #IFDEF BIT(CCP1CON_EN)
               ;CCPCONCache.CCP1CON_EN = 1
               487: CCPCONCACHE.CCP1CON_EN = 1
-              495: #IFDEF DUTYCYCLEL 0
-              496: #IFDEF BIT(CCP1X)
+              519: #IFDEF DUTYCYCLEL 2
+              520: #IFDEF BIT(CCP1X)
               ;SET CCPCONCache.CCP1Y OFF
-              497: SET CCPCONCACHE.CCP1Y OFF
-              ;SET CCPCONCache.CCP1X OFF
-              498: SET CCPCONCACHE.CCP1X OFF
+              521: SET CCPCONCACHE.CCP1Y OFF
+              ;SET CCPCONCache.CCP1X ON
+              522: SET CCPCONCACHE.CCP1X ON
               2383: #IFDEF USE_HPWMCCP1 TRUE
               2384: #IFDEF VAR(CCP1CON)
               ;if PWMChannel =1 then              'is it this channel?
@@ -5172,9 +5169,9 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               290: #IFDEF CHIPMHZ 64
               ;OSCFRQ = 0b00001000  '64mhz
               291: OSCFRQ = 8
-              308: #IFDEF CHIPMHZ 16
-              ;OSCFRQ = 0b00000101   '16mhz
-              309: OSCFRQ = 5
+              325: #IFDEF CHIPMHZ 4
+              ;OSCFRQ = 0b00000010    '4mhz
+              326: OSCFRQ = 2
               1062: #IFDEF PIC
               ;_Complete_the_chip_setup_of_BSR_ADCs_ANSEL_and_other_key_setup_registers_or_register_bits
               1066: #IFDEF VAR(TBLPTRU)
@@ -7113,115 +7110,124 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               164: #IFDEF KEYPAD_ROW_1
               ;Set KEYPAD_ROW_1 Off
               165: SET KEYPAD_ROW_1 OFF
-              680: #IFDEF CHIPFAMILY 12,14,15,16
+              180: #IFNDEF DISABLEOPTIMISED_STR32
+              ;asm 'Optimised LongToString/Str32 function.  To revert to legacy function use '#DEFINE DISABLEOPTIMISED_STR32'
+              182: ASM
+              ;Dim str_digitIndex As Byte
+              183: DIM STR_DIGITINDEX AS BYTE
+              ;Dim str_currentDigit As Byte
+              184: DIM STR_CURRENTDIGIT AS BYTE
+              ;Dim str_reverseString As String * 10
+              185: DIM STR_REVERSESTRING AS STRING * 10
+              ;Dim str_loopCounter As Byte
+              186: DIM STR_LOOPCOUNTER AS BYTE
+              ;If SysValTemp = 0 Then
+              188: IF SYSVALTEMP = 0 THEN
+              ;Str32 = "0"
+              189: STR32 = ;STRING59;
+              ;Exit Function
+              190: EXIT FUNCTION
+              ;End If
+              191: END IF
+              ;str_digitIndex = 0
+              193: STR_DIGITINDEX = 0
+              ;Do While SysValTemp > 0
+              194: DO WHILE SYSVALTEMP > 0
+              ;str_currentDigit = SysValTemp Mod 10
+              195: STR_CURRENTDIGIT = SYSVALTEMP MOD 10
+              ;SysValTemp = SysValTemp / 10
+              196: SYSVALTEMP = SYSVALTEMP / 10
+              ;str_digitIndex++
+              197: STR_DIGITINDEX++
+              ;str_reverseString(str_digitIndex) = str_currentDigit + 48
+              198: STR_REVERSESTRING(STR_DIGITINDEX) = STR_CURRENTDIGIT + 48
+              ;Loop
+              199: LOOP
+              ;Reverse the extracted digits into the final result string
+              ;Str32(0) = str_digitIndex
+              202: STR32(0) = STR_DIGITINDEX
+              ;For str_loopCounter = 1 To str_digitIndex
+              203: FOR STR_LOOPCOUNTER = 1 TO STR_DIGITINDEX
+              ;Str32(str_loopCounter) = str_reverseString(str_digitIndex - str_loopCounter + 1)
+              204: STR32(STR_LOOPCOUNTER) = STR_REVERSESTRING(STR_DIGITINDEX - STR_LOOPCOUNTER + 1)
+              ;Next
+              205: NEXT
+              711: #IFDEF CHIPFAMILY 12,14,15,16
               ;SysByteTempX = False
-              682: SYSBYTETEMPX = FALSE
+              713: SYSBYTETEMPX = FALSE
               ;If [BYTE]SysULongInt_STS_Num = 0 Then    // Check all is ZERO
-              683: IF [BYTE]SYSULONGINT_STS_NUM = 0 THEN
+              714: IF [BYTE]SYSULONGINT_STS_NUM = 0 THEN
               ;If SysULongInt_STS_Num_H = 0 Then
-              684: IF SYSULONGINT_STS_NUM_H = 0 THEN
+              715: IF SYSULONGINT_STS_NUM_H = 0 THEN
               ;If SysULongInt_STS_Num_U = 0 Then
-              685: IF SYSULONGINT_STS_NUM_U = 0 THEN
+              716: IF SYSULONGINT_STS_NUM_U = 0 THEN
               ;If SysULongInt_STS_Num_E = 0 Then
-              686: IF SYSULONGINT_STS_NUM_E = 0 THEN
+              717: IF SYSULONGINT_STS_NUM_E = 0 THEN
               ;If SysULongInt_STS_Num_A = 0 Then
-              687: IF SYSULONGINT_STS_NUM_A = 0 THEN
+              718: IF SYSULONGINT_STS_NUM_A = 0 THEN
               ;If SysULongInt_STS_Num_B = 0 Then
-              688: IF SYSULONGINT_STS_NUM_B = 0 THEN
+              719: IF SYSULONGINT_STS_NUM_B = 0 THEN
               ;If SysULongInt_STS_Num_C = 0 Then
-              689: IF SYSULONGINT_STS_NUM_C = 0 THEN
+              720: IF SYSULONGINT_STS_NUM_C = 0 THEN
               ;If SysULongInt_STS_Num_D = 0 Then
-              690: IF SYSULONGINT_STS_NUM_D = 0 THEN
+              721: IF SYSULONGINT_STS_NUM_D = 0 THEN
               ;SysByteTempX = True
-              691: SYSBYTETEMPX = TRUE
+              722: SYSBYTETEMPX = TRUE
               ;End if
-              692: END IF
+              723: END IF
               ;End if
-              693: END IF
+              724: END IF
               ;End if
-              694: END IF
+              725: END IF
               ;End if
-              695: END IF
+              726: END IF
               ;End if
-              696: END IF
+              727: END IF
               ;End if
-              697: END IF
+              728: END IF
               ;End if
-              698: END IF
+              729: END IF
               ;End if
-              699: END IF
-              759: #IFNDEF CHIPFAMILY 12,14,15
+              730: END IF
+              790: #IFNDEF CHIPFAMILY 12,14,15
               ;	SysULongIntTempA = SysULongInt_STS_Num
-              760: SYSULONGINTTEMPA = SYSULONGINT_STS_NUM
+              791: SYSULONGINTTEMPA = SYSULONGINT_STS_NUM
               ;SysULongIntTempB = 0
-              761: SYSULONGINTTEMPB = 0
+              792: SYSULONGINTTEMPB = 0
               ;SysCompEqual64
-              762: SYSCOMPEQUAL64
-              804: #IFNDEF CHIPFAMILY 12,14,15
+              793: SYSCOMPEQUAL64
+              835: #IFNDEF CHIPFAMILY 12,14,15
               ;SysULongIntTempA = SysULongInt_STS_Num     // ERV move to #ELSE once Clint as approved
-              805: SYSULONGINTTEMPA = SYSULONGINT_STS_NUM
+              836: SYSULONGINTTEMPA = SYSULONGINT_STS_NUM
               ;SysULongIntTempB = 1
-              806: SYSULONGINTTEMPB = 1
+              837: SYSULONGINTTEMPB = 1
               ;SysCompEqual64
-              807: SYSCOMPEQUAL64
-              1537: #IFDEF CHIPFAMILY 12,14,15,16
+              838: SYSCOMPEQUAL64
+              1568: #IFDEF CHIPFAMILY 12,14,15,16
               ;SysByteTempX = False
-              1539: SYSBYTETEMPX = FALSE
+              1570: SYSBYTETEMPX = FALSE
               ;If [BYTE]SysULongIntTempA = 0 Then    // Check all is ZERO
-              1540: IF [BYTE]SYSULONGINTTEMPA = 0 THEN
+              1571: IF [BYTE]SYSULONGINTTEMPA = 0 THEN
               ;If SysULongIntTempA_H = 0 Then
-              1541: IF SYSULONGINTTEMPA_H = 0 THEN
+              1572: IF SYSULONGINTTEMPA_H = 0 THEN
               ;If SysULongIntTempA_U = 0 Then
-              1542: IF SYSULONGINTTEMPA_U = 0 THEN
+              1573: IF SYSULONGINTTEMPA_U = 0 THEN
               ;If SysULongIntTempA_E = 0 Then
-              1543: IF SYSULONGINTTEMPA_E = 0 THEN
+              1574: IF SYSULONGINTTEMPA_E = 0 THEN
               ;If SysULongIntTempA_A = 0 Then
-              1544: IF SYSULONGINTTEMPA_A = 0 THEN
+              1575: IF SYSULONGINTTEMPA_A = 0 THEN
               ;If SysULongIntTempA_B = 0 Then
-              1545: IF SYSULONGINTTEMPA_B = 0 THEN
+              1576: IF SYSULONGINTTEMPA_B = 0 THEN
               ;If SysULongIntTempA_C = 0 Then
-              1546: IF SYSULONGINTTEMPA_C = 0 THEN
+              1577: IF SYSULONGINTTEMPA_C = 0 THEN
               ;If SysULongIntTempA_D = 0 Then
-              1547: IF SYSULONGINTTEMPA_D = 0 THEN
+              1578: IF SYSULONGINTTEMPA_D = 0 THEN
               ;SysByteTempX = True
-              1548: SYSBYTETEMPX = TRUE
+              1579: SYSBYTETEMPX = TRUE
               ;End if
-              1549: END IF
+              1580: END IF
               ;End if
-              1550: END IF
-              ;End if
-              1551: END IF
-              ;End if
-              1552: END IF
-              ;End if
-              1553: END IF
-              ;End if
-              1554: END IF
-              ;End if
-              1555: END IF
-              ;End if
-              1556: END IF
-              1570: #IFDEF CHIPFAMILY 12,14,15,16
-              ;SysByteTempX = False
-              1572: SYSBYTETEMPX = FALSE
-              ;If [BYTE]SysULongIntTempA = 0 Then    // Check all is ZERO
-              1573: IF [BYTE]SYSULONGINTTEMPA = 0 THEN
-              ;If SysULongIntTempA_H = 0 Then
-              1574: IF SYSULONGINTTEMPA_H = 0 THEN
-              ;If SysULongIntTempA_U = 0 Then
-              1575: IF SYSULONGINTTEMPA_U = 0 THEN
-              ;If SysULongIntTempA_E = 0 Then
-              1576: IF SYSULONGINTTEMPA_E = 0 THEN
-              ;If SysULongIntTempA_A = 0 Then
-              1577: IF SYSULONGINTTEMPA_A = 0 THEN
-              ;If SysULongIntTempA_B = 0 Then
-              1578: IF SYSULONGINTTEMPA_B = 0 THEN
-              ;If SysULongIntTempA_C = 0 Then
-              1579: IF SYSULONGINTTEMPA_C = 0 THEN
-              ;If SysULongIntTempA_D = 0 Then
-              1580: IF SYSULONGINTTEMPA_D = 0 THEN
-              ;SysByteTempX = True
-              1581: SYSBYTETEMPX = TRUE
+              1581: END IF
               ;End if
               1582: END IF
               ;End if
@@ -7234,84 +7240,117 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               1586: END IF
               ;End if
               1587: END IF
-              ;End if
-              1588: END IF
-              ;End if
-              1589: END IF
-              1613: #IFDEF CHIPFAMILY 12,14,15,16
+              1601: #IFDEF CHIPFAMILY 12,14,15,16
               ;SysByteTempX = False
-              1615: SYSBYTETEMPX = FALSE
+              1603: SYSBYTETEMPX = FALSE
               ;If [BYTE]SysULongIntTempA = 0 Then    // Check all is ZERO
-              1616: IF [BYTE]SYSULONGINTTEMPA = 0 THEN
+              1604: IF [BYTE]SYSULONGINTTEMPA = 0 THEN
               ;If SysULongIntTempA_H = 0 Then
-              1617: IF SYSULONGINTTEMPA_H = 0 THEN
+              1605: IF SYSULONGINTTEMPA_H = 0 THEN
               ;If SysULongIntTempA_U = 0 Then
-              1618: IF SYSULONGINTTEMPA_U = 0 THEN
+              1606: IF SYSULONGINTTEMPA_U = 0 THEN
               ;If SysULongIntTempA_E = 0 Then
-              1619: IF SYSULONGINTTEMPA_E = 0 THEN
+              1607: IF SYSULONGINTTEMPA_E = 0 THEN
               ;If SysULongIntTempA_A = 0 Then
-              1620: IF SYSULONGINTTEMPA_A = 0 THEN
+              1608: IF SYSULONGINTTEMPA_A = 0 THEN
               ;If SysULongIntTempA_B = 0 Then
-              1621: IF SYSULONGINTTEMPA_B = 0 THEN
+              1609: IF SYSULONGINTTEMPA_B = 0 THEN
               ;If SysULongIntTempA_C = 0 Then
-              1622: IF SYSULONGINTTEMPA_C = 0 THEN
+              1610: IF SYSULONGINTTEMPA_C = 0 THEN
               ;If SysULongIntTempA_D = 0 Then
-              1623: IF SYSULONGINTTEMPA_D = 0 THEN
+              1611: IF SYSULONGINTTEMPA_D = 0 THEN
               ;SysByteTempX = True
-              1624: SYSBYTETEMPX = TRUE
+              1612: SYSBYTETEMPX = TRUE
               ;End if
-              1625: END IF
+              1613: END IF
               ;End if
-              1626: END IF
+              1614: END IF
               ;End if
-              1627: END IF
+              1615: END IF
               ;End if
-              1628: END IF
+              1616: END IF
               ;End if
-              1629: END IF
+              1617: END IF
               ;End if
-              1630: END IF
+              1618: END IF
               ;End if
-              1631: END IF
+              1619: END IF
               ;End if
-              1632: END IF
-              1654: #IFDEF CHIPFAMILY 12,14,15,16
+              1620: END IF
+              1644: #IFDEF CHIPFAMILY 12,14,15,16
               ;SysByteTempX = False
-              1656: SYSBYTETEMPX = FALSE
+              1646: SYSBYTETEMPX = FALSE
               ;If [BYTE]SysULongIntTempA = 0 Then    // Check all is ZERO
-              1657: IF [BYTE]SYSULONGINTTEMPA = 0 THEN
+              1647: IF [BYTE]SYSULONGINTTEMPA = 0 THEN
               ;If SysULongIntTempA_H = 0 Then
-              1658: IF SYSULONGINTTEMPA_H = 0 THEN
+              1648: IF SYSULONGINTTEMPA_H = 0 THEN
               ;If SysULongIntTempA_U = 0 Then
-              1659: IF SYSULONGINTTEMPA_U = 0 THEN
+              1649: IF SYSULONGINTTEMPA_U = 0 THEN
               ;If SysULongIntTempA_E = 0 Then
-              1660: IF SYSULONGINTTEMPA_E = 0 THEN
+              1650: IF SYSULONGINTTEMPA_E = 0 THEN
               ;If SysULongIntTempA_A = 0 Then
-              1661: IF SYSULONGINTTEMPA_A = 0 THEN
+              1651: IF SYSULONGINTTEMPA_A = 0 THEN
               ;If SysULongIntTempA_B = 0 Then
-              1662: IF SYSULONGINTTEMPA_B = 0 THEN
+              1652: IF SYSULONGINTTEMPA_B = 0 THEN
               ;If SysULongIntTempA_C = 0 Then
-              1663: IF SYSULONGINTTEMPA_C = 0 THEN
+              1653: IF SYSULONGINTTEMPA_C = 0 THEN
               ;If SysULongIntTempA_D = 0 Then
-              1664: IF SYSULONGINTTEMPA_D = 0 THEN
+              1654: IF SYSULONGINTTEMPA_D = 0 THEN
               ;SysByteTempX = True
-              1665: SYSBYTETEMPX = TRUE
+              1655: SYSBYTETEMPX = TRUE
               ;End if
-              1666: END IF
+              1656: END IF
               ;End if
-              1667: END IF
+              1657: END IF
               ;End if
-              1668: END IF
+              1658: END IF
               ;End if
-              1669: END IF
+              1659: END IF
               ;End if
-              1670: END IF
+              1660: END IF
               ;End if
-              1671: END IF
+              1661: END IF
               ;End if
-              1672: END IF
+              1662: END IF
               ;End if
-              1673: END IF
+              1663: END IF
+              1685: #IFDEF CHIPFAMILY 12,14,15,16
+              ;SysByteTempX = False
+              1687: SYSBYTETEMPX = FALSE
+              ;If [BYTE]SysULongIntTempA = 0 Then    // Check all is ZERO
+              1688: IF [BYTE]SYSULONGINTTEMPA = 0 THEN
+              ;If SysULongIntTempA_H = 0 Then
+              1689: IF SYSULONGINTTEMPA_H = 0 THEN
+              ;If SysULongIntTempA_U = 0 Then
+              1690: IF SYSULONGINTTEMPA_U = 0 THEN
+              ;If SysULongIntTempA_E = 0 Then
+              1691: IF SYSULONGINTTEMPA_E = 0 THEN
+              ;If SysULongIntTempA_A = 0 Then
+              1692: IF SYSULONGINTTEMPA_A = 0 THEN
+              ;If SysULongIntTempA_B = 0 Then
+              1693: IF SYSULONGINTTEMPA_B = 0 THEN
+              ;If SysULongIntTempA_C = 0 Then
+              1694: IF SYSULONGINTTEMPA_C = 0 THEN
+              ;If SysULongIntTempA_D = 0 Then
+              1695: IF SYSULONGINTTEMPA_D = 0 THEN
+              ;SysByteTempX = True
+              1696: SYSBYTETEMPX = TRUE
+              ;End if
+              1697: END IF
+              ;End if
+              1698: END IF
+              ;End if
+              1699: END IF
+              ;End if
+              1700: END IF
+              ;End if
+              1701: END IF
+              ;End if
+              1702: END IF
+              ;End if
+              1703: END IF
+              ;End if
+              1704: END IF
               1326: #IFDEF PIC
               1328: #IF CHIPUSART > 1
               ;Set the default value for USART handler - required when more than one USART
@@ -9588,11 +9627,11 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :CHIPMAXADDRESS                                        5375
               FINAL/CONSTANT :CHIPMAXMHZ                                            64
               FINAL/CONSTANT :CHIPMEMORYLOCK                                        NVMLOCK
-              FINAL/CONSTANT :CHIPMHZ                                               16
+              FINAL/CONSTANT :CHIPMHZ                                               4
               FINAL/CONSTANT :CHIPMINIMUMBANKSELECT                                 5
               FINAL/CONSTANT :CHIPNAME                                              18F46Q35
               FINAL/CONSTANT :CHIPNAMESTR                                           "18F46Q35"    ;STRING148;
-              FINAL/CONSTANT :CHIPOSC                                               HFINTOSC_1MHZ
+              FINAL/CONSTANT :CHIPOSC                                               6
               FINAL/CONSTANT :CHIPPINS                                              40
               FINAL/CONSTANT :CHIPPROGRAMMERNAMESTR                                 "18F46Q35"    ;STRING149;
               FINAL/CONSTANT :CHIPPSP                                               0
@@ -9629,9 +9668,9 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :DISPLAYOFF                                            11
               FINAL/CONSTANT :DISPLAYON                                             12
               FINAL/CONSTANT :DOWN                                                  1
-              FINAL/CONSTANT :DUTYCYCLE                                             212
-              FINAL/CONSTANT :DUTYCYCLEH                                            53
-              FINAL/CONSTANT :DUTYCYCLEL                                            0
+              FINAL/CONSTANT :DUTYCYCLE                                             54
+              FINAL/CONSTANT :DUTYCYCLEH                                            13
+              FINAL/CONSTANT :DUTYCYCLEL                                            2
               FINAL/CONSTANT :EPREAD                                                NVMADR_EPREAD
               FINAL/CONSTANT :EPWRITE                                               NVMADR_EPWRITE
               FINAL/CONSTANT :EXT                                                   0
@@ -9711,10 +9750,10 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :HIGHSPEED                                             255
               FINAL/CONSTANT :HPWM1                                                 1
               FINAL/CONSTANT :HPWM16F_DCH_SCRIPT                                    0
-              FINAL/CONSTANT :HPWM16F_DCL_SCRIPT                                    210
+              FINAL/CONSTANT :HPWM16F_DCL_SCRIPT                                    52
               FINAL/CONSTANT :HPWM16F_DCY                                           0
-              FINAL/CONSTANT :HPWM16F_PRH_SCRIPT                                    1
-              FINAL/CONSTANT :HPWM16F_PRL_SCRIPT                                    165
+              FINAL/CONSTANT :HPWM16F_PRH_SCRIPT                                    0
+              FINAL/CONSTANT :HPWM16F_PRL_SCRIPT                                    105
               FINAL/CONSTANT :HPWM16F_PRPS_REQ                                      0
               FINAL/CONSTANT :HPWM16_10_HPWM16F_DCH_SCRIPT                          0
               FINAL/CONSTANT :HPWM16_10_HPWM16F_DCL_SCRIPT                          0
@@ -9981,8 +10020,8 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :POST_9                                                8
               FINAL/CONSTANT :POTENTIOMETER                                         PORTA.0
               FINAL/CONSTANT :PPSTOOLPART                                           18F46Q43
-              FINAL/CONSTANT :PR2_CPP_PWM_TEMP                                      105
-              FINAL/CONSTANT :PR2_CPP_PWM_TEMP_10BIT_POTENTIALLY                    421
+              FINAL/CONSTANT :PR2_CPP_PWM_TEMP                                      26
+              FINAL/CONSTANT :PR2_CPP_PWM_TEMP_10BIT_POTENTIALLY                    105
               FINAL/CONSTANT :PRE0_1                                                0
               FINAL/CONSTANT :PRE0_1024                                             10
               FINAL/CONSTANT :PRE0_128                                              7
@@ -9999,7 +10038,7 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :PRE0_64                                               6
               FINAL/CONSTANT :PRE0_8                                                3
               FINAL/CONSTANT :PRE0_8192                                             13
-              FINAL/CONSTANT :PRXPERIODREGISTER                                     105
+              FINAL/CONSTANT :PRXPERIODREGISTER                                     26
               FINAL/CONSTANT :PS0_128                                               6
               FINAL/CONSTANT :PS0_16                                                3
               FINAL/CONSTANT :PS0_2                                                 0
@@ -10070,11 +10109,11 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :PS_1_256                                              4
               FINAL/CONSTANT :PS_1_64                                               3
               FINAL/CONSTANT :PS_1_8                                                2
-              FINAL/CONSTANT :PWMCCP1MAXDUTYVALUE                                   421
+              FINAL/CONSTANT :PWMCCP1MAXDUTYVALUE                                   26
               FINAL/CONSTANT :PWMMODULE                                             255
-              FINAL/CONSTANT :PWMOSC1                                               4000
-              FINAL/CONSTANT :PWMOSC16                                              250
-              FINAL/CONSTANT :PWMOSC4                                               1000
+              FINAL/CONSTANT :PWMOSC1                                               1000
+              FINAL/CONSTANT :PWMOSC16                                              62
+              FINAL/CONSTANT :PWMOSC4                                               250
               FINAL/CONSTANT :PWM_DUTY                                              50
               FINAL/CONSTANT :PWM_FREQ                                              38
               FINAL/CONSTANT :R1200                                                 16
@@ -10085,7 +10124,7 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :R600                                                  32
               FINAL/CONSTANT :R9600                                                 2
               FINAL/CONSTANT :RANDOMIZE_SEED                                        TIMER0
-              FINAL/CONSTANT :RANDSTART                                             7608
+              FINAL/CONSTANT :RANDSTART                                             12432
               FINAL/CONSTANT :RBITRATEUNIT                                          52
               FINAL/CONSTANT :RSTBUTTON                                             PORTE.3
               FINAL/CONSTANT :SAF_BLOCK0_ADDR                                       HEF_BLOCK0_ADDR
@@ -10101,7 +10140,7 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :SCRIPTREADAD10BITFORCEVARIANTDIFFENTIAL               0
               FINAL/CONSTANT :SCRIPT_DEFAULT_COMPORT                                1
               FINAL/CONSTANT :SCRIPT_LCD_BF                                         PORTD.3
-              FINAL/CONSTANT :SCRIPT_LCD_POSTWRITEDELAY                             76 US
+              FINAL/CONSTANT :SCRIPT_LCD_POSTWRITEDELAY                             21 US
               FINAL/CONSTANT :SCRIPT_SET_DEFAULTUSART1RETURNVALUE                   1
               FINAL/CONSTANT :SCRIPT_SET_DEFAULTUSART2RETURNVALUE                   0
               FINAL/CONSTANT :SCRIPT_SET_DEFAULTUSART3RETURNVALUE                   0
@@ -10117,20 +10156,20 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :SOUNDOUT2                                             SYSTEMP.0
               FINAL/CONSTANT :SOURCEFILE                                            "130_rotate_the_leds_using_16bit_timer0_" ;STRING147;
               FINAL/CONSTANT :SPBRG                                                 SPBRGL
-              FINAL/CONSTANT :SPBRGH_TEMP                                           1
-              FINAL/CONSTANT :SPBRGL_TEMP                                           159
-              FINAL/CONSTANT :SPBRG_TEMP                                            415.6668
-              FINAL/CONSTANT :SPI1DELAY_SCRIPT                                      8
+              FINAL/CONSTANT :SPBRGH_TEMP                                           0
+              FINAL/CONSTANT :SPBRGL_TEMP                                           103
+              FINAL/CONSTANT :SPBRG_TEMP                                            103.1667
+              FINAL/CONSTANT :SPI1DELAY_SCRIPT                                      20
               FINAL/CONSTANT :SPI2BAUDRATE_SCRIPT                                   3
               FINAL/CONSTANT :SPI2BAUDRATE_SCRIPT_MASTER                            9
               FINAL/CONSTANT :SPI2BAUDRATE_SCRIPT_MASTERSLOW                        33
               FINAL/CONSTANT :SPI2TRANSFER                                          HWSPI2TRANSFER
-              FINAL/CONSTANT :SPI2_BAUD_RATE                                        4000
+              FINAL/CONSTANT :SPI2_BAUD_RATE                                        1000
               FINAL/CONSTANT :SPIBAUDRATE_SCRIPT                                    3
               FINAL/CONSTANT :SPIBAUDRATE_SCRIPT_MASTER                             9
               FINAL/CONSTANT :SPIBAUDRATE_SCRIPT_MASTERSLOW                         33
               FINAL/CONSTANT :SPITRANSFER                                           HWSPITRANSFER
-              FINAL/CONSTANT :SPI_BAUD_RATE                                         4000
+              FINAL/CONSTANT :SPI_BAUD_RATE                                         1000
               FINAL/CONSTANT :SPI_CPHA_0                                            0
               FINAL/CONSTANT :SPI_CPHA_1                                            1
               FINAL/CONSTANT :SPI_CPOL_0                                            0
@@ -10177,7 +10216,7 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :SYNC_TX1STA                                           SYNC
               FINAL/CONSTANT :SYSEPREAD                                             NVMADR_EPREAD
               FINAL/CONSTANT :SYSTONEDELAY                                          WAIT TONEPERIOD 10US
-              FINAL/CONSTANT :SYS_CLOCK_DIV_NEEDED                                  4
+              FINAL/CONSTANT :SYS_CLOCK_DIV_NEEDED                                  16
               FINAL/CONSTANT :SYS_CLOCK_INT_PLL_USED                                0
               FINAL/CONSTANT :TIMEOUT                                               SYSBITVAR0.0
               FINAL/CONSTANT :TIMERXPRESCALESELECTVALUE                             1
@@ -10343,7 +10382,7 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :_SIGNVALUE                                            SYSBITVAR2.3
               FINAL/CONSTANT :_V9081PATCH                                           2
               FINAL/CONSTANT :__DEFINE_RS232H_CONSTANTS                             0
-              FINAL/CONSTANT :__LCD_CALC                                            76
+              FINAL/CONSTANT :__LCD_CALC                                            21
               FINAL/CONSTANT :__LCD_DELAYS                                          5
               FINAL/CONSTANT :__LCD_INSTRUCTIONS                                    74
               FINAL/CONSTANT :__LCD_PERIOD                                          100
@@ -10532,11 +10571,11 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :CHIPMAXADDRESS                                        5375
               FINAL/CONSTANT :CHIPMAXMHZ                                            64
               FINAL/CONSTANT :CHIPMEMORYLOCK                                        NVMLOCK
-              FINAL/CONSTANT :CHIPMHZ                                               16
+              FINAL/CONSTANT :CHIPMHZ                                               4
               FINAL/CONSTANT :CHIPMINIMUMBANKSELECT                                 5
               FINAL/CONSTANT :CHIPNAME                                              18F46Q35
               FINAL/CONSTANT :CHIPNAMESTR                                           "18F46Q35"    ;STRING148;
-              FINAL/CONSTANT :CHIPOSC                                               HFINTOSC_1MHZ
+              FINAL/CONSTANT :CHIPOSC                                               6
               FINAL/CONSTANT :CHIPPINS                                              40
               FINAL/CONSTANT :CHIPPROGRAMMERNAMESTR                                 "18F46Q35"    ;STRING149;
               FINAL/CONSTANT :CHIPPSP                                               0
@@ -10573,9 +10612,9 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :DISPLAYOFF                                            11
               FINAL/CONSTANT :DISPLAYON                                             12
               FINAL/CONSTANT :DOWN                                                  1
-              FINAL/CONSTANT :DUTYCYCLE                                             212
-              FINAL/CONSTANT :DUTYCYCLEH                                            53
-              FINAL/CONSTANT :DUTYCYCLEL                                            0
+              FINAL/CONSTANT :DUTYCYCLE                                             54
+              FINAL/CONSTANT :DUTYCYCLEH                                            13
+              FINAL/CONSTANT :DUTYCYCLEL                                            2
               FINAL/CONSTANT :EPREAD                                                NVMADR_EPREAD
               FINAL/CONSTANT :EPWRITE                                               NVMADR_EPWRITE
               FINAL/CONSTANT :EXT                                                   0
@@ -10655,10 +10694,10 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :HIGHSPEED                                             255
               FINAL/CONSTANT :HPWM1                                                 1
               FINAL/CONSTANT :HPWM16F_DCH_SCRIPT                                    0
-              FINAL/CONSTANT :HPWM16F_DCL_SCRIPT                                    210
+              FINAL/CONSTANT :HPWM16F_DCL_SCRIPT                                    52
               FINAL/CONSTANT :HPWM16F_DCY                                           0
-              FINAL/CONSTANT :HPWM16F_PRH_SCRIPT                                    1
-              FINAL/CONSTANT :HPWM16F_PRL_SCRIPT                                    165
+              FINAL/CONSTANT :HPWM16F_PRH_SCRIPT                                    0
+              FINAL/CONSTANT :HPWM16F_PRL_SCRIPT                                    105
               FINAL/CONSTANT :HPWM16F_PRPS_REQ                                      0
               FINAL/CONSTANT :HPWM16_10_HPWM16F_DCH_SCRIPT                          0
               FINAL/CONSTANT :HPWM16_10_HPWM16F_DCL_SCRIPT                          0
@@ -10925,8 +10964,8 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :POST_9                                                8
               FINAL/CONSTANT :POTENTIOMETER                                         PORTA.0
               FINAL/CONSTANT :PPSTOOLPART                                           18F46Q43
-              FINAL/CONSTANT :PR2_CPP_PWM_TEMP                                      105
-              FINAL/CONSTANT :PR2_CPP_PWM_TEMP_10BIT_POTENTIALLY                    421
+              FINAL/CONSTANT :PR2_CPP_PWM_TEMP                                      26
+              FINAL/CONSTANT :PR2_CPP_PWM_TEMP_10BIT_POTENTIALLY                    105
               FINAL/CONSTANT :PRE0_1                                                0
               FINAL/CONSTANT :PRE0_1024                                             10
               FINAL/CONSTANT :PRE0_128                                              7
@@ -10943,7 +10982,7 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :PRE0_64                                               6
               FINAL/CONSTANT :PRE0_8                                                3
               FINAL/CONSTANT :PRE0_8192                                             13
-              FINAL/CONSTANT :PRXPERIODREGISTER                                     105
+              FINAL/CONSTANT :PRXPERIODREGISTER                                     26
               FINAL/CONSTANT :PS0_128                                               6
               FINAL/CONSTANT :PS0_16                                                3
               FINAL/CONSTANT :PS0_2                                                 0
@@ -11014,11 +11053,11 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :PS_1_256                                              4
               FINAL/CONSTANT :PS_1_64                                               3
               FINAL/CONSTANT :PS_1_8                                                2
-              FINAL/CONSTANT :PWMCCP1MAXDUTYVALUE                                   421
+              FINAL/CONSTANT :PWMCCP1MAXDUTYVALUE                                   26
               FINAL/CONSTANT :PWMMODULE                                             255
-              FINAL/CONSTANT :PWMOSC1                                               4000
-              FINAL/CONSTANT :PWMOSC16                                              250
-              FINAL/CONSTANT :PWMOSC4                                               1000
+              FINAL/CONSTANT :PWMOSC1                                               1000
+              FINAL/CONSTANT :PWMOSC16                                              62
+              FINAL/CONSTANT :PWMOSC4                                               250
               FINAL/CONSTANT :PWM_DUTY                                              50
               FINAL/CONSTANT :PWM_FREQ                                              38
               FINAL/CONSTANT :R1200                                                 16
@@ -11029,7 +11068,7 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :R600                                                  32
               FINAL/CONSTANT :R9600                                                 2
               FINAL/CONSTANT :RANDOMIZE_SEED                                        TIMER0
-              FINAL/CONSTANT :RANDSTART                                             7608
+              FINAL/CONSTANT :RANDSTART                                             12432
               FINAL/CONSTANT :RBITRATEUNIT                                          52
               FINAL/CONSTANT :RSTBUTTON                                             PORTE.3
               FINAL/CONSTANT :SAF_BLOCK0_ADDR                                       HEF_BLOCK0_ADDR
@@ -11045,7 +11084,7 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :SCRIPTREADAD10BITFORCEVARIANTDIFFENTIAL               0
               FINAL/CONSTANT :SCRIPT_DEFAULT_COMPORT                                1
               FINAL/CONSTANT :SCRIPT_LCD_BF                                         PORTD.3
-              FINAL/CONSTANT :SCRIPT_LCD_POSTWRITEDELAY                             76 US
+              FINAL/CONSTANT :SCRIPT_LCD_POSTWRITEDELAY                             21 US
               FINAL/CONSTANT :SCRIPT_SET_DEFAULTUSART1RETURNVALUE                   1
               FINAL/CONSTANT :SCRIPT_SET_DEFAULTUSART2RETURNVALUE                   0
               FINAL/CONSTANT :SCRIPT_SET_DEFAULTUSART3RETURNVALUE                   0
@@ -11061,20 +11100,20 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :SOUNDOUT2                                             SYSTEMP.0
               FINAL/CONSTANT :SOURCEFILE                                            "130_rotate_the_leds_using_16bit_timer0_" ;STRING147;
               FINAL/CONSTANT :SPBRG                                                 SPBRGL
-              FINAL/CONSTANT :SPBRGH_TEMP                                           1
-              FINAL/CONSTANT :SPBRGL_TEMP                                           159
-              FINAL/CONSTANT :SPBRG_TEMP                                            415.6668
-              FINAL/CONSTANT :SPI1DELAY_SCRIPT                                      8
+              FINAL/CONSTANT :SPBRGH_TEMP                                           0
+              FINAL/CONSTANT :SPBRGL_TEMP                                           103
+              FINAL/CONSTANT :SPBRG_TEMP                                            103.1667
+              FINAL/CONSTANT :SPI1DELAY_SCRIPT                                      20
               FINAL/CONSTANT :SPI2BAUDRATE_SCRIPT                                   3
               FINAL/CONSTANT :SPI2BAUDRATE_SCRIPT_MASTER                            9
               FINAL/CONSTANT :SPI2BAUDRATE_SCRIPT_MASTERSLOW                        33
               FINAL/CONSTANT :SPI2TRANSFER                                          HWSPI2TRANSFER
-              FINAL/CONSTANT :SPI2_BAUD_RATE                                        4000
+              FINAL/CONSTANT :SPI2_BAUD_RATE                                        1000
               FINAL/CONSTANT :SPIBAUDRATE_SCRIPT                                    3
               FINAL/CONSTANT :SPIBAUDRATE_SCRIPT_MASTER                             9
               FINAL/CONSTANT :SPIBAUDRATE_SCRIPT_MASTERSLOW                         33
               FINAL/CONSTANT :SPITRANSFER                                           HWSPITRANSFER
-              FINAL/CONSTANT :SPI_BAUD_RATE                                         4000
+              FINAL/CONSTANT :SPI_BAUD_RATE                                         1000
               FINAL/CONSTANT :SPI_CPHA_0                                            0
               FINAL/CONSTANT :SPI_CPHA_1                                            1
               FINAL/CONSTANT :SPI_CPOL_0                                            0
@@ -11121,7 +11160,7 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :SYNC_TX1STA                                           SYNC
               FINAL/CONSTANT :SYSEPREAD                                             NVMADR_EPREAD
               FINAL/CONSTANT :SYSTONEDELAY                                          WAIT TONEPERIOD 10US
-              FINAL/CONSTANT :SYS_CLOCK_DIV_NEEDED                                  4
+              FINAL/CONSTANT :SYS_CLOCK_DIV_NEEDED                                  16
               FINAL/CONSTANT :SYS_CLOCK_INT_PLL_USED                                0
               FINAL/CONSTANT :TIMEOUT                                               SYSBITVAR0.0
               FINAL/CONSTANT :TIMERXPRESCALESELECTVALUE                             1
@@ -11287,7 +11326,7 @@ IFDEF/SAF_BLOCK3_ADDR       HEF_BLOCK3_ADDR             23
               FINAL/CONSTANT :_SIGNVALUE                                            SYSBITVAR2.3
               FINAL/CONSTANT :_V9081PATCH                                           2
               FINAL/CONSTANT :__DEFINE_RS232H_CONSTANTS                             0
-              FINAL/CONSTANT :__LCD_CALC                                            76
+              FINAL/CONSTANT :__LCD_CALC                                            21
               FINAL/CONSTANT :__LCD_DELAYS                                          5
               FINAL/CONSTANT :__LCD_INSTRUCTIONS                                    74
               FINAL/CONSTANT :__LCD_PERIOD                                          100

@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Compilation Report</title>
+<style>
+    body {
+        font-family: monospace;
+        line-height: 1.4;
+        margin: 20px;
+        max-width: 1400px;
+    }
+    h1, h2 {
+        font-family: monospace;
+    }
+    table {
+        font-family: monospace;
+        border-collapse: collapse;
+        width: 100%;
+        margin: 1em 0;
+    }
+    th, td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+    }
+    thead tr {
+        background-color: #e0e0e0;
+    }
+    .summary p {
+        margin: 0.4em 0;
+    }
+    .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 1em 0;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    .table-wrapper table {
+        min-width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    .table-wrapper th, .table-wrapper td {
+        white-space: nowrap;
+    }
+    .table-wrapper::-webkit-scrollbar {
+        height: 8px;
+    }
+    .table-wrapper::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    .table-wrapper::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+    .table-wrapper::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+    details {
+        margin: 1em 0;
+    }
+    details > summary {
+        cursor: pointer;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 0.4em;
+        user-select: none;
+    }
+    details > summary::-webkit-details-marker { display: none; }
+    details > summary::marker { display: none; }
+    .toggle-icon {
+        width: 1em; height: 1em;
+        transition: transform 0.2s;
+        flex-shrink: 0;
+    }
+    details[open] .toggle-icon {
+        transform: rotate(90deg);
+    }
+    details > summary h2 {
+        display: inline;
+        margin: 0;
+    }
+    th { cursor: pointer; }
+    th.sort-asc::after  { content: ' \25B2'; font-size: 0.75em; }
+    th.sort-desc::after { content: ' \25BC'; font-size: 0.75em; }
+</style>
+</head>
+<body>
+<h1>Compilation Report</h1>
+<p>Compiler Version (YYYY-MM-DD): 2026.08.07 (Windows 64 bit) : Build 1617)</p>
+<h2>Compilation time</h2>
+<p> Compile time: 1.875 seconds</p>
+<p> Assembly time: 0.46875 seconds</p>
+<p> Download time: 11.84375 seconds</p>
+<p> Total time: 14.1875 seconds</p>
+<h2>Chip resource usage:</h2>
+<p>Chip Model: 18F46Q35</p>
+<p>Program Memory: 8008/32768 words (24.44%)</p>
+<p>RAM: 282/4096 bytes (6.88%)</p>
+<p> OSC: HFINTOSC_1MHZ, 64Mhz (Internal oscillator)</p>
+<script>
+function sortTableById(tableId, numericCols, n) {
+  var table = document.getElementById(tableId);
+  if (!table) return;
+  var tbody = table.tBodies[0];
+  var rows = Array.from(tbody.rows);
+  var th = table.tHead.rows[0].cells[n];
+  var asc = th.classList.contains('sort-desc');
+  var ths = table.tHead.rows[0].cells;
+  for (var k = 0; k < ths.length; k++) {
+    ths[k].classList.remove('sort-asc','sort-desc');
+  }
+  th.classList.add(asc ? 'sort-asc' : 'sort-desc');
+  var isNum = numericCols.indexOf(n) >= 0;
+  rows.sort(function(a, b) {
+    var x = a.cells[n].textContent.trim();
+    var y = b.cells[n].textContent.trim();
+    if (isNum) { x = parseFloat(x) || 0; y = parseFloat(y) || 0; }
+    else { x = x.toLowerCase(); y = y.toLowerCase(); }
+    if (x < y) return asc ? -1 : 1;
+    if (x > y) return asc ? 1 : -1;
+    return 0;
+  });
+  rows.forEach(function(r) { tbody.appendChild(r); });
+}
+</script>
+<details><summary><svg class="toggle-icon" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><polygon points="4,2 12,8 4,14"/></svg><h2>Variable Memory Map</h2></summary>
+<div class="table-wrapper">
+<table id="varTable">
+<thead><tr>
+<th onclick="sortTableById('varTable',[1,3],0)">Variable Name</th>
+<th onclick="sortTableById('varTable',[1,3],1)">Address (Dec)</th>
+<th onclick="sortTableById('varTable',[1,3],2)">Address (Hex)</th>
+<th onclick="sortTableById('varTable',[1,3],3)">Size (bytes)</th>
+<th onclick="sortTableById('varTable',[1,3],4)">Bank / Location</th>
+</tr></thead><tbody>
+<tr>
+<td>BYTENUMBER</td>
+<td>1294</td>
+<td>0x050E</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>CCOUNT</td>
+<td>1295</td>
+<td>0x050F</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>CHARCODE</td>
+<td>1296</td>
+<td>0x0510</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>CHARCOL</td>
+<td>1297</td>
+<td>0x0511</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>CHARCOLS</td>
+<td>1299</td>
+<td>0x0513</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>CHARLOCX</td>
+<td>1300</td>
+<td>0x0514</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>CHARLOCY</td>
+<td>1302</td>
+<td>0x0516</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>CHARROW</td>
+<td>1304</td>
+<td>0x0518</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>CHARROWS</td>
+<td>1306</td>
+<td>0x051A</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>COL</td>
+<td>1307</td>
+<td>0x051B</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>COLOR</td>
+<td>1308</td>
+<td>0x051C</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>CURRCHARCOL</td>
+<td>1310</td>
+<td>0x051E</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>CURRCHARROW</td>
+<td>1311</td>
+<td>0x051F</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>CURRCHARVAL</td>
+<td>1312</td>
+<td>0x0520</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>CURRCOL</td>
+<td>1313</td>
+<td>0x0521</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>DDF_X</td>
+<td>1315</td>
+<td>0x0523</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>DDF_Y</td>
+<td>1317</td>
+<td>0x0525</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>DELAYTEMP</td>
+<td>1280</td>
+<td>0x0500</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>DELAYTEMP2</td>
+<td>1281</td>
+<td>0x0501</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>DRAWLINE</td>
+<td>1319</td>
+<td>0x0527</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>FF</td>
+<td>1321</td>
+<td>0x0529</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>FILLCIRCLEXX</td>
+<td>1323</td>
+<td>0x052B</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>FILLCIRCLEYY</td>
+<td>1324</td>
+<td>0x052C</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>GLCDBACKGROUND</td>
+<td>1325</td>
+<td>0x052D</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>GLCDCOLOUR</td>
+<td>1327</td>
+<td>0x052F</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>GLCDDEVICEHEIGHT</td>
+<td>1329</td>
+<td>0x0531</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>GLCDDEVICEWIDTH</td>
+<td>1331</td>
+<td>0x0533</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>GLCDFNTDEFAULT</td>
+<td>1333</td>
+<td>0x0535</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>GLCDFNTDEFAULTHEIGHT</td>
+<td>1334</td>
+<td>0x0536</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>GLCDFNTDEFAULTSIZE</td>
+<td>1335</td>
+<td>0x0537</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>GLCDFONTWIDTH</td>
+<td>1336</td>
+<td>0x0538</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>GLCDFOREGROUND</td>
+<td>1337</td>
+<td>0x0539</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>GLCDPIXELCOUNT</td>
+<td>1339</td>
+<td>0x053B</td>
+<td>4</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>GLCDPRINTLEN</td>
+<td>1343</td>
+<td>0x053F</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>GLCDPRINTLOC</td>
+<td>1344</td>
+<td>0x0540</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>GLCDPRINT_STRING_COUNTER</td>
+<td>1346</td>
+<td>0x0542</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>GLCDROTATESTATE</td>
+<td>1347</td>
+<td>0x0543</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>GLCDTEMP</td>
+<td>1348</td>
+<td>0x0544</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>GLCDX</td>
+<td>1350</td>
+<td>0x0546</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>GLCDY</td>
+<td>1352</td>
+<td>0x0548</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>GLCD_YORDINATE</td>
+<td>1354</td>
+<td>0x054A</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>ILI9341SENDBYTE</td>
+<td>1356</td>
+<td>0x054C</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>ILI9341SENDWORD</td>
+<td>1357</td>
+<td>0x054D</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>ILI9341TEMPOUT</td>
+<td>1359</td>
+<td>0x054F</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>INXRADIUS</td>
+<td>1360</td>
+<td>0x0550</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>LCDVALUE</td>
+<td>1362</td>
+<td>0x0552</td>
+<td>4</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>LINECOLOUR</td>
+<td>1366</td>
+<td>0x0556</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>LINEDIFFX</td>
+<td>1368</td>
+<td>0x0558</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>LINEDIFFX_X2</td>
+<td>1370</td>
+<td>0x055A</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>LINEDIFFY</td>
+<td>1372</td>
+<td>0x055C</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>LINEDIFFY_X2</td>
+<td>1374</td>
+<td>0x055E</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>LINEERR</td>
+<td>1376</td>
+<td>0x0560</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>LINESTEPX</td>
+<td>1378</td>
+<td>0x0562</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>LINESTEPY</td>
+<td>1380</td>
+<td>0x0564</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>LINEX1</td>
+<td>1382</td>
+<td>0x0566</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>LINEX2</td>
+<td>1384</td>
+<td>0x0568</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>LINEY1</td>
+<td>1386</td>
+<td>0x056A</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>LINEY2</td>
+<td>1388</td>
+<td>0x056C</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>LOCX</td>
+<td>1390</td>
+<td>0x056E</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>LOCY</td>
+<td>1392</td>
+<td>0x0570</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>LONGNUMBER</td>
+<td>1394</td>
+<td>0x0572</td>
+<td>4</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>OLDFONT</td>
+<td>1398</td>
+<td>0x0576</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>PAD</td>
+<td>5335</td>
+<td>0x14D7</td>
+<td>40</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>PRINTLEN</td>
+<td>1399</td>
+<td>0x0577</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>PRINTLOCX</td>
+<td>1400</td>
+<td>0x0578</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>PRINTLOCY</td>
+<td>1402</td>
+<td>0x057A</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>RADIUSERR</td>
+<td>1404</td>
+<td>0x057C</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>ROW</td>
+<td>1406</td>
+<td>0x057E</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SPICLOCKMODE</td>
+<td>1407</td>
+<td>0x057F</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SPICURRENTMODE</td>
+<td>1408</td>
+<td>0x0580</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SPIRXDATA</td>
+<td>1409</td>
+<td>0x0581</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SPITXDATA</td>
+<td>1410</td>
+<td>0x0582</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>STR</td>
+<td>5284</td>
+<td>0x14A4</td>
+<td>5</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>STRINGLOCX</td>
+<td>1411</td>
+<td>0x0583</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>STRINGPOINTER</td>
+<td>1413</td>
+<td>0x0585</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSARRAYTEMP1</td>
+<td>1414</td>
+<td>0x0586</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSARRAYTEMP2</td>
+<td>1415</td>
+<td>0x0587</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSBYTETEMPA</td>
+<td>1285</td>
+<td>0x0505</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSBYTETEMPB</td>
+<td>1289</td>
+<td>0x0509</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSBYTETEMPX</td>
+<td>1280</td>
+<td>0x0500</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSCALCTEMPA</td>
+<td>1285</td>
+<td>0x0505</td>
+<td>4</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSCALCTEMPX</td>
+<td>1280</td>
+<td>0x0500</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSCHARCOUNT</td>
+<td>1416</td>
+<td>0x0588</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSCHARSHANDLER</td>
+<td>1417</td>
+<td>0x0589</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSDIVLOOP</td>
+<td>1284</td>
+<td>0x0504</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSDIVMULTA</td>
+<td>1287</td>
+<td>0x0507</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSDIVMULTB</td>
+<td>1291</td>
+<td>0x050B</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSDIVMULTX</td>
+<td>1282</td>
+<td>0x0502</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSINTEGERTEMPA</td>
+<td>1285</td>
+<td>0x0505</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSINTEGERTEMPB</td>
+<td>1289</td>
+<td>0x0509</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSINTEGERTEMPX</td>
+<td>1280</td>
+<td>0x0500</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSLCDPRINTDATAHANDLER</td>
+<td>1419</td>
+<td>0x058B</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSLONGDIVMULTA</td>
+<td>1421</td>
+<td>0x058D</td>
+<td>4</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSLONGDIVMULTB</td>
+<td>1425</td>
+<td>0x0591</td>
+<td>4</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSLONGDIVMULTX</td>
+<td>1429</td>
+<td>0x0595</td>
+<td>4</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSLONGTEMPA</td>
+<td>1285</td>
+<td>0x0505</td>
+<td>4</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSLONGTEMPB</td>
+<td>1289</td>
+<td>0x0509</td>
+<td>4</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSLONGTEMPX</td>
+<td>1280</td>
+<td>0x0500</td>
+<td>4</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSPRINTBUFFER</td>
+<td>5290</td>
+<td>0x14AA</td>
+<td>10</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSPRINTBUFFLEN</td>
+<td>1433</td>
+<td>0x0599</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSPRINTDATAHANDLER</td>
+<td>1434</td>
+<td>0x059A</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSPRINTTEMP</td>
+<td>1436</td>
+<td>0x059C</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSREPEATTEMP1</td>
+<td>1437</td>
+<td>0x059D</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSREPEATTEMP2</td>
+<td>1438</td>
+<td>0x059E</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSREPEATTEMP3</td>
+<td>1439</td>
+<td>0x059F</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSREPEATTEMP4</td>
+<td>1441</td>
+<td>0x05A1</td>
+<td>4</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSSIGNBYTE</td>
+<td>1293</td>
+<td>0x050D</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSSTRDATA</td>
+<td>1445</td>
+<td>0x05A5</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSSTRINGA</td>
+<td>1287</td>
+<td>0x0507</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSSTRINGLENGTH</td>
+<td>1286</td>
+<td>0x0506</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSSTRINGPARAM1</td>
+<td>5318</td>
+<td>0x14C6</td>
+<td>16</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSSTRINGPARAM2</td>
+<td>5301</td>
+<td>0x14B5</td>
+<td>16</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSSTRINGTEMP</td>
+<td>1446</td>
+<td>0x05A6</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSSTRLEN</td>
+<td>1447</td>
+<td>0x05A7</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSSYSINSTRING3HANDLER</td>
+<td>1448</td>
+<td>0x05A8</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSSYSINSTRINGHANDLER</td>
+<td>1450</td>
+<td>0x05AA</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSTEMP1</td>
+<td>1452</td>
+<td>0x05AC</td>
+<td>4</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSTEMP2</td>
+<td>1456</td>
+<td>0x05B0</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSTEMP3</td>
+<td>1458</td>
+<td>0x05B2</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSVALTEMP</td>
+<td>1460</td>
+<td>0x05B4</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSWAITTEMPMS</td>
+<td>1282</td>
+<td>0x0502</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSWAITTEMPS</td>
+<td>1284</td>
+<td>0x0504</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSWAITTEMPUS</td>
+<td>1285</td>
+<td>0x0505</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSWORDTEMPA</td>
+<td>1285</td>
+<td>0x0505</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSWORDTEMPB</td>
+<td>1289</td>
+<td>0x0509</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSWORDTEMPX</td>
+<td>1280</td>
+<td>0x0500</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>WORDNUMBER</td>
+<td>1462</td>
+<td>0x05B6</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>XCHAR</td>
+<td>1464</td>
+<td>0x05B8</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>XOFFSET</td>
+<td>1465</td>
+<td>0x05B9</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>XRADIUS</td>
+<td>1467</td>
+<td>0x05BB</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>YCALC1</td>
+<td>1469</td>
+<td>0x05BD</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>YCALC2</td>
+<td>1471</td>
+<td>0x05BF</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>YOFFSET</td>
+<td>1473</td>
+<td>0x05C1</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>YORDINATE</td>
+<td>1475</td>
+<td>0x05C3</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>_X1</td>
+<td>1476</td>
+<td>0x05C4</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>_X2</td>
+<td>1478</td>
+<td>0x05C6</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>_Y1</td>
+<td>1480</td>
+<td>0x05C8</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>_Y2</td>
+<td>1482</td>
+<td>0x05CA</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+</tbody></table>
+</div>
+</details>
+<details><summary><svg class="toggle-icon" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><polygon points="4,2 12,8 4,14"/></svg><h2>Subroutines</h2></summary>
+<div class="table-wrapper">
+<table id="subTable">
+<thead>
+<tr><th onclick="sortTableById('subTable',[1,2],0)">Name</th><th onclick="sortTableById('subTable',[1,2],1)">Code Size (lines)</th><th onclick="sortTableById('subTable',[1,2],2)">Compiled Size (words)</th><th onclick="sortTableById('subTable',[1,2],3)">Outgoing calls</th></tr>
+</thead><tbody>
+<tr><td>Main</td><td>98</td><td>372</td><td>SYSREADSTRING ×5, Delay_S ×1, BOX ×2, GLCDDRAWSTRING_ILI9341 ×2, SHOWCASE2 ×1, SHOWCASE1 ×1, GLCDPRINT ×3, GLCDPRINT ×3, GLCDCLS_ILI9341 ×3, INITGLCD_ILI9341 ×89, GLCDROTATE_ILI9341 ×3, INITPPS ×30, INITSYS ×53</td></tr>
+<tr><td>INITPPS</td><td>13</td><td>15</td><td></td></tr>
+<tr><td>SHOWCASE1</td><td>46</td><td>824</td><td>SYSDIVSUB16 ×11, SYSREADSTRING ×13, GLCDDRAWCHAR_ILI9341 ×1, STR ×3, PAD ×3, GLCDPRINT ×2, GLCDPRINT ×1, FILLEDBOX_ILI9341 ×1, _LINE ×2, FILLEDCIRCLE ×1, CIRCLE ×1, BOX ×3, GLCDDRAWSTRING_ILI9341 ×11, GLCDROTATE_ILI9341 ×1</td></tr>
+<tr><td>SHOWCASE2</td><td>47</td><td>856</td><td>SYSDIVSUB16 ×11, SYSREADSTRING ×15, GLCDDRAWCHAR_ILI9341 ×1, STR ×3, PAD ×3, GLCDPRINT ×2, GLCDPRINT ×1, BIGPRINT_ILI9341 ×1, FILLEDBOX_ILI9341 ×1, _LINE ×2, FILLEDCIRCLE ×1, CIRCLE ×1, BOX ×3, GLCDDRAWSTRING_ILI9341 ×11, GLCDROTATE_ILI9341 ×1</td></tr>
+<tr><td>GLCDPRINT</td><td>19</td><td>69</td><td>GLCDDRAWCHAR_ILI9341 ×1</td></tr>
+<tr><td>GLCDPRINT</td><td>22</td><td>115</td><td>SYSDIVSUB32 ×1, SYSCOMPEQUAL32 ×1, GLCDDRAWCHAR_ILI9341 ×1</td></tr>
+<tr><td>BOX</td><td>20</td><td>175</td><td>SYSCOMPLESSTHAN16 ×6, PSET_ILI9341 ×4</td></tr>
+<tr><td>CIRCLE</td><td>20</td><td>262</td><td>SYSMULTSUBINT ×1, SYSDIVSUBINT ×1, SYSCOMPLESSTHANINT ×2, PSET_ILI9341 ×8</td></tr>
+<tr><td>FILLEDCIRCLE</td><td>24</td><td>208</td><td>SYSMULTSUBINT ×1, SYSCOMPLESSTHANINT ×1, _LINE ×5</td></tr>
+<tr><td>_LINE</td><td>55</td><td>298</td><td>SYSMULTSUBINT ×4, SYSCOMPLESSTHANINT ×5, SYSCOMPEQUAL16 ×2, PSET_ILI9341 ×4</td></tr>
+<tr><td>INITSYS</td><td>1172</td><td>30</td><td></td></tr>
+<tr><td>SYSREADSTRING</td><td>114</td><td>19</td><td></td></tr>
+<tr><td>SYSMULTSUB16</td><td>73</td><td>17</td><td></td></tr>
+<tr><td>SYSMULTSUBINT</td><td>13</td><td>26</td><td>SYSMULTSUB16 ×1</td></tr>
+<tr><td>SYSMULTSUB32</td><td>43</td><td>67</td><td>SYSCOMPLESSTHAN32 ×1</td></tr>
+<tr><td>SYSDIVSUB</td><td>48</td><td>20</td><td></td></tr>
+<tr><td>SYSDIVSUB16</td><td>38</td><td>52</td><td>SYSCOMPEQUAL16 ×1</td></tr>
+<tr><td>SYSDIVSUBINT</td><td>14</td><td>31</td><td>SYSDIVSUB16 ×1</td></tr>
+<tr><td>SYSDIVSUB32</td><td>40</td><td>94</td><td>SYSCOMPEQUAL32 ×1</td></tr>
+<tr><td>SYSCOMPEQUAL16</td><td>34</td><td>9</td><td></td></tr>
+<tr><td>SYSCOMPEQUAL32</td><td>52</td><td>15</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHAN</td><td>23</td><td>5</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHAN16</td><td>38</td><td>14</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHAN32</td><td>63</td><td>22</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHANINT</td><td>48</td><td>41</td><td></td></tr>
+<tr><td>SPIMODE</td><td>230</td><td>71</td><td></td></tr>
+<tr><td>HWSPITRANSFER</td><td>80</td><td>9</td><td></td></tr>
+<tr><td>FASTHWSPITRANSFER</td><td>43</td><td>9</td><td></td></tr>
+<tr><td>STR</td><td>36</td><td>177</td><td>SYSDIVSUB16 ×4, SYSCOMPLESSTHAN16 ×4</td></tr>
+<tr><td>PAD</td><td>16</td><td>145</td><td>SYSREADSTRING ×1, SYSCOMPLESSTHAN ×1</td></tr>
+<tr><td>INITGLCD_ILI9341</td><td>175</td><td>321</td><td>Delay_MS ×4, GLCDCLS_ILI9341 ×1, SENDDATA_ILI9341 ×65, SENDCOMMAND_ILI9341 ×22, SPIMODE ×1</td></tr>
+<tr><td>GLCDCLS_ILI9341</td><td>57</td><td>55</td><td>FASTHWSPITRANSFER ×2, SETADDRESSWINDOW_ILI9341 ×1</td></tr>
+<tr><td>GLCDDRAWSTRING_ILI9341</td><td>13</td><td>56</td><td>GLCDDRAWCHAR_ILI9341 ×1</td></tr>
+<tr><td>GLCDDRAWCHAR_ILI9341</td><td>99</td><td>192</td><td>SYSCOMPLESSTHAN ×2, PSET_ILI9341 ×2</td></tr>
+<tr><td>FILLEDBOX_ILI9341</td><td>17</td><td>167</td><td>SYSMULTSUB32 ×1, SYSCOMPLESSTHAN16 ×2, SYSCOMPLESSTHAN32 ×1, SENDWORD_ILI9341 ×1, SETADDRESSWINDOW_ILI9341 ×1</td></tr>
+<tr><td>PSET_ILI9341</td><td>2</td><td>22</td><td>SENDWORD_ILI9341 ×1, SETADDRESSWINDOW_ILI9341 ×1</td></tr>
+<tr><td>SENDCOMMAND_ILI9341</td><td>42</td><td>14</td><td>HWSPITRANSFER ×1</td></tr>
+<tr><td>SENDDATA_ILI9341</td><td>42</td><td>14</td><td>HWSPITRANSFER ×1</td></tr>
+<tr><td>SENDWORD_ILI9341</td><td>51</td><td>19</td><td>HWSPITRANSFER ×2</td></tr>
+<tr><td>SETADDRESSWINDOW_ILI9341</td><td>11</td><td>33</td><td>SENDDATA_ILI9341 ×8, SENDCOMMAND_ILI9341 ×3</td></tr>
+<tr><td>GLCDROTATE_ILI9341</td><td>23</td><td>73</td><td>SENDDATA_ILI9341 ×5, SENDCOMMAND_ILI9341 ×1</td></tr>
+<tr><td>BIGPRINT_ILI9341</td><td>10</td><td>51</td><td>DRAWBIGCHAR_ILI9341 ×1</td></tr>
+<tr><td>DRAWBIGCHAR_ILI9341</td><td>71</td><td>486</td><td>SYSDIVSUB ×1, SYSCOMPLESSTHAN ×26, PSET_ILI9341 ×1</td></tr>
+<tr><td>Delay_MS</td><td>0</td><td>14</td><td></td></tr>
+<tr><td>Delay_S</td><td>0</td><td>8</td><td>Delay_MS ×1</td></tr>
+<tr><td>SysStringTables</td><td>0</td><td>83</td><td></td></tr>
+<tr><td>GLCDCHARCOL3EXTENDED1</td><td>0</td><td>137</td><td></td></tr>
+<tr><td>GLCDCHARCOL4EXTENDED1</td><td>0</td><td>137</td><td></td></tr>
+<tr><td>GLCDCHARCOL5EXTENDED1</td><td>0</td><td>137</td><td></td></tr>
+<tr><td>GLCDCHARCOL6EXTENDED1</td><td>0</td><td>137</td><td></td></tr>
+<tr><td>GLCDCHARCOL7EXTENDED1</td><td>0</td><td>137</td><td></td></tr>
+<tr><td>BIGFONT32_41</td><td>0</td><td>137</td><td></td></tr>
+<tr><td>BIGFONT42_51</td><td>0</td><td>137</td><td></td></tr>
+<tr><td>BIGFONT52_61</td><td>0</td><td>138</td><td></td></tr>
+<tr><td>BIGFONT62_71</td><td>0</td><td>137</td><td></td></tr>
+<tr><td>BIGFONT72_81</td><td>0</td><td>138</td><td></td></tr>
+<tr><td>BIGFONT82_91</td><td>0</td><td>137</td><td></td></tr>
+<tr><td>BIGFONT92_101</td><td>0</td><td>137</td><td></td></tr>
+<tr><td>BIGFONT102_111</td><td>0</td><td>137</td><td></td></tr>
+<tr><td>BIGFONT112_121</td><td>0</td><td>137</td><td></td></tr>
+<tr><td>BIGFONT122_126</td><td>0</td><td>72</td><td></td></tr>
+<tr><td>BIGFONT193_202</td><td>0</td><td>137</td><td></td></tr>
+<tr><td>BIGFONT203_212</td><td>0</td><td>136</td><td></td></tr>
+<tr><td>BIGFONT213_216</td><td>0</td><td>65</td><td></td></tr>
+</tbody></table>
+</div>
+</details>
+</body>
+</html>

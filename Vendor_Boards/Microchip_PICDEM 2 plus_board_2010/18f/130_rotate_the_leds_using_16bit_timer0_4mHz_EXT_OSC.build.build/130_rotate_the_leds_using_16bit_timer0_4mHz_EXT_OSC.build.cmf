@@ -1,0 +1,475 @@
+%CMF
+# %PSECTS Section
+# For each object file, details of its psects are enumerated here.
+# The begining of the section is indicated by %PSECTS.  The first
+# line indicates the name of the first object file, e.g.
+#    $foo.obj
+# Each line that follows describes a psect in that object file, until
+# the next object file.  The lines that describe a psect have the
+# format:
+#    <psect name> <class name> <space> <link address> <load addresses> <length> <delta> <reloc>
+# All addresses and the length are given in unqualified hexadecimal
+# in delta units.  Any other numeric values are decimal.
+%PSECTS
+$D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+RESETVEC - 0 0 0 21C 1 1
+config CONFIG 4 300000 300000 15 1 1
+# %UNUSED Section
+# This section enumerates the unused ranges of each CLASS. Each entry
+# is described on a single line as follows:
+#    <class name> <range> <delta>
+# Addresses given in the range are in hexadecimal and units of delta.
+%UNUSED
+RAM 560-14FF 1
+SFR 21C-4FF 1
+SFR 1500-15FF 1
+BANK5 560-5FF 1
+BANK6 600-6FF 1
+BANK7 700-7FF 1
+BANK8 800-8FF 1
+BANK9 900-9FF 1
+CONST 21C-FFFF 1
+IDLOC 200000-20003F 1
+SMALLCONST 1600-FFFF 1
+CODE 21C-FFFF 1
+BANK10 A00-AFF 1
+BANK11 B00-BFF 1
+BANK12 C00-CFF 1
+BANK13 D00-DFF 1
+BANK14 E00-EFF 1
+BANK15 F00-FFF 1
+BANK16 1000-10FF 1
+BANK17 1100-11FF 1
+BANK18 1200-12FF 1
+BANK19 1300-13FF 1
+BANK20 1400-14FF 1
+BIGRAM 500-14FF 1
+BIGSFR 21C-4FF 1
+BIGSFR 1500-15FF 1
+COMRAM 500-55F 1
+CONFIG 300015-300015 1
+EEDATA 380000-3800FF 1
+MEDIUMCONST 1600-FFFF 1
+# %LINETAB Section
+# This section enumerates the file/line to address mappings.
+# The beginning of the section is indicated by %LINETAB.
+# The first line indicates the name of the first object file, e.g.
+#   $foo.obj
+# Each line that follows describes a single mapping until the next
+# object file.  Mappings have the following format:
+#    <address> <psect name> <class name> ><line number>:<file name>
+# The address is absolute and given given in unqualified hex 
+# in delta units of the psect. All mappings within an object file
+# are in ascending order of addresses.
+# All other numeric values are in decimal.
+%LINETAB
+$D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+0 RESETVEC ABS >151:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+8 RESETVEC ABS >153:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+C RESETVEC ABS >162:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+E RESETVEC ABS >163:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+10 RESETVEC ABS >164:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+12 RESETVEC ABS >225:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+14 RESETVEC ABS >226:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+16 RESETVEC ABS >228:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+18 RESETVEC ABS >230:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1A RESETVEC ABS >232:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1C RESETVEC ABS >235:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1E RESETVEC ABS >237:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+20 RESETVEC ABS >239:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+22 RESETVEC ABS >255:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+24 RESETVEC ABS >256:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+26 RESETVEC ABS >257:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+28 RESETVEC ABS >258:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+2A RESETVEC ABS >259:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+2C RESETVEC ABS >260:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+2E RESETVEC ABS >261:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+30 RESETVEC ABS >264:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+32 RESETVEC ABS >265:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+34 RESETVEC ABS >266:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+36 RESETVEC ABS >267:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+38 RESETVEC ABS >268:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+3A RESETVEC ABS >269:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+3C RESETVEC ABS >272:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+3E RESETVEC ABS >273:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+40 RESETVEC ABS >279:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+42 RESETVEC ABS >280:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+44 RESETVEC ABS >284:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+46 RESETVEC ABS >292:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+48 RESETVEC ABS >293:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+4A RESETVEC ABS >296:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+4C RESETVEC ABS >298:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+50 RESETVEC ABS >299:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+52 RESETVEC ABS >300:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+54 RESETVEC ABS >301:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+56 RESETVEC ABS >302:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+58 RESETVEC ABS >303:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+5A RESETVEC ABS >304:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+5C RESETVEC ABS >305:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+5E RESETVEC ABS >306:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+60 RESETVEC ABS >307:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+62 RESETVEC ABS >308:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+64 RESETVEC ABS >309:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+66 RESETVEC ABS >310:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+68 RESETVEC ABS >311:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+6A RESETVEC ABS >313:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+6C RESETVEC ABS >316:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+70 RESETVEC ABS >319:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+72 RESETVEC ABS >322:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+74 RESETVEC ABS >325:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+76 RESETVEC ABS >326:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+78 RESETVEC ABS >327:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+7A RESETVEC ABS >328:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+7C RESETVEC ABS >330:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+7E RESETVEC ABS >331:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+80 RESETVEC ABS >333:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+82 RESETVEC ABS >339:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+84 RESETVEC ABS >340:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+86 RESETVEC ABS >341:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+88 RESETVEC ABS >342:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+8A RESETVEC ABS >343:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+8C RESETVEC ABS >344:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+8E RESETVEC ABS >346:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+90 RESETVEC ABS >351:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+92 RESETVEC ABS >352:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+94 RESETVEC ABS >360:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+98 RESETVEC ABS >361:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+9C RESETVEC ABS >362:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+A0 RESETVEC ABS >364:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+A2 RESETVEC ABS >365:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+A4 RESETVEC ABS >366:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+A6 RESETVEC ABS >370:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+A8 RESETVEC ABS >371:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+AA RESETVEC ABS >372:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+AC RESETVEC ABS >373:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+AE RESETVEC ABS >374:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+B0 RESETVEC ABS >377:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+B2 RESETVEC ABS >379:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+B4 RESETVEC ABS >380:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+B6 RESETVEC ABS >381:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+B8 RESETVEC ABS >382:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+BA RESETVEC ABS >383:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+BC RESETVEC ABS >384:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+BE RESETVEC ABS >385:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+C2 RESETVEC ABS >386:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+C4 RESETVEC ABS >388:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+C6 RESETVEC ABS >389:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+C8 RESETVEC ABS >390:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+CA RESETVEC ABS >391:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+CC RESETVEC ABS >398:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+CE RESETVEC ABS >399:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+D0 RESETVEC ABS >400:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+D2 RESETVEC ABS >402:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+D4 RESETVEC ABS >403:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+D6 RESETVEC ABS >404:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+D8 RESETVEC ABS >417:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+DA RESETVEC ABS >418:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+DC RESETVEC ABS >420:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+E0 RESETVEC ABS >421:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+E2 RESETVEC ABS >430:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+E4 RESETVEC ABS >431:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+E6 RESETVEC ABS >434:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+E8 RESETVEC ABS >435:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+EA RESETVEC ABS >436:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+EC RESETVEC ABS >438:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+EE RESETVEC ABS >439:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+F0 RESETVEC ABS >440:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+F2 RESETVEC ABS >441:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+F4 RESETVEC ABS >450:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+F6 RESETVEC ABS >454:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+F8 RESETVEC ABS >455:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+FA RESETVEC ABS >458:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+FC RESETVEC ABS >461:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+FE RESETVEC ABS >464:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+100 RESETVEC ABS >469:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+102 RESETVEC ABS >470:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+104 RESETVEC ABS >472:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+106 RESETVEC ABS >473:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+108 RESETVEC ABS >477:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+10A RESETVEC ABS >480:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+10C RESETVEC ABS >481:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+10E RESETVEC ABS >484:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+110 RESETVEC ABS >486:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+112 RESETVEC ABS >487:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+114 RESETVEC ABS >489:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+116 RESETVEC ABS >491:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+118 RESETVEC ABS >493:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+11A RESETVEC ABS >496:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+11C RESETVEC ABS >497:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+11E RESETVEC ABS >499:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+120 RESETVEC ABS >502:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+122 RESETVEC ABS >503:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+124 RESETVEC ABS >505:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+126 RESETVEC ABS >507:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+128 RESETVEC ABS >509:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+12A RESETVEC ABS >511:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+12C RESETVEC ABS >512:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+12E RESETVEC ABS >513:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+130 RESETVEC ABS >529:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+132 RESETVEC ABS >530:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+134 RESETVEC ABS >531:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+136 RESETVEC ABS >532:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+138 RESETVEC ABS >533:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+13A RESETVEC ABS >536:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+13C RESETVEC ABS >537:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+13E RESETVEC ABS >538:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+140 RESETVEC ABS >540:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+142 RESETVEC ABS >542:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+144 RESETVEC ABS >546:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+146 RESETVEC ABS >552:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+14A RESETVEC ABS >559:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+14C RESETVEC ABS >560:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+14E RESETVEC ABS >561:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+150 RESETVEC ABS >562:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+152 RESETVEC ABS >565:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+154 RESETVEC ABS >568:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+158 RESETVEC ABS >569:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+15A RESETVEC ABS >570:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+15C RESETVEC ABS >579:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+15E RESETVEC ABS >580:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+160 RESETVEC ABS >583:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+162 RESETVEC ABS >584:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+164 RESETVEC ABS >586:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+166 RESETVEC ABS >587:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+168 RESETVEC ABS >589:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+16A RESETVEC ABS >591:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+16C RESETVEC ABS >593:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+16E RESETVEC ABS >595:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+170 RESETVEC ABS >596:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+172 RESETVEC ABS >597:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+174 RESETVEC ABS >605:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+176 RESETVEC ABS >606:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+178 RESETVEC ABS >607:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+17A RESETVEC ABS >610:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+17E RESETVEC ABS >612:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+182 RESETVEC ABS >615:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+184 RESETVEC ABS >620:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+186 RESETVEC ABS >621:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+188 RESETVEC ABS >622:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+18A RESETVEC ABS >624:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+18E RESETVEC ABS >626:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+192 RESETVEC ABS >631:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+194 RESETVEC ABS >632:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+196 RESETVEC ABS >633:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+198 RESETVEC ABS >635:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+19C RESETVEC ABS >638:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+19E RESETVEC ABS >639:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1A0 RESETVEC ABS >640:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1A2 RESETVEC ABS >641:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1A4 RESETVEC ABS >643:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1A8 RESETVEC ABS >645:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1AC RESETVEC ABS >650:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1AE RESETVEC ABS >651:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1B0 RESETVEC ABS >652:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1B2 RESETVEC ABS >654:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1B6 RESETVEC ABS >656:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1B8 RESETVEC ABS >664:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1BA RESETVEC ABS >665:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1BC RESETVEC ABS >666:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1BE RESETVEC ABS >668:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1C0 RESETVEC ABS >669:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1C2 RESETVEC ABS >674:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1C4 RESETVEC ABS >675:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1C6 RESETVEC ABS >676:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1C8 RESETVEC ABS >678:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1CA RESETVEC ABS >679:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1CC RESETVEC ABS >684:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1CE RESETVEC ABS >685:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1D0 RESETVEC ABS >686:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1D2 RESETVEC ABS >687:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1D4 RESETVEC ABS >689:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1D6 RESETVEC ABS >690:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1D8 RESETVEC ABS >695:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1DA RESETVEC ABS >696:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1DC RESETVEC ABS >697:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1DE RESETVEC ABS >698:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1E0 RESETVEC ABS >700:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1E2 RESETVEC ABS >701:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1E4 RESETVEC ABS >706:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1E6 RESETVEC ABS >707:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1E8 RESETVEC ABS >708:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1EA RESETVEC ABS >709:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1EC RESETVEC ABS >711:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1EE RESETVEC ABS >712:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1F0 RESETVEC ABS >716:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1F2 RESETVEC ABS >717:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1F4 RESETVEC ABS >729:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1F6 RESETVEC ABS >731:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1FA RESETVEC ABS >733:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+1FE RESETVEC ABS >735:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+200 RESETVEC ABS >739:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+202 RESETVEC ABS >741:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+204 RESETVEC ABS >743:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+206 RESETVEC ABS >745:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+208 RESETVEC ABS >751:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+20A RESETVEC ABS >753:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+20C RESETVEC ABS >755:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+20E RESETVEC ABS >761:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+210 RESETVEC ABS >763:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+214 RESETVEC ABS >765:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+216 RESETVEC ABS >767:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+218 RESETVEC ABS >768:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+21A RESETVEC ABS >777:D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+# %SYMTAB Section
+# An enumeration of all symbols in the program.
+# The beginning of the section is indicated by %SYMTAB.
+# Each line describes a single symbol as follows:
+#    <label> <value> [-]<load-adj> <class> <space> <psect> <file-name>
+# The value and load-adj are both in unqualified hexadecimal.
+# All other numeric values are in decimal.  The load-adj is the
+# quantity one needs to add to the symbol value in order to obtain the load
+# address of the symbol.  This value may be signed. If the symbol
+# was defined in a psect then <psect> will be "-". File-name
+# is the name of the object file in which the symbol was defined.
+%SYMTAB
+__Hspace_0 21C 0 ABS 0 - -
+__Hspace_1 0 0 ABS 0 - -
+__Hspace_3 0 0 ABS 0 - -
+__Hspace_4 600015 0 ABS 0 - -
+__Hudata_bank5 0 0 ABS 0 udata_bank5 -
+__Hudata_bank6 0 0 ABS 0 udata_bank6 -
+__Hudata_bank7 0 0 ABS 0 udata_bank7 -
+__Hudata_bank8 0 0 ABS 0 udata_bank8 -
+__Hudata_bank9 0 0 ABS 0 udata_bank9 -
+__L__absolute__ 0 0 ABS 0 __absolute__ -
+AFSR0 4E9 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+SYSSTRINGLENGTH 506 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+SYSSTRINGPARAM1 14FD 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+SYSPRINTDATAHANDLER 50A 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+SYSSTRINGTABLES 21A 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+BASPROGRAMEND 90 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+STARTTIMER 1B8 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+SYSWAITLOOP1 46 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+SYSWAITLOOP2 D8 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+SYSPRINTDATAHANDLER_H 50B 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+AFSR0_H 4EA 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+SYSSTRINGREADCHECK 208 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+__Hudata_bank10 0 0 ABS 0 udata_bank10 -
+__Hudata_bank11 0 0 ABS 0 udata_bank11 -
+__Hudata_bank12 0 0 ABS 0 udata_bank12 -
+__Hudata_bank13 0 0 ABS 0 udata_bank13 -
+__Hudata_bank14 0 0 ABS 0 udata_bank14 -
+__Hudata_bank15 0 0 ABS 0 udata_bank15 -
+__Hudata_bank16 0 0 ABS 0 udata_bank16 -
+__Hudata_bank17 0 0 ABS 0 udata_bank17 -
+__Hudata_bank18 0 0 ABS 0 udata_bank18 -
+__Hudata_bank19 0 0 ABS 0 udata_bank19 -
+__Hudata_bank20 0 0 ABS 0 udata_bank20 -
+SYSSTRINGREAD 20E 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+SYSREADSTRING 1F4 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+SYSDOLOOP_E1 90 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+SYSDOLOOP_S1 46 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+SYSSTRINGA 507 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+SYSREADSTRINGPART 200 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+isa$xinst 0 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+SYSFORLOOPEND1 CC 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+__Hedata 0 0 ABS 0 edata -
+__Hudata 0 0 ABS 0 udata -
+HSERSEND345 D8 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+__Hconfig 300015 0 CONFIG 4 config -
+__Ledata 0 0 ABS 0 edata -
+__Ludata 0 0 ABS 0 udata -
+SYSFORLOOP1 B0 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+__Hcode 0 0 ABS 0 code -
+__Hdata 0 0 ABS 0 data -
+__Lcode 0 0 ABS 0 code -
+__Ldata 0 0 ABS 0 data -
+LEDS 501 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+__S0 0 0 ABS 0 - -
+__S1 0 0 ABS 0 - -
+__S3 0 0 ABS 0 - -
+ENDIF10 1AC 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+ENDIF12 146 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+ENDIF13 CC 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+SYSSTRINGA_H 508 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+__Ludata_bank10 0 0 ABS 0 udata_bank10 -
+__Ludata_bank11 0 0 ABS 0 udata_bank11 -
+__Ludata_bank12 0 0 ABS 0 udata_bank12 -
+__Ludata_bank13 0 0 ABS 0 udata_bank13 -
+__Ludata_bank14 0 0 ABS 0 udata_bank14 -
+__Ludata_bank15 0 0 ABS 0 udata_bank15 -
+__Ludata_bank16 0 0 ABS 0 udata_bank16 -
+__Ludata_bank17 0 0 ABS 0 udata_bank17 -
+__Ludata_bank18 0 0 ABS 0 udata_bank18 -
+__Ludata_bank19 0 0 ABS 0 udata_bank19 -
+__Ludata_bank20 0 0 ABS 0 udata_bank20 -
+STRINGTABLE1 21A 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+TMRNUMBER 50E 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+SYSTEMP1 50D 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+SERDATA 504 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+__Lconfig 0 0 CONFIG 4 config -
+SYSPRINTTEMP 50C 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+PRINTLEN 502 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+isa$std 1 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+SETTIMER197 174 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+TMRSOURCE 511 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+ENDIF1 82 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+ENDIF2 1C2 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+ENDIF3 1CC 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+ENDIF4 1D8 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+ENDIF5 1E4 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+ENDIF6 1F0 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+ENDIF7 184 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+ENDIF8 192 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+__LRESETVEC 0 0 ABS 0 RESETVEC -
+INITPPS E2 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+INITSYS F4 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+__Lspace_0 0 0 ABS 0 - -
+__Lspace_1 0 0 ABS 0 - -
+__Lspace_3 0 0 ABS 0 - -
+__Lspace_4 0 0 ABS 0 - -
+TMRVALUE_H 513 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+INITTIMER0199 130 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+HSERSENDUSART1HANDLER D8 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+ELSE12_1 144 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+__Ludata_bank5 0 0 ABS 0 udata_bank5 -
+__Ludata_bank6 0 0 ABS 0 udata_bank6 -
+__Ludata_bank7 0 0 ABS 0 udata_bank7 -
+__Ludata_bank8 0 0 ABS 0 udata_bank8 -
+__Ludata_bank9 0 0 ABS 0 udata_bank9 -
+__H__absolute__ 0 0 ABS 0 __absolute__ -
+HSERPRINTSTRINGCRLF 94 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+SYSCALCTEMPA 505 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+__HRESETVEC 21C 0 ABS 0 RESETVEC -
+INITUSART 15C 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+COMPORT 500 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+STRINGPOINTER 509 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+__Hudata_acs 0 0 ABS 0 udata_acs -
+TMRVALUE 512 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+__Ludata_acs 0 0 ABS 0 udata_acs -
+BASPROGRAMSTART C 0 ABS 0 RESETVEC D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+TMRPOST 50F 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+TMRPRES 510 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+ROTATECOUNT 503 0 ABS 0 - D:\GreatCowBASICGits\Demonstration_Sources.git\Vendor_Boards\Microchip_PICDEM 2 plus_board_2010\18f\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.o
+# %SPLITSTAB Section
+# This section enumerates all the psect splits performed by the assembler.
+# The beginning of the section is indicated by %SPLITSTAB.
+# Each line is a record a particular split, where the parent psect is on
+# the left and the child on the right.  Note that a child psect is always
+# split form the top of the parent psect. All splits from a given parent
+# are listed in the order in which they occurred.
+%SPLITSTAB
+# %DABS Section
+# This section contains a table of all usuage of the assember
+# directive DABS in the program. Each line has the following format:
+#   <name> <space> <address> <size>
+# If the DABS was originally labelled then that shall be <name>,
+# otherwise name will be "-".  The <space> number is in decimal.
+# <address> and <size> are in byte units as unqaulified hexadecimal
+%DABS
+# %SEGMENTS Section
+# This sections enumerates the segments of the program.  Each segment
+# is described on a single line as follows:
+#    <name> <space> <link address> <file address> <size> <delta>
+# Addresses and size are in unqualified hexadecimal.  The link address
+# and size are in units of delta. The file address is in units of bytes.
+# All other numeric quantities are in decimal.
+%SEGMENTS
+# %NOTES Section
+# This section contains data of all the note-psects.  The beginning of the section
+# is indicated by %NOTES. The first line indicates the name and decimal
+# byte-length of the first note-psect, e.g.
+#   $codecov_info_hdr 16
+# Each line that follows contains the byte-data of the psect in hexadecimal as a
+# space-separated list. These lines are limited to 16 bytes of data.
+%NOTES

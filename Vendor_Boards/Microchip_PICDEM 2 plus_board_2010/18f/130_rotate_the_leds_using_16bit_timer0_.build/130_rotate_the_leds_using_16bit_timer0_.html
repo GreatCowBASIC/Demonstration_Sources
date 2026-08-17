@@ -93,15 +93,15 @@
 <h1>Compilation Report</h1>
 <p>Compiler Version (YYYY-MM-DD): 2026.08.07 (Windows 64 bit) : Build 1617)</p>
 <h2>Compilation time</h2>
-<p> Compile time: 0.9775391 seconds</p>
-<p> Assembly time: 0.2460938 seconds</p>
-<p> Download time: 6.388672 seconds</p>
-<p> Total time: 7.612305 seconds</p>
+<p> Compile time: 0.90625 seconds</p>
+<p> Assembly time: 0.203125 seconds</p>
+<p> Download time: 6.4375 seconds</p>
+<p> Total time: 7.546875 seconds</p>
 <h2>Chip resource usage:</h2>
 <p>Chip Model: 18F46Q35</p>
-<p>Program Memory: 268/32768 words (.82%)</p>
+<p>Program Memory: 267/32768 words (.81%)</p>
 <p>RAM: 19/4096 bytes (.46%)</p>
-<p> OSC: HFINTOSC_1MHZ, 16Mhz (Internal oscillator)</p>
+<p> OSC: EXTOSC, 4Mhz (Internal oscillator)</p>
 <script>
 function sortTableById(tableId, numericCols, n) {
   var table = document.getElementById(tableId);
@@ -273,14 +273,14 @@ function sortTableById(tableId, numericCols, n) {
 <thead>
 <tr><th onclick="sortTableById('subTable',[1,2],0)">Name</th><th onclick="sortTableById('subTable',[1,2],1)">Code Size (lines)</th><th onclick="sortTableById('subTable',[1,2],2)">Compiled Size (words)</th><th onclick="sortTableById('subTable',[1,2],3)">Outgoing calls</th></tr>
 </thead><tbody>
-<tr><td>Main</td><td>58</td><td>68</td><td>SYSREADSTRING ×1, HSERPRINTSTRINGCRLF ×1, STARTTIMER ×1, SETTIMER ×2, INITTIMER0 ×1, INITPPS ×8, INITSYS ×14</td></tr>
+<tr><td>Main</td><td>72</td><td>68</td><td>SYSREADSTRING ×1, HSERPRINTSTRINGCRLF ×1, STARTTIMER ×1, SETTIMER ×2, INITTIMER0 ×1, INITPPS ×8, INITSYS ×14</td></tr>
 <tr><td>INITPPS</td><td>3</td><td>9</td><td></td></tr>
 <tr><td>STARTTIMER</td><td>148</td><td>30</td><td></td></tr>
 <tr><td>SETTIMER</td><td>145</td><td>34</td><td></td></tr>
 <tr><td>INITTIMER0</td><td>22</td><td>22</td><td></td></tr>
 <tr><td>INITSYS</td><td>1172</td><td>30</td><td></td></tr>
 <tr><td>SYSREADSTRING</td><td>114</td><td>19</td><td></td></tr>
-<tr><td>INITUSART</td><td>399</td><td>13</td><td></td></tr>
+<tr><td>INITUSART</td><td>399</td><td>12</td><td></td></tr>
 <tr><td>HSERSEND</td><td>366</td><td>5</td><td></td></tr>
 <tr><td>HSERPRINTSTRINGCRLF</td><td>8</td><td>34</td><td>HSERSEND ×3</td></tr>
 <tr><td>SysStringTables</td><td>0</td><td>1</td><td></td></tr>

@@ -1,0 +1,8 @@
+[p ASM ]
+[d version 1.1 ]
+[d edition pro ]
+[d chip 18F46Q35 ]
+"773 D:\\GreatCowBASICGits\\Demonstration_Sources.git\\Vendor_Boards\\Microchip_PICDEM 2 plus_board_2010\\18f\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.build\\130_rotate_the_leds_using_16bit_timer0_4mHz_EXT_OSC.build.S
+[v SYSSTRINGTABLES SYSSTRINGTABLES `CVE[2]uc 1 e 2 0 ]
+"776
+[v STRINGTABLE1 STRINGTABLE1 `CVE[2]uc 1 e 2 0 ]
