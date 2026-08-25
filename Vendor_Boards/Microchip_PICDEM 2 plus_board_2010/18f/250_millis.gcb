@@ -99,11 +99,11 @@
 
 #include <millis.h>       ' Include the Library
 
-        #define LEDRate 1000     ' Flash rate in mS
+        #define LEDRATE 500     ' Flash rate in mS
 
-        Dim CurMs, LstMs as word  ' declare working variables
+        Dim CurMs, LastMs as word  ' declare working variables
         ' Main                    ' This loop runs over and over forever.
-        LstMs = 0
+        LastMs = 0
         CurMs = 0
 
         ' Main                    ' This loop runs over and over forever.
@@ -111,9 +111,9 @@
           CurMs = millis()
 
           IntOff  
-          if CurMs - LstMs >= LEDRate then  ' required Time has Elapsed
+          if CurMs - LastMs >= LEDRATE then  ' required Time has Elapsed
             LEDD3 = !LEDD3                  ' So Toggle state of LED
-            LstMs = CurMs                   ' And Record Toggle Time
+            LastMs = CurMs                   ' And Record Toggle Time
           end if
           IntOn
         Loop

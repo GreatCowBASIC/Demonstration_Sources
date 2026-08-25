@@ -1,0 +1,93 @@
+'''A demonstration program for GCBASIC.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''This program reads a Microchip TC77 SPI digital temperature sensor and prints the result to
+'''a hardware serial terminal (9600 bps, e.g. COM4).
+'''
+'''This variant bit-bangs Software SPI, so TC77_CS/TC77_SCK/TC77_DO/TC77_DI can be any GPIO
+'''pins.  See the companion HW_SPI demo for a version that uses the chip's Hardware SPI module
+'''instead - just add/remove #define TC77_HardwareSPI and change the pin mappings below,
+'''exactly as the ILI9341 GLCD demos do for their SPI configuration.
+'''
+'''This board wires the TC77 with a single physical SI/O line (no separate MOSI/MISO), so
+'''TC77_DO and TC77_DI are both mapped to the same pin, PortB.0.  The library's TC77_DO
+'''direction is released (set as an input) except while a Configuration register write is
+'''actually in progress, so sharing one pin this way does not cause any bus contention on reads.
+'''
+'''Wiring:
+'''  TC77 CS   -> PortB.2
+'''  TC77 SCK  -> PortB.1
+'''  TC77 SI/O -> PortB.0
+'''
+'''Functional List (TC77.h calls used by this program)
+'''  Function TC77Detect     as Word   In: none   Out: return value (raw Manufacturer ID; high byte = 0x54 if genuine); leaves TC77 in Continuous Conversion mode
+'''  Sub      TC77FormatTemp           In: none   Out: TC77Str, TC77RawRegister, TC77Dec1 (and TC77Int/TC77Dec, via TC77ReadTemp)
+'''
+'''@author    Evan Venn
+'''@licence   GPL
+'''@version   1.0
+'''@date      2026-08-25
+'''********************************************************************************
+
+' ----- Configuration
+#chip 18F4550, 48
+#config MCLRE   = on
+#config FOSC    = HSPLL_HS
+#config PLLDIV  = 5
+#config CPUDIV  = OSC1_PLL2
+#config USBDIV  = 2
+#config VREGEN  = on
+#config PBADEN  = off
+#config LVP     = off
+#option Explicit
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
+' ----- TC77 port configuration - Software (bit-banged) SPI, any GPIO pins
+' #define TC77_HardwareSPI    ' Add this line (and use the hardware SPI pins) to switch to Hardware SPI
+
+#define TC77_CS   PortB.2
+#define TC77_SCK  PortB.1
+#define TC77_DO   PortB.0
+#define TC77_DI   PortB.0
+
+#include <TC77.h>
+
+' ----- Variables
+  Dim TC77MfgID as Word = 0
+
+'To initialise the USART
+HSerSend( 0x00 )
+HserPrint "TC77 Temperature Sensor (Software SPI)"
+HserPrintCRLF
+
+'Confirm the sensor is present before starting - runs the datasheet's documented single-CS
+'detect sequence (read temp, write Shutdown, read Manufacturer ID, write Continuous Conversion),
+'so it needs TC77_DO wired to the TC77 as above.  If TC77_DO is left unconnected, remove this
+'block and go straight to the read loop.
+TC77MfgID = TC77Detect
+if TC77MfgID_H = 0x54 then
+  HserPrint "TC77 detected (Manufacturer ID 0x54)"
+else
+  HserPrint "TC77 NOT detected - check wiring: 0x"
+  HSerPrint WordToHex(TC77MfgID)
+end if
+HserPrintCRLF
+
+Do
+
+    TC77FormatTemp
+
+    HserPrint "Raw: 0x"
+    HserPrint WordToHex(TC77RawRegister)
+    HserPrint "  Temperature: "
+    HserPrint TC77Str
+    HserPrint " C  (rounded: ."
+    HserPrint TC77Dec1
+    HserPrint ")"
+    HserPrintCRLF
+
+    Wait 1 s
+
+Loop

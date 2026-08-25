@@ -1,0 +1,40 @@
+#chip 18F46Q35
+#option Explicit
+#config MCLRE_EXTMCLR
+
+    // PIC PPS Tool version: 0.0.6.5
+    
+    #startup InitPPS, 85
+    #define PPSToolPart 18F46Q35
+
+    Sub InitPPS
+            
+            // Module: UART pin directions
+            Dir PORTC.6 Out    ' Make TX1 pin an output
+            // Module: UART1
+            RC6PPS = 0x0012    // TX1 > RC6
+        
+        End Sub
+    // Add this code segment to your GCBASIC source program
+
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
+#include "clearram.h"
+
+Dim myRAM as Long
+
+Wait 1 s
+HSerPrintCRLF
+HSerPrint "0x"+LongToHex(myRAM)
+
+myRAM = 0x12345678
+
+HSerPrintCRLF
+HSerPrint "0x"+LongToHex(myRAM)
+HSerPrintCRLF 
+
+Do
+Loop

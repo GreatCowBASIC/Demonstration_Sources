@@ -1,0 +1,112 @@
+'''A demonstration program for GCBASIC.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''This program reads a Microchip TC77 SPI digital temperature sensor and prints the result to
+'''a hardware serial terminal (9600 bps, e.g. COM4).
+'''
+'''This variant defines TC77_HardwareSPI, so the library drives the sensor via the chip's
+'''Hardware SPI module (MSSP1) instead of bit-banging.  Confirmed working on real hardware:
+'''correct Manufacturer ID detection (0x54xx) and stable, physically accurate temperature
+'''readings, with TC77_SCK/TC77_DO/TC77_DI mapped to PortB (matching this board's wiring),
+'''NOT the 18F4550's usual fixed MSSP1 silicon pins (RC3/RC4/RC5).
+'''
+'''See TC77.h's "Implementation notes" for a real bug this configuration exposed and its fix:
+'''toggling TC77_DO's direction (Dir TC77_DO Out/In) around a Configuration-register write -
+'''needed for Software SPI's bit-bang, to avoid contending with the TC77 on the shared SI/O pin -
+'''silently broke Hardware SPI writes on this board.  TC77WriteConfig/TC77Detect now skip that
+'''direction toggling entirely when TC77_HardwareSPI is defined.
+'''
+'''Wiring (as physically connected on this board):
+'''  TC77 CS   -> PortB.2
+'''  TC77 SCK  -> PortB.1
+'''  TC77 SI/O -> PortB.0
+'''
+'''Functional List (TC77.h calls used by this program)
+'''  Function TC77Detect     as Word   In: none   Out: return value (raw Manufacturer ID; high byte = 0x54 if genuine); leaves TC77 in Continuous Conversion mode
+'''  Sub      TC77FormatTemp           In: none   Out: TC77Str, TC77RawRegister, TC77Dec1 (and TC77Int/TC77Dec, via TC77ReadTemp)
+'''
+'''@author    Evan Venn
+'''@licence   GPL
+'''@version   1.0
+'''@date      2026-08-25
+'''********************************************************************************
+
+' ----- Configuration
+#chip 18F4550, 48
+#config MCLRE   = on   // Master Clear (reset pin) enabled
+#config FOSC    = HSPLL_HS  // external crystal + PLL, high-speed range
+#config PLLDIV  = 5    // 20MHz crystal / 5 = 4MHz PLL input
+#config CPUDIV  = OSC1_PLL2 // CPU clock = PLL output(96MHz) / 2 = 48MHz
+#config USBDIV  = 2    // USB clock = PLL output(96MHz) / 2 = 48MHz (fixed by USB spec)
+#config VREGEN  = on   // enable the on-chip USB 3.3V regulator
+#config PBADEN  = off  // PORTB.0-4 start as digital I/O, not analog
+#config LVP     = off  // disable low-voltage programming (frees RB5)
+
+#option Explicit
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
+' ----- TC77 port configuration - Hardware SPI (MSSP1)
+#DEFINE TC77_HardwareSPI
+
+    // You can use a shared constant to set a consant with the desired SPIClockMode
+    // TC77 requires SPI Mode 0,0 (CPOL=0, CPHA=0)
+    #DEFINE HWSPIClockMode  SPI_CPOL_0 + SPI_CPHA_0
+
+    // Selects the SPIMode speed (Master/MasterFast/MasterSlow/MasterUltraFast) - see hwspi.h.
+    // TC77 supports up to 7MHz; MasterFast is well within that on this chip.
+    #DEFINE HWSPIMode   MasterFast
+
+#DEFINE TC77_CS   PortB.2
+#DEFINE TC77_SCK  PortB.1
+#DEFINE TC77_DO   PortB.0
+#DEFINE TC77_DI   PortB.0
+
+#include <TC77.h>
+
+' ----- Variables
+Dim TC77MfgID as Word = 0
+
+Wait 3 s // for terminal to settle
+
+'To initialise the USART
+HSerSend( 0x00 )
+#ifdef TC77_HardwareSPI
+  HserPrint "TC77 Temperature Sensor (Hardware SPI)"
+#else
+  HserPrint "TC77 Temperature Sensor (Software SPI)"
+#endif
+HserPrintCRLF
+
+'Confirm the sensor is present before starting - runs the datasheet's documented single-CS
+'detect sequence (read temp, write Shutdown, read Manufacturer ID, write Continuous Conversion),
+'so it needs TC77_DO wired to the TC77 as above.  If TC77_DO is left unconnected, remove this
+'block and go straight to the read loop.
+TC77MfgID = TC77Detect
+HserPrint "Manufacturer ID: 0x"
+HSerPrint WordToHex(TC77MfgID)
+HserPrint "  "
+if TC77MfgID_H = 0x54 then
+  HserPrint "TC77 detected"
+else
+  HserPrint "TC77 NOT detected - check wiring"
+end if
+HserPrintCRLF
+
+Do
+
+    TC77FormatTemp
+
+    HserPrint "Raw: 0x"
+    HserPrint WordToHex(TC77RawRegister)
+    HserPrint "  Temperature: "
+    HserPrint TC77Str
+    HserPrint " C  (rounded: ."
+    HserPrint TC77Dec1
+    HserPrint ")"
+    HserPrintCRLF
+
+    Wait 1 s
+
+Loop
