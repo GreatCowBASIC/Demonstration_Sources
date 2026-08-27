@@ -25,7 +25,7 @@
 //Set microcontroller required
 #chip 18F46Q35
 #option Explicit
-
+!
 /*
         ------------PORTA---------------
 Bit#:  -7---6---5---4---3---2---1---0---
@@ -57,7 +57,7 @@ IO:    ---------------------------------
         // Set the LEDs on
         PORTB = 255
         wait 500 ms
-        
+
         // Set the LEDs off
         PORTB = 0
         wait 500 ms

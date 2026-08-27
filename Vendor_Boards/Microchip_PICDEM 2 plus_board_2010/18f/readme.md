@@ -3,13 +3,16 @@
 This document describes a series of GCBASIC demonstration programs written for the
 **PIC18FxxQ35** (Q35 family), progressing from basic digital I/O through ADC, debounced
 input, UART/LCD output, RAM/string handling, hardware timers, external interrupts,
-EEPROM/program-memory data storage, I2C/SPI graphical displays, and PWM/motor-brightness
-control.
+EEPROM/program-memory/SAF data storage, I2C/SPI graphical displays, PWM/motor-brightness
+control, and hardware Configurable Logic Cell (CLC) logic.
 
 All demos share the same physical board layout (4 LEDs on `PORTB.0-3`, a potentiometer
 on `PORTA.0`, a direction switch on `PORTA.4`, an LCD header on `PORTD`, and a reset
 button on `PORTE.3`), so later demos build directly on the constants and wiring
 established in the earlier ones.
+
+A companion slide-deck series lives in [`tutorials/`](#tutorials-tutorials) and walks
+through the same progression lesson-by-lesson.
 
 ---
 
@@ -41,13 +44,15 @@ though the primary VDD/VSS pins are powered. Always verify VDDIO2 before trouble
 | 105 | ...to_LCD | ✓ | ✓ | ✓ | ✓ | | | | | | | | |
 | 110 | ...timer_overflow_event | ✓ | ✓ | ✓ | | | ✓ | | | | | | |
 | 120 | ...8bit_timer0 | ✓ | ✓ | ✓ | | | ✓ | | | | | | |
+| 130 | ...16bit_timer0 | ✓ | ✓ | ✓ | | | ✓ | ✓ | | | | | |
 | 140 | showing_eeprom_data_to_serial_terminal | ✓ | ✓ | ✓ | | | | ✓ | | | | ✓ | |
 | 150 | showing_tableeeprom_data_to_serial_terminal | ✓ | | ✓ | | | | ✓ | | | | ✓ | |
 | 160 | ensuring_program_matches_chip_specified | ✓ | | ✓ | | | | ✓ | | | | | |
 | 170 | show_i2c_devices_to_serial_terminal | ✓ | ✓ | ✓ | | | | ✓ | ✓ | | | | |
 | 180 | i2c_glcd_using_ssd1306_64_32 | ✓ | | ✓ | ✓ | | | | ✓ | | | | ✓ |
-| 190 | i2c_glcd_using_ssd1306_128_64 | ✓ | | ✓ | ✓ | | | | ✓ | | | | ✓ |
-| 200 | i2c_glcd_using_ssd1306_128_32 | ✓ | | ✓ | ✓ | | | | ✓ | | | | ✓ |
+| 190 | i2c_glcd_using_ssd1306_128_32 | ✓ | | ✓ | ✓ | | | | ✓ | | | | ✓ |
+| 200 | i2c_glcd_using_ssd1306_128_64 | ✓ | | ✓ | ✓ | | | | ✓ | | | | ✓ |
+| 205 | i2c_glcd_using_ssd1309_128_64 | ✓ | | ✓ | ✓ | | | | ✓ | | | | ✓ |
 | 210 | i2c_glcd_sprites_using_ssd1306 | ✓ | | ✓ | | | | | ✓ | | | | ✓ |
 | 220 | i2c_glcd_voltmeter_using_ssd1306 | ✓ | | ✓ | ✓ | | | | ✓ | | | | ✓ |
 | 225 | i2c_glcd_bmp_ssd1306_128_64 | ✓ | | ✓ | | | | | ✓ | | | | ✓ |
@@ -58,9 +63,12 @@ though the primary VDD/VSS pins are powered. Always verify VDDIO2 before trouble
 | 243 | use_pwmout_to_control_led_brightness | ✓ | | | | | | | | | ✓ | | |
 | 244 | use_fixed_mode_pwm_via_ccp | ✓ | | ✓ | | | | ✓ | | | ✓ | | |
 | 245 | use_pwm_via_ccp_and_adc | ✓ | | ✓ | ✓ | | | | | | ✓ | | |
-| 250 | using_external_interrupt_to_raise_an_event | ✓ | ✓ | ✓ | | | | | | | | | |
-| 251 | using_an_interrupt_control_an_leds_brightness | ✓ | | ✓ | | | ✓ | | | | ✓ | | |
-| 260 | showing_datablock_to_LCD | ✓ | | ✓ | | | | ✓ | | | | ✓ | |
+| 246 | using_16bitpwm_operations | | | | ✓ | | | | | | ✓ | | |
+| 250 | millis | ✓ | | ✓ | | | ✓ | | | | | | |
+| 251 | using_external_interrupt_to_raise_an_event | ✓ | ✓ | ✓ | | | | | | | | | |
+| 252 | using_an_interrupt_control_an_leds_brightness | ✓ | | ✓ | | | ✓ | | | | ✓ | | |
+| 260 | showing_storage | ✓ | | ✓ | | | | ✓ | | | | ✓ | |
+| 270 | using_CLC | ✓ | ✓ | | | | | | | | | | |
 
 ---
 
@@ -158,6 +166,16 @@ Same 8-bit Timer0 configuration as 110, but **polled instead of interrupt-driven
 side-by-side contrast of ISR vs. flag-polling use of the same hardware timer; also
 touches the `OSCTUNE` register.
 
+## 130 — `130_rotate_the_leds_using_16bit_timer0_.gcb`
+**Tests:** Output, Input, Config, Timer, USART
+
+Steps Timer0 up to **16-bit mode** (`#DEFINE TMR0_16BIT`, `PRE0_64 + TMR0_FOSC4`),
+preloading the count register (`SetTimer(0, 3036)`) to time a precise 1-second rollover
+at 16 MHz. On each overflow the main loop polls `TMR0IF`, rotates the LEDs, resets after
+4 rotations, and prints a "." to the serial terminal as a heartbeat — the same
+poll-a-timer idiom as 120, extended to a longer, more accurate interval via the wider
+counter.
+
 ## 140 — `140_showing_eeprom_data_to_serial_terminal.gcb`
 **Tests:** Output, Input, Config, USART, EEPROM
 
@@ -201,20 +219,29 @@ library (`#DEFINE GLCD_TYPE GLCD_TYPE_SSD1306_64x32`). Draws boxes, a circle, an
 prints text/numbers, and live-updates a potentiometer reading (`ReadAD`) on screen —
 exercising `GLCDPrint`, `Box`, `Circle`, `Line`, and `GLCDCLS` in "Full Memory" mode.
 
-## 190 — `190_i2c_glcd_using_ssd1306_128_64.gcb`
+## 190 — `190_i2c_glcd_using_ssd1306_128_32.gcb`
 **Tests:** Output, Config, ADC, I2C, GLCD
 
-Same idea as 180, scaled up to a 128×64 SSD1306 panel. Also demonstrates the
-`GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE` compile switch and
+Same idea as 180, on a 128×32 SSD1306 panel (`GLCD_TYPE_SSD1306_32`). Also demonstrates
+the `GLCD_TYPE_SSD1306_LOWMEMORY_GLCD_MODE` compile switch and
 `GLCD_Open_PageTransaction`/`GLCD_Close_PageTransaction`, showing how to trade RAM usage
 for display update method (full-memory buffer vs. low-memory page-at-a-time writes).
 
-## 200 — `200_i2c_glcd_using_ssd1306_128_32.gcb`
+## 200 — `200_i2c_glcd_using_ssd1306_128_64.gcb`
 **Tests:** Output, Config, ADC, I2C, GLCD
 
-Same pattern again for a 128×32 SSD1306 panel (`GLCD_TYPE_SSD1306_32`) — confirms the
-same GLCD API/code works unchanged across all three supported SSD1306 resolutions by
+Same pattern again for a 128×64 SSD1306 panel (default `GLCD_TYPE_SSD1306`, driven in
+Full Memory mode by default with the low-memory `#DEFINE` left commented out) — confirms
+the same GLCD API/code works unchanged across all three supported SSD1306 resolutions by
 just swapping the `GLCD_TYPE` constant.
+
+## 205 — `205_i2c_glcd_using_ssd1309_128_64.gcb`
+**Tests:** Output, Config, ADC, I2C, GLCD
+
+A controller variant of 200: same 128×64, full-memory-mode drawing/text demo, but
+targeting the **SSD1309** OLED controller instead of SSD1306 — confirms the `glcd.h`
+library supports both controller ICs on the same physical panel size/interface without
+further code changes.
 
 ## 210 — `210_i2c_glcd_sprites_using_ssd1306.gcb`
 **Tests:** Output, Config, I2C, GLCD
@@ -236,9 +263,11 @@ trig/scale-driven graphics rather than static shapes.
 **Tests:** Output, Config, I2C, GLCD
 
 Demonstrates bitmap image display: `#INCLUDE "ANOBIUMFULL.BMP"` auto-converts a BMP file
-into a program-memory table at compile time, which is then walked pixel-by-pixel with
-`PSet` to render the image onto a 128×64 SSD1306 panel — a compile-time asset pipeline
-for graphics rather than hand-coded shapes or sprites.
+into a program-memory table at compile time (materialized in this folder as
+`ANOBIUMFULL.GCB`, a generated `Table ... End Table` of the image's raw pixel bytes),
+which is then walked pixel-by-pixel with `PSet` to render the image onto a 128×64
+SSD1306 panel — a compile-time asset pipeline for graphics rather than hand-coded shapes
+or sprites.
 
 ## 230 — `230_spi_glcd_using_ILI9341.gcb`
 **Tests:** Output, Config, SPI, GLCD
@@ -299,7 +328,28 @@ Combines ADC and hardware PWM: `HPWM 1, 38, ADCVal` continuously updates the CCP
 duty cycle from a live potentiometer reading, so LED brightness (or motor speed) tracks
 the pot in real time — variable-mode hardware PWM, as opposed to 244's fixed duty cycle.
 
-## 250 — `250_using_external_interrupt_to_raise_an_event.gcb`
+## 246 — `246_using_16bitpwm_operations.gcb`
+**Tests:** ADC, PWM
+
+Moves off the CCP module entirely onto the Q35's dedicated **16-bit PWM peripheral**
+(`PWM1CLK`, `PWM1PRL`/`PWM1PRH`, `PWM1S1P1L`/`H`, `PWM1S1P2L`/`H`, `PWM1CON`), configured
+directly via register writes (no `HPWM`/`PWMOn` library call) for a 38 kHz / 50% base
+signal on all four `PORTB` LED pins via PPS. The main loop then reads the potentiometer
+with `ReadAD10` and rescales it with `Scale()` into the 16-bit duty register
+(`myDuty As Word Alias PWM1S1P1H, PWM1S1P1L`), reloading the period/duty registers on
+change via `LD_PWM1CON` — the register-level counterpart to 245's `HPWM` call.
+
+## 250 — `250_millis.gcb`
+**Tests:** Output, Config, Timer
+
+Introduces the `millis.h` library (`#include <millis.h>`, `millis()`) as a
+`micros()`-style non-blocking timebase: the main loop reads a running millisecond
+counter and toggles `LEDD3` every 500 ms by comparing elapsed time (`CurMs - LastMs`)
+instead of calling `Wait`, wrapping the comparison in `IntOff`/`IntOn` to protect the
+read — a lighter-weight alternative to hand-rolling a Timer0 ISR when you just need a
+periodic, non-blocking tick.
+
+## 251 — `251_using_external_interrupt_to_raise_an_event.gcb`
 **Tests:** Output, Input, Config
 
 The external interrupt input, **INT0**: `PORTA.4` is routed via PPS (`INT0PPS`) to the
@@ -308,29 +358,79 @@ interrupt manager, configured for a falling edge (`INT0EDG = 0`). The ISR
 main loop independently toggles `LEDD3` every 100 ms via a plain `Wait` — contrasting a
 hardware-interrupt-driven output against a software-timed polled one on the same device.
 
-> **Note:** the port-map diagram in this file labels `PORTB.0` as "INT", but the
-> interrupt is actually sourced from `PORTA.4` via PPS. `#DEFINE INT0 PORTB.0` and
-> `#DEFINE LEDD0 PORTB.0` both still point at the same pin; that constant isn't
-> referenced elsewhere in the code, but it's worth checking against your actual board
-> wiring.
-
-## 251 — `251_using_an_interrupt_control_an_leds_brightness.gcb`
+## 252 — `252_using_an_interrupt_control_an_leds_brightness.gcb`
 **Tests:** Output, Config, Timer, PWM
 
 Generates **software PWM entirely inside a Timer0-overflow ISR**
 (`On Interrupt Timer0Overflow Call PWMHandler`): a free-running `PWMCounter` (0–99) is
 compared against a `MotorSpeed` value each interrupt to decide whether the output pin is
-high or low, producing a variable-duty waveform without any CCP hardware — framed as
-driving a motor's speed, but applicable directly to LED brightness.
+high or low, producing a variable-duty waveform without any CCP or PWM peripheral hardware
+— framed as driving a motor's speed, but applicable directly to LED brightness.
 
-## 260 — `260_showing_datablock_to_LCD.gcb`
+## 260 — `260_showing_storage.gcb`
 **Tests:** Output, Config, USART, EEPROM
 
-Demonstrates **program-memory `DATA` blocks** alongside `EEPROM` blocks as two different
-ways to store fixed reference data. Uses the `@` operator to get a data block's address
-and `ProgramRead` to read values back out of program memory (PROGMEM), printing
-addresses and values to both the LCD and the serial terminal — useful for storing
-lookup tables, calibration constants, or text that shouldn't live in EEPROM.
+Surveys the chip's non-volatile/reference-data storage options side by side:
+**program-memory `DATA` blocks** (`DATA myDataBlock1 ... End DATA`), **compile-time
+`EEPROM` blocks** (`EEPROM MyEEData1/2 ... End EEPROM`), and **Storage Area Flash**
+(`SAFWrite`/`SAFRead`) as a third, flash-backed key/value store. Uses the `@` operator
+to get a data block's address and `ProgramRead` to read values back out of program
+memory, printing each address/value pair to both the LCD and the serial terminal.
+
+## 270 — `270_using_CLC.gcb`
+**Tests:** Output, Input
+
+No polling, no interrupt, no main-loop code at all — the switch-to-LED logic is wired
+entirely in hardware using the **Configurable Logic Cell (CLC)** peripheral. `RA4` (the
+switch) is routed via PPS into `CLC3`'s input, and `RB0`/`RB3` are routed out of `CLC3`
+as an inverted OR-XOR gate (`CLCnPOL`, `CLCnGLS0`, `CLCnCON`), so the LEDs respond to the
+switch with zero CPU involvement — a demonstration of offloading simple glue logic (and
+things like LED dimming or signal modulation) from firmware onto silicon.
+
+---
+
+## Tutorials (`tutorials/`)
+
+A parallel series of slide decks (`.pptx`) that teaches the same material as the demo
+programs above, lesson by lesson. They're a good starting point if you want the
+explanation *behind* a demo rather than just the source code.
+
+| Slide deck | Covers | Related demo(s) |
+|---|---|---|
+| `001_Initial_Challenges.pptx` | Board bring-up and common first-time gotchas (incl. VDDIO2) | 010 |
+| `GCBASIC_Part1.pptx` | Hello World / basic digital output | 010, 020 |
+| `GCBASIC_Part2.pptx` | Alternative output idioms, bit rotation | 030, 040 |
+| `GCBASIC_Part3_ADC.pptx` | Analog-to-digital conversion | 050, 060 |
+| `GCBASIC_Part4_RotateADCDelay.pptx` | ADC-scaled variable delay | 060, 090 |
+| `GCBASIC_Part5_SwitchSetsLEDs.pptx` | Debounced digital input | 070 |
+| `GCBASIC_Part6_Using_the_Reset.pptx` | Repurposing MCLR as a general input | 080 |
+| `GCBASIC_Part7_LPC_demo.pptx` | Full switch + ADC + direction integration | 090 |
+| `GCBASIC_Part8_Show_Serial_Data.pptx` | UART output, RAM/string handling | 100 |
+| `GCBASIC_Part8_Show_LCD_Bonus.pptx` | Character LCD output | 105 |
+| `GCBASIC_Part9_Timers.pptx` | Hardware Timer0: interrupt-driven vs. polled, 8/16-bit | 110, 120, 130 |
+| `GCBASIC_Part10_EEPROM_ops.pptx` | Runtime and compile-time EEPROM | 140, 150, 160 |
+| `GCBASIC_Part11_I2C.pptx` | I2C bus scanning | 170 |
+| `GCBASIC_Part12_GLCD_I2C_demos.pptx` | I2C graphical OLED displays | 180, 190, 200, 205, 210, 220, 225 |
+| `GCBASIC_Part13_GLCD_SPI.pptx` | SPI graphical LCD displays | 230 |
+| `GCBASIC_Part14_PWM.pptx` | PWM: discovery, software and hardware techniques | 240–246 |
+| `GCBASIC_Part15_Milllis_Interrupt.pptx` | Non-blocking timing and external interrupts | 250, 251, 252 |
+| `GCBASIC_Part16_storage.pptx` | DATA/EEPROM blocks and Storage Area Flash | 260 |
+| `GCBASIC_Part17_clc.pptx` | Configurable Logic Cell (CLC) | 270 |
+| `GCBASIC_Part18_toolchain.pptx` | The GCBASIC build toolchain | — |
+| `GCBASIC_Part19_ASMs.pptx` | Inline/mixed assembly with GCBASIC | — |
+| `GCBASIC_Part20_Summary.pptx` | Series wrap-up and recap | — |
+
+---
+
+## Other files in this folder
+
+- **`ANOBIUMFULL.GCB` / `anobiumfull.bmp`** — the source bitmap and its compiler-generated
+  `Table ... End Table` byte data, produced from the BMP by demo 225's
+  `#INCLUDE "ANOBIUMFULL.BMP"` step. Not a standalone demo; regenerated as part of
+  building 225.
+- **`GCBversionnumber.GCB`** — an auto-generated compiler build-info stub
+  (`GCBBuildStr`/`GCBBuildTimeStr`) stamped in by the GCBASIC toolchain, not hand-written
+  demo source.
 
 ---
 
@@ -345,23 +445,29 @@ Raw pin I/O (010-030)
                -> Full integration: switch + ADC + direction (090)
                   -> Output peripherals: PPS UART + RAM/string test (100),
                      parallel LCD (105)
-                     -> Hardware Timer0: interrupt-driven (110) vs. polled (120)
+                     -> Hardware Timer0: interrupt-driven (110), polled 8-bit (120),
+                        polled 16-bit (130)
                         -> Non-volatile storage: runtime EEPROM (140),
                            compile-time EEPROM tables (150)
                               -> Build-safety check: chip-match verification (160)
                                  -> I2C bus scanning (170)
-                                    -> I2C GLCD graphics: SSD1306 @ 64x32/128x64/128x32
-                                       (180/190/200), sprites (210), voltmeter gauge (220),
+                                    -> I2C GLCD graphics: SSD1306 @ 64x32/128x32/128x64
+                                       (180/190/200), SSD1309 @ 128x64 (205),
+                                       sprites (210), voltmeter gauge (220),
                                        BMP image rendering (225)
                                        -> SPI GLCD graphics (230)
                                           -> PWM: discovery/diagnostics (240),
                                              bit-banged/PulseOut/PWMOut software
                                              techniques (241-243), hardware CCP
-                                             fixed (244) and ADC-variable (245) PWM
-                                             -> External interrupt: INT0 via PPS (250)
-                                                -> Interrupt-driven software PWM (251)
-                                                   -> Program-memory DATA/EEPROM
-                                                      blocks (260)
+                                             fixed (244) and ADC-variable (245) PWM,
+                                             register-level 16-bit PWM (246)
+                                             -> Non-blocking timing via millis() (250)
+                                                -> External interrupt: INT0 via PPS (251)
+                                                   -> Interrupt-driven software PWM (252)
+                                                      -> Program-memory DATA/EEPROM/SAF
+                                                         storage (260)
+                                                         -> Hardware CLC logic, zero
+                                                            firmware (270)
 ```
 
 Every demo that drives an LED depends on **VDDIO2** being correctly supplied, since the
