@@ -1,0 +1,141 @@
+/*
+GCBASIC Program.
+--------------------------------------------------------------------------------------------------------------------------------
+Description:  Digital frequency counter for a PIC16F1847 running from a
+               10 MHz external clock. Measures a ~4.9 MHz reference
+               signal (the Drake TR-4C's PTO/VFO chain, sampled on the
+               T1CKI pin) and reports the reading over a software-serial
+               UART, formatted as a punctuated MHz.kHz.Hz string.
+
+SAMPLING METHOD
+
+                This measures frequency by putting Timer1 into asynchronous
+                external-counter mode (T1CON = 0b10000101: TMR1CS=10 selects
+                the T1CKI pin as the clock source, nT1SYNC=1 decouples it
+                from the instruction clock so it isn't limited to Fosc/4),
+                with the signal arriving on RB6, which is physically the
+                same pin as T1CKI. It gates that hardware counter for a
+                short, fixed GATE_MS window, reads the raw 16-bit
+                TMR1H:TMR1L count, and scales it by x100 to get Hz. Because
+                10 ms at ~4.9 MHz only accumulates about 49,000 counts -
+                safely under the register's 65,535 ceiling - there's no
+                need to track Timer1 overflow at all; the routine just
+                repeats this short gate AVERAGE_SAMPLES times and averages
+                the results.
+
+PROGRAMMING WARNING
+
+                RB6 is shared between T1CKI (the frequency input) and PGC, the
+                ICSP programming clock line. The external signal being measured
+                must be physically disconnected from RB6 before programming the
+                chip, or the programmer will not be able to clock the device.
+
+@author     Evan R Venn
+@licence    GPL
+@version    1.00
+@date       2026-09-05
+
+ ------------PORTA---------------
+Bit#: -7---6---5---4---3---2---1---0---
+IO: ---------------------------LED-----
+IO: ---------------------------O-------
+
+ ------------PORTB----------------
+Bit#: -7---6---5---4---3---2---1---0---
+IO: -----T1CKI--------------------TX--
+IO: -------I-----------------------O---
+                
+*/
+
+#chip 16F1847, 10
+#config FOSC_ECM, WDTE_OFF, PWRTE_ON, BOREN_ON, LVP_OFF
+#option Explicit
+
+// ----- Includes
+#include <SoftSerial.h>
+
+// ----- Configuration
+#Define LED1 PortA.1
+
+#define SER1_BAUD 9600   ; baudrate must be defined
+; Config I/O ports for transmitting:
+#define SER1_TXPORT PORTB  ; I/O port (without .bit) must be defined
+#define SER1_TXPIN 0       ; portbit  must be defined
+#define Ser1CRLF   Ser1Send  13:Ser1Send  10
+
+// ----- Define Hardware settings
+DIR LED1 Out
+
+// ----- Variables
+Dim RAW_FREQUENCY As Long
+Dim FREQ_STRING as String * 10
+
+// ----- Main body of program
+Wait 2 s
+Ser1CRLF
+Ser1Print "DRAKE TR-4C": Ser1CRLF
+Ser1Print "WARMING UP": Ser1CRLF
+
+Wait 3 s
+
+Do
+    LED1 = !LED1
+    Wait 1 s
+
+    measure_frequency
+
+Loop
+
+// ----- Subroutines
+
+#DEFINE GATE_MS            10     // gate window; keep short enough that
+                                   // counts stay under 65535 at max expected Hz
+#DEFINE AVERAGE_SAMPLES    40
+#define ADJUST = INT(490000 - 489795)   // calibration offset vs. reference
+
+Sub measure_frequency()
+
+    Dim j As Word
+    Dim count As Word
+    Dim freq As Long
+    Dim freq_accum As Long
+
+    DIR PORTB.6 In                // T1CKI/CCP2 shared input pin (RB6) - also PGC (ICSP clock); disconnect signal before programming
+
+    freq_accum = 0
+
+    For j = 1 To AVERAGE_SAMPLES
+
+        TMR1H = 0
+        TMR1L = 0
+
+        // TMR1CS=10 (clock source = T1CKI pin), T1CKPS=00 (1:1),
+        // T1OSCEN=0, nT1SYNC=1 (async - required above Fosc/4), TMR1ON=1
+        T1CON = 0b10000101
+
+        Wait GATE_MS ms
+
+        T1CON = 0b10000100        // TMR1ON=0, stop counting
+
+        count = TMR1L : count_h = TMR1H
+
+        freq = count * 100         // scale 10 ms window up to Hz
+        freq_accum = freq_accum + freq
+
+    Next j
+
+    RAW_FREQUENCY = freq_accum / AVERAGE_SAMPLES
+    RAW_FREQUENCY = RAW_FREQUENCY - ADJUST
+    display_frequency
+
+End Sub
+
+Sub display_frequency
+    FREQ_STRING = LongToString(RAW_FREQUENCY)
+    Ser1Print Left(FREQ_STRING, 1)
+    Ser1Print "."
+    Ser1Print Mid(FREQ_STRING, 2, 3)
+    Ser1Print "."
+    Ser1Print Mid(FREQ_STRING, 5, 2)
+    Ser1CRLF
+End Sub
