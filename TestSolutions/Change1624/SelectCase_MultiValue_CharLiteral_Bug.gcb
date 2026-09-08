@@ -1,0 +1,68 @@
+' Bug 3: Select Case with a multi-value list of CHARACTER LITERALS silently
+' only tests the FIRST value in the list. The second (and any further) value
+' is dropped entirely - no warning, no error - it simply never matches.
+'
+' How to see the bug:
+'   1. Compile this file with the CURRENT (unfixed) compiler.
+'   2. Inspect the .lst file for the "Case "a", "A"" lines below - only ONE
+'      comparison instruction is emitted per Case (against "a"), not two.
+'   3. Run in the simulator - the LCD will show TEST 1 as MATCH (correct),
+'      but TEST 2 will show NO MATCH even though "A" is clearly listed in
+'      the same Case as "a".
+'
+' Expected/correct behaviour once fixed: both TEST 1 and TEST 2 should show
+' MATCH.
+
+#chip 16f877a, 20
+'Setup LCD Parameters (4-bit bus, matches Vendor_Boards\Real_Pic_Simulator\LCD_demonstration.gcb)
+#DEFINE LCD_IO 4
+#DEFINE LCD_NO_RW
+#DEFINE LCD_SPEED FAST
+
+#DEFINE LCD_RS PortB.4
+#DEFINE LCD_Enable PortB.5
+#DEFINE LCD_DB4 PortB.0
+#DEFINE LCD_DB5 PortB.1
+#DEFINE LCD_DB6 PortB.2
+#DEFINE LCD_DB7 PortB.3
+
+#option explicit
+
+Dim MyByte As Byte
+
+CLS
+Print "SELECT CASE BUG"
+Locate 1,0
+Print "CHAR MULTI-VALUE"
+Wait 3 s
+
+' ----- Test 1: lowercase should always match (proves the first value works)
+MyByte = "a"
+CLS
+Locate 0,0
+Print "TEST1 (a):"
+Locate 1,0
+Select Case MyByte
+  Case "a", "A"
+    Print "MATCH"          ' <<< EXPECTED to run - and it does, on the real compiler
+  Case Else
+    Print "NO MATCH"
+End Select
+Wait 3 s
+
+' ----- Test 2: uppercase should ALSO match "A", but currently does not
+MyByte = "A"
+CLS
+Locate 0,0
+Print "TEST2 (A):"
+Locate 1,0
+Select Case MyByte
+  Case "a", "A"
+    Print "MATCH"          ' <<< EXPECTED to run, but with the bug it does NOT -
+  Case Else                '     the LCD shows NO MATCH instead, because the
+    Print "NO MATCH"       '     compiled comparison only ever checks for "a"
+End Select
+Wait 3 s
+
+Do
+Loop

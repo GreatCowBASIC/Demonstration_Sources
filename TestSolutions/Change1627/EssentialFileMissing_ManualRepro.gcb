@@ -1,0 +1,28 @@
+' Manual repro for the "Essential file missing" error (Change 1627).
+'
+' This cannot be exercised by a normal automated compile, since the bug it
+' guards against only shows up when a file listed in include\lowlevel.dat
+' is missing from disk - not something a .gcb source file can express on
+' its own. To verify by hand:
+'
+'   1. Rename include\lowlevel\usart.h (in the include tree the compiler
+'      you are testing actually reads from - see its own /version output
+'      for which install directory that is) to something else, e.g. test.h.
+'   2. Compile this file. Expect a single, clean error:
+'        Error: Essential file missing: <path>\usart.h (listed in lowlevel.dat)
+'      and no other unrelated errors (in particular, no second error for a
+'      trailing blank line in lowlevel.dat - Change 1627 also fixed that).
+'   3. Rename usart.h back. Expect this file to compile normally again,
+'      identical to any other ordinary HSerSend program.
+
+#chip 16F877A, 20
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+Dir PORTC.6 Out
+
+Do
+  HSerSend(65)
+  Wait 100 ms
+Loop

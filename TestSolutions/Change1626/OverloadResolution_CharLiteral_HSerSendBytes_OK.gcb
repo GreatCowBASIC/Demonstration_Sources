@@ -1,0 +1,28 @@
+#chip 16F15355
+#option Explicit
+
+#DEFINE USART_BAUD_RATE 9600
+#DEFINE USART_BLOCKING
+#DEFINE USART_DELAY OFF
+
+    dim ch1 as byte = "B"
+    dim ch2 as byte = "E"
+    dim ch3 as byte = "N"
+    dim ch4 as byte = "9"
+    dim tst2 as byte = 0x31
+        HserPrintCRLF
+        HSerSendBytes (ch1,ch2,ch3,ch4)//BEN9
+        HserPrintCRLF
+        HSerSendBytes (ch1,"R",ch3,ch4)//BRN9
+        HserPrintCRLF
+        HSerSendBytes (ch1,ch2,"R",ch3)//BERN
+        HserPrintCRLF
+        HSerSendBytes (ch1, tst2)//B1
+        HserPrintCRLF
+        HSerSendBytes (tst2," ",tst2)//1 1
+        HserPrintCRLF
+        HSerSendBytes (tst2,0x32,tst2)//121
+        HserPrintCRLF
+        HSerSendBytes ("J","I","M")
+        HserPrintCRLF
+        HserPrintCRLF

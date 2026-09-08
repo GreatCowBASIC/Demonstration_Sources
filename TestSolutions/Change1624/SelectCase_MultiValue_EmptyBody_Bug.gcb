@@ -1,0 +1,59 @@
+' Bug 4: a Select Case branch with a multi-value list and an EMPTY body
+' (nothing between it and the next Case) fails to compile, but with a
+' confusing, misattributed error message.
+'
+' How to see the bug:
+'   1. Compile this file with the CURRENT (unfixed) compiler.
+'   2. Compilation fails with:  Invalid variable name: 13,10
+'      attributed to the "Case Else" line below - even though nothing on
+'      that line is a variable name. The real issue is the empty-bodied
+'      "Case 13, 10" line just above it.
+'   3. This is a COMPILE-time failure - the program never builds, so there
+'      is no LCD output to see for this one; the chip/LCD setup below is
+'      only present for consistency with the sibling test file and to keep
+'      this a realistic, complete program once the bug is fixed.
+'
+' Expected/correct behaviour once fixed: this should compile cleanly, with
+' Case 13, 10 acting as a no-op (falls straight through to End Select) for
+' either of those two values, and the LCD should show "OK" underneath.
+
+#chip 16f877a, 20
+'Setup LCD Parameters (4-bit bus, matches Vendor_Boards\Real_Pic_Simulator\LCD_demonstration.gcb)
+#DEFINE LCD_IO 4
+#DEFINE LCD_NO_RW
+#DEFINE LCD_SPEED FAST
+
+#DEFINE LCD_RS PortB.4
+#DEFINE LCD_Enable PortB.5
+#DEFINE LCD_DB4 PortB.0
+#DEFINE LCD_DB5 PortB.1
+#DEFINE LCD_DB6 PortB.2
+#DEFINE LCD_DB7 PortB.3
+
+#option explicit
+
+Dim MyByte As Byte
+MyByte = 13
+
+CLS
+Print "SELECT CASE BUG"
+Locate 1,0
+Print "EMPTY CASE BODY"
+Wait 3 s
+
+CLS
+Locate 0,0
+Print "TEST (13,10):"
+Locate 1,0
+
+Select Case MyByte
+  Case 13, 10
+    ' <<< deliberately empty - this is what triggers the bug
+  Case Else
+    Print "UNEXPECTED"
+End Select
+
+Print "OK"                 ' <<< only reached once this compiles and falls through correctly
+
+Do
+Loop

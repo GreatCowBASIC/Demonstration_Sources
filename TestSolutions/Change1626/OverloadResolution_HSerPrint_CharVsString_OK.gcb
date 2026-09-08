@@ -1,0 +1,15 @@
+#chip 16F877A, 20
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+Dir PORTC.6 Out
+Dim numval As Word = 1234
+
+Do
+  HSerPrint("A")
+  HSerPrint("Hello")
+  HSerPrint(65)
+  HSerPrint(numval)
+  Wait 100 ms
+Loop

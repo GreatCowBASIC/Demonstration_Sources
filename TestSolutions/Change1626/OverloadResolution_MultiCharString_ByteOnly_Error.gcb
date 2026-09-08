@@ -1,0 +1,12 @@
+#SKIPTEST
+#chip 16F877A, 20
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+Dim ch2 As Byte = 5
+
+Do
+  HSerSendBytes("HelloWorld", ch2)
+  Wait 100 ms
+Loop

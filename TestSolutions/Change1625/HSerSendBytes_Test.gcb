@@ -1,0 +1,14 @@
+#chip 16f877a, 20
+#option explicit
+
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+Dir PORTC.6 Out
+
+Do
+  HSerSendBytes(1, 2, 3)
+  HSerSend(13)
+  Wait 100 ms
+Loop
