@@ -22,7 +22,7 @@
 #DEFINE USART_TX_BLOCKING
 #DEFINE USART_DELAY OFF
 
-#include "clearram.h"
+#include <clearram.h>
 
 Dim myRAM as Long
 
