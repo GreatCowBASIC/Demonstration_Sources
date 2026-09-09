@@ -1,0 +1,961 @@
+/* ============================================================================
+   GCBASIC LANGUAGE TOUR
+   Chip: This tour is really for any chip
+
+   A tour of most of the GCBASIC language, with comments written for someone
+   learning the language for the first time - read it top to bottom alongside
+   the compiled output to see what each construct does.
+
+   A companion file, MEGA_STRESS_TEST__COMMON_MISTAKES.gcb, shows
+   common mistakes beginners make and what the compiler says in response to
+   each one.
+   ============================================================================ */
+
+#chip 18F46Q35
+#option explicit
+#include <maths.h>
+#include <trig2places.h>
+
+/* The Watchdog Timer's on/off config fuse is named WDTE on this chip - the
+   exact fuse name varies by chip family, so always check chipdata for your
+   own chip rather than assuming a name carries over. SEN means the fuse
+   only ENABLES watchdog control - the program still switches it on/off at
+   runtime with WDTCON0.SEN (see the WATCHDOG TIMER section further down). */
+#config WDTE = SEN
+
+/* ========================================================================
+   PPS (PERIPHERAL PIN SELECT) - on this chip family, peripherals are NOT
+   hard-wired to fixed pins the way they are on older chips. Without this
+   block, HSerPrint's USART output and HPWM's CCP1 output below would be
+   left on whatever pins reset to (or nowhere usable at all), silently -
+   no error, just no signal on the pin you expect. The values below are
+   copied from real, working demos for this exact chip family (not
+   invented): EUSART1 TX/RX from
+   Vendor_Boards/Great_Cow_Basic_Demo_Board/18F25Q10_ChipRange_Demonstrations
+   /210_Serial_Operations_Terminal.GCB, and CCP1 from
+   18f16q41_chiprange_demonstrations/240_pwm_fixed_modes.gcb.
+
+   #startup schedules InitPPS to run automatically before Main, at
+   priority 85 - after GCBASIC's own InitSys (80) but before the hardware
+   USART library's startup code (90), so the pins are already remapped by
+   the time HSerPrint's own initialisation runs. See ppsintro.adoc for why
+   85 specifically, and why it must never be removed.
+   ======================================================================== */
+#startup InitPPS, 85
+/* Chips with more than one EUSART use a numbered register name (U1RXPPS,
+   U2RXPPS, ...) instead of the plain "RXPPS" seen on single-EUSART chips -
+   the 18F46Q35 has two, so the first one is "U1RXPPS" here.
+
+   I2C1's SCL/SDA PPS registers are I2C1SCLPPS/I2C1SDAPPS on this chip
+   family - older 16F-family PPS chips instead use SSP1CLKPPS/SSP1DATPPS,
+   so always check your specific chip's naming rather than assuming. Each
+   I2C pin also needs its RCxPPS output-selector set (so the pin's output
+   driver is connected to the module), plus two extra per-pin settings I2C
+   specifically needs that USART/PWM didn't: RCxI2C_TH0 (I2C input
+   threshold level) and ODCCx (open-drain output, since I2C is a shared
+   open-drain bus). */
+Sub InitPPS
+  RC6PPS = 0x0009    /* RC6 -> EUSART1 TX */
+  U1RXPPS = 0x0017   /* RC7 -> EUSART1 RX */
+  CCP1PPS = 0x0010   /* RC0 -> CCP1 (bi-directional) */
+
+  RC3PPS = 0x0021      /* RC3 -> SCL1 (bi-directional) */
+  I2C1SCLPPS = 0x0013  /* SCL1 <- RC3 */
+  Dir PORTC.3 Out      /* I2C pins are driven open-drain, but still "Out" */
+  RC3I2C_TH0 = 1       /* set the I2C input level for this pin */
+  ODCC3 = 1            /* open-drain output, required for I2C */
+  RC4PPS = 0x0022      /* RC4 -> SDA1 (bi-directional) */
+  I2C1SDAPPS = 0x0014  /* SDA1 <- RC4 */
+  Dir PORTC.4 Out      /* I2C pins are driven open-drain, but still "Out" */
+  RC4I2C_TH0 = 1       /* set the I2C input level for this pin */
+  ODCC4 = 1            /* open-drain output, required for I2C */
+End Sub
+
+/* GCBASIC has no separate "Const" keyword - #define is how you name a fixed
+   value, whether it is text (APP_NAME), a number (APP_VERSION), or has no
+   value at all, used purely as a flag (USART_TX_BLOCKING below). */
+#define APP_NAME "MegaStress"
+#define APP_VERSION 3
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+#ifdef APP_NAME
+  // confirms conditional compilation
+#endif
+
+/* ========================================================================
+   DATA TYPES - every variable needs a type, chosen by how big a number (or
+   what kind of data) it needs to hold. Picking the smallest type that fits
+   saves RAM, which is always scarce on a microcontroller.
+   ======================================================================== */
+Dim MyBit As Bit          /* a single 0 or 1 - the smallest possible storage */
+Dim MyByte As Byte        /* whole numbers 0 to 255 */
+Dim MyByte2 As Byte
+Dim InnerCount As Byte
+Dim MyWord As Word        /* whole numbers 0 to 65535 */
+Dim MyInteger As Integer  /* whole numbers -32768 to 32767 (signed) */
+Dim MyLong As Long        /* whole numbers 0 to 4294967295 (much bigger, costs more RAM) */
+Dim MySingle As Single    /* a floating-point (decimal) number */
+Dim MyString As String    /* text, of no fixed length */
+/* A fixed-length string is capped at a set number of characters, using a
+   known, fixed amount of RAM instead of whatever the current text needs. */
+Dim FixedString As String * 16
+Dim ByteArray(10) As Byte        /* 10 Bytes in a row, accessed as ByteArray(1) .. ByteArray(10) */
+Dim WordArray(5) As Word         /* 5 Words in a row */
+
+/* The following line is the first of actual assembly in the users main program! */
+
+Dim InitArray(3) As Byte = 10, 20, 30   /* an array can be given starting values right in the Dim */
+Dim Buffer As Alloc              /* a block of RAM you size and use yourself */
+
+/* A variable can also be given a starting value on the same line as its
+   Dim - handy for values that act like named constants throughout the program. */
+Dim LoopCount As Byte = 0
+Dim Accumulator As Long = 0
+Dim TextHeading As String * 12 = "StressTest"
+Dim SampleWord As Word = 4213
+
+/* ========================================================================
+   TABLE and DATA - two different ways to store a fixed list of values that
+   are baked into the program itself, rather than calculated or typed in by
+   a user. Neither of these uses RAM while the values just sit there.
+   ======================================================================== */
+
+/* A Table is a simple lookup list: put values between "Table Name" and
+   "End Table", then fetch one back later by its position (1st, 2nd, ...)
+   with ReadTable. This is the easiest way to store a fixed list.
+   Values go directly inside Table...End Table - there is no nested
+   "Data ... End Data" wrapper (that syntax is for a different, program-
+   memory-only construct, not a lookup Table). */
+Table LookupTable
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+End Table
+
+/* A DATA block is a lower-level cousin of Table: it also stores fixed
+   values in program memory, but you read it back with ProgramRead(location,
+   store) using a numeric offset (0, 1, 2, ...) rather than ReadTable.
+   Distinct from both Table/ReadTable above and EEPROM EPWrite/EPRead below,
+   which is a separate, much smaller memory area meant for values that
+   should survive a power cycle and can be changed while the program runs. */
+DATA ProgMemSet As Byte
+  111
+  122
+  133
+End DATA
+
+/* ========================================================================
+   MACRO - text substitution that happens before compilation, not a real
+   Sub call. Wherever DoubleIt(MyByte) appears, the compiler literally
+   replaces it with "MyByte = MyByte * 2" first, then compiles that. This
+   means a macro has no call overhead, but also no type checking of its
+   own - whatever you pass in is used exactly as written.
+   ======================================================================== */
+/* Macro parameters follow the same naming rules as Sub/Function parameters
+   - a single-letter name like "x" can collide with a reserved internal name. */
+Macro DoubleIt(target)
+  target = target * 2
+End Macro
+
+/* ========================================================================
+   SUBS, FUNCTIONS, and OVERLOADING
+   ========================================================================
+   A Sub is a named block of reusable code that does not return a value.
+   A Function is the same idea but DOES return one, by assigning to its own
+   name somewhere in its body (see AddBytes and FactorialWord below).
+
+   "Overloading" means declaring the SAME Sub/Function name more than once,
+   each time with different parameter types. The compiler picks the right
+   one automatically based on what you pass in - ShowValue(MyByte) calls a
+   different actual routine than ShowValue(SampleWord), even though they're
+   called the exact same way in your code. */
+/* Single-letter parameter names like v/a/b/n collide with reserved internal
+   names and raise "Invalid variable name" - use descriptive names instead,
+   like valByte/valWord/valLong below. */
+Sub ShowValue(In valByte As Byte)
+  HSerPrint "B:"
+  HSerPrint valByte
+  HSerPrint 13
+  HSerPrint 10
+End Sub
+
+Sub ShowValue(In valWord As Word)
+  HSerPrint "W:"
+  HSerPrint valWord
+  HSerPrint 13
+  HSerPrint 10
+End Sub
+
+Sub ShowValue(In valLong As Long)
+  HSerPrint "L:"
+  HSerPrint valLong
+  HSerPrint 13
+  HSerPrint 10
+End Sub
+
+/* Same reserved-name collision as ShowValue above - renamed to valA/valB. */
+Function AddBytes(In valA As Byte, In valB As Byte) As Word
+  AddBytes = valA + valB
+End Function
+
+/* Same reserved-name collision again ("n" renamed to upTo). Also note Dim's
+   required order: "Dim Name As Type", not "Dim As Type Name". */
+Function FactorialWord(In upTo As Byte) As Word
+  Dim Result As Word
+  Dim Idx As Byte
+  Result = 1
+  For Idx = 1 To upTo
+    Result = Result * Idx
+  Next
+  FactorialWord = Result
+End Function
+
+/* A parameter can be marked Optional and given a default value - callers
+   can then leave it out entirely (GreetWithDefault("World")) or supply it
+   to change the behaviour (GreetWithDefault("WORLD", 1)). */
+Sub GreetWithDefault(In who As String, Optional In loud As Byte = 0)
+  If loud <> 0 Then
+    HSerPrint "HELLO, "
+  Else
+    HSerPrint "Hello, "
+  End If
+  HSerPrint who
+  HSerPrint 13
+  HSerPrint 10
+End Sub
+
+/* ========================================================================
+   INTERRUPTS - code that runs automatically when a hardware event happens
+   (here, Timer0 overflowing/rolling over), interrupting whatever the main
+   program was doing. The handler should be short and fast.
+   ======================================================================== */
+Dim TickCount As Byte = 0
+
+/* An interrupt handler is just an ordinary Sub with no parameters, wired up
+   with a separate "On Interrupt event Call handler" statement - there is no
+   dedicated "Interrupt ... End Interrupt" block syntax. */
+Sub Timer0TickHandler
+  TickCount = TickCount + 1
+End Sub
+
+/* ========================================================================
+   MAIN PROGRAM - execution starts here, at the line is outside any
+   Sub/Function. Everything above this point was just declaring things however
+   any assigments will appear before this code.
+   ======================================================================== */
+/* PORTB.0/PORTB.1 are used here (rather than pins on PORTC) to avoid
+   colliding with PORTC pins used further down for PWM (RC0) and I2C
+   (RC3/RC4) - always check a new peripheral's pins against every pin
+   already in use elsewhere in the program. */
+Dir PORTB.0 Out   /* Dir sets whether a pin is an output (drives a voltage) */
+Dir PORTB.1 Out   /* or an input (reads one) - do this before using a pin */
+Dir PORTC.6 Out   /* EUSART1 TX, per the PPS mapping above */
+Dir PORTC.7 In    /* EUSART1 RX, per the PPS mapping above */
+
+/* Set up Timer0, then connect its overflow event to our handler Sub above.
+   InitTimer0 takes (source, prescaler) - "Rate <n> <unit>" is Wait's
+   syntax, not InitTimer0's. */
+InitTimer0 Osc, 32
+On Interrupt Timer0Overflow Call Timer0TickHandler
+/* IntOn/IntOff take NO argument - On Interrupt ... Call already enables
+   this specific interrupt; bare IntOn is only needed to resume after a
+   bare IntOff. */
+
+/* ========================================================================
+   IF / ELSE - the basic two-or-more-way branch. Conditions are tested top
+   to bottom; the first one that is true runs, and the rest are skipped.
+   ======================================================================== */
+MyByte = 42
+If MyByte > 100 Then
+  HSerPrint "big"
+/* GCBASIC requires the two separate words "Else If" - the one-word
+   "ElseIf" is a syntax error. */
+Else If MyByte > 10 Then
+  HSerPrint "medium value: "
+  HSerPrint MyByte
+Else
+  HSerPrint "small"
+End If
+HSerPrint 13 : HSerPrint 10
+
+/* ========================================================================
+   SELECT CASE - choosing one of several branches to run, based on a value
+   ========================================================================
+   Select Case looks at one variable and runs the FIRST Case whose value(s)
+   match it, then jumps straight to End Select - unlike some languages, you
+   never need to worry about "falling through" into the next Case. */
+
+/* 1. The simplest form: one literal value per Case. */
+For LoopCount = 0 To 6
+  Select Case LoopCount
+    Case 0, 1, 2
+      HSerPrint "low-group "
+    Case 3, 4
+      HSerPrint "mid-group "
+    Case Else
+      HSerPrint "hi-group "
+  End Select
+  HSerPrint LoopCount
+  HSerPrint 32
+Next
+HSerPrint 13 : HSerPrint 10
+
+/* 2. A Case can list several values separated by commas - the branch runs
+   if the tested variable matches ANY one of them (up to 64 per Case).
+   When a Case's whole body is one line, it can go on the same line
+   after a colon, which many people find easier to scan. */
+For LoopCount = 0 To 4
+  Select Case LoopCount
+    Case 0: HSerPrint "zero "
+    Case 1: HSerPrint "one "
+    Case 2, 3: HSerPrint "two-or-three "
+    Case Else: HSerPrint "other "
+  End Select
+Next
+HSerPrint 13 : HSerPrint 10
+
+/* 3. Select Case can also test a STRING variable, not just a number -
+   each Case then lists one or more string literals to match against. */
+MyString = "GREEN"
+Select Case MyString
+  Case "RED"
+    HSerPrint "stop"
+  Case "YELLOW"
+    HSerPrint "caution"
+  Case "GREEN"
+    HSerPrint "go"
+  Case Else
+    HSerPrint "unknown colour"
+End Select
+HSerPrint 13 : HSerPrint 10
+
+/* ========================================================================
+   LOOPS - three different ways to repeat code, each suited to a different
+   situation.
+   ======================================================================== */
+
+/* FOR/NEXT: use this when you know how many times to loop, or want to walk
+   through a range of numbers. Step lets you count by more than 1, or
+   backwards (Step -2 here counts down: 10, 8, 6, 4, 2, 0). */
+For LoopCount = 10 To 0 Step -2
+  HSerPrint LoopCount
+  HSerPrint 32
+Next
+HSerPrint 13 : HSerPrint 10
+
+/* DO/LOOP: use this when the number of repeats depends on a condition,
+   not a fixed count. "Do While condition ... Loop" checks BEFORE each
+   pass, so the body might run zero times if the condition starts false. */
+LoopCount = 0
+Do While LoopCount < 5
+  LoopCount = LoopCount + 1
+Loop
+ShowValue(LoopCount)
+
+/* "Do ... Loop Until condition" checks AFTER each pass instead, so the
+   body always runs at least once, even if the condition is already true. */
+LoopCount = 0
+Do
+  LoopCount = LoopCount + 1
+Loop Until LoopCount = 5
+ShowValue(LoopCount)
+
+/* REPEAT: a fixed-count loop, similar to For but simpler when you just
+   need "do this N times" and don't need a loop-counter variable of your
+   own. GCBASIC's Repeat is a fixed-count loop ("Repeat times ... End
+   Repeat" with an optional "<condition> Exit Repeat"), not a Repeat/Until
+   condition loop like some other BASIC dialects. */
+LoopCount = 0
+Repeat 3
+  LoopCount = LoopCount + 1
+End Repeat
+ShowValue(LoopCount)
+
+/* IntOff/IntOn (bare, no argument) temporarily disable/re-enable ALL
+   interrupts, for a moment when it would be unsafe for one to fire mid-way
+   through - such as while reading a value an interrupt handler might also
+   change. Keep the gap between them as short as possible. */
+IntOff
+MyWord = SampleWord
+IntOn
+
+/* ========================================================================
+   GOSUB / GOTO / LABELS - older-style flow control. GoSub jumps to a
+   label and comes back (via Return) like calling a Sub with no
+   parameters; GoTo just jumps and never comes back. A label is any word
+   followed by a colon, sitting on its own line.
+   ======================================================================== */
+GoSub PrintBanner
+GoTo AfterBanner
+
+PrintBanner:
+  HSerPrint "== "
+  HSerPrint APP_NAME
+  HSerPrint " v"
+  HSerPrint APP_VERSION
+  HSerPrint " =="
+  HSerPrint 13 : HSerPrint 10
+  Return
+
+AfterBanner:
+
+/* --- Overloaded Sub calls, dispatched by argument type --- */
+ShowValue(MyByte)
+ShowValue(SampleWord)
+ShowValue(Accumulator)
+
+/* --- Function calls --- */
+MyWord = AddBytes(200, 55)
+ShowValue(MyWord)
+
+MyWord = FactorialWord(6)
+ShowValue(MyWord)
+
+/* --- Optional parameters --- */
+GreetWithDefault("World")
+GreetWithDefault("WORLD", 1)
+
+/* ========================================================================
+   BITWISE / LOGICAL OPERATORS - work on the individual binary bits of a
+   number (AND, OR, XOR, NOT), as opposed to the arithmetic +, -, *, /.
+   Common uses: turning specific hardware bits on/off without disturbing
+   the others, and testing flags packed into one variable.
+   ======================================================================== */
+MyByte = 12 AND 10   /* 1100 AND 1010 = 1000 (8) - keeps only bits set in BOTH */
+MyByte = MyByte OR 1   /* sets bit 0, leaving every other bit unchanged */
+MyByte = MyByte XOR 3  /* flips bits 0 and 1, leaves the rest unchanged */
+/* Set needs a "variable.bit" target and an On/Off keyword
+   ("Set variable.bit {On|Off}") - it doesn't take a whole Bit-typed
+   variable by itself. */
+If NOT MyByte = 0 Then
+  Set MyByte.0 On   /* Set turns one specific bit of a variable on or off */
+End If
+ShowValue(MyByte)
+
+/* A single bit of a port can be read or written directly with ".bitnumber"
+   - PORTB.0 is bit 0 of PORTB. Flipping a bit (making a 0 into a 1, or a 1
+   into a 0) is done with NOT, not with a dedicated "toggle" command;
+   "Toggle" is not a GCBASIC command. */
+PORTB.0 = 1
+PORTB.0 = 0
+PORTB.1 = NOT PORTB.1
+
+/* ========================================================================
+   ROTATE - shifts every bit of a variable one position Left or Right; the
+   bit that falls off one end lands in the CPU's Carry flag (STATUS.C),
+   which also feeds the OPPOSITE end - so Rotate treats the variable plus
+   the Carry flag as one continuous 9-bit (Byte), 17-bit (Word) etc. ring.
+   Adding "Simple" skips the Carry flag entirely, so the bit that falls off
+   one end always reappears directly at the other end instead.
+   ======================================================================== */
+MyByte = 0b01110011
+Rotate MyByte Left         /* MSB moves into Carry; Carry's old value becomes the new LSB */
+ShowValue(MyByte)
+Rotate MyByte Right Simple /* LSB wraps straight to the MSB - Carry isn't involved at all */
+ShowValue(MyByte)
+
+/* ========================================================================
+   SOUND - Tone generates a square wave of a given frequency on one pin for
+   a given duration, using simple software timing rather than a dedicated
+   hardware peripheral, so it works on every chip. It must be told which
+   pin to use through the SoundOut constant before it is called - Tone
+   itself has no pin parameter.
+   ======================================================================== */
+#define SoundOut PORTB.2
+Dir SoundOut Out
+Tone 440, 20    /* 440 Hz (concert pitch A) for 20 x 10ms = 200ms */
+
+/* ========================================================================
+   ARRAYS - a numbered row of variables that all share one name, accessed
+   by position by putting the position in parentheses. GCBASIC arrays
+   start counting from 1, not 0.
+   ======================================================================== */
+For LoopCount = 1 To 10
+  ByteArray(LoopCount) = LoopCount * LoopCount   /* fill the array: 1, 4, 9, 16, ... */
+Next
+Accumulator = 0
+For LoopCount = 1 To 10
+  Accumulator = Accumulator + ByteArray(LoopCount)   /* then add every element up */
+Next
+ShowValue(Accumulator)
+
+/* InitArray was given its starting values right in its Dim, further up. */
+ShowValue(InitArray(1))
+ShowValue(InitArray(2))
+ShowValue(InitArray(3))
+
+/* ========================================================================
+   Reading the Table declared earlier: ReadTable TableName, Item, Output
+   copies the Item'th value (1st, 2nd, ...) from the Table into Output.
+   ReadTable is a SUBROUTINE (ReadTable TableName, Item, OutputVar), not a
+   function - "x = ReadTable(...)" is a syntax error.
+   ======================================================================== */
+Dim TableValue As Byte
+Accumulator = 0
+For LoopCount = 1 To 10
+  ReadTable LookupTable, LoopCount, TableValue
+  Accumulator = Accumulator + TableValue
+Next
+ShowValue(Accumulator)
+
+/* ========================================================================
+   EEPROM - a small amount of memory that keeps its contents even after
+   power is removed, good for settings that should survive a restart. It
+   is addressed by a plain number (0, 1, 2, ...), not a name.
+
+   EPWrite/EPRead take a plain numeric EEPROM address - there is no named
+   EEPROM variable declared via a Data block. EPRead is also a SUBROUTINE
+   (EPRead location, store), like ReadTable - not a function callable as
+   "x = EPRead(...)".
+   ======================================================================== */
+EPWrite 0, 200
+EPRead 0, MyByte
+ShowValue(MyByte)
+
+/* Reading back the DATA block declared earlier - ProgramRead(location,
+   store) fetches one value by its 0-based position (0 = first value). */
+ProgramRead(0, MyByte)
+ShowValue(MyByte)
+ProgramRead(1, MyByte)
+ShowValue(MyByte)
+ProgramRead(2, MyByte)
+ShowValue(MyByte)
+
+/* ========================================================================
+   STRING FUNCTIONS - built-in tools for working with text.
+   ======================================================================== */
+MyString = "  Hello GCBASIC  "
+MyString = Trim(MyString)     /* removes leading/trailing spaces */
+MyString = UCase(MyString)    /* converts to UPPER CASE */
+HSerPrint MyString
+HSerPrint 13 : HSerPrint 10
+
+FixedString = Left("abcdefghij", 5)   /* the first 5 characters: "abcde" */
+HSerPrint FixedString
+HSerPrint 13 : HSerPrint 10
+
+MyByte = Len("abcdefg")     /* the number of characters in the string */
+ShowValue(MyByte)
+
+MyByte = InStr("abcdefg", "cd")   /* the position where "cd" starts (3) */
+ShowValue(MyByte)
+
+MyString = Str(1234)   /* converts a NUMBER to its text representation "1234" */
+HSerPrint MyString
+HSerPrint 13 : HSerPrint 10
+
+MyWord = Val("789")    /* the reverse: converts TEXT "789" to the number 789 */
+ShowValue(MyWord)
+
+/* ========================================================================
+   MATH FUNCTIONS - beyond the basic +, -, *, /, these built-in functions
+   cover common operations like square root, absolute value, and rounding.
+   Several need an explicit #include (see the top of the file) because
+   they aren't loaded automatically.
+   ======================================================================== */
+MyWord = Abs(-1234)   /* the absolute (always positive) value: 1234 */
+ShowValue(MyWord)
+
+/* Sqrt/Power require #include <maths.h>; Sin/Cos require an explicit
+   precision include (<trig2places.h> etc.) and return Integer, not
+   Single. */
+MyWord = Sqrt(144)
+ShowValue(MyWord)
+
+MyInteger = Sin(45)
+MyInteger = Cos(45)
+
+MyWord = Power(2, 8)
+ShowValue(MyWord)
+
+MyByte = Average(10, 20)
+ShowValue(MyByte)
+
+Randomize
+MyByte = Random(100)
+
+/* --- Macro expansion --- */
+MyByte = 21
+DoubleIt(MyByte)
+ShowValue(MyByte)
+
+/* --- ADC read --- */
+Dir PORTA.0 In
+MyWord = ReadAD10(AN0)
+ShowValue(MyWord)
+
+/* ========================================================================
+   SENDING SERIAL DATA - HSerPrint sends one value; these two commands
+   send SEVERAL values in a single statement instead of writing one
+   HSerPrint/HSerSend call per value.
+   ======================================================================== */
+/* HSerSendBytes sends 2-16 raw bytes in one call, in the order given. */
+HSerSendBytes(1, 2, 3, 4)
+HSerSend(13)
+HSerSend(10)
+
+/* HSerPrintList sends a mixed list of values - strings, bytes, words, ...
+   - as one statement; the compiler dispatches each item to the correctly
+   typed HSerPrint call for you, so no manual type conversion is needed. */
+HSerPrintList "{STAT,", TextHeading, ",", SampleWord, ",", MyByte, "}", 13, 10
+
+/* ========================================================================
+   WAIT - pauses the program for a fixed time. The unit can be written with
+   or without a space (100 ms and 5 10ms both work); "10ms"/"10us" are
+   their own fixed unit names (a count of tens of ms/us), not a number
+   glued to a unit.
+   ======================================================================== */
+Wait 100 ms
+Wait 1 s
+Wait 50 10us
+Wait 5 10ms
+
+/* --- More string functions --- */
+MyString = Right("abcdefghij", 4)
+HSerPrint MyString
+HSerPrint 13 : HSerPrint 10
+
+MyString = Mid("abcdefghij", 3, 4)
+HSerPrint MyString
+HSerPrint 13 : HSerPrint 10
+
+MyString = LCase("HELLO")
+MyString = RTrim("hello   ")
+MyString = LTrim("   hello")
+MyString = LeftPad("42", 5, "0")
+HSerPrint MyString
+HSerPrint 13 : HSerPrint 10
+
+MyByte = Asc("A")
+ShowValue(MyByte)
+MyString = Chr(65)
+HSerPrint MyString
+HSerPrint 13 : HSerPrint 10
+
+/* --- Number <-> string conversions --- */
+MyString = ByteToHex(255)
+HSerPrint MyString
+HSerPrint 13 : HSerPrint 10
+
+MyString = ByteToBin(170)
+HSerPrint MyString
+HSerPrint 13 : HSerPrint 10
+
+MyString = WordToHex(4660)
+HSerPrint MyString
+HSerPrint 13 : HSerPrint 10
+
+/* --- More math functions --- */
+MyWord = Log2(64)
+ShowValue(MyWord)
+
+MyWord = Loge(100)
+ShowValue(MyWord)
+
+/* Note: Difference()/Diff() are not real GCBASIC commands, despite once
+   being documented - always verify a Help-documented command actually has
+   an implementation before relying on it. */
+
+/* Swap exchanges the contents of two variables of the same type - after
+   this, MyByte holds 2 and MyByte2 holds 1. */
+MyByte = 1
+MyByte2 = 2
+Swap(MyByte, MyByte2)
+ShowValue(MyByte)
+ShowValue(MyByte2)
+
+/* Numbers can be written in hexadecimal (0x prefix) or binary (0b prefix)
+   as well as ordinary decimal - useful when a value's bit pattern matters
+   more than its decimal value, such as a hardware register setting. */
+MyByte = 0x1F    /* hex 1F = decimal 31 */
+MyByte = 0b1010  /* binary 1010 = decimal 10 */
+ShowValue(MyByte)
+
+/* 4. Select Case's third form: "Case value3 To value4" matches any value
+   in that range (inclusive of both ends) - continuing the Select Case
+   walkthrough from earlier in the file. */
+For LoopCount = 0 To 12
+  Select Case LoopCount
+    Case 0 To 3
+      HSerPrint "range-A "
+    Case 4 To 8
+      HSerPrint "range-B "
+    Case Else
+      HSerPrint "range-C "
+  End Select
+Next
+HSerPrint 13 : HSerPrint 10
+
+/* ========================================================================
+   EXIT - leaves a loop (or Sub/Function) early, before its natural end.
+   ========================================================================
+   Loops can be nested (one inside another) - "Exit For" only leaves the
+   innermost For it's written in, not every loop at once. Here the inner
+   loop always stops after 2 additions (InnerCount reaching 3), and the
+   outer loop stops after its 4th pass. */
+Accumulator = 0
+For LoopCount = 1 To 5
+  For InnerCount = 1 To 5
+    If InnerCount = 3 Then Exit For
+    Accumulator = Accumulator + 1
+  Next
+  If LoopCount = 4 Then Exit For
+Next
+ShowValue(Accumulator)
+
+/* Exit Do works the same way for Do/Loop - leave immediately, skipping
+   whatever condition would normally have ended the loop. */
+LoopCount = 0
+Do
+  LoopCount = LoopCount + 1
+  If LoopCount = 7 Then Exit Do
+Loop
+ShowValue(LoopCount)
+
+/* Exit Sub / Exit Function (not shown running here, since GreetWithDefault
+   never needs to use it) would let a Sub or Function return early, before
+   reaching its own End Sub/End Function - handy for "stop here if this
+   input is invalid" style checks at the top of a routine. */
+GreetWithDefault("EarlyExitTest")
+
+/* ========================================================================
+   TIMERS - a Timer is a hardware counter that increments on its own, in
+   the background, independent of your code. Timer0 (used above to drive
+   our interrupt) is one; here Timer1 is read directly instead of using
+   an interrupt, showing the other common way to use a timer.
+   ======================================================================== */
+InitTimer1 Osc, 8       /* start Timer1 running from the internal clock */
+StartTimer 1
+Wait 10 ms
+StopTimer 1
+MyWord = Timer1          /* Timer1's current count is just read like a variable */
+ShowValue(MyWord)
+ClearTimer 1             /* reset it back to 0 for next time */
+
+/* ========================================================================
+   MORE ADC (ANALOG-TO-DIGITAL CONVERSION) - already used ReadAD10 earlier;
+   GCBASIC also offers plain ReadAD (matches the chip's native resolution)
+   and ReadAD12 (always a 12-bit result), for when a specific resolution
+   matters more than convenience.
+   ======================================================================== */
+MyWord = ReadAD(AN1)
+ShowValue(MyWord)
+MyWord = ReadAD12(AN1)
+ShowValue(MyWord)
+
+/* ========================================================================
+   HARDWARE PWM - generates a repeating on/off waveform in hardware, at a
+   set frequency and duty cycle (% of each cycle spent "on"), without your
+   code having to toggle the pin itself. Commonly used for LED dimming and
+   motor speed control.
+
+   By default GCBASIC compiles in support for every CCP/PWM channel a chip
+   has, for compatibility. If a program only actually uses one channel,
+   the #define USE_HPWMCCPn FALSE lines below tell the compiler to leave
+   the unused channels' support out entirely, which is pure code-size
+   saving with no change in behaviour - see hpwmoptimisation.adoc.
+   ======================================================================== */
+#define USE_HPWMCCP1 TRUE     /* the only channel this program actually uses */
+#define USE_HPWMCCP2 FALSE
+#define USE_HPWMCCP3 FALSE
+#define USE_HPWMCCP4 FALSE
+
+/* HPWM's "frequency" parameter is a Byte-sized value (like the 40 used in
+   hpwmoptimisation.adoc's own example), not a literal Hz figure - passing
+   5000 would overflow the Byte and match no overload. CCP1 is routed by
+   the InitPPS block above to RC0 - Dir the SAME pin the PPS mapping
+   actually uses, not an arbitrary one. */
+Dir PORTC.0 Out
+For MyByte = 0 To 255 Step 51
+  HPWM 1, 100, MyByte    /* channel 1, duty cycle 0-255 -> 0%-100% */
+  Wait 50 ms
+Next
+
+/* ========================================================================
+   I2C (HARDWARE) - a two-wire bus (SCL = clock, SDA = data) for talking to
+   external chips (sensors, EEPROMs, displays) that each have their own
+   fixed address. GCBASIC's hardware I2C commands are HI2CStart, HI2CSend,
+   HI2CReceive and HI2CStop - Start/Stop mark the beginning and end of one
+   exchange, Send writes a byte, Receive reads one.
+
+   Like USART and PWM above, this needs its own PPS mapping (added to
+   InitPPS near the top of this file) before SCL/SDA reach real pins.
+   ======================================================================== */
+/* The hwi2c.h library needs HI2C_CLOCK/HI2C_DATA #define'd to the same
+   pins InitPPS wired up - it doesn't infer them from the PPS registers,
+   and leaving them undefined fails to compile with "HI2C_DATA, or your
+   Defined CONSTANT, is not a valid I/O pin or port". */
+#define HI2C_CLOCK PORTC.3
+#define HI2C_DATA PORTC.4
+#define hi2c_BAUD_RATE 400
+HI2CMode Master
+#DEFINE MUTE_HIC2Q2XBUFFERSIZE_WARNING
+
+/* HI2CSend and HI2CReceive are Subs, not Functions - HI2CReceive takes the
+   destination variable as its first argument, like EPRead's Out parameter
+   earlier in this file.
+
+   This test program has no real I2C device wired to RC3/RC4 - on real
+   hardware, HI2CSend/HI2CReceive would otherwise hang forever waiting for
+   an ACK that never comes. HI2CWaitMSSPTimeout (set by HI2CStart itself)
+   guards against exactly this - always check it before trusting the bus
+   is actually there.
+
+   0xA0 is just an example device address here - real code would use the
+   target device's own address. */
+HI2CStart
+If HI2CWaitMSSPTimeout <> True Then
+  HI2CSend 0xA0    /* a device address byte */
+  HI2CSend MyByte  /* then one or more data bytes */
+End If
+HI2CStop
+
+HI2CStart
+If HI2CWaitMSSPTimeout <> True Then
+  HI2CSend 0xA1              /* 0xA1 = same example address with the read bit set */
+  /* NACK on the last (or only) byte read tells the other device this was
+     the last byte. */
+  HI2CReceive MyByte2, NACK
+  ShowValue(MyByte2)
+End If
+HI2CStop
+
+/* ========================================================================
+   WATCHDOG TIMER - a separate hardware timer that resets the whole chip if
+   it is ever allowed to reach its time-out period without being restarted.
+   It exists to recover automatically if the program ever hangs (an
+   infinite loop, a jammed peripheral wait) instead of staying stuck
+   forever. WDTCON0.SEN turns it on at runtime (the WDTE = SEN config fuse
+   above just permits this); once it is on, the program must periodically
+   "feed" it with CLRWDT, or the chip will reset.
+
+   GCBASIC has no dedicated GCBASIC-level command for this - CLRWDT is a
+   raw PIC assembly instruction, reached with Asm.
+   ======================================================================== */
+WDTCON0.SEN_WDTCON0 = 1
+Asm CLRWDT
+/* Turned back off here only so the rest of this test program isn't reset
+   while it keeps running. */
+WDTCON0.SEN_WDTCON0 = 0
+
+/* ========================================================================
+   SLEEP - puts the chip into a low-power state where the CPU stops
+   executing instructions entirely, until woken by an interrupt (or, if the
+   Watchdog Timer above is left on, by a watchdog time-out). Like CLRWDT,
+   this is a raw assembly instruction (SLEEP), reached with Asm, since
+   GCBASIC has no dedicated command for it either.
+
+   Not actually executed here, since this test program has more to run
+   afterwards, and Timer0Overflow (already enabled near the top of this
+   file) would wake it again almost immediately:
+     Asm SLEEP
+   ======================================================================== */
+
+/* ========================================================================
+   MAIN LOOP - most GCBASIC programs end with a Do/Loop that never exits,
+   since a microcontroller program has nowhere else to "finish" to; it just
+   keeps running this loop for as long as the chip has power.
+   ======================================================================== */
+Do
+  LoopCount = TickCount Mod 250
+  PORTB.0 = NOT PORTB.0
+  Wait 200 ms
+Loop
+
+
+
+/* GCBASIC Optimisation file - this will optimise ADC operations by disabling the ADC operations on the AD channel that is set to FALSE
+                             to enable ADC operations on a specific AD channel set to TRUE
+
+            Legacy chip Constants for ADC
+ */
+            #DEFINE USE_AD0 TRUE
+            #DEFINE USE_AD1 FALSE
+            #DEFINE USE_AD2 FALSE
+            #DEFINE USE_AD3 FALSE
+            #DEFINE USE_AD4 FALSE
+            #DEFINE USE_AD5 FALSE
+            #DEFINE USE_AD6 FALSE
+            #DEFINE USE_AD7 FALSE
+            #DEFINE USE_AD8 FALSE
+            #DEFINE USE_AD9 FALSE
+            #DEFINE USE_AD10 FALSE
+            #DEFINE USE_AD11 FALSE
+            #DEFINE USE_AD12 FALSE
+            #DEFINE USE_AD13 FALSE
+            #DEFINE USE_AD14 FALSE
+            #DEFINE USE_AD15 FALSE
+            #DEFINE USE_AD16 FALSE
+            #DEFINE USE_AD17 FALSE
+            #DEFINE USE_AD18 FALSE
+            #DEFINE USE_AD19 FALSE
+            #DEFINE USE_AD20 FALSE
+            #DEFINE USE_AD21 FALSE
+            #DEFINE USE_AD22 FALSE
+            #DEFINE USE_AD23 FALSE
+            #DEFINE USE_AD24 FALSE
+            #DEFINE USE_AD25 FALSE
+            #DEFINE USE_AD26 FALSE
+            #DEFINE USE_AD27 FALSE
+            #DEFINE USE_AD28 FALSE
+            #DEFINE USE_AD29 FALSE
+            #DEFINE USE_AD30 FALSE
+            #DEFINE USE_AD31 FALSE
+            #DEFINE USE_AD32 FALSE
+            #DEFINE USE_AD33 FALSE
+            #DEFINE USE_AD34 FALSE
+/*          Recent chip Constants for ADC */
+            #DEFINE USE_ADA0 TRUE
+            #DEFINE USE_ADA1 FALSE
+            #DEFINE USE_ADA2 FALSE
+            #DEFINE USE_ADA3 FALSE
+            #DEFINE USE_ADA4 FALSE
+            #DEFINE USE_ADA5 FALSE
+            #DEFINE USE_ADA6 FALSE
+            #DEFINE USE_ADA7 FALSE
+            #DEFINE USE_ADB0 FALSE
+            #DEFINE USE_ADB1 FALSE
+            #DEFINE USE_ADB2 FALSE
+            #DEFINE USE_ADB3 FALSE
+            #DEFINE USE_ADB4 FALSE
+            #DEFINE USE_ADB5 FALSE
+            #DEFINE USE_ADB6 FALSE
+            #DEFINE USE_ADB7 FALSE
+            #DEFINE USE_ADC0 FALSE
+            #DEFINE USE_ADC1 FALSE
+            #DEFINE USE_ADC2 FALSE
+            #DEFINE USE_ADC3 FALSE
+            #DEFINE USE_ADC4 FALSE
+            #DEFINE USE_ADC5 FALSE
+            #DEFINE USE_ADC6 FALSE
+            #DEFINE USE_ADC7 FALSE
+            #DEFINE USE_ADD0 FALSE
+            #DEFINE USE_ADD1 FALSE
+            #DEFINE USE_ADD2 FALSE
+            #DEFINE USE_ADD3 FALSE
+            #DEFINE USE_ADD4 FALSE
+            #DEFINE USE_ADD5 FALSE
+            #DEFINE USE_ADD6 FALSE
+            #DEFINE USE_ADD7 FALSE
+            #DEFINE USE_ADE0 FALSE
+            #DEFINE USE_ADE1 FALSE
+            #DEFINE USE_ADE2 FALSE
+
+
+/* GCBASIC Optimisation file - this will optimise PWM operations by disabling the PWM operations on the PWM channel and Timer that is set to FALSE
+                             to enable PWM and Timer operations set to FALSE
+
+           Optimise PWM */
+           #DEFINE USE_HPWM1 TRUE
+           #DEFINE USE_HPWM2 FALSE
+           #DEFINE USE_HPWM3 FALSE
+           #DEFINE USE_HPWM4 FALSE
+           #DEFINE USE_HPWM5 FALSE
+           #DEFINE USE_HPWM6 FALSE
+           #DEFINE USE_HPWM7 FALSE
+           #DEFINE USE_HPWM8 FALSE
+
+/*         Optimise Timers associated with PWM operations */
+           #DEFINE USE_HPWM_TIMER2 TRUE
+           #DEFINE USE_HPWM_TIMER4 FALSE
+           #DEFINE USE_HPWM_TIMER6 FALSE

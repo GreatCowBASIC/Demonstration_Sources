@@ -1,0 +1,19 @@
+' HSerPrintList fans one statement into a typed HSerPrint call per argument,
+' dispatched by the compiler's existing overload resolution.
+' Verifies: string literal, string variable, byte, and word in one statement.
+#chip 16f877a, 20
+#option explicit
+
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+Dim Txt_Heading As String * 12 = "K9AY North"
+Dim SignalLevel As Byte = 87
+Dim SampleCount As Word = 4213
+
+HSerPrintList "{STAT,", Txt_Heading, ",", SignalLevel, ",", SampleCount, "}", 13, 10
+
+Do
+  Wait 1 s
+Loop

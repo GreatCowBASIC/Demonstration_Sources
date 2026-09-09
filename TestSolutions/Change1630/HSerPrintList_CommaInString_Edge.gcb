@@ -1,0 +1,18 @@
+' A comma inside a string literal must not be treated as an argument separator.
+' By the time the List-splitter runs, string literals have already been replaced
+' with ;STRING<n>; tokens, so this should compile as a single string argument
+' followed by the byte argument - two HSerPrint calls in total.
+#chip 16f877a, 20
+#option explicit
+
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+Dim myByte As Byte = 5
+
+HSerPrintList "a,b", myByte
+
+Do
+  Wait 100 ms
+Loop
