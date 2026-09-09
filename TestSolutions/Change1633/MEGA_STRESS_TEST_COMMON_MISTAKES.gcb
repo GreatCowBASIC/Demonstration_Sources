@@ -3,8 +3,8 @@
 
    This file does compile - every example below is a mistake someone
    new to GCBASIC might plausibly make, written as a comment showing the
-   WRONG code, what actually happens when you compile it (as of build
-   1632), and what to write instead. It exists to teach, and to record
+   WRONG code, what actually happens when you compile it,
+   and what to write instead. It exists to teach, and to record
    compiler behaviour that was deliberately tested - some of the compiler
    responses below are genuine gaps, noted as such.
    ============================================================================ */
@@ -76,11 +76,7 @@
                                                  S, T, V, W, Z) ...
    This turns out to be INTENTIONAL, not a bug: B/C/F/H/N/S/T/V/W/Z (and I
    on AVR) collide with real assembler bit-instruction operand names, so
-   the compiler has always rejected them. The confusing part was that the
-   ORIGINAL message just said "Invalid variable name: B" with no reason -
-   FIXED in build 1632 to explain why, as shown above. I,J,K,L,M remain
-   fine as single-letter names (just a mild warning, since they're easy to
-   misread at a glance). */
+   the compiler has always rejected them. */
 
 /* ----------------------------------------------------------------------
    6) A reserved keyword used as a variable name
@@ -106,24 +102,14 @@
      Dim x As Byte
      Dim x As Word              -> compiles with only unrelated "Single
                                     letter variable name: X" warnings -
-                                    nothing about the redeclaration itself.
-   NOT FIXED - investigated, but this exact code area (variable
-   registration) proved fragile once already (see #6's reverted first
-   attempt), and there was not enough time left in the session to safely
-   validate a change here across the full demo corpus. The compiler
-   silently keeps whichever type "wins" by an internal size/precedence
-   rule, rather than flagging the redeclaration. */
+                                    nothing about the redeclaration itself. */
 
 /* ----------------------------------------------------------------------
    8) Writing past the end of a declared array
    ----------------------------------------------------------------------
      Dim arr(5) As Byte
      arr(99) = 1                -> compiles and assembles with ZERO
-                                    warnings or errors.
-   NOT FIXED - likely an accepted tradeoff for an embedded compiler
-   (bounds-checking every array access costs code size and speed), but a
-   constant literal index like 99 above is known at compile time and
-   could be checked for free. Lowest priority of the gaps found. */
+                                    warnings or errors. */
 
 /* ----------------------------------------------------------------------
    9) Assigning a value that doesn't fit the variable's type
@@ -132,9 +118,7 @@
      MyByte = 300                -> Error: Cannot store 300 in the byte
                                      variable MYBYTE
      MyByte = -5                 -> Error: Cannot store -5 in the byte
-                                     variable MYBYTE
-   Both handled well - GOOD - GCBASIC checks constant assignments against
-   the variable's valid range at compile time. */
+                                     variable MYBYTE.  */
 
 /* ----------------------------------------------------------------------
    10) Comparing a String variable directly to a bare number
@@ -146,11 +130,7 @@
                                       check syntax, simplify source, check
                                       use of variable types, check
                                       String/Array size mismatch. Target
-                                      variable = 5 from Main
-   Does catch the mistake (not a silent bug), but the message is very
-   compiler-internals-flavoured for what is a simple, common newbie slip -
-   a message closer to "Cannot compare a String to a number directly"
-   would be much clearer. Reported, not fixed. */
+                                      variable = 5 from Main */
 
 /* ----------------------------------------------------------------------
    11) Dividing by a literal zero
@@ -158,9 +138,7 @@
      Dim MyByte As Byte
      MyByte = 5 / 0               -> compiles and assembles with ZERO
                                      warnings or errors.
-   NOT FIXED - a genuine gap. The divisor is a compile-time-known
-   constant, so this could be caught for free, and division by zero
-   produces undefined/meaningless behaviour on real hardware. Worth fixing. */
+                                     User should trap against this. */
 
 /* ----------------------------------------------------------------------
    12) Forgetting the comma in a multi-value Case list
@@ -171,11 +149,7 @@
        Case Else                    MyByte = 12 (!), not MyByte = 1 or 2.
          MyByte = 0
      End Select
-   NOT FIXED - a genuinely sneaky gap: "1 2" (missing comma) is silently
-   read as the single number "12", silently changing the program's logic
-   with no warning at all. Probably the most dangerous single finding in
-   this file, because the typo is very easy to make and the result still
-   compiles and looks plausible. */
+     */
 
 /* ----------------------------------------------------------------------
    13) Calling a Sub with too MANY arguments
@@ -185,11 +159,7 @@
      End Sub
      Foo(1, 2, 3)                 -> compiles with ZERO warnings or
                                       errors; the extra argument (3) is
-                                      silently dropped.
-   NOT FIXED - confirms and extends an issue already known from earlier in
-   this session (HSerPrint x, y, z silently drops z when it has too many
-   same-typed overload candidates): the parameter-matching code only ever
-   checks for too FEW arguments, never too many, for ordinary user Subs too. */
+                                      silently dropped. */
 
 /* ----------------------------------------------------------------------
    14) A Function that never sets its own return value
@@ -200,10 +170,7 @@
      End Function                 -> compiles with ZERO warnings; the
                                       caller receives an undefined/garbage
                                       value.
-   NOT FIXED - a real gap. A Function is supposed to assign its own name
-   before it ends (see FactorialWord in the main tour file for the correct
-   pattern); forgetting to do so is an easy mistake with silently wrong
-   results and no compiler hint. */
+                                    Alway set the retrun value */
 
 /* ----------------------------------------------------------------------
    15) Overflowing a fixed-size String
@@ -245,9 +212,7 @@
    19) A "0x"/"0b" numeric literal with no digits after the prefix
    ----------------------------------------------------------------------
      MyByte = MyByte Or 0x        -> Error: Invalid numeric literal 0x -
-                                     no digits follow the prefix
-   Also fixed earlier this session (r1926) - previously silently produced
-   a meaningless value and compiled to wrong code. */
+                                     no digits follow the prefix. */
 
 /* ----------------------------------------------------------------------
    20) Malformed "IntOn"/"IntOff" usage (e.g. with an argument)
@@ -256,9 +221,4 @@
                                       COMPILER INDEFINITELY - no output,
                                       no error, forever)
                                      (build 1631+: Error: Syntax Error,
-                                      in under 2 seconds)
-   The most serious finding of the whole session, fixed as r1934: a
-   "Continue Do" inside CompileIntOnOff skipped the loop's own advance
-   step for any line that started with INTON/INTOFF but didn't exactly
-   match one of those two words, so the loop span forever on the same
-   line. IntOn/IntOff take no argument at all - see inton.adoc/intoff.adoc. */
+                                      in under 2 seconds. */
