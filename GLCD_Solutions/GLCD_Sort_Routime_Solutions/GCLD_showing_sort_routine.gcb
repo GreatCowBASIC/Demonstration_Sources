@@ -1,0 +1,107 @@
+' Insertion Sort Visualizer — Monochrome GLCD (KS0108, 128x64)
+' Target: PIC16F887 @ 20MHz (from GLCD.rpp)
+' 95 elements, x-position scaled across the 128px width using Scale().
+
+#chip 16F877, 20
+#option explicit
+
+#include <glcd.h>
+
+' --- Pin mapping: EDIT THESE to match your actual wiring ---
+#DEFINE GLCD_CS1 PORTb.1
+#DEFINE GLCD_CS2 PORTb.0
+'D0 to pin 7 on LCD
+#DEFINE GLCD_DB0 PORTD.0
+'D1 to pin 8 on LCD
+#DEFINE GLCD_DB1 PORTD.1
+'D2 to pin 9 on LCD
+#DEFINE GLCD_DB2 PORTD.2
+'D3 to pin 10 on LCD
+#DEFINE GLCD_DB3 PORTD.3
+'D4 to pin 11 on LCD
+#DEFINE GLCD_DB4 PORTD.4
+'D5 to pin 12 on LCD
+#DEFINE GLCD_DB5 PORTD.5
+'D6 to pin 13 on LCD
+#DEFINE GLCD_DB6 PORTD.6
+'D7 to pin 14 on LCD
+#DEFINE GLCD_DB7 PORTD.7
+
+#DEFINE GLCD_RS PORTb.2
+#DEFINE GLCD_Enable PORTb.5
+#DEFINE GLCD_RW PORTb.4
+#DEFINE GLCD_RESET PORTC.2
+
+
+#define GLCD_TYPE   GLCD_TYPE_KS0108
+#define GLCD_WIDTH  128
+#define GLCD_HEIGHT 64
+
+' --- Display geometry ---
+#define ArraySize     95
+#define ScreenHeight  64
+
+Dim MyArray(ArraySize) As Byte
+Dim idx, j, key, colIndex As Byte
+Dim scaledX As Byte
+
+' --- Fill array with random values in range 0 to (ScreenHeight - 1) ---
+Sub FillAndShuffle
+  Dim kvar As Byte
+
+  For kvar = 1 To ArraySize
+    MyArray(kvar) = Random Mod ScreenHeight   ' 0 to 63
+  Next kvar
+End Sub
+
+' --- Erase old bar, draw new bar for element at 0-based position posJ ---
+' posJ (0..ArraySize-1) is scaled across the full 0..127 pixel width.
+' itemVal is already 0..(ScreenHeight-1), so it maps directly to a pixel row.
+Sub DrawColumn(In posJ As Byte, In itemVal As Byte)
+  scaledX = Scale(posJ, 0, ArraySize - 1, 0, 127)
+
+  ' Erase: overdraw the full column OFF
+  Line(scaledX, 0, scaledX, ScreenHeight - 1, 0)
+
+  ' Draw: bar height = value directly, ON pixels, from the bottom up
+  Line(scaledX, ScreenHeight - 1, scaledX, ScreenHeight - 1 - itemVal, 1)
+End Sub
+
+Sub DrawAll
+  For colIndex = 1 To ArraySize
+    DrawColumn(colIndex - 1, MyArray(colIndex))
+  Next colIndex
+End Sub
+
+' --- Insertion sort, redrawing every column it touches ---
+Sub SortArray(Arr() As Byte, ArrSize As Byte)
+  For idx = 2 To ArrSize
+    key = Arr(idx)
+    j = idx - 1
+
+    Do While (j >= 1) And (Arr(j) > key)
+      Arr(j + 1) = Arr(j)
+      DrawColumn(j, Arr(j + 1))     ' element position = j (0-based)
+      j = j - 1
+    Loop
+
+    Arr(j + 1) = key
+    DrawColumn(j, key)
+  Next idx
+End Sub
+
+' --- Main ---
+
+
+GLCDCLS
+Randomize
+Box 0,0,127,63
+
+Do
+    FillAndShuffle
+    DrawAll
+    Wait 1 s
+
+    SortArray(MyArray, ArraySize)
+    wait 4 s
+Loop

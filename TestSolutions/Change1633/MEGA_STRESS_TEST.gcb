@@ -104,7 +104,7 @@ Dim InnerCount As Byte
 Dim MyWord As Word        /* whole numbers 0 to 65535 */
 Dim MyInteger As Integer  /* whole numbers -32768 to 32767 (signed) */
 Dim MyLong As Long        /* whole numbers 0 to 4294967295 (much bigger, costs more RAM) */
-Dim MySingle As Single    /* a floating-point (decimal) number */
+Dim MySingle As Single  = 3.142  /* a floating-point (decimal) number */
 Dim MyString As String    /* text, of no fixed length */
 /* A fixed-length string is capped at a set number of characters, using a
    known, fixed amount of RAM instead of whatever the current text needs. */
