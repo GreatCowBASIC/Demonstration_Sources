@@ -28,12 +28,19 @@
    hard-wired to fixed pins the way they are on older chips. Without this
    block, HSerPrint's USART output and HPWM's CCP1 output below would be
    left on whatever pins reset to (or nowhere usable at all), silently -
-   no error, just no signal on the pin you expect. The values below are
-   copied from real, working demos for this exact chip family (not
-   invented): EUSART1 TX/RX from
-   Vendor_Boards/Great_Cow_Basic_Demo_Board/18F25Q10_ChipRange_Demonstrations
-   /210_Serial_Operations_Terminal.GCB, and CCP1 from
-   18f16q41_chiprange_demonstrations/240_pwm_fixed_modes.gcb.
+   no error, just no signal on the pin you expect. The output-selector codes
+   below (RC6PPS/RC0PPS/RC3PPS/RC4PPS) are family-specific - they were
+   originally copied from Q10/Q41-family demos, which turned out to use a
+   different PPS output-function numbering than this chip's own Q-series
+   generation and produced wrong values (caught by cross-checking against
+   real, same-generation demos and PIC PPS Tool output). They are now taken
+   from Vendor_Boards/Great_Cow_Basic_Demo_Board/18f26q43_chiprange_demonstrations
+   (I2C_Discovery's 18f26q43 demo for EUSART1 TX/I2C1, and
+   240_pwm_fixed_modes.gcb for CCP1) - 18F26Q43 shares the same PPS
+   generation as this chip's 18F46Q35. The *input*-selector codes
+   (U1RXPPS/CCP1PPS/I2C1SCLPPS/I2C1SDAPPS) use a universal port*8+bit pin
+   index that is the same across chip families, so those were already
+   correct.
 
    #startup schedules InitPPS to run automatically before Main, at
    priority 85 - after GCBASIC's own InitSys (80) but before the hardware
@@ -55,16 +62,17 @@
    threshold level) and ODCCx (open-drain output, since I2C is a shared
    open-drain bus). */
 Sub InitPPS
-  RC6PPS = 0x0009    /* RC6 -> EUSART1 TX */
+  RC6PPS = 0x0020    /* RC6 -> EUSART1 TX */
   U1RXPPS = 0x0017   /* RC7 -> EUSART1 RX */
+  RC0PPS = 0x0015    /* RC0 -> CCP1 (bi-directional) */
   CCP1PPS = 0x0010   /* RC0 -> CCP1 (bi-directional) */
 
-  RC3PPS = 0x0021      /* RC3 -> SCL1 (bi-directional) */
+  RC3PPS = 0x0037      /* RC3 -> SCL1 (bi-directional) */
   I2C1SCLPPS = 0x0013  /* SCL1 <- RC3 */
   Dir PORTC.3 Out      /* I2C pins are driven open-drain, but still "Out" */
   RC3I2C_TH0 = 1       /* set the I2C input level for this pin */
   ODCC3 = 1            /* open-drain output, required for I2C */
-  RC4PPS = 0x0022      /* RC4 -> SDA1 (bi-directional) */
+  RC4PPS = 0x0038      /* RC4 -> SDA1 (bi-directional) */
   I2C1SDAPPS = 0x0014  /* SDA1 <- RC4 */
   Dir PORTC.4 Out      /* I2C pins are driven open-drain, but still "Out" */
   RC4I2C_TH0 = 1       /* set the I2C input level for this pin */

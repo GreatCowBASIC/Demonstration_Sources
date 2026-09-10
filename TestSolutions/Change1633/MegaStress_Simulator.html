@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MegaStress Simulator</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f0ece2; --panel:#ffffff; --panel-2:#f7f4ec; --border:#d9d0bd;
+  --text:#211d17; --text-dim:#6b6152; --accent:#c9711c; --accent-2:#8a4d10;
+  --pwm:#0e7d92; --good:#2f7a33; --warn:#9a6b06; --critical:#b23a2e;
+  --led-off:#cfc6b2; --shadow:0 1px 2px rgba(30,20,5,.08),0 6px 18px rgba(30,20,5,.06);
+  --radius:10px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#1c1815; --panel:#221d18; --panel-2:#2a231b; --border:#453a2a;
+    --text:#f2e9da; --text-dim:#b0a184; --accent:#ff9d2e; --accent-2:#ffcf6b;
+    --pwm:#58c4dc; --good:#7fd858; --warn:#f2c94c; --critical:#ff6b5e;
+    --led-off:#3a3226; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 26px rgba(0,0,0,.45);
+    color-scheme: dark;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:"IBM Plex Sans",system-ui,sans-serif;
+  padding:28px 20px 60px;
+}
+.wrap{max-width:1180px; margin:0 auto}
+.eyebrow{
+  font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.12em;
+  color:var(--accent); text-transform:uppercase; margin:0 0 6px;
+  font-variant-numeric: tabular-nums;
+}
+h1{
+  font-family:"Big Shoulders",sans-serif; font-weight:800; font-stretch:condensed;
+  font-size:clamp(38px,6vw,64px); line-height:.92; margin:0 0 4px; text-wrap:balance;
+  letter-spacing:.005em;
+}
+h1 sup{
+  font-family:"IBM Plex Mono",monospace; font-size:16px; font-weight:600;
+  color:var(--accent); vertical-align:super; margin-left:8px;
+}
+.subhead{
+  color:var(--text-dim); max-width:62ch; font-size:15px; line-height:1.55; margin:8px 0 0;
+}
+.subhead b{color:var(--text); font-weight:600}
+.topline{
+  display:flex; flex-wrap:wrap; gap:10px 22px; align-items:baseline;
+  border-bottom:1px solid var(--border); padding-bottom:18px; margin-bottom:22px;
+}
+.grid{display:grid; grid-template-columns: 1.55fr 1fr; gap:20px}
+@media (max-width:860px){ .grid{grid-template-columns:1fr} }
+
+.panel{
+  background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+.panel-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 16px; border-bottom:1px solid var(--border);
+}
+.panel-title{
+  font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.09em;
+  text-transform:uppercase; color:var(--text-dim); font-weight:600;
+}
+.term-wrap{ padding:16px }
+.term{
+  background:#15120e; border-radius:6px; padding:16px 18px; height:400px;
+  overflow-y:auto; font-family:"IBM Plex Mono",monospace; font-size:13.5px;
+  line-height:1.62; color:#f4ecd8; white-space:pre-wrap; word-break:break-word;
+}
+.term::-webkit-scrollbar{width:10px}
+.term::-webkit-scrollbar-thumb{background:#3a332a; border-radius:6px}
+.term .ln{opacity:0; animation:appear .18s ease forwards}
+@keyframes appear{to{opacity:1}}
+@media (prefers-reduced-motion: reduce){ .term .ln{animation:none;opacity:1} }
+
+.transport{
+  display:flex; align-items:center; gap:10px; padding:12px 16px;
+  border-top:1px solid var(--border); flex-wrap:wrap;
+}
+button{
+  font-family:"IBM Plex Mono",monospace; font-size:12.5px; letter-spacing:.04em;
+  border:1px solid var(--border); background:var(--panel-2); color:var(--text);
+  padding:9px 16px; border-radius:7px; cursor:pointer; text-transform:uppercase;
+  font-weight:600; transition:border-color .15s, color .15s;
+}
+button:hover{border-color:var(--accent); color:var(--accent)}
+button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+button.primary{background:var(--accent); border-color:var(--accent); color:#1c1815}
+button.primary:hover{color:#1c1815; opacity:.88}
+button:disabled{opacity:.4; cursor:default}
+.speedgroup{display:flex; align-items:center; gap:8px; margin-left:auto; font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--text-dim)}
+select{
+  font-family:"IBM Plex Mono",monospace; font-size:12.5px; background:var(--panel-2);
+  color:var(--text); border:1px solid var(--border); border-radius:6px; padding:6px 8px;
+}
+.clock{
+  display:flex; gap:18px; padding:10px 16px; border-top:1px solid var(--border);
+  font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+.clock b{color:var(--text); font-weight:600}
+
+.side{display:flex; flex-direction:column; gap:16px}
+.hw{padding:16px; display:flex; flex-direction:column; gap:16px}
+.row{display:flex; align-items:center; gap:12px}
+.pin-label{
+  font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--text-dim);
+  width:78px; flex-shrink:0;
+}
+.led{
+  width:15px; height:15px; border-radius:50%; background:var(--led-off);
+  box-shadow: inset 0 0 0 1px var(--border); flex-shrink:0; transition:background .1s, box-shadow .1s;
+}
+.led.on{background:var(--good); box-shadow:0 0 10px 2px color-mix(in srgb, var(--good) 65%, transparent), inset 0 0 0 1px var(--good)}
+.led-desc{font-size:12.5px; color:var(--text-dim)}
+
+.gauge-wrap{display:flex; flex-direction:column; gap:8px}
+.gauge-top{display:flex; justify-content:space-between; align-items:baseline}
+.gauge-num{font-family:"IBM Plex Mono",monospace; font-size:22px; font-weight:600; color:var(--pwm); font-variant-numeric:tabular-nums}
+.gauge-track{height:10px; background:var(--panel-2); border:1px solid var(--border); border-radius:6px; overflow:hidden}
+.gauge-fill{height:100%; width:0%; background:var(--pwm); transition:width .35s ease}
+
+.chip{
+  display:inline-flex; align-items:center; gap:6px; font-family:"IBM Plex Mono",monospace;
+  font-size:11.5px; font-weight:600; padding:4px 10px; border-radius:20px; letter-spacing:.03em;
+  background:var(--panel-2); border:1px solid var(--border); color:var(--text-dim); text-transform:uppercase;
+  width:fit-content; transition:all .15s;
+}
+.chip.active{border-color:var(--pwm); color:var(--pwm)}
+.chip.crit{border-color:var(--critical); color:var(--critical)}
+.chip .dot{width:6px; height:6px; border-radius:50%; background:currentColor}
+
+.slider-row{display:flex; flex-direction:column; gap:8px}
+.slider-head{display:flex; justify-content:space-between; font-size:12.5px}
+.slider-head b{font-family:"IBM Plex Mono",monospace; color:var(--accent); font-variant-numeric:tabular-nums}
+input[type=range]{
+  -webkit-appearance:none; width:100%; height:4px; background:var(--border); border-radius:3px; outline:none;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:var(--accent);
+  border:2px solid var(--panel); box-shadow:0 0 0 1px var(--accent); cursor:pointer;
+}
+input[type=range]::-moz-range-thumb{
+  width:14px; height:14px; border-radius:50%; background:var(--accent); border:2px solid var(--panel); cursor:pointer;
+}
+.ad-readout{
+  display:grid; grid-template-columns:1fr 1fr; gap:8px; font-family:"IBM Plex Mono",monospace;
+  font-size:11.5px; color:var(--text-dim);
+}
+.ad-readout .v{color:var(--text); font-weight:600; font-variant-numeric:tabular-nums}
+
+.log{
+  font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--text-dim);
+  display:flex; flex-direction:column; gap:5px; max-height:150px; overflow-y:auto;
+}
+.log div{display:flex; gap:8px}
+.log .t{color:var(--accent); flex-shrink:0; font-variant-numeric:tabular-nums}
+
+.notes{
+  margin-top:20px; padding:16px 18px; font-size:12.5px; color:var(--text-dim); line-height:1.7;
+}
+.notes b{color:var(--text)}
+.notes .approx{color:var(--accent); font-weight:600}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="topline">
+    <div>
+      <p class="eyebrow">18F46Q35 · GCBASIC behavioral simulation</p>
+      <h1>MegaStress<sup>v3</sup></h1>
+      <p class="subhead">Re-runs the <b>logic</b> of <code>MEGA_STRESS_TEST.gcb</code> in JavaScript and prints exactly
+        what <code>HSerPrint</code>/<code>HSerSend</code> would send over EUSART1 (RC6, 9600 baud). It is not an
+        instruction-accurate emulator — nothing here executes the compiled <code>.hex</code> on a modelled PIC18
+        core. A few genuinely hardware-dependent values are estimated and marked <span class="approx">≈</span> —
+        see the notes below.</p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">EUSART1 · RC6 → terminal, 9600 8N1</span>
+        <span class="panel-title" id="lineCount">0 lines</span>
+      </div>
+      <div class="term-wrap"><div class="term" id="term"></div></div>
+      <div class="transport">
+        <button class="primary" id="btnRun">▶ Run</button>
+        <button id="btnPause" disabled>⏸ Pause</button>
+        <button id="btnReset">↺ Reset</button>
+        <div class="speedgroup">
+          Playback
+          <select id="speed">
+            <option value="1">1×</option>
+            <option value="2" selected>2×</option>
+            <option value="4">4×</option>
+            <option value="8">8×</option>
+          </select>
+        </div>
+      </div>
+      <div class="clock">
+        <span>Simulated elapsed: <b id="clockSim">0 ms</b></span>
+        <span>Program counter: <b id="clockStep">0 / 0</b></span>
+        <span id="clockLoop" hidden>Main loop pass: <b id="loopPass">0</b></span>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="panel hw">
+        <span class="panel-title">Digital I/O</span>
+        <div class="row">
+          <span class="pin-label">PORTB.0</span>
+          <span class="led" id="ledB0"></span>
+          <span class="led-desc" id="ledB0desc">toggled once at startup, then blinks every 200&nbsp;ms in the main loop</span>
+        </div>
+        <div class="row">
+          <span class="pin-label">PORTB.1</span>
+          <span class="led" id="ledB1"></span>
+          <span class="led-desc">flipped once (<code>NOT PORTB.1</code>)</span>
+        </div>
+        <div class="row">
+          <span class="pin-label">Watchdog</span>
+          <span class="chip" id="wdtChip"><span class="dot"></span>armed off</span>
+        </div>
+      </div>
+
+      <div class="panel hw">
+        <span class="panel-title">CCP1 → RC0 · Hardware PWM</span>
+        <div class="gauge-wrap">
+          <div class="gauge-top">
+            <span class="led-desc">Duty cycle</span>
+            <span class="gauge-num" id="pwmPct">0%</span>
+          </div>
+          <div class="gauge-track"><div class="gauge-fill" id="pwmFill"></div></div>
+        </div>
+        <span class="led-desc">Byte duty value <code>0…255</code> passed to <code>HPWM 1, 100, MyByte</code>, swept in steps of 51</span>
+      </div>
+
+      <div class="panel hw">
+        <span class="panel-title">I2C1 · RC3 (SCL) / RC4 (SDA)</span>
+        <span class="chip" id="i2cChip"><span class="dot"></span>idle</span>
+        <span class="led-desc">No device is wired to the bus in this program — <code>HI2CWaitMSSPTimeout</code> is expected to catch both exchanges before any byte is sent.</span>
+      </div>
+
+      <div class="panel hw">
+        <span class="panel-title">Simulated analog input</span>
+        <div class="slider-row">
+          <div class="slider-head"><span>V<sub>AN</sub> (drives AN0 &amp; AN1)</span><b id="vinLabel">2.50 V</b></div>
+          <input type="range" id="vin" min="0" max="5" step="0.01" value="2.5">
+        </div>
+        <div class="ad-readout">
+          <span>ReadAD10(AN0)</span><span class="v" id="adAn0">—</span>
+          <span>ReadAD(AN1), 10-bit</span><span class="v" id="adAn1">—</span>
+          <span>ReadAD12(AN1)</span><span class="v" id="adAn1_12">—</span>
+        </div>
+      </div>
+
+      <div class="panel hw">
+        <span class="panel-title">Event log</span>
+        <div class="log" id="eventLog"><div class="led-desc">Press Run to start.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel notes">
+    <b>What "≈" means in this run:</b> Rotate's carry-in bit (assumed 0 — real STATUS.C depends on every prior
+    arithmetic op, not simulated here) · Timer1's post-10&nbsp;ms count (estimated from the compiler's own reported
+    64&nbsp;MHz HFINTOSC and a /8 prescaler, not cycle-simulated) · <code>Loge(100)</code>'s library rounding (shown
+    as the nearest integer to ln(100), not the actual fixed-point routine) · <code>Random(100)</code>, <code>Sin(45)</code>
+    and <code>Cos(45)</code> are computed by the program but never printed, so they're skipped here too.
+  </div>
+</div>
+
+<script>
+(function(){
+  var term = document.getElementById('term');
+  var lineCountEl = document.getElementById('lineCount');
+  var clockSim = document.getElementById('clockSim');
+  var clockStep = document.getElementById('clockStep');
+  var clockLoop = document.getElementById('clockLoop');
+  var loopPassEl = document.getElementById('loopPass');
+  var btnRun = document.getElementById('btnRun');
+  var btnPause = document.getElementById('btnPause');
+  var btnReset = document.getElementById('btnReset');
+  var speedSel = document.getElementById('speed');
+  var vin = document.getElementById('vin');
+  var vinLabel = document.getElementById('vinLabel');
+  var adAn0 = document.getElementById('adAn0');
+  var adAn1 = document.getElementById('adAn1');
+  var adAn1_12 = document.getElementById('adAn1_12');
+  var ledB0 = document.getElementById('ledB0');
+  var ledB0desc = document.getElementById('ledB0desc');
+  var ledB1 = document.getElementById('ledB1');
+  var pwmFill = document.getElementById('pwmFill');
+  var pwmPct = document.getElementById('pwmPct');
+  var i2cChip = document.getElementById('i2cChip');
+  var wdtChip = document.getElementById('wdtChip');
+  var eventLog = document.getElementById('eventLog');
+
+  function raw10(v){ return Math.round(v/5*1023); }
+  function raw12(v){ return Math.round(v/5*4095); }
+
+  vin.addEventListener('input', function(){
+    vinLabel.textContent = parseFloat(vin.value).toFixed(2) + ' V';
+    if (!running) refreshAdcPreview();
+  });
+  function refreshAdcPreview(){
+    var v = parseFloat(vin.value);
+    adAn0.textContent = raw10(v);
+    adAn1.textContent = raw10(v);
+    adAn1_12.textContent = raw12(v);
+  }
+  refreshAdcPreview();
+
+  function line(text){ return {k:'line', text:text}; }
+  function dyn(fn){ return {k:'line', fn:fn}; }
+  function wait(ms){ return {k:'wait', ms:ms}; }
+  function led(pin,val,desc){ return {k:'led', pin:pin, val:val, desc:desc}; }
+  function pwm(duty){ return {k:'pwm', duty:duty}; }
+  function i2c(state, text){ return {k:'i2c', state:state, text:text}; }
+  function wdt(state, text){ return {k:'wdt', state:state, text:text}; }
+  function loopStart(){ return {k:'loopstart'}; }
+
+  function buildSteps(){
+    var s = [];
+    s.push(led('B0',0,'off at reset'));
+    s.push(led('B1',0,'off at reset'));
+
+    s.push(line('medium value: 42'));
+
+    s.push(line('low-group 0 low-group 1 low-group 2 mid-group 3 mid-group 4 hi-group 5 hi-group 6 '));
+    s.push(line('zero one two-or-three two-or-three other '));
+    s.push(line('go'));
+    s.push(line('10 8 6 4 2 0 '));
+
+    s.push(line('B:5'));
+    s.push(line('B:5'));
+    s.push(line('B:3'));
+
+    s.push(line('== MegaStress v3 =='));
+
+    s.push(line('B:42'));
+    s.push(line('W:4213'));
+    s.push(line('L:0'));
+    s.push(line('W:255'));
+    s.push(line('W:720'));
+    s.push(line('Hello, World'));
+    s.push(line('HELLO, WORLD'));
+
+    s.push(line('B:11'));
+
+    s.push(led('B0',1,'set high (PORTB.0 = 1)'));
+    s.push(led('B0',0,'set low (PORTB.0 = 0)'));
+    s.push(led('B1',1,'flipped by NOT'));
+
+    s.push(line('B:230 ≈ (carry-in assumed 0)'));
+    s.push(line('B:115'));
+
+    s.push({k:'note-inline', text:'Tone 440 Hz for 200 ms on PORTB.2'});
+    s.push(wait(200));
+
+    s.push(line('L:385'));
+    s.push(line('B:10'));
+    s.push(line('B:20'));
+    s.push(line('B:30'));
+    s.push(line('L:55'));
+    s.push(line('B:200'));
+    s.push(line('B:111'));
+    s.push(line('B:122'));
+    s.push(line('B:133'));
+    s.push(line('HELLO GCBASIC'));
+    s.push(line('abcde'));
+    s.push(line('B:7'));
+    s.push(line('B:3'));
+    s.push(line('1234'));
+    s.push(line('W:789'));
+    s.push(line('W:1234'));
+    s.push(line('W:12'));
+    s.push(line('W:256'));
+    s.push(line('B:15'));
+    s.push(line('B:42'));
+
+    s.push(dyn(function(){ return 'W:' + raw10(parseFloat(vin.value)); }));
+
+    s.push(line('␁␂␃␄'));
+    s.push(line('{STAT,StressTest,4213,42}'));
+
+    s.push(wait(100));
+    s.push(wait(1000));
+    s.push(wait(0.5));
+    s.push(wait(50));
+
+    s.push(line('ghij'));
+    s.push(line('cdef'));
+    s.push(line('00042'));
+    s.push(line('B:65'));
+    s.push(line('A'));
+    s.push(line('FF'));
+    s.push(line('10101010'));
+    s.push(line('1234'));
+    s.push(line('W:6'));
+    s.push(line('W:5 ≈ (library rounding)'));
+    s.push(line('B:2'));
+    s.push(line('B:1'));
+    s.push(line('B:10'));
+
+    s.push(line('range-A range-A range-A range-A range-B range-B range-B range-B range-B range-C range-C range-C range-C '));
+
+    s.push(line('L:8'));
+    s.push(line('B:7'));
+    s.push(line('Hello, EarlyExitTest'));
+
+    s.push(wait(10));
+    s.push(line('W:20000 ≈ (estimated from 64 MHz HFINTOSC ÷4 ÷8 prescaler, not cycle-simulated)'));
+
+    s.push(dyn(function(){ return 'W:' + raw10(parseFloat(vin.value)); }));
+    s.push(dyn(function(){ return 'W:' + raw12(parseFloat(vin.value)); }));
+
+    var duties = [0,51,102,153,204,255];
+    for (var i=0;i<duties.length;i++){
+      s.push(pwm(duties[i]));
+      s.push(wait(50));
+    }
+
+    s.push(i2c('start','HI2CStart (device 0xA0)'));
+    s.push(i2c('timeout','no ACK — HI2CWaitMSSPTimeout, write skipped'));
+    s.push(i2c('start','HI2CStart (device 0xA1, read)'));
+    s.push(i2c('timeout','no ACK — HI2CWaitMSSPTimeout, read skipped'));
+    s.push(i2c('idle',''));
+
+    s.push(wdt('on','WDTCON0.SEN = 1'));
+    s.push(wdt('fed','Asm CLRWDT'));
+    s.push(wdt('off','WDTCON0.SEN = 0 (left off so the demo keeps running)'));
+
+    s.push(loopStart());
+    return s;
+  }
+
+  var steps, idx, timer, running, elapsed, loopPass;
+  var speed = 2;
+  speedSel.addEventListener('change', function(){ speed = parseFloat(speedSel.value); });
+
+  function fmtMs(ms){
+    if (ms < 1000) return Math.round(ms) + ' ms';
+    return (ms/1000).toFixed(2) + ' s';
+  }
+
+  function logEvent(text){
+    var row = document.createElement('div');
+    var t = document.createElement('span'); t.className='t'; t.textContent = fmtMs(elapsed);
+    var m = document.createElement('span'); m.textContent = text;
+    row.appendChild(t); row.appendChild(m);
+    if (eventLog.firstChild && eventLog.firstChild.className === 'led-desc') eventLog.innerHTML='';
+    eventLog.insertBefore(row, eventLog.firstChild);
+  }
+
+  function appendLine(text){
+    var div = document.createElement('div');
+    div.className = 'ln';
+    div.textContent = text;
+    term.appendChild(div);
+    term.scrollTop = term.scrollHeight;
+    lineCountEl.textContent = term.children.length + ' lines';
+  }
+
+  function setLed(el, on){ el.classList.toggle('on', !!on); }
+
+  function reset(){
+    clearTimeout(timer);
+    running = false; idx = 0; elapsed = 0; loopPass = 0;
+    steps = buildSteps();
+    term.innerHTML = '';
+    lineCountEl.textContent = '0 lines';
+    clockSim.textContent = '0 ms';
+    clockStep.textContent = '0 / ' + steps.length;
+    clockLoop.hidden = true;
+    setLed(ledB0,false); setLed(ledB1,false);
+    ledB0desc.textContent = 'toggled once at startup, then blinks every 200 ms in the main loop';
+    pwmFill.style.width='0%'; pwmPct.textContent='0%';
+    i2cChip.className='chip'; i2cChip.innerHTML='<span class="dot"></span>idle';
+    wdtChip.className='chip'; wdtChip.innerHTML='<span class="dot"></span>armed off';
+    eventLog.innerHTML = '<div class="led-desc">Press Run to start.</div>';
+    btnRun.disabled = false; btnPause.disabled = true; btnRun.textContent = '▶ Run';
+    refreshAdcPreview();
+  }
+
+  function step(){
+    if (idx >= steps.length){
+      running = false; btnPause.disabled = true; btnRun.disabled = true; btnRun.textContent='▶ Done';
+      return;
+    }
+    var st = steps[idx++];
+    clockStep.textContent = idx + ' / ' + steps.length;
+    var delay = 55 / speed;
+
+    switch(st.k){
+      case 'line':
+        appendLine(st.fn ? st.fn() : st.text);
+        break;
+      case 'wait':
+        elapsed += st.ms;
+        clockSim.textContent = fmtMs(elapsed);
+        delay = Math.min(280, Math.max(30, st.ms/6)) / speed;
+        break;
+      case 'led':
+        setLed(st.pin==='B0'?ledB0:ledB1, st.val);
+        if (st.pin==='B0') ledB0desc.textContent = st.desc;
+        logEvent('PORTB.' + (st.pin==='B0'?'0':'1') + ' → ' + (st.val?'HIGH':'LOW') + ' — ' + st.desc);
+        delay = 40/speed;
+        break;
+      case 'pwm':
+        var pct = Math.round(st.duty/255*100);
+        pwmFill.style.width = pct + '%';
+        pwmPct.textContent = pct + '%';
+        logEvent('HPWM 1, 100, ' + st.duty + ' → ' + pct + '% duty');
+        delay = 60/speed;
+        break;
+      case 'i2c':
+        if (st.state==='timeout'){ i2cChip.className='chip crit'; i2cChip.innerHTML='<span class="dot"></span>no ack'; }
+        else if (st.state==='start'){ i2cChip.className='chip active'; i2cChip.innerHTML='<span class="dot"></span>start'; }
+        else { i2cChip.className='chip'; i2cChip.innerHTML='<span class="dot"></span>idle'; }
+        if (st.text) logEvent(st.text);
+        delay = 90/speed;
+        break;
+      case 'wdt':
+        if (st.state==='on'){ wdtChip.className='chip active'; wdtChip.innerHTML='<span class="dot"></span>armed on'; }
+        else if (st.state==='fed'){ wdtChip.className='chip active'; wdtChip.innerHTML='<span class="dot"></span>fed (CLRWDT)'; }
+        else { wdtChip.className='chip'; wdtChip.innerHTML='<span class="dot"></span>armed off'; }
+        logEvent(st.text);
+        delay = 50/speed;
+        break;
+      case 'note-inline':
+        logEvent(st.text);
+        delay = 40/speed;
+        break;
+      case 'loopstart':
+        clockLoop.hidden = false;
+        timer = setTimeout(mainLoopTick, 200/speed);
+        return;
+    }
+    timer = setTimeout(step, delay);
+  }
+
+  function mainLoopTick(){
+    if (!running) return;
+    loopPass++;
+    loopPassEl.textContent = loopPass;
+    var on = loopPass % 2 === 1;
+    setLed(ledB0, on);
+    ledB0desc.textContent = 'main loop: PORTB.0 = NOT PORTB.0 (pass ' + loopPass + ')';
+    elapsed += 200;
+    clockSim.textContent = fmtMs(elapsed);
+    if (loopPass <= 40 || loopPass % 5 === 0){
+      logEvent('main loop pass ' + loopPass + ' — LED ' + (on?'ON':'OFF'));
+    }
+    timer = setTimeout(mainLoopTick, 200/speed);
+  }
+
+  btnRun.addEventListener('click', function(){
+    if (idx >= steps.length && idx > 0 && !running){ reset(); }
+    running = true;
+    btnRun.disabled = true; btnPause.disabled = false;
+    step();
+  });
+  btnPause.addEventListener('click', function(){
+    running = false; clearTimeout(timer);
+    btnRun.disabled = false; btnPause.disabled = true; btnRun.textContent = '▶ Resume';
+  });
+  btnReset.addEventListener('click', reset);
+
+  reset();
+})();
+</script>
+</body>
+</html>
