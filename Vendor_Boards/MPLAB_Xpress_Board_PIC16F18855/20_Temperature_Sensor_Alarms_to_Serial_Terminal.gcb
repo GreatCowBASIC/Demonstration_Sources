@@ -95,7 +95,7 @@ Dir HI2C2_CLOCK In
 'MASTER Second Port
 HI2C2Mode Master
 
-Dim HI, LO, EMC_TEMP_H, SIGNBIT, WHOLE, FRACT, DIG, SHOWDEGREECHAR, DATA, OLDSTATUS As Byte
+Dim HI, LO, EMC_TEMP_H, SIGNBIT, WHOLE, FRACT, DIG, SHOWDEGREECHAR, datavalue, OLDSTATUS As Byte
 showDegreeChar = FALSE
 
 // ----- Main body of program commences here.
@@ -128,30 +128,30 @@ Do
     'Optionally, Send a bell alert to the terminal
     'HSerSend 7
     'Read Product ID register
-    EMC1001_Read( EMC1001_TEMP_PROD_ID ,  data )
+    EMC1001_Read( EMC1001_TEMP_PROD_ID ,  datavalue )
     If ( HI2C2WaitMSSPTimeout <> TRUE )  Then
         HSerPrint "Product ID:         EMC1001"
-        If data <> 0 Then
+        If datavalue <> 0 Then
             HSerPrint "-"
-            HSerPrintByteCRLF data
+            HSerPrintByteCRLF datavalue
         End If
         HSerPrintCRLF
 
     End If
 
     'Read Manufacturer ID register
-    EMC1001_Read( EMC1001_TEMP_MANUFACTURE_ID,  data )
+    EMC1001_Read( EMC1001_TEMP_MANUFACTURE_ID,  datavalue )
     If ( HI2C2WaitMSSPTimeout <> TRUE )  Then
         HSerPrint "Manufacturer ID:    0x"
-        HSerPrint Hex(data)
+        HSerPrint Hex(datavalue)
         HSerPrintCRLF
     End If
 
     'Read Revision register
-    EMC1001_Read( EMC1001_TEMP_REV_NUMBER,  data )
+    EMC1001_Read( EMC1001_TEMP_REV_NUMBER,  datavalue )
     If ( HI2C2WaitMSSPTimeout <> TRUE )  Then
         HSerPrint "Revision:           "
-        HSerPrintByteCRLF data
+        HSerPrintByteCRLF datavalue
     End If
 
     'Read temp registers
@@ -203,17 +203,17 @@ DisplayTemp:
     End If
 
     'Read Conversion register
-    EMC1001_Read( EMC1001_CONV_RATE ,  data )
+    EMC1001_Read( EMC1001_CONV_RATE ,  datavalue )
     If ( HI2C2WaitMSSPTimeout <> TRUE )  Then
         HSerPrint "Conversion rate is: "
-        HSerPrintByteCRLF data
+        HSerPrintByteCRLF datavalue
     End If
 
     'Read Hi limit register
-    EMC1001_Read(EMC1001_TEMP_LIMIT_HI_H,  data )
+    EMC1001_Read(EMC1001_TEMP_LIMIT_HI_H,  datavalue )
     If ( HI2C2WaitMSSPTimeout <> TRUE )  Then
         HSerPrint "High limit is:      "
-        HSerPrint data
+        HSerPrint datavalue
         If showDegreeChar = TRUE Then
             HSerPrint CHR(0xB0)
         End If
@@ -222,10 +222,10 @@ DisplayTemp:
     End If
 
     'Read Low Limit register
-    EMC1001_Read( EMC1001_TEMP_LIMIT_LO_H,  data )
+    EMC1001_Read( EMC1001_TEMP_LIMIT_LO_H,  datavalue )
     If ( HI2C2WaitMSSPTimeout <> TRUE )  Then
         HSerPrint "Low limit is:       "
-        HSerPrint data
+        HSerPrint datavalue
         If showDegreeChar = TRUE Then
             HSerPrint CHR(0xB0)
         End If
@@ -235,22 +235,22 @@ DisplayTemp:
 
 
     'Read Status register
-    EMC1001_Read( EMC1001_TEMP_STATUS,  data )
+    EMC1001_Read( EMC1001_TEMP_STATUS,  datavalue )
     If ( HI2C2WaitMSSPTimeout <> TRUE )  Then
         HSerPrint "Status is:          "
-        HSerPrint ByteToBin ( data )
+        HSerPrint ByteToBin ( datavalue )
         HSerPrintCRLF
     End If
 
-    oldStatus = data
+    oldStatus = datavalue
     Do While check_switch = check_switch
         SetWith ( LEDD2 , FnNotBit ( LEDD2 ) )
         Wait 100 ms
         'Alarms
         SetWith ( LEDD4 , FnEquBit ( ALARM1 ) )
         SetWith ( LEDD5 , FnEquBit ( ALARM2 ) )
-        EMC1001_Read( EMC1001_TEMP_STATUS,  data )
-        If data <> oldStatus Then
+        EMC1001_Read( EMC1001_TEMP_STATUS,  datavalue )
+        If datavalue <> oldStatus Then
             'Exit to show all the information
             Exit Do
         End If
