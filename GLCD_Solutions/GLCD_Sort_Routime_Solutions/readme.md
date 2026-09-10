@@ -19,6 +19,10 @@ GitHub strips `<script>` tags from files rendered in its own preview, so opening
 
 This isn't a stylized approximation — the simulation's pixel framebuffer is the same shape and size as the physical display (128×64, 1 bit per pixel), and the drawing functions mirror the GCBASIC `Line()`/`Box()` calls directly.
 
+## Array Size
+
+The array size is limited by the largest contiguous amount of linear RAM. In the case of the 16F877 that is 95 bytes of RAM. The array will be larger on microcontrollers with large contiguous RAM.
+
 ## Hardware target
 
 | | |
