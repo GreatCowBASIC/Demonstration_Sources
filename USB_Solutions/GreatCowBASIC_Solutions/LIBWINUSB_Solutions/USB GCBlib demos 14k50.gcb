@@ -52,7 +52,7 @@ HI2CMode Master
 
 //Variables 
 'Byte Array, current item, and received data lenght
-dim data(3) as Byte
+dim datavar(3) as Byte
 dim datan as Integer
 dim datal as Integer
 'set current item to 0 so array read can start
@@ -117,7 +117,7 @@ sub USB_Com_CallBack
       else
         'we already received the length so we are receiving bytes, store the byte in the corresponding array item
         '(actualy this is a loop commanded by the PC because we are receiving continuos commands and bytes)
-        data(datan)=USBTempBuffer(2)
+        datavar(datan)=USBTempBuffer(2)
         datan += 1
         'so lets check if we ended receiving the array, if so, lets reset the item number to 0 to get ready in the case of another future byte array send
         if datan = datal +1 then
@@ -125,9 +125,9 @@ sub USB_Com_CallBack
           'ok, you have your array, so do something whit it
 
           cls
-          print data(1)
-          print data(2)
-          print data(3)
+          print datavar(1)
+          print datavar(2)
+          print datavar(3)
 
         end if
       end if

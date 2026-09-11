@@ -25,7 +25,6 @@
 //Set microcontroller required
 #chip 18F46Q35
 #option Explicit
-!
 /*
         ------------PORTA---------------
 Bit#:  -7---6---5---4---3---2---1---0---
