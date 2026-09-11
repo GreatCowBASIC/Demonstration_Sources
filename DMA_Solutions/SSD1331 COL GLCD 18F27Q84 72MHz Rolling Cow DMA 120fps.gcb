@@ -58,7 +58,7 @@ OSCTUNE = 29 '0b00100000
 #DEFINE CHECK_USART_BAUD_RATE
 #DEFINE ISSUE_CHECK_USART_BAUD_RATE_WARNING
 
-Dim Data As byte
+Dim DataVar As byte
 Dim offset as word
 DIM ii as Word
 
@@ -66,16 +66,16 @@ DIM ARRAYframe(12292) as Byte // four bytes extra. Exact version: DIM ARRAYframe
 
 //Receive stream via serial
 // For ii = 0 to 12000 '12287 exactly for 96x64, but continue a bit if a byte is missed not to miss FF
-//     data=Hserreceive
-//     Arrayframe(ii)=data
+//     DataVar=Hserreceive
+//     Arrayframe(ii)=DataVar
 //     next
   
 //   For ii = 12001 to 12300 'check only the last frames for End of Frame 0xFF)
-//     data=Hserreceive
-//     if data=0xFF Then 'FF= end of frame
+//     DataVar=Hserreceive
+//     if DataVar=0xFF Then 'FF= end of frame
 //     exit for
 //     end if
-//     Arrayframe(ii)=data
+//     Arrayframe(ii)=DataVar
 //     next
 
 
