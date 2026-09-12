@@ -1,0 +1,13 @@
+#SKIPTEST
+#chip 16F1938
+
+'Demonstrates the NoMatchingOverload check added at build 1637 (see Change1637):
+'calling Scale() with more arguments (7) than its largest overload declares (6,
+'including the optional calibrate parameter) is a genuine "too many parameters"
+'call that no overload can serve, so this must fail to compile with a clear error.
+'#SKIPTEST above is required because this file is intentionally expected to fail -
+'see NoMatchingOverload_TooManyParams_DISABLE1637_Warning.gcb for the escape-hatch
+'variant that compiles.
+
+Dim rVar As Integer
+rVar = Scale(100, 0, 1023, 0, 255, 0, 999)

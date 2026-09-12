@@ -1,0 +1,11 @@
+#chip 16F1938
+#DEFINE DISABLE1637
+
+'Demonstrates the DISABLE1637 escape hatch for the NoMatchingOverload check added at
+'build 1637 (see Change1637): the same too-many-parameters Scale() call as
+'NoMatchingOverload_TooManyParams_Error.gcb, but with DISABLE1637 defined the
+'check is downgraded from a compile error to a warning, so this file must still
+'compile successfully (with a warning logged), not fail.
+
+Dim rVar As Integer
+rVar = Scale(100, 0, 1023, 0, 255, 0, 999)

@@ -46,8 +46,9 @@ Function ValidPassCode
     HSerPrintStringCRLF "Press `enter` to start"
 
     // Dump any serial data
-    Do 
-        HSerReceive ( Temp , 3)
+    Comport = 3
+    Do
+        HSerReceive ( Temp )
     Loop While Temp = DEFAULTUSARTRETURNVALUE
 
     HSerPrintStringCRLF "Enter passcode on KeyPad, 4 presses"
@@ -56,7 +57,8 @@ Function ValidPassCode
     ccount = 0
     Do While ccount < 4
         //? Get key value from serial
-        HSerReceive( Temp, 3)
+        Comport = 3
+        HSerReceive( Temp )
         
         //? If a key is pressed, then display it
         If Temp <> DEFAULTUSARTRETURNVALUE  Then

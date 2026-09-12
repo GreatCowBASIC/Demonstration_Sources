@@ -16,7 +16,7 @@
   #chip mega328p,16
   #option explicit
   #include <glcd.h>
-  #include <..\converters\anobiumfull.bmp>
+  #include <..\converters\anobium84_48.bmp>
 
 
   ; ----- Define Software settings
@@ -59,9 +59,9 @@
   GLCDCLS
 
   ' Add your own case statement here to handle multiple BMPs, you just  need the variables to be defined
-  ReadTable AnobiumFull, 0, lengthofpicture
-  ReadTable AnobiumFull, 1, widthofpicture
-  ReadTable AnobiumFull, 2, heightofpicture
+  ReadTable Anobium84_48, 0, lengthofpicture
+  ReadTable Anobium84_48, 1, widthofpicture
+  ReadTable Anobium84_48, 2, heightofpicture
   lengthofpicture =  heightofpicture / 8
   lengthofpicture = [word]lengthofpicture * widthofpicture
 
@@ -75,7 +75,7 @@
   for  ram_index =  3 to lengthofpicture + 3         ; start at third byte and finish at the end
 
             ' Add your own case statement here to handle multiple BMPs, you just  need set CurrCharVal to the data value
-            ReadTable AnobiumFull,  ( ram_index ), CurrCharVal  ' read data
+            ReadTable Anobium84_48,  ( ram_index ), CurrCharVal  ' read data
 
             if ( ( ram_index - 3 ) % widthofpicture ) = 0  and firstpass = false then     ' change position for new line of data
                CharLocY = CharLocY + 8
