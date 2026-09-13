@@ -1,0 +1,23 @@
+#chip 16F1938
+
+'Demonstrates the new #SCRIPT ELSE support added at build 1638 (see Change1638):
+'when the IF condition is false, the ELSE branch must execute instead of the
+'IF branch. Before this change, #SCRIPT had no ELSE support at all.
+
+#define TESTFLAG 0
+
+#script
+  RESULT = 0
+  If TESTFLAG = 1 Then
+    RESULT = 1
+  Else
+    RESULT = 2
+  End If
+  If RESULT <> 2 Then
+    Error Script ELSE branch did not execute when IF condition was false
+  End If
+  info result 
+#endscript
+
+Dim xVar As Integer
+xVar = RESULT

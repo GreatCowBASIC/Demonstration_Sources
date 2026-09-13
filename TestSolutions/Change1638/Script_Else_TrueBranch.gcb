@@ -1,0 +1,24 @@
+#chip 16F1938
+
+'Demonstrates the new #SCRIPT ELSE support added at build 1638 (see Change1638):
+'when the IF condition is true, the ELSE branch must be skipped entirely.
+'If ELSE support has a bug, RESULT would end up 2 instead of 1 and the
+'script's own Error command below halts compilation with a clear message.
+
+#define TESTFLAG 1
+
+#script
+  RESULT = 0
+  If TESTFLAG = 1 Then
+    RESULT = 1
+  Else
+    RESULT = 2
+  End If
+  If RESULT <> 1 Then
+    Error Script ELSE branch incorrectly executed when IF condition was true
+  End If
+  Info RESULT
+#endscript
+
+Dim xVar As Integer
+xVar = RESULT

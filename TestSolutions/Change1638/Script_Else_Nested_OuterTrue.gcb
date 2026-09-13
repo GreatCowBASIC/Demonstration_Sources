@@ -1,0 +1,34 @@
+#chip 16F1938
+
+'Demonstrates nested IF/ELSE inside a #SCRIPT block (build 1638, Change1638).
+'Outer condition is true, so the outer IF branch runs; inside it, the inner
+'condition is false, so the inner ELSE branch runs. This exercises the new
+'top-level ELSE dispatch (skip-forward-to-END-IF) correctly tracking nesting
+'depth (TL) across the inner IF/ELSE/END IF before reaching the outer ELSE.
+
+#define FLAGA 1
+#define FLAGB 0
+
+#script
+  RESULT = 0
+  If FLAGA = 1 Then
+    If FLAGB = 1 Then
+      RESULT = 11
+    Else
+      RESULT = 10
+    End If
+  Else
+    If FLAGB = 1 Then
+      RESULT = 1
+    Else
+      RESULT = 0
+    End If
+  End If
+  If RESULT <> 10 Then
+    Error Nested script IF/ELSE produced the wrong result for outer-true case
+  End If
+  Info RESULT
+#endscript
+
+Dim xVar As Integer
+xVar = RESULT
