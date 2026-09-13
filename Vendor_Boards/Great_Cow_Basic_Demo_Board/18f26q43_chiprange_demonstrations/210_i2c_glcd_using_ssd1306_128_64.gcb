@@ -97,6 +97,9 @@ Dir     SWITCHIN      In
 
 Dir HI2C_DATA Out
 Dir HI2C_CLOCK Out
+' Define I2C clock sources for minimal operation
+#DEFINE I2C1ClockSource     I2C1CLOCK_MFINTOSC
+#DEFINE HI2CITSCLWaitPeriod 100    'minimum for this type of device
 'Port specific controls may be required - see the datasheet
 
 

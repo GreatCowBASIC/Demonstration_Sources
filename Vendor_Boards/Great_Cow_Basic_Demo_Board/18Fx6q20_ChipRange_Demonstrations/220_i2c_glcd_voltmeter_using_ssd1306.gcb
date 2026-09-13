@@ -93,6 +93,9 @@
     #DEFINE HI2C_BAUD_RATE  100
     #DEFINE HI2C_DATA       PORTB.5
     #DEFINE HI2C_CLOCK      PORTB.6
+    ' Define I2C clock sources for minimal operation
+    #DEFINE I2C1ClockSource     I2C1CLOCK_MFINTOSC
+    #DEFINE HI2CITSCLWaitPeriod 100    'minimum for this type of device
     HI2CMode (Master)
 
     #DEFINE MUTE_HIC2Q2XBUFFERSIZE_WARNING

@@ -106,6 +106,9 @@ This version is compatible will all version of GCBASIC as this demonstration use
 // Define I2C settings
     #DEFINE HI2C_DATA       PORTC.4
     #DEFINE HI2C_CLOCK      PORTC.3
+    ' Define I2C clock sources for minimal operation
+    #DEFINE I2C1ClockSource     I2C1CLOCK_MFINTOSC
+    #DEFINE HI2CITSCLWaitPeriod 100    'minimum for this type of device
     #DEFINE HI2C_BAUD_RATE  100
     HI2CMode (Master)
 

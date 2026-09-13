@@ -89,6 +89,9 @@ Dir     SWITCHIN      In
 'Initialise I2C - note for the I2C module the ports need to be set to IN
 Dir HI2C_DATA Out
 Dir HI2C_CLOCK Out
+' Define I2C clock sources for minimal operation
+#DEFINE I2C1ClockSource     I2C1CLOCK_MFINTOSC
+#DEFINE HI2CITSCLWaitPeriod 100    'minimum for this type of device
 
 '*****************************************************************************************************
 'Main program commences here.. everything before this is setup for the board.

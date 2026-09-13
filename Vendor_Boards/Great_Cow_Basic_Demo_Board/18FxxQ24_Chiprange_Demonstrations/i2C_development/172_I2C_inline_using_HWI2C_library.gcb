@@ -30,6 +30,9 @@ if you use <GCBVersionNumber.cnt> this is a system wide versionString tracker.
 
 #define HI2C_DATA   PORTC.4
 #define HI2C_CLOCK  PORTC.3
+' Define I2C clock sources for minimal operation
+#DEFINE I2C1ClockSource     I2C1CLOCK_MFINTOSC
+#DEFINE HI2CITSCLWaitPeriod 100    'minimum for this type of device
 HI2CMode Master
 
 #DEFINE MUTE_HIC2Q2XBUFFERSIZE_WARNING
