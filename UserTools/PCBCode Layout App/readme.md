@@ -2,6 +2,10 @@
 
 An interactive HTML-based design tool created to assist microcontroller developers with physical pin planning, conflict resolution, and code generation for the **PIC18F57Q43** microcontroller.
 
+[![Launch Pin Planner](https://img.shields.io/badge/Launch-Pin%20Planner%20App-brightgreen?style=for-the-badge)](https://htmlpreview.github.io/?https://github.com/GreatCowBASIC/Demonstration_Sources/blob/main/UserTools/PCBCode%20Layout%20App/pic18f57q43-pinplanner_V4.html)
+
+> 🚀 **[Launch PIC18F57Q43 Pin Planner App directly in browser](https://htmlpreview.github.io/?https://github.com/GreatCowBASIC/Demonstration_Sources/blob/main/UserTools/PCBCode%20Layout%20App/pic18f57q43-pinplanner_V4.html)**
+
 ---
 
 ## Overview
@@ -32,13 +36,14 @@ Additionally, it automatically generates code reference snippets for **GCBASIC**
 
 ## How to Use
 
-1. **Name Your Project:** Enter your project name in the bottom-left text box.
-2. **Select a Pin:** Click on any pin on the central PIC18F57Q43 visual map.
-3. **Configure Settings:** 
+1. **Launch the App:** Open the [Live Web App](https://htmlpreview.github.io/?https://github.com/GreatCowBASIC/Demonstration_Sources/blob/main/UserTools/PCBCode%20Layout%20App/pic18f57q43-pinplanner_V4.html) or open `pic18f57q43-pinplanner_V4.html` in any web browser.
+2. **Name Your Project:** Enter your project name in the bottom-left text box.
+3. **Select a Pin:** Click on any pin on the central PIC18F57Q43 visual map.
+4. **Configure Settings:** 
    * Use the right panel to assign a custom net name.
    * Select the intended function for the pin (leveraging PPS).
-4. **Generate Code:** Click one of the code buttons (**Generic**, **GCBASIC**, or **PBP**) under the selection box to review the pin setup code.
-5. **Save & Export:** Use the top toolbar to export your project state (`.json`), pinout documentation (`.md`), or compiler source files (e.g., GCBASIC code output).
+5. **Generate Code:** Click one of the code buttons (**Generic**, **GCBASIC**, or **PBP**) under the selection box to review the pin setup code.
+6. **Save & Export:** Use the top toolbar to export your project state (`.json`), pinout documentation (`.md`), or compiler source files (e.g., GCBASIC code output).
 
 ---
 
