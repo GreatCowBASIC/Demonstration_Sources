@@ -2,6 +2,8 @@
 
 An interactive HTML-based design tool created to assist microcontroller developers with physical pin planning, conflict resolution, and code generation for the **PIC18F57Q43** microcontroller.
 
+Written by Craig Fendley and provide here with his permission.
+
 [![Launch Pin Planner](https://img.shields.io/badge/Launch-Pin%20Planner%20App-brightgreen?style=for-the-badge)](https://htmlpreview.github.io/?https://github.com/GreatCowBASIC/Demonstration_Sources/blob/main/UserTools/PCBCode%20Layout%20App/pic18f57q43-pinplanner_V4.html)
 
 > 🚀 **[Launch PIC18F57Q43 Pin Planner App directly in browser](https://htmlpreview.github.io/?https://github.com/GreatCowBASIC/Demonstration_Sources/blob/main/UserTools/PCBCode%20Layout%20App/pic18f57q43-pinplanner_V4.html)**
