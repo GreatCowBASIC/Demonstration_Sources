@@ -1,0 +1,52 @@
+# PIC18F57Q43 Pin Configuration & Code Layout App
+
+An interactive HTML-based design tool created to assist microcontroller developers with physical pin planning, conflict resolution, and code generation for the **PIC18F57Q43** microcontroller.
+
+---
+
+## Overview
+
+Planning physical pin layouts for new PCB designs can be a time-consuming process, especially when trying to avoid pin conflicts. This app provides a quick visual workspace to map out your chip's configuration and leverage Peripheral Pin Select (PPS) capabilities. 
+
+Additionally, it automatically generates code reference snippets for **GCBASIC** and **PicBasic Pro (PBP)**.
+
+> **Note:** Code generation parses GCBASIC and PBP manual functions. Please verify generated pin setups against official compiler documentation to ensure optimal implementation.
+
+---
+
+## Features
+
+* **Pin Filter & Conflict Key:** Easily filter pins and identify pin assignment conflicts via the left control panel.
+* **Interactive IC Map:** Select individual pins on the visual PIC18F57Q43 layout to configure properties.
+* **Custom Net Naming:** Assign custom net names to any pin on the chip.
+* **Multi-Language Code Generation:** Instantly preview pin configuration code in:
+  * Generic format
+  * [GCBASIC](https://sourceforge.net/p/gcbasic/discussion/629990/thread/8f7b706342/?limit=25#6c44)
+  * PicBasic Pro (PBP)
+* **Import / Export Capabilities:**
+  * **`.json`**: Save and reload project configurations locally.
+  * **`.md`**: Export the pinout layout setup as Markdown documentation.
+  * **Code Export:** Export generated source code snippets for your targeted programming language.
+
+---
+
+## How to Use
+
+1. **Name Your Project:** Enter your project name in the bottom-left text box.
+2. **Select a Pin:** Click on any pin on the central PIC18F57Q43 visual map.
+3. **Configure Settings:** 
+   * Use the right panel to assign a custom net name.
+   * Select the intended function for the pin (leveraging PPS).
+4. **Generate Code:** Click one of the code buttons (**Generic**, **GCBASIC**, or **PBP**) under the selection box to review the pin setup code.
+5. **Save & Export:** Use the top toolbar to export your project state (`.json`), pinout documentation (`.md`), or compiler source files (e.g., GCBASIC code output).
+
+---
+
+## AI Replication Guide
+
+You can replicate this tool for other integrated circuits (ICs) using AI models (such as Claude or Grok):
+
+1. Upload this application's source files to your AI tool.
+2. Provide the datasheet/documentation for your target IC.
+3. Provide the reference documentation for your preferred programming language.
+4. Prompt the AI to adapt the pin planner logic and code generator to match your new chip and target compiler.
