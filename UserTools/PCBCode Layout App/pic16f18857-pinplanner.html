@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PIC16F18857 Pin Planner</title>
+<style>
+  :root{
+    --bg:#1e1e1e; --panel:#252526; --panel-2:#2d2d30; --border:#3c3c3c;
+    --text:#d4d4d4; --text-dim:#8a8a8a;
+    --accent:#4ec9b0; --accent-2:#569cd6; --conflict:#f14c4c;
+    --pin-io:#3c3c3c; --pin-power:#6a6a6a; --pin-assigned:#264f4a;
+    --mono:"Cascadia Code","Consolas","SF Mono",monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13px;height:100vh;overflow:hidden;}
+  .app{display:grid;grid-template-columns:250px 1fr 340px;grid-template-rows:44px 1fr 130px;height:100vh;}
+
+  .titlebar{grid-column:1/4;grid-row:1;background:var(--panel-2);border-bottom:1px solid var(--border);
+    display:flex;align-items:center;padding:0 14px;gap:10px;}
+  .titlebar .chip-id{color:var(--accent);font-weight:600;}
+  .titlebar .sub{color:var(--text-dim);}
+  .titlebar .spacer{flex:1;}
+  .btn{background:var(--panel);border:1px solid var(--border);color:var(--text);padding:6px 11px;
+    border-radius:2px;cursor:pointer;font-family:var(--mono);font-size:12px;}
+  .btn:hover{border-color:var(--accent-2);color:var(--accent-2);}
+  .btn.primary{border-color:var(--accent);color:var(--accent);}
+  .btn.primary:hover{background:rgba(78,201,176,0.1);}
+  input[type=file]{display:none;}
+
+  .rail-left{grid-column:1;grid-row:2/4;background:var(--panel);border-right:1px solid var(--border);
+    padding:10px;overflow-y:auto;}
+  .rail-left h4{margin:14px 0 6px;color:var(--text-dim);font-weight:500;font-size:11px;letter-spacing:.03em;}
+  .rail-left h4:first-child{margin-top:0;}
+  .search{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);
+    padding:6px 8px;border-radius:2px;font-family:var(--mono);font-size:12px;}
+  .filter-group{display:flex;flex-direction:column;gap:2px;margin-top:4px;}
+  .filter-row{display:flex;align-items:center;gap:6px;padding:3px 4px;border-radius:2px;cursor:pointer;user-select:none;}
+  .filter-row:hover{background:var(--panel-2);}
+  .filter-row.active{background:var(--panel-2);color:var(--accent-2);}
+  .swatch{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+  .filter-row span{color:var(--text-dim);font-size:11.5px;}
+  .filter-row.active span{color:var(--accent-2);}
+
+  .stage{grid-column:2;grid-row:2;position:relative;overflow:auto;display:flex;align-items:center;justify-content:center;
+    padding:10px;background:radial-gradient(circle at 50% 40%,#232324 0%,var(--bg) 70%);}
+  .stage svg{width:100%;height:100%;max-width:900px;max-height:900px;}
+
+  .side-right{grid-column:3;grid-row:2/4;background:var(--panel);border-left:1px solid var(--border);
+    display:flex;flex-direction:column;overflow:hidden;}
+  .pin-detail{padding:14px;border-bottom:1px solid var(--border);}
+  .pin-detail .pin-num{color:var(--text-dim);font-size:11px;}
+  .pin-detail .pin-name{color:var(--accent);font-size:18px;font-weight:600;margin:2px 0 10px;}
+  .field{margin-bottom:10px;}
+  .field label{display:block;color:var(--text-dim);font-size:11px;margin-bottom:4px;}
+  .field select,.field input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);
+    padding:6px 8px;border-radius:2px;font-family:var(--mono);font-size:12px;}
+  .field select:focus,.field input:focus{outline:none;border-color:var(--accent-2);}
+  .field small{color:var(--text-dim);display:block;margin-top:4px;font-size:10.5px;}
+  .conflict-banner{background:rgba(241,76,76,0.12);border:1px solid var(--conflict);color:var(--conflict);
+    padding:8px 10px;border-radius:2px;font-size:11.5px;margin-top:8px;}
+  .lang-toggle{display:flex;gap:4px;margin-bottom:6px;}
+  .lang-toggle button{background:var(--bg);border:1px solid var(--border);color:var(--text-dim);
+    padding:4px 10px;border-radius:2px;cursor:pointer;font-family:var(--mono);font-size:11px;}
+  .lang-toggle button:hover{color:var(--text);}
+  .lang-toggle button.active{border-color:var(--accent);color:var(--accent);}
+  .snippet-box{background:var(--bg);border:1px solid var(--border);border-radius:2px;padding:8px 10px;
+    font-size:11.5px;line-height:1.5;color:var(--text);white-space:pre;overflow-x:auto;margin:0;}
+  .snippet-note{color:var(--text-dim);font-size:10.5px;margin-top:5px;display:block;}
+  .empty-detail{padding:20px 14px;color:var(--text-dim);font-size:12px;}
+  .assign-list{flex:1;overflow-y:auto;padding:8px 14px;}
+  .assign-list .hdr{color:var(--text-dim);font-size:11px;letter-spacing:.03em;margin:8px 0 4px;}
+  .assign-list .row{display:flex;justify-content:space-between;gap:6px;padding:5px 0;border-bottom:1px dashed var(--border);
+    font-size:12px;cursor:pointer;}
+  .assign-list .row:hover{background:var(--panel-2);}
+  .assign-list .row .p{color:var(--text-dim);width:30px;flex-shrink:0;}
+  .assign-list .row .n{flex:1;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .assign-list .row .f{color:var(--accent-2);font-size:11px;text-align:right;}
+  .assign-list .row.conflict .f{color:var(--conflict);}
+
+  .bottom-bar{grid-column:1/4;grid-row:3;background:var(--panel-2);border-top:1px solid var(--border);
+    display:flex;overflow-x:auto;}
+  .bottom-bar .conflict-item{flex-shrink:0;border-right:1px solid var(--border);padding:10px 16px;
+    display:flex;flex-direction:column;justify-content:center;gap:2px;cursor:pointer;min-width:190px;}
+  .bottom-bar .conflict-item:hover{background:var(--panel);}
+  .bottom-bar .conflict-item .t{color:var(--conflict);font-size:11.5px;font-weight:600;}
+  .bottom-bar .conflict-item .d{color:var(--text-dim);font-size:11px;}
+  .bottom-bar .empty{padding:10px 16px;color:var(--text-dim);font-size:12px;align-self:center;}
+
+  svg text{font-family:var(--mono);}
+  .pin-body{fill:var(--pin-io);stroke:#151515;stroke-width:1;cursor:pointer;}
+  .pin-body.power{fill:var(--pin-power);}
+  .pin-body.assigned{fill:var(--pin-assigned);stroke:var(--accent);}
+  .pin-body.selected{stroke:var(--accent-2);stroke-width:2.5;}
+  .pin-body.conflict{fill:rgba(241,76,76,0.28);stroke:var(--conflict);stroke-width:2;}
+  .pin-body.dimmed{opacity:.25;}
+  .pin-body:hover{stroke:var(--accent-2);}
+  .pin-label{fill:var(--text);font-size:12px;}
+  .pin-num-label{fill:var(--text-dim);font-size:9px;}
+  .pin-func-label{fill:var(--accent);font-size:10px;}
+  .die{fill:#141414;stroke:var(--border);stroke-width:1.5;}
+  .die-label{fill:var(--text-dim);font-size:14px;}
+  .die-label.chip-name{fill:var(--text);font-size:17px;font-weight:600;}
+  .pin1-dot{fill:var(--accent);}
+
+  ::-webkit-scrollbar{width:9px;height:9px;}
+  ::-webkit-scrollbar-thumb{background:#4a4a4a;border-radius:5px;}
+  ::-webkit-scrollbar-track{background:var(--panel);}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="titlebar">
+    <span class="chip-id">PIC16F18857</span>
+    <span class="sub">28-pin SPDIP / SOIC / SSOP · Pin Planner</span>
+    <div class="spacer"></div>
+    <label class="btn" for="importFile">Import project…</label>
+    <input type="file" id="importFile" accept="application/json">
+    <button class="btn" id="exportMd">Export pinout (.md)</button>
+    <button class="btn" id="exportCode">Export code (.md)</button>
+    <button class="btn primary" id="exportJson">Export project (.json)</button>
+  </div>
+
+  <div class="rail-left">
+    <h4>SEARCH</h4>
+    <input class="search" id="searchBox" placeholder="pin, port, or net name…">
+
+    <h4>SHOW ON CHIP</h4>
+    <div class="filter-group" id="viewFilters">
+      <div class="filter-row" data-filter="assigned"><div class="swatch" style="background:var(--pin-assigned);border:1px solid var(--accent)"></div><span>Assigned pins</span></div>
+      <div class="filter-row" data-filter="unassigned"><div class="swatch" style="background:var(--pin-io)"></div><span>Unassigned I/O</span></div>
+      <div class="filter-row" data-filter="power"><div class="swatch" style="background:var(--pin-power)"></div><span>Power / ground</span></div>
+      <div class="filter-row" data-filter="conflict"><div class="swatch" style="background:rgba(241,76,76,0.4);border:1px solid var(--conflict)"></div><span>Conflicts</span></div>
+    </div>
+
+    <h4>FILTER BY PERIPHERAL</h4>
+    <div class="filter-group" id="periphFilters"></div>
+
+    <h4>PROJECT</h4>
+    <div class="field"><label>Board / revision</label><input id="boardName" placeholder="main-control-v1"></div>
+  </div>
+
+  <div class="stage">
+    <svg id="chipSvg" viewBox="0 0 780 780"></svg>
+  </div>
+
+  <div class="side-right">
+    <div id="pinDetail" class="empty-detail">Click a pin on the chip to configure it.</div>
+    <div class="assign-list" id="assignList"></div>
+  </div>
+
+  <div class="bottom-bar" id="conflictBar"></div>
+
+</div>
+
+<script>
+/* ---------- Device data: PIC16F18857 28-pin SPDIP/SOIC/SSOP ----------
+   Physical pin order and fixed functions from Microchip DS40001825F
+   (TABLE 2 – 28-PIN ALLOCATION TABLE). PPS pool from TABLES 13-1 / 13-3. */
+
+const PIN_NAMES_IN_ORDER = [
+  "RE3","RA0","RA1","RA2","RA3","RA4","RA5","VSS",
+  "RA7","RA6","RC0","RC1","RC2","RC3","RC4","RC5",
+  "RC6","RC7","VSS","VDD","RB0","RB1","RB2","RB3",
+  "RB4","RB5","RB6","RB7"
+];
+
+const PIN_INFO = {
+  RA0:{analog:'ANA0', fixed:[{id:'C1IN0M',label:'C1IN0- / C2IN0- (comparator -)'}]},
+  RA1:{analog:'ANA1', fixed:[{id:'C1IN1M',label:'C1IN1- / C2IN1- (comparator -)'}]},
+  RA2:{analog:'ANA2', fixed:[
+    {id:'VREFM',label:'VREF- (ADC/DAC reference)'},
+    {id:'DAC1OUT1',label:'DAC1OUT1 (DAC1 output)'},
+    {id:'C1IN0P',label:'C1IN0+ / C2IN0+ (comparator +)'}
+  ]},
+  RA3:{analog:'ANA3', fixed:[
+    {id:'VREFP',label:'VREF+ (ADC/DAC reference)'},
+    {id:'C1IN1P',label:'C1IN1+ (comparator +)'}
+  ]},
+  RA4:{analog:'ANA4'},
+  RA5:{analog:'ANA5'},
+  RA6:{analog:'ANA6', fixed:[{id:'OSC2',label:'OSC2 / CLKOUT (ext. oscillator)'}], noPPS:true},
+  RA7:{analog:'ANA7', fixed:[{id:'OSC1',label:'OSC1 / CLKIN (ext. oscillator)'}], noPPS:true},
+  RB0:{analog:'ANB0', fixed:[
+    {id:'ZCD',label:'ZCD (zero-cross detect input)'},
+    {id:'C2IN1P',label:'C2IN1+ (comparator +)'}
+  ]},
+  RB1:{analog:'ANB1', fixed:[{id:'C1IN3M',label:'C1IN3- / C2IN3- (comparator -)'}]},
+  RB2:{analog:'ANB2'},
+  RB3:{analog:'ANB3', fixed:[{id:'C1IN2M',label:'C1IN2- / C2IN2- (comparator -)'}]},
+  RB4:{analog:'ANB4'},
+  RB5:{analog:'ANB5'},
+  RB6:{analog:'ANB6', fixed:[{id:'ICSPCLK',label:'ICSPCLK (programming clock)'}], noPPS:true},
+  RB7:{analog:'ANB7', fixed:[
+    {id:'DAC1OUT2',label:'DAC1OUT2 (DAC1 output)'},
+    {id:'ICSPDAT',label:'ICSPDAT (programming data)'}
+  ], noPPS:true},
+  RC0:{analog:'ANC0', fixed:[{id:'SOSCO',label:'SOSCO (secondary oscillator)'}]},
+  RC1:{analog:'ANC1', fixed:[{id:'SOSCI',label:'SOSCI (secondary oscillator)'}]},
+  RC2:{analog:'ANC2'},
+  RC3:{analog:'ANC3', fixed:[{id:'SCL1LVL',label:'SCL1 (dedicated I²C-level pin)'}]},
+  RC4:{analog:'ANC4', fixed:[{id:'SDA1LVL',label:'SDA1 (dedicated I²C-level pin)'}]},
+  RC5:{analog:'ANC5'},
+  RC6:{analog:'ANC6'},
+  RC7:{analog:'ANC7'},
+  RE3:{fixed:[{id:'MCLR',label:'MCLR / VPP (reset / program voltage)'}], noPPS:true,
+       note:'Digital input only when MCLRE config bit disables the reset function.'},
+  VSS:{power:true},
+  VDD:{power:true}
+};
+
+/* Global PPS-mappable digital peripheral pool (from TABLE 13-1 / 13-3).
+   Each signal can live on exactly one pin; duplicates are flagged as conflicts. */
+const PPS_GROUPS = [
+  {group:'EUSART', items:[
+    ['TX','TX / CK (out)'],['RX','RX / DT (in)'],['DT','DT (bidir)']
+  ]},
+  {group:'MSSP1 (SPI/I2C)', items:[
+    ['SCK1','SCK1 / SCL1 (bidir)'],['SDO1','SDO1 (out)'],['SDI1','SDI1 / SDA1 (bidir)'],['SS1','SS1 (bidir)']
+  ]},
+  {group:'MSSP2 (SPI/I2C)', items:[
+    ['SCK2','SCK2 / SCL2 (bidir)'],['SDO2','SDO2 (out)'],['SDI2','SDI2 / SDA2 (bidir)'],['SS2','SS2 (bidir)']
+  ]},
+  {group:'CCP', items:[
+    ['CCP1','CCP1 (bidir)'],['CCP2','CCP2 (bidir)'],['CCP3','CCP3 (bidir)'],
+    ['CCP4','CCP4 (bidir)'],['CCP5','CCP5 (bidir)']
+  ]},
+  {group:'PWM', items:[
+    ['PWM6OUT','PWM6OUT (out)'],['PWM7OUT','PWM7OUT (out)']
+  ]},
+  {group:'CWG1', items:[
+    ['CWG1A','CWG1A (out)'],['CWG1B','CWG1B (out)'],['CWG1C','CWG1C (out)'],['CWG1D','CWG1D (out)'],
+    ['CWG1IN','CWG1IN (in)']
+  ]},
+  {group:'CWG2', items:[
+    ['CWG2A','CWG2A (out)'],['CWG2B','CWG2B (out)'],['CWG2C','CWG2C (out)'],['CWG2D','CWG2D (out)'],
+    ['CWG2IN','CWG2IN (in)']
+  ]},
+  {group:'CWG3', items:[
+    ['CWG3A','CWG3A (out)'],['CWG3B','CWG3B (out)'],['CWG3C','CWG3C (out)'],['CWG3D','CWG3D (out)'],
+    ['CWG3IN','CWG3IN (in)']
+  ]},
+  {group:'CLC', items:[
+    ['CLC1OUT','CLC1OUT (out)'],['CLC2OUT','CLC2OUT (out)'],['CLC3OUT','CLC3OUT (out)'],['CLC4OUT','CLC4OUT (out)'],
+    ['CLCIN0','CLCIN0 (in)'],['CLCIN1','CLCIN1 (in)'],['CLCIN2','CLCIN2 (in)'],['CLCIN3','CLCIN3 (in)']
+  ]},
+  {group:'Comparator', items:[
+    ['C1OUT','C1OUT (out)'],['C2OUT','C2OUT (out)']
+  ]},
+  {group:'ADC', items:[
+    ['ADGRDA','ADGRDA guard ring (out)'],['ADGRDB','ADGRDB guard ring (out)'],['ADCACT','ADCACT (in)']
+  ]},
+  {group:'Timers / SMT', items:[
+    ['TMR0','TMR0 (out)'],['T0CKI','T0CKI (in)'],
+    ['T1CKI','T1CKI (in)'],['T1G','T1G (in)'],
+    ['T3CKI','T3CKI (in)'],['T3G','T3G (in)'],
+    ['T5CKI','T5CKI (in)'],['T5G','T5G (in)'],
+    ['T2IN','T2IN (in)'],['T4IN','T4IN (in)'],['T6IN','T6IN (in)'],
+    ['SMTWIN1','SMT1WIN (in)'],['SMTSIG1','SMT1SIG (in)'],
+    ['SMTWIN2','SMT2WIN (in)'],['SMTSIG2','SMT2SIG (in)']
+  ]},
+  {group:'DSM', items:[
+    ['DSM','DSM (out)'],['MDCARL','MDCARL (in)'],['MDCARH','MDCARH (in)'],['MDSRC','MDSRC (in)']
+  ]},
+  {group:'NCO / CLKR', items:[
+    ['NCO','NCO (out)'],['CLKR','CLKR (out)']
+  ]},
+  {group:'Interrupts', items:[
+    ['INT','INT (in)']
+  ]}
+];
+const PPS_LOOKUP = {};
+PPS_GROUPS.forEach(g=>g.items.forEach(([id,label])=>{PPS_LOOKUP[id]={label, group:g.group};}));
+
+/* ---------- Runtime state ---------- */
+const pinState = {};
+for(let i=1;i<=28;i++) pinState[i] = {name:'', kind:'gpio_in', valueId:''};
+let selectedPin = null;
+let activeViewFilters = new Set();
+let activePeriphFilter = null;
+let searchTerm = '';
+
+function pinName(num){ return PIN_NAMES_IN_ORDER[num-1]; }
+function pinInfo(num){ return PIN_INFO[pinName(num)] || {}; }
+function isPower(num){ return !!pinInfo(num).power; }
+
+function computePpsUsage(){
+  const usage = {};
+  for(let i=1;i<=28;i++){
+    const st = pinState[i];
+    if(st.kind==='pps' && st.valueId){
+      (usage[st.valueId] = usage[st.valueId] || []).push(i);
+    }
+  }
+  return usage;
+}
+
+function functionLabel(num){
+  const st = pinState[num], info = pinInfo(num);
+  if(isPower(num)) return pinName(num);
+  if(st.kind==='gpio_in') return 'GPIO in';
+  if(st.kind==='gpio_out') return 'GPIO out';
+  if(st.kind==='analog') return info.analog;
+  if(st.kind==='fixed'){
+    const f = (info.fixed||[]).find(f=>f.id===st.valueId);
+    return f ? f.label.split(' (')[0] : st.valueId;
+  }
+  if(st.kind==='pps') return st.valueId;
+  return '';
+}
+
+/* ---------- SVG chip rendering (28-pin dual-in-line style) ---------- */
+const svgNS = "http://www.w3.org/2000/svg";
+const svg = document.getElementById('chipSvg');
+const dieX=200, dieY=120, dieW=380, dieH=540;
+const bodyLen=58, bodyW=28;
+const pitch = (dieH - 40) / 13; // 14 pins per side
+
+function pinGeometry(num){
+  // Left side (pins 1-14 top→bottom), Right side (pins 28-15 bottom→top visual)
+  let side, idx;
+  if(num <= 14){ side = 0; idx = num-1; }
+  else { side = 1; idx = 28-num; }
+
+  const off = 20 + idx * pitch;
+  let x,y,w,h,tx,ty,anchor;
+  if(side===0){ // left
+    x = dieX - bodyLen; y = dieY + off - bodyW/2; w = bodyLen; h = bodyW;
+    tx = x - 6; ty = y + h/2 + 4; anchor = 'end';
+  } else { // right
+    x = dieX + dieW; y = dieY + off - bodyW/2; w = bodyLen; h = bodyW;
+    tx = x + w + 6; ty = y + h/2 + 4; anchor = 'start';
+  }
+  return {x,y,w,h,tx,ty,anchor,side};
+}
+
+function renderChip(){
+  svg.innerHTML = '';
+  const die = document.createElementNS(svgNS,'rect');
+  die.setAttribute('class','die'); die.setAttribute('x',dieX); die.setAttribute('y',dieY);
+  die.setAttribute('width',dieW); die.setAttribute('height',dieH); die.setAttribute('rx',6);
+  svg.appendChild(die);
+
+  const dot = document.createElementNS(svgNS,'circle');
+  dot.setAttribute('class','pin1-dot'); dot.setAttribute('cx',dieX+16); dot.setAttribute('cy',dieY+18); dot.setAttribute('r',5);
+  svg.appendChild(dot);
+
+  const nameLbl = document.createElementNS(svgNS,'text');
+  nameLbl.setAttribute('class','die-label chip-name'); nameLbl.setAttribute('x',dieX+dieW/2); nameLbl.setAttribute('y',dieY+dieH/2-8);
+  nameLbl.setAttribute('text-anchor','middle'); nameLbl.textContent='PIC16F18857';
+  svg.appendChild(nameLbl);
+  const subLbl = document.createElementNS(svgNS,'text');
+  subLbl.setAttribute('class','die-label'); subLbl.setAttribute('x',dieX+dieW/2); subLbl.setAttribute('y',dieY+dieH/2+14);
+  subLbl.setAttribute('text-anchor','middle'); subLbl.textContent='28-pin SPDIP / SOIC / SSOP';
+  svg.appendChild(subLbl);
+
+  const usage = computePpsUsage();
+  const conflictSignals = new Set(Object.keys(usage).filter(k=>usage[k].length>1));
+
+  for(let n=1;n<=28;n++){
+    const g = pinGeometry(n);
+    const name = pinName(n);
+    const st = pinState[n];
+    const power = isPower(n);
+    const assigned = !power && (st.name || st.kind!=='gpio_in');
+    const conflict = st.kind==='pps' && conflictSignals.has(st.valueId);
+
+    const rect = document.createElementNS(svgNS,'rect');
+    rect.setAttribute('x',g.x); rect.setAttribute('y',g.y); rect.setAttribute('width',g.w); rect.setAttribute('height',g.h);
+    let cls = 'pin-body';
+    if(power) cls+=' power'; else if(conflict) cls+=' conflict'; else if(assigned) cls+=' assigned';
+    if(selectedPin===n) cls+=' selected';
+    if(!pinPassesFilters(n)) cls+=' dimmed';
+    rect.setAttribute('class',cls);
+    rect.addEventListener('click',()=>{ selectedPin=n; renderAll(); });
+    svg.appendChild(rect);
+
+    const numLbl = document.createElementNS(svgNS,'text');
+    numLbl.setAttribute('class','pin-num-label'); numLbl.textContent=n;
+    numLbl.setAttribute('x', g.side===0 ? g.x+g.w/2 : g.x+g.w/2);
+    numLbl.setAttribute('y', g.y-3);
+    numLbl.setAttribute('text-anchor','middle');
+    svg.appendChild(numLbl);
+
+    const lbl = document.createElementNS(svgNS,'text');
+    const showFunc = assigned && !power;
+    lbl.setAttribute('class', showFunc? 'pin-func-label':'pin-label');
+    lbl.setAttribute('x',g.tx); lbl.setAttribute('y',g.ty); lbl.setAttribute('text-anchor',g.anchor);
+    lbl.textContent = power ? name : (st.name ? st.name : name);
+    svg.appendChild(lbl);
+
+    if(showFunc && st.name){
+      const sub = document.createElementNS(svgNS,'text');
+      sub.setAttribute('class','pin-num-label'); sub.setAttribute('text-anchor',g.anchor);
+      sub.setAttribute('x',g.tx); sub.setAttribute('y',g.ty+12);
+      sub.textContent = `${name} · ${functionLabel(n)}`;
+      svg.appendChild(sub);
+    }
+  }
+}
+
+function pinPassesFilters(n){
+  if(searchTerm){
+    const st=pinState[n], name=pinName(n).toLowerCase();
+    const hay = `${n} ${name} ${st.name||''} ${functionLabel(n)}`.toLowerCase();
+    if(!hay.includes(searchTerm)) return false;
+  }
+  if(activePeriphFilter){
+    const st = pinState[n];
+    if(!(st.kind==='pps' && PPS_LOOKUP[st.valueId] && PPS_LOOKUP[st.valueId].group===activePeriphFilter)) return false;
+  }
+  if(activeViewFilters.size){
+    const power=isPower(n), st=pinState[n];
+    const usage = computePpsUsage();
+    const conflict = st.kind==='pps' && (usage[st.valueId]||[]).length>1;
+    const assigned = !power && (st.name || st.kind!=='gpio_in');
+    let ok=false;
+    if(activeViewFilters.has('power') && power) ok=true;
+    if(activeViewFilters.has('assigned') && assigned && !power) ok=true;
+    if(activeViewFilters.has('unassigned') && !assigned && !power) ok=true;
+    if(activeViewFilters.has('conflict') && conflict) ok=true;
+    if(!ok) return false;
+  }
+  return true;
+}
+
+/* ---------- Code example generator ---------- */
+let snippetLang = 'gcbasic';
+
+function peripheralCategory(num){
+  const st = pinState[num];
+  if(st.kind==='analog') return 'adc';
+  if(st.kind==='gpio_out') return 'gpio_out';
+  if(st.kind==='gpio_in') return 'gpio_in';
+  if(st.kind==='fixed') return 'fixed';
+  if(st.kind==='pps'){
+    const g = (PPS_LOOKUP[st.valueId]||{}).group || '';
+    if(g==='EUSART') return 'uart';
+    if(g.startsWith('MSSP')) return 'spi_i2c';
+    if(g==='CCP' || g==='PWM') return 'ccp_pwm';
+    return 'other';
+  }
+  return 'gpio_in';
+}
+
+function buildSnippet(num){
+  const name = pinName(num), st = pinState[num], net = st.name || name;
+  const cat = peripheralCategory(num);
+  const port = name[1]; const bit = name.slice(2);
+  const T = { generic:{}, gcbasic:{}, pbp:{} };
+
+  if(cat==='gpio_out'){
+    T.generic.code = `; Digital output — ${name}\nTRIS${port}.${bit} = 0    ; 0 = output\nLAT${port}.${bit}  = 1    ; drive high`;
+    T.gcbasic.code = `#define ${net} Port${port}.${bit}\nDir ${net} Out\n${net} = 1`;
+    T.pbp.code = `${net} VAR PORT${port}.${bit}\nHIGH ${net}`;
+    T.note = "PBP's HIGH/LOW/INPUT/OUTPUT set TRIS for you automatically.";
+  } else if(cat==='gpio_in'){
+    T.generic.code = `; Digital input — ${name}\nTRIS${port}.${bit} = 1    ; 1 = input\nIf PORT${port}.${bit} = 1 Then ...`;
+    T.gcbasic.code = `#define ${net} Port${port}.${bit}\nDir ${net} In\nIf ${net} = 1 Then ...`;
+    T.pbp.code = `${net} VAR PORT${port}.${bit}\nINPUT ${net}\nIF ${net} = 1 THEN ...`;
+  } else if(cat==='adc'){
+    const an = pinInfo(num).analog;
+    T.generic.code = `; Analog input — ${name} (${an})\nTRIS${port}.${bit} = 1\nANSEL${port}.${bit} = 1  ; enable analog\nADPCH = <channel code for ${an}>\nADCON0.ADON = 1 : ADCON0.GO = 1\nWhile ADCON0.GO : Wend\n; result in ADRESH:ADRESL`;
+    T.gcbasic.code = `#define ${net} Port${port}.${bit}\nDir ${net} In\nDim result As Word\nresult = ReadAD(<channel # for ${an}>)  ; check GC Studio ADC table for this chip`;
+    T.pbp.code = `${net} VAR PORT${port}.${bit}\nINPUT ${net}\nADCIN <channel # for ${an}>, result  ; channel numbering per PBP's device file`;
+    T.note = `${an} is this pin's fixed analog channel — it cannot be moved via PPS.`;
+  } else if(cat==='fixed'){
+    const f = (pinInfo(num).fixed||[]).find(f=>f.id===st.valueId);
+    T.generic.code = `; ${name} is a fixed-function pin: ${f?f.label:st.valueId}\n; Not reassignable — configured via its own dedicated register/config bit,\n; not through PPS or TRIS like a general I/O pin.`;
+    T.gcbasic.code = T.generic.code; T.pbp.code = T.generic.code;
+    T.note = pinInfo(num).note || "Fixed-function pins are set up once in chip config, not per-instruction.";
+  } else if(cat==='uart'){
+    const isInput = st.valueId==='RX' || st.valueId==='DT';
+    T.generic.code = `; EUSART ${st.valueId} on ${name}\nTRIS${port}.${bit} = ${isInput?'1':'0'}\n${isInput
+      ? `RXPPS = <code for ${name}>   ; see TABLE 13-2`
+      : `${name}PPS = 0x10          ; TX/CK output code from TABLE 13-3`}\n; then configure TX1STA / RC1STA / SP1BRG per the EUSART chapter`;
+    T.gcbasic.code = `#startup InitPPS, 85\nSub InitPPS\n  UnLockPPS\n    ${isInput
+      ? `RXPPS = <code for ${name}>`
+      : `${name}PPS = 0x10   ; TX/CK`}\n  LockPPS\nEnd Sub\n\n#define USART_BAUD_RATE 9600\nHSerPrint("hello")`;
+    T.pbp.code = `' PBP has no PPS macros — unlock/remap the registers yourself\n${isInput
+      ? `' set RXPPS to the code for ${name}`
+      : `${name}PPS = 0x10   ; TX/CK`}\n\nDEFINE HSER_BAUD 9600\nHSEROUT ["hello"]`;
+    T.note = "GCBASIC uses HSerPrint / HSerSend for the single hardware USART. PBP uses HSEROUT / HSERIN. Always UnLockPPS before writing the PPS registers.";
+  } else if(cat==='spi_i2c'){
+    const isI2C = st.valueId.includes('SCL') || st.valueId.includes('SDA') || st.valueId.startsWith('SCK') || st.valueId.startsWith('SDI') || st.valueId.startsWith('SDO') || st.valueId.startsWith('SS');
+    T.generic.code = `; ${st.valueId} on ${name}\n${name}PPS = <output code from TABLE 13-3>\n; for bidirectional (I2C / SPI clock/data) also set the matching input PPS register\n; then configure SSPxCON1 / SSPxSTAT / SSPxADD`;
+    T.gcbasic.code = `#startup InitPPS, 85\nSub InitPPS\n  UnLockPPS\n    ${name}PPS = <code for ${st.valueId}>\n    ; also set the corresponding SSP1CLKPPS / SSP1DATPPS (or SSP2*) if needed\n  LockPPS\nEnd Sub\n\nHI2CMode Master   ; or SPIMode for SPI\nHI2CSend address, [data]`;
+    T.pbp.code = `${net} VAR PORT${port}.${bit}\n' PBP bit-bangs I2C / SPI with I2CWRITE / SHIFTOUT — name both SDA & SCL pins\nI2CWRITE SDApin, SCLpin, address, [data]`;
+    T.note = "I²C prefers RC3/RC4 (or RB1/RB2) for proper I²C input levels. Other pins use standard ST/TTL thresholds.";
+  } else if(cat==='ccp_pwm'){
+    T.generic.code = `; ${st.valueId} on ${name}\nTRIS${port}.${bit} = 0\n${name}PPS = <code from TABLE 13-3>\n; set CCPRxL / CCPRxH or PWMxDCH / PWMxDCL for duty/period`;
+    T.gcbasic.code = `#startup InitPPS, 85\nSub InitPPS\n  UnLockPPS\n    ${name}PPS = <code for ${st.valueId}>\n  LockPPS\nEnd Sub\n\nHPWM <channel>, duty, freq   ; GCBasic HPWM handles the register math`;
+    T.pbp.code = `${name}PPS = <code for ${st.valueId}>\nHPWM <channel>, duty, freq   ; confirm channel numbering in your PBP device file`;
+    T.note = "duty/freq are application-specific. HPWM channel argument maps to the CCP/PWM instance, not the pin number.";
+  } else {
+    T.generic.code = `; ${st.valueId} on ${name}\n${name}PPS = <code from TABLE 13-3>\n; then configure the owning peripheral's control registers`;
+    T.gcbasic.code = `#startup InitPPS, 85\nSub InitPPS\n  UnLockPPS\n    ${name}PPS = <code for ${st.valueId}>\n  LockPPS\nEnd Sub`;
+    T.pbp.code = T.generic.code;
+    T.note = "This peripheral (CWG/CLC/timer/comparator/etc.) is configured via its own control registers in both compilers.";
+  }
+  return { code: T[snippetLang].code, note: T.note || '' };
+}
+
+/* ---------- Right panel ---------- */
+function renderDetail(){
+  const panel = document.getElementById('pinDetail');
+  if(!selectedPin){ panel.className='empty-detail'; panel.textContent='Click a pin on the chip to configure it.'; return; }
+  const n = selectedPin, name = pinName(n), info = pinInfo(n), st = pinState[n];
+  panel.className='pin-detail';
+  if(isPower(n)){
+    panel.innerHTML = `<div class="pin-num">PIN ${n}</div><div class="pin-name">${name}</div>
+      <div class="field"><small>Power/ground pin — not user-assignable. Every VDD needs a 0.1 µF bypass cap to VSS as close as possible to the pin.</small></div>`;
+    return;
+  }
+
+  let optionsHtml = `<option value="gpio_in">Digital input (GPIO)</option><option value="gpio_out">Digital output (GPIO)</option>`;
+  if(info.analog) optionsHtml += `<option value="analog:${info.analog}">${info.analog} (analog input)</option>`;
+  (info.fixed||[]).forEach(f=> optionsHtml += `<option value="fixed:${f.id}">${f.label}</option>`);
+  if(!info.noPPS){
+    const usage = computePpsUsage();
+    PPS_GROUPS.forEach(g=>{
+      optionsHtml += `<optgroup label="${g.group}">`;
+      g.items.forEach(([id,label])=>{
+        const owners = (usage[id]||[]).filter(p=>p!==n);
+        const tag = owners.length ? ` — in use on pin ${owners.join(', ')}` : '';
+        optionsHtml += `<option value="pps:${id}">${label}${tag}</option>`;
+      });
+      optionsHtml += `</optgroup>`;
+    });
+  }
+
+  const currentVal = st.kind==='analog' ? `analog:${st.valueId}` : st.kind==='fixed' ? `fixed:${st.valueId}` : st.kind==='pps' ? `pps:${st.valueId}` : st.kind;
+
+  const usage = computePpsUsage();
+  const conflictOwners = st.kind==='pps' ? (usage[st.valueId]||[]).filter(p=>p!==n) : [];
+  const conflictHtml = conflictOwners.length
+    ? `<div class="conflict-banner">⚠ "${st.valueId}" is also assigned to pin ${conflictOwners.join(', ')} — a PPS signal can only be routed to one pin.</div>` : '';
+  const noteHtml = info.note ? `<div class="field"><small>${info.note}</small></div>` : '';
+  const snippet = buildSnippet(n);
+  const langBtn = (id,label)=>`<button data-lang="${id}" class="${snippetLang===id?'active':''}">${label}</button>`;
+  const snippetHtml = `
+    <div class="field">
+      <label>Code example</label>
+      <div class="lang-toggle">${langBtn('generic','Generic')}${langBtn('gcbasic','GCBasic')}${langBtn('pbp','PBP')}</div>
+      <pre class="snippet-box">${snippet.code.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</pre>
+      ${snippet.note ? `<small class="snippet-note">${snippet.note}</small>` : ''}
+    </div>`;
+
+  panel.innerHTML = `
+    <div class="pin-num">PIN ${n} · ${name}</div>
+    <div class="pin-name" id="detailNameLabel">${st.name || name}</div>
+    <div class="field"><label>Custom net name</label><input id="netNameInput" value="${st.name||''}" placeholder="e.g. MOTOR1_PWM"></div>
+    <div class="field"><label>Function</label><select id="funcSelect">${optionsHtml.replace(`value="${currentVal}"`, `value="${currentVal}" selected`)}</select></div>
+    ${noteHtml}${conflictHtml}${snippetHtml}`;
+
+  panel.querySelectorAll('.lang-toggle button').forEach(b=>{
+    b.addEventListener('click', ()=>{ snippetLang = b.dataset.lang; renderDetail(); });
+  });
+
+  document.getElementById('netNameInput').addEventListener('input', e=>{
+    pinState[n].name = e.target.value;
+    const lbl = document.getElementById('detailNameLabel');
+    if(lbl) lbl.textContent = e.target.value || name;
+    renderChip(); renderAssignList(); renderConflictBar(); syncFilterHighlight();
+  });
+  document.getElementById('netNameInput').addEventListener('blur', ()=>{ renderDetail(); });
+  document.getElementById('funcSelect').addEventListener('change', e=>{
+    const v = e.target.value, [kind,val] = v.includes(':') ? v.split(':') : [v,''];
+    pinState[n].kind = kind; pinState[n].valueId = val;
+    renderAll();
+  });
+}
+
+/* ---------- Assignment list + conflicts ---------- */
+function renderAssignList(){
+  const el = document.getElementById('assignList');
+  const usage = computePpsUsage();
+  let rows = '';
+  let count = 0;
+  for(let n=1;n<=28;n++){
+    if(isPower(n)) continue;
+    const st = pinState[n];
+    const assigned = st.name || st.kind!=='gpio_in';
+    if(!assigned) continue;
+    count++;
+    const conflict = st.kind==='pps' && (usage[st.valueId]||[]).length>1;
+    rows += `<div class="row ${conflict?'conflict':''}" data-pin="${n}">
+      <span class="p">${n}</span><span class="n">${st.name||pinName(n)}</span><span class="f">${pinName(n)} · ${functionLabel(n)}</span>
+    </div>`;
+  }
+  el.innerHTML = `<div class="hdr">ASSIGNED PINS (${count} of 25 I/O)</div>${rows || '<div style="color:var(--text-dim);font-size:12px;padding:6px 0;">Nothing assigned yet.</div>'}`;
+  el.querySelectorAll('.row').forEach(r=> r.addEventListener('click', ()=>{ selectedPin = +r.dataset.pin; renderAll(); }));
+}
+
+function renderConflictBar(){
+  const el = document.getElementById('conflictBar');
+  const usage = computePpsUsage();
+  const items = [];
+  Object.entries(usage).forEach(([sig,pins])=>{
+    if(pins.length>1){
+      const label = PPS_LOOKUP[sig] ? `${PPS_LOOKUP[sig].group} · ${sig}` : sig;
+      items.push({title:`⚠ PPS signal reused`, desc:`"${label}" assigned to pins ${pins.join(', ')}`, pin: pins[0]});
+    }
+  });
+  const byName = {};
+  for(let n=1;n<=28;n++){ const nm=pinState[n].name; if(nm){ (byName[nm]=byName[nm]||[]).push(n); } }
+  Object.entries(byName).forEach(([nm,pins])=>{
+    if(pins.length>1) items.push({title:`⚠ Duplicate net name`, desc:`"${nm}" used on pins ${pins.join(', ')}`, pin: pins[0]});
+  });
+
+  if(!items.length){ el.innerHTML = `<div class="empty">No conflicts detected.</div>`; return; }
+  el.innerHTML = items.map(it=>`<div class="conflict-item" data-pin="${it.pin}"><div class="t">${it.title}</div><div class="d">${it.desc}</div></div>`).join('');
+  el.querySelectorAll('.conflict-item').forEach(r=> r.addEventListener('click', ()=>{ selectedPin=+r.dataset.pin; renderAll(); }));
+}
+
+/* ---------- Left rail filters ---------- */
+function buildPeriphFilterRail(){
+  const el = document.getElementById('periphFilters');
+  el.innerHTML = PPS_GROUPS.map(g=>`<div class="filter-row" data-periph="${g.group}"><span>${g.group}</span></div>`).join('');
+  el.querySelectorAll('.filter-row').forEach(r=>{
+    r.addEventListener('click', ()=>{
+      const g = r.dataset.periph;
+      activePeriphFilter = (activePeriphFilter===g) ? null : g;
+      renderAll();
+    });
+  });
+}
+document.getElementById('viewFilters').querySelectorAll('.filter-row').forEach(r=>{
+  r.addEventListener('click', ()=>{
+    const f = r.dataset.filter;
+    if(activeViewFilters.has(f)) activeViewFilters.delete(f); else activeViewFilters.add(f);
+    renderAll();
+  });
+});
+document.getElementById('searchBox').addEventListener('input', e=>{ searchTerm = e.target.value.trim().toLowerCase(); renderAll(); });
+
+function syncFilterHighlight(){
+  document.querySelectorAll('#viewFilters .filter-row').forEach(r=> r.classList.toggle('active', activeViewFilters.has(r.dataset.filter)));
+  document.querySelectorAll('#periphFilters .filter-row').forEach(r=> r.classList.toggle('active', activePeriphFilter===r.dataset.periph));
+}
+
+/* ---------- Export / Import ---------- */
+function download(filename, content, mime){
+  const blob = new Blob([content], {type:mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=filename; document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+document.getElementById('exportJson').addEventListener('click', ()=>{
+  const pins = [];
+  for(let n=1;n<=28;n++){
+    if(isPower(n)) continue;
+    const st = pinState[n];
+    if(!(st.name || st.kind!=='gpio_in')) continue;
+    pins.push({pin:n, port:pinName(n), netName: st.name||null, kind:st.kind, value: st.valueId||null, function: functionLabel(n)});
+  }
+  const project = {
+    chip:'PIC16F18857', package:'28-pin SPDIP/SOIC/SSOP', board: document.getElementById('boardName').value || null,
+    exported: new Date().toISOString(), pins
+  };
+  download(`pic16f18857-pinmap-${Date.now()}.json`, JSON.stringify(project, null, 2), 'application/json');
+});
+
+document.getElementById('exportMd').addEventListener('click', ()=>{
+  let md = `# PIC16F18857 — Pin Map\n\n`;
+  md += `Board: ${document.getElementById('boardName').value || '(unnamed)'}  \nGenerated: ${new Date().toISOString()}\n\n`;
+  md += `| Pin | Port | Net name | Function |\n|---|---|---|---|\n`;
+  for(let n=1;n<=28;n++){
+    const st = pinState[n];
+    if(isPower(n)){ md += `| ${n} | ${pinName(n)} | | power |\n`; continue; }
+    const assigned = st.name || st.kind!=='gpio_in';
+    md += `| ${n} | ${pinName(n)} | ${st.name||''} | ${assigned? functionLabel(n) : '(unassigned)'} |\n`;
+  }
+  download(`pic16f18857-pinout-${Date.now()}.md`, md, 'text/markdown');
+});
+
+document.getElementById('exportCode').addEventListener('click', ()=>{
+  const langLabel = {generic:'Generic (register-level)', gcbasic:'GCBasic', pbp:'PBP'}[snippetLang];
+  let md = `# PIC16F18857 — Code Reference (${langLabel})\n\n`;
+  md += `Board: ${document.getElementById('boardName').value || '(unnamed)'}  \nGenerated: ${new Date().toISOString()}\n\n`;
+  md += `Snippets reflect the "${langLabel}" tab selected in the app at export time. `;
+  md += `Verify anything flagged with a note against your compiler's docs for this chip before relying on it.\n\n`;
+
+  let any = false;
+  for(let n=1;n<=28;n++){
+    if(isPower(n)) continue;
+    const st = pinState[n];
+    const assigned = st.name || st.kind!=='gpio_in';
+    if(!assigned) continue;
+    any = true;
+    const name = pinName(n), snippet = buildSnippet(n);
+    md += `## Pin ${n} · ${name}${st.name ? ` — ${st.name}` : ''}\n\n`;
+    md += `Function: ${functionLabel(n)}\n\n`;
+    md += "```\n" + snippet.code + "\n```\n\n";
+    if(snippet.note) md += `> ${snippet.note}\n\n`;
+  }
+  if(!any) md += `_No pins assigned yet — nothing to show._\n`;
+
+  download(`pic16f18857-code-${snippetLang}-${Date.now()}.md`, md, 'text/markdown');
+});
+
+document.getElementById('importFile').addEventListener('change', e=>{
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev=>{
+    try{
+      const data = JSON.parse(ev.target.result);
+      for(let n=1;n<=28;n++) pinState[n] = {name:'', kind:'gpio_in', valueId:''};
+      (data.pins||[]).forEach(p=>{
+        if(p.pin>=1 && p.pin<=28){ pinState[p.pin] = {name:p.netName||'', kind:p.kind||'gpio_in', valueId:p.value||''}; }
+      });
+      if(data.board) document.getElementById('boardName').value = data.board;
+      selectedPin = null; renderAll();
+    }catch(err){ alert('Could not read that file — expecting a project .json exported from this app.'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+/* ---------- Render loop ---------- */
+function renderAll(){ renderChip(); renderDetail(); renderAssignList(); renderConflictBar(); syncFilterHighlight(); }
+buildPeriphFilterRail();
+renderAll();
+</script>
+</body>
+</html>
