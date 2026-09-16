@@ -9,7 +9,7 @@
 '''PPS/pin setup copied verbatim from the existing, already-verified
 '''Vendor_Boards/Great_Cow_Basic_Demo_Board/18f27Q84_chiprange_demonstrations/150_show_i2c_devices_to_serial_terminal.gcb
 '''
-'''@author  Claude
+'''@author  Automation
 '''@date    2026-09-16
 ' ----- Configuration
 
