@@ -1,0 +1,207 @@
+'*****************************************************************************************************
+' ATtiny202 LED Light Show - advanced multi-mode, software-PWM demo
+'
+' Target:  ATtiny202, 8-pin SOIC/SSOP, internal 20MHz oscillator, UPDI programming/debug
+'
+' Wiring:  5 LEDs (each with a current-limiting resistor to GND), one per usable GPIO pin on this
+'          8-pin package: LED1->PA6, LED2->PA7, LED3->PA1, LED4->PA2, LED5->PA3.
+'          PA0 is reserved for UPDI (RSTPINCFG=UPDI fuse); PA4/PA5 do not exist on this package.
+'
+' Behaviour: a 5-channel software-PWM "light show" (32 brightness levels per LED, bit-banged - this
+'          chip has no hardware PWM wired to these pins) that automatically cycles through five
+'          animation modes, forever:
+'              0 - Comet chase: a bright lead LED bounces end to end with a fading trail behind it
+'              1 - Synchronised breathing: all five LEDs fade up and down together
+'              2 - Phase-shifted wave: each LED breathes on its own staggered phase offset
+'              3 - Binary counter: the 5-bit count 0-31 displayed at full brightness
+'              4 - Pseudo-random twinkle: a 16-bit Galois LFSR lights a random LED briefly
+'          ShowFrame() renders one software-PWM sub-frame (each LED ON while its brightness exceeds
+'          the current PWM tick); RenderFor() calls it repeatedly to hold a brightness pattern long
+'          enough for the eye to perceive it as steady/fading light rather than visible flicker.
+'*****************************************************************************************************
+
+#chip tiny202, 20
+#option explicit
+
+'LED pin assignments (named constants, not raw pin names)
+#define LED1 PORTA.6
+#define LED2 PORTA.7
+#define LED3 PORTA.1
+#define LED4 PORTA.2
+#define LED5 PORTA.3
+
+'Software-PWM resolution: 32 brightness levels (0 = off, PWMMAX = fully on)
+#define PWMMAX 31
+
+Dim Bright(5) As Byte
+Dim PWMTick As Byte
+Dim FrameCounter As Word
+Dim Mode As Byte
+Dim StepCount As Byte
+Dim Idx As Byte
+Dim Lvl As Byte
+Dim Lead As Byte
+Dim Count5 As Byte
+Dim LFSR As Word
+Dim RandLED As Byte
+Dim Bit0 As Byte
+
+Dir LED1 Out
+Dir LED2 Out
+Dir LED3 Out
+Dir LED4 Out
+Dir LED5 Out
+
+Bright(1) = 0
+Bright(2) = 0
+Bright(3) = 0
+Bright(4) = 0
+Bright(5) = 0
+PWMTick = 0
+Mode = 0
+LFSR = 43981   'nonzero 16-bit seed
+
+Sub ShowFrame()
+  'One software-PWM sub-frame: each LED is ON while its brightness exceeds the current PWM tick
+  If Bright(1) > PWMTick Then
+    Set LED1 On
+  Else
+    Set LED1 Off
+  End If
+
+  If Bright(2) > PWMTick Then
+    Set LED2 On
+  Else
+    Set LED2 Off
+  End If
+
+  If Bright(3) > PWMTick Then
+    Set LED3 On
+  Else
+    Set LED3 Off
+  End If
+
+  If Bright(4) > PWMTick Then
+    Set LED4 On
+  Else
+    Set LED4 Off
+  End If
+
+  If Bright(5) > PWMTick Then
+    Set LED5 On
+  Else
+    Set LED5 Off
+  End If
+
+  PWMTick = PWMTick + 1
+  If PWMTick > PWMMAX Then
+    PWMTick = 0
+  End If
+End Sub
+
+Sub RenderFor(Frames As Word)
+  'Hold the current Bright() values for this many software-PWM sub-frames (~1ms each)
+  For FrameCounter = 1 To Frames
+    Call ShowFrame()
+    Wait 1 ms
+  Next
+End Sub
+
+Sub NextRandom()
+  'Standard 16-bit Galois LFSR, taps 16/14/13/11 (mask 0xB400) - maximal length, period 65535
+  Bit0 = LFSR.0
+  LFSR = LFSR >> 1
+  If Bit0 = 1 Then
+    LFSR = LFSR Xor 0xB400
+  End If
+End Sub
+
+Do
+  Select Case Mode
+
+    Case 0
+      'Comet chase with fading trail, bouncing end to end
+      For Lead = 1 To 5
+        For Idx = 1 To 5
+          If Idx = Lead Then
+            Bright(Idx) = PWMMAX
+          Else If Bright(Idx) > 8 Then
+            Bright(Idx) = Bright(Idx) - 8
+          Else
+            Bright(Idx) = 0
+          End If
+        Next
+        Call RenderFor(60)
+      Next
+      For Lead = 4 To 1 Step -1
+        For Idx = 1 To 5
+          If Idx = Lead Then
+            Bright(Idx) = PWMMAX
+          Else If Bright(Idx) > 8 Then
+            Bright(Idx) = Bright(Idx) - 8
+          Else
+            Bright(Idx) = 0
+          End If
+        Next
+        Call RenderFor(60)
+      Next
+
+    Case 1
+      'Synchronised breathing - all LEDs fade up then down together
+      For Lvl = 0 To PWMMAX
+        Bright(1) = Lvl : Bright(2) = Lvl : Bright(3) = Lvl : Bright(4) = Lvl : Bright(5) = Lvl
+        Call RenderFor(20)
+      Next
+      For Lvl = PWMMAX To 0 Step -1
+        Bright(1) = Lvl : Bright(2) = Lvl : Bright(3) = Lvl : Bright(4) = Lvl : Bright(5) = Lvl
+        Call RenderFor(20)
+      Next
+
+    Case 2
+      'Phase-shifted wave - each LED breathes with a staggered phase offset (triangle wave, period 64)
+      For StepCount = 0 To 63
+        For Idx = 1 To 5
+          Lvl = StepCount + (Idx * 12)
+          If Lvl > 63 Then
+            Lvl = Lvl - 64
+          End If
+          If Lvl > PWMMAX Then
+            Bright(Idx) = 63 - Lvl
+          Else
+            Bright(Idx) = Lvl
+          End If
+        Next
+        Call RenderFor(15)
+      Next
+
+    Case 3
+      'Binary counter, 0-31, full brightness per set bit across the 5 LEDs
+      For Count5 = 0 To 31
+        If Count5.0 = 1 Then Bright(1) = PWMMAX Else Bright(1) = 0
+        If Count5.1 = 1 Then Bright(2) = PWMMAX Else Bright(2) = 0
+        If Count5.2 = 1 Then Bright(3) = PWMMAX Else Bright(3) = 0
+        If Count5.3 = 1 Then Bright(4) = PWMMAX Else Bright(4) = 0
+        If Count5.4 = 1 Then Bright(5) = PWMMAX Else Bright(5) = 0
+        Call RenderFor(70)
+      Next
+
+    Case 4
+      'Pseudo-random twinkle using a 16-bit LFSR
+      For StepCount = 0 To 39
+        Call NextRandom()
+        RandLED = (LFSR And 7) + 1
+        If RandLED > 5 Then
+          RandLED = RandLED - 5
+        End If
+        Bright(1) = 0 : Bright(2) = 0 : Bright(3) = 0 : Bright(4) = 0 : Bright(5) = 0
+        Bright(RandLED) = PWMMAX
+        Call RenderFor(40)
+      Next
+
+  End Select
+
+  Mode = Mode + 1
+  If Mode > 4 Then
+    Mode = 0
+  End If
+Loop

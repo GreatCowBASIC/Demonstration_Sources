@@ -30,18 +30,30 @@ Tests were completed using a **PICkit4** with the following `use.ini` programmer
 [tool = atprogram4]
 desc = ATMEL PICKit4 using UPDI
 type = programmer
-useif =
+useif = DEF(AVR)
 progconfig =
 command = %atmelATPROGRAMdir%\ATprogram.exe
 params = -t pickit4 -i UPDI -d AT%ChipModel%  chiperase program  -f "%FileName%"
 workingdir = %atmelATPROGRAMdir%\
 ```
 
-Set `atprogram4` as the active programmer in `use.ini`'s `[gcbasic]` section:
+Set `ATMEL PICKit4 using UPDI` as the active programmer in Preferences Editor
+
+Or,
 
 ```ini
-programmer = atprogram4, pickitpluscmd1, pickit2cmdline, arduinouno
+[tool = atprogram5]
+desc = Avrdude PICKit4 UPDI Mode
+type = programmer
+command = %GCSTUDIO_INSTALL_PATH%\avrdude\avrdude.exe
+workingdir = 
+params = -qq -c pickit4_updi -p AT%chipmodel% -P usb -U flash:w:"%filename%":i
+useif = DEF(AVR)
+progconfig = 
 ```
+
+Set `Avrdude PICKit4 UPDI Mode` as the active programmer in Preferences Editor
+
 
 ### Tested hardware
 
