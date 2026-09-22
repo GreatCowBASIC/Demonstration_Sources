@@ -1,0 +1,12 @@
+#chip 16F886
+
+'Regression check for Change1646: a plain literal/arithmetic initializer with no
+'function call (the common case, and the one that already worked before this fix)
+'must still compile and assign correctly.
+
+Dim total As Byte = 5 + 2
+
+Do Forever
+  PulseOut PortB.5, total ms
+  Wait 900 ms
+Loop

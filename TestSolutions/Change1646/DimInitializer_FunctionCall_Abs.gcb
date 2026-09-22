@@ -1,0 +1,13 @@
+#chip 16F886
+
+'Demonstrates that Change1646's fix is general, not UBound-specific: any
+'function-call initializer in a combined "Dim x As Type = expr" statement hit the
+'same bug (Abs() shown here). result is used afterwards so the assignment isn't
+'optimised away as dead code.
+
+Dim result As Byte = Abs(-5)
+
+Do Forever
+  PulseOut PortB.5, result ms
+  Wait 900 ms
+Loop

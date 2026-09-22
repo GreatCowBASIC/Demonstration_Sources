@@ -1,0 +1,16 @@
+#chip 16F886
+
+'Regression check for Change1646: an array declared with an explicit size and a
+'comma-separated initializer list (Dim arr(5) As Byte = 1,2,3,4,5) must still work
+'unchanged - this exercises the same IsArrayDecl-based variable-name extraction
+'that Change1646 touched (previously a bare OpenParenPos check), just for the
+'genuine array-declaration case rather than a function-call initializer.
+
+Dim arr(5) As Byte = 1,2,3,4,5
+Dim total As Byte
+total = arr(0) + arr(4)
+
+Do Forever
+  PulseOut PortB.5, total ms
+  Wait 900 ms
+Loop

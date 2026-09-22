@@ -1,0 +1,18 @@
+#chip 16F886
+
+'Demonstrates the fix in Change1646: "Dim x As Type = expr" previously failed to
+'compile with a garbled "is not a variable" error whenever expr contained a
+'function call, e.g. UBound(MyArray) - the exact bug report this change fixes.
+'myArraySize is deliberately used afterwards so the initializer assignment isn't
+'optimised away as dead code, proving UBound's result actually reaches the
+'variable (not just that the file compiles).
+
+Dim myArray(10)
+Dim myArraySize As Byte = UBound(MyArray)
+Dim PulseLen As Word
+
+Do Forever
+  PulseLen = myArraySize
+  PulseOut PortB.5, PulseLen ms
+  Wait 900 ms
+Loop
