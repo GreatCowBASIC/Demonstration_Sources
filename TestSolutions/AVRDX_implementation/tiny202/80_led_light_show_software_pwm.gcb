@@ -8,13 +8,16 @@
 '          PA0 is reserved for UPDI (RSTPINCFG=UPDI fuse); PA4/PA5 do not exist on this package.
 '
 ' Behaviour: a 5-channel software-PWM "light show" (32 brightness levels per LED, bit-banged - this
-'          chip has no hardware PWM wired to these pins) that automatically cycles through five
+'          chip has no hardware PWM wired to these pins) that automatically cycles through eight
 '          animation modes, forever:
 '              0 - Comet chase: a bright lead LED bounces end to end with a fading trail behind it
 '              1 - Synchronised breathing: all five LEDs fade up and down together
 '              2 - Phase-shifted wave: each LED breathes on its own staggered phase offset
 '              3 - Binary counter: the 5-bit count 0-31 displayed at full brightness
 '              4 - Pseudo-random twinkle: a 16-bit Galois LFSR lights a random LED briefly
+'              5 - Bar-graph fill/drain: LEDs fill solid LED1->LED5, hold, then drain LED5->LED1
+'              6 - Heartbeat: two quick pulses then a pause, repeated - a "thump-thump..." rhythm
+'              7 - Random walk: a single lit LED wanders left/right via the LFSR, bouncing at the ends
 '          ShowFrame() renders one software-PWM sub-frame (each LED ON while its brightness exceeds
 '          the current PWM tick); RenderFor() calls it repeatedly to hold a brightness pattern long
 '          enough for the eye to perceive it as steady/fading light rather than visible flicker.
@@ -45,6 +48,8 @@ Dim Count5 As Byte
 Dim LFSR As Word
 Dim RandLED As Byte
 Dim Bit0 As Byte
+Dim WalkPos As Byte
+Dim Beat As Byte
 
 Dir LED1 Out
 Dir LED2 Out
@@ -59,6 +64,7 @@ Bright(4) = 0
 Bright(5) = 0
 PWMTick = 0
 Mode = 0
+WalkPos = 3    'random walk starts in the middle
 LFSR = 43981   'nonzero 16-bit seed
 
 Sub ShowFrame()
@@ -116,46 +122,56 @@ Sub NextRandom()
   End If
 End Sub
 
+Sub SetAll(NewLevel As Byte)
+  'Set all five LEDs' brightness to the same value in one call - shrinks every mode that needs it
+  Bright(1) = NewLevel
+  Bright(2) = NewLevel
+  Bright(3) = NewLevel
+  Bright(4) = NewLevel
+  Bright(5) = NewLevel
+End Sub
+
+Sub Breathe(StepFrames As Word)
+  'One full fade up then down, all LEDs together
+  For Lvl = 0 To PWMMAX
+    Call SetAll(Lvl)
+    Call RenderFor(StepFrames)
+  Next
+  For Lvl = PWMMAX To 0 Step -1
+    Call SetAll(Lvl)
+    Call RenderFor(StepFrames)
+  Next
+End Sub
+
+Sub CometStep()
+  'Render one step of the comet chase: LED at Lead goes full bright, others decay their trail
+  For Idx = 1 To 5
+    If Idx = Lead Then
+      Bright(Idx) = PWMMAX
+    Else If Bright(Idx) > 8 Then
+      Bright(Idx) = Bright(Idx) - 8
+    Else
+      Bright(Idx) = 0
+    End If
+  Next
+  Call RenderFor(60)
+End Sub
+
 Do
   Select Case Mode
 
     Case 0
       'Comet chase with fading trail, bouncing end to end
       For Lead = 1 To 5
-        For Idx = 1 To 5
-          If Idx = Lead Then
-            Bright(Idx) = PWMMAX
-          Else If Bright(Idx) > 8 Then
-            Bright(Idx) = Bright(Idx) - 8
-          Else
-            Bright(Idx) = 0
-          End If
-        Next
-        Call RenderFor(60)
+        Call CometStep()
       Next
       For Lead = 4 To 1 Step -1
-        For Idx = 1 To 5
-          If Idx = Lead Then
-            Bright(Idx) = PWMMAX
-          Else If Bright(Idx) > 8 Then
-            Bright(Idx) = Bright(Idx) - 8
-          Else
-            Bright(Idx) = 0
-          End If
-        Next
-        Call RenderFor(60)
+        Call CometStep()
       Next
 
     Case 1
       'Synchronised breathing - all LEDs fade up then down together
-      For Lvl = 0 To PWMMAX
-        Bright(1) = Lvl : Bright(2) = Lvl : Bright(3) = Lvl : Bright(4) = Lvl : Bright(5) = Lvl
-        Call RenderFor(20)
-      Next
-      For Lvl = PWMMAX To 0 Step -1
-        Bright(1) = Lvl : Bright(2) = Lvl : Bright(3) = Lvl : Bright(4) = Lvl : Bright(5) = Lvl
-        Call RenderFor(20)
-      Next
+      Call Breathe(20)
 
     Case 2
       'Phase-shifted wave - each LED breathes with a staggered phase offset (triangle wave, period 64)
@@ -193,15 +209,55 @@ Do
         If RandLED > 5 Then
           RandLED = RandLED - 5
         End If
-        Bright(1) = 0 : Bright(2) = 0 : Bright(3) = 0 : Bright(4) = 0 : Bright(5) = 0
+        Call SetAll(0)
         Bright(RandLED) = PWMMAX
         Call RenderFor(40)
+      Next
+
+    Case 5
+      'Bar-graph fill/drain - LEDs fill solid LED1->LED5, hold, then drain LED5->LED1, hold
+      For Idx = 1 To 5
+        Bright(Idx) = PWMMAX
+        Call RenderFor(90)
+      Next
+      Call RenderFor(150)
+      For Idx = 5 To 1 Step -1
+        Bright(Idx) = 0
+        Call RenderFor(90)
+      Next
+      Call RenderFor(60)
+
+    Case 6
+      'Heartbeat - two quick pulses then a pause, all LEDs together, repeated 3 beats
+      For Beat = 1 To 3
+        Call Breathe(4)
+        Call RenderFor(60)
+        Call Breathe(4)
+        Call RenderFor(300)
+      Next
+
+    Case 7
+      'Random walk - a single LED wanders left/right via the LFSR, bouncing at the ends
+      For StepCount = 0 To 29
+        Call SetAll(0)
+        Bright(WalkPos) = PWMMAX
+        Call RenderFor(80)
+        Call NextRandom()
+        If LFSR.0 = 1 Then
+          If WalkPos < 5 Then
+            WalkPos = WalkPos + 1
+          End If
+        Else
+          If WalkPos > 1 Then
+            WalkPos = WalkPos - 1
+          End If
+        End If
       Next
 
   End Select
 
   Mode = Mode + 1
-  If Mode > 4 Then
+  If Mode > 7 Then
     Mode = 0
   End If
 Loop
