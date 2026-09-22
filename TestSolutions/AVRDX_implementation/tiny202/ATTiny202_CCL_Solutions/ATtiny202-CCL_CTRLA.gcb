@@ -1,0 +1,42 @@
+'
+'-----------------------------------------------------------------------------
+' Target           : ATtiny202 CCL
+' Purpose          : Implements various logic gate types using configurable Look-Up Tables (LUTs)
+' Logic gate types : 2-input or 3-input logic gate types as AND,NAND,OR,NOR,XOR,XNOR 
+' Note             : CCL Bypasses the CPU completely using Core Independent Peripherals (CIP)
+' Reference        : 2021 Microchip Technology Inc. Datasheet DS40002318A (p:17,p:359-365)
+' Programmer       : Adafruit High Voltage Friend - USB Serial UPDI Programmer
+'
+'------------------------------ *** WARNING *** ------------------------------
+' Completely disconnect the UPDI HV programmer before installing a switch on Pin 6
+'-----------------------------------------------------------------------------
+'                                             Typical Application Circuit
+'           VDD ──┤1     8├── GND                         VDD
+'      OUT  PA6 ──┤2     7├── PA3 not used                ─┬─ 
+' not used  PA7 ──┤3     6├── PA0 IN0 (UPDI HV)             ├─ NO switch
+'      IN1  PA1 ──┤4     5├── PA2 IN2                      │
+'                                                          ├────> to PAx
+'                  ATtiny202                               █ 10k Resistor
+'            SOIC-8 package Pinout                        ─┴─   
+'                                                         GND
+'-----------------------------------------------------------------------------
+ #chip tiny202, 20              ' set chip type and internal clock to 20 MHz
+ #option explicit               ' recommended
+  CCL_CTRLA = 0x00             ' disable peripheral 
+'----------------------------------------------------------------------------- 
+' Select the gate input type for CCL_LUT0CTRLB
+   CCL_LUT0CTRLB = 0x50        ' 2-input (PA1,PA2) 
+   'CCL_LUT0CTRLB = 0x55        ' 3-input (PA0,PA1,PA2)
+'----------------------------------------------------------------------------- 
+' Replace the CCL_TRUTH0 hex code below with one from this list     
+   CCL_TRUTH0 = 0x40           
+'         AND    NAND   OR     NOR    XOR    XNOR     logic element  
+'         0x40   0xBF   0xFC   0x03   0x3C   0xC3     2-Input Combinations
+'         0x80   0x7F   0xFE   0x01   0x96   0x69     3-Input Combinations
+'----------------------------------------------------------------------------- 
+   CCL_LUT0CTRLC = 0x05         ' PA2 on pin 5 is enabled
+   CCL_LUT0CTRLA = 0x09         ' Output on pin 2 and LUT0 are enabled
+   CCL_CTRLA = 0x01             ' Peripheral is enabled
+'-----------------------------------------------------------------------------    
+ Do                             ' Bypasses the CPU completely 
+ Loop
