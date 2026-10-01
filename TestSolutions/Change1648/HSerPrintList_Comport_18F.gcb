@@ -1,0 +1,21 @@
+#chip 18F26K22, 20
+
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+'Demonstrates Change1648's [comport] optimization on 18F (Access-Bank-qualified
+'store, "movwf COMPORT,ACCESS" - a different instruction form from the 14-bit
+'core's plain "movwf COMPORT", confirmed by direct compile and specifically
+'covered by the optimizer's pattern match). Two adjacent HSerPrintList
+'statements both target comport 2, so the second one's redundant comport
+'reload is collapsed away, the same as it would be within a single statement.
+
+Dim ByteVal As Byte = 87
+Dim WordVal As Word = 4213
+
+Do Forever
+  HSerPrintList [2], ByteVal, 13, 10
+  HSerPrintList [2], WordVal, 13, 10
+  Wait 1 s
+Loop

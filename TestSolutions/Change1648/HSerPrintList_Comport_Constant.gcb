@@ -1,0 +1,23 @@
+#chip 16F877A, 20
+
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+#define MyPort 2
+
+'Demonstrates Change1648: the [comport] argument also accepts a named #DEFINE
+'constant, not just a literal number. MyPort is not itself a literal at the point
+'HSerPrintList is expanded (constants aren't registered yet during this
+'preprocessing pass), so the identifier is passed through unresolved as
+'HSerPrint value, MyPort and resolved normally by the compiler later, exactly like
+'any other code referencing a constant.
+
+Dim ByteVal As Byte = 87
+Dim WordVal As Word = 4213
+
+Do
+  HSerPrintList [MyPort], ByteVal, ",", WordVal, 13, 10
+  Wait 1 s
+Loop
+

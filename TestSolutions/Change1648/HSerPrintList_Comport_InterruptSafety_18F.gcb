@@ -1,0 +1,25 @@
+#chip 18F26K22, 20
+
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+'18F counterpart of HSerPrintList_Comport_InterruptSafety_16F.gcb - proves the
+'same safety gate applies to the 18F "movwf COMPORT,ACCESS" form of the
+'optimizer, not just the 14-bit core one. A no-op Interrupt sub must still
+'disable the collapse of the two HSerPrintList statements below, both of which
+'target comport 2. Compare against HSerPrintList_Comport_18F.gcb, which has no
+'Interrupt sub and does get optimized.
+
+Dim ByteVal As Byte = 87
+Dim WordVal As Word = 4213
+
+Sub Interrupt
+  nop
+End Sub
+
+Do Forever
+  HSerPrintList [2], ByteVal, 13, 10
+  HSerPrintList [2], WordVal, 13, 10
+  Wait 1 s
+Loop

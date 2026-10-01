@@ -1,0 +1,23 @@
+#SKIPTEST
+#chip 16F877A, 20
+
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+'Demonstrates Change1648: empty brackets, HSerPrintList [], a, b, must fail to
+'compile rather than silently falling back to the default comport. This is a
+'real regression found during testing: IsConst("") returns TRUE (its digit-check
+'loop is "For idx = 0 To Len(Temp)-1", which for an empty string is 0 To -1 and
+'never runs, so zero characters vacuously "pass" as a valid number), so the
+'comport-candidate check must reject an empty bracket explicitly before ever
+'calling IsConst on it. #SKIPTEST above is required because this file is
+'intentionally expected to fail.
+
+Dim ByteVal As Byte = 5
+Dim WordVal As Word = 100
+
+Do Forever
+  HSerPrintList [], ByteVal, ",", WordVal, 13, 10
+  Wait 1 s
+Loop

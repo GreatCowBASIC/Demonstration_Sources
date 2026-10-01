@@ -1,0 +1,20 @@
+#chip 16F877A, 20
+
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+'Demonstrates Change1648: HSerPrintList's new optional leading [comport] argument,
+'with a plain numeric literal. HSerPrintList [2], a, b, c expands to HSerPrint a, 2 /
+'HSerPrint b, 2 / HSerPrint c, 2 - reusing HSerPrint's own existing
+'"optional In comport" parameter, so every value in this call goes to comport 2
+'instead of the default.
+
+Dim Txt_Heading As String * 12 = "K9AY North"
+Dim SignalLevel As Byte = 87
+Dim SampleCount As Word = 4213
+
+Do
+  HSerPrintList [2], "{STAT,", Txt_Heading, ",", SignalLevel, ",", SampleCount, "}", 13, 10
+  Wait 1 s
+Loop

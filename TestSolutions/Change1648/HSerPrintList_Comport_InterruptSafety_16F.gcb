@@ -1,0 +1,28 @@
+#chip 16F877A, 20
+
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+'Proves Change1648's peephole optimizer safety gate: merely having an Interrupt
+'sub - even one that does nothing but nop, and never touches Comport itself -
+'must disable the "movlw K / movwf COMPORT" collapse entirely. The optimizer
+'cannot know whether this ISR (or a future edit to it) will fire between the
+'two HSerPrint calls and change Comport for its own purposes, so the gate is
+'"any interrupt handler present at all", not "does this specific ISR touch
+'Comport" - checked by the same UserInt/SysInt flags used everywhere else in
+'the compiler for "could an ISR run here". Compare against
+'HSerPrintList_Comport_Literal.gcb, which has no Interrupt sub and does get
+'optimized.
+
+Dim ByteVal As Byte = 87
+Dim WordVal As Word = 4213
+
+Sub Interrupt
+  nop
+End Sub
+
+Do Forever
+  HSerPrintList [2], ByteVal, ",", WordVal, 13, 10
+  Wait 1 s
+Loop

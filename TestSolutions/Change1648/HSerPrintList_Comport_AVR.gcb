@@ -1,0 +1,19 @@
+#chip mega328p, 16
+
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+'Demonstrates Change1648's [comport] optimization on AVR ("ldi SysValueCopy,K /
+'sts COMPORT,SysValueCopy" - a completely different instruction set from PIC's
+'movlw/movwf, confirmed by direct compile and specifically covered by its own
+'peephole rule). All 5 values share comport 2, so only the first one's comport
+'setup survives; the other 4 redundant reloads are collapsed away.
+
+Dim ByteVal As Byte = 87
+Dim WordVal As Word = 4213
+
+Do Forever
+  HSerPrintList [2], ByteVal, ",", WordVal, 13, 10
+  Wait 1 s
+Loop

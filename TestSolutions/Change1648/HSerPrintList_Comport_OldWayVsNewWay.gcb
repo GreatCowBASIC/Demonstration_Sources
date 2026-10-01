@@ -1,0 +1,42 @@
+#chip 16F877A, 20
+
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+'Demonstrates Change1648 side by side with the code it replaces: sending the same
+'nine values to comport 2, once the old long way (one HSerPrint call per value,
+'each with its own explicit comport argument) and once the new way (a single
+'HSerPrintList [2], ... statement). Both Subs below send byte-for-byte identical
+'output - the difference is only how much of it you have to type and maintain.
+
+Dim Txt_Heading As String * 12 = "K9AY North"
+Dim SignalLevel As Byte = 87
+Dim SampleCount As Word = 4213
+
+Sub OldWay
+  'The long way, before Change1648: one HSerPrint call per value, each one
+  'repeating the same comport argument by hand. Nine values, nine statements.
+  HSerPrint "{STAT,", 2
+  HSerPrint Txt_Heading, 2
+  HSerPrint ",", 2
+  HSerPrint SignalLevel, 2
+  HSerPrint ",", 2
+  HSerPrint SampleCount, 2
+  HSerPrint "}", 2
+  HSerPrint 13, 2
+  HSerPrint 10, 2
+End Sub
+
+Sub NewWay
+  'The new way, Change1648: the same nine values and the same comport, but as
+  'one statement - the compiler expands this into the same nine HSerPrint calls
+  'shown in OldWay above.
+  HSerPrintList [2], "{STAT,", Txt_Heading, ",", SignalLevel, ",", SampleCount, "}", 13, 10
+End Sub
+
+Do
+  OldWay
+  NewWay
+  Wait 1 s
+Loop

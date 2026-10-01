@@ -1,0 +1,24 @@
+#chip mega328p, 16
+
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+'AVR counterpart of HSerPrintList_Comport_InterruptSafety_16F.gcb - proves the
+'same safety gate applies to the AVR "ldi SysValueCopy,K / sts COMPORT,
+'SysValueCopy" form of the optimizer, not just the PIC ones. A no-op Interrupt
+'sub must still disable the collapse of all 5 comport writes below. Compare
+'against HSerPrintList_Comport_AVR.gcb, which has no Interrupt sub and does
+'get optimized down to a single write.
+
+Dim ByteVal As Byte = 87
+Dim WordVal As Word = 4213
+
+Sub Interrupt
+  nop
+End Sub
+
+Do Forever
+  HSerPrintList [2], ByteVal, ",", WordVal, 13, 10
+  Wait 1 s
+Loop

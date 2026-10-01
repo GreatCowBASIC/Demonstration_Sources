@@ -1,0 +1,19 @@
+#SKIPTEST
+#chip 16F877A, 20
+
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+'Demonstrates Change1648's syntax requirement: a comma must follow the closing
+'"]" of the [comport] argument. HSerPrintList [2] ByteVal (no comma) must fail
+'to compile with a clear error, not be silently accepted as if the comma were
+'optional. #SKIPTEST above is required because this file is intentionally
+'expected to fail - see HSerPrintList_Comport_Literal.gcb for the correct form.
+
+Dim ByteVal As Byte = 5
+
+Do Forever
+  HSerPrintList [2] ByteVal, 13, 10
+  Wait 1 s
+Loop
