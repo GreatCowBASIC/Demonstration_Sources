@@ -1,0 +1,18 @@
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): Value form: a value above 32 bits (8,000,000,000 cycles - computed in 64 bits)
+'Expect: compiles, and the whole Repeat For construct runs exactly 8,000,000,000 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+Dim Flag As Bit
+Dim Cnt As Byte
+Dim X As Byte
+Dim Y As Byte
+Dim W1 As Word
+Dim W2 As Word
+Repeat For 4000000000 us
+    Wait 10 us
+End Repeat
+Do
+Loop

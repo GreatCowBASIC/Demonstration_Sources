@@ -1,0 +1,14 @@
+#chip mega328p, 16
+
+'Repeat For test (Change 1654): Wait 2 ms (a constant Wait in milliseconds) in a 20 ms loop
+'Expect: compiles, and the whole Repeat For construct runs exactly 320,000 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+
+Repeat for 20 ms
+    Wait 2 ms
+    PORTB = !PORTB
+End Repeat
+Do
+Loop

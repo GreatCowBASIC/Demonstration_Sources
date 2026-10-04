@@ -1,0 +1,14 @@
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): Wait 5 ms plus a whole-port toggle inside a 100 ms loop. The compiler fits as many passes as it can (about 19 here) and spreads the leftover time as padding over every pass, so the toggle period is slightly more than 5 ms, and the whole loop is exactly 100 ms
+'Expect: compiles, and the whole Repeat For construct runs exactly 200,000 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+
+Repeat for 100 ms
+    Wait 5 ms
+    PORTA = !PORTA
+End Repeat
+Do
+Loop

@@ -1,0 +1,13 @@
+#SKIPTEST
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): Rejected: no time unit
+'Expect: compile error (this file is marked #SKIPTEST so the demo sweep ignores it):
+'  Repeat For requires a time unit (e.g. us) after the value
+
+#option explicit
+Repeat For 100
+    Wait 10 us
+End Repeat
+Do
+Loop

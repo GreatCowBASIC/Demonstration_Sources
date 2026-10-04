@@ -1,0 +1,12 @@
+#chip 18F4550, 48
+
+'Repeat For test (Change 1654): Clock speed: 48 MHz PIC18 clock
+'Expect: compiles, and the whole Repeat For construct runs exactly 1,200 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+Repeat For 100 us
+    nop
+End Repeat
+Do
+Loop

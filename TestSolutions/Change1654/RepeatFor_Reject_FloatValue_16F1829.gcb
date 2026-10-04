@@ -1,0 +1,13 @@
+#SKIPTEST
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): Rejected: a floating point time value (1.5 ms)
+'Expect: compile error (this file is marked #SKIPTEST so the demo sweep ignores it):
+'  Cannot use Single or Double for Repeat operations. Use an Integer constant/variable or cast single/double variable
+
+#option explicit
+Repeat For 1.5 ms
+    Wait 10 us
+End Repeat
+Do
+Loop

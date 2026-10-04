@@ -1,0 +1,15 @@
+#chip tiny202, 20
+
+'Repeat For test (Change 1654): WaitL1 5 ms in the body (the one-cycle-shorter form behaves the same for milliseconds)
+'Expect: compiles, and the whole Repeat For construct runs exactly 2,000,000 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+Dim X As Byte
+
+Repeat for 100 ms
+    WaitL1 5 ms
+    X = X + 1
+End Repeat
+Do
+Loop

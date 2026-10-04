@@ -1,0 +1,16 @@
+#chip mega328p, 16
+
+'Repeat For test (Change 1654): WaitL1 mixed with Wait and nop inside the loop body on mega328p
+'Expect: compiles, and the whole Repeat For construct runs exactly 320,000 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+Dim Flag As Bit
+Dim X As Byte
+Repeat For 20 ms
+    WaitL1 10 us
+    Wait 10 us
+    nop
+End Repeat
+Do
+Loop

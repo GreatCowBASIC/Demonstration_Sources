@@ -1,0 +1,13 @@
+#SKIPTEST
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): Rejected: a time too short for one pass of a 1009 us Wait
+'Expect: compile error (this file is marked #SKIPTEST so the demo sweep ignores it):
+'  Repeat For: requested time is too short for even one pass of this loop body
+
+#option explicit
+Repeat For 1 us
+    Wait 1009 us
+End Repeat
+Do
+Loop

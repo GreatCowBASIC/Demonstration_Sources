@@ -1,0 +1,22 @@
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): Context: inside a Select Case branch, on 16F1829
+'Expect: compiles
+
+#option explicit
+Dim Flag As Bit
+Dim Cnt As Byte
+Dim X As Byte
+Dim Y As Byte
+Dim W1 As Word
+Dim W2 As Word
+Select Case X
+    Case 1
+        Repeat For 500 us
+            Wait 10 us
+        End Repeat
+    Case 2
+        X = 0
+End Select
+Do
+Loop

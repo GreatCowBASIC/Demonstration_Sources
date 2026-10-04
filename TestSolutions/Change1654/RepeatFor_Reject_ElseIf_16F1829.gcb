@@ -1,0 +1,19 @@
+#SKIPTEST
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): Rejected: Else If branch
+'Expect: compile error (this file is marked #SKIPTEST so the demo sweep ignores it):
+'  Repeat For does not support If/Else inside its body - only If with no Else is supported
+
+#option explicit
+Dim Counter As Byte
+Repeat For 2000 us
+    If Counter = 5 Then
+        Counter = 0
+    Else If Counter = 10 Then
+        Counter = 1
+    End If
+    Wait 10 us
+End Repeat
+Do
+Loop

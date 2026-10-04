@@ -1,0 +1,15 @@
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): Empty (commented-out) body with a 1 s target: padded, not an error. Written with // comments, as in a user report.
+'Expect: compiles, and the whole Repeat For construct runs exactly 2,000,000 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+
+Repeat For 1 s
+    // Wait 100 us
+    // Wait 20 ms
+End Repeat
+
+Do
+Loop

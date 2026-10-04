@@ -1,0 +1,14 @@
+#chip tiny202, 20
+
+'Repeat For test (Change 1654): Wait 2 ms (a constant Wait in milliseconds) in a 20 ms loop
+'Expect: compiles, and the whole Repeat For construct runs exactly 400,000 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+
+Repeat for 20 ms
+    Wait 2 ms
+    PORTA = !PORTA
+End Repeat
+Do
+Loop

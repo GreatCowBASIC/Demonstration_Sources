@@ -1,0 +1,21 @@
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): Context: two Repeat For loops one after the other, on 16F1829
+'Expect: compiles
+
+#option explicit
+Dim Flag As Bit
+Dim Cnt As Byte
+Dim X As Byte
+Dim Y As Byte
+Dim W1 As Word
+Dim W2 As Word
+Repeat For 500 us
+    Wait 10 us
+End Repeat
+Wait 50 us
+Repeat For 700 us
+    Wait 20 us
+End Repeat
+Do
+Loop

@@ -1,0 +1,217 @@
+#chip mega328p, 16
+
+'Repeat For test (Change 1654): Body variables live in a higher RAM bank than the loop counter, so bank-select instructions are inserted inside the loop - they must be counted (mega328p)
+'Expect: compiles, and the whole Repeat For construct runs exactly 80,000 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+Dim Flag As Bit
+Dim Cnt As Byte
+Dim X As Byte
+Dim Y As Byte
+Dim W1 As Word
+Dim W2 As Word
+Dim V1 As Byte
+Dim V2 As Byte
+Dim V3 As Byte
+Dim V4 As Byte
+Dim V5 As Byte
+Dim V6 As Byte
+Dim V7 As Byte
+Dim V8 As Byte
+Dim V9 As Byte
+Dim V10 As Byte
+Dim V11 As Byte
+Dim V12 As Byte
+Dim V13 As Byte
+Dim V14 As Byte
+Dim V15 As Byte
+Dim V16 As Byte
+Dim V17 As Byte
+Dim V18 As Byte
+Dim V19 As Byte
+Dim V20 As Byte
+Dim V21 As Byte
+Dim V22 As Byte
+Dim V23 As Byte
+Dim V24 As Byte
+Dim V25 As Byte
+Dim V26 As Byte
+Dim V27 As Byte
+Dim V28 As Byte
+Dim V29 As Byte
+Dim V30 As Byte
+Dim V31 As Byte
+Dim V32 As Byte
+Dim V33 As Byte
+Dim V34 As Byte
+Dim V35 As Byte
+Dim V36 As Byte
+Dim V37 As Byte
+Dim V38 As Byte
+Dim V39 As Byte
+Dim V40 As Byte
+Dim V41 As Byte
+Dim V42 As Byte
+Dim V43 As Byte
+Dim V44 As Byte
+Dim V45 As Byte
+Dim V46 As Byte
+Dim V47 As Byte
+Dim V48 As Byte
+Dim V49 As Byte
+Dim V50 As Byte
+Dim V51 As Byte
+Dim V52 As Byte
+Dim V53 As Byte
+Dim V54 As Byte
+Dim V55 As Byte
+Dim V56 As Byte
+Dim V57 As Byte
+Dim V58 As Byte
+Dim V59 As Byte
+Dim V60 As Byte
+Dim V61 As Byte
+Dim V62 As Byte
+Dim V63 As Byte
+Dim V64 As Byte
+Dim V65 As Byte
+Dim V66 As Byte
+Dim V67 As Byte
+Dim V68 As Byte
+Dim V69 As Byte
+Dim V70 As Byte
+Dim V71 As Byte
+Dim V72 As Byte
+Dim V73 As Byte
+Dim V74 As Byte
+Dim V75 As Byte
+Dim V76 As Byte
+Dim V77 As Byte
+Dim V78 As Byte
+Dim V79 As Byte
+Dim V80 As Byte
+Dim V81 As Byte
+Dim V82 As Byte
+Dim V83 As Byte
+Dim V84 As Byte
+Dim V85 As Byte
+Dim V86 As Byte
+Dim V87 As Byte
+Dim V88 As Byte
+Dim V89 As Byte
+Dim V90 As Byte
+Dim V91 As Byte
+Dim V92 As Byte
+Dim V93 As Byte
+Dim V94 As Byte
+Dim V95 As Byte
+Dim V96 As Byte
+Dim V97 As Byte
+Dim V98 As Byte
+Dim V99 As Byte
+Dim V100 As Byte
+Repeat For 5 ms
+    V3 = V3 + 1
+    V97 = V97 + 1
+    V98 = V98 + 1
+    V99 = V99 + 1
+    V100 = V100 + 1
+End Repeat
+V1 = 1
+V2 = 1
+V4 = 1
+V5 = 1
+V6 = 1
+V7 = 1
+V8 = 1
+V9 = 1
+V10 = 1
+V11 = 1
+V12 = 1
+V13 = 1
+V14 = 1
+V15 = 1
+V16 = 1
+V17 = 1
+V18 = 1
+V19 = 1
+V20 = 1
+V21 = 1
+V22 = 1
+V23 = 1
+V24 = 1
+V25 = 1
+V26 = 1
+V27 = 1
+V28 = 1
+V29 = 1
+V30 = 1
+V31 = 1
+V32 = 1
+V33 = 1
+V34 = 1
+V35 = 1
+V36 = 1
+V37 = 1
+V38 = 1
+V39 = 1
+V40 = 1
+V41 = 1
+V42 = 1
+V43 = 1
+V44 = 1
+V45 = 1
+V46 = 1
+V47 = 1
+V48 = 1
+V49 = 1
+V50 = 1
+V51 = 1
+V52 = 1
+V53 = 1
+V54 = 1
+V55 = 1
+V56 = 1
+V57 = 1
+V58 = 1
+V59 = 1
+V60 = 1
+V61 = 1
+V62 = 1
+V63 = 1
+V64 = 1
+V65 = 1
+V66 = 1
+V67 = 1
+V68 = 1
+V69 = 1
+V70 = 1
+V71 = 1
+V72 = 1
+V73 = 1
+V74 = 1
+V75 = 1
+V76 = 1
+V77 = 1
+V78 = 1
+V79 = 1
+V80 = 1
+V81 = 1
+V82 = 1
+V83 = 1
+V84 = 1
+V85 = 1
+V86 = 1
+V87 = 1
+V88 = 1
+V89 = 1
+V90 = 1
+V91 = 1
+V92 = 1
+V93 = 1
+V94 = 1
+V95 = 1
+V96 = 1
+Do
+Loop

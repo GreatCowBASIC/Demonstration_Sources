@@ -1,0 +1,12 @@
+#chip 16F1829, 32
+
+'Repeat For test (Change 1654): Clock speed: 32 MHz PIC clock, 333 us
+'Expect: compiles, and the whole Repeat For construct runs exactly 2,664 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+Repeat For 333 us
+    nop
+End Repeat
+Do
+Loop

@@ -1,0 +1,17 @@
+#chip mega328p, 16
+
+'Repeat For test (Change 1654): Wait 2 ms, Wait 3 ms and Wait 200 us in one body
+'Expect: compiles, and the whole Repeat For construct runs exactly 1,600,000 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+Dim X As Byte
+
+Repeat for 100 ms
+    Wait 2 ms
+    X = X + 1
+    Wait 3 ms
+    Wait 200 us
+End Repeat
+Do
+Loop

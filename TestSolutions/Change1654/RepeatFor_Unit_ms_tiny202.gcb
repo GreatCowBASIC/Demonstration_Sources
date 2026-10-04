@@ -1,0 +1,18 @@
+#chip tiny202, 20
+
+'Repeat For test (Change 1654): Time unit 'ms' (milliseconds) on tiny202
+'Expect: compiles, and the whole Repeat For construct runs exactly 60,000 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+Dim Flag As Bit
+Dim Cnt As Byte
+Dim X As Byte
+Dim Y As Byte
+Dim W1 As Word
+Dim W2 As Word
+Repeat For 3 ms
+    Wait 10 us
+End Repeat
+Do
+Loop

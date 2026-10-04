@@ -1,0 +1,15 @@
+#SKIPTEST
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): Rejected: a nested Repeat For
+'Expect: compile error (this file is marked #SKIPTEST so the demo sweep ignores it):
+'  Repeat For cannot use this construct inside its body because its timing is not fixed: a Call, a Wait with a variable time, Goto, Gosub, Exit Sub, Exit
+
+#option explicit
+Repeat For 50000 us
+    Repeat For 100 us
+        nop
+    End Repeat
+End Repeat
+Do
+Loop

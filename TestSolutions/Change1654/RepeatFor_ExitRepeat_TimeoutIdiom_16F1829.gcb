@@ -1,0 +1,16 @@
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): Exit Repeat inside an If: wait up to 90 ms, leave early when the flag is set. The flag is never set here, so the loop runs its full time.
+'Expect: compiles, and the whole Repeat For construct runs exactly 180,000 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+Dim Flag As Bit
+Repeat For 90000 us
+    If Flag = 1 Then
+        Exit Repeat
+    End If
+    Wait 10 us
+End Repeat
+Do
+Loop

@@ -1,0 +1,12 @@
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): Plain 'Repeat n' is unaffected by the Repeat For change
+'Expect: compiles
+
+#option explicit
+Dim I As Byte
+Repeat 10
+    nop
+End Repeat
+Do
+Loop

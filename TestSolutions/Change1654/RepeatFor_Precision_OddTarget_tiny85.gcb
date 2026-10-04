@@ -1,0 +1,11 @@
+#chip tiny85, 1
+
+'Repeat For test (Change 1654): An odd target above 2^24 cycles (16,777,217) must not lose a cycle
+'Expect: compiles, and the Repeat For construct runs exactly the requested number of clock cycles (cycle-accurate simulation)
+
+#option explicit
+Repeat For 16777217 us
+    nop
+End Repeat
+Do
+Loop

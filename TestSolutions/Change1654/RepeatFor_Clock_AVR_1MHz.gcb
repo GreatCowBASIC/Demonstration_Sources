@@ -1,0 +1,12 @@
+#chip mega328p, 1
+
+'Repeat For test (Change 1654): Clock speed: 1 MHz AVR clock
+'Expect: compiles, and the whole Repeat For construct runs exactly 100 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+Repeat For 100 us
+    nop
+End Repeat
+Do
+Loop

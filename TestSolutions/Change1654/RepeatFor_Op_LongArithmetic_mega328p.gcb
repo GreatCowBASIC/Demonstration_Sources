@@ -1,0 +1,19 @@
+#chip mega328p, 16
+
+'Repeat For test (Change 1654): 32-bit (Long) arithmetic in the body on mega328p
+'Expect: compiles, and the whole Repeat For construct runs exactly 80,000 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+Dim Flag As Bit
+Dim Cnt As Byte
+Dim X As Byte
+Dim Y As Byte
+Dim W1 As Word
+Dim W2 As Word
+Dim BW As Long
+Repeat For 5 ms
+    BW = BW + 1
+End Repeat
+Do
+Loop

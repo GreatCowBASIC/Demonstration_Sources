@@ -1,0 +1,13 @@
+#SKIPTEST
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): Rejected: a zero time
+'Expect: compile error (this file is marked #SKIPTEST so the demo sweep ignores it):
+'  Repeat For requires a constant, non-negative, non-zero whole number value
+
+#option explicit
+Repeat For 0 us
+    Wait 10 us
+End Repeat
+Do
+Loop

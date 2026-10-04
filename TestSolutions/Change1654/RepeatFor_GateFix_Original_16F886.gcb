@@ -1,0 +1,19 @@
+#chip 16F886, 8
+
+'Repeat For test (Change 1654): The original GATE FIX example, unmodified, on 16F886
+'Expect: compiles, and the Repeat For construct runs exactly the requested 790,047 microseconds worth of clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+Dim Overflows As Byte
+Dim TMR1IF As Bit
+Repeat For 790047 us
+    Wait 1009 us
+    nop
+    If TMR1IF = 1 Then
+        Overflows = Overflows + 1
+        TMR1IF = 0
+    End If
+End Repeat
+Do
+Loop

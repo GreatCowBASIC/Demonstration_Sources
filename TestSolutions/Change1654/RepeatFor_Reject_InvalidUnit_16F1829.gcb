@@ -1,0 +1,13 @@
+#SKIPTEST
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): Rejected: an unknown unit
+'Expect: compile error (this file is marked #SKIPTEST so the demo sweep ignores it):
+'  Repeat For does not support this time unit - supported units are us, 10us, ms, 10ms, s, m, h (and their usec/msec/sec/min/hour variants)
+
+#option explicit
+Repeat For 100 xyz
+    Wait 10 us
+End Repeat
+Do
+Loop

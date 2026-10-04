@@ -1,0 +1,11 @@
+#chip tiny202, 20
+
+'Repeat For test (Change 1654): 1 hour at 20 MHz = 72,000,000,000 cycles. A single-precision clock value once made this 4096 cycles short.
+'Expect: compiles, and the Repeat For construct runs exactly the requested number of clock cycles (cycle-accurate simulation)
+
+#option explicit
+Repeat For 1 h
+    Wait 10 us
+End Repeat
+Do
+Loop

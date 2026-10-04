@@ -1,0 +1,18 @@
+#chip 18F4550, 20
+
+'Repeat For test (Change 1654): Loop body: a 1009 us Wait (needs GenerateExactDelay's counting loop), on 18F4550
+'Expect: compiles, and the whole Repeat For construct runs exactly 100,000 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+Dim Flag As Bit
+Dim Cnt As Byte
+Dim X As Byte
+Dim Y As Byte
+Dim W1 As Word
+Dim W2 As Word
+Repeat For 20 ms
+    Wait 1009 us
+End Repeat
+Do
+Loop

@@ -1,0 +1,11 @@
+#chip mega328p, 20
+
+'Repeat For test (Change 1654): 3,333,333 us at 20 MHz
+'Expect: compiles, and the Repeat For construct runs exactly the requested number of clock cycles (cycle-accurate simulation)
+
+#option explicit
+Repeat For 3333333 us
+    Wait 10 us
+End Repeat
+Do
+Loop

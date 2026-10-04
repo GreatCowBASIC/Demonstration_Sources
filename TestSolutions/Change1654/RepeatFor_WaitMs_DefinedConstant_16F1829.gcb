@@ -1,0 +1,16 @@
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): Wait with a #define constant as the time (Wait PAUSE ms)
+'Expect: compiles, and the whole Repeat For construct runs exactly 200,000 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+#define PAUSE 5
+Dim X As Byte
+
+Repeat for 100 ms
+    Wait PAUSE ms
+    X = X + 1
+End Repeat
+Do
+Loop

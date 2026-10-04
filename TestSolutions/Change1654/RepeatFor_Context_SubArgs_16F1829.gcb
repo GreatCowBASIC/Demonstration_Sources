@@ -1,0 +1,20 @@
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): Context: body modifies a Sub parameter, on 16F1829
+'Expect: compiles
+
+#option explicit
+Dim Flag As Bit
+Dim Cnt As Byte
+Dim X As Byte
+Dim Y As Byte
+Dim W1 As Word
+Dim W2 As Word
+Sub Pace3(In Pn As Byte)
+    Repeat For 500 us
+        Pn = Pn + 1
+    End Repeat
+End Sub
+Pace3 3
+Do
+Loop

@@ -1,0 +1,20 @@
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): Wait 5 ms, arithmetic, an If with no Else and Wait 10 us together in one body
+'Expect: compiles, and the whole Repeat For construct runs exactly 200,000 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+Dim X As Byte
+Dim Flag As Bit
+
+Repeat for 100 ms
+    Wait 5 ms
+    X = X + 1
+    If Flag = 1 Then
+        X = 0
+    End If
+    Wait 10 us
+End Repeat
+Do
+Loop

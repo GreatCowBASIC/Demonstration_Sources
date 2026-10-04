@@ -1,0 +1,14 @@
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): 'Wait 1 ms' inside a 90 ms loop is built inline and is exact (it used to be rejected as a library call)
+'Expect: compiles, and the whole Repeat For construct runs exactly 180,000 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+
+Repeat For 90 ms
+    Wait 1 ms
+End Repeat
+
+Do
+Loop

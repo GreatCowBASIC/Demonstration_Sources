@@ -1,0 +1,19 @@
+#chip tiny202, 20
+
+'Repeat For test (Change 1654): Loop body: byte arithmetic, on tiny202
+'Expect: compiles, and the whole Repeat For construct runs exactly 400,000 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+Dim Flag As Bit
+Dim Cnt As Byte
+Dim X As Byte
+Dim Y As Byte
+Dim W1 As Word
+Dim W2 As Word
+Repeat For 20 ms
+    X = X + Y
+    Y = Y + 3
+End Repeat
+Do
+Loop

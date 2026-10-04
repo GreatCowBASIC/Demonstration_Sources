@@ -1,0 +1,18 @@
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): Alternative spelling 'msec' of a time unit is accepted (same table as Wait)
+'Expect: compiles, and the whole Repeat For construct runs exactly 6,000 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+Dim Flag As Bit
+Dim Cnt As Byte
+Dim X As Byte
+Dim Y As Byte
+Dim W1 As Word
+Dim W2 As Word
+Repeat For 3 msec
+    Wait 10 us
+End Repeat
+Do
+Loop

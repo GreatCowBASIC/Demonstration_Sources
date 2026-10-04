@@ -1,0 +1,21 @@
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): Context: Sub parameters used in the body, on 16F1829
+'Expect: compiles
+
+#option explicit
+Dim Flag As Bit
+Dim Cnt As Byte
+Dim X As Byte
+Dim Y As Byte
+Dim W1 As Word
+Dim W2 As Word
+Sub Pace4(In Pn As Byte, In Pm As Word)
+    Repeat For 5 ms
+        Pn = Pn + 1
+        Pm = Pm + Pn
+    End Repeat
+End Sub
+Pace4 3, 400
+Do
+Loop

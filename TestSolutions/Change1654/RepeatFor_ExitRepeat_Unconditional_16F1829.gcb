@@ -1,0 +1,12 @@
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): Exit Repeat fires on the first pass
+'Expect: compiles. Exit Repeat runs on the first pass, so the elapsed time is intentionally far below the requested time.
+
+#option explicit
+Repeat For 90000 us
+    Exit Repeat
+    Wait 10 us
+End Repeat
+Do
+Loop

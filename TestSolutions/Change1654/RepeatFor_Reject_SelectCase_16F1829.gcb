@@ -1,0 +1,18 @@
+#SKIPTEST
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): Rejected: Select Case
+'Expect: compile error (this file is marked #SKIPTEST so the demo sweep ignores it):
+'  Repeat For cannot use this construct inside its body because its timing is not fixed: a Call, a Wait with a variable time, Goto, Gosub, Exit Sub, Exit
+
+#option explicit
+Dim Counter As Byte
+Repeat For 2000 us
+    Select Case Counter
+        Case 0
+            Counter = 1
+    End Select
+    Wait 10 us
+End Repeat
+Do
+Loop

@@ -1,0 +1,22 @@
+#chip mega328p, 16
+
+'Repeat For test (Change 1654): If X > 250 with the condition FALSE (variables pre-set before the loop). When a condition is true its body runs uncounted, by design, so the loop runs slightly long.
+'Expect: compiles, and the whole Repeat For construct runs exactly 320,000 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+Dim Flag As Bit
+Dim Cnt As Byte
+Dim X As Byte
+Dim Y As Byte
+Flag = 1
+X = 200
+Y = 1
+Cnt = 0
+Repeat For 20 ms
+    If X > 250 Then
+        Y = 1
+    End If
+End Repeat
+Do
+Loop

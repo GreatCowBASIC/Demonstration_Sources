@@ -1,0 +1,14 @@
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): WaitL1 10 us inside the loop body on 16F1829
+'Expect: compiles, and the whole Repeat For construct runs exactly 40,000 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+Dim Flag As Bit
+Dim X As Byte
+Repeat For 20 ms
+    WaitL1 10 us
+End Repeat
+Do
+Loop

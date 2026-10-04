@@ -1,0 +1,19 @@
+#chip mega328p, 16
+
+'Repeat For test (Change 1654): Timeout idiom: If Flag Then Exit Repeat, then Wait 5 ms in the body
+'Expect: compiles, and the whole Repeat For construct runs exactly 1,600,000 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+Dim X As Byte
+Dim Flag As Bit
+
+Repeat for 100 ms
+    If Flag = 1 Then
+        Exit Repeat
+    End If
+    Wait 5 ms
+    X = X + 1
+End Repeat
+Do
+Loop

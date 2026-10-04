@@ -1,0 +1,16 @@
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): A target barely bigger than the body forces padding in every pass
+'Expect: compiles, and the whole Repeat For construct runs exactly 28 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+
+Dim MyByte As Byte
+
+Repeat For 14 us
+  MyByte = MyByte + 1
+End Repeat
+
+Do
+Loop

@@ -1,0 +1,23 @@
+#SKIPTEST
+#chip tiny202, 20
+
+'Repeat For test (Change 1654): Rejected: compound Or condition
+'Expect: compile error (this file is marked #SKIPTEST so the demo sweep ignores it):
+'  Repeat For cannot use this construct inside its body because its timing is not fixed: a Call, a Wait with a variable time, Goto, Gosub, Exit Sub, Exit
+
+#option explicit
+Dim Flag As Bit
+Dim Cnt As Byte
+Dim X As Byte
+Dim Y As Byte
+Flag = 1
+X = 200
+Y = 1
+Cnt = 0
+Repeat For 20 ms
+    If X = 1 Or Flag = 0 Then
+        Y = 0
+    End If
+End Repeat
+Do
+Loop

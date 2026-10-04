@@ -1,0 +1,11 @@
+#chip mega328p, 16
+
+'Repeat For test (Change 1654): A long constant Wait written in microseconds (Wait 10000 us) is built inline and is exact at any size. A constant Wait in ms/10ms/s is also built inline now (see the RepeatFor_WaitMs_* files), up to 8,000,000 cycles
+'Expect: compiles, and the Repeat For construct runs exactly the requested number of clock cycles (cycle-accurate simulation)
+
+#option explicit
+Repeat For 1 s
+    Wait 10000 us
+End Repeat
+Do
+Loop

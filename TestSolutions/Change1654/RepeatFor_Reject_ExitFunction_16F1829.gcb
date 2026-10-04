@@ -1,0 +1,19 @@
+#SKIPTEST
+#chip 16F1829, 8
+
+'Repeat For test (Change 1654): Rejected: Exit Function
+'Expect: compile error (this file is marked #SKIPTEST so the demo sweep ignores it):
+'  Repeat For cannot use this construct inside its body because its timing is not fixed: a Call, a Wait with a variable time, Goto, Gosub, Exit Sub, Exit
+
+#option explicit
+Dim Result As Byte
+Function DoLoop() As Byte
+    Repeat For 2000 us
+        Exit Function
+        Wait 10 us
+    End Repeat
+    DoLoop = 1
+End Function
+Do
+    Result = DoLoop()
+Loop

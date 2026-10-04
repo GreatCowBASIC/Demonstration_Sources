@@ -1,0 +1,14 @@
+#chip 16F886, 8
+
+'Repeat For test (Change 1654): Wait 1 s inside a 5 s loop (within the 8,000,000 cycle limit for an inline Wait at this clock)
+'Expect: compiles, and the whole Repeat For construct runs exactly 10,000,000 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+
+Repeat for 5 s
+    Wait 1 s
+    PORTA = !PORTA
+End Repeat
+Do
+Loop

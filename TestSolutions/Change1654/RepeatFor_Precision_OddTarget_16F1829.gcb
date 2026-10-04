@@ -1,0 +1,11 @@
+#chip 16F1829, 4
+
+'Repeat For test (Change 1654): An odd target of 20,000,001 cycles
+'Expect: compiles, and the Repeat For construct runs exactly the requested number of clock cycles (cycle-accurate simulation)
+
+#option explicit
+Repeat For 20000001 us
+    nop
+End Repeat
+Do
+Loop

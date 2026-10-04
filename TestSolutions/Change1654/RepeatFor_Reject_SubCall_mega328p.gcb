@@ -1,0 +1,30 @@
+#SKIPTEST
+#chip mega328p, 16
+
+'Repeat For test (Change 1654): Rejected: call to a Sub
+'Expect: compile error (this file is marked #SKIPTEST so the demo sweep ignores it):
+'  Repeat For cannot use this construct inside its body because its timing is not fixed: a Call, a Wait with a variable time, Goto, Gosub, Exit Sub, Exit
+
+#option explicit
+Dim Flag As Bit
+Dim Cnt As Byte
+Dim X As Byte
+Dim Y As Byte
+Dim W1 As Word
+Dim W2 As Word
+Dim S1 As String
+Dim Buf(8) As Byte
+Table Tbl
+    1, 2, 3
+End Table
+Sub Tick
+    X = X + 1
+End Sub
+Function Plus1(Av As Byte) As Byte
+    Plus1 = Av + 1
+End Function
+Repeat For 20 ms
+    Tick
+End Repeat
+Do
+Loop

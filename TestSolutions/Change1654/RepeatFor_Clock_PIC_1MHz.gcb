@@ -1,0 +1,12 @@
+#chip 16F1829, 1
+
+'Repeat For test (Change 1654): Clock speed: 1 MHz PIC clock (a quarter cycle per microsecond)
+'Expect: compiles, and the whole Repeat For construct runs exactly 250 clock cycles
+'(checked by simulating the generated assembly instruction by instruction)
+
+#option explicit
+Repeat For 1 ms
+    nop
+End Repeat
+Do
+Loop
