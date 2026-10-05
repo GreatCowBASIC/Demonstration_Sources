@@ -6,8 +6,8 @@
 #option explicit
 Dim Flag As Bit
 Dim Cnt As Byte
-Dim X As Byte
-Dim Y As Byte
+Dim Xv As Byte
+Dim Yv As Byte
 Dim W1 As Word
 Dim W2 As Word
 If Flag = 0 Then

@@ -7,14 +7,14 @@
 #option explicit
 Dim Flag As Bit
 Dim Cnt As Byte
-Dim X As Byte
-Dim Y As Byte
+Dim Xv As Byte
+Dim Yv As Byte
 Flag = 1
-X = 200
-Y = 1
+Xv = 200
+Yv = 1
 Cnt = 0
 Repeat For 20 ms
-    If X = Y Then
+    If Xv = Yv Then
         Cnt = 0
     End If
 End Repeat

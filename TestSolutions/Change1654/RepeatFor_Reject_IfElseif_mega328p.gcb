@@ -8,8 +8,8 @@
 #option explicit
 Dim Flag As Bit
 Dim Cnt As Byte
-Dim X As Byte
-Dim Y As Byte
+Dim Xv As Byte
+Dim Yv As Byte
 Dim W1 As Word
 Dim W2 As Word
 Dim S1 As String
@@ -18,16 +18,16 @@ Table Tbl
     1, 2, 3
 End Table
 Sub Tick
-    X = X + 1
+    Xv = Xv + 1
 End Sub
 Function Plus1(Av As Byte) As Byte
     Plus1 = Av + 1
 End Function
 Repeat For 20 ms
-    If X = 1 Then
-        Y = 0
-    Else If X = 2 Then
-        Y = 1
+    If Xv = 1 Then
+        Yv = 0
+    Else If Xv = 2 Then
+        Yv = 1
     End If
 End Repeat
 Do

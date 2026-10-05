@@ -1,0 +1,248 @@
+Microchip MPLAB XC8 PIC(R) Assembler V4.00
+
+Linker command line:
+
+-W-3 --edf=20260614213421_en.msgs -cs \
+  -h+D:\GreatCowBASICGits\Demonstration_Sources.git\TestSolutions\Change1654\RepeatFor_GateFix_Original_12F1822.build\RepeatFor_GateFix_Original_12F1822.sym \
+  --cmf=D:\GreatCowBASICGits\Demonstration_Sources.git\TestSolutions\Change1654\RepeatFor_GateFix_Original_12F1822.build\RepeatFor_GateFix_Original_12F1822.cmf \
+  -z -Q12F1822 -oC:\Users\admin\AppData\Local\Temp\xcAs5w4.0\driver_tmp_3.o \
+  --fixupoverflow=error -ver=XC8 PIC(R) Assembler --fixupoverflow=lstwarn \
+  -MD:\GreatCowBASICGits\Demonstration_Sources.git\TestSolutions\Change1654\RepeatFor_GateFix_Original_12F1822.build\RepeatFor_GateFix_Original_12F1822.map \
+  -E1 -ACODE=00h-07FFh -ASTRCODE=00h-07FFh -ASTRING=00h-0FFhx8 \
+  -ACONST=00h-0FFhx8 -AENTRY=00h-0FFhx8 -ACOMMON=070h-07Fh \
+  -ABANK0=020h-06Fh -ABANK1=0A0h-0BFh -ABIGRAM=02000h-0206Fh \
+  -ARAM=020h-06Fh,0A0h-0BFh -AABS1=020h-07Fh,0A0h-0BFh -ASFR0=00h-01Fh \
+  -ASFR1=080h-09Fh -ASFR2=0100h-016Fh -ASFR3=0180h-01EFh -ASFR4=0200h-026Fh \
+  -ASFR5=0280h-02EFh -ASFR6=0300h-036Fh -ASFR7=0380h-03EFh \
+  -ASFR8=0400h-046Fh -ASFR9=0480h-04EFh -ASFR10=0500h-056Fh \
+  -ASFR11=0580h-05EFh -ASFR12=0600h-066Fh -ASFR13=0680h-06EFh \
+  -ASFR14=0700h-076Fh -ASFR15=0780h-07EFh -ASFR16=0800h-086Fh \
+  -ASFR17=0880h-08EFh -ASFR18=0900h-096Fh -ASFR19=0980h-09EFh \
+  -ASFR20=0A00h-0A6Fh -ASFR21=0A80h-0AEFh -ASFR22=0B00h-0B6Fh \
+  -ASFR23=0B80h-0BEFh -ASFR24=0C00h-0C6Fh -ASFR25=0C80h-0CEFh \
+  -ASFR26=0D00h-0D6Fh -ASFR27=0D80h-0DEFh -ASFR28=0E00h-0E6Fh \
+  -ASFR29=0E80h-0EEFh -ASFR30=0F00h-0F6Fh -ASFR31=0F80h-0FEFh \
+  -ACONFIG=08007h-08008h -DCONFIG=2 -AIDLOC=08000h-08003h -DIDLOC=2 \
+  -AEEDATA=00h-0FFh/0F000h -DEEDATA=2 -DCODE=2 -DSTRCODE=2 -DSTRING=2 \
+  -DCONST=2 -DENTRY=2 \
+  D:\GreatCowBASICGits\Demonstration_Sources.git\TestSolutions\Change1654\RepeatFor_GateFix_Original_12F1822.build\RepeatFor_GateFix_Original_12F1822.o 
+
+Object code version is 3.11
+
+Machine type is 12F1822
+
+
+
+                Name                               Link     Load   Length Selector   Space Scale
+D:\GreatCowBASICGits\Demonstration_Sources.git\TestSolutions\Change1654\RepeatFor_GateFix_Original_12F1822.build\RepeatFor_GateFix_Original_12F1822.o
+                config                             8007     8007        2        0       4
+                PROGMEM0                              0        0       3B        0       0
+
+TOTAL           Name                               Link     Load   Length     Space
+        CLASS   CODE           
+
+        CLASS   STRCODE        
+
+        CLASS   STRING         
+
+        CLASS   CONST          
+
+        CLASS   ENTRY          
+
+        CLASS   COMMON         
+
+        CLASS   BANK0          
+
+        CLASS   BANK1          
+
+        CLASS   BIGRAM         
+
+        CLASS   RAM            
+
+        CLASS   ABS1           
+
+        CLASS   SFR0           
+
+        CLASS   SFR1           
+
+        CLASS   SFR2           
+
+        CLASS   SFR3           
+
+        CLASS   SFR4           
+
+        CLASS   SFR5           
+
+        CLASS   SFR6           
+
+        CLASS   SFR7           
+
+        CLASS   SFR8           
+
+        CLASS   SFR9           
+
+        CLASS   SFR10          
+
+        CLASS   SFR11          
+
+        CLASS   SFR12          
+
+        CLASS   SFR13          
+
+        CLASS   SFR14          
+
+        CLASS   SFR15          
+
+        CLASS   SFR16          
+
+        CLASS   SFR17          
+
+        CLASS   SFR18          
+
+        CLASS   SFR19          
+
+        CLASS   SFR20          
+
+        CLASS   SFR21          
+
+        CLASS   SFR22          
+
+        CLASS   SFR23          
+
+        CLASS   SFR24          
+
+        CLASS   SFR25          
+
+        CLASS   SFR26          
+
+        CLASS   SFR27          
+
+        CLASS   SFR28          
+
+        CLASS   SFR29          
+
+        CLASS   SFR30          
+
+        CLASS   SFR31          
+
+        CLASS   CONFIG         
+                config                             8007     8007        2         4
+
+        CLASS   IDLOC          
+
+        CLASS   EEDATA         
+
+        CLASS   UNCLASSED
+                PROGMEM0                              0        0       3B         0
+
+
+SEGMENTS        Name                           Load    Length   Top    Selector   Space  Class     Delta
+
+
+
+UNUSED ADDRESS RANGES
+
+        Name                Unused          Largest block    Delta
+        BANK0            00020-0006F              50           1
+        BANK1            000A0-000BF              20           1
+        BIGRAM           02000-0206F              70           1
+        CODE             0003B-007FF             7C5           2
+        COMMON           00070-0007F              10           1
+        CONST            0003B-007FF             100           2
+        EEDATA           0F000-0F0FF             100           2
+        ENTRY            0003B-007FF             100           2
+        IDLOC            08000-08003               4           2
+        RAM              00020-0006F              50           1
+                         000A0-000BF              20
+        SFR1             00080-0009F              20           1
+        SFR10            00500-0056F              70           1
+        SFR11            00580-005EF              70           1
+        SFR12            00600-0066F              70           1
+        SFR13            00680-006EF              70           1
+        SFR14            00700-0076F              70           1
+        SFR15            00780-007EF              70           1
+        SFR16            00800-0086F              70           1
+        SFR17            00880-008EF              70           1
+        SFR18            00900-0096F              70           1
+        SFR19            00980-009EF              70           1
+        SFR2             00100-0016F              70           1
+        SFR20            00A00-00A6F              70           1
+        SFR21            00A80-00AEF              70           1
+        SFR22            00B00-00B6F              70           1
+        SFR23            00B80-00BEF              70           1
+        SFR24            00C00-00C6F              70           1
+        SFR25            00C80-00CEF              70           1
+        SFR26            00D00-00D6F              70           1
+        SFR27            00D80-00DEF              70           1
+        SFR28            00E00-00E6F              70           1
+        SFR29            00E80-00EEF              70           1
+        SFR3             00180-001EF              70           1
+        SFR30            00F00-00F6F              70           1
+        SFR31            00F80-00FEF              70           1
+        SFR4             00200-0026F              70           1
+        SFR5             00280-002EF              70           1
+        SFR6             00300-0036F              70           1
+        SFR7             00380-003EF              70           1
+        SFR8             00400-0046F              70           1
+        SFR9             00480-004EF              70           1
+        STRCODE          0003B-007FF             7C5           2
+        STRING           0003B-007FF             100           2
+
+                                  Symbol Table
+
+BASPROGRAMEND          PROGMEM0     00029
+BASPROGRAMSTART        PROGMEM0     00005
+DELAYTEMP              (abs)        00070
+DELAYTEMP2             (abs)        00071
+DELAYUS1               PROGMEM0     0000B
+DELAYUS2               PROGMEM0     00011
+DELAYUS3               PROGMEM0     00026
+DELAYUSO1              PROGMEM0     0000A
+ENDIF1                 PROGMEM0     00017
+INITSYS                PROGMEM0     0002B
+OVERFLOWS              (abs)        00020
+SYSBITVAR0             (abs)        00021
+SYSDOLOOP_E1           PROGMEM0     00029
+SYSDOLOOP_S1           PROGMEM0     00028
+SYSREPEATFORCMP1       (abs)        00022
+SYSREPEATFORCOUNTER1   (abs)        00023
+SYSREPEATFORCOUNTER1_H (abs)        00024
+SYSREPEATFORDONE1      PROGMEM0     00028
+SYSREPEATFORLOOP1      PROGMEM0     00008
+SYSREPEATFORLOOPEND1   PROGMEM0     00024
+SYSREPEATFORPAD1       PROGMEM0     00017
+SYSREPEATFORSETUP1     PROGMEM0     00006
+SYSREPEATFORTAIL1      PROGMEM0     00018
+SYSWAITTEMPUS          (abs)        00075
+SYSWAITTEMPUS_H        (abs)        00076
+__HPROGMEM0            PROGMEM0     0003B
+__H__absolute__        __absolute__ 00000
+__Hcode                code         00000
+__Hconfig              config       08009
+__Hdata                data         00000
+__Hedata               edata        00000
+__Hspace_0             (abs)        0003B
+__Hspace_1             (abs)        00000
+__Hspace_3             (abs)        00000
+__Hspace_4             (abs)        10010
+__Hudata               udata        00000
+__Hudata_bank0         udata_bank0  00000
+__Hudata_bank1         udata_bank1  00000
+__Hudata_shr           udata_shr    00000
+__LPROGMEM0            PROGMEM0     00000
+__L__absolute__        __absolute__ 00000
+__Lcode                code         00000
+__Lconfig              config       00000
+__Ldata                data         00000
+__Ledata               edata        00000
+__Lspace_0             (abs)        00000
+__Lspace_1             (abs)        00000
+__Lspace_3             (abs)        00000
+__Lspace_4             (abs)        00000
+__Ludata               udata        00000
+__Ludata_bank0         udata_bank0  00000
+__Ludata_bank1         udata_bank1  00000
+__Ludata_shr           udata_shr    00000
+__S0                   (abs)        00000
+__S1                   (abs)        00000
+__S3                   (abs)        00000

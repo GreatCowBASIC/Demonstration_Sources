@@ -6,7 +6,7 @@
 
 #option explicit
 Dim Flag As Bit
-Dim X As Byte
+Dim Xv As Byte
 Repeat For 20 ms
     WaitL1 3 us
     WaitL1 6 us

@@ -13,7 +13,6 @@ Dim W1 As Word
 Dim W2 As Word
 Repeat For 20 ms
     Wait 1009 us
-    nop
     If Flag = 1 Then
         X = X + 1
         Flag = 0

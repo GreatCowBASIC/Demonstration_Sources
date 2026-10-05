@@ -6,8 +6,8 @@
 #option explicit
 Dim Flag As Bit
 Dim Cnt As Byte
-Dim X As Byte
-Dim Y As Byte
+Dim Xv As Byte
+Dim Yv As Byte
 Dim W1 As Word
 Dim W2 As Word
 Function Pace2 As Byte
@@ -16,6 +16,6 @@ Function Pace2 As Byte
     End Repeat
     Pace2 = 5
 End Function
-X = Pace2
+Xv = Pace2
 Do
 Loop

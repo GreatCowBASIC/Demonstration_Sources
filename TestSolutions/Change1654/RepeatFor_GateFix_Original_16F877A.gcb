@@ -6,10 +6,8 @@
 
 #option explicit
 Dim Overflows As Byte
-Dim TMR1IF As Bit
 Repeat For 790047 us
     Wait 1009 us
-    nop
     If TMR1IF = 1 Then
         Overflows = Overflows + 1
         TMR1IF = 0

@@ -6,11 +6,11 @@
 
 #option explicit
 #define PAUSE 5
-Dim X As Byte
+Dim Xv As Byte
 
 Repeat for 100 ms
     Wait PAUSE ms
-    X = X + 1
+    Xv = Xv + 1
 End Repeat
 Do
 Loop

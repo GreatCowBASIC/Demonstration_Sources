@@ -5,7 +5,7 @@
 '(checked by simulating the generated assembly instruction by instruction)
 
 #option explicit
-Dim X As Byte
+Dim Xv As Byte
 Dim Flag As Bit
 
 Repeat for 100 ms
@@ -13,7 +13,7 @@ Repeat for 100 ms
         Exit Repeat
     End If
     Wait 5 ms
-    X = X + 1
+    Xv = Xv + 1
 End Repeat
 Do
 Loop

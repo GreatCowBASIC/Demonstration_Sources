@@ -6,12 +6,12 @@
 
 #option explicit
 Dim Flag As Bit
-Dim X As Byte
+Dim Xv As Byte
 Repeat For 20 ms
     WaitL1 1009 us
     nop
     If Flag = 1 Then
-        X = X + 1
+        Xv = Xv + 1
         Flag = 0
     End If
 End Repeat
