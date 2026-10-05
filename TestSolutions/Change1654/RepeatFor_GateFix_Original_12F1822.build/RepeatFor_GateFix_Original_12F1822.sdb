@@ -1,9 +1,0 @@
-[p ASM ]
-[d version 1.1 ]
-[d edition pro ]
-[d chip 12F1822 ]
-"1 C:\\Users\\admin\\.mchp_packs\\8bit PIC\\PIC12-16F1xxx_DFP\\1.9.258\\xc8\\pic\\include/pic.inc
-"1 C:\\Users\\admin\\.mchp_packs\\8bit PIC\\PIC12-16F1xxx_DFP\\1.9.258\\xc8\\pic\\include/pic_as_chip_select.inc
-"1 C:\\GCstudio\\picas\\pic\\include/xc.inc
-"1 D:\\GreatCowBASICGits\\Demonstration_Sources.git\\TestSolutions\\Change1654\\RepeatFor_GateFix_Original_12F1822.build\\RepeatFor_GateFix_Original_12F1822.S
-"1 C:\\Users\\admin\\.mchp_packs\\8bit PIC\\PIC12-16F1xxx_DFP\\1.9.258\\xc8\\pic\\include\\proc/pic12f1822.inc
