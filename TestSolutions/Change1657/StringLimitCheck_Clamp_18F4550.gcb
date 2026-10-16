@@ -1,0 +1,14 @@
+#chip 18F4550, 20
+
+'Change1657 test: #option StringLimitCheck on PIC18 (movff/cpfsgt based clamp in SysReadString).
+'Expect: compiles; same clamp-before-call pattern as the 14-bit case, using PIC18's own
+'cpfsgt/movff idiom in system.h.
+
+#option StringLimitCheck
+#option explicit
+
+Dim Buf As String * 5
+Buf = "ABCDEFGHIJ"
+
+Do
+Loop

@@ -1,0 +1,13 @@
+#SKIPTEST
+#chip 18F4550, 20
+
+'Change1657 test: #option bootloaderhost Rule 3 - #option bootloader and #option bootloaderhost
+'cannot both be used in the same program (one builds the application, the other the host).
+'Expect: Error "use either #option bootloader (an application) or #option bootloaderhost
+'(a bootloader)"
+
+#option bootloader 0xA000
+#option bootloaderhost 0xA000
+
+Do
+Loop

@@ -1,0 +1,17 @@
+#chip mega328p, 16
+
+'Change1657 test: #option StringLimitCheck on a variable-to-variable copy (SysCopyString,
+'not SysReadString - the source is a variable, not a constant literal).
+'Expect: compiles; the destination's own declared length clamps the copy even though the
+'source string (Src) is longer than the destination (Dst).
+
+#option StringLimitCheck
+#option explicit
+
+Dim Src As String * 20
+Dim Dst As String * 5
+Src = "ABCDEFGHIJKLMNOPQRST"
+Dst = Src   'Clamped to Dst's 5-character buffer
+
+Do
+Loop

@@ -1,0 +1,13 @@
+#chip tiny202, 20
+
+'Change1657 test: #option StringLimitCheck on AVR (SysValueCopy-based clamp in SysReadString).
+'Expect: compiles; "ldi SysValueCopy,BUF_STRING_LENGTH" precedes the rcall SYSREADSTRING.
+
+#option StringLimitCheck
+#option explicit
+
+Dim Buf As String * 5
+Buf = "ABCDEFGHIJ"
+
+Do
+Loop

@@ -1,0 +1,13 @@
+#SKIPTEST
+'Change1657 test: #option StringLimitCheck is only supported on PIC and AVR. This file has no
+'real #chip (illustrative only - see the Expect note); on an unsupported target the option is
+'ignored with a Warning, not an Error: "#option StringLimitCheck is not supported on this chip,
+'and is ignored" (WarningStringLimitCheck). Marked #SKIPTEST since it needs a real non-PIC/AVR
+'target to actually exercise, which this project does not otherwise test against.
+
+#option StringLimitCheck
+#option explicit
+
+Dim Buf As String * 5
+Do
+Loop

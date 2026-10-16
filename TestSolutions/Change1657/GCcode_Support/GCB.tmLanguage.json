@@ -1,0 +1,218 @@
+{
+	"$schema": "tmlanguage.json",
+	"name": "GCB",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#preprocessor"
+		},
+		{
+			"include": "#numeric"
+		},
+		{
+			"include": "#types"
+		},
+		{
+			"include": "#typemods"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#operators"
+		},
+		{
+			"include": "#stdlib"
+		},
+		{
+			"include": "#intrinsics"
+		},
+		{
+			"include": "#comments"
+		}
+	],
+	
+	"repository": {
+		"keywords": {
+			"patterns": [{
+				"name": "keyword.control.GCB",
+				"match": "(?i)\\b(enum|as|at|asm|dim|do|else|return|for|exit|function|gosub|goto|if|implements|import|include|let|loop|next|repeat|redim|resume|scope|select|step|sub|then|to|type|union|until|using|var|end|while|with)\\b",
+				"comment": "Main Keywords Control (dont use double words separated by spaces like: 'End If' just single words or use \\s as space)"
+			},
+			{
+				"name": "variable.other.enummember.GCB",
+				"match": "(?i)\\b\\s*\\S+(:)$",
+				"comment": "Label Recognition!  bucle:"
+			}]
+		},
+
+	"intrinsics": {
+		"patterns": [{
+			"name": "constant.language.GCB",
+			"match": "(?i)\\b(TFT[_]\\S*|ILI9341[_]\\S*|AD_REF_SOURCE|dim|10ms|10us|10msec|10usec|31k|32.768k|ms|msec|usec|sec|hour|Out|IN|ON|OFF|TRUE|FALSE|swap4|swap|bootloader|bootloaderhost|StringLimitCheck|required|explicit|NoConfig|NoContextSave|NoLatch|ReserveHighProg|RemoveAVRVectors|StartupMethodsDisabled|UserCodeOnly|Volatile|USE_HPWMCCP[0-9]|USE_HPWM[0-9]|USE_HPWM_TIMER[0-9]|USE_AD([0-9a-fA-F]|[0-9a-fA-F][0-9a-fA-F])|case|trim|ucase|UBound|Right|Rtrim|INKEY|INSTR|LCase|BIT|DEF|NODEF|_GLCDPage|_GLCDPagesH|_GLCDPagesL|ABS|ADOff|ALLOC|AllOf|Array|Asc|ATan|Average|BcdToDec_GCB|Box|ByteToBin|Call|canskip|ChipADC|ChipEEprom|ChipFamily|ChipIO|ChipMHz|ChipName|ChipNameStr|ChipOsc|ChipPins|ChipProgrammerNameStr|ChipRAM|ChipReserveHighProg|ChipUsingIntOsc|ChipWords|CHR|Circle|ClearSMT1|ClearSMT2|ClearTimer|CLS|cos|CreateButton|CURSOROFF|CURSORON|DecToBcd_GCB|Difference|Dir|DisplayChar|DisplaySegment|DisplayValue|DS18B20SetResolution|EERAM_AutoStore|EERAM_Backup|EERAM_HS|EERAM_HWStore|EERAM_I2C_Adr|EERAM_Read|EERAM_Recall|EERAM_Status|EERAM_Trecall|EERAM_Tstore|EERAM_Write|EERAM_Write_Command|Ellipse|EPRead|EPWrite|FAST|FastHWSPITransfer|Fill|FilledBox|FilledCircle|FilledEllipse|FilledTriangle|FillRoundRect|FLASH|FLASHOFF|FLASHON|FnLSL|FnLSR|Forever|FOSC|FOSC4|FVR_1x|FVR_2x|FVR_4x|FVR_off|FVRInitialize|FVRIsOutputReady|Get|GetUserID|GLCD_Close_PageTransaction|GLCD_NextionSerialPrint|GLCD_NextionSerialSend|GLCD_Open_PageTransaction|GLCDBackground|GLCDCLS|GLCDDisplay|GLCDDrawChar|GLCDDrawString|GLCDfntDefaultSize|GLCDFontWidth|GLCDForeground|GLCDGetTouch_Nextion|GLCDLocateString|GLCDLocateString_Nextion|GLCDPrint|GLCDPrint_Nextion|GLCDPrintDefaultFont_Nextion|GLCDPrintLargeFont|GLCDPrintString|GLCDPrintString_Nextion|GLCDPrintStringLn|GLCDPrintStringLn_Nextion|GLCDPrintWithSize|GLCDReadByte|GLCDRotate|GLCDSendOpInstruction_Nextion|GLCDSetContrast|GLCDTimeDelay|GLCDUpdateObject_Nextion|GLCDWriteByte|HEFEraseBlock|HEFRead|HEFReadBlock|HEFReadByte|HEFReadWord|HEFWrite|HEFWriteBlock|HEFWriteWord|Hex|HFINTOSC|HI2C2AckpollState|HI2C2Mode|HI2C2Receive|HI2C2ReStart|HI2C2Send|HI2C2SetAddress|HI2C2Start|HI2C2StartOccurred|HI2C2Stop|HI2C2Stopped|HI2C2WaitMSSP|HI2CAckpollState|HI2CMode|HI2CReceive|HI2CReStart|HI2CSend|HI2CSetAddress|HI2CStart|HI2CStartOccurred|HI2CStop|HI2CStopped|HI2CWaitMSSP|HI2CWaitMSSPTimeout|HLine|HPWM|HPWM_CCPTimerN|HPWM_Fast|HPWMOff|HPWMUpdate|HSerGetNum|HSerGetString|HSerPrint|HSerPrintList|HSerPrintByteCRLF|HSerPrintCRLF|HSerPrintStringCRLF|HSerReceive|HSerReceive1|HSerReceive2|HSerReceiveFrom|HSerSend|HSerSendBytes|I2C_Adr_EERAM|I2CAckpoll|I2CReceive|I2CReset|I2CRestart|I2CSend|I2CSlaveDeviceReceive|I2CStart|I2CStartOccurred|I2CStop|If|Ignore|IndCall|InitGLCD|InitSer|InitSMT1|InitSMT2|InitTimer0|InitTimer1|InitTimer10|InitTimer12|InitTimer2|InitTimer3|InitTimer4|InitTimer5|InitTimer6|InitTimer7|InitTimer8|IntegerToBin|Interrupt|IntOff|IntOn|KeypadData|KeypadRaw|Landscape|Landscape_Rev|LCD_I2C_Address_1|LCD_I2C_Address_2|LCD_I2C_Address_3|LCD_I2C_Address_4|LCD_I2C_Address_Current|LCD_IO|LCD_SPEED|LCD_VARIANT|LCD_VFD_DELAY|LCDBacklight|LCDCMD|LCDCreateChar|LCDCreateGraph|LCDCursor|LCDDisplayOff|LCDDisplayOn|LCDHex|LCDHome|LCDOFF|LCDON|LCDSpace|LCDWriteChar|Left|LeftPad|Len|LFINTOSC|Line|Locate|LOCKPPS|Log10|Log2|Loge|LongtoBin|Loop|Ltrim|m|min|h|Macro|MEDIUM|MFINTOSC|Mid|MOD|NoBit|NoVar|OneOf|Optional|Pad|Peek|PFMErase|PFMRead|PFMWrite|Play|PlayRTTTL|Poke|Portrait|Portrait_Rev|Pot|Power|Print|ProgramErase|ProgramRead|ProgramWrite|PS2ReadByte|PS2SetKBLeds|PS2WriteByte|Pset|Pulsein|PulseOut|PulseOutInv|Put|PWMModule|PWMOff|PWMOn|PWMOut|Random|Randomize|ReadAD|ReadAD10|ReadAD12|ReadDigitalTemp|ReadTable|ReadTemp|ReadTemp12|Rotate|RoundRect|s|SAFEraseBlock|SAFRead|SAFReadBlock|SAFReadByte|SAFReadWord|SAFWrite|SAFWriteBlock|SAFWriteWord|Scale|Sqrt|Ser1Print|Ser1PrintList|Ser1Receive|Ser1Send|Ser2Print|Ser2PrintList|Ser2Receive|Ser2Send|Ser3Print|Ser3PrintList|Ser3Receive|Ser3Send|SerPrint|SerReceive|SerSend|Set|SetSMT1|SetSMT1Period|SetSMT2|SetSMT2Period|SetTimer|SetWith|Shift|ShortTone|Simple|sin|SLOW|SOSC|SPIMode|SPITransfer|SPI2Mode|SPI2Transfer|FastHWSPI2Transfer|HWSPI2Transfer|SRAMRead|SRAMWrite|ST7735Rotation|ST7735SendCommand|ST7920cTile|ST7920GLCDClearGraphics|ST7920GLCDDisableGraphics|ST7920GLCDEnableGraphics|ST7920GLCDReadByte|ST7920gLocate|ST7920GraphicTest|ST7920gReaddata|ST7920gTile|ST7920lineh|ST7920LineHs|ST7920linev|ST7920Locate|ST7920Tile|ST7920WriteByte|ST7920WriteCommand|ST7920WriteData|StartSMT1|StartSMT2|StartTimer|Stopscroll_uc1601|StopSMT1|StopSMT2|StopTimer|Str|Str32|StrInteger|SWAP4|SYSDEFAULTCONCATSTRING|Table|Timer0|Timer1|Timer10|Timer12|Timer2|Timer3|Timer4|Timer5|Timer6|Timer7|Timer8|Tone|Triangle|TxCKIPPS|UNLOCKPPS|us|Val|Val32|VarToBin|VarWToBin|Vline|Wait|Word|WORDTOBIN|RaiseCompilerError|tmSndDec|tmSndHex|tmSndDig|tmSndStr|tmSndChr|tmChrBuf|tmDecBuf|tmHexBuf|tmSegBuf|tmSndBuf|tmFlashDsp|tmFlashDig|tmFlashSeg|tmCLRbuf|tmCLRdisp|tmCtrlSnd|tmGetKey|tmScrlBuf|TM_1637_OEM_Lib-Variables|TM_DispLen|TM_6dReMap|TM_Blank0|TM_Bright|TM_Disp|TM_dpPos|TM_FlashRate|TM_scroll|TM_ScrollRate |TM_ButnVal|TM_KeyChk|TM_LEDs|TM_DispBuf|EEPROM|DATA|SOURCEFILE|CHIPSUBFAMILY)\\b",
+			"comment": "i deleted XOR as it must go on condition operators"
+			}]
+		},
+
+		"numeric": {
+			"patterns": [
+				{
+					"name": "invalid.gcb",
+					"match": "(0b[0-1]+|0B[0-1]+)",
+					"comment": "binary (needs to be before numbers match!)"
+				},
+				{
+					"name": "invalid.gcb",
+					"match": "(b'[0-1]+'|B'[0-1]+')",
+					"comment": "binary (needs to be before numbers match!)"
+				},
+				
+				{
+					"name": "invalid.gcb",
+					"match": "0(x|X)[0-9a-fA-F]+",
+					"comment": "hex (needs to be before numbers match!)"
+				},
+				{
+				"name": "constant.numeric.gcb",
+				"match": "(?i)\\b(10ms|10us|10msec|10usec)\\b|\\b(\\d+\\.?\\d*([EeDd][+|-]?[0-9]*)?[K]?)|(0[Bb][01]+)|(0[Xx][0-9a-fA-F]+)\\b",
+				"comment": ""
+			}
+			
+
+		]
+
+		},
+		"preprocessor": {
+			"patterns": [{
+				"match": "(?i)^(\\s*#\\s*chip)(\\s+)([A-Za-z0-9_\\-]+)",
+				"captures": {
+					"1": { "name": "keyword.other.GCB" },
+					"3": { "name": "keyword.other.GCB" }
+				},
+				"comment": "Colour only the chip name itself the same as #chip; leave the rest of the line (comma, clock speed, comments) to the normal numeric/comment rules"
+			},
+			{
+				"name": "keyword.other.GCB",
+				"match": "(?i)^\\s*(\\#\\s*(IGNORECOMPILATION|IGNOREWARNING|ignore|option|end macro|define|undefine|ifnot|else if|error|ifdef|ifndef|endif|include|macro|pragma|ASMRAW|config|ENDSCRIPT|MEM|SAMEBIT|SAMEVAR|SCRIPT|STARTUP|IF|insert|else))"
+			}]
+
+		},
+		"stdlib": {
+			"patterns": [{
+				"name": "string.regexp.GCB",
+				"match": "\\s(/|\\\\|\\*)\\s"
+			},
+			{
+				"name": "string.regexp.GCB",
+				"match": "(\\=|\\+|\\-|!|&|%|#|<|>|\\|)"
+			}]
+		},
+		"operators": {
+			"patterns": [{
+				"name": "invalid.gcb",
+				"match": "(?i)\\b(and|andnot|bit|clear|dcd|dig|inv|is|nand|ncd|nob|nor|not|or|ornot|rev|set|xnor|xor|xornot)\\b",
+				"comment": "Logical/bitwise operators - coloured via the theme's red 'invalid' scope, per explicit request"
+			},
+			{
+				"name": "storage.type.GCB",
+				"match": "(?i)\\b(atan|cos|tan|sin|sqr|max|min|mod|bytetohex|wordtohex|longtohex|integertohex|singletohex)\\b",
+				"comment": "Math/conversion functions"
+			}
+		]
+		},
+		"types": {
+			"patterns": [{
+				"name": "storage.type.GCB",
+				"match": "(?i)\\b(alloc|array|byte|word|string|long|integer|single|medium|LongINT|uLongINT|Double)\\b"
+			}]
+		},
+		"typemods": {
+			"patterns": [{
+				"name": "storage.modifier.GCB",
+				"match": "(?i)\\b(alias)\\b"
+			}]
+		},
+		"string_escaped_char": {
+			"patterns": [
+				{
+					"match": "\\\\([\"\\\\abflnrtv']|[0-9]{1,3}|&h[0-9a-fA-Z]{1,2}|&o[0-7]{1,3}|&b[01]{1,8}|u[0-9a-fA-Z]{1,4})",
+					"name": "constant.character.escape.GCB"
+				}
+			]
+		},
+		"strings": {
+			"patterns": [
+				{
+					"name": "variable.GCB",
+					"match": "(?i)(?:dim\\s+)(.+)(?=\\s+as\\s+)",
+					"comment": "This find declared variables and higligth the dim and name, if you want to disable, add DIM on Keywords repo"
+				},
+				{
+					"name": "variable.GCB",
+					"match": "(?i)(?:#define\\s+)(\\S+)",
+					"comment": "same as the above, for #define, if you want to disable, add DIM on preprocessor repo"
+				},
+				{
+					"name": "variable.GCB",
+					"match": "(?i)(?:#undefine\\s+)(\\S+)",
+					"comment": "same as the above, for #undefine, if you want to disable, add DIM on preprocessor repo"
+				},
+				{
+					"name": "string.quoted.double.GCB",
+					"begin": "\"",
+					"end": "\"|\n"
+				},
+				{
+					"name": "string.quoted.double_escapes_off.GCB",
+					"begin": "\\$\"",
+					"end": "\"|\n"
+				},
+				{
+					"name": "string.quoted.double_escapes_on.GCB",
+					"begin": "!\"",
+					"end": "\"|\n",
+					"patterns": [
+						{
+							"include": "#string_escaped_char"
+						}
+					]
+				}
+ 				
+			]
+		},
+		"comments": {
+			"patterns": [
+				{
+					"name": "comment.line.GCB",
+					"begin": "//",
+					"end": "\n"
+				},
+				{
+					"name": "comment.line.GCB",
+					"begin": "(?i)REM\\s",
+					"end": "\n"
+				},
+				{
+					"name": "comment.line.GCB",
+					"begin": ";",
+					"end": "\n"
+				},
+				{
+					"name": "comment.line.GCB",
+					"begin": "'",
+					"end": "\n"
+				},
+				{
+					"name": "comment.block.GCB",
+					"begin": "/\\*",
+					"end": "\\*/"
+					
+				}
+
+			]
+		}
+	},
+	"scopeName": "source.GCB"
+}

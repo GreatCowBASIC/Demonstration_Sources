@@ -1,0 +1,15 @@
+#chip 18F4550, 20
+
+'Change1657 test: #option bootloaderhost - the basic acceptance case from SPEC_bootloaderhost.md.
+'Expect: compiles; the generated vector table is exactly
+'  ORG 0  / goto BASPROGRAMSTART
+'  ORG 8  / goto 0xA008   (high-priority interrupt: to the application)
+'  ORG 24 / goto 0xA018   (low-priority interrupt: to the application)
+'  ORG 28 / BASPROGRAMSTART
+'and the resulting hex has 0x0008 = 04 EF 50 F0 and 0x0018 = 0C EF 50 F0, byte-identical to
+'Microchip bootloader v1.4 - on both the GCASM and PIC-AS assemblers.
+
+#option bootloaderhost 0xA000
+
+Do
+Loop

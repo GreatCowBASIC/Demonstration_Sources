@@ -1,0 +1,13 @@
+#chip 12F683, 7
+#osc INTOSC
+
+'Change1657 test: the internal-oscillator frequency/chip mismatch message (BadIntFreq) is now
+'an Information message, not a Warning - it no longer counts toward the Warning total and
+'cannot be promoted to an Error by #option WarningsAsErrors. 7MHz is not one of 12F683's valid
+'internal-oscillator speeds.
+'Expect: compiles with 0 errors, 0 warnings; the summary prints "Compiler information:" /
+'"Information: Internal oscillator clock source does not support the specified frequency...".
+'Before this change, the same source produced "A warning has been generated:" / "Warning: ...".
+
+Do
+Loop

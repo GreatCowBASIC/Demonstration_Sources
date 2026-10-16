@@ -1,0 +1,16 @@
+#chip 16F877A, 20
+
+'Change1657 test: #option StringLimitCheck clamps an over-long literal assignment to the
+'destination's declared length instead of overrunning adjacent RAM (14-bit PIC/SysReadString).
+'Expect: compiles; the W register is loaded with BUF_STRING_LENGTH (5) immediately before
+'the call to SYSREADSTRING (confirmed by comparing the generated .asm with and without this
+'option: without it, no such movlw/BUF_STRING_LENGTH line precedes the call at all).
+
+#option StringLimitCheck
+#option explicit
+
+Dim Buf As String * 5
+Buf = "ABCDEFGHIJ"   'Longer than Buf's 5-character buffer: clamped to "ABCDE", not overrun
+
+Do
+Loop

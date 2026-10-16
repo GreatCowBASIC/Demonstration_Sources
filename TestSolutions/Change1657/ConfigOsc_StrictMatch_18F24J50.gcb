@@ -1,0 +1,15 @@
+#chip 18F24J50, 8
+#osc INTOSC
+
+'Change1657 test: fixes ConfigNameMatch picking the wrong config setting on a chip that has
+'both a setting literally named OSC and settings merely containing OSC as a substring
+'(RTCOSC, DSWDTOSC) - the settings list is in reverse order, so the old loose "contains OSC"
+'match could reach RTCOSC/DSWDTOSC before the real OSC setting.
+'Expect: compiles; the console OSC: line reads "OSC: INTOSC, 8Mhz (Internal oscillator)".
+'Before this fix, the same source compiled the correct CONFIG OSC=INTOSC fuse bits, but
+'mis-reported the OSC: line as "OSC: , 8Mhz (...)" - the diagnostic text was blank/wrong
+'because the reporting lookup (a separate loop from the one that writes the real fuse bits)
+'picked up RTCOSC or DSWDTOSC's value instead of OSC's.
+
+Do
+Loop

@@ -1,0 +1,11 @@
+#SKIPTEST
+#chip 18F4550, 20
+
+'Change1657 test: #option bootloaderhost Rule 4 - the application address must be even and
+'above the host's own vector area (greater than 0x001C). 0xA001 is odd.
+'Expect: Error "#option bootloaderhost: invalid application address"
+
+#option bootloaderhost 0xA001
+
+Do
+Loop

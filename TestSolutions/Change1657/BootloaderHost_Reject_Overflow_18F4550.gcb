@@ -1,0 +1,13 @@
+#SKIPTEST
+#chip 18F4550, 20
+
+'Change1657 test: #option bootloaderhost Rule 2 - the host's own code (and tables) must end
+'below the application address. 0x1E (30) is a valid address (even, > 0x1C) but the host's
+'vector table plus InitSys plus the Do/Loop body alone already reach past it.
+'Expect: Error "#option bootloaderhost: program reaches 0x44, the application area starts
+'at 0x1E"
+
+#option bootloaderhost 0x1E
+
+Do
+Loop

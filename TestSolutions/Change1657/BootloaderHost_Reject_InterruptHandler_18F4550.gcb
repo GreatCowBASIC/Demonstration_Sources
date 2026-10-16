@@ -1,0 +1,15 @@
+#SKIPTEST
+#chip 18F4550, 20
+
+'Change1657 test: #option bootloaderhost Rule 1 - the host cannot have its own interrupt
+'handler, since both interrupt vectors are forwarded to the application.
+'Expect: Error "#option bootloaderhost: interrupts are forwarded to the application; the
+'bootloader cannot have an interrupt handler"
+
+#option bootloaderhost 0xA000
+
+Sub Interrupt
+End Sub
+
+Do
+Loop
