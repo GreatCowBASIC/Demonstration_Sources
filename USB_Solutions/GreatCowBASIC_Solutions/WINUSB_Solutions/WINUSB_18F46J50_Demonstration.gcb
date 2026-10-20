@@ -1,0 +1,238 @@
+'''A program  for GCGB and GCB.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''
+'''Demonstration of the GCBASIC USB library with WinUSB: no driver to install.
+'''
+'''The same demonstration as the other WINUSB_<chip> programs in this folder (the same requests, USB ID and GUID,
+'''so the same PC program), on the Microchip PIC18F Starter Kit 1 (PIC18F46J50). The kit has no user LEDs: the four
+'''LEDs are drawn on the kit's OLED with GCBASIC's GLCD library, and the switch is the kit's MENU button.
+'''
+'''A standalone program: no bootloader. Program it with a PICkit; it replaces the bootloader (to go back, program
+'''the bootloader's BOOT_GCB.HEX again).
+'''
+''' The kit
+'''  USB: the kit's USB connector (D+ RC5, D- RC4), 12 MHz crystal, PLL (48 MHz)
+'''  OLED: SH1101A on the 8080 bus (PORTD, RE0..RE2, RB5), powered from APP_VDD (kit_base.h's AppPowerOn)
+'''  LEDs I/O 1 to 4 (keep-alive, red, yellow, green): drawn on the OLED
+'''  Input I/O 6: the MENU button (RB0, low when pressed); I/O 5, 7 and 8 answer 1 (no switch)
+'''
+''' Use the Windows application to control!
+'''
+'''@author     EvanV
+'''@licence    GPL
+'''@version    2.0 (WinUSB, no driver; the kit, LEDs on the OLED)
+'''@date       19/10/2026
+'''********************************************************************************
+
+' ----- Configuration
+    #chip 18F46J50, 48
+    #option Explicit
+    #option ReserveHighProg 512          ' a J chip keeps its configuration words in its last flash page
+    #option StartupMethodsDisabled       ' no InitSys: it clears PORTC, which drives RC0 low and switches APP_VDD on
+                                         ' without the soft start. InitUSB and InitGLCD are called below.
+    #config OSC = HSPLL, PLLDIV = 3, CPUDIV = OSC1, WDTEN = OFF, XINST = OFF, STVREN = ON, IOL1WAY = OFF
+
+    ' ----- Constants for usb.h (GCBASIC's usb.h: USB_WCID from build 1660, 2026-10-19)
+    'Define a name - 30 chars max long
+    #define USB_PRODUCT_NAME  "GCBASIC WinUSB " + CHIPNAMESTR
+
+    'The USB ID: 04D8:0052, bcdDevice 0x0100 (the PC program looks for the same)
+    #define USB_VID 0x04D8
+    #define USB_PID 0x0052
+    #define USB_REV 0x0100
+
+    'WinUSB without a driver: the Microsoft OS 1.0 descriptors, and this solution's own device interface GUID
+    #define USB_WCID
+    #define USB_WCID_GUID "{BFC2B144-FB5A-4F56-98AC-93BC164EED46}"
+
+    #include <usb.h>
+
+    ' ----- The kit: pins and AppPowerOn (this folder's copy of GCBASICDemo\kit_base.h)
+    #include "kit_base.h"
+
+    ' ----- GCBASIC GLCD: the SH1101A on the kit's 8080 parallel bus
+    #include <glcd.h>
+    #define GLCD_TYPE GLCD_TYPE_SH1101A
+    #define GLCD_DATA_PORT PORTD          ' D0..D7
+    #define GLCD_WR        PORTE.1        ' write strobe
+    #define GLCD_RD        PORTE.0        ' read strobe (held high)
+    #define GLCD_CS        PORTE.2        ' chip select
+    #define GLCD_DC        PORTB.5        ' data / command
+
+    'Constants that match the codes in the PC application - these are numeric messages
+
+    #Define USBDEVICEREADREDLEDSTATUS     130
+    #Define USBDEVICESETREDLEDON          131
+    #Define USBDEVICESETREDLEDOFF         132
+
+    #Define USBDEVICEREADYELLOWLEDSTATUS   133
+    #Define USBDEVICESETYELLOWLEDON        134
+    #Define USBDEVICESETYELLOWLEDOFF       135
+
+    #Define USBDEVICEREADGREENLEDSTATUS   136
+    #Define USBDEVICESETGREENLEDON        137
+    #Define USBDEVICESETGREENLEDOFF       138
+
+    #Define USBDEVICERPORTSTATUS          140
+
+    'Define USB specific callback handlers
+
+    'MANDATED to handle your solution
+    #define USB_SETUP_HANDLER           SetupHandler_CallBack
+
+    ' ------ The LEDs: one byte each (0 off, 1 on), drawn on the OLED by the main loop
+
+        Dim LedKeepAlive, LedRed, LedYellow, LedGreen As Byte
+        Dim ShownLeds, NowLeds, ShownMenu, NowMenu, ShownUsb, NowUsb As Byte
+        Dim USBState As Byte                ' usb.h's state (USB_STATE_CONFIGURED when the PC has configured it)
+
+        'The input: the MENU button on I/O 6 (low when pressed, as a switch to 0V)
+        #Define INPUT2        MENU_BUTTON
+
+        'The screen, as the kit demonstrations: text row r (0..6) is display page r + 1, and GLCDPrint at y draws rows
+        'y + 1 .. y + 8, so row r is printed at y = 8 * r + 7. Row 6 at y = 55 ends at row 63: a GLCDPrint at y = 56
+        'would draw row 64, which wraps to row 0 (the top lines were corrupted). Page 0 is not used.
+        #Define ROW0          7
+        #Define ROW1          15
+        #Define ROW5          47
+        #Define ROW6          55
+        'Where the four LEDs are drawn: centres at y = LED_Y (rows 26..42), x = 16, 48, 80, 112
+        #Define LED_Y         34
+        #Define LED_R         8
+        'The labels under the LEDs: each one centred on its LED (6-pixel characters), then LABEL_SHIFT pixels right
+        #Define LABEL_SHIFT   2
+
+    ' ------ What InitSys would have done, minus the PORTC clear (as the kit demonstrations)
+        INTCON = 0                          ' interrupts off until InitUSB
+        TBLPTRU = 0                         ' for ReadTable
+        APP_POWER = 1 : Dir PORTC.0 Out     ' keep APP_VDD off until AppPowerOn
+        OSCTUNE.PLLEN = 1                   ' the PLL (48 MHz)
+        Wait 2 ms
+        SD_CS = 1 : Dir PORTC.6 Out         ' SD card and accelerometer deselected
+        ACCEL_CS = 1 : Dir PORTC.7 Out
+        Dir PORTB.0 In                      ' MENU button
+        WDTCON.4 = 1                        ' ADSHR: the ANCONx registers share addresses
+        ANCON0 = 0xFF                       ' every pin digital
+        ANCON1 = 0x1F
+        WDTCON.4 = 0
+        LATD = 0 : LATE = 0
+
+        LedKeepAlive = 0 : LedRed = 0 : LedYellow = 0 : LedGreen = 0
+
+        AppPowerOn                          ' APP_VDD on with the soft start: the OLED has power
+        InitGLCD                            ' the GLCD library (its #startup does not run here)
+        GLCDCLS
+        GLCDfntDefaultsize = 1
+        GLCDPrint(0, ROW0, "GCBASIC WinUSB demo")
+        GLCDPrint(16 - 5 + LABEL_SHIFT, ROW5, "KA")      ' 2 characters: 11 pixels wide
+        GLCDPrint(48 - 8 + LABEL_SHIFT, ROW5, "RED")     ' 3 characters: 17 pixels wide
+        GLCDPrint(80 - 8 + LABEL_SHIFT, ROW5, "YEL")
+        GLCDPrint(112 - 8 + LABEL_SHIFT, ROW5, "GRN")
+        DrawLeds
+        ShownMenu = 255 : ShownUsb = 255
+
+        InitUSB                             ' USB and its interrupt (its #startup does not run here)
+        INTCON.PEIE = 1                     ' USB is a peripheral interrupt: INTCON = 0 above turned both off,
+        INTCON.GIE = 1                      ' and InitUSB only sets USBIE (without these the board never answers)
+
+        // ----- Main body of program commences here: redraw what changed; USB works in the interrupt
+        Do
+              NowLeds = LedKeepAlive Or (LedRed * 2) Or (LedYellow * 4) Or (LedGreen * 8)
+              If NowLeds <> ShownLeds Then DrawLeds
+
+              NowMenu = 0
+              If MENU_BUTTON = 1 Then NowMenu = 1
+              If NowMenu <> ShownMenu Then
+                  ShownMenu = NowMenu
+                  If ShownMenu = 0 Then
+                      GLCDPrint(0, ROW6, "MENU: pressed ")
+                  Else
+                      GLCDPrint(0, ROW6, "MENU: released")
+                  End If
+              End If
+
+              NowUsb = 0
+              If USBState = USB_STATE_CONFIGURED Then NowUsb = 1
+              If NowUsb <> ShownUsb Then
+                  ShownUsb = NowUsb
+                  If ShownUsb = 1 Then
+                      GLCDPrint(0, ROW1, "USB: connected   ")
+                  Else
+                      GLCDPrint(0, ROW1, "USB: waiting     ")
+                  End If
+              End If
+
+              Wait 20 ms
+              'Do not sleep the MCU!!
+        Loop
+
+        end
+
+
+        ' ----- The LEDs on the OLED: a filled circle when on, an outline when off
+        Sub DrawLeds
+            NowLeds = LedKeepAlive Or (LedRed * 2) Or (LedYellow * 4) Or (LedGreen * 8)
+            ShownLeds = NowLeds
+            DrawLed(16, LedKeepAlive)
+            DrawLed(48, LedRed)
+            DrawLed(80, LedYellow)
+            DrawLed(112, LedGreen)
+        End Sub
+
+        Sub DrawLed(In LedX As Word, In LedOn As Byte)
+            FilledCircle(LedX, LED_Y, LED_R, GLCDBackground)
+            If LedOn = 0 Then
+                Circle(LedX, LED_Y, LED_R)
+            Else
+                FilledCircle(LedX, LED_Y, LED_R)
+            End If
+        End Sub
+
+
+        ' ----- Support methods.  User call backs
+
+        ' The real handler - where the work is done (in the USB interrupt: only the LED bytes change here)
+        Sub SetupHandler_CallBack
+
+              Select Case USBRequest
+
+              'Red LED handler
+                    Case USBDEVICEREADREDLEDSTATUS
+                      USBBufferWrite( LedRed )
+                    Case USBDEVICESETREDLEDON
+                      LedRed = 1
+                    Case USBDEVICESETREDLEDOFF
+                      LedRed = 0
+
+              'Yellow LED handler
+                    Case USBDEVICEREADYELLOWLEDSTATUS
+                      USBBufferWrite( LedYellow )
+                    Case USBDEVICESETYELLOWLEDON
+                      LedYellow = 1
+                    Case USBDEVICESETYELLOWLEDOFF
+                      LedYellow = 0
+
+              'Green LED handler
+                    Case USBDEVICEREADGREENLEDSTATUS
+                      USBBufferWrite( LedGreen )
+                    Case USBDEVICESETGREENLEDON
+                      LedGreen = 1
+                    Case USBDEVICESETGREENLEDOFF
+                      LedGreen = 0
+
+                    'The inputs I/O 5 to 8: only I/O 6 (MENU) is on the kit; the others read as 1 (no switch)
+                    Case USBDEVICERPORTSTATUS
+                      USBBufferWrite( 1 )
+                      USBBufferWrite( INPUT2 )
+                      USBBufferWrite( 1 )
+                      USBBufferWrite( 1 )
+
+                'Response to control request: Transfer 255, keep alive
+                Case USBDEVICEKEEPALIVE
+                  USBBufferWrite( USBDEVICEKEEPALIVE )
+                  LedKeepAlive = !LedKeepAlive And 1
+
+                Case Else
+              End Select
+
+        End Sub

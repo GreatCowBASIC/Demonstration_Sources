@@ -107,7 +107,7 @@
             Firstpass = false                                          ' now this is NOT the first pass
             Charlocx++                                                 ' increment the X pos
   next  wait 2 s
-  SetContrast_SSD1306 ( 10 )
+  GLCDSetContrast ( 10 )
   wait 2 s
   startscrollright_SSD1306(0x00, 0x0F)
   wait 3 s

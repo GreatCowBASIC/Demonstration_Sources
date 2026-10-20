@@ -1,0 +1,10 @@
+D:\localreps\GCBDEMO_CONVERSION\PC_Application\VBProject\bin\Release\WINUSB_DEMO_PROGRAM.exe.config
+D:\localreps\GCBDEMO_CONVERSION\PC_Application\VBProject\bin\Release\WINUSB_DEMO_PROGRAM.exe
+D:\localreps\GCBDEMO_CONVERSION\PC_Application\VBProject\bin\Release\LibUsbDotNet.dll
+D:\localreps\GCBDEMO_CONVERSION\PC_Application\VBProject\obj\Release\WinUSB_Demo_Program.vbprojAssemblyReference.cache
+D:\localreps\GCBDEMO_CONVERSION\PC_Application\VBProject\obj\Release\WinUSB_Demo_Program.MainForm.resources
+D:\localreps\GCBDEMO_CONVERSION\PC_Application\VBProject\obj\Release\WinUSB_Demo_Program.Resources.resources
+D:\localreps\GCBDEMO_CONVERSION\PC_Application\VBProject\obj\Release\WinUSB_Demo_Program.vbproj.GenerateResource.cache
+D:\localreps\GCBDEMO_CONVERSION\PC_Application\VBProject\obj\Release\WinUSB_Demo_Program.vbproj.CoreCompileInputs.cache
+D:\localreps\GCBDEMO_CONVERSION\PC_Application\VBProject\obj\Release\WinUSB_Demo_Program.vbproj.CopyComplete
+D:\localreps\GCBDEMO_CONVERSION\PC_Application\VBProject\obj\Release\WINUSB_DEMO_PROGRAM.exe

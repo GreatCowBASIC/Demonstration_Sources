@@ -1,0 +1,10 @@
+#SKIPTEST
+/*
+   Change1659 test: an #include AFTER the block comment has closed is still followed.
+   Expect: Error "Cannot find ...\no_such_file.h" (line 7) - deliberate, hence #SKIPTEST.
+*/
+#chip 18F46J50, 48
+#include "no_such_file.h"
+
+Do
+Loop

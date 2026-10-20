@@ -1,0 +1,11 @@
+#chip 18F46J50, 48
+
+'Change1660 test: a variable called Override is still a variable - OVERRIDE is only a keyword
+'after AT location. Expect: compiles with no warnings.
+
+Dim Abc, Override As Byte
+Abc = 1
+Override = 2
+
+Do
+Loop

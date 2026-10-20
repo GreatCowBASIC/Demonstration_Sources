@@ -114,7 +114,7 @@ GLCDUpdateScreen1:
   OutString = OutString+Str(ChipMHz)+"hHz"
 
    Do Forever
-    SetContrast_SSD1306 ( 0 )
+    GLCDSetContrast ( 0 )
 
     GLCDFontWidth= 6
       GLCD_Open_PageTransaction 0,7

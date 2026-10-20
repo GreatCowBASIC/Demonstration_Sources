@@ -1,0 +1,13 @@
+#chip 16F877A, 20
+
+'Change1660 test: OVERRIDE on a mid-range PIC (banked RAM). Two 16-byte buffers purposely at the
+'same location. Expect: compiles with no warnings; BUFFERA and BUFFERB both at 0xA0.
+
+Dim BufferA(15) As Byte At 0xA0 OVERRIDE
+Dim BufferB(15) As Byte At 0xA0 OVERRIDE
+
+BufferA(1) = 1
+BufferB(2) = 2
+
+Do
+Loop

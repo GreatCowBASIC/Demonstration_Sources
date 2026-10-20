@@ -59,77 +59,78 @@
         #DEFINE USART_TX_BLOCKING
         #DEFINE USART_DELAY OFF
 
-    Dim initialrun as Bit
-    Dim s0, s1, s2, prevs0, prevs1, prevs2 as Word
-    Dim twistcalc, ccount as Long
-    Dim targetGalaxy as Byte
-    // Alias the bytes to rotate each byte
-    Dim s0L as Byte Alias s0
-    Dim s0H as Byte Alias s0_H
-    Dim s1L as Byte Alias s1
-    Dim s1H as Byte Alias s1_H
-    Dim s2L as Byte Alias s2
-    Dim s2H as Byte Alias s2_H
+    Dim s0, s1, s2 as Word          // System seeds (QQ15)
+    Dim gs0, gs1, gs2 as Word       // Galaxy seeds (QQ21)
+    Dim ccount as Long
+    Dim galaxy as Byte
+    Dim sysnum as Word              // Word counter, so For 0 to 255 does not wrap
+    // Alias the galaxy seed bytes to rotate each byte
+    Dim gs0L as Byte Alias gs0
+    Dim gs0H as Byte Alias gs0_H
+    Dim gs1L as Byte Alias gs1
+    Dim gs1H as Byte Alias gs1_H
+    Dim gs2L as Byte Alias gs2
+    Dim gs2H as Byte Alias gs2_H
 
     #define S0SEED  0x5A4A
     #define S1SEED  0x0248
     #define S2SEED  0xB753
 
-    s0 = S0SEED
-    s1 = S1SEED
-    s2 = S2SEED
-    initialrun = 1
+    gs0 = S0SEED
+    gs1 = S1SEED
+    gs2 = S2SEED
     ccount = 0
-    targetGalaxy = 0
 
-    
+    // 8 galaxies of 256 systems. Each galaxy starts from its galaxy seeds,
+    // each system is 4 twists on from the previous one.
+    For galaxy = 1 to 8
+
+        #ifdef USART_BAUD_RATE
+            HserPrint "Galaxy "
+            HserPrint galaxy
+            HSerSend 13
+            HSerSend 10
+        #endif
+
+        s0 = gs0
+        s1 = gs1
+        s2 = gs2
+
+        For sysnum = 0 to 255
+            Show            // Seeds for system sysnum
+            QQ21            // The twist, 4 times to reach the next system
+            QQ21
+            QQ21
+            QQ21
+            ccount++
+        Next
+
+        Ghy                 // Rotate galaxy seeds to the next galaxy
+
+    Next
+
+    // After 8 galactic jumps the galaxy seeds roll round to Tibedied's again
     #ifdef USART_BAUD_RATE
-        HSerPrint "Start in Tibedied Galaxy"
+        if gs0 = S0SEED then
+            if gs1 = S1SEED then
+                if gs2 = S2SEED then
+                    HSerPrint "Welcome back to Tibedied Galaxy, "
+                end if
+            end if
+        end if
+        HserPrint ccount
+        HserPrint " systems in all galaxies"
         HSerSend 13
         HSerSend 10
     #endif
 
-Do
-
-    if initialrun = 1 then
-        initialrun = 0
-    else 
-        QQ21
-    end if 
-    QQ21  // The twist
-    QQ21  // The twist
-    QQ21  // The twist
-    ccount++
-
-    if ccount.17 = 1 Then  // everything repeats every 131072 times
-        Ghy
-        Show
-    End if	
-
-    // Are we back at the start ?
-    if s0 = 0x5A4A then
-        If s1 =  0x0248 then
-            if s2 = 0xB753 then
-                if targetGalaxy <> 0 Then
-                    #ifdef USART_BAUD_RATE 
-                        HSerPrint "Welcome back to Tibedied Galaxy, " 
-                        HserPrint ( ccount / 4 ) - 1
-                        HserPrint " systems in all galaxies "
-                        HSerSend 13
-                        HSerSend 10
-                    #endif
-                    end
-                end if
-            end if
-        end if
-    end if
-
-Loop
 End
 
 Sub Show
 
     #ifdef USART_BAUD_RATE
+        HserPrint sysnum
+        HSerSend 9
         HserPrint hex(s0_h)
         HserPrint hex(s0)
         
@@ -140,8 +141,6 @@ Sub Show
         HSerSend 9
         HSerPrint hex(s2_h)
         HserPrint hex(s2)
-        HSerSend 13
-        HSerSend 10
         HSerSend 13
         HSerSend 10
     #endif
@@ -173,50 +172,15 @@ Sub Ghy   // The galaxy twist
     The Rotate command will rotate variable one bit in a specified direction. 
     The bit shifted will be placed in the Carry bit of the Status register (STATUS.C).
     STATUS.C acts as a ninth bit of the variable that is being rotated.
-    So, Rotate each byte and use STATUS.C to complete the Rotate.
+    SIMPLE rotates the byte within itself (bit 7 -> bit 0), so the carry is not involved.
 
     */
 
-    targetGalaxy++
-    #ifdef USART_BAUD_RATE
-        HserPrint "Twist Galaxy to Galaxy "
-        HserPrint targetGalaxy
-        HSerSend 13
-        HSerSend 10
-    #endif
-
-    s0 = S0SEED
-    s1 = S1SEED
-    s2 = S2SEED
-
-    Set C Off
-    repeat targetGalaxy
-        rotate s0L left simple
-    end Repeat
-
-    Set C Off
-    repeat targetGalaxy
-        rotate s0H left simple
-    end Repeat
-
-    Set C Off
-    repeat targetGalaxy
-        rotate s1L left simple
-    end Repeat
-
-    Set C Off
-    repeat targetGalaxy
-        rotate s1H left simple
-    end Repeat
-
-    Set C Off
-    repeat targetGalaxy
-        rotate s2L left simple
-    end Repeat
-
-    Set C Off 
-    repeat targetGalaxy
-        rotate s2H left simple
-    end Repeat
+    rotate gs0L left simple
+    rotate gs0H left simple
+    rotate gs1L left simple
+    rotate gs1H left simple
+    rotate gs2L left simple
+    rotate gs2H left simple
 
     End Sub

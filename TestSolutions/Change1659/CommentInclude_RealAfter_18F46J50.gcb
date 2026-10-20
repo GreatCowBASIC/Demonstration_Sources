@@ -1,0 +1,12 @@
+/*
+   Change1659 test: a real include after a block comment, with a /* note */ on its own line, is
+   still followed. Expect: compiles (Sub FromRealH comes from Change1659_real.h).
+*/
+
+#chip 18F46J50, 48
+
+#include "Change1659_real.h" /* a note */
+
+FromRealH
+Do
+Loop

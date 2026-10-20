@@ -1,0 +1,13 @@
+#chip mega328p, 16
+
+'Change1660 test: OVERRIDE on an AVR. Two 32-byte buffers purposely at the same location.
+'Expect: compiles with no warnings; BUFFERA and BUFFERB both at 0x200.
+
+Dim BufferA(31) As Byte At 0x200 OVERRIDE
+Dim BufferB(31) As Byte At 0x200 OVERRIDE
+
+BufferA(1) = 1
+BufferB(2) = 2
+
+Do
+Loop

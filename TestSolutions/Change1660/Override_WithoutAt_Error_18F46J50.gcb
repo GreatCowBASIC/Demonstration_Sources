@@ -1,0 +1,12 @@
+#SKIPTEST
+#chip 18F46J50, 48
+
+'Change1660 test: OVERRIDE without AT - there is no fixed location to override.
+'Expect: Error "OVERRIDE can only follow AT <location> in a DIM: it marks an intended overlap of a
+'fixed location" (line 7) - deliberate, hence #SKIPTEST.
+Dim Lonely(10) As Byte OVERRIDE
+
+Lonely(1) = 1
+
+Do
+Loop

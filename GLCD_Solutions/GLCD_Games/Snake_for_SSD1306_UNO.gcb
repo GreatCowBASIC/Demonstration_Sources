@@ -195,7 +195,7 @@
           GLCDPrint (22,24,"YOU LOST")
           repeat 4
             for GLCD_dim_state = 0 to 255
-              SetContrast_SSD1306 ( GLCD_dim_state )
+              GLCDSetContrast ( GLCD_dim_state )
               wait 1 ms
             next
           end repeat
@@ -211,7 +211,7 @@
           GLCDPrint (22,24,"YOU WIN")
           repeat 100
             for GLCD_dim_state = 0 to 255
-              SetContrast_SSD1306 ( GLCD_dim_state )
+              GLCDSetContrast ( GLCD_dim_state )
             next
           end repeat
           GameState = StartGame

@@ -1,0 +1,13 @@
+/*
+   Change1659 test: what was already correct, and still is - none of this comment is acted on.
+   - an #include in the middle of a line: see #include "no_such_file.h"
+#define NOT_USED 1
+#option explicit
+*/
+' #include "no_such_file.h"      (in a line comment)
+
+#chip 18F46J50, 48
+
+NotDeclared = 5                   ' compiles: the #option explicit is inside the block comment
+Do
+Loop

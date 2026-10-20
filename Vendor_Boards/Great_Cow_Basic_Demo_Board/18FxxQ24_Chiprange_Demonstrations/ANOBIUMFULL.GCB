@@ -8,7 +8,7 @@
 '      BMP CompressionType = 0
 '      BMP BitsPerPixel = 1
 '> Completed Examination of BMP file
-Table ANOBIUMFULL as Byte
+Table ge_Demonstrations\ANOBIUMFULL as Byte
 
 ' start data
 0x80

@@ -1,0 +1,41 @@
+#chip 18F46J50, 48
+
+'Change1659 test: For X = X To N with other types and steps.
+'Expect (MDB simulator, at the final Do / Loop): CountA = 6, CountB = 4, CountC = 5, CountD = 5,
+'CountW = 301. Build 1658 gave CountA = 0 and CountW = 0 (the Word start wrapped to 65535).
+
+Dim Idx, LastIdx, CountA, CountB, CountC, CountD As Byte
+Dim WIdx, WLast, CountW As Word
+
+'A: byte, start 0, step 1 (6)
+LastIdx = 5 : Idx = 0 : CountA = 0
+For Idx = Idx To LastIdx
+    CountA++
+Next
+
+'B: byte, start 3, step -1 down to 0 (4)
+Idx = 3 : CountB = 0
+For Idx = Idx To 0 Step -1
+    CountB++
+Next
+
+'C: byte, start 0, step 2 to 9 (5: 0 2 4 6 8)
+Idx = 0 : CountC = 0
+For Idx = Idx To 9 Step 2
+    CountC++
+Next
+
+'D: start 1 (worked before too: 5)
+Idx = 1 : CountD = 0
+For Idx = Idx To LastIdx
+    CountD++
+Next
+
+'W: word, start 0 to 300 (301)
+WIdx = 0 : WLast = 300 : CountW = 0
+For WIdx = WIdx To WLast
+    CountW++
+Next
+
+Do
+Loop

@@ -1,0 +1,11 @@
+/*
+   Change1659 test: an #ignore at the start of a line inside a block comment is not acted on.
+   Build 1658 and earlier printed "Compilation ignored" and stopped (exit code 0, no hex).
+   Expect: compiles.
+#ignore
+*/
+
+#chip 18F46J50, 48
+
+Do
+Loop

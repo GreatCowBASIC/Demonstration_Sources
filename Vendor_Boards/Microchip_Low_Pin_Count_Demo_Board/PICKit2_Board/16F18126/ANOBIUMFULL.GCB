@@ -8,7 +8,7 @@
 '      BMP CompressionType = 0
 '      BMP BitsPerPixel = 1
 '> Completed Examination of BMP file
-Table anobiumfull as Byte
+Table rd\16F18126\anobiumfull as Byte
 
 ' start data
 0x80

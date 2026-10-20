@@ -1,0 +1,28 @@
+#chip 18F46J50, 48
+
+'Change1659 test: For X = X To N (the loop variable as its own start value).
+'Build 1658 and earlier: with X = 0 the loop was skipped - the legacy loop set X = start - step and
+'then checked the start (X itself, already decremented: 0 -> 255) against the end.
+'Expect (run in the MDB simulator to the final Do / Loop): CountA = 6 and CountB = 6.
+'Build 1658 gave CountA = 0, CountB = 6.
+
+Dim Idx, StartIdx, LastIdx, CountA, CountB As Byte
+
+LastIdx = 5
+
+'A: the counter is its own start value
+Idx = 0
+CountA = 0
+For Idx = Idx To LastIdx
+    CountA++
+Next
+
+'B: the control - a separate start variable (was always correct)
+StartIdx = 0
+CountB = 0
+For Idx = StartIdx To LastIdx
+    CountB++
+Next
+
+Do
+Loop

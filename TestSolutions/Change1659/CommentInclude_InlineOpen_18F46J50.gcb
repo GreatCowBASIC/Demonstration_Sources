@@ -1,0 +1,12 @@
+#chip 18F46J50, 48
+
+'Change1659 test: code, then a /* comment that continues on the next lines (the code counts,
+'the lines after it are comment until the */). Build 1658 stopped with "Cannot find ...".
+'Expect: compiles.
+
+Dim Abc As Byte   /* a comment that continues
+#include "no_such_file.h"
+   */
+
+Do
+Loop

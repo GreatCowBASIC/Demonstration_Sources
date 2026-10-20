@@ -1,0 +1,12 @@
+#chip 18F46J50, 48
+
+'Change1660 test: OVERRIDE with an initial value - OVERRIDE comes straight after the location,
+'before "= value". Expect: compiles with no warnings; COUNTER at 0x400, set to 5.
+
+Dim Buffer(15) As Byte At 0x400 OVERRIDE
+Dim Counter As Byte At 0x400 OVERRIDE = 5
+
+Buffer(1) = Counter
+
+Do
+Loop

@@ -72,7 +72,7 @@ GLCDUpdateScreen1:
 
 
    Do Forever
-    SetContrast_SSD1306 ( 0 )
+    GLCDSetContrast ( 0 )
 
     porta.5 = !porta.5
     GLCDFontWidth= 6

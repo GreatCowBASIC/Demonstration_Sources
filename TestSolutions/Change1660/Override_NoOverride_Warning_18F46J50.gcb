@@ -1,0 +1,14 @@
+#chip 18F46J50, 48
+
+'Change1660 test: the same overlap WITHOUT OVERRIDE still warns - OVERRIDE is per DIM, so an
+'accidental overlap is not hidden. Expect: compiles, with one warning:
+'  Memory location specified for BUFFERB may be invalid
+
+Dim BufferA(15) As Byte At 0x400
+Dim BufferB(15) As Byte At 0x400
+
+BufferA(1) = 1
+BufferB(2) = 2
+
+Do
+Loop

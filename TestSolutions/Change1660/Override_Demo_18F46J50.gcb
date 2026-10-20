@@ -1,0 +1,47 @@
+#chip 18F46J50, 48
+
+/*
+   Change1660 demo: DIM ... AT location OVERRIDE - RAM purposely allocated to two parts of a program
+   that are never in use at the same time.
+
+   A 512-byte transfer buffer is only needed while a transfer runs; a 64-entry name list is only
+   needed while it does not. Both are placed from TRANSFER_RAM, so they use the same RAM: about 512
+   bytes less RAM in total. Every location is written relative to TRANSFER_RAM, so moving the area
+   needs one change.
+
+   Each overlapping DIM ends with OVERRIDE - the first one too: the compiler, not the order in the
+   source, decides which variable is given the location first, and any other one would warn. The
+   overlap is intended, so the compiler gives no "Memory location specified for ... may be invalid"
+   warning for them. A DIM that overlaps without OVERRIDE still warns (see
+   Override_NoOverride_Warning_18F46J50.gcb).
+
+   Expect: compiles with no warnings. In the .asm variable map TRANSFERBUFFER, NAMELIST and
+   NAMEKIND are at 0x400, 0x400 and 0x701 (0x400 + 769: NameList(768) is 769 bytes, 0..768).
+*/
+
+#define TRANSFER_RAM 0x400                       ' the start of the purposely allocated RAM
+#define LIST_ENTRIES 64
+#define NAME_LEN     12
+
+Dim TransferBuffer As Alloc * 512 At TRANSFER_RAM OVERRIDE            ' used during a transfer only
+Dim NameList(768) As Byte At TRANSFER_RAM OVERRIDE                     ' LIST_ENTRIES x NAME_LEN, used between transfers
+Dim NameKind(64) As Byte At TRANSFER_RAM + 769 OVERRIDE                ' right after NameList
+Dim Index As Word
+
+' between transfers: the list is in use
+For Index = 1 To LIST_ENTRIES
+    NameKind(Index) = 1
+Next
+NameList(1) = 65
+
+' a transfer: the buffer is in use, the list is not (it is read again afterwards)
+TransferBuffer(0) = 0x55
+TransferBuffer(511) = 0xAA
+
+' after the transfer: the list must be rebuilt before it is used again
+For Index = 1 To LIST_ENTRIES
+    NameKind(Index) = 2
+Next
+
+Do
+Loop

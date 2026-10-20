@@ -64,7 +64,7 @@
     ycentre=58
     ;draw dial
     GLCDCLS
-    SetContrast_SSD1306 ( 255 )
+    GLCDSetContrast ( 255 )
 
     box 0,0,127,63
     for radius=144 to 141

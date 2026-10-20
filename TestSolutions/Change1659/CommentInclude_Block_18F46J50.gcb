@@ -1,0 +1,12 @@
+/*
+   Change1659 test: an #include at the start of a line inside a block comment is not followed.
+   Build 1658 and earlier stopped with "Cannot find ...\no_such_file.h" for the line below.
+   Expect: compiles.
+#include "no_such_file.h"
+   #include "no_such_file2.h"
+*/
+
+#chip 18F46J50, 48
+
+Do
+Loop
