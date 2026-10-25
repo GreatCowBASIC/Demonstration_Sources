@@ -52,6 +52,30 @@ Partial Friend NotInheritable Class Settings
             Return defaultInstance
         End Get
     End Property
+
+    <Global.System.Configuration.UserScopedSettingAttribute(),  _
+     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+    Public Property SelectedBoard() As String
+        Get
+            Return CType(Me("SelectedBoard"),String)
+        End Get
+        Set
+            Me("SelectedBoard") = value
+        End Set
+    End Property
+
+    <Global.System.Configuration.UserScopedSettingAttribute(),  _
+     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+    Public Property WindowLocation() As String
+        Get
+            Return CType(Me("WindowLocation"),String)
+        End Get
+        Set
+            Me("WindowLocation") = value
+        End Set
+    End Property
 End Class
 
 Namespace My

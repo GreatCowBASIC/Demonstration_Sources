@@ -1,0 +1,285 @@
+{
+  "schemaVersion": 1,
+  "fieldNotes": [
+    "This file describes the boards the WinUSB Demo Program can show. The program creates it from its built-in template when it is missing.",
+    "Edit it with any text editor, then select Reload in the program. Unknown fields, like this one, are ignored.",
+    "id: unique short name of the board. name: the descriptive name. productMatch: text (or a list of texts) found in the board's USB product name, e.g. 'GCBASIC WinUSB 18F4550'.",
+    "keepAlive: the LED that toggles on every keep-alive (request 255): name, io, port.",
+    "switches: up to four. name, io, port, usbCode (the request that reads them, 140 in the demonstration programs) replyByte (the byte of the reply, 0 = first) and onValue (the reading that shows the switch as on: 0 for a switch to 0V with a pull-up, 1 if left out).",
+    "switchPollSeconds: the poll period: Start Poll reads the switches every this many seconds until End Poll (0 or left out: no poll, only Read).",
+    "leds: name, io, colour (a .NET colour name such as Red, or #RRGGBB), port, usbCodeRead, usbCodeOn and usbCodeOff.",
+    "adc: name, io, port, channel (ANx or ANAx), range ('0-255', '0-1023' or '0-4095' for 12 bit), usbCode and replyByte. A range above 255 uses two bytes, low byte first.",
+    "usbControl: the name of a keep-alive, LED, switch or ADC channel in the firmware: USBCONTROLKEEPALIVE, USBCONTROLOUTPUT1 to 8, USBCONTROLINPUT1 to 4 (its replyByte is its number - 1), USBCONTROLADC1 to 4. headerFile: the firmware header Ctrl+G writes for the board, with these names, its pins and its request codes.",
+    "bodyText: the help text, one string per line."
+  ],
+  "boards": [
+    {
+      "id": "PICDEMUSBBOARD18F44502004",
+      "name": "PICDEM FS USB Demo 18F4450 Board, 2004",
+      "productMatch": "18F4550",
+      "headerFile": "WINUSB_18F4550_Demonstration.h",
+      "keepAlive": { "name": "Keep-alive", "io": "I/O 1", "port": "PORTD.3", "usbControl": "USBCONTROLKEEPALIVE" },
+      "switchPollSeconds": 10,
+      "switches": [
+        { "usbControl": "USBCONTROLINPUT1", "name": "Switch 1", "io": "I/O 5", "port": "PORTB.4", "usbCode": 140, "replyByte": 0, "onValue": 0 },
+        { "usbControl": "USBCONTROLINPUT2", "name": "Switch 2", "io": "I/O 6", "port": "PORTB.5", "usbCode": 140, "replyByte": 1, "onValue": 0 }
+      ],
+      "leds": [
+        { "usbControl": "USBCONTROLOUTPUT1", "name": "D1", "io": "I/O 2", "colour": "BRIGHTGREEN", "port": "PORTD.0", "usbCodeRead": 130, "usbCodeOn": 131, "usbCodeOff": 132 },
+        { "usbControl": "USBCONTROLOUTPUT2", "name": "D2", "io": "I/O 3", "colour": "BRIGHTGREEN", "port": "PORTD.1", "usbCodeRead": 133, "usbCodeOn": 134, "usbCodeOff": 135 },
+        { "usbControl": "USBCONTROLOUTPUT3", "name": "D3", "io": "I/O 4", "colour": "BRIGHTGREEN", "port": "PORTD.2", "usbCodeRead": 136, "usbCodeOn": 137, "usbCodeOff": 138 }
+      ],
+      "adc": [],
+      "bodyText": [
+        "GCBASIC WinUSB application: no driver to install.",
+        "",
+        "This application shows:",
+        "",
+        "- The connection status. It finds the board when it is plugged in, and connects again after it is removed and plugged back in.",
+        "",
+        "- Setting PIC outputs: use the Set State boxes to turn the red, yellow and green LEDs (I/O 2, 3 and 4) on and off.",
+        "",
+        "- Reading PIC inputs: select 'Read' to read the two switches (I/O 5 and 6). A switch reads 0 when it is pressed (switches to 0V, pull-ups).",
+        "",
+        "- When it connects, it reads the state of the LEDs and shows it here.",
+        "",
+        "- A keep-alive 10 seconds after the last USB transfer: the LED on I/O 1 toggles. The dots at the bottom right count the seconds to it. If it fails, the application closes the board and opens it again when it answers.",
+        "",
+        "- No driver: the board's program (usb.h with USB_WCID) tells Windows 8.1 and later to load their own WinUSB driver.",
+        "",
+        "The board: WINUSB_18F4550_Demonstration.gcb. D+ to RC5, D- to RC4, 220-470 nF on VUSB, a 20 MHz crystal (PLLDIV 5).",
+        "",
+        "Enjoy"
+      ]
+    },
+    {
+      "id": "PICDEMUSBBOARD18F45K502004",
+      "name": "PICDEM FS USB Demo 18F45K50 Board, 2004",
+      "productMatch": "18F45K50",
+      "headerFile": "WINUSB_18F45K50_Demonstration.h",
+      "keepAlive": { "name": "Keep-alive", "io": "I/O 1", "port": "PORTD.3", "usbControl": "USBCONTROLKEEPALIVE" },
+      "switchPollSeconds": 10,
+      "switches": [
+        { "usbControl": "USBCONTROLINPUT1", "name": "Switch 1", "io": "I/O 5", "port": "PORTB.4", "usbCode": 140, "replyByte": 0, "onValue": 0 },
+        { "usbControl": "USBCONTROLINPUT2", "name": "Switch 2", "io": "I/O 6", "port": "PORTB.5", "usbCode": 140, "replyByte": 1, "onValue": 0 }
+      ],
+      "leds": [
+        { "usbControl": "USBCONTROLOUTPUT1", "name": "D1", "io": "I/O 2", "colour": "BRIGHTGREEN", "port": "PORTD.0", "usbCodeRead": 130, "usbCodeOn": 131, "usbCodeOff": 132 },
+        { "usbControl": "USBCONTROLOUTPUT2", "name": "D2", "io": "I/O 3", "colour": "BRIGHTGREEN", "port": "PORTD.1", "usbCodeRead": 133, "usbCodeOn": 134, "usbCodeOff": 135 },
+        { "usbControl": "USBCONTROLOUTPUT3", "name": "D3", "io": "I/O 4", "colour": "BRIGHTGREEN", "port": "PORTD.2", "usbCodeRead": 136, "usbCodeOn": 137, "usbCodeOff": 138 }
+      ],
+      "adc": [],
+      "bodyText": [
+        "GCBASIC WinUSB application: no driver to install.",
+        "",
+        "This application shows:",
+        "",
+        "- The connection status. It finds the board when it is plugged in, and connects again after it is removed and plugged back in.",
+        "",
+        "- Setting PIC outputs: use the Set State boxes to turn the red, yellow and green LEDs (I/O 2, 3 and 4) on and off.",
+        "",
+        "- Reading PIC inputs: select 'Read' to read the two switches (I/O 5 and 6). A switch reads 0 when it is pressed (switches to 0V, pull-ups).",
+        "",
+        "- When it connects, it reads the state of the LEDs and shows it here.",
+        "",
+        "- A keep-alive 10 seconds after the last USB transfer: the LED on I/O 1 toggles. The dots at the bottom right count the seconds to it. If it fails, the application closes the board and opens it again when it answers.",
+        "",
+        "- No driver: the board's program (usb.h with USB_WCID) tells Windows 8.1 and later to load their own WinUSB driver.",
+        "",
+        "The board: the PICDEM FS USB Demo Board with a PIC18F45K50, WINUSB_18F45K50_Demonstration.gcb.",
+        "",
+        "Enjoy"
+      ]
+    },
+    {
+      "id": "WINUSB_18F14K50",
+      "name": "PIC18F14K50, 12 MHz crystal, one switch",
+      "productMatch": "18F14K50",
+      "headerFile": "WINUSB_18F14K50_Demonstration.h",
+      "keepAlive": { "name": "Keep-alive", "io": "I/O 1", "port": "PORTC.0", "usbControl": "USBCONTROLKEEPALIVE" },
+      "switchPollSeconds": 10,
+      "switches": [
+        { "usbControl": "USBCONTROLINPUT2", "name": "Switch", "io": "I/O 6", "port": "PORTA.3", "usbCode": 140, "replyByte": 1, "onValue": 0 }
+      ],
+      "leds": [
+        { "usbControl": "USBCONTROLOUTPUT1", "name": "Red", "io": "I/O 2", "colour": "Red", "port": "PORTC.1", "usbCodeRead": 130, "usbCodeOn": 131, "usbCodeOff": 132 },
+        { "usbControl": "USBCONTROLOUTPUT2", "name": "Yellow", "io": "I/O 3", "colour": "Gold", "port": "PORTC.2", "usbCodeRead": 133, "usbCodeOn": 134, "usbCodeOff": 135 },
+        { "usbControl": "USBCONTROLOUTPUT3", "name": "Green", "io": "I/O 4", "colour": "LimeGreen", "port": "PORTC.3", "usbCodeRead": 136, "usbCodeOn": 137, "usbCodeOff": 138 }
+      ],
+      "adc": [],
+      "bodyText": [
+        "GCBASIC WinUSB application: no driver to install.",
+        "",
+        "This application shows:",
+        "",
+        "- The connection status. It finds the board when it is plugged in, and connects again after it is removed and plugged back in.",
+        "",
+        "- Setting PIC outputs: use the Set State boxes to turn the red, yellow and green LEDs (I/O 2, 3 and 4) on and off.",
+        "",
+        "- Reading PIC inputs: select 'Read' to read the switch (I/O 6). It reads 0 when it is pressed (a switch to 0V, pull-up).",
+        "",
+        "- When it connects, it reads the state of the LEDs and shows it here.",
+        "",
+        "- A keep-alive 10 seconds after the last USB transfer: the LED on I/O 1 toggles. The dots at the bottom right count the seconds to it. If it fails, the application closes the board and opens it again when it answers.",
+        "",
+        "- No driver: the board's program (usb.h with USB_WCID) tells Windows 8.1 and later to load their own WinUSB driver.",
+        "",
+        "The board: WINUSB_18F14K50_Demonstration.gcb. A 12 MHz crystal with the PLL.",
+        "",
+        "Enjoy"
+      ]
+    },
+    {
+      "id": "WINUSB_16F1459",
+      "name": "PIC16F1459, internal oscillator, one switch",
+      "productMatch": "16F1459",
+      "headerFile": "WINUSB_16F1459_Demonstration.h",
+      "keepAlive": { "name": "Keep-alive", "io": "I/O 1", "port": "PORTC.0", "usbControl": "USBCONTROLKEEPALIVE" },
+      "switchPollSeconds": 10,
+      "switches": [
+        { "usbControl": "USBCONTROLINPUT2", "name": "Switch", "io": "I/O 6", "port": "PORTA.4", "usbCode": 140, "replyByte": 1, "onValue": 0 }
+      ],
+      "leds": [
+        { "usbControl": "USBCONTROLOUTPUT1", "name": "Red", "io": "I/O 2", "colour": "Red", "port": "PORTC.1", "usbCodeRead": 130, "usbCodeOn": 131, "usbCodeOff": 132 },
+        { "usbControl": "USBCONTROLOUTPUT2", "name": "Yellow", "io": "I/O 3", "colour": "Gold", "port": "PORTC.2", "usbCodeRead": 133, "usbCodeOn": 134, "usbCodeOff": 135 },
+        { "usbControl": "USBCONTROLOUTPUT3", "name": "Green", "io": "I/O 4", "colour": "LimeGreen", "port": "PORTC.3", "usbCodeRead": 136, "usbCodeOn": 137, "usbCodeOff": 138 }
+      ],
+      "adc": [],
+      "bodyText": [
+        "GCBASIC WinUSB application: no driver to install.",
+        "",
+        "This application shows:",
+        "",
+        "- The connection status. It finds the board when it is plugged in, and connects again after it is removed and plugged back in.",
+        "",
+        "- Setting PIC outputs: use the Set State boxes to turn the red, yellow and green LEDs (I/O 2, 3 and 4) on and off.",
+        "",
+        "- Reading PIC inputs: select 'Read' to read the switch (I/O 6). It reads 0 when it is pressed (a switch to 0V, pull-up).",
+        "",
+        "- When it connects, it reads the state of the LEDs and shows it here.",
+        "",
+        "- A keep-alive 10 seconds after the last USB transfer: the LED on I/O 1 toggles. The dots at the bottom right count the seconds to it. If it fails, the application closes the board and opens it again when it answers.",
+        "",
+        "- No driver: the board's program (usb.h with USB_WCID) tells Windows 8.1 and later to load their own WinUSB driver.",
+        "",
+        "The board: WINUSB_16F1459_Demonstration.gcb. Internal oscillator with the PLL and active clock tuning.",
+        "",
+        "Enjoy"
+      ]
+    },
+    {
+      "id": "WINUSB_16F1455",
+      "name": "PIC16F1455, internal oscillator, one switch",
+      "productMatch": "16F1455",
+      "headerFile": "WINUSB_16F1455_Demonstration.h",
+      "keepAlive": { "name": "Keep-alive", "io": "I/O 1", "port": "PORTC.0", "usbControl": "USBCONTROLKEEPALIVE" },
+      "switchPollSeconds": 10,
+      "switches": [
+        { "usbControl": "USBCONTROLINPUT2", "name": "Switch", "io": "I/O 6", "port": "PORTA.4", "usbCode": 140, "replyByte": 1, "onValue": 0 }
+      ],
+      "leds": [
+        { "usbControl": "USBCONTROLOUTPUT1", "name": "Red", "io": "I/O 2", "colour": "Red", "port": "PORTC.1", "usbCodeRead": 130, "usbCodeOn": 131, "usbCodeOff": 132 },
+        { "usbControl": "USBCONTROLOUTPUT2", "name": "Yellow", "io": "I/O 3", "colour": "Gold", "port": "PORTC.2", "usbCodeRead": 133, "usbCodeOn": 134, "usbCodeOff": 135 },
+        { "usbControl": "USBCONTROLOUTPUT3", "name": "Green", "io": "I/O 4", "colour": "LimeGreen", "port": "PORTC.3", "usbCodeRead": 136, "usbCodeOn": 137, "usbCodeOff": 138 }
+      ],
+      "adc": [],
+      "bodyText": [
+        "GCBASIC WinUSB application: no driver to install.",
+        "",
+        "This application shows:",
+        "",
+        "- The connection status. It finds the board when it is plugged in, and connects again after it is removed and plugged back in.",
+        "",
+        "- Setting PIC outputs: use the Set State boxes to turn the red, yellow and green LEDs (I/O 2, 3 and 4) on and off.",
+        "",
+        "- Reading PIC inputs: select 'Read' to read the switch (I/O 6). It reads 0 when it is pressed (a switch to 0V, pull-up).",
+        "",
+        "- When it connects, it reads the state of the LEDs and shows it here.",
+        "",
+        "- A keep-alive 10 seconds after the last USB transfer: the LED on I/O 1 toggles. The dots at the bottom right count the seconds to it. If it fails, the application closes the board and opens it again when it answers.",
+        "",
+        "- No driver: the board's program (usb.h with USB_WCID) tells Windows 8.1 and later to load their own WinUSB driver.",
+        "",
+        "The board: WINUSB_16F1455_Demonstration.gcb. Internal oscillator with the PLL and active clock tuning. The 14-pin chip has no PORTB.",
+        "",
+        "Enjoy"
+      ]
+    },
+    {
+      "id": "WINUSB_16F1454",
+      "name": "PIC16F1454, internal oscillator, one switch",
+      "productMatch": "16F1454",
+      "headerFile": "WINUSB_16F1454_Demonstration.h",
+      "keepAlive": { "name": "Keep-alive", "io": "I/O 1", "port": "PORTC.0", "usbControl": "USBCONTROLKEEPALIVE" },
+      "switchPollSeconds": 10,
+      "switches": [
+        { "usbControl": "USBCONTROLINPUT2", "name": "Switch", "io": "I/O 6", "port": "PORTA.4", "usbCode": 140, "replyByte": 1, "onValue": 0 }
+      ],
+      "leds": [
+        { "usbControl": "USBCONTROLOUTPUT1", "name": "Red", "io": "I/O 2", "colour": "Red", "port": "PORTC.1", "usbCodeRead": 130, "usbCodeOn": 131, "usbCodeOff": 132 },
+        { "usbControl": "USBCONTROLOUTPUT2", "name": "Yellow", "io": "I/O 3", "colour": "Gold", "port": "PORTC.2", "usbCodeRead": 133, "usbCodeOn": 134, "usbCodeOff": 135 },
+        { "usbControl": "USBCONTROLOUTPUT3", "name": "Green", "io": "I/O 4", "colour": "LimeGreen", "port": "PORTC.3", "usbCodeRead": 136, "usbCodeOn": 137, "usbCodeOff": 138 }
+      ],
+      "adc": [],
+      "bodyText": [
+        "GCBASIC WinUSB application: no driver to install.",
+        "",
+        "This application shows:",
+        "",
+        "- The connection status. It finds the board when it is plugged in, and connects again after it is removed and plugged back in.",
+        "",
+        "- Setting PIC outputs: use the Set State boxes to turn the red, yellow and green LEDs (I/O 2, 3 and 4) on and off.",
+        "",
+        "- Reading PIC inputs: select 'Read' to read the switch (I/O 6). It reads 0 when it is pressed (a switch to 0V, pull-up).",
+        "",
+        "- When it connects, it reads the state of the LEDs and shows it here.",
+        "",
+        "- A keep-alive 10 seconds after the last USB transfer: the LED on I/O 1 toggles. The dots at the bottom right count the seconds to it. If it fails, the application closes the board and opens it again when it answers.",
+        "",
+        "- No driver: the board's program (usb.h with USB_WCID) tells Windows 8.1 and later to load their own WinUSB driver.",
+        "",
+        "The board: WINUSB_16F1454_Demonstration.gcb. Internal oscillator with the PLL and active clock tuning. The 14-pin chip has no PORTB.",
+        "",
+        "Enjoy"
+      ]
+    },
+    {
+      "id": "STARTERKIT1",
+      "name": "PIC18F Starter Kit 1 (18F46J50), LEDs on the OLED",
+      "productMatch": [ "18F46J50", "18F47J53" ],
+      "headerFile": "WINUSB_18F46J50_Demonstration.h",
+      "keepAlive": { "name": "Keep-alive", "io": "I/O 1", "port": "OLED", "usbControl": "USBCONTROLKEEPALIVE" },
+      "switchPollSeconds": 10,
+      "switches": [
+        { "usbControl": "USBCONTROLINPUT2", "name": "MENU", "io": "I/O 6", "port": "PORTB.0", "usbCode": 140, "replyByte": 1, "onValue": 0 }
+      ],
+      "leds": [
+        { "usbControl": "USBCONTROLOUTPUT1", "name": "Red", "io": "I/O 2", "colour": "Red", "port": "OLED", "usbCodeRead": 130, "usbCodeOn": 131, "usbCodeOff": 132 },
+        { "usbControl": "USBCONTROLOUTPUT2", "name": "Yellow", "io": "I/O 3", "colour": "Gold", "port": "OLED", "usbCodeRead": 133, "usbCodeOn": 134, "usbCodeOff": 135 },
+        { "usbControl": "USBCONTROLOUTPUT3", "name": "Green", "io": "I/O 4", "colour": "LimeGreen", "port": "OLED", "usbCodeRead": 136, "usbCodeOn": 137, "usbCodeOff": 138 }
+      ],
+      "adc": [],
+      "bodyText": [
+        "GCBASIC WinUSB application: no driver to install.",
+        "",
+        "This application shows:",
+        "",
+        "- The connection status. It finds the board when it is plugged in, and connects again after it is removed and plugged back in.",
+        "",
+        "- Setting PIC outputs: use the Set State boxes to turn the red, yellow and green LEDs (I/O 2, 3 and 4) on and off. The kit has no user LEDs: they are circles on its OLED.",
+        "",
+        "- Reading PIC inputs: select 'Read' to read the MENU button (I/O 6). It reads 0 when it is pressed.",
+        "",
+        "- When it connects, it reads the state of the LEDs and shows it here.",
+        "",
+        "- A keep-alive 10 seconds after the last USB transfer: the keep-alive circle on the OLED toggles. The dots at the bottom right count the seconds to it. If it fails, the application closes the board and opens it again when it answers.",
+        "",
+        "- No driver: the board's program (usb.h with USB_WCID) tells Windows 8.1 and later to load their own WinUSB driver.",
+        "",
+        "The board: WINUSB_18F46J50_Demonstration.gcb, standalone (it replaces the kit's bootloader). It also builds for the 18F47J53.",
+        "",
+        "Enjoy"
+      ]
+    }
+  ]
+}

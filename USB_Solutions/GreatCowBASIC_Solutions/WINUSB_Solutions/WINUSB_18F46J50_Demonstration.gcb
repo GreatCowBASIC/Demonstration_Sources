@@ -12,16 +12,21 @@
 '''
 ''' The kit
 '''  USB: the kit's USB connector (D+ RC5, D- RC4), 12 MHz crystal, PLL (48 MHz)
-'''  OLED: SH1101A on the 8080 bus (PORTD, RE0..RE2, RB5), powered from APP_VDD (kit_base.h's AppPowerOn)
+'''  OLED: SH1101A on the 8080 bus (PORTD, RE0..RE2, RB5), powered from APP_VDD (PIC18StarterKit1.h's AppPowerOn)
 '''  LEDs I/O 1 to 4 (keep-alive, red, yellow, green): drawn on the OLED
 '''  Input I/O 6: the MENU button (RB0, low when pressed); I/O 5, 7 and 8 answer 1 (no switch)
+'''
+''' The request codes and the input are in WINUSB_18F46J50_Demonstration.h, which the PC program writes from its board
+''' file (BoardTypes.json): select the board and press Ctrl+G. The LEDs are not pins, so the header has only their codes
+''' (USBCONTROLOUTPUTn_READ, _ON, _OFF); this program keeps their state and draws them. The MENU button is
+''' USBCONTROLINPUT2.
 '''
 ''' Use the Windows application to control!
 '''
 '''@author     EvanV
 '''@licence    GPL
-'''@version    2.0 (WinUSB, no driver; the kit, LEDs on the OLED)
-'''@date       19/10/2026
+'''@version    3.0 (the codes in WINUSB_18F46J50_Demonstration.h; 2.0 WinUSB, no driver; the kit, LEDs on the OLED)
+'''@date       25/10/2026
 '''********************************************************************************
 
 ' ----- Configuration
@@ -47,8 +52,8 @@
 
     #include <usb.h>
 
-    ' ----- The kit: pins and AppPowerOn (this folder's copy of GCBASICDemo\kit_base.h)
-    #include "kit_base.h"
+    ' ----- The kit: pins and AppPowerOn (this folder's copy of GCBASICDemo\PIC18StarterKit1.h)
+    #include "PIC18StarterKit1.h"
 
     ' ----- GCBASIC GLCD: the SH1101A on the kit's 8080 parallel bus
     #include <glcd.h>
@@ -59,35 +64,21 @@
     #define GLCD_CS        PORTE.2        ' chip select
     #define GLCD_DC        PORTB.5        ' data / command
 
-    'Constants that match the codes in the PC application - these are numeric messages
-
-    #Define USBDEVICEREADREDLEDSTATUS     130
-    #Define USBDEVICESETREDLEDON          131
-    #Define USBDEVICESETREDLEDOFF         132
-
-    #Define USBDEVICEREADYELLOWLEDSTATUS   133
-    #Define USBDEVICESETYELLOWLEDON        134
-    #Define USBDEVICESETYELLOWLEDOFF       135
-
-    #Define USBDEVICEREADGREENLEDSTATUS   136
-    #Define USBDEVICESETGREENLEDON        137
-    #Define USBDEVICESETGREENLEDOFF       138
-
-    #Define USBDEVICERPORTSTATUS          140
+    ' ----- The board: request codes and the input (USBCONTROL...), written by the PC program (Ctrl+G).
+    'Its #startup USBControlInit does not run here (StartupMethodsDisabled): USBControlInit is called below.
+    #include "WINUSB_18F46J50_Demonstration.h"
 
     'Define USB specific callback handlers
 
     'MANDATED to handle your solution
     #define USB_SETUP_HANDLER           SetupHandler_CallBack
 
-    ' ------ The LEDs: one byte each (0 off, 1 on), drawn on the OLED by the main loop
+    ' ------ The LEDs: one byte each (0 off, 1 on), drawn on the OLED by the main loop.
+    '        Outputs 1 to 3 of the header (USBCONTROLOUTPUT1 to 3) are red, yellow and green.
 
         Dim LedKeepAlive, LedRed, LedYellow, LedGreen As Byte
         Dim ShownLeds, NowLeds, ShownMenu, NowMenu, ShownUsb, NowUsb As Byte
         Dim USBState As Byte                ' usb.h's state (USB_STATE_CONFIGURED when the PC has configured it)
-
-        'The input: the MENU button on I/O 6 (low when pressed, as a switch to 0V)
-        #Define INPUT2        MENU_BUTTON
 
         'The screen, as the kit demonstrations: text row r (0..6) is display page r + 1, and GLCDPrint at y draws rows
         'y + 1 .. y + 8, so row r is printed at y = 8 * r + 7. Row 6 at y = 55 ends at row 63: a GLCDPrint at y = 56
@@ -110,7 +101,7 @@
         Wait 2 ms
         SD_CS = 1 : Dir PORTC.6 Out         ' SD card and accelerometer deselected
         ACCEL_CS = 1 : Dir PORTC.7 Out
-        Dir PORTB.0 In                      ' MENU button
+        USBControlInit                      ' the header's pin directions: the MENU button (USBCONTROLINPUT2) in
         WDTCON.4 = 1                        ' ADSHR: the ANCONx registers share addresses
         ANCON0 = 0xFF                       ' every pin digital
         ANCON1 = 0x1F
@@ -196,36 +187,65 @@
 
               Select Case USBRequest
 
-              'Red LED handler
-                    Case USBDEVICEREADREDLEDSTATUS
+              'Output 1: the red LED on the OLED
+              #ifdef USBCONTROLOUTPUT1_READ
+                    Case USBCONTROLOUTPUT1_READ
                       USBBufferWrite( LedRed )
-                    Case USBDEVICESETREDLEDON
+                    Case USBCONTROLOUTPUT1_ON
                       LedRed = 1
-                    Case USBDEVICESETREDLEDOFF
+                    Case USBCONTROLOUTPUT1_OFF
                       LedRed = 0
+              #endif
 
-              'Yellow LED handler
-                    Case USBDEVICEREADYELLOWLEDSTATUS
+              'Output 2: the yellow LED on the OLED
+              #ifdef USBCONTROLOUTPUT2_READ
+                    Case USBCONTROLOUTPUT2_READ
                       USBBufferWrite( LedYellow )
-                    Case USBDEVICESETYELLOWLEDON
+                    Case USBCONTROLOUTPUT2_ON
                       LedYellow = 1
-                    Case USBDEVICESETYELLOWLEDOFF
+                    Case USBCONTROLOUTPUT2_OFF
                       LedYellow = 0
+              #endif
 
-              'Green LED handler
-                    Case USBDEVICEREADGREENLEDSTATUS
+              'Output 3: the green LED on the OLED
+              #ifdef USBCONTROLOUTPUT3_READ
+                    Case USBCONTROLOUTPUT3_READ
                       USBBufferWrite( LedGreen )
-                    Case USBDEVICESETGREENLEDON
+                    Case USBCONTROLOUTPUT3_ON
                       LedGreen = 1
-                    Case USBDEVICESETGREENLEDOFF
+                    Case USBCONTROLOUTPUT3_OFF
                       LedGreen = 0
+              #endif
 
-                    'The inputs I/O 5 to 8: only I/O 6 (MENU) is on the kit; the others read as 1 (no switch)
-                    Case USBDEVICERPORTSTATUS
-                      USBBufferWrite( 1 )
-                      USBBufferWrite( INPUT2 )
-                      USBBufferWrite( 1 )
-                      USBBufferWrite( 1 )
+              'Inputs: always four bytes, inputs 1 to 4; 1 (no switch) for an input the header does not define.
+              'On the kit only input 2 (I/O 6, the MENU button) is defined.
+              #ifdef USBCONTROLINPUTSTATUS
+                    Case USBCONTROLINPUTSTATUS
+                      #ifdef USBCONTROLINPUT1
+                          USBBufferWrite( USBCONTROLINPUT1 )
+                      #endif
+                      #ifndef USBCONTROLINPUT1
+                          USBBufferWrite( 1 )
+                      #endif
+                      #ifdef USBCONTROLINPUT2
+                          USBBufferWrite( USBCONTROLINPUT2 )
+                      #endif
+                      #ifndef USBCONTROLINPUT2
+                          USBBufferWrite( 1 )
+                      #endif
+                      #ifdef USBCONTROLINPUT3
+                          USBBufferWrite( USBCONTROLINPUT3 )
+                      #endif
+                      #ifndef USBCONTROLINPUT3
+                          USBBufferWrite( 1 )
+                      #endif
+                      #ifdef USBCONTROLINPUT4
+                          USBBufferWrite( USBCONTROLINPUT4 )
+                      #endif
+                      #ifndef USBCONTROLINPUT4
+                          USBBufferWrite( 1 )
+                      #endif
+              #endif
 
                 'Response to control request: Transfer 255, keep alive
                 Case USBDEVICEKEEPALIVE

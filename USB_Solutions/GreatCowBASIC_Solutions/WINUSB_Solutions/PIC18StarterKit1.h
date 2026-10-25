@@ -1,5 +1,5 @@
 '    Version 1.1 (2026-10-16)
-'    kit_base.h - the basics of the Microchip PIC18F Starter Kit 1 (PIC18F46J50) for a
+'    PIC18StarterKit1.h - the basics of the Microchip PIC18F Starter Kit 1 (PIC18F46J50) for a
 '    GCBASIC program loaded by the kit's SD-card bootloader
 '
 '    The one copy of these routines: every kit program includes this file (2026-10-13; it was
@@ -11,7 +11,7 @@
 '    the screen to GLCDMirror.exe on the PC (1.1, 2026-10-16; programs without it are unchanged).
 '
 '    Include it after #chip / #option / #config:
-'        #include "kit_base.h"
+'        #include "PIC18StarterKit1.h"
 '
 '    Gives
 '      pins         APP_POWER, SD_CS, ACCEL_CS, OLED_RD / WR / CS / DC, MENU_BUTTON

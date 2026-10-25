@@ -13,17 +13,21 @@
 '''  no crystal: the internal oscillator and PLL (48 MHz)
 '''  You can provide supply voltage via the USB, or, you can provide local voltage.
 '''
-''' LEDs on PORTC.0 (keep-alive), PORTC.1 (red), PORTC.2 (yellow) and PORTC.3 (green) via suitable resistors: I/O 1 to 4.
-''' Inputs PORTC.4, PORTA.4, PORTA.3 and PORTA.5 (I/O 5 to 8), switches to 0V with pull-up resistors: read by the
-''' PC program (port status). The board has one switch, on PORTA.4 (I/O 6).
+''' The board's LEDs, switches and ADC channels, and their USB request codes, are in WINUSB_16F1454_Demonstration.h.
+''' The PC program writes that header from its board file (BoardTypes.json): select the board and press Ctrl+G.
+''' This program handles only the names the header defines:
+'''   USBCONTROLOUTPUT1 to 8     outputs (LEDs): read, on and off
+'''   USBCONTROLINPUT1 to 4      inputs (switches): request USBCONTROLINPUTSTATUS sends all four, 1 for one not defined
+'''   USBCONTROLKEEPALIVE        the LED the keep-alive (request 255) toggles
+'''   USBCONTROLADC1 to 4        ADC channels: 8 bits as one byte, 10 or 12 bits as two bytes, low byte first
 ''' A serial terminal at 115200bps can be connected to the USART TX pin for debug messages (when the USART is used).
 '''
 ''' Use the Windows application to control!
 '''
 '''@author     EvanV
 '''@licence    GPL
-'''@version    2.0 (WinUSB, no driver; 1.0 LibK/WinUSB with a driver)
-'''@date       19/10/2026
+'''@version    3.0 (the board in WINUSB_16F1454_Demonstration.h; 2.0 WinUSB, no driver; 1.0 LibK/WinUSB with a driver)
+'''@date       25/10/2026
 '''********************************************************************************
 
 ' ----- Configuration
@@ -71,22 +75,6 @@
     ' ------ End of Version Control
 
 
-    'Constants that match the codes in the PC application - these are numeric messages
-
-    #Define USBDEVICEREADREDLEDSTATUS     130
-    #Define USBDEVICESETREDLEDON          131
-    #Define USBDEVICESETREDLEDOFF         132
-
-    #Define USBDEVICEREADYELLOWLEDSTATUS   133
-    #Define USBDEVICESETYELLOWLEDON        134
-    #Define USBDEVICESETYELLOWLEDOFF       135
-
-    #Define USBDEVICEREADGREENLEDSTATUS   136
-    #Define USBDEVICESETGREENLEDON        137
-    #Define USBDEVICESETGREENLEDOFF       138
-
-    #Define USBDEVICERPORTSTATUS          140
-
     'Define USB specific callback handlers
 
     'MANDATED to handle your solution
@@ -95,33 +83,14 @@
     #define USB_ERROR_HANDLER           ErrorHandler_CallBack
     #define USB_DESCRIPTOR_HANDLER      DescriptorHandler_CallBack
 
-    ' ------ Port assignments
+    ' ------ The board: pins and request codes (USBCONTROL...), written by the PC program (Ctrl+G)
 
-        #Define KEEPALIVELED  PORTC.0       'I/O 1
+        'The header sets the directions of the board's pins at startup (#startup USBControlInit, 90)
+        #include "WINUSB_16F1454_Demonstration.h"
 
-        #Define REDLED        PORTC.1       'I/O 2
-        #Define REDLED_LAT    LATC.1
+        'An ADC reading of more than 8 bits
+        Dim USBControlADCValue As Word
 
-        #Define YELLOWLED     PORTC.2       'I/O 3
-        #Define YELLOWLED_LAT LATC.2
-
-        #Define GREENLED      PORTC.3       'I/O 4
-        #Define GREENLED_LAT  LATC.3
-
-        Dir KEEPALIVELED      OUT
-        Dir REDLED            OUT
-        Dir YELLOWLED         OUT
-        Dir GREENLED          OUT
-
-        #Define INPUT1        PORTC.4       'I/O 5 (the 16F1459's PORTB.4: no PORTB here)
-        #Define INPUT2        PORTA.4       'I/O 6 (the switch)
-        #Define INPUT3        PORTA.3       'I/O 7
-        #Define INPUT4        PORTA.5       'I/O 8
-
-        Dir INPUT1            IN
-        Dir INPUT2            IN
-        Dir INPUT3            IN
-        Dir INPUT4            IN
 
         'No crystal: active clock tuning keeps the internal oscillator on the USB start-of-frame packets (ACTEN, ACTSRC = USB)
         ACTCON = 0x90
@@ -144,62 +113,200 @@
           #ENDIF
         End Sub
 
-        ' The real handler - where the work is done
+        ' The real handler - where the work is done. Each USBCONTROL... name is handled only when the header defines it.
         Sub SetupHandler_CallBack
 
               Select Case USBRequest
 
-              'Red LED handler
-                    'Response to control request: Transfer USBDEVICEREADREDLEDSTATUS, send status of port
-                    Case USBDEVICEREADREDLEDSTATUS
-                      USBBufferWrite( REDLED_LAT )
+              'Output 1
+              #ifdef USBCONTROLOUTPUT1
+                    'Response to control request: Transfer USBCONTROLOUTPUT1_READ, send status of the output
+                    Case USBCONTROLOUTPUT1_READ
+                      USBBufferWrite( USBCONTROLOUTPUT1_LAT )
 
-                    'Response to control request: Transfer USBDEVICESETREDLEDON, turn on LED
-                    Case USBDEVICESETREDLEDON
-                      Set REDLED On
+                    'Response to control request: Transfer USBCONTROLOUTPUT1_ON, turn on the output
+                    Case USBCONTROLOUTPUT1_ON
+                      Set USBCONTROLOUTPUT1 On
 
-                    'Response to control request: Transfer USBDEVICESETREDLEDOFF, turn off LED
-                    Case USBDEVICESETREDLEDOFF
-                      Set REDLED Off
+                    'Response to control request: Transfer USBCONTROLOUTPUT1_OFF, turn off the output
+                    Case USBCONTROLOUTPUT1_OFF
+                      Set USBCONTROLOUTPUT1 Off
+              #endif
 
-              'Yellow LED handler
-                    'Response to control request: Transfer USBDEVICEREADYELLOWLEDSTATUS, send status of port
-                    Case USBDEVICEREADYELLOWLEDSTATUS
-                      USBBufferWrite( YELLOWLED_LAT )
+              'Output 2
+              #ifdef USBCONTROLOUTPUT2
+                    Case USBCONTROLOUTPUT2_READ
+                      USBBufferWrite( USBCONTROLOUTPUT2_LAT )
+                    Case USBCONTROLOUTPUT2_ON
+                      Set USBCONTROLOUTPUT2 On
+                    Case USBCONTROLOUTPUT2_OFF
+                      Set USBCONTROLOUTPUT2 Off
+              #endif
 
-                    'Response to control request: Transfer USBDEVICESETYELLOWLEDON, turn on LED
-                    Case USBDEVICESETYELLOWLEDON
-                      Set YELLOWLED On
+              'Output 3
+              #ifdef USBCONTROLOUTPUT3
+                    Case USBCONTROLOUTPUT3_READ
+                      USBBufferWrite( USBCONTROLOUTPUT3_LAT )
+                    Case USBCONTROLOUTPUT3_ON
+                      Set USBCONTROLOUTPUT3 On
+                    Case USBCONTROLOUTPUT3_OFF
+                      Set USBCONTROLOUTPUT3 Off
+              #endif
 
-                    'Response to control request: Transfer USBDEVICESETYELLOWLEDOFF, turn off LED
-                    Case USBDEVICESETYELLOWLEDOFF
-                      Set YELLOWLED Off
+              'Output 4
+              #ifdef USBCONTROLOUTPUT4
+                    Case USBCONTROLOUTPUT4_READ
+                      USBBufferWrite( USBCONTROLOUTPUT4_LAT )
+                    Case USBCONTROLOUTPUT4_ON
+                      Set USBCONTROLOUTPUT4 On
+                    Case USBCONTROLOUTPUT4_OFF
+                      Set USBCONTROLOUTPUT4 Off
+              #endif
 
-              'Green LED handler
-                    'Response to control request: Transfer USBDEVICEREADGREENLEDSTATUS, send status of port
-                    Case USBDEVICEREADGREENLEDSTATUS
-                      USBBufferWrite( GREENLED_LAT )
+              'Output 5
+              #ifdef USBCONTROLOUTPUT5
+                    Case USBCONTROLOUTPUT5_READ
+                      USBBufferWrite( USBCONTROLOUTPUT5_LAT )
+                    Case USBCONTROLOUTPUT5_ON
+                      Set USBCONTROLOUTPUT5 On
+                    Case USBCONTROLOUTPUT5_OFF
+                      Set USBCONTROLOUTPUT5 Off
+              #endif
 
-                    'Response to control request: Transfer USBDEVICESETGREENLEDON, turn on LED
-                    Case USBDEVICESETGREENLEDON
-                      Set GREENLED On
+              'Output 6
+              #ifdef USBCONTROLOUTPUT6
+                    Case USBCONTROLOUTPUT6_READ
+                      USBBufferWrite( USBCONTROLOUTPUT6_LAT )
+                    Case USBCONTROLOUTPUT6_ON
+                      Set USBCONTROLOUTPUT6 On
+                    Case USBCONTROLOUTPUT6_OFF
+                      Set USBCONTROLOUTPUT6 Off
+              #endif
 
-                    'Response to control request: Transfer USBDEVICESETGREENLEDOFF, turn off LED
-                    Case USBDEVICESETGREENLEDOFF
-                      Set GREENLED Off
+              'Output 7
+              #ifdef USBCONTROLOUTPUT7
+                    Case USBCONTROLOUTPUT7_READ
+                      USBBufferWrite( USBCONTROLOUTPUT7_LAT )
+                    Case USBCONTROLOUTPUT7_ON
+                      Set USBCONTROLOUTPUT7 On
+                    Case USBCONTROLOUTPUT7_OFF
+                      Set USBCONTROLOUTPUT7 Off
+              #endif
 
+              'Output 8
+              #ifdef USBCONTROLOUTPUT8
+                    Case USBCONTROLOUTPUT8_READ
+                      USBBufferWrite( USBCONTROLOUTPUT8_LAT )
+                    Case USBCONTROLOUTPUT8_ON
+                      Set USBCONTROLOUTPUT8 On
+                    Case USBCONTROLOUTPUT8_OFF
+                      Set USBCONTROLOUTPUT8 Off
+              #endif
 
-                    Case USBDEVICERPORTSTATUS
+              'Inputs: always four bytes, inputs 1 to 4; 1 (a switch not pressed) for an input the header does not define
+              #ifdef USBCONTROLINPUTSTATUS
+                    Case USBCONTROLINPUTSTATUS
+                      #ifdef USBCONTROLINPUT1
+                          USBBufferWrite( USBCONTROLINPUT1 )
+                      #endif
+                      #ifndef USBCONTROLINPUT1
+                          USBBufferWrite( 1 )
+                      #endif
+                      #ifdef USBCONTROLINPUT2
+                          USBBufferWrite( USBCONTROLINPUT2 )
+                      #endif
+                      #ifndef USBCONTROLINPUT2
+                          USBBufferWrite( 1 )
+                      #endif
+                      #ifdef USBCONTROLINPUT3
+                          USBBufferWrite( USBCONTROLINPUT3 )
+                      #endif
+                      #ifndef USBCONTROLINPUT3
+                          USBBufferWrite( 1 )
+                      #endif
+                      #ifdef USBCONTROLINPUT4
+                          USBBufferWrite( USBCONTROLINPUT4 )
+                      #endif
+                      #ifndef USBCONTROLINPUT4
+                          USBBufferWrite( 1 )
+                      #endif
+              #endif
 
-                      USBBufferWrite( INPUT1 )
-                      USBBufferWrite( INPUT2 )
-                      USBBufferWrite( INPUT3 )
-                      USBBufferWrite( INPUT4 )
+              'ADC channels: the reading, low byte first when it is more than 8 bits
+              #ifdef USBCONTROLADC1
+                    Case USBCONTROLADC1_REQUEST
+                      #if USBCONTROLADC1_BITS = 8
+                          USBBufferWrite( ReadAD( USBCONTROLADC1 ) )
+                      #endif
+                      #if USBCONTROLADC1_BITS = 10
+                          USBControlADCValue = ReadAD10( USBCONTROLADC1 )
+                          USBBufferWrite( USBControlADCValue )
+                          USBBufferWrite( USBControlADCValue_H )
+                      #endif
+                      #if USBCONTROLADC1_BITS = 12
+                          USBControlADCValue = ReadAD12( USBCONTROLADC1 )
+                          USBBufferWrite( USBControlADCValue )
+                          USBBufferWrite( USBControlADCValue_H )
+                      #endif
+              #endif
+
+              #ifdef USBCONTROLADC2
+                    Case USBCONTROLADC2_REQUEST
+                      #if USBCONTROLADC2_BITS = 8
+                          USBBufferWrite( ReadAD( USBCONTROLADC2 ) )
+                      #endif
+                      #if USBCONTROLADC2_BITS = 10
+                          USBControlADCValue = ReadAD10( USBCONTROLADC2 )
+                          USBBufferWrite( USBControlADCValue )
+                          USBBufferWrite( USBControlADCValue_H )
+                      #endif
+                      #if USBCONTROLADC2_BITS = 12
+                          USBControlADCValue = ReadAD12( USBCONTROLADC2 )
+                          USBBufferWrite( USBControlADCValue )
+                          USBBufferWrite( USBControlADCValue_H )
+                      #endif
+              #endif
+
+              #ifdef USBCONTROLADC3
+                    Case USBCONTROLADC3_REQUEST
+                      #if USBCONTROLADC3_BITS = 8
+                          USBBufferWrite( ReadAD( USBCONTROLADC3 ) )
+                      #endif
+                      #if USBCONTROLADC3_BITS = 10
+                          USBControlADCValue = ReadAD10( USBCONTROLADC3 )
+                          USBBufferWrite( USBControlADCValue )
+                          USBBufferWrite( USBControlADCValue_H )
+                      #endif
+                      #if USBCONTROLADC3_BITS = 12
+                          USBControlADCValue = ReadAD12( USBCONTROLADC3 )
+                          USBBufferWrite( USBControlADCValue )
+                          USBBufferWrite( USBControlADCValue_H )
+                      #endif
+              #endif
+
+              #ifdef USBCONTROLADC4
+                    Case USBCONTROLADC4_REQUEST
+                      #if USBCONTROLADC4_BITS = 8
+                          USBBufferWrite( ReadAD( USBCONTROLADC4 ) )
+                      #endif
+                      #if USBCONTROLADC4_BITS = 10
+                          USBControlADCValue = ReadAD10( USBCONTROLADC4 )
+                          USBBufferWrite( USBControlADCValue )
+                          USBBufferWrite( USBControlADCValue_H )
+                      #endif
+                      #if USBCONTROLADC4_BITS = 12
+                          USBControlADCValue = ReadAD12( USBCONTROLADC4 )
+                          USBBufferWrite( USBControlADCValue )
+                          USBBufferWrite( USBControlADCValue_H )
+                      #endif
+              #endif
 
                 'Response to control request: Transfer 255, keep alive
                 Case USBDEVICEKEEPALIVE
                   USBBufferWrite( USBDEVICEKEEPALIVE )
-                  KEEPALIVELED = !KEEPALIVELED
+                  #ifdef USBCONTROLKEEPALIVE
+                      USBCONTROLKEEPALIVE = !USBCONTROLKEEPALIVE
+                  #endif
 
                 'Handle the others via the serial port as we do not know what they are
                 Case Else
