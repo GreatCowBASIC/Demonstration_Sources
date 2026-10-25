@@ -8,3 +8,4 @@ D:\localreps\GCBDEMO_CONVERSION\PC_Application\VBProject\obj\Release\WinUSB_Demo
 D:\localreps\GCBDEMO_CONVERSION\PC_Application\VBProject\obj\Release\WinUSB_Demo_Program.vbproj.CoreCompileInputs.cache
 D:\localreps\GCBDEMO_CONVERSION\PC_Application\VBProject\obj\Release\WinUSB_Demo_Program.vbproj.CopyComplete
 D:\localreps\GCBDEMO_CONVERSION\PC_Application\VBProject\obj\Release\WINUSB_DEMO_PROGRAM.exe
+D:\GreatCowBASICGits\Demonstration_Sources.git\USB_Solutions\GreatCowBASIC_Solutions\WINUSB_Solutions\PC_Application\VBProject\obj\Release\WinUSB_Demo_Program.vbprojAssemblyReference.cache

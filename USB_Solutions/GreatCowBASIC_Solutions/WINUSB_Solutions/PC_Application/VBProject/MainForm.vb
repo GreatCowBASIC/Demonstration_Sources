@@ -106,6 +106,13 @@ Partial Public Class MainForm
 
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
+        'A new version keeps its settings apart: bring the last version's (the board in use, the window position)
+        If My.Settings.UpgradeRequired Then
+            My.Settings.Upgrade()
+            My.Settings.UpgradeRequired = False
+            My.Settings.Save()
+        End If
+
         'Where the window was when the program closed (EnsureOnScreen, in BuildBoardUI, keeps it all visible)
         RestoreWindowLocation()
 

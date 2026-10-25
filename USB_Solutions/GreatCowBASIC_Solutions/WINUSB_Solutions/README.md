@@ -217,6 +217,70 @@ the board does not have. Each program keeps its own chip set-up (configuration w
 16F145x). The Starter Kit program keeps its LED states for the OLED, and calls `USBControlInit` itself
 (`StartupMethodsDisabled`).
 
+## From coloured LEDs to outputs (version 3.0)
+
+Up to version 2.0 the firmware and the PC program talked about three coloured LEDs: `REDLED`, `YELLOWLED` and
+`GREENLED`, with request names such as `USBDEVICESETREDLEDON`. Version 3.0 calls them outputs, numbered:
+`USBCONTROLOUTPUT1`, `2`, `3` ... The colour is now only how the PC program draws the lamp.
+
+### Why
+
+- **The colours belonged to one board.** The first board had a red, a yellow and a green LED. The PICDEM FS USB board
+  has D1 to D4, the Starter Kit has none (they are drawn on its OLED), and another board may have one blue LED.
+  A name like `GREENLED` said nothing true about those boards.
+- **The names hid the mapping.** To run on the PICDEM board, a hand-written header had to say
+  `REDLED = PORTD.2`, `YELLOWLED = PORTD.1`, `GREENLED = PORTD.0`: three LEDs that are not red, yellow or green, in an
+  order that had to be remembered. The PC program called the same LEDs D1, D2, D3.
+- **Every program demanded every name.** The firmware used `REDLED`, `YELLOWLED`, `GREENLED` and `INPUT1` to `INPUT4`
+  whether the board had them or not. A board with two LEDs, or one switch, did not compile until dummy pins were
+  invented for the rest.
+- **An output is not always an LED.** The same request (on, off, read back) drives a relay, a buzzer or an enable pin
+  just as well. "Output" is what the firmware does; "LED" and its colour are what one board has.
+- **One place for the truth.** The PC program already numbered the LEDs in `BoardTypes.json`. With numbered names, the
+  board file can say which output is which (`usbControl`), and the firmware's header is generated from it, so the
+  PC program and the firmware cannot disagree.
+
+### How
+
+1. **The board file names each item for the firmware.** Each LED, switch and ADC channel in `BoardTypes.json` has a
+   `usbControl` name; the board's name for it (`name`, e.g. "D1" or "Red") and its `colour` are only for the PC
+   program's window.
+2. **The PC program writes the header.** Ctrl+G turns the board's entry into `WINUSB_<chip>_Demonstration.h`: for each
+   output its pin, its LAT bit and its three request codes, all under the numbered name.
+3. **The firmware uses only numbered names, and only those defined.** Each handler is inside `#ifdef`, so the program
+   compiles for a board with any number of outputs (up to 8) and inputs (up to 4), without changes.
+4. **The request codes came out of the program.** Version 2.0 had them as constants in each `.gcb`
+   (`#Define USBDEVICESETREDLEDON 131`); now they are in the board file and the header (`USBCONTROLOUTPUT1_ON 131`).
+   The template keeps the same codes, so the protocol did not change: a 2.0 board still works with the 3.0 PC program
+   when its board entry has its pins.
+
+| Version 2.0 name | Version 3.0 name | Notes |
+|---|---|---|
+| `REDLED`, `REDLED_LAT` | `USBCONTROLOUTPUT1`, `USBCONTROLOUTPUT1_LAT` | output 1 (the template's "Red" or "D1") |
+| `YELLOWLED`, `YELLOWLED_LAT` | `USBCONTROLOUTPUT2`, `USBCONTROLOUTPUT2_LAT` | output 2 |
+| `GREENLED`, `GREENLED_LAT` | `USBCONTROLOUTPUT3`, `USBCONTROLOUTPUT3_LAT` | output 3 |
+| `USBDEVICEREADREDLEDSTATUS` (130) | `USBCONTROLOUTPUT1_READ` | the code comes from the board file |
+| `USBDEVICESETREDLEDON` (131) | `USBCONTROLOUTPUT1_ON` | |
+| `USBDEVICESETREDLEDOFF` (132) | `USBCONTROLOUTPUT1_OFF` | likewise `..._2_...` (133 to 135), `..._3_...` (136 to 138) |
+| `INPUT1` to `INPUT4` | `USBCONTROLINPUT1` to `USBCONTROLINPUT4` | only the board's own switches are defined |
+| `USBDEVICERPORTSTATUS` (140) | `USBCONTROLINPUTSTATUS` | |
+| `KEEPALIVELED` | `USBCONTROLKEEPALIVE` | |
+| `Dir ...` in the program | `USBControlInit`, in the header | runs at startup (`#startup USBControlInit, 90`) |
+
+The `USBCONTROL` prefix keeps the names apart from GCBASIC's and the libraries' own (`usb.h` uses `USB...`), and makes
+it plain where a name comes from: the generated header.
+
+The help text (`bodyText`) follows the same idea: each board's text names its own LEDs and switches.
+
+| Board | Its help text says |
+|---|---|
+| PICDEM FS USB boards (18F4550, 18F45K50) | LEDs D1, D2 and D3 (RD0 to RD2: outputs 1 to 3); the two switches on RB4 and RB5 (inputs 1 and 2), with Read and Start Poll; the keep-alive LED D4 (RD3). The 18F4550 board line names the PICDEM board, its PIC18F4550 and its 20 MHz crystal. |
+| Starter Kit (18F46J50) | The red, yellow and green LEDs (outputs 1 to 3) are circles on the OLED, labelled RED, YEL and GRN, filled when on; the MENU button (RB0: input 2), with Read and Start Poll, also shown on the OLED; "USB: connected" on the OLED; the KA circle toggles on the keep-alive. |
+| 18F14K50, 16F1459, 16F1455, 16F1454 | The red, yellow and green LEDs (I/O 2, 3 and 4) and the switch (I/O 6): these boards' LEDs are those colours. |
+
+The PICDEM and Starter Kit texts call the LED boxes "Set", as the program labels them; the other boards' texts still
+say "Set State" (version 2.0's label). To change a board's text, edit its `bodyText` and press **Reload file**.
+
 ## Files
 
 | File | What it is |
@@ -298,7 +362,8 @@ Start Poll) and the keep-alive LED. Unplug and plug in again: the program connec
 ## History
 
 - **3.0 (2026-10-25):** the boards in `BoardTypes.json`; the firmware's pins in a generated header (Ctrl+G); switch
-  lamps and polling; the 18F45K50 program on the PICDEM board's pins (2.0: LEDs RA4, RA5, RC0, RC1, switches RB4 to
+  lamps and polling; the help text of the PICDEM boards and the Starter Kit rewritten for their own LEDs and switches;
+  the 18F45K50 program on the PICDEM board's pins (2.0: LEDs RA4, RA5, RC0, RC1, switches RB4 to
   RB7); only each board's own switches are read (2.0 read four input pins on every board).
 - **2.0 (2026-10-19):** WinUSB with no driver (the Microsoft OS descriptors), from the LibK/WinUSB version.
 - **1.0:** LibK/WinUSB with a driver (`USB_LIBKWINUSB_18F14K50_Demonstration.gcb`, 1209:2006). The old LibK versions
@@ -306,7 +371,7 @@ Start Poll) and the keep-alive LED. Unplug and plug in again: the program connec
 
 ## Building the PC program
 
-The PC program (v3.0.0) was built with the .NET Framework's own MSBuild
-(`C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe`, so VB 2012 syntax) with
-`/p:TargetFrameworkVersion=v4.8.1 /p:TargetFrameworkProfile=`, from a local copy: MSBuild refuses the resx on a
-network drive.
+The PC program (v3.0.0) is built with Visual Studio 2017 (open `PC_Application\WinUSB_Demo_Program.sln`, or
+`MSBuild.exe WinUSB_Demo_Program.sln /p:Configuration=Release` from `...\2017\Community\MSBuild\15.0\Bin`), for
+.NET Framework 4.0 Client. Build from a local copy of `PC_Application`: on a network drive MSBuild refuses
+`MainForm.resx` (error MSB3821, the file is in the Internet zone) unless the share is in Windows' Local intranet zone.

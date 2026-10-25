@@ -28,5 +28,5 @@ Imports System.Runtime.InteropServices
 ' You can specify all values by your own or you can build default build and revision
 ' numbers with the '*' character (the default):
 
-<Assembly: AssemblyVersion("2.0.0")>
-<Assembly: AssemblyFileVersion("2.0.0")>
+<Assembly: AssemblyVersion("3.0.0")>
+<Assembly: AssemblyFileVersion("3.0.0")>
