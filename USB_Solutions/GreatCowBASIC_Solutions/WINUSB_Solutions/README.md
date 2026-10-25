@@ -52,7 +52,7 @@ The window opens where it was last closed (always fully on a screen), and widens
 | Board type (name in the program) | Firmware (`WINUSB_<chip>_Demonstration.gcb`) | Keep-alive LED | LEDs | Switches | ADC |
 |---|---|---|---|---|---|
 | PICDEM FS USB Demo 18F4450 Board, 2004 | `18F4550` (20 MHz crystal) | RD3 | D1 RD0, D2 RD1, D3 RD2 | RB4, RB5 | potentiometer RA0 (AN0), 10 bits |
-| PICDEM FS USB Demo 18F45K50 Board, 2004 | `18F45K50` (internal oscillator) | RD3 | D1 RD0, D2 RD1, D3 RD2 | RB4, RB5 | potentiometer RA0 (AN0), 10 bits |
+| PICDEM FS USB Demo 18F45K50 Board, 2012 | `18F45K50` (internal oscillator) | RD3 | D1 RD0, D2 RD1, D3 RD2 | RB4, RB5 | potentiometer RA0 (AN0), 10 bits |
 | PIC18F14K50, 12 MHz crystal, one switch | `18F14K50` | RC0 | red RC1, yellow RC2, green RC3 | RA3 | |
 | PIC16F1459, internal oscillator, one switch | `16F1459` | RC0 | red RC1, yellow RC2, green RC3 | RA4 | |
 | PIC16F1455, internal oscillator, one switch | `16F1455` | RC0 | red RC1, yellow RC2, green RC3 | RA4 | |
@@ -456,10 +456,16 @@ say "Set State" (version 2.0's label). To change a board's text, edit its `bodyT
 | Board | Status |
 |---|---|
 | PICDEM FS USB board, 18F4550 | Version 3.1 tested on the board, 2026-10-25: enumerates with WinUSB; the PC program sets the LEDs on and off and reads them back, and reads the two switches. The potentiometer (ADC, RA0/AN0, 10 bits) tested on the board, 2026-10-25: the value follows the potentiometer, read on connect, by Read and by Start Poll |
-| 18F45K50 | Version 3.1 compiles; not tested on a board |
+| PICDEM FS USB board, 18F45K50 | Version 3.1 tested on the board, 2026-10-25: enumerates with WinUSB; the PC program sets the LEDs D1 to D3 and reads them back, reads the two switches and the potentiometer (511), and polls them |
 | 18F14K50 | Version 2.0 tested on the board (2026-10-19); version 3.1 compiles, not tested |
 | 16F1454, 16F1455, 16F1459 | Version 2.0 tested on the boards (2026-10-19); version 3.1 compiles, not tested |
 | Starter Kit (18F46J50) | Version 3.0 compiles; not tested on the kit |
+
+The two PICDEM boards with version 3.1, polling, the LEDs on:
+
+| PICDEM FS USB board, 18F4550 | PICDEM FS USB board, 18F45K50 |
+|---|---|
+| ![The PC program v3.1.0 with the PICDEM 18F4550 board: connected, polling, LEDs D1 to D3 on, potentiometer 557](PC_Application/Documentation/PICDEM_18F4550_v3.1.png) | ![The PC program v3.1.0 with the PICDEM 18F45K50 board: connected, polling, LEDs D1 to D3 on, potentiometer 511](PC_Application/Documentation/PICDEM_18F45K50_v3.1.png) |
 
 To test a board: program its HEX, plug it in (Device Manager: "GCBASIC WinUSB <chip>" under Universal Serial Bus
 devices, no driver installed), start the PC program, select the board type, and check the LEDs, the switches (Read,
