@@ -1,0 +1,115 @@
+'''A program  for GCGB and GCB.
+'''--------------------------------------------------------------------------------------------------------------------------------
+'''
+'''The four LEDs show the ADC: the PICDEM FS USB board's potentiometer, as a 4-bit number on its LEDs D1 to D4.
+'''
+'''The board does the work: its main loop reads the potentiometer (AN0, 10 bits) about every 20 ms and sets the LEDs
+'''to the top four bits of the reading (0 to 15, D1 the lowest bit). It works with no PC. Over USB (WinUSB, no driver
+'''to install) the PC can read the reading and the LEDs: the ADC LED Terminal (ADC_LED_Terminal.exe) shows them.
+'''
+'''The PICDEM FS USB Demo Board, 2004, with a PIC18F4550
+'''  USB: the board's USB connector (D+ RC5, D- RC4), 20 MHz crystal, PLL (48 MHz)
+'''  Potentiometer RV1 on RA0 (AN0)
+'''  LEDs D1, D2, D3, D4 on RD0, RD1, RD2, RD3
+'''
+''' Request 150: three bytes: the reading (a Word: low byte, then high byte, 0 to 1023), then the LEDs (0 to 15)
+''' Request 255: the keep-alive: answers 255
+'''
+''' Its own USB identity: 04D8:0052 with bcdDevice 0x0200 and its own GUID, so the WinUSB Demo Program (bcdDevice
+''' 0x0100) does not open it, and the terminal does not open the demonstration programs.
+'''
+'''@author     EvanV
+'''@licence    GPL
+'''@version    1.0
+'''@date       25/10/2026
+'''********************************************************************************
+
+' ----- Configuration
+    #chip 18F4550, 48
+    #option Explicit
+
+    '20 MHz crystal: PLLDIV = 5 (4 MHz into the PLL), 96 MHz PLL, CPUDIV = OSC1_PLL2 and USBDIV = 2 (48 MHz both),
+    'the USB regulator on (VUSB)
+    #config FOSC = HSPLL_HS, PLLDIV = 5, CPUDIV = OSC1_PLL2, USBDIV = 2, VREGEN = ON
+    #config MCLRE = ON, PBADEN = OFF, LVP = OFF, WDT = OFF
+
+
+    ' ----- Constants for usb.h (GCBASIC's usb.h with USB_WCID)
+    #define USB_PRODUCT_NAME  "GCBASIC WinUSB ADC LEDs"
+
+    'The USB ID: 04D8:0052, bcdDevice 0x0200 (the terminal looks for the same)
+    #define USB_VID 0x04D8
+    #define USB_PID 0x0052
+    #define USB_REV 0x0200
+
+    'WinUSB without a driver: the Microsoft OS 1.0 descriptors, and this solution's own device interface GUID
+    #define USB_WCID
+    #define USB_WCID_GUID "{C1060DC6-E7CA-4011-AA82-B63E9A555A20}"
+
+    'The handler of the PC's requests
+    #define USB_SETUP_HANDLER           SetupHandler_CallBack
+
+    #include <usb.h>
+
+
+    ' ----- The requests
+    #define ADCLEDSREAD                 150         'the reading (2 bytes, low first), then the LEDs (1 byte)
+
+
+    ' ----- The board
+    #define POTENTIOMETER               AN0         'RV1 on RA0
+    #define POTENTIOMETER_PIN           PORTA.0
+
+    'D1 to D4 are RD0 to RD3: the low four bits of PORTD
+    Dir PORTD.0 Out
+    Dir PORTD.1 Out
+    Dir PORTD.2 Out
+    Dir PORTD.3 Out
+    Dir POTENTIOMETER_PIN In
+
+
+    ' ----- The last reading and LEDs, for the USB interrupt to send
+    Dim ADCValue As Word                        'the main loop's reading
+    Dim LEDValue As Byte                        'the main loop's LEDs: ADCValue / 64, 0 to 15
+    Dim SentADCValue As Word                    'copies for the USB interrupt, set with interrupts off,
+    Dim SentLEDValue As Byte                    'so it never sends half of an old reading and half of a new one
+
+
+    ' ----- Main body of program commences here: read the potentiometer, show it on the LEDs
+    Do
+        ADCValue = ReadAD10( POTENTIOMETER )
+        LEDValue = ADCValue / 64
+
+        'D1 to D4 (RD0 to RD3); RD4 to RD7 unchanged
+        LATD = ( LATD And 0xF0 ) Or LEDValue
+
+        IntOff
+        SentADCValue = ADCValue
+        SentLEDValue = LEDValue
+        IntOn
+
+        Wait 20 ms
+        'Do not sleep the MCU!!
+    Loop
+
+    end
+
+
+    ' ----- The USB requests: in the USB interrupt
+    Sub SetupHandler_CallBack
+
+        Select Case USBRequest
+
+            'The reading, then the LEDs: three bytes
+            Case ADCLEDSREAD
+                USBBufferWrite( SentADCValue )          'a Word: its low byte, then its high byte
+                USBBufferWrite( SentLEDValue )
+
+            'The keep-alive
+            Case USBDEVICEKEEPALIVE
+                USBBufferWrite( USBDEVICEKEEPALIVE )
+
+            Case Else
+        End Select
+
+    End Sub

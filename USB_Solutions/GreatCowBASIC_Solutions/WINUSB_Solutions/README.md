@@ -400,6 +400,7 @@ say "Set State" (version 2.0's label). To change a board's text, edit its `bodyT
 | (`usb.h`) | GCBASIC's own `include\usb.h` (2026-10-19), with `USB_WCID` and the PIC18 bank fix. |
 | `PC_Application\` | The PC program's source (VB.NET, LibUsbDotNet; open `WinUSB_Demo_Program.sln`). |
 | `WINUSB_DEMO_PROGRAM_v2.1.0\` | The previous PC program (its boards in its code), kept to compare with. |
+| `ADC_LED_Terminal\` | A separate, smaller solution for the PICDEM 18F4550 board: the board shows its potentiometer on its four LEDs, and a terminal shows the reading and the LEDs. See its own [README](ADC_LED_Terminal/README.md). |
 
 ## How it works
 
