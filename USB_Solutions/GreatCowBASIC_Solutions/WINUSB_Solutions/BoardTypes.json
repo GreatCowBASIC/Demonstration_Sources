@@ -54,7 +54,7 @@
     },
     {
       "id": "PICDEMUSBBOARD18F45K502004",
-      "name": "PICDEM FS USB Demo 18F45K50 Board, 2004",
+      "name": "PICDEM FS USB Demo 18F45K50 Board, 2012",
       "productMatch": "18F45K50",
       "headerFile": "WINUSB_18F45K50_Demonstration.h",
       "keepAlive": { "name": "Keep-alive", "io": "I/O 1", "port": "PORTD.3", "usbControl": "USBCONTROLKEEPALIVE" },
