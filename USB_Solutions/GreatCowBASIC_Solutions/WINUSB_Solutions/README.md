@@ -26,9 +26,9 @@ Everything about a board (its LEDs, switches, pins, USB request codes and help t
 | **Board Type in use** | The boards in `BoardTypes.json`, by name. Select the board you have; the window changes to its LEDs, switches and help. |
 | **Reload file** | Read `BoardTypes.json` again, after you change it. |
 | **Edit file** | Open `BoardTypes.json` in Notepad. |
-| **Input Port State** | One row per switch: a lamp and the value read. A white lamp: the switch is on (pressed). A black ring: off. |
-| **Read** | Read the switches now. |
-| **Start Poll (10 s)** / **End Poll** | Read the switches every 10 seconds (the period is in the board file) until End Poll. Polling never starts by itself, and stops when the board is unplugged or another board is selected. |
+| **Input Port State** | One row per switch: a lamp and the value read. A white lamp: the switch is on (pressed). A black ring: off. Below a line, one row per ADC channel (the PICDEM board's potentiometer): its value, 0 to 1023 for 10 bits. Hover over a row for its pin, channel, range and request code. |
+| **Read** | Read the switches and the ADC channels now. They are also read when the board connects. |
+| **Start Poll (10 s)** / **End Poll** | Read the switches and the ADC channels every 10 seconds (the period is in the board file) until End Poll. Polling never starts by itself, and stops when the board is unplugged or another board is selected. |
 | **LED Status** | One row per LED: a lamp in the LED's colour, and **Set** to turn it on or off on the board. |
 | **On the right** | The board's name, its help text, and its pin tables: each LED and switch with its port, I/O and USB request codes. |
 | **Status line** (bottom left) | The board's USB name, e.g. "GCBASIC WinUSB 18F4550". In red when the board plugged in is not the board type selected. |
@@ -45,19 +45,19 @@ The window opens where it was last closed (always fully on a screen), and widens
 | The status line is red: "not the board type in use" | Select the board you have in **Board Type in use**. |
 | A message: "BoardTypes.json cannot be used ... at line n, column m" | Correct the file there (**Edit file**), then **Retry**; or **Cancel** to use the built-in boards. |
 | A message listing problems in the file | The file loaded, but some entries were ignored or are wrong: the message names the board and field. |
-| A switch shows "-" | The board did not answer the read: check the board's firmware is the one for the board type selected. |
+| A switch or ADC value shows "-" | The board did not answer the read: check the board's firmware is the one for the board type selected. |
 
 ## The boards
 
-| Board type (name in the program) | Firmware (`WINUSB_<chip>_Demonstration.gcb`) | Keep-alive LED | LEDs | Switches |
-|---|---|---|---|---|
-| PICDEM FS USB Demo 18F4450 Board, 2004 | `18F4550` (20 MHz crystal) | RD3 | D1 RD0, D2 RD1, D3 RD2 | RB4, RB5 |
-| PICDEM FS USB Demo 18F45K50 Board, 2004 | `18F45K50` (internal oscillator) | RD3 | D1 RD0, D2 RD1, D3 RD2 | RB4, RB5 |
-| PIC18F14K50, 12 MHz crystal, one switch | `18F14K50` | RC0 | red RC1, yellow RC2, green RC3 | RA3 |
-| PIC16F1459, internal oscillator, one switch | `16F1459` | RC0 | red RC1, yellow RC2, green RC3 | RA4 |
-| PIC16F1455, internal oscillator, one switch | `16F1455` | RC0 | red RC1, yellow RC2, green RC3 | RA4 |
-| PIC16F1454, internal oscillator, one switch | `16F1454` | RC0 | red RC1, yellow RC2, green RC3 | RA4 |
-| PIC18F Starter Kit 1 (18F46J50), LEDs on the OLED | `18F46J50` | on the OLED | on the OLED | MENU (RB0) |
+| Board type (name in the program) | Firmware (`WINUSB_<chip>_Demonstration.gcb`) | Keep-alive LED | LEDs | Switches | ADC |
+|---|---|---|---|---|---|
+| PICDEM FS USB Demo 18F4450 Board, 2004 | `18F4550` (20 MHz crystal) | RD3 | D1 RD0, D2 RD1, D3 RD2 | RB4, RB5 | potentiometer RA0 (AN0), 10 bits |
+| PICDEM FS USB Demo 18F45K50 Board, 2004 | `18F45K50` (internal oscillator) | RD3 | D1 RD0, D2 RD1, D3 RD2 | RB4, RB5 | potentiometer RA0 (AN0), 10 bits |
+| PIC18F14K50, 12 MHz crystal, one switch | `18F14K50` | RC0 | red RC1, yellow RC2, green RC3 | RA3 | |
+| PIC16F1459, internal oscillator, one switch | `16F1459` | RC0 | red RC1, yellow RC2, green RC3 | RA4 | |
+| PIC16F1455, internal oscillator, one switch | `16F1455` | RC0 | red RC1, yellow RC2, green RC3 | RA4 | |
+| PIC16F1454, internal oscillator, one switch | `16F1454` | RC0 | red RC1, yellow RC2, green RC3 | RA4 | |
+| PIC18F Starter Kit 1 (18F46J50), LEDs on the OLED | `18F46J50` | on the OLED | on the OLED | MENU (RB0) | |
 
 - The switches are to 0V with pull-up resistors: they read 0 when pressed.
 - The HEX of each is in `WINUSB_<chip>_Demonstration.build\`. Compile with GCBASIC as usual (F6 in GC Studio).
@@ -125,7 +125,14 @@ This is the PICDEM board in the template, with what each line means:
       "usbCodeOff": 132 },                     the request that turns it off
     ...
   ],
-  "adc": [],                                   ADC channels: none on this board
+  "adc": [                                     ADC channels: the potentiometer
+    { "usbControl": "USBCONTROLADC1",          the firmware's name for it (ADC channel 1)
+      "name": "Potentiometer", "io": "RV1",    shown in Input Port State
+      "port": "PORTA.0", "channel": "AN0",     its pin, and its ADC channel
+      "range": "0-1023",                       10 bits: the firmware reads it with ReadAD10
+      "usbCode": 139,                          its own request: the board answers two bytes, low byte first
+      "replyByte": 0 }
+  ],
   "bodyText": [                                the help text on the right, one string per line ("" for an empty line)
     "GCBASIC WinUSB application: no driver to install.",
     ...
@@ -171,7 +178,7 @@ An LED:
 | `port` | The pin, e.g. `PORTD.0`. Something that is not a pin (`OLED`) is fine: the header then has only the codes. | |
 | `usbCodeRead`, `usbCodeOn`, `usbCodeOff` | The three request codes, 0 to 255, each used once on the board. Not 255 (the keep-alive) or 32 (Windows' WCID request). | (a message) |
 
-An ADC channel (the firmware is ready for them; no board in the template has one yet):
+An ADC channel (the PICDEM boards have one: the potentiometer):
 
 | Field | What it is | When left out |
 |---|---|---|
@@ -179,7 +186,7 @@ An ADC channel (the firmware is ready for them; no board in the template has one
 | `name`, `io` | Shown in Input Port State. | "ADC n", none |
 | `port`, `channel` | The pin, and its ADC channel: `AN0`, or `ANA0` on chips that name them so. | |
 | `range` | `0-255` (8 bits), `0-1023` (10 bits) or `0-4095` (12 bits). | `0-255` |
-| `usbCode` | Its own request code: the firmware answers each channel on its own request. | (a message) |
+| `usbCode` | Its own request code: the firmware answers each channel on its own request (139 for the PICDEM potentiometer). | (a message) |
 | `replyByte` | 0: the reading is the whole answer, low byte first when more than 8 bits. | 0 |
 
 ### Common changes
@@ -194,6 +201,8 @@ An ADC channel (the firmware is ready for them; no board in the template has one
   then Ctrl+G and compile.
 - **Add a switch:** add an entry to `switches` with a free `USBCONTROLINPUTn` and `replyByte` n - 1; then Ctrl+G and
   compile.
+- **Add an ADC channel:** add an entry to `adc` with a free `USBCONTROLADCn`, its pin and `channel`, its `range`, its
+  own request code and `replyByte` 0; then Ctrl+G and compile. See [Adding an ADC channel](#adding-an-adc-channel).
 
 ## The firmware header (Ctrl+G)
 
@@ -206,7 +215,7 @@ code used twice or reserved). The header has:
 | `USBCONTROLOUTPUTn`, `_LAT`, `_READ`, `_ON`, `_OFF` | An LED: its pin, its LAT bit and its request codes. An LED that is not a pin has only its codes. |
 | `USBCONTROLINPUTSTATUS`, `USBCONTROLINPUTn` | The request that reads the switches, and each switch's pin |
 | `USBCONTROLKEEPALIVE` | The keep-alive LED's pin |
-| `USBCONTROLADCn`, `_REQUEST`, `_BITS` | An ADC channel, its request code and its bits (8, 10 or 12) |
+| `USBCONTROLADCn`, `_REQUEST`, `_BITS`, `_PIN` | An ADC channel (`AN0`), its request code, its bits (8, 10 or 12) and its pin (set as an input) |
 | `USBControlInit` | The pin directions, run at startup by `#startup USBControlInit, 90` (before USB starts) |
 
 Do not edit the header: change the board file and generate it again.
@@ -216,6 +225,103 @@ switches needs no change to the program. Request 140 always answers four bytes, 
 the board does not have. Each program keeps its own chip set-up (configuration words, and `ACTCON = 0x90` on the
 16F145x). The Starter Kit program keeps its LED states for the OLED, and calls `USBControlInit` itself
 (`StartupMethodsDisabled`).
+
+## Adding an ADC channel
+
+The PICDEM boards' potentiometer is the example: RA0, channel AN0, 10 bits, request 139.
+
+**1. The board file.** Add the channel to the board's `adc` list (see [Every field](#every-field)):
+
+```
+"adc": [ { "usbControl": "USBCONTROLADC1", "name": "Potentiometer", "io": "RV1",
+           "port": "PORTA.0", "channel": "AN0", "range": "0-1023", "usbCode": 139, "replyByte": 0 } ],
+```
+
+- `range` sets the bits: `0-255` 8 bits, `0-1023` 10 bits, `0-4095` 12 bits (only on chips with a 12-bit ADC).
+- `usbCode` must be the channel's own: not used by an LED or the switches, not 255 (keep-alive) or 32 (WCID).
+- Press **Reload file**: the channel's row appears in Input Port State, under the switches.
+
+**2. The header (Ctrl+G).** The header gets:
+
+```
+#define USBCONTROLADC1              AN0
+#define USBCONTROLADC1_REQUEST      139
+#define USBCONTROLADC1_BITS         10
+#define USBCONTROLADC1_PIN          PORTA.0
+```
+
+and `Dir USBCONTROLADC1_PIN In` in `USBControlInit`.
+
+**3. The firmware.** Nothing to change: each `WINUSB_<chip>_Demonstration.gcb` (not the Starter Kit's) answers
+`USBCONTROLADC1` to `4` when the header defines them:
+
+```
+#ifdef USBCONTROLADC1
+      Case USBCONTROLADC1_REQUEST
+        #if USBCONTROLADC1_BITS = 10
+            USBControlADCValue = ReadAD10( USBCONTROLADC1 )
+            USBBufferWrite( USBControlADCValue )        'a Word: its low byte, then its high byte
+        #endif
+        ...
+#endif
+```
+
+- GCBASIC's `ReadAD`, `ReadAD10` and `ReadAD12` set up the ADC for the channel on each read, and put the pins back to
+  digital afterwards (on the 18F4550: the PCFG bits), so the switches on RB4 and RB5 (AN11, AN9) stay digital.
+  There is no ADC configuration to write.
+- `USBBufferWrite` of a Word writes two bytes, low first; `ReadAD` (8 bits) returns a Byte, and writes one.
+
+**4. Compile and program** as GC Studio does: F6 (Make HEX), then F5 or Flash Previous to program it with the
+programmer in `use.ini`. From a command prompt, in `C:\GCstudio\gcbasic`:
+
+```
+GCBASIC.EXE "<path>\WINUSB_18F4550_Demonstration.gcb" /NP /S:use.ini /F:N /P: /DO    (compile)
+GCBASIC.EXE "<path>\WINUSB_18F4550_Demonstration.gcb" /NP /S:use.ini /FO /DO         (program the HEX)
+```
+
+**5. Check it.** Plug the board in and start the PC program: the value shows when it connects. Turn the
+potentiometer and press **Read** (or **Start Poll**): the value follows, 0 to 1023.
+
+## A board without LEDs, switches or an ADC
+
+A board has only what its entry in `BoardTypes.json` lists. Leave out `leds`, `switches` or `adc` (or make the list
+empty, `[]`) and that part is gone, from the PC program's window and from the firmware: nothing else changes.
+
+This was tested on 2026-10-25 with three copies of the PICDEM 18F4550 board, each without one part. Each copy's header
+was generated with Ctrl+G and `WINUSB_18F4550_Demonstration.gcb` compiled with it, unchanged; the PC program ran with
+the PICDEM board:
+
+| Left out | The PC program's window | The firmware |
+|---|---|---|
+| `adc` | Input Port State has the switch rows only (no line, no ADC row). The pin tables have no ADC section. | 1,472 words. It answers the LED requests (130 to 138) and the switches (140); no `ReadAD10` code. |
+| `leds` | LED Status says "No LEDs on this board". The LED table has only the keep-alive LED. The switches and the potentiometer work. | 1,496 words. It answers only the switches (140) and the ADC (139); no LED pin is set as an output. The keep-alive LED stays (it is `keepAlive`, not in `leds`). |
+| `switches` | Input Port State has the potentiometer only; Read and Start Poll read it. The inputs table says "(none)". | 1,548 words. It answers the LED requests and the ADC; request 140 is not answered, and RB4, RB5 are left as they are. |
+
+No warnings when the headers were generated.
+
+| Without the ADC | Without LEDs | Without switches |
+|---|---|---|
+| ![The window without the ADC: two switch rows, three LEDs](PC_Application/Documentation/Board_without_ADC.png) | ![The window without LEDs: "No LEDs on this board"](PC_Application/Documentation/Board_without_LEDs.png) | ![The window without switches: the potentiometer only in Input Port State](PC_Application/Documentation/Board_without_switches.png) |
+
+How it works:
+
+- **The PC program** builds its rows from the lists: an empty list gives no rows, and nothing is ever asked of the
+  board for it. A group with nothing in it says so ("No LEDs on this board", "No inputs on this board"). Read and
+  Start Poll are available while there is a switch or an ADC channel to read.
+- **The header** has `'None` in that part's section, so its `USBCONTROL...` names are not defined, and
+  `USBControlInit` sets no direction for its pins.
+- **The firmware** handles each name inside `#ifdef`, so code for a part the header does not define is not compiled
+  at all: the program gets smaller, and the pins stay free.
+
+When the board file and the firmware disagree:
+
+- **The firmware has a part the board file does not:** harmless; the PC program never asks for it.
+- **The board file has a part the firmware does not** (its header was not generated again): the firmware answers that
+  request with nothing (a successful transfer of 0 bytes), and the PC program shows "-" for it. Nothing else is
+  affected: the board stays connected, and the switches, LEDs and keep-alive work. Generate the header (Ctrl+G),
+  compile and program. Tested 2026-10-25: the PICDEM board with the potentiometer in the board file, programmed with
+  firmware built without it: request 139 answered 0 bytes three times, each followed by normal answers to 140, 130
+  and 255; the PC program showed "Potentiometer (AN0) -" and stayed connected.
 
 ## From coloured LEDs to outputs (version 3.0)
 
@@ -285,7 +391,7 @@ say "Set State" (version 2.0's label). To change a board's text, edit its `bodyT
 
 | File | What it is |
 |---|---|
-| `WINUSB_DEMO_PROGRAM.exe`, `.exe.config`, `LibUsbDotNet.dll` | The PC program (v3.0.0), ready to run. |
+| `WINUSB_DEMO_PROGRAM.exe`, `.exe.config`, `LibUsbDotNet.dll` | The PC program (v3.1.0), ready to run. |
 | `BoardTypes.json` | The board file the PC program uses. |
 | `WINUSB_<chip>_Demonstration.gcb` | The firmware, one per chip. |
 | `WINUSB_<chip>_Demonstration.h` | The board's pins and request codes, written by the PC program (Ctrl+G). |
@@ -335,10 +441,10 @@ say "Set State" (version 2.0's label). To change a board's text, edit its `bodyT
 
 ## Sizes (GCBASIC build 1660)
 
-| Firmware, version 3.0 | Program memory | RAM |
+| Firmware, version 3.1 (the Starter Kit's 3.0) | Program memory | RAM |
 |---|---|---|
-| 18F4550 | 1,471 words | 717 bytes |
-| 18F45K50 | 1,485 words | 717 bytes |
+| 18F4550 (with the ADC) | 1,576 words | 723 bytes |
+| 18F45K50 (with the ADC) | 1,793 words | 723 bytes |
 | 18F14K50 | 1,471 words | 461 bytes |
 | 16F1459 | 1,803 words | 716 bytes |
 | 16F1455 | 1,801 words | 716 bytes |
@@ -349,10 +455,10 @@ say "Set State" (version 2.0's label). To change a board's text, edit its `bodyT
 
 | Board | Status |
 |---|---|
-| PICDEM FS USB board, 18F4550 | Version 3.0 tested on the board, 2026-10-25: enumerates with WinUSB; the PC program sets the LEDs on and off and reads them back, and reads the two switches |
-| 18F45K50 | Version 3.0 compiles; not tested on a board |
-| 18F14K50 | Version 2.0 tested on the board (2026-10-19); version 3.0 compiles, not tested |
-| 16F1454, 16F1455, 16F1459 | Version 2.0 tested on the boards (2026-10-19); version 3.0 compiles, not tested |
+| PICDEM FS USB board, 18F4550 | Version 3.1 tested on the board, 2026-10-25: enumerates with WinUSB; the PC program sets the LEDs on and off and reads them back, and reads the two switches. The potentiometer (ADC, RA0/AN0, 10 bits) tested on the board, 2026-10-25: the value follows the potentiometer, read on connect, by Read and by Start Poll |
+| 18F45K50 | Version 3.1 compiles; not tested on a board |
+| 18F14K50 | Version 2.0 tested on the board (2026-10-19); version 3.1 compiles, not tested |
+| 16F1454, 16F1455, 16F1459 | Version 2.0 tested on the boards (2026-10-19); version 3.1 compiles, not tested |
 | Starter Kit (18F46J50) | Version 3.0 compiles; not tested on the kit |
 
 To test a board: program its HEX, plug it in (Device Manager: "GCBASIC WinUSB <chip>" under Universal Serial Bus
@@ -361,6 +467,11 @@ Start Poll) and the keep-alive LED. Unplug and plug in again: the program connec
 
 ## History
 
+- **3.1 (2026-10-25):** ADC channels: the PICDEM boards' potentiometer (RA0/AN0, 10 bits, request 139), shown as a
+  value in Input Port State and read on connect, by Read and by Start Poll. The header defines the channel's pin and
+  sets it as an input; the firmware answers a 10- or 12-bit reading as one Word (3.0 sent its high byte twice). The PC
+  program is built with Visual Studio 2017, and keeps the previous version's settings. The Starter Kit program is
+  unchanged (3.0).
 - **3.0 (2026-10-25):** the boards in `BoardTypes.json`; the firmware's pins in a generated header (Ctrl+G); switch
   lamps and polling; the help text of the PICDEM boards and the Starter Kit rewritten for their own LEDs and switches;
   the 18F45K50 program on the PICDEM board's pins (2.0: LEDs RA4, RA5, RC0, RC1, switches RB4 to
@@ -371,7 +482,7 @@ Start Poll) and the keep-alive LED. Unplug and plug in again: the program connec
 
 ## Building the PC program
 
-The PC program (v3.0.0) is built with Visual Studio 2017 (open `PC_Application\WinUSB_Demo_Program.sln`, or
+The PC program (v3.1.0) is built with Visual Studio 2017 (open `PC_Application\WinUSB_Demo_Program.sln`, or
 `MSBuild.exe WinUSB_Demo_Program.sln /p:Configuration=Release` from `...\2017\Community\MSBuild\15.0\Bin`), for
 .NET Framework 4.0 Client. Build from a local copy of `PC_Application`: on a network drive MSBuild refuses
 `MainForm.resx` (error MSB3821, the file is in the Internet zone) unless the share is in Windows' Local intranet zone.

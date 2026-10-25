@@ -26,7 +26,7 @@
 '''
 '''@author     EvanV
 '''@licence    GPL
-'''@version    3.0 (the board in WINUSB_18F14K50_Demonstration.h; 2.0 WinUSB, no driver; 1.0 LibK/WinUSB with a driver)
+'''@version    3.1 (an ADC channel answered as one Word, its pin an input; 3.0 the board in WINUSB_18F14K50_Demonstration.h; 2.0 WinUSB, no driver; 1.0 LibK/WinUSB with a driver)
 '''@date       25/10/2026
 '''********************************************************************************
 
@@ -239,13 +239,11 @@
                       #endif
                       #if USBCONTROLADC1_BITS = 10
                           USBControlADCValue = ReadAD10( USBCONTROLADC1 )
-                          USBBufferWrite( USBControlADCValue )
-                          USBBufferWrite( USBControlADCValue_H )
+                          USBBufferWrite( USBControlADCValue )        'a Word: its low byte, then its high byte
                       #endif
                       #if USBCONTROLADC1_BITS = 12
                           USBControlADCValue = ReadAD12( USBCONTROLADC1 )
-                          USBBufferWrite( USBControlADCValue )
-                          USBBufferWrite( USBControlADCValue_H )
+                          USBBufferWrite( USBControlADCValue )        'a Word: its low byte, then its high byte
                       #endif
               #endif
 
@@ -256,13 +254,11 @@
                       #endif
                       #if USBCONTROLADC2_BITS = 10
                           USBControlADCValue = ReadAD10( USBCONTROLADC2 )
-                          USBBufferWrite( USBControlADCValue )
-                          USBBufferWrite( USBControlADCValue_H )
+                          USBBufferWrite( USBControlADCValue )        'a Word: its low byte, then its high byte
                       #endif
                       #if USBCONTROLADC2_BITS = 12
                           USBControlADCValue = ReadAD12( USBCONTROLADC2 )
-                          USBBufferWrite( USBControlADCValue )
-                          USBBufferWrite( USBControlADCValue_H )
+                          USBBufferWrite( USBControlADCValue )        'a Word: its low byte, then its high byte
                       #endif
               #endif
 
@@ -273,13 +269,11 @@
                       #endif
                       #if USBCONTROLADC3_BITS = 10
                           USBControlADCValue = ReadAD10( USBCONTROLADC3 )
-                          USBBufferWrite( USBControlADCValue )
-                          USBBufferWrite( USBControlADCValue_H )
+                          USBBufferWrite( USBControlADCValue )        'a Word: its low byte, then its high byte
                       #endif
                       #if USBCONTROLADC3_BITS = 12
                           USBControlADCValue = ReadAD12( USBCONTROLADC3 )
-                          USBBufferWrite( USBControlADCValue )
-                          USBBufferWrite( USBControlADCValue_H )
+                          USBBufferWrite( USBControlADCValue )        'a Word: its low byte, then its high byte
                       #endif
               #endif
 
@@ -290,13 +284,11 @@
                       #endif
                       #if USBCONTROLADC4_BITS = 10
                           USBControlADCValue = ReadAD10( USBCONTROLADC4 )
-                          USBBufferWrite( USBControlADCValue )
-                          USBBufferWrite( USBControlADCValue_H )
+                          USBBufferWrite( USBControlADCValue )        'a Word: its low byte, then its high byte
                       #endif
                       #if USBCONTROLADC4_BITS = 12
                           USBControlADCValue = ReadAD12( USBCONTROLADC4 )
-                          USBBufferWrite( USBControlADCValue )
-                          USBBufferWrite( USBControlADCValue_H )
+                          USBBufferWrite( USBControlADCValue )        'a Word: its low byte, then its high byte
                       #endif
               #endif
 

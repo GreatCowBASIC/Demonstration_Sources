@@ -8,7 +8,7 @@
 '''                          (an output that is not a pin, e.g. drawn on a display, has only its request codes)
 '''  USBCONTROLINPUTn        an input (switch): its pin. USBCONTROLINPUTSTATUS reads inputs 1 to 4 (1 for one not defined)
 '''  USBCONTROLKEEPALIVE     the LED the keep-alive (request 255) toggles
-'''  USBCONTROLADCn          an ADC channel: its channel, its _REQUEST code and its _BITS (8, 10 or 12)
+'''  USBCONTROLADCn          an ADC channel: its channel, its _REQUEST code, its _BITS (8, 10 or 12) and its _PIN
 '''
 '''USBControlInit sets the directions of the pins. It runs at startup (#startup USBControlInit, 90): the program does not call it.
 '''
@@ -16,7 +16,7 @@
 '''
 '''@board      PICDEMUSBBOARD18F44502004
 '''@source     D:\GreatCowBASICGits\Demonstration_Sources.git\USB_Solutions\GreatCowBASIC_Solutions\WINUSB_Solutions\BoardTypes.json
-'''@date       25/10/2026 11:48
+'''@date       25/10/2026 16:24
 '''********************************************************************************
 
 ' ----- Outputs (LEDs)
@@ -58,7 +58,12 @@
     #define USBCONTROLKEEPALIVE         PORTD.3
 
 ' ----- ADC channels
-    'None
+
+    'Potentiometer, RV1: PORTA.0, 0-1023
+    #define USBCONTROLADC1              AN0
+    #define USBCONTROLADC1_REQUEST      139
+    #define USBCONTROLADC1_BITS         10
+    #define USBCONTROLADC1_PIN          PORTA.0
 
 ' ----- Pin directions: set at startup
 
@@ -71,4 +76,5 @@
         Dir USBCONTROLINPUT1 In
         Dir USBCONTROLINPUT2 In
         Dir USBCONTROLKEEPALIVE Out
+        Dir USBCONTROLADC1_PIN In
     End Sub

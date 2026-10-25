@@ -55,7 +55,7 @@ Public Class FirmwareHeader
         Line("'''                          (an output that is not a pin, e.g. drawn on a display, has only its request codes)")
         Line("'''  USBCONTROLINPUTn        an input (switch): its pin. USBCONTROLINPUTSTATUS reads inputs 1 to 4 (1 for one not defined)")
         Line("'''  USBCONTROLKEEPALIVE     the LED the keep-alive (request 255) toggles")
-        Line("'''  USBCONTROLADCn          an ADC channel: its channel, its _REQUEST code and its _BITS (8, 10 or 12)")
+        Line("'''  USBCONTROLADCn          an ADC channel: its channel, its _REQUEST code, its _BITS (8, 10 or 12) and its _PIN")
         Line("'''")
         Line("'''USBControlInit sets the directions of the pins. It runs at startup (#startup USBControlInit, 90): the program does not call it.")
         Line("'''")
@@ -158,6 +158,11 @@ Public Class FirmwareHeader
             Define(Adc.UsbControl, Adc.Channel.ToUpperInvariant())
             Define(Adc.UsbControl & "_REQUEST", Adc.UsbCode.ToString())
             Define(Adc.UsbControl & "_BITS", BitsOf(Adc.RangeMax).ToString())
+            'Its pin is an input (ReadAD makes the channel analog when it reads)
+            If LatOf(Adc.Port) IsNot Nothing Then
+                Define(Adc.UsbControl & "_PIN", Adc.Port)
+                Dirs.Add("Dir " & Adc.UsbControl & "_PIN In")
+            End If
         Next
     End Sub
 

@@ -90,6 +90,12 @@ Partial Public Class MainForm
         Me.InitializeComponent()
         ConnectionStatus.Select()
 
+        'The version (AssemblyInfo.vb's AssemblyVersion) in the title and at the bottom right
+        Dim Version = My.Application.Info.Version
+        Dim VersionText = "v" & Version.Major & "." & Version.Minor & "." & Version.Build
+        Text = Text & " " & VersionText
+        footerRightText.Text = VersionText
+
         'Store the orignal UI value - we update later
         orginalfooterRightText = footerRightText.Text
 
@@ -376,6 +382,11 @@ Partial Public Class MainForm
             AddInputRow(Y, Describe(Switch.Name, Switch.IO), Switch.Port & ", request " & Switch.UsbCode & " byte " & Switch.ReplyByte & ", on at " & Switch.OnValue, RowFont, SwitchValues, SwitchLamps)
             Y += InputRowHeight
         Next
+        'The ADC channels: a value each (0 to the channel's range), under a line when there are switches above
+        If Adcs.Count > 0 AndAlso Switches.Count > 0 Then
+            groupBox2.Controls.Add(New Label With {.BorderStyle = BorderStyle.Fixed3D, .Location = New Point(15, Y - 4), .Size = New Size(LeftWidth - 30, 2)})
+            Y += 4
+        End If
         For Each Adc In Adcs
             AddInputRow(Y, Describe(Adc.Name, Adc.Channel), Adc.Port & " " & Adc.Channel & ", 0-" & Adc.RangeMax & ", request " & Adc.UsbCode & " byte " & Adc.ReplyByte, RowFont, AdcValues)
             Y += InputRowHeight
@@ -634,7 +645,11 @@ Partial Public Class MainForm
         Dim Replies As New Dictionary(Of Byte, Byte())
 
         ReadSwitches(Replies)
+        ReadAdcs(Replies)
+    End Sub
 
+    'Read the ADC channels and show their values: one byte, or two (low byte first) above 8 bits
+    Sub ReadAdcs(Replies As Dictionary(Of Byte, Byte()))
         For Index = 0 To Math.Min(Board.Adcs.Count, AdcValues.Count) - 1
             Dim Adc = Board.Adcs(Index)
             Dim Reply = RequestOnce(Replies, Adc.UsbCode)
@@ -663,18 +678,20 @@ Partial Public Class MainForm
         Next
     End Sub
 
-    'Poll the switches every SwitchPollSeconds (from the board file) while the board is connected.
+    'Poll the switches and the ADC channels every SwitchPollSeconds (from the board file) while the board is connected.
     'The poll is not a keep-alive: the keep-alive count is kept, so the keep-alive still runs every 10 s.
     Private Sub SwitchPoll_Tick(sender As Object, e As EventArgs) Handles SwitchPoll.Tick
         If Board Is Nothing OrElse Device Is Nothing Then Return
         Dim SavedCount = KeepAliveCounter
-        ReadSwitches(New Dictionary(Of Byte, Byte()))
+        Dim Replies As New Dictionary(Of Byte, Byte())
+        ReadSwitches(Replies)
+        ReadAdcs(Replies)
         KeepAliveCounter = SavedCount
     End Sub
 
-    'The board in use has switches and a poll period (switchPollSeconds in the board file)
+    'The board in use has inputs (switches or ADC channels) and a poll period (switchPollSeconds in the board file)
     Function CanPoll() As Boolean
-        Return Board IsNot Nothing AndAlso Board.SwitchPollSeconds > 0 AndAlso SwitchValues.Count > 0
+        Return Board IsNot Nothing AndAlso Board.SwitchPollSeconds > 0 AndAlso SwitchValues.Count + AdcValues.Count > 0
     End Function
 
     'Start Poll / End Poll was clicked. The poll never starts by itself.

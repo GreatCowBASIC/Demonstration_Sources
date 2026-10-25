@@ -225,7 +225,7 @@ Partial Class MainForm
         Me.footerRightText.Name = "footerRightText"
         Me.footerRightText.Size = New System.Drawing.Size(100, 19)
         Me.footerRightText.TabIndex = 9
-        Me.footerRightText.Text = "v3.0.0"
+        Me.footerRightText.Text = "v3.1.0"
         Me.footerRightText.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'VenPidText
@@ -260,7 +260,7 @@ Partial Class MainForm
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MaximizeBox = False
         Me.Name = "MainForm"
-        Me.Text = "GCBASIC WinUSB Demo Program - no driver"
+        Me.Text = "GCBASIC WinUSB Demo Program"
         Me.groupBox1.ResumeLayout(False)
         Me.groupBoxBoard.ResumeLayout(False)
         Me.groupBox2.ResumeLayout(False)

@@ -29,7 +29,7 @@
         { "usbControl": "USBCONTROLOUTPUT2", "name": "D2", "io": "I/O 3", "colour": "BRIGHTGREEN", "port": "PORTD.1", "usbCodeRead": 133, "usbCodeOn": 134, "usbCodeOff": 135 },
         { "usbControl": "USBCONTROLOUTPUT3", "name": "D3", "io": "I/O 4", "colour": "BRIGHTGREEN", "port": "PORTD.2", "usbCodeRead": 136, "usbCodeOn": 137, "usbCodeOff": 138 }
       ],
-      "adc": [],
+      "adc": [ { "usbControl": "USBCONTROLADC1", "name": "Potentiometer", "io": "RV1", "port": "PORTA.0", "channel": "AN0", "range": "0-1023", "usbCode": 139, "replyByte": 0 } ],
       "bodyText": [
         "GCBASIC WinUSB application: no driver to install.",
         "",
@@ -40,6 +40,8 @@
         "- Setting PIC outputs: use the Set boxes to turn the board's LEDs D1, D2 and D3 (RD0, RD1 and RD2: outputs 1, 2 and 3) on and off.",
         "",
         "- Reading PIC inputs: select 'Read' to read the board's two switches (RB4 and RB5: inputs 1 and 2), or 'Start Poll' to read them every 10 seconds. A switch reads 0 when it is pressed (switches to 0V, pull-ups): its lamp is white.",
+        "",
+        "- Reading the potentiometer: its value (0 to 1023, 10 bits, from RA0: AN0) is read with the switches, by 'Read' and 'Start Poll'. Turn it and read again.",
         "",
         "- When it connects, it reads the state of the LEDs and the switches and shows it here.",
         "",
@@ -68,7 +70,7 @@
         { "usbControl": "USBCONTROLOUTPUT2", "name": "D2", "io": "I/O 3", "colour": "BRIGHTGREEN", "port": "PORTD.1", "usbCodeRead": 133, "usbCodeOn": 134, "usbCodeOff": 135 },
         { "usbControl": "USBCONTROLOUTPUT3", "name": "D3", "io": "I/O 4", "colour": "BRIGHTGREEN", "port": "PORTD.2", "usbCodeRead": 136, "usbCodeOn": 137, "usbCodeOff": 138 }
       ],
-      "adc": [],
+      "adc": [ { "usbControl": "USBCONTROLADC1", "name": "Potentiometer", "io": "RV1", "port": "PORTA.0", "channel": "AN0", "range": "0-1023", "usbCode": 139, "replyByte": 0 } ],
       "bodyText": [
         "GCBASIC WinUSB application: no driver to install.",
         "",
@@ -79,6 +81,8 @@
         "- Setting PIC outputs: use the Set boxes to turn the board's LEDs D1, D2 and D3 (RD0, RD1 and RD2: outputs 1, 2 and 3) on and off.",
         "",
         "- Reading PIC inputs: select 'Read' to read the board's two switches (RB4 and RB5: inputs 1 and 2), or 'Start Poll' to read them every 10 seconds. A switch reads 0 when it is pressed (switches to 0V, pull-ups): its lamp is white.",
+        "",
+        "- Reading the potentiometer: its value (0 to 1023, 10 bits, from RA0: AN0) is read with the switches, by 'Read' and 'Start Poll'. Turn it and read again.",
         "",
         "- When it connects, it reads the state of the LEDs and the switches and shows it here.",
         "",
