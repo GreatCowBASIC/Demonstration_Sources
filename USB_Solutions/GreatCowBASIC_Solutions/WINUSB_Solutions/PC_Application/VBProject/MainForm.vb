@@ -583,6 +583,11 @@ Partial Public Class MainForm
                 End If
                 ConnectionStatus.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
                 VenPidText.Text = ""
+                'Only when the focus is on a control that is disabled below: every second, it would take the focus
+                'from the board list (and close it), so the board could not be changed while disconnected
+                Dim Focused = ActiveControl
+                If Focused Is PollValues OrElse Focused Is PollToggle OrElse TypeOf Focused Is CheckBox Then ConnectionStatus.Select()
+
                 'Disable the UI
                 PollValues.Enabled = False
                 'The board has gone: the poll stops, Start Poll starts it again
@@ -591,9 +596,6 @@ Partial Public Class MainForm
                 For Each Check In LedChecks
                     Check.Enabled = False
                 Next
-
-                'Do not move this call
-                ConnectionStatus.Select()
             End If
         Catch
             'exit gracefully
