@@ -1,0 +1,17 @@
+' Change 1662: #option StartupMethodsDisabled with the program's own #startup sub.
+' Expected (build 1662): ";!  call MYSTART" in the asm and no MYSTART routine (it is not called). Build 1661 compiled
+' MYSTART although it was never called.
+#chip 18F46J50, 48
+#option explicit
+#option StartupMethodsDisabled
+#startup MyStart
+
+Dir PORTB Out
+Do
+    PORTB = PORTB + 1
+    Wait 100 ms
+Loop
+
+Sub MyStart
+    PORTB = 0x55
+End Sub

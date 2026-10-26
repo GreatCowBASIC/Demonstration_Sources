@@ -1,0 +1,13 @@
+' Change 1662: #option StartupMethodsDisabled, AVR, with Random.
+' Expected (build 1662): ";!  rcall INITSYS" and ";!  rcall INITRANDOM" in the asm, and no INITSYS or INITRANDOM
+' routine. Build 1661 compiled both although they were never called.
+#chip mega328p, 16
+#option explicit
+#option StartupMethodsDisabled
+
+Dir PORTB Out
+Randomize 0x1234
+Do
+    PORTB = Random
+    Wait 100 ms
+Loop

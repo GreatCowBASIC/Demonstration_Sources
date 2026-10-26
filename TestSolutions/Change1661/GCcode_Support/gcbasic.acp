@@ -1,0 +1,598 @@
+#chars #!&()
+-> ! / NOT / ! | \_conditions.html
+-> # / XOR / # | \_conditions.html
+-> #ASMRAW valid_assembly | \__asmraw.html
+-> #CHIP model, speed | \__chip.html
+-> #CONFIG option1, option2, ... , optionN | \__config.html
+-> #DEFINE Find Replace| \__define.html
+-> #ELSE | \__ifdef.html
+-> #ENDIF | \__ifdef.html
+-> #ENDSCRIPT |#SCRIPT [scriptcommand1] [scriptcommand2] ... [scriptcommandN] #ENDSCRIPT | \__script.html
+-> #IF Condition ... #ENDIF | \_if.html
+-> #IFNOT Condition ... #ENDIF | \__ifnot.html
+-> #IFDEF |#IFDEF Constant / Constant Value / Var (VariableName) ... #ENDIF | \__ifdef.html
+-> #IFNDEF |#IFNDEF Constant / Constant Value / Var (VariableName) ... #ENDIF | \__ifndef.html
+-> #INCLUDE filename | \__include.html
+-> #MEM  | \_glcd_overview.htmlThis directive is obsolete | \_glcd_overview.html | \__mem.html
+-> #SAMEBIT | \_other_directives.html
+-> #SAMEVAR | \_other_directives.html
+-> #UNDEFINE Find Replace| \__undefine.html
+-> 32.768k |  \__chip.html
+-> 31k |  \__chip.html
+
+
+-> [canskip] |  \_setting_variables.html
+
+-> #OPTION NoConfig | \__option_noconfig.html
+-> #OPTION Explicit | \__option_explicit.html
+-> #OPTION Bootloader Address | \__option_bootloader.html
+-> #OPTION BootloaderHost Address | \__option_bootloaderhost.html
+-> #OPTION IncludePath "folder;folder" | \__option_includepath.html
+-> #OPTION NoContextSave | \__option_nocontextsave.html
+-> #OPTION NoLatch | \__option_nolatch.html
+-> #OPTION Required PIC�AVR CONSTANT  %message%�String | \__option_required.html
+-> #OPTION StringLimitCheck | \__option_stringlimitcheck.html
+-> #OPTION Volatile port.bit | \__option_volatile.html
+
+-> NoConfig | \__option_noconfig.html
+-> Explicit | \__option_explicit.html
+-> Bootloader | \__option_bootloader.html
+-> BootloaderHost | \__option_bootloaderhost.html
+-> IncludePath | \__option_includepath.html
+-> NoContextSave | \__option_nocontextsave.html
+-> NoLatch | \__option_nolatch.html
+-> ReserveHighProg  | \__option_reservehighprog.html
+-> StringLimitCheck | \__option_stringlimitcheck.html
+-> Volatile | \__option_volatile.html
+
+
+-> #SCRIPT [scriptcommand1] [scriptcommand2] ... [scriptcommandN] | \__script.html
+-> #SCRIPT |#SCRIPT [scriptcommand1] [scriptcommand2] ... [scriptcommandN] #ENDSCRIPT | \_script.html
+-> #STARTUP SubName | \__startup.html
+-> & |& / AND  | \_conditions.html
+-> 10ms | Wait timevalue 10-MILLISECONDS | \_wait.html
+-> 10us | Wait timevalue 10-MICROSECONDS | \_wait.html
+-> ABS (integer_variable) | integer_variable = ABS (integer_variable)
+-> ADOff ! This command is obsolete !
+-> AD_REF_SOURCE | \_analog_digital_conversion_overview.html
+-> Alias | \_dim.html
+-> Alloc | \_alloc.html
+-> AND |AND / &  | \_conditions.html
+-> ATAN ( x_vector,y_vector) | \_trigonometry_atan.html
+-> Array | \_variables.html
+-> Asc (String, [position]) | bytevar = Asc (String, [position])
+-> Average (byte_variable1, byte_variable2) | integer_variable = Average (byte_variable1, byte_variable2)
+-> BcdToDec_GCB (ByteVariable) | \_bcdtodec_gcb.html
+-> BIT | \_variables.html
+-> Var (..[,..])  | \_other_directives.html
+-> NoVar (..[,..])  | \_other_directives.html
+-> NoBit (..[,..])  | \_other_directives.html
+-> BIT (..[,..])  | \_other_directives.html
+-> OneOf ..[,..])  | \_other_directives.html
+-> AllOf (..[,..])  | \_other_directives.html
+
+-> Bootloader | \__option_bootloader.html
+-> Bootloader |#OPTION Bootloader Address | \_optionbootloader.html
+-> Box (LineX1,LineY1, LineX2, LineY2, Optional LineColour = 1)
+-> Byte | \_variables.html
+-> ByteToBin (bytevar) |stringvar = ByteToBin (bytevar)
+-> Call |On Interrupt event Call handler / On Interrupt event Ignore | \_on_interrupt.html
+-> Case |Select Case Var / Case value1 / ...code / ...Case valueN / ...code / ...Case Else / ...code / ...End Select | \_select.html
+
+
+-> CCP_PWM_1_On | \_hpwm_fixed_mode.html
+-> CCP_PWM_2_On | \_hpwm_fixed_mode.html
+-> CCP_PWM_3_On | \_hpwm_fixed_mode.html
+-> CCP_PWM_4_On | \_hpwm_fixed_mode.html
+-> CCP_PWM_5_On | \_hpwm_fixed_mode.html
+-> CCP_PWM_1_Off | \_hpwm_fixed_mode.html
+-> CCP_PWM_2_Off | \_hpwm_fixed_mode.html
+-> CCP_PWM_3_Off | \_hpwm_fixed_mode.html
+-> CCP_PWM_4_Off | \_hpwm_fixed_mode.html
+-> CCP_PWM_5_Off | \_hpwm_fixed_mode.html
+-> CCP_PWMOn ( channel ) | \_hpwm_fixed_mode.html
+-> CCP_PWMOff ( channel ) | \_hpwm_fixed_mode.html
+
+-> ChipFamily | \_other_directives.html
+-> ChipMHz | \_other_directives.html
+-> ChipName | \_other_directives.html
+-> ChipNameStr | \_other_directives.html
+-> ChipRAM | \_other_directives.html
+-> ChipReserveHighProg | \_other_directives.html
+-> ChipProgrammerNameStr | \_other_directives.html
+-> CHR (bytevar) |stringvar = CHR (bytevar)
+-> Circle (XPixelPosition, YPixelPosition, Radius [,Optional LineColour] [,Optional Rounding]) | \_circle.html
+-> ClearTimer TimerNo
+-> CLS | \_cls.html
+-> cos ( angle_as_byte ) | \_trigonometry_sine_cosine_and_tangent.html
+-> CreateButton | \_sdd1289_controllers.html
+-> CURSORON | \_lcdcursor.html
+-> CURSOROFF | \_lcdcursor.html
+-> DecToBcd_GCB (bytevar) | \_dectobcd_gcb.html
+-> Difference
+-> Dim |Dim variable [, variable2[, variable3]] [As type] [Alias othervar [,othervar2]] [At location [Override]] / Dim Array (size) [At location [Override]]
+-> Dir |Dir port.bit {In / Out} -Individual Form- |Dir port {In / Out / DirectionByte} -Entire Port Form-
+-> DisplayChar (display, character [,TRUE | FALSE] )
+-> DisplayValue (display, data [,TRUE | FALSE] )
+-> DisplaySegment (display, data )
+-> Do [{While / Until} condition] /  ...program code /  ...Loop [{While / Until} condition]
+-> Ellipse (XPixelPosition, YPixelPosition, XRadius, YRadius [,Optional LineColour] )
+-> FilledEllipse (XPixelPosition, YPixelPosition, XRadius YRadius [,Optional LineColour] )
+
+-> EERAM_AutoStore  | \_47xxx_eeram_devices.html
+-> EERAM_Status  | \_47xxx_eeram_devices.html
+-> EERAM_AutoStore  | \_47xxx_eeram_devices.html
+-> EERAM_Backup  | \_47xxx_eeram_devices.html
+-> EERAM_Recall  | \_47xxx_eeram_devices.html
+-> EERAM_HWStore  | \_47xxx_eeram_devices.html
+-> EERAM_Write  | \_47xxx_eeram_devices.html
+-> EERAM_Read  | \_47xxx_eeram_devices.html
+-> EERAM_Write_Command  | \_47xxx_eeram_devices.html
+-> I2C_Adr_EERAM   | \_47xxx_eeram_devices.html
+-> EERAM_HS   | \_47xxx_eeram_devices.html
+-> EERAM_Tstore  | \_47xxx_eeram_devices.html
+-> EERAM_Trecall  | \_47xxx_eeram_devices.html
+-> EERAM_I2C_Adr   | \_47xxx_eeram_devices.html
+
+
+-> Else |1) If condition Then command  2) If condition Then / ...code To run If TRUE / Else / ...code To run If FALSE / End If | \_if.html
+-> End Sub | \_subroutines.html
+-> End   | \_glcd_overview.htmlEnds programm execution | \_glcd_overview.html
+-> End Macro | \_macrosoverview.html
+-> End Select | \_select.html
+-> End Table | \_lookuptables.html
+-> EPRead location, store
+-> EPWrite location, data
+-> Exit Sub | \_exit.html
+-> Exit | \_exit.html
+-> FAST | \_lcd_speed.html
+-> FastHWSPITransfer ( byte_variable )
+-> Fill ( length_as_byte [, pad_character] ) | \_fill.html
+-> FilledBox (LineX1,LineY1, LineX2, LineY2, Optional LineColour = 1)
+-> FilledCircle (XPixelPosition, YPixelPosition, Radius [,Optional LineColour] ) | \_filledcircle.html
+-> FillRoundRect | \_sdd1289_controllers.html
+-> CURSORON | \_lcdcursor.html
+-> FLASH | \_lcdcursor.html
+-> FLASHON | \_lcdcursor.html
+-> FLASHOFF | \_lcdcursor.html
+-> FnLSL  ( BitsIn, NumBits )
+-> FnLSR  ( BitsIn, NumBits )
+-> For counter = start To End [Step increment] / ...program code / ...Next
+-> Forever | \_dim.html
+-> Function |Function Return / ...program code / ...End Function | \_functions.html
+
+-> FVRInitialize ( FVR_Constant_Value )
+-> FVRIsOutputReady()
+
+-> Get (Line, Column) |Var = Get (Line, Column)
+-> Get (Line, Column) |Var = Get (Line, Column)
+-> GetUserID
+-> GLCDBackground | \_glcd_overview.html
+-> GLCDCLS
+-> GLCDDisplay ( On OR Off )
+-> GLCDDrawChar (CharLocX, CharLocY, CharCode)
+-> GLCDDrawString (CharLocX, CharLocY, String )
+-> GLCDfntDefaultSize | \_glcd_overview.html
+-> GLCDFontWidth | \_glcd_overview.html
+-> GLCDForeground | \_glcd_overview.html
+-> GLCDPrint (PrintLocX, PrintLocY, PrintData)
+-> GLCDPrintWithSize (PrintLocX, PrintLocY, PrintData, FontSize [,Color])
+-> GLCDLocateString (PrintLocX, PrintLocY)
+-> GLCDPrintString (PrintLocX, PrintLocY, String)
+-> GLCDPrintStringLn (String)
+-> GLCDPrintLargeFont (PrintLocX, PrintLocY, String)
+-> GLCDReadByte (LCDByte)
+-> GLCDRotate
+-> GLCDTimeDelay
+-> GLCDWriteByte (LCDByte)
+-> Gosub label |...program code / ...Return
+-> Goto label
+-> GLCD_Open_PageTransaction | \_glcdtransaction.html
+-> GLCD_Close_PageTransaction | \_glcdtransaction.html
+
+-> GLCD_NextionSerialPrint  | \_nextion_controllers.html
+-> GLCD_NextionSerialSend | \_nextion_controllers.html
+-> GLCDLocateString_Nextion ( PrintLocX, PrintLocY )| \_nextion_controllers.html
+-> GLCDPrintDefaultFont_Nextion | \_nextion_controllers.html
+-> GLCDPrint_Nextion ( PrintLocX, PrintLocY, PrintData [,NextionFontSelection] ) | \_nextion_controllers.html
+-> GLCDPrintString_Nextion ( PrintDataString )| \_nextion_controllers.html
+-> GLCDPrintStringLn_Nextion ( PrintDataString )| \_nextion_controllers.html
+-> GLCDSendOpInstruction_Nextion ( Nextion_Command, value )| \_nextion_controllers.html
+-> GLCDUpdateObject_Nextion ( Nextion_Command, value )| \_nextion_controllers.html
+-> GLCDGetTouch_Nextion ( Nextion_Command ) | \_nextion_controllers.html
+
+-> h |Wait timevalue HOURS | \_wait.html
+-> HEFRead
+-> HEFReadWord
+-> HEFReadBlock
+-> HEFWrite
+-> HEFWriteWord
+-> HEFWriteBlock
+-> HEFEraseBlock
+
+-> Hex (number) |stringvar = Hex (number) | \_hex.html
+-> HI2C2AckpollState | \_HI2CAckpollState.html
+-> HI2C2Mode | HI2C2Mode Master HI2C2Mode Slave |\_HI2CMode.html
+-> HI2C2Receive |HI2C2Receive data HI2C2Receive data, ack | nack |\_hi2creceive.html
+-> HI2C2ReStart | \_HI2crestart.html
+-> HI2C2Send |HI2C2Send data [ack | nack ] |\_HI2CSend.html
+-> HI2C2SetAddress | HI2C2SetAddress  this_device_address_on_bus | \_hi2Csetaddress.html
+-> HI2C2StartOccurred |\_HI2CStartOccurred.html
+-> HI2C2Start|\_hi2cstart.html
+-> HI2C2Stop |\_HI2CStop.html
+-> HI2C2Stopped |\_HI2CStopped.html
+-> HI2C2WaitMSSP | \_HI2CWaitMSSP.html
+-> HI2CAckpollState | \_HI2CAckpollState.html
+-> HI2CMode | HI2CMode Master HI2CMode Slave |\_hi2cmode.html
+-> HI2CReceive |HI2CReceive data HI2CReceive data, ack | nack
+-> HI2CReStart | \_HI2crestart.html
+-> HI2CSend |HI2CSend data [ack | nack ]
+-> HI2CSetAddress | HI2CSetAddress  this_device_address_on_bus | \_hi2csetaddress.html
+-> HI2CStart
+-> HI2CStartOccurred
+-> HI2CStop |\_HI2cStop.html
+-> HI2CStopped |\_HI2cStopped.html
+-> HI2CWaitMSSP | \_HI2cWaitMSSP.html
+-> HI2CWaitMSSPTimeout | \_HI2cWaitMSSP.html
+-> HLine | \_line.html
+-> HPWM channel, frequency, duty cycle | \_hpwm_ccp.html
+-> HPWM_CCPTimerN channel, frequency, duty cycle [timer 2,4 OR 6] | \_hpwm_ccptimern.html
+-> HPWM_Fast | \_hpwm_ccp.html
+-> HPWMOff [( channel ) [,PWMModule] ]
+-> HPWMUpdate ( channel, duty cycle )
+-> HSerPrint value
+-> HSerPrintList [comport], value1, value2 | \_hserprintlist.html
+-> HSerPrintCRLF
+-> HSerSend data
+-> HSerSendBytes(byte1, byte2, ...) | \_hsersendbytes.html
+-> HSerSpace - [Optional byte value = Number of spaces] [,Optional byte value = Comport 1 to 5] | use as reference to right digit
+-> HSerGetNum |HSerGetNum output
+-> HSerGetString |HSerGetString output
+-> HSerPrintByteCRLF data
+-> HSerPrintStringCRLF String
+-> HSerReceive |HSerReceive output / output = HSerReceive
+-> HSerReceive1 |HSerReceive1 output / output = HSerReceive | \_hserreceive.html
+-> HSerReceive2 |HSerReceive2 output / output = HSerReceive| \_hserreceive.html
+-> HSerReceiveFrom |HSerReceiveFrom output / output = HSerReceive|
+-> HSerPrintLF1  a Constant that will force the sending of a LF at the end of each USART transmission for USART1
+-> HSerPrintCR1  a Constant that will force the sending of a CR at the end of each USART transmission for USART1
+-> HSerPrintLF2  a Constant that will force the sending of a LF at the end of each USART transmission for USART2
+-> HSerPrintCR2  a Constant that will force the sending of a CR at the end of each USART transmission for USART2
+-> HSerPrintLF3  a Constant that will force the sending of a LF at the end of each USART transmission for USART3
+-> HSerPrintCR3  a Constant that will force the sending of a CR at the end of each USART transmission for USART3
+-> HSerPrintLF4  a Constant that will force the sending of a LF at the end of each USART transmission for USART4
+-> HSerPrintCR4  a Constant that will force the sending of a CR at the end of each USART transmission for USART4
+-> HSerPrintLF5  a Constant that will force the sending of a LF at the end of each USART transmission for USART5
+-> HSerPrintCR5  a Constant that will force the sending of a CR at the end of each USART transmission for USART5
+-> I2CAckpoll (I2C_device_address)
+-> I2CReceive |I2CReceive data I2CReceive data, ack
+-> I2CReset
+-> I2CRestart | \_I2crestart.html
+-> I2CSend |I2CSend data I2CSend data, ack
+-> I2CSlaveDeviceReceive (this_devices_address, current_device_address_on_bus, [Optional ACK/NACK])
+-> I2CStart
+-> I2CStartOccurred
+-> I2CStop
+-> If |1) If condition Then command  2) If condition Then / ...code To run If TRUE / Else / ...code To run If FALSE / End If
+-> Ignore |On Interrupt event Call handler / On Interrupt event Ignore | \_on_interrupt.html
+-> In |Dir port.bit {In / Out} (Individual Form) Dir port {In / Out / DirectionByte} (Entire Port Form) | \_dir.html
+-> IndCall Address | \_indcall.html
+-> InitGLCD
+-> InitSer channel, rate, start, data, stop, parity, invert
+-> InitTimer0 Source, Prescaler [ , Postscaler]
+-> InitTimer1 Source, Prescaler
+-> InitTimer10 Prescaler, Postscaler
+-> InitTimer12 Prescaler, Postscaler
+-> InitTimer2 Prescaler, Postscaler [ , Postscaler]
+-> InitTimer3 Source, Prescaler
+-> InitTimer4 Prescaler, Postscaler [ , Postscaler]
+-> InitTimer5 Source, Prescaler
+-> InitTimer6 Prescaler, Postscaler [ , Postscaler]
+-> InitTimer7 Source, Prescaler
+-> InitTimer8 Prescaler, Postscaler [ , Postscaler]
+-> InitSMT1( Source,Prescaler ) | \_smt_timers.html
+-> InitSMT2( Source,Prescaler ) | \_smt_timers.html
+-> ClearSMT1 | \_smt_timers.html
+-> ClearSMT2 | \_smt_timers.html
+-> SetSMT1( TimerValue ) | \_smt_timers.html
+-> SetSMT2( TimerValue ) | \_smt_timers.html
+-> StopSMT1 | \_smt_timers.html
+-> StopSMT2 | \_smt_timers.html
+-> StartSMT1 | \_smt_timers.html
+-> StartSMT2 | \_smt_timers.html
+-> SetSMT1Period ( PeriodValue ) | \_smt_timers.html
+-> SetSMT2Period ( PeriodValue ) | \_smt_timers.html
+-> INKEY |output = INKEY
+-> Instr (source, find) |location = Instr (source, find)
+-> Integer | \_variables.html
+-> Interrupt |On Interrupt event Call handler / On Interrupt event Ignore  | \_on_interrupt.html
+-> IntOff
+-> IntOn
+-> KeypadData |Var = KeypadData
+-> KeypadRaw |largevar = KeypadRaw
+-> Landscape | \_glcdrotate.html
+-> Landscape_Rev | \_glcdrotate.html
+-> LCase (source) |output = LCase (source)
+-> LCDBacklight ( On | Off ) Turns LCD backlight On OR Off
+-> LCDCMD bytevar
+-> LCDCreateChar | ( char, chardata() ) \ Create CGRAM character | \_lcdcreatechar.html
+-> LCDCreateGraph | ( LCDCharLoc, LCDValue ) Create a CGRAM character that represents a bar graph
+-> LCDCursor | ( LCDON | LCDOFF | CURSORON | CURSOROFF | FLASHON | FLASHOFF)
+-> LCDDisplayOff Turns Off LCD display, turn Off cursor AND turn Off FLASH  \_lcddisplayoff.html
+-> LCDDisplayOn Turns Off LCD display, , turn Off curor AND turn Off FLASH  \_lcddisplayon.html
+-> LCDHex ( byte_variable ) Prints Byte variable To LCD As one character Hex format
+-> LCDHex ( byte_variable , LeadingZeroActive ) Prints Byte variable To LCD As two characters. The second paramter called LeadingZeroActive is required.
+-> LCDHome
+-> LCDSpace ( value ) Print number of spaces To LCD display
+-> LCDWriteChar  ascii_character
+-> LCD_I2C_Address_1 | \_lcd_io_10_example.html
+-> LCD_I2C_Address_2 | \_lcd_io_10_example.html
+-> LCD_I2C_Address_3 | \_lcd_io_10_example.html
+-> LCD_I2C_Address_4 | \_lcd_io_10_example.html
+-> LCD_I2C_Address_Current | \_lcd_io_10_example.html
+-> LCD_IO  0, 2, 3, 4, 8, 10, 12 | \_lcd_overview.html
+-> LCDON | \_lcdcursor.html
+-> LCDOFF | \_lcdcursor.html
+-> LCD_SPEED  |FAST | MEDIUM | SLOW
+-> LCD_VARIANT  1601a
+-> LCD_VFD_DELAY | \_lcd_io_4.html
+-> Left (source, count) |output = Left (source, count)
+-> LeftPad ( String, length_as_byte , pad_character )
+-> Len (String) |output = Len (String) | \_len.html
+-> Line (LineX1,LineY1, LineX2, LineY2, Optional LineColour = 1)
+-> Locate ( LCDline, LCDcolumn )
+-> LOCKPPS
+-> Log10 |wordvar = Log10 (wordvar)
+-> Log2 |wordvar = Log2 (wordvar)
+-> Loge |wordvar = Loge (wordvar)
+-> Long | \_variables.html
+-> Loop |Do [{While / Until} condition] /  ...program code /  ...Loop [{While / Until} condition] | \_do.html
+-> Ltrim (stringvar) |stringvar = Ltrim (stringvar) | \_ltrim.html
+-> m |Wait timevalue MINUTES | \_wait.html
+-> Macro | \_macros_overview.html
+-> Medium | \_lcd_speed.html
+-> Mid (source, start, count) |output = Mid (source, start, count)
+-> ms |Wait timevalue MILLISECONDS | \_wait.html
+-> Next |For counter = start To End [Step increment] / ...program code / ...Next | \_for.html
+-> NoBit | \_variables.html
+-> NOT |NOT / !  | \_conditions.html
+-> Off |Set variable.bit {On / Off} | \_set.html
+-> On Interrupt |On Interrupt event Call handler / On Interrupt event Ignore | \_on_interrupt.html
+-> On |Set variable.bit {On / Off} | \_set.html
+-> Optional | \_subroutines.html
+-> OR |OR /  | \_glcd_overview.html| | \_glcd_overview.html | \_conditions.html
+-> Out |Dir port.bit {In / Out} (Individual Form) Dir port {In / Out / DirectionByte} (Entire Port Form) | \_dir.html
+-> Override |Dim variable [As type] At location Override | \_dim.html
+-> Pad ( String, length_as_byte , pad_character )
+-> Peek (location) |OutputVariable = Peek (location)
+-> Play
+-> PlayRTTTL |\_play_rtttl.html
+-> Poke (location, value)
+-> Portrait | \_glcdrotate.html
+-> Portrait_Rev | \_glcdrotate.html
+-> Pot pin, output
+-> Power |longvar = Power (base, exponent)
+-> Print ( Var [ Byte | Word | Long | Integer ] )
+-> ProgramErase (location)
+-> ProgramRead (location, store)
+-> ProgramWrite (location, value)
+
+
+-> PFMRead (location, store)  | \_PFMRead.html
+-> PFMWrite (location, value)| \_PFMWrite.html
+
+
+-> PS2ReadByte |output = PS2ReadByte
+-> PS2SetKBLeds (LedStatus)
+-> PS2WriteByte
+-> Pset (GLCDX, GLCDY, GLCDState)
+-> Pulsein pin, variable, time units
+-> PulseOut pin, time units
+-> PulseOutInv pin, time units
+-> Put ( LCDLine,LCDColumn, Character )
+-> PWMOff
+-> PWMOn
+-> PWMOut channel, duty cycle, cycles
+-> RaiseCompilerError |\_development_guide.html
+-> Random |Var = Random
+-> Randomize Randomize seed
+-> ReadAD( ANx [ , ANy] ) |Var = ReadAD ( ANx [  , ANy] )
+-> ReadAD10( ANx [ , ANy] ) |Var = ReadAD10 ( ANx [ , ANy] )
+-> ReadAD12( ANx [ , ANy] ) |Var = ReadAD12 ( ANx [ , ANy] )
+-> ReadDigitalTemp |Temperature is returned To the global variables of DSint AND DSdec
+-> ReadTable TableName, Item, Output | \_lookup_tables.html
+-> ReadTemp <- byte_var = ReadTemp12 | A funtion returning the value of the sensor As an Integer rounded up To the nearest Integer
+-> ReadTemp12 <- byte_var = ReadTemp12 | A funtion returning a 12 BIT temperature data from the DS18B20 digital temperature sensor
+-> Repeat times
+-> Repeat For time unit |Repeat For time unit / ...program code / ...End Repeat | \_repeat_for.html
+-> Return |Gosub label / ...program code / ...Return | \_gosub.html
+-> Right (source, count) |output = Right (source, count)
+-> Rotate variable {Left / Right} [Simple]
+-> RoundRect | \_sdd1289_controllers.html
+-> Rtrim (stringvar) |stringvar = Rtrim (stringvar) |\_rtrim.html
+-> s | Wait timevalue SECONDS | \_wait.html
+
+
+-> SAFRead
+-> SAFReadWord
+-> SAFReadBlock
+-> SAFWrite
+-> SAFWriteWord
+-> SAFWriteBlock
+-> SAFEraseBlock
+
+
+-> Scale ( map As Word, fromLow , fromHigh , toLow , toHigh  , Optional calibrate )  | \_scale.html
+-> Select Case Var |Select Case Var / Case value1 / ...code / ...Case valueN / ...code / ...Case Else / ...code / ...End Select
+-> SerPrint channel, value
+-> SerReceive channel, output
+-> SerSend channel, data
+
+-> Ser3Print  bytevar  | \_SerNprint.html
+-> Ser3PrintList value1, value2 | \_SerNprintlist.html
+-> Ser3Receive | bytevar = Ser3Receive | \_SerNReceive.html
+-> Ser3Send bytevar   | \_SerNSend.html
+
+-> Ser2Print  bytevar  | \_SerNprint.html
+-> Ser2PrintList value1, value2 | \_SerNprintlist.html
+-> Ser2Receive | bytevar = Ser2Receive | \_SerNReceive.html
+-> Ser2Send bytevar   | \_SerNSend.html
+
+-> Ser1Print  bytevar  | \_SerNprint.html
+-> Ser1PrintList value1, value2 | \_SerNprintlist.html
+-> Ser1Receive | bytevar = Ser2Receive | \_SerNReceive.html
+-> Ser1Send bytevar   | \_SerNSend.html
+
+-> SLOW | \_lcd_speed.html
+
+-> Set variable.bit {On / Off}
+-> GLCDSetContrast | \_glcd_overview.html
+-> GLCDSetDisplayInvertMode | \_glcd_overview.html
+-> GLCDSetDisplayNormalMode | \_glcd_overview.html
+-> SetTimer TimerNo, 8bit_value OR 16bit_Value | \_settimer.html
+-> ShortTone Frequency, Duration
+-> Simple |Rotate variable {Left / Right} [Simple] | \_rotate.html
+-> sin ( angle_as_byte ) | \_trigonometry_sine_cosine_and_tangent.html
+-> SPIMode  ( Mode  [,  SPIClockMode ] )
+-> SPIMode  ( Mode )
+-> SPITransfer tx, rx
+-> Sqrt |wordvar = Sqrt (wordvar)
+-> SRAMRead
+-> SRAMWrite
+-> ST7735Rotation ( ST7735_LANDSCAPE | ST7735_PORTRAIT_REV | ST7735_LANDSCAPE_REV | ST7735_PORTRAIT ) | \_st7735_controllers.html
+-> ST7735SendCommand ( ST7735Command) | \_st7735_controllers.html
+
+-> SYSDEFAULTCONCATSTRING | \_concatenation.html
+
+-> TFT_BLACK | \_glcd_overview.html
+-> TFT_NAVY | \_glcd_overview.html
+-> TFT_DARKGREEN | \_glcd_overview.html
+-> TFT_DARKCYAN | \_glcd_overview.html
+-> TFT_MAROON | \_glcd_overview.html
+-> TFT_PURPLE | \_glcd_overview.html
+-> TFT_OLIVE | \_glcd_overview.html
+-> TFT_LIGHTGREY | \_glcd_overview.html
+-> TFT_DARKGREY | \_glcd_overview.html
+-> TFT_BLUE | \_glcd_overview.html
+-> TFT_GREEN | \_glcd_overview.html
+-> TFT_CYAN | \_glcd_overview.html
+-> TFT_RED | \_glcd_overview.html
+-> TFT_MAGENTA | \_glcd_overview.html
+-> TFT_YELLOW | \_glcd_overview.html
+-> TFT_WHITE | \_glcd_overview.html
+-> TFT_ORANGE | \_glcd_overview.html
+-> TFT_GREENYELLOW | \_glcd_overview.html
+-> TFT_PINK | \_glcd_overview.html
+
+-> tmSndDec (Value, [Optional position{Disp_Len}], [Optional number of digits{Disp_Len}]) |- TM1637/1638 OEM Lib:  Disp. value as decimal (Max. value 999999)
+-> tmSndHex (Value, [Optional position{Disp_Len}], [Optional number of digits{Disp_Len}]) |- TM1637/1638 OEM Lib:  Disp. value as Hex (Max. value 16777215)
+-> tmSndDig (byte value, position )|- TM1637/1638 OEM Lib:  Send 1 raw byte to Disp. *
+-> tmSndStr ("Text",  [Optional buffer name{DispBuf}], [Optional send buffer On/Off {On}])|- TM1637/1638 OEM Lib:  Disp. String (Set TMscroll = On for long strings)
+-> tmSndChr ("chr", position)|- Send 1 alphanumeric character to TM1637/1638
+-> tmChrBuf ("chr", position, [Optional buffer name{DispBuf}])|- Load display buffer with 1 ASCII character
+-> tmDecBuf (Value, [Optional position{Disp_Len}], [Optional number of digits{Disp_Len}], [Optional buffer name{DispBuf}]) | TM1637/1638 OEM Lib: - Load display buffer with Decimal digits
+-> tmHexBuf (Value, [Optional position{Disp_Len}], [Optional number of digits{Disp_Len}], [Optional buffer name{DispBuf}]) | TM1637/1638 OEM Lib: - Load display buffer with Hex digits
+-> tmSegBuf (digit number, segment number, On/Off, [Optional buffer name{DispBuf}], [Optional send digit {Off}]) | - TM1637/1638 OEM Lib: Set segment in display buffer [send option{Off}]
+-> tmSndBuf ([Optional position{Disp_Len}], [Optional number of digits{Disp_Len}], [Optional buffer name{DispBuf}]) | - TM1637/1638 OEM Lib: Send display buffer *
+-> tmFlashDsp Flash display | TM1637/1638 OEM Lib:  - Flash display
+-> tmFlashDig (Digit number, [Optional number of digits{1}], [Optional Buffer name{DispBuf}]) | - TM1637/1638 OEM Lib: Flash digit(s)  Buffer must be current
+-> tmFlashSeg (Digit number, Segment number, [Optional Buffer name{DispBuf}]) | - TM1637/1638 OEM Lib: Flash segment  Buffer must be current
+-> tmCLRbuf  ([Optional position{Disp_Len}], [Optional number of digits{Disp_Len}], [Optional buffer name{DispBuf}]) | - TM1637/1638 OEM Lib: Clear display buffer
+-> tmCLRdisp  Clear all display | TM1637/1638 OEM Lib - Clear all display digits
+-> tmCtrlSnd Send Control Byte | TM1637/1638 OEM Lib - Send TM1637/1638 Control Byte *
+-> tmGetKey  Read Button/Key press | TM1637/1638 OEM Lib - Get Key pressed,  Button Number set in 'TM_ButnVal1' Var *
+-> tmScrlBuf (Array name, [Optional Buffer name{DispBuf}]) | - TM1637/1638 OEM Lib: Scroll Buffer
+-> tmSetLED (LED Num, On/Off) | - TM16338 OEM Lib: Set LED 1~16 ON or Off
+
+-> TM_1637/1638_OEM_Lib-Variables - Settings/Options list...  | Following is a list of Variables to set for TM1637/1638_OEM_Cmd_Lib.h
+-> TM_DispLen - (byte constant) TM1637/1638 Digit Length of 7seg display | use as reference to right digit
+-> TM_6dReMap  (bit var) TM1637 Remap for 6d module (with swapped pins) | TM_6dReMap = On/Off {default = Off}
+-> TM_Blank0 - (bit var) TM1637/1638 Enable zero Blanking | TM_blank0 = On/Off {default = ON}
+-> TM_Bright - (byte var) TM1637/1638 Set LED brightness |  TM_bright = Value (0 - 7) {default = 0}
+-> TM_Disp - (bit var) Set TM1637/1638 display On or Off |  TM_disp = On/Off {default = ON}
+-> TM_dpPos  - (byte var) TM1637/1638 Position of DecimalPoint  | TMdpPos = Value (1 - 6){default = 0} 0 = off
+-> TM_FlashRate - (byte var) TM1637/1638 Set Flash Rate | TM_FlashRate = Value (1 - 255) {default = 100} val*4ms eg. 100 = 400ms
+-> TM_Scroll - (bit var) TM1637/1638 Scroll long strings |  TM_Scroll = On/Off {default = Off}
+-> TM_ScrollRate - (byte var) TM1637/1638 Set scroll speed |  ScrollSpd = Value (1 - 255){default = 75} val*4ms eg. 100 = 400ms
+-> TM_ButnVal1 - (byte var) TM1637/1638 Button pressed value | Set by tmGetKey (1 - 16/24) & TM_ButnVal2 for TM1638
+-> TM_KeyChk - (bit var) TM1637/1638 Enable check keypress in TM_FlashRate |  TM_KeyChk = On/Off {default = Off}
+-> TM_LEDs - (byte constant) TM1637/1638 buffer use for discrete LED's |
+-> TM_STB - (byte var) TM1638 strobe pin select | Select Display to use, TM_STB = Value (1 - 4)
+-> TM_DispBuf - (byte array) TM1637/1638 Display Buffer |  7seg digit values (0 - 255)
+
+
+-> ST7920cTile (wordvar)
+-> ST7920GLCDClearGraphics
+-> ST7920GLCDDisableGraphics
+-> ST7920GLCDEnableGraphics
+-> ST7920GLCDReadByte |bytevar = ST7920GLCDReadByte
+-> ST7920gLocate (xPos, Ypos)
+-> ST7920GraphicTest
+-> ST7920gReaddata |bytevar = ST7920gReaddata
+-> ST7920gTile (bytevar, bytevar)
+-> ST7920lineh (Xpos, Ypos, xUnitsStyle, On / Off)
+-> ST7920LineHs (Xpos, Ypos, XLength, Style)
+-> ST7920linev (Xpos, Ypos, xUnitsStyle, On / Off)
+-> ST7920Locate (Xpos, Ypos)
+-> ST7920Tile (wordvar)
+-> ST7920WriteByte (Byte)
+-> ST7920WriteCommand (Byte)
+-> ST7920WriteData (Byte)
+-> Scroll_uc1601 | \_uc1601_controllers.html
+-> Startscrolldiagleft_SSD1306 | \_ssd1306_controllers.html
+-> Startscrolldiagright_SSD1306 | \_ssd1306_controllers.html
+-> startscrollleft_SSD1306 | \_ssd1306_controllers.html
+-> Startscrollright_SSD1306 | \_ssd1306_controllers.html
+-> StartTimer TimerNo
+-> Step |For counter = start To End [Step increment] / ...program code / ...Next | \_for.html
+-> Stopscroll_SSD1306 | \_ssd1306_controllers.html
+-> Stopscroll_uc1601 | \_uc1601_controllers.html
+-> StopTimer TimerNo
+-> Str (number) |stringvar = Str (byte_number | word_number)
+-> Str32 (long_number) |stringvar = Str32 (long_number) | \_str.html
+-> StrInteger (Integer_number) |stringvar = Str32 (Integer_number) | \_str.html
+
+-> String | \_variables.html
+-> Sub |Sub (var1,[,var2] [,varN]) [#NR] / ...program code / ...End Sub | \_subroutines.html
+-> SWAP (VariableA, VariableB)
+-> SWAP4 (VariableA)
+-> Table | \_lookup_tables.html
+-> Then |1) If condition Then command  2) If condition Then / ...code To run If TRUE / Else / ...code To run If FALSE / End If | \_if.html
+-> Timer0 | \_reading_timers.html
+-> Timer1 | \_reading_timers.html
+-> Timer10 | \_reading_timers.html
+-> Timer12 | \_reading_timers.html
+-> Timer2 | \_reading_timers.html
+-> Timer3 | \_reading_timers.html
+-> Timer4 | \_reading_timers.html
+-> Timer5 | \_reading_timers.html
+-> Timer6 | \_reading_timers.html
+-> Timer7 | \_reading_timers.html
+-> Timer8 | \_reading_timers.html
+-> To |For counter = start To End [Step increment] / ...program code / ...Next | \_for.html
+-> Tone Frequency, Duration
+
+-> Triangle (XPixelPosition, YPixelPosition, XPixelPosition2, YPixelPosition2, XPixelPosition3, YPixelPosition3 [,Optional LineColour] )
+-> FilledTriangle (XPixelPosition, YPixelPosition, XPixelPosition2, YPixelPosition2, XPixelPosition3, YPixelPosition3 [,Optional LineColour] )
+
+-> tan ( angle_as_byte ) | \_trigonometry_sine_cosine_and_tangent.html
+-> Trim (stringvar) |stringvar = Trim (stringvar) |\_trim.html
+-> UCase (source) |output = UCase (source)
+-> UNLOCKPPS
+-> Until |Do [{While / Until} condition] /  ...program code /  ...Loop [{While / Until} condition] | \_do.html
+-> us |Wait timevalue MICROSECONDS | \_wait.html
+-> Val (String) |Var = Val (String)
+-> Val32 (String) |Var = Val32 (String) | \_Val.html
+
+-> VarToBin
+-> VarWToBin
+-> IntegerToBin
+-> LongtoBin
+
+-> Vline | \_line.html
+-> Wait |Wait timevalue timeunit / Wait {While / Until} condition
+-> While |Do [{While / Until} condition] /  ...program code /  ...Loop [{While / Until} condition] | \_do.html
+-> Word | \_variables.html
+-> WORDTOBIN (bytevar) |stringvar = WORDTOBIN (bytevar)
+-> XOR |XOR / #  | \_conditions.html
+-> || OR /  | \_glcd_overview.html| | \_glcd_overview.html  | \_conditions.html

@@ -1,0 +1,13 @@
+' Change 1662: #option StartupMethodsDisabled, and the program calls InitSys itself.
+' Expected (build 1662): ";!  call INITSYS" at the start, then the program's own "call INITSYS": the INITSYS routine
+' is compiled because the program calls it. INITRANDOM is not compiled (not called).
+#chip 18F46J50, 48
+#option explicit
+#option StartupMethodsDisabled
+
+InitSys
+Dir PORTB Out
+Do
+    PORTB = PORTB + 1
+    Wait 100 ms
+Loop

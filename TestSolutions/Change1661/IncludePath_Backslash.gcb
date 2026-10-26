@@ -1,0 +1,12 @@
+'''Change1661 test: a relative folder with backslashes, lib1\..\lib1 (as the Starter Kit's
+'''"..\GCBASICBootloader\libraries")
+'''Expected: compiles; PORTB = 0x11 (lib1\a_lib1.h). The backslashes are path separators, not string escapes
+'''(\. and \l would otherwise be "Unrecognised escape sequence" errors).
+#chip 16F877A, 20
+#option explicit
+#option IncludePath "lib1\..\lib1"
+#include <a_lib1.h>
+
+FromLib1
+Do
+Loop

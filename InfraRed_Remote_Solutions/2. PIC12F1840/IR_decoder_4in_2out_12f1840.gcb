@@ -1,656 +1,644 @@
-''===============================================================================
-'' IR remote control signature decoder for PIC12F1840
-''-------------------------------------------------------------------------------
-'' Purpose:
-''   This program learns up to four IR remote-control buttons and stores their
-''   captured timing signatures in internal EEPROM. During normal operation,
-''   each received IR packet is compared against the stored signatures.
-''
-'' Supported signal type:
-''   This is not a strict NEC/Sony/RC5 protocol decoder. It is a timing-based
-''   signature matcher. The program samples the demodulated output of a
-''   TSOP-type IR receiver (e.g. TSOP-4348, active-low output) and compares
-''   the sampled bit pattern with previously learned signatures.
-''   It works best with NEC-like remotes or similar protocols where the full
-''   button frame fits within the sampling window.
-''
-'' Outputs:
-''   Learned buttons CH1..CH4 generate logic outputs IR_out_1..IR_out_4.
-''   In this example, CH1 or CH2 controls out_1, and CH3 or CH4 controls out_2.
-''
-'' Learning procedure:
-''   1) Press the LEARN button once. The LED turns ON and the decoder waits
-''      for the first IR packet.
-''   2) Press the IR remote buttons in the desired order: CH1, CH2, CH3, CH4.
-''   3) After each successfully learned button, the LED blinks as confirmation:
-''      CH1 = 1 blink, CH2 = 2 blinks, CH3 = 3 blinks, CH4 = 5 blinks.
-''   4) After the fourth button is learned, the LED turns OFF and the decoder
-''      returns to normal operation.
-''   5) If learning mode was entered by mistake, press the LEARN button again.
-''      Learning will be cancelled, the LED will turn OFF, and existing EEPROM
-''      data will remain unchanged (unless a new IR signature has already been saved).
-''
-'' LED behaviour in normal mode:
-''   - LED stays ON continuously while a learned IR button is detected and held.
-''   - LED gives a short blink when an IR packet is received but not recognized.
-''
-'' Notes:
-''   - External pull-up resistors are recommended for both the IR receiver input
-''     and the LEARN button input, even if internal pull-ups are enabled.
-''   - Ensure clean power for the TSOP receiver. Place a 100 nF capacitor close
-''     to the receiver and preferably add a small electrolytic capacitor as well.
-''     receiver and preferably also a small electrolytic capacitor.
-''===============================================================================
-'' Mērķis:
-''   Šī programma iemācās līdz četrām IR pults pogām un saglabā to
-''   uztvertos IR signālu parakstus (signature) iekšējā EEPROM atmiņā.
-''   Normālas darbības laikā katra saņemtā IR pakete tiek salīdzināta
-''   ar iepriekš iemācītajiem parakstiem.
-''
-'' Atbalstītais signāla tips:
-''   Šis nav stingrs NEC/Sony/RC5 protokola dekoders. Tas ir laika
-''   paraksta (timing signature) salīdzinātājs. Tas veic demodulētā
-''   signāla paraugu ņemšanu no TSOP tipa IR uztvērēja
-''   (piemēram, TSOP-4348, aktīvs LOW līmenis) un salīdzina iegūto
-''   bitu karti ar iepriekš iemācītajiem parakstiem.
-''   Vislabāk darbojas ar NEC tipa pultīm vai līdzīgiem protokoliem,
-''   kur pilns pogas signāls ietilpst paraugu logā.
-''
-'' Izejas:
-''   Iemācītās pogas CH1..CH4 ģenerē loģiskos signālus IR_out_1..IR_out_4.
-''   Šajā piemērā CH1 vai CH2 ieslēdz out_1, bet CH3 vai CH4 ieslēdz out_2.
-''
-'' Programmēšanas (learning) procedūra:
-''   1) Nospied LEARN pogu vienu reizi. LED iedegas, un dekoders gaida
-''      pirmo IR pogas signālu.
-''   2) Spied IR pults pogas vajadzīgajā secībā: CH1, CH2, CH3, CH4.
-''   3) Pēc katras iemācītās pogas LED nomirgo kā apstiprinājums:
-''      CH1 = 1 mirgojums, CH2 = 2 mirgojumi, CH3 = 3 mirgojumi,
-''      CH4 = 5 mirgojumi.
-''   4) Pēc ceturtās pogas iemācīšanas LED nodziest, un dekoders
-''      atgriežas normālā režīmā.
-''   5) Ja programmēšanas režīms tika ieslēgts nejauši, nospied LEARN
-''      pogu vēlreiz. Programmēšana tiks atcelta, LED nodzisīs, un
-''      esošie EEPROM dati netiks dzēsti vai mainīti (ja vien jauns
-''      IR signāls jau nav ticis saglabāts).
-''
-'' LED darbība normālā režīmā:
-''   - LED deg nepārtraukti, kamēr tiek uztverta un turēta iemācīta
-''     IR poga.
-''   - LED īsi nomirgo, ja tiek uztverta IR pakete, bet tā netiek
-''     atpazīta (nav iemācīta).
-''
-'' Piezīmes:
-''   - Ieteicams izmantot ārējos pull-up rezistorus IR uztvērēja ieejai
-''     un LEARN pogas ieejai, pat ja kodā ir ieslēgti iekšējie pull-up.
-''   - Nodrošini tīru barošanu TSOP uztvērējam; pievieno 100 nF
-''     kondensatoru pēc iespējas tuvāk uztvērējam un vēlams arī
-''     nelielu elektrolītisko kondensatoru.
+' PIC12F1840 IR V8.2 TCL STRICT - 26.10.2026 - LV / EN
+'
+' LV: V8 pārskatīta versija; V8.2 pievelk tikai TCL signatūras atpazīšanu.
+' EN: Reviewed V8 version; V8.2 tightens TCL signature matching only.
+' LV: TCL: MAX_BAD_PULSES=0 un MAX_BAD_ACTIVE_PULSES=0, bet PULSE_TOL=3 saglabāts.
+' EN: TCL: MAX_BAD_PULSES=0 and MAX_BAD_ACTIVE_PULSES=0, while PULSE_TOL stays at 3.
+' LV: EEPROM formāts nemainās. Ja EEPROM saglabā, pogas nav jāiemāca no jauna.
+' EN: EEPROM format is unchanged. No relearning is required if EEPROM is preserved.
+' LV: Darbība: četras iemācāmas komandas; 1/2 -> OUT1, 3/4 -> OUT2.
+' EN: Operation: four learned commands; 1/2 -> OUT1, 3/4 -> OUT2.
+' LV: Izeja turas aktīva ar derīgām paketēm/atkārtojumiem; pārslēgšanās režīma nav.
+' EN: A valid frame/repeat keeps its output active; this is not a toggle controller.
+' LV: TCL saglabā 48 fāžu ilgumus; NEC saglabā visus četrus dekodētos baitus.
+' EN: TCL stores 48 phase durations; NEC stores all four decoded bytes.
+' LV: Magnat un trešā pults: 67 fāžu pilna pakete, pēc tam 3 fāžu atkārtojumi.
+' EN: Magnat and the third remote: a 67-phase full frame, then 3-phase repeats.
+' LV: LEARN nospied un atlaid; iemāci četras pogas, katru nospiežot/atlaižot atsevišķi.
+' EN: Press/release LEARN; teach four buttons, pressing/releasing each separately.
+' LV: Apstiprinājums: 1/2/3/4 iedegšanās; pēdējā paliek degot līdz nākamajai darbībai.
+' EN: Confirmation: 1/2/3/4 ON edges; the final ON stays lit until the next action.
+' LV: Pēc ceturtās pogas apmācība beidzas; tās pēdējais ON impulss ilgst 80 ms.
+' EN: Learning ends after button four; its final ON pulse lasts 80 ms.
+' LV: Darbā zināma komanda -> LED deg; nezināma uztvere -> LED mainās pēc paketēm.
+' EN: In normal mode a known command lights the LED; unknown captures toggle it per packet.
+' LV: Šai indikācijai nav atsevišķa taimera/pārtraukuma/Wait. Frekvence atkarīga no pults.
+' EN: This indication adds no timer/interrupt/Wait. Its frequency depends on the remote.
+'
+' LV: V8.1 labojumi: izejas OFF pirms LEARN atlaišanas gaidīšanas; TCL pilnās
+'     salīdzināšanas ieejā obligāti 51 fāze; LED 120 ciklu konstante nosaukta.
+' EN: V8.1 changes: outputs OFF before waiting for LEARN release; TCL full matching
+'     requires 51 phases; the LED 120-loop setting is now a named constant.
+' LV: CaptureFrame mērīšanas cikls un NEC dekodēšana nav mainīti.
+' EN: The CaptureFrame measurement loop and NEC decoding are unchanged.
+'
+' LV: EEPROM karte: CH1=0..47, CH2=48..95, CH3=96..143, CH4=144..191.
+' EN: EEPROM map: CH1=0..47, CH2=48..95, CH3=96..143, CH4=144..191.
+' LV: 192..199: marķieris + tā XOR 255; 200..203: katra kanāla protokola tips.
+' EN: 192..199: marker + its XOR 255 complement; 200..203: protocol type per channel.
+' LV: TCL izmanto visus 48 slota baitus; NEC izmanto tikai pirmos četrus.
+' EN: TCL uses all 48 bytes of a slot; NEC uses only its first four bytes.
+' LV: Formāts saderīgs ar V4..V8. Pārrakstot PIC, saglabā EEPROM, ja nevēlies pārmācīt.
+' EN: Format is compatible with V4..V8. Preserve EEPROM when programming to retain keys.
+'
+' LV: Laiki idleMs/unknownLedHold ir pamatcikla skaitītāji, nevis reāla laika taimeri.
+' EN: idleMs/unknownLedHold count main-loop iterations; they are not real-time clocks.
+' LV: 210/120 cikli ir aptuveni 210/120 ms TIKAI klusumā; uztveršana tos paildzina.
+' EN: 210/120 loops are approximately 210/120 ms ONLY in silence; capture extends them.
+' LV: NEC īsais atkārtojums nesatur pogas/adreses kodu; tas pagarina pēdējo NEC komandu.
+' EN: A short NEC repeat contains no key/address code; it extends the last NEC command.
+' LV: Ja jaunas pogas pilnā pakete vispār netiek uztverta, atkārtojums to nevar identificēt.
+' EN: If a new key's full frame is completely missed, its repeat cannot identify it.
+' LV: TCL pirmās 48 fāzes ir signatūra, nevis pilns bitu dekoders; laika pielaide paliek 3.
+' EN: The first 48 TCL phases form a signature, not a full bit decoder; timing tolerance stays at 3.
+' LV: TCL pēdējās 3 fāzes tiek uztvertas garuma pārbaudei, bet EEPROM nesalīdzina.
+' EN: The last 3 TCL phases are captured for length validation but are not compared to EEPROM.
+' LV: TCL pielaides var pieņemt tuvu kodu; NEC visiem 32 bitiem jāsakrīt precīzi.
+' EN: TCL tolerances can admit a nearby code; all 32 NEC bits must match exactly.
+' LV: NEC komplementārie baiti netiek atsevišķi validēti; salīdzina visus 4 saņemtos baitus.
+' EN: NEC complement bytes are not separately validated; all 4 received bytes are compared.
+' LV: Nezināma LED indikācija ietver arī bojātu uztveri/troksni un atkārtojumu bez komandas.
+' EN: Unknown LED indication also covers malformed captures/noise and repeats without a command.
+' LV: LEARN un tā apstiprināšana bloķē gaidīšanu apzināti; parastajā uztverē jaunu paužu nav.
+' EN: LEARN and its confirmation deliberately block; no new delays are added to normal reception.
+' LV: Timer1 reģistra avots: Microchip PIC12(L)F1840 DS40001441F, sadaļa 21.11.
+' EN: Timer1 register reference: Microchip PIC12(L)F1840 DS40001441F, section 21.11.
+' https://ww1.microchip.com/downloads/en/DeviceDoc/40001441F.pdf
+' LV: Šeit veikta avota pārbaude; GCBASIC kompilators un PIC pārbaude nav pieejami.
+' EN: Source review was performed here; the GCBASIC compiler and PIC hardware are unavailable.
 
 
-#chip 12F1840, 8' šim nav GPIO !!!!!!!!!!!!!!!!!!!!
 
-#config MCLRE = ON ' LV: MCLR ir ieslegts; sis pins nav pieejams ka parasta DI ieeja. / EN: MCLR is enabled; this pin is not available as a normal digital input.
-'' LV: nWPUEN=0 atlaauj ieksejos weak pull-up globali; skatit GCB dokumentaciju. / EN: nWPUEN=0 enables internal weak pull-ups globally; see GCB documentation.
+#chip 12F1840, 8  ' LV: Procesors PIC12F1840, sistēmas frekvence 8 MHz | EN: PIC12F1840 target, system clock 8 MHz
+#config MCLRE = ON  ' LV: RA3 ir aparatūras RESET/MCLR, nevis parasta ieeja | EN: RA3 is hardware RESET/MCLR rather than a normal input
+SET WPUEN = 0  ' LV: Globāli atļauj vājos pull-up; atļauja ir aktīva ar 0 | EN: Globally enables weak pull-ups; this enable is active LOW
+ANSELA = 0  ' LV: Visus PORTA analogos režīmus pārslēdz uz digitāliem | EN: Sets all PORTA analog-capable pins to digital mode
+#define IR_sens porta.0  ' LV: TSOP digitālā ieeja RA0; IR nesēja uztvere dod LOW | EN: TSOP digital input RA0; received IR carrier produces LOW
+#define learn_LED porta.1  ' LV: LED RA1: 1=deg, 0=nedeg šajā shēmā | EN: LED RA1: 1=ON, 0=OFF in this circuit
+#define learn_button porta.2  ' LV: LEARN RA2: nospiesta=0; iekšējā pievilkšana uz + | EN: LEARN RA2: pressed=0; internal pull-up enabled
+#define out_2 porta.4  ' LV: OUT2 RA4, komandu sloti 3/4 | EN: OUT2 RA4, command slots 3/4
+#define out_1 porta.5  ' LV: OUT1 RA5, komandu sloti 1/2 | EN: OUT1 RA5, command slots 1/2
+Dir porta.0 In  ' LV: porta.0 ir digitāla ieeja | EN: porta.0 is a digital input
+Dir porta.1 Out  ' LV: porta.1 ir digitāla izeja | EN: porta.1 is a digital output
+Dir porta.2 In  ' LV: porta.2 ir digitāla ieeja | EN: porta.2 is a digital input
+Dir porta.4 Out  ' LV: porta.4 ir digitāla izeja | EN: porta.4 is a digital output
+Dir porta.5 Out  ' LV: porta.5 ir digitāla izeja | EN: porta.5 is a digital output
+SET WPUA0 = 1  ' LV: RA0 pull-up uztur HIGH, ja TSOP izeja nav aktīva | EN: RA0 pull-up holds HIGH when the TSOP output is inactive
+SET WPUA2 = 1  ' LV: RA2 pull-up uztur LEARN atlaistu=HIGH | EN: RA2 pull-up makes released LEARN read HIGH
 
-''=========== LV: IR sekcijas iestatijumi / EN: IR section settings
-SET WPUEN = 0  ' LV: globali atlautas vajas pull-up ieejas; prakse ieteicami arejie 10k rezistori. / EN: weak pull-ups enabled globally; external 10k resistors are recommended in practice.
-ANSELA = 0        ' LV: visi analogie pini parslegti uz digitalu rezimu. / EN: all analog-capable pins are switched to digital mode.
+#define SIG_BYTES 48  ' LV: TCL EEPROM signatūra: 48 fāžu ilgumi katram slotam | EN: TCL EEPROM signature: 48 phase durations per slot
+#define RX_BYTES 80  ' LV: Uztveršanas masīva ietilpība; sasniedzot 80, paketi noraida | EN: Capture array capacity; reaching 80 rejects the frame
+#define TYPE_TCL 1  ' LV: EEPROM protokola tips TCL | EN: EEPROM protocol identifier for TCL
+#define TYPE_NEC 2  ' LV: EEPROM protokola tips NEC/Magnat/trešā pults | EN: EEPROM protocol identifier for NEC/Magnat/third remote
+#define PULSE_TOL 3  ' LV: TCL vienas fāzes pielaide 3*128=384 us | EN: TCL per-phase tolerance: 3*128=384 us
+#define MAX_BAD_PULSES 0  ' LV: TCL meklēšanā neviena fāze nedrīkst pārsniegt savu laika pielaidi | EN: No TCL search phase may exceed its timing tolerance
+#define MAX_BAD_ACTIVE_PULSES 0  ' LV: Arī aktīvās TCL pogas atkārtojumā nepieļauj sliktas fāzes | EN: Active TCL repeats also allow no bad phases
+#define FRAME_GAP_TICKS 3000  ' LV: NEC beigas pēc 3000*4 us=12 ms HIGH | EN: NEC ends after 3000*4 us=12 ms HIGH
+#define TCL_GAP_TICKS 1500  ' LV: TCL klusuma beigu slieksnis 1500*4 us=6 ms | EN: TCL silence-ending threshold: 1500*4 us=6 ms
+#define TCL_FRAME_PHASES 51  ' LV: TCL sagaidāmais kopējais fāžu skaits; 51. ir pēdējais LOW | EN: Expected TCL phase count; phase 51 is the final LOW
+#define TCL_LEADER_MAX 40  ' LV: Pirmais LOW <=40*128 us izvēlas TCL ceļu; tas nav protokola pierādījums | EN: First LOW <=40*128 us selects TCL; not proof of protocol
+#define PULSE_TIMEOUT_TICKS 15000  ' LV: Vienas fāzes avārijas robeža 15000*4 us=60 ms | EN: Single-phase abort limit: 15000*4 us=60 ms
+#define PULSE_UNIT_TICKS 32  ' LV: 32 Timer1 takti =128 us vienā signatūras vienībā | EN: 32 Timer1 ticks =128 us per signature unit
+#define MIN_FULL_PHASES 40  ' LV: No 40 fāzēm mēģina pilnu atpazīšanu; dekoders pārbauda precīzo garumu | EN: At 40 phases try full matching; decoder checks exact length
+#define HOLD_TIMEOUT_MS 210  ' LV: 210 pamatcikli bez pieņemtas paketes -> izejas OFF; nav precīzas ms | EN: 210 loops without accepted data -> outputs OFF; not exact ms
+#define LEARN_RELEASE_MS 160  ' LV: 160 secīgi HIGH paraugi ar 1 ms pauzi -> poga atlaista | EN: 160 successive HIGH samples with 1 ms wait -> released
+#define UNKNOWN_LED_HOLD_LOOPS 120  ' LV: 120 pamatcikli pēc nezināmas uztveres; bez jauna taimera | EN: 120 main loops after unknown capture; no additional timer
 
-#define learn_button porta.2
-dir porta.2 in
-SET WPUA2 = 1 ' LV: learn pogas pull-up; prakse vajag arejo 10k rezistoru. / EN: learn button pull-up; in practice use an external 10k resistor.
-#define IR_sens porta.0 ' LV: IR uztvereja TSOP-4348 izeja, aktiva LOW. / EN: TSOP-4348 IR receiver output, active LOW.
-dir porta.0 in
-SET WPUA0 = 1  ' LV: IR ieejas pull-up; prakse vajag arejo 10k rezistoru. / EN: IR input pull-up; in practice use an external 10k resistor.
-#define learn_LED porta.1
-dir porta.1 out
-#define out_1 porta.5
-dir porta.5 out
-#define out_2 porta.4
-dir porta.4 out
+Dim sigRx(RX_BYTES) As Byte  ' LV: Uztverto fāžu ilgumi 128 us vienībās, indeksi 0..79 | EN: Captured phase durations in 128 us units, indices 0..79
+Dim necCode(4) As Byte  ' LV: Pilnās NEC paketes četri baiti, indeksi 0..3 | EN: Four full NEC frame bytes, indices 0..3
+Dim necValid As Bit  ' LV: 1 = pilna NEC pakete iztur garuma un laiku pārbaudes | EN: 1 = full NEC frame passes length and timing checks
+Dim necByte As Byte  ' LV: NEC dekodējamā baita indekss 0..3 | EN: NEC byte index being decoded, 0..3
+Dim necBit As Byte  ' LV: NEC bita indekss baitā 0..7; LSB pirmais | EN: NEC bit index in byte, 0..7; LSB first
+Dim necMask As Byte  ' LV: Bita maska 1,2,4,...,128 | EN: Bit mask 1,2,4,...,128
+Dim storedType As Byte  ' LV: No EEPROM nolasītais kanāla protokols | EN: Channel protocol type read from EEPROM
+Dim currentType As Byte  ' LV: Pašlaik saglabājamais protokols | EN: Protocol type currently being saved
+Dim matchCount As Byte  ' LV: Precīzi sakritušo NEC slotu skaits | EN: Number of exactly matching NEC slots
+Dim timerHighCheck As Byte  ' LV: Timer1 augstā baita kontrole stabilai nolasīšanai | EN: Timer1 high-byte check for a coherent read
+Dim phaseCount As Byte  ' LV: Šajā uztverē izmērīto LOW/HIGH fāžu skaits | EN: Number of LOW/HIGH phases measured in this capture
+Dim pulseLevel As Bit  ' LV: Pašlaik mērītais līmenis: 0=LOW, 1=HIGH | EN: Level currently measured: 0=LOW, 1=HIGH
+Dim frameGapLimit As Word  ' LV: Paketes beigu HIGH klusuma robeža Timer1 taktos | EN: Frame-ending HIGH silence limit in Timer1 ticks
+Dim isTclFrame As Bit  ' LV: 1 = pēc pirmā LOW izvēlēts TCL uztveršanas ceļš | EN: 1 = first LOW selected the TCL capture path
+Dim pulseTicks As Word  ' LV: Pašreizējās fāzes ilgums Timer1 4 us taktos | EN: Current phase duration in Timer1 4 us ticks
+Dim pulseValue As Word  ' LV: Fāzes ilgums pēc dalīšanas ar 32, vēl Word | EN: Phase duration after dividing by 32, still a Word
+Dim byteIdx As Byte  ' LV: Kopīgs fāžu/baitu cikla indekss | EN: Shared phase/byte loop index
+Dim captureError As Byte  ' LV: 0=uztvere pabeigta, 1=atteikums/taimauts/pārāk gara | EN: 0=capture complete, 1=rejected/timeout/too long
+Dim eeAdr As Word  ' LV: EEPROM adrese; izmantotas tikai 0..203 | EN: EEPROM address; only 0..203 are used
+Dim eeTmp As Byte  ' LV: EEPROM datu pagaidu baits | EN: Temporary EEPROM data byte
+Dim eeA As Byte  ' LV: Marķiera baits vai HaveGet rezultāts 0/1 | EN: Marker byte or HaveGet result 0/1
+Dim eeB As Byte  ' LV: Marķiera komplementa baits | EN: Marker complement byte
+Dim chSel As Byte  ' LV: Izvēlētais vai pārbaudāmais slots 1..4 | EN: Selected/tested slot 1..4
+Dim learnStep As Byte  ' LV: Nākamā apmācāmā slota numurs 1..4; 0=nav | EN: Next slot to learn, 1..4; 0=none
+Dim learnMode As Bit  ' LV: 1=apmācība, 0=parastā darbība | EN: 1=learning, 0=normal operation
+Dim haveMask As Byte  ' LV: Iemācīto slotu biti 0..3 | EN: Learned-slot presence bits 0..3
+Dim maskVal As Byte  ' LV: Viena slota bitu maska 1/2/4/8 | EN: Single-slot bit mask 1/2/4/8
+Dim loopCnt As Byte  ' LV: Palīgcikla skaitītājs maskas veidošanai | EN: Helper loop counter for constructing a mask
+Dim blinkCount As Byte  ' LV: Pilno mirgojumu atlikums pirms pēdējās LED iedegšanās | EN: Full flashes remaining before the final LED ON edge
+Dim startByte As Word  ' LV: Slota sākuma adrese: (chSel-1)*48 | EN: Slot start address: (chSel-1)*48
+Dim diffCount As Byte  ' LV: TCL nepieļauto fāžu / NEC atšķirīgo baitu skaits | EN: TCL out-of-tolerance phase / NEC unequal-byte count
+Dim totalDelta As Word  ' LV: TCL visu 48 absolūto noviržu summa | EN: Sum of all 48 absolute TCL timing deviations
+Dim bestDelta As Word  ' LV: Mazākā atrastā TCL noviržu summa | EN: Smallest TCL deviation sum found
+Dim bestCh As Byte  ' LV: Atpazītais slots 1..4; 0=nav viennozīmīgas atbilstības | EN: Matched slot 1..4; 0=no accepted result
+Dim pulseDelta As Word  ' LV: Absolūtā saņemtā/saglabātā ilguma starpība | EN: Absolute received/stored duration difference
+Dim idleMs As Word  ' LV: Cikli kopš pēdējās pieņemtās komandas; nav precīzas ms | EN: Loops since last accepted command; not exact milliseconds
+Dim stableMs As Word  ' LV: Secīgi HIGH paraugi ar 1 ms pauzi apmācībā | EN: Consecutive HIGH samples separated by 1 ms while learning
+Dim activeCh As Byte  ' LV: Pašlaik aktīvais slots 1..4; 0=izejas OFF | EN: Currently active slot 1..4; 0=outputs OFF
+Dim repeatOK As Bit  ' LV: 1=derīgs īsais NEC atkārtojums | EN: 1=valid short NEC repeat
+Dim activeMatch As Bit  ' LV: 1=TCL pakete atbilst jau aktīvajam TCL slotam | EN: 1=TCL frame matches the already active TCL slot
+Dim activeBad As Byte  ' LV: TCL aktīvās komandas neatbilstošo fāžu skaits | EN: Out-of-tolerance phase count for the active TCL command
+Dim packetKnown As Bit  ' LV: 1=šī uztvere pieņemta kā komanda/atkārtojums/apmācība | EN: 1=this capture was accepted as a key/repeat/learning event
+Dim unknownLedOn As Bit  ' LV: Neatpazīto pakešu LED stāvoklis | EN: LED state for unrecognized captures
+Dim unknownLedHold As Byte  ' LV: Atlikušais nezināmas LED indikācijas pamatciklu skaits | EN: Remaining main-loop count for unknown LED indication
 
-' LV: Logiskie IR izejas biti; tos var izmantot talak RGB vai cita kontroles koda. / EN: logical IR output bits; these can be used later by RGB or other control code.
-Dim IR_out_1, IR_out_2, IR_out_3, IR_out_4 As Bit
+out_1 = 0  ' LV: OUT1 izslēgta | EN: OUT1 OFF
+out_2 = 0  ' LV: OUT2 izslēgta | EN: OUT2 OFF
+learn_LED = 0  ' LV: LED izslēgta | EN: LED OFF
+learnMode = 0  ' LV: Parastais darba režīms | EN: Normal operating mode
+learnStep = 0  ' LV: Nav aktīvas apmācības pakāpes | EN: No active learning step
+activeCh = 0  ' LV: Atceļ komandu; izejas atjaunos zemāk | EN: Clears command; physical outputs are updated below
+idleMs = 0  ' LV: Sāk turēšanas klusuma skaitīšanu no 0 | EN: Restarts hold-silence counting at 0
+T1CON = 0  ' LV: Aptur Timer1; konfigurēs pirms nākamās uztveres | EN: Stops Timer1; configures it before the next capture
+unknownLedOn = 0  ' LV: Nezināmas uztveres LED stāvoklis OFF | EN: Unknown-capture LED state OFF
+unknownLedHold = 0  ' LV: Atceļ nezināmās uztveres indikācijas atlikumu | EN: Clears the unknown-capture indication lifetime
+Call LoadMarkers  ' LV: Atjauno iemācīto slotu masku no EEPROM marķieriem | EN: Restores the learned-slot mask from EEPROM markers
+Wait 250 ms  ' LV: Īsa starta nostabilizēšanās pauze | EN: Brief startup settling delay
 
-'==================== LV: IR signature uztvere / EN: IR signature capture ====================
-#define SAMPLE_US        80       ' LV: paraugosanas solis mikrosekundes. / EN: sampling interval in microseconds.
-#define SAMPLE_COUNT     320      ' LV: paraugu skaits; 320 * 80 us ir apmeram 25.6 ms uztveres logs. / EN: number of samples; 320 * 80 us is about a 25.6 ms capture window.
-#define SIG_BYTES        40       ' LV: ciets skaitlis; 320 / 8 = 40 baiti, lai GCB For cikli strada korekti. / EN: fixed value; 320 / 8 = 40 bytes, required for reliable GCB loops.
+' LV: Pamatcikls: LEARN -> uztvere -> atpazīšana -> izejas/LED -> 1 ms.
+' EN: Main loop: LEARN -> capture -> match -> outputs/LED -> 1 ms.
+MainLoop:
 
-'==================== LV: Salidzinasanas logs / EN: Comparison window ====================
-#define SKIP_SAMPLES     64       ' LV: salidzinasana izlaiz sakuma header dalu. / EN: comparison skips the initial header part.
-#define CMP_BYTES        20       ' LV: salidzina tikai so signature dalu. / EN: only this part of the signature is compared.
-#define MAX_DIFF_BITS    14        ' LV: pielaujamo atskirigo bitu skaits; lielaka vertiba ir tolerantaka. / EN: allowed number of different bits; higher value is more tolerant.
+  If learn_button = 0 Then  ' LV: Pārbauda, vai LEARN poga nospiesta | EN: Tests whether LEARN is pressed
+    Wait 30 ms  ' LV: Pamatcikla/pogas pauze; paužu vietas saglabātas no V8 | EN: Main-loop/button delay; original V8 delay locations are retained
+    If learn_button = 0 Then  ' LV: Pārbauda, vai LEARN poga nospiesta | EN: Tests whether LEARN is pressed
+      out_1 = 0  ' LV: OUT1 izslēgta | EN: OUT1 OFF
+      out_2 = 0  ' LV: OUT2 izslēgta | EN: OUT2 OFF
+      Do While learn_button = 0  ' LV: Gaidot atlaišanu, uztveršana ir bloķēta; izejas jau OFF | EN: Reception blocks until release; outputs are already OFF
+      Loop
+      Wait 30 ms  ' LV: Pamatcikla/pogas pauze; paužu vietas saglabātas no V8 | EN: Main-loop/button delay; original V8 delay locations are retained
+      unknownLedHold = 0  ' LV: Atceļ nezināmās uztveres indikācijas atlikumu | EN: Clears the unknown-capture indication lifetime
+      unknownLedOn = 0  ' LV: Nezināmas uztveres LED stāvoklis OFF | EN: Unknown-capture LED state OFF
+      If learnMode = 0 Then  ' LV: Ja bijām parastā režīmā, LEARN tagad ieslēgs apmācību | EN: If previously in normal mode, LEARN now enters learning
+        learnMode = 1  ' LV: Ieslēdz apmācības režīmu | EN: Enters learning mode
+        learnStep = 1  ' LV: Sāk ar pirmo apmācāmo slotu | EN: Starts with the first slot to learn
+        activeCh = 0  ' LV: Atceļ komandu; izejas atjaunos zemāk | EN: Clears command; physical outputs are updated below
+        idleMs = 0  ' LV: Sāk turēšanas klusuma skaitīšanu no 0 | EN: Restarts hold-silence counting at 0
+        learn_LED = 1  ' LV: LED ieslēgta | EN: LED ON
+      Else
+        learnMode = 0  ' LV: Parastais darba režīms | EN: Normal operating mode
+        learnStep = 0  ' LV: Nav aktīvas apmācības pakāpes | EN: No active learning step
+        activeCh = 0  ' LV: Atceļ komandu; izejas atjaunos zemāk | EN: Clears command; physical outputs are updated below
+        learn_LED = 0  ' LV: LED izslēgta | EN: LED OFF
+      End If
+    End If
+  End If
 
-'==================== LV: Laika konstantes / EN: Timing constants ====================
-#define LED_BLINK_MS      80      ' LV: LED mirgosanas ON/OFF laiks learning rezima. / EN: LED blink ON/OFF time in learning mode.
-#define POST_IR_WAIT_MS   20      ' LV: neliela pauze pec IR paketes apstrades. / EN: small delay after IR packet processing.
-#define LEARN_DEBOUNCE_MS 30      ' LV: learn pogas kontaktu atleksanas filtrs. / EN: debounce time for the learn button.
+  If IR_sens = 0 Then  ' LV: TSOP ir aktīvs LOW: iespējams jaunas paketes sākums | EN: TSOP is active LOW: possible start of a new frame
+    Call CaptureFrame  ' LV: Sinhroni uztver visu paketi/fāzes līdz beigu nosacījumam | EN: Synchronously captures phases until a frame-ending condition
+    packetKnown = 0  ' LV: Katru uztveri sākotnēji uzskata par neatpazītu | EN: Initially treats every capture as unrecognized
+    If captureError = 0 Then  ' LV: Apstrādā tikai uztveri bez taimauta/pārpildes kļūdas | EN: Processes only a capture without timeout/overflow error
+      necValid = 0  ' LV: Atceļ iepriekšējās NEC dekodēšanas derīgumu | EN: Clears validity from any previous NEC decode
+      If isTclFrame = 0 Then  ' LV: Paketei nav izvēlēts TCL uztveršanas ceļš | EN: The capture was not classified as TCL-like
+        Call DecodeNEC  ' LV: Mēģina pārbaudīt un dekodēt visas 67 NEC fāzes | EN: Tries to validate and decode all 67 NEC phases
+      End If
+      If learnMode = 1 Then  ' LV: Apmācības zars | EN: Learning-mode branch
+        If ((isTclFrame = 1) And (phaseCount = TCL_FRAME_PHASES)) Or (necValid = 1) Then  ' LV: Apmācībai der pilns TCL garums vai derīga NEC pakete | EN: Learning requires a full-length TCL frame or valid NEC frame
+          packetKnown = 1  ' LV: Uztvere pieņemta; nezināmas paketes LED indikāciju neizsauc | EN: Capture accepted; do not trigger unknown-frame indication
+          chSel = learnStep  ' LV: Izvēlas pašlaik apmācāmo slotu | EN: Selects the slot currently being learned
+          Call SaveLearned  ' LV: Ieraksta šī slota kodu, tipu un marķieri EEPROM | EN: Writes this slot code, type and validity marker to EEPROM
+          blinkCount = learnStep - 1  ' LV: Par vienu pilnu mirgojumu mazāk; pēdējais ir ON palikšana | EN: One fewer complete flash; the last is the final steady ON
+          Call BlinkConfirm  ' LV: Parāda slota numuru ar LED; apmācībā šī gaidīšana ir apzināta | EN: Shows slot number on LED; blocking is intentional while learning
+          If learnStep < 4 Then  ' LV: Pēc 1./2./3. pogas vēl ir nākamais slots | EN: After button 1/2/3 another slot remains
+            learnStep = learnStep + 1  ' LV: Pāriet uz nākamo apmācāmo pogu | EN: Advances to the next button to learn
+            learn_LED = 1  ' LV: LED ieslēgta | EN: LED ON
+          Else
+            learnMode = 0  ' LV: Parastais darba režīms | EN: Normal operating mode
+            learnStep = 0  ' LV: Nav aktīvas apmācības pakāpes | EN: No active learning step
+            learn_LED = 0  ' LV: LED izslēgta | EN: LED OFF
+          End If
 
-'==================== LV: Learning aizsardziba pret repeat paketem / EN: Learning protection against repeat packets ====================
-#define LEARN_RELEASE_STABLE_MS  120
+          Call WaitRelease  ' LV: Neļauj turētas pogas atkārtojumu iemācīt nākamajā slotā | EN: Prevents a held key repeat from being learned into the next slot
+        End If
+      Else
+        If phaseCount >= MIN_FULL_PHASES Then  ' LV: Garākai uztverei mēģina pilnas komandas atpazīšanu | EN: For a longer capture tries a full-command match
 
-'==================== LV: Neblokejosa pogas turesana / EN: Non-blocking button hold ====================
-#define HOLD_RELEASE_LOOPS  500
+          activeMatch = 0  ' LV: Sākotnēji nav aktīvā TCL slota sakritības | EN: Initially no active TCL-slot match
+          If (activeCh <> 0) And (isTclFrame = 1) Then  ' LV: Aktīvas komandas saīsināto salīdzināšanu lieto tikai TCL | EN: Uses active-command shortcut only for TCL captures
+            Call MatchActiveRepeat  ' LV: Pārbauda aktīvās TCL pogas atkārtotu pilno paketi | EN: Checks a repeated full frame of the active TCL button
+          End If
+          If activeMatch = 1 Then  ' LV: Jau aktīvā TCL komanda atkal apstiprināta | EN: The already active TCL command has been confirmed again
+            packetKnown = 1  ' LV: Uztvere pieņemta; nezināmas paketes LED indikāciju neizsauc | EN: Capture accepted; do not trigger unknown-frame indication
+            idleMs = 0  ' LV: Sāk turēšanas klusuma skaitīšanu no 0 | EN: Restarts hold-silence counting at 0
+          Else
+            If isTclFrame = 1 Then  ' LV: TCL signatūras atpazīšanas zars | EN: TCL signature-matching branch
+              Call MatchFullFrame  ' LV: Meklē labāko derīgo TCL slotu starp visiem četriem | EN: Finds the best acceptable TCL slot among all four
+            Else
+              Call MatchNEC  ' LV: Meklē precīzu visu 4 NEC baitu sakritību | EN: Finds an exact match for all 4 NEC bytes
+            End If
+            If bestCh <> 0 Then  ' LV: Atrasts pieņemams komandas slots | EN: An acceptable command slot was found
+              packetKnown = 1  ' LV: Uztvere pieņemta; nezināmas paketes LED indikāciju neizsauc | EN: Capture accepted; do not trigger unknown-frame indication
+              activeCh = bestCh  ' LV: Aktivizē atrasto slotu; fiziskās izejas iestata zemāk | EN: Activates the matched slot; physical outputs are updated below
+              idleMs = 0  ' LV: Sāk turēšanas klusuma skaitīšanu no 0 | EN: Restarts hold-silence counting at 0
+            Else
 
-'==================== LV: Starta warm-up, TSOP stabilizacija / EN: Start-up warm-up, TSOP stabilization ====================
-#define IR_BOOT_STABLE_MS   250   ' LV: IR_sens jabut stabili HIGH, lai TSOP uzskatitu par gatavu. / EN: IR_sens must stay HIGH to treat the TSOP as ready.
-#define IR_BOOT_MAXWAIT_MS  1500  ' LV: maksimalais gaidisanas laiks pec ieslegsanas. / EN: maximum wait time after power-up.
-
-
-'==================== LV: EEPROM izkartojums / EN: EEPROM layout ====================
-' LV: Visi 4 signature bloki atrodas viena EEPROM datu bloka. / EN: All four signature blocks are stored in one EEPROM data block.
-' LV: CH1: 0..39, CH2: 40..79, CH3: 80..119, CH4: 120..159; kopa 160 baiti. / EN: CH1: 0..39, CH2: 40..79, CH3: 80..119, CH4: 120..159; total 160 bytes.
-#define EE_SIG_BASE        0
-
-' LV: Deriguma markeri sakas aiz signature datu bloka. / EN: Validity markers start after the signature data block.
-#define EE_MRK_BASE        (EE_SIG_BASE + (SIG_BYTES * 4))   ' LV: markeru sakums aiz 4 signature blokiem; 0 + 160 = 160. / EN: marker area starts after four signature blocks; 0 + 160 = 160.
-
-#define EE_MAGIC1          161     ' LV: CH1 deriguma markeris. / EN: CH1 validity marker.
-#define EE_MAGIC2          162     ' LV: CH2 deriguma markeris. / EN: CH2 validity marker.
-#define EE_MAGIC3          163     ' LV: CH3 deriguma markeris. / EN: CH3 validity marker.
-#define EE_MAGIC4          164     ' LV: CH4 deriguma markeris. / EN: CH4 validity marker.
-
-
-'==================== LV: Mainigie / EN: Variables ====================
-Dim learnMode As Bit          ' LV: 1 = learning rezims ir aktivs. / EN: 1 = learning mode is active.
-Dim learnStep As Byte         ' LV: 1..4 norada, kuru IR pogu sobrid macam. / EN: 1..4 indicates which IR button is being learned.
-
-' LV: haveMask bit0=CH1, bit1=CH2, bit2=CH3, bit3=CH4; 1 nozime, ka kanals ir iemacits. / EN: haveMask bit0=CH1, bit1=CH2, bit2=CH3, bit3=CH4; 1 means the channel is learned.
-Dim haveMask As Byte
-
-Dim idx As Word
-Dim quietLoops As Word        ' LV: cik galvenos ciklus IR_sens ir HIGH, t.i. klusums. / EN: number of main loops with IR_sens HIGH, meaning silence.
-Dim diffBits As Word
-
-Dim byteIdx As Byte
-Dim bitIdx As Byte
-
-' LV: RX signature ir pedejais uztvertais IR paraugu logs. / EN: RX signature is the last captured IR sample window.
-Dim sigRx(SIG_BYTES) As Byte
-
-' LV: Visi 4 iemacitie signature bloki viena masiva. / EN: all four learned signature blocks in one array.
-Dim sigLearnAll(160) As Byte   ' LV: visi 4 iemacitie signature bloki viena masiva; 4 * 40 = 160. / EN: all four learned signature blocks in one array; 4 * 40 = 160.
-
-Dim maskVal As Byte
-Dim loopCnt As Byte
-Dim xorVal As Byte
-Dim bitLoop As Byte
-
-Dim startByte As Word          ' LV: bazes adrese masiva attiecigajam kanalam, 0/40/80/120. / EN: base array address for selected channel, 0/40/80/120.
-Dim endByte As Byte
-
-Dim blinkCount As Byte         ' LV: cik reizes LED mirgo pec learning apstiprinajuma. / EN: how many times the LED blinks after learning confirmation.
-
-'==================== LV: Neblokejosa pogas turesana / EN: Non-blocking button hold ====================
-Dim IR_holdCh As Byte          ' LV: 0 = nav turetas pogas, 1..4 = kurs kanals sobrid tiek turets. / EN: 0 = no held button, 1..4 = currently held channel.
-
-' LV: Paligmainigais IR atlaisanas stabilitates parbaudei. / EN: Helper variable for stable IR release detection.
-Dim relCnt As Byte
-
-' LV: Pirmais neatpazitais signals pec reset netiek radits ka kluda, jo TSOP var vel stabilizeeties. / EN: The first unknown signal after reset is ignored because the TSOP may still be stabilizing.
-Dim bootIgnoreUnknown As Bit
-
-' LV: chSel izmanto kopigajas subrutinas, lai izveletos kanalu 1..4. / EN: chSel selects channel 1..4 for shared subroutines.
-Dim chSel As Byte
-
-' LV: EEPROM paligmainigie lasisanai un rakstisanai. / EN: EEPROM helper variables for read and write operations.
-Dim eeA As Byte
-Dim eeB As Byte
-Dim eeTmp As Byte              ' LV: obligats EPRead/EPWrite starpnieks. / EN: required temporary variable for EPRead/EPWrite.
-Dim eeAdr As Word              ' LV: EEPROM adrese. / EN: EEPROM address.
-
-
-'==================== LV: Inicializacija, lai pec reset nav nejausu stavoklu / EN: Initialization to avoid random states after reset ====================
-learnMode = 0
-learnStep = 0
-IR_holdCh = 0
-quietLoops = 0
-haveMask = 0
-IR_out_1 = 0
-IR_out_2 = 0
-IR_out_3 = 0
-IR_out_4 = 0
-learn_LED = 0
-bootIgnoreUnknown = 1
-
-
-'==================== LV: EEPROM ielade starta / EN: Load learned data from EEPROM at start-up ====================
-Call EEPROM_LoadLearned()
-
-' LV: Pec ieslegsanas pagaidam, kamer TSOP izeja ir mieriga. / EN: after power-up, wait until the TSOP output is stable.
-Call IR_BootWarmup()
-
-main:
-  '===== LV: IR_Service jaizsauc ari learning rezima. / EN: IR_Service must also be called while learning mode is active.
- If (learnMode = 1) Or (IR_sens = 0) Or (learn_button = 0)  Then
-    Call IR_Service()
- End If
-
-  '==================== LV: Neblokejosa pogas turesana / EN: Non-blocking button hold ====================
- Call IR_HoldUpdate()
-
-''======= LV: IR pults logiskie biti IR_out_1..IR_out_4 / EN: IR remote logic bits IR_out_1..IR_out_4 ===configure according to application.=======
-''==============================================================================================
-if IR_out_1 or IR_out_2 then set out_1 ON else set out_1 off
-if IR_out_3 or IR_out_4 then set out_2 ON else set out_2 off
-
-
-goto main
-
-
-'==============================================================================================
-' LV: IR apkalposana: learning rezims un normalas atpazisanas rezims. / EN: IR service: learning mode and normal recognition mode.
-'==============================================================================================
-Sub IR_Service()
-
-  ' ---- LV: Learn poga: ieiet learning rezima vai iziet no ta. / EN: Learn button: enter learning mode or cancel it. ----
-  ' LV: Ja learning rezims ieslegts nejausi, otrais learn_button spiediens iziet ara bez reset un bez EEPROM bojasanas. / EN: If learning mode was entered by mistake, a second learn_button press exits without reset and without damaging EEPROM.
-  ' LV: Sis bloks ari atcel learning rezimu, ja poga nospiesta otru reizi. / EN: this block also cancels learning mode when the button is pressed a second time.
-  If learn_button = 0 Then
-     Wait LEARN_DEBOUNCE_MS ms
-     If learn_button = 0 Then
-
-        If learnMode = 0 Then
-           ' LV: Ieiet learning rezima un gaida pirmo IR pogu. / EN: enter learning mode and wait for the first IR button.
-           learnMode = 1
-           learnStep = 1
-           IR_holdCh = 0
-           quietLoops = 0
-           learn_LED = 1
-
-           Do While learn_button = 0
-           Loop
-           Wait LEARN_DEBOUNCE_MS ms
-
+              If isTclFrame = 0 Then  ' LV: Paketei nav izvēlēts TCL uztveršanas ceļš | EN: The capture was not classified as TCL-like
+                activeCh = 0  ' LV: Atceļ komandu; izejas atjaunos zemāk | EN: Clears command; physical outputs are updated below
+                idleMs = 0  ' LV: Sāk turēšanas klusuma skaitīšanu no 0 | EN: Restarts hold-silence counting at 0
+              End If
+            End If
+          End If
         Else
-           ' ---------------------------------------------
-           ' LV: Izejam no learning rezima (CANCEL). / EN: exit learning mode (CANCEL).
-           ' ---------------------------------------------
-           learnMode = 0
-           learnStep = 0
-           IR_holdCh = 0
-           quietLoops = 0
-           learn_LED = 0  ' LV: LED izsledz, jo learning rezims tiek atcelts. / EN: turn LED off because learning mode is cancelled.
-             ' LV: Gaidam, kamer learn poga ir atlaista. / EN: wait until the learn button is released.
-           Do While learn_button = 0
-           Loop
-           Wait LEARN_DEBOUNCE_MS ms
-          ' LV: Svarigi: saja cikla talak vairs neko neapstradajam. / EN: important: do not process anything else in this service call.
-           Exit Sub
+
+          If activeCh <> 0 Then  ' LV: Ir pašlaik aktīvs komandas slots | EN: A command slot is currently active
+            Call CheckShortRepeat  ' LV: Pārbauda, vai īsā pakete ir NEC turēšanas atkārtojums | EN: Checks whether the short frame is a NEC hold repeat
+            If repeatOK = 1 Then  ' LV: Derīgs atkārtojums pagarina pēdējās NEC komandas darbību | EN: A valid repeat extends the last NEC command
+              packetKnown = 1  ' LV: Uztvere pieņemta; nezināmas paketes LED indikāciju neizsauc | EN: Capture accepted; do not trigger unknown-frame indication
+              idleMs = 0  ' LV: Sāk turēšanas klusuma skaitīšanu no 0 | EN: Restarts hold-silence counting at 0
+            End If
+          End If
         End If
+      End If
+    End If
 
-     End If
+    If learnMode = 0 Then  ' LV: Ja apmācība nav ieslēgta, lieto parastās darbības ceļu | EN: Uses normal-operation path when learning is not active
+      If packetKnown = 1 Then  ' LV: Pieņemta komanda/atkārtojums: atceļ nezināmo indikāciju | EN: Accepted command/repeat: clears unknown indication
+        unknownLedHold = 0  ' LV: Atceļ nezināmās uztveres indikācijas atlikumu | EN: Clears the unknown-capture indication lifetime
+        unknownLedOn = 0  ' LV: Nezināmas uztveres LED stāvoklis OFF | EN: Unknown-capture LED state OFF
+      Else
+        If unknownLedOn = 0 Then  ' LV: Katras nepieņemtās uztveres beigās maina LED stāvokli | EN: Toggles LED state at the end of each unaccepted capture
+          unknownLedOn = 1  ' LV: Nezināmas uztveres LED stāvoklis ON | EN: Unknown-capture LED state ON
+        Else
+          unknownLedOn = 0  ' LV: Nezināmas uztveres LED stāvoklis OFF | EN: Unknown-capture LED state OFF
+        End If
+        unknownLedHold = UNKNOWN_LED_HOLD_LOOPS  ' LV: Atjauno indikācijas atlikumu uz 120 pamatcikliem | EN: Refreshes indication lifetime to 120 main-loop iterations
+      End If
+    End If
   End If
 
-  ' LV: Ja jau ir atpazita un tureta poga, normalaja rezima vairs nedekodejam, lai LED nestrobe. / EN: If a learned button is already held, do not decode again in normal mode to avoid LED strobing.
-  ' LV: Kamēr poga tureta, izejas tiek uzturetas IR_HoldUpdate subrutina. / EN: while the button is held, outputs are maintained by IR_HoldUpdate.
-  If (learnMode = 0) And (IR_holdCh <> 0) Then
-     quietLoops = 0
-     Exit Sub
-  End If
-
-  If IR_sens <> 0 Then Exit Sub
-
-  ' ---- LV: Uztver signature, apmeram 25.6 ms logs. / EN: capture signature, about a 25.6 ms window. ----
-  Call IR_CaptureSignature()
-
-  If learnMode = 1 Then
-
-     ' LV: Learning seciba ir CH1 -> CH2 -> CH3 -> CH4. / EN: learning order is CH1 -> CH2 -> CH3 -> CH4.
-     chSel = learnStep
-
-     ' LV: RX signature ir pedejais uztvertais IR paraugu logs. / EN: RX signature is the last captured IR sample window.
-     Call IR_CopyRxToLearnSelected()
-
-     ' LV: 2) Atzimejam, ka kanals ir iemacits. / EN: 2) mark the channel as learned.
-     eeA = 1
-     Call Have_Set()
-
-     ' LV: 3) Saglabajam EEPROM: vispirms dati, pec tam markeri. / EN: 3) save to EEPROM: data first, markers afterwards.
-     Call EEPROM_Save_Selected()
-
-     ' LV: 4) LED apstiprinajuma mirgosana: CH1=1x, CH2=2x, CH3=3x, CH4=5x. / EN: 4) LED confirmation blink: CH1=1x, CH2=2x, CH3=3x, CH4=5x.
-     If learnStep = 1 Then
-        blinkCount = 1
-     Else If learnStep = 2 Then
-        blinkCount = 2
-     Else If learnStep = 3 Then
-        blinkCount = 3
-     Else
-        blinkCount = 5
-     End If
-     Call LedBlink_Do()
-
-     ' LV: 5) Parejam uz nakamo learning soli vai beidzam learning rezimu. / EN: 5) move to the next learning step or finish learning mode.
-     If learnStep < 4 Then
-        learn_LED = 1
-        learnStep = learnStep + 1
-     Else
-        learn_LED = 0
-        learnMode = 0
-        learnStep = 0
-     End If
-
-     ' LV: 5) Parejam uz nakamo learning soli vai beidzam learning rezimu. / EN: 5) move to the next learning step or finish learning mode.
-     Call WaitIrReleaseStable()
-
+  If learnMode = 0 Then  ' LV: Ja apmācība nav ieslēgta, lieto parastās darbības ceļu | EN: Uses normal-operation path when learning is not active
+    If activeCh <> 0 Then  ' LV: Ir pašlaik aktīvs komandas slots | EN: A command slot is currently active
+      If idleMs < HOLD_TIMEOUT_MS Then  ' LV: Derīgas turēšanas komandas gaidīšanas robeža nav sasniegta | EN: The accepted-command hold limit has not been reached
+        idleMs = idleMs + 1  ' LV: Vēl viens pamatcikls bez taimera; uztveršanas laiks te neietilpst | EN: Adds one main loop; frame-capture time is not counted here
+      Else
+        activeCh = 0  ' LV: Atceļ komandu; izejas atjaunos zemāk | EN: Clears command; physical outputs are updated below
+      End If
+    End If
+    If (activeCh = 1) Or (activeCh = 2) Then  ' LV: OUT1 ieslēdz tikai sloti 1 vai 2 | EN: Only slot 1 or 2 turns OUT1 ON
+      out_1 = 1  ' LV: OUT1 ieslēgta | EN: OUT1 ON
+    Else
+      out_1 = 0  ' LV: OUT1 izslēgta | EN: OUT1 OFF
+    End If
+    If (activeCh = 3) Or (activeCh = 4) Then  ' LV: OUT2 ieslēdz tikai sloti 3 vai 4 | EN: Only slot 3 or 4 turns OUT2 ON
+      out_2 = 1  ' LV: OUT2 ieslēgta | EN: OUT2 ON
+    Else
+      out_2 = 0  ' LV: OUT2 izslēgta | EN: OUT2 OFF
+    End If
+    If unknownLedHold > 0 Then  ' LV: Nezināmas uztveres LED indikācijai ir prioritāte | EN: Unknown-capture LED indication takes priority
+      unknownLedHold = unknownLedHold - 1  ' LV: Samazina atlikumu vienu reizi pamatciklā | EN: Decrements lifetime once per main-loop iteration
+      learn_LED = unknownLedOn  ' LV: Uz fiziskās LED parāda pakešu pārslēgto stāvokli | EN: Displays the packet-toggled state on the physical LED
+      If unknownLedHold = 0 Then unknownLedOn = 0  ' LV: Pēc indikācijas beigām nākamā svešā pakete sāks ar ON | EN: After expiry the next unknown capture starts with ON
+    Else
+      If activeCh <> 0 Then  ' LV: Ir pašlaik aktīvs komandas slots | EN: A command slot is currently active
+        learn_LED = 1  ' LV: LED ieslēgta | EN: LED ON
+      Else
+        learn_LED = 0  ' LV: LED izslēgta | EN: LED OFF
+      End If
+    End If
   Else
-     ' ---- LV: Normalais atpazisanas rezims. / EN: normal recognition mode. ----
-     chSel = 1
-     Do While chSel <= 4
-
-        Call Have_Get()
-        If eeA = 1 Then
-           Call IR_CompareWithLearnSelected()
-           If diffBits <= MAX_DIFF_BITS Then Exit Do
-        End If
-
-        chSel = chSel + 1
-     Loop
-
-     If chSel <= 4 Then
-        IR_holdCh = chSel
-        quietLoops = 0
-        bootIgnoreUnknown = 0
-     Else
-        If bootIgnoreUnknown = 1 Then
-           bootIgnoreUnknown = 0
-           Exit Sub
-        End If
-
-        learn_LED = 1
-        Wait 30 ms
-        learn_LED = 0
-     End If
-
+    out_1 = 0  ' LV: OUT1 izslēgta | EN: OUT1 OFF
+    out_2 = 0  ' LV: OUT2 izslēgta | EN: OUT2 OFF
   End If
+  Wait 1 ms  ' LV: Pamatcikla/pogas pauze; paužu vietas saglabātas no V8 | EN: Main-loop/button delay; original V8 delay locations are retained
+Goto MainLoop  ' LV: Atkārto pogas, uztveres, izeju un LED apstrādi | EN: Repeats button, capture, output and LED processing
 
-  Wait POST_IR_WAIT_MS ms
-
-End Sub
-
-
-'------------------------------------------------------------
-'==================== LV: Starta warm-up, TSOP stabilizacija / EN: Start-up warm-up, TSOP stabilization ====================
-'------------------------------------------------------------
-Sub IR_BootWarmup()
-
-  idx = 0
-  Do While (IR_sens = 0) And (idx < IR_BOOT_MAXWAIT_MS)
-     Wait 1 ms
-     idx = idx + 1
-  Loop
-
-  relCnt = 0
-  idx = 0
-  Do While (relCnt < IR_BOOT_STABLE_MS) And (idx < IR_BOOT_MAXWAIT_MS)
-     If IR_sens = 1 Then
-        relCnt = relCnt + 1
-     Else
-        relCnt = 0
-     End If
-     Wait 1 ms
-     idx = idx + 1
-  Loop
-
-End Sub
-
-
-'------------------------------------------------------------
-' LV: Gaidam, lidz IR_sens ir HIGH nepartraukti noteiktu laiku. / EN: wait until IR_sens stays HIGH continuously for the required time.
-'------------------------------------------------------------
-Sub WaitIrReleaseStable()
-
-  relCnt = 0
+' ----------------------------------------------------------------------
+' LV: Izmēra mainīgās LOW/HIGH fāzes; šajā ciklā LED darbību nav.
+' EN: Measures alternating LOW/HIGH phases; no LED work is done inside this loop.
+Sub CaptureFrame()
+  captureError = 0  ' LV: Sāk uztveri bez kļūdas | EN: Starts capture without an error
+  phaseCount = 0  ' LV: Pirmajai fāzei būs masīva indekss0 | EN: The first phase will use array index0
+  For byteIdx = 0 To RX_BYTES - 1  ' LV: Notīra 80 elementus; 0..79 ir vienīgās derīgās adreses | EN: Clears 80 elements; only indices 0..79 are valid
+    sigRx(byteIdx) = 0  ' LV: Noņem iepriekšējās paketes atlikumu | EN: Removes stale data from the previous frame
+  Next
+  If IR_sens <> 0 Then  ' LV: Ja sākums jau pazudis, uztveri atceļ | EN: Aborts if the possible start has already disappeared
+    captureError = 1  ' LV: Atzīmē uztveri kā noraidītu; vecie dati nav lietojami | EN: Rejects this capture; its data must not be used
+    Exit Sub  ' LV: Atgriežas izsaucējā ar pašreizējo rezultāta/kļūdas karogu | EN: Returns to caller with the current result/error flag
+  End If
+  T1CON = 0  ' LV: Aptur Timer1; konfigurēs pirms nākamās uztveres | EN: Stops Timer1; configures it before the next capture
+  TMR1H = 0  ' LV: Notīra Timer1 augsto baitu | EN: Clears the Timer1 high byte
+  TMR1L = 0  ' LV: Notīra Timer1 zemo baitu; sāk jauna ilguma mērījumu | EN: Clears Timer1 low byte; starts a fresh duration measurement
+  T1CON = 49  ' LV: 0x31: Fosc/4, prescaler 1:8, Timer1 ON -> 4 us/takts | EN: 0x31: Fosc/4, 1:8 prescaler, Timer1 ON -> 4 us/tick
+  pulseLevel = 0  ' LV: Izvēlas LOW fāzi; ar LOW sāk arī visu uztveri | EN: Selects the LOW phase; capture also starts at LOW
+  frameGapLimit = FRAME_GAP_TICKS  ' LV: Noklusēti izvēlas NEC 12 ms HIGH beigu klusumu | EN: Defaults to the NEC 12 ms HIGH ending gap
+  isTclFrame = 0  ' LV: Pirms pirmās fāzes vēl nav TCL klasifikācijas | EN: No TCL classification before measuring the first phase
   Do
-     If IR_sens = 1 Then
-        relCnt = relCnt + 1
-        If relCnt >= LEARN_RELEASE_STABLE_MS Then Exit Do
-     Else
-        relCnt = 0
-     End If
-     Wait 1 ms
+    TMR1H = 0  ' LV: Notīra Timer1 augsto baitu | EN: Clears the Timer1 high byte
+    TMR1L = 0  ' LV: Notīra Timer1 zemo baitu; sāk jauna ilguma mērījumu | EN: Clears Timer1 low byte; starts a fresh duration measurement
+    Do
+
+      Do
+        timerHighCheck = TMR1H  ' LV: Saglabā augsto baitu pirms zemā baita lasīšanas | EN: Saves the high byte before reading the low byte
+        pulseTicks = timerHighCheck  ' LV: Sāk 16 bitu Timer1 vērtības veidošanu | EN: Starts assembling the 16-bit Timer1 value
+        pulseTicks = pulseTicks * 256  ' LV: Augsto baitu pārbīda uz Word bitiem 8..15 | EN: Moves the high byte into Word bits 8..15
+        pulseTicks = pulseTicks + TMR1L  ' LV: Pievieno pašreizējo zemo baitu | EN: Adds the current low byte
+      Loop While timerHighCheck <> TMR1H  ' LV: Ja lasīšanas laikā mainījās augstais baits, nolasa vēlreiz | EN: Retries if the high byte changed during the read
+      If (pulseLevel = 1) And (pulseTicks >= frameGapLimit) Then  ' LV: Pietiekami ilgs HIGH nozīmē paketes beigas; to masīvā neieraksta | EN: A long enough HIGH ends the frame; this gap is not stored
+        T1CON = 0  ' LV: Aptur Timer1; konfigurēs pirms nākamās uztveres | EN: Stops Timer1; configures it before the next capture
+        Exit Sub  ' LV: Atgriežas izsaucējā ar pašreizējo rezultāta/kļūdas karogu | EN: Returns to caller with the current result/error flag
+      End If
+      If pulseTicks >= PULSE_TIMEOUT_TICKS Then  ' LV: Ilgstoši nemainīgs līmenis pārsniedz 60 ms aborta robežu | EN: An unchanged level exceeds the 60 ms abort limit
+        T1CON = 0  ' LV: Aptur Timer1; konfigurēs pirms nākamās uztveres | EN: Stops Timer1; configures it before the next capture
+        captureError = 1  ' LV: Atzīmē uztveri kā noraidītu; vecie dati nav lietojami | EN: Rejects this capture; its data must not be used
+        Exit Sub  ' LV: Atgriežas izsaucējā ar pašreizējo rezultāta/kļūdas karogu | EN: Returns to caller with the current result/error flag
+      End If
+    Loop While IR_sens = pulseLevel  ' LV: Turpina mērīt, kamēr TSOP līmenis vēl nav mainījies | EN: Continues timing until the TSOP level changes
+    If phaseCount < RX_BYTES Then  ' LV: Pirms ieraksta pārbauda masīva robežu | EN: Checks the array bound before writing
+      pulseValue = pulseTicks / PULSE_UNIT_TICKS  ' LV: 4 us takti /32 ->128 us vienības; daļu atmet | EN: 4 us ticks /32 ->128 us units; fractional part is discarded
+      If pulseValue > 255 Then pulseValue = 255  ' LV: Piesātina līdz Byte maksimumam, nevis ļauj pārpildīties | EN: Saturates at the Byte maximum instead of wrapping
+      sigRx(phaseCount) = pulseValue  ' LV: Saglabā izmērītās fāzes kvantēto ilgumu | EN: Stores the measured phase duration after quantization
+
+      If phaseCount = 0 Then  ' LV: Tikai pirmais LOW nosaka uztveršanas ceļu | EN: Only the first LOW selects the capture path
+        If pulseValue <= TCL_LEADER_MAX Then  ' LV: Īsāks sākuma LOW izvēlas TCL režīmu | EN: A shorter first LOW selects the TCL-like path
+          frameGapLimit = TCL_GAP_TICKS  ' LV: TCL pārtrauc pie 6 ms HIGH, lai paketes nesaliptu | EN: TCL uses 6 ms HIGH so successive frames are not merged
+          isTclFrame = 1  ' LV: Atzīmē TCL līdzīgu uztveršanas ceļu | EN: Marks the TCL-like capture path
+        Else
+          frameGapLimit = FRAME_GAP_TICKS  ' LV: Noklusēti izvēlas NEC 12 ms HIGH beigu klusumu | EN: Defaults to the NEC 12 ms HIGH ending gap
+        End If
+      End If
+    End If
+    phaseCount = phaseCount + 1  ' LV: Pieskaita tikko izmērīto LOW vai HIGH fāzi | EN: Counts the just-measured LOW or HIGH phase
+    If phaseCount >= RX_BYTES Then  ' LV: 80 fāzes šeit ir pārāk gara pakete: noraida | EN: 80 phases is an oversized frame here: reject
+      T1CON = 0  ' LV: Aptur Timer1; konfigurēs pirms nākamās uztveres | EN: Stops Timer1; configures it before the next capture
+      captureError = 1  ' LV: Atzīmē uztveri kā noraidītu; vecie dati nav lietojami | EN: Rejects this capture; its data must not be used
+      Exit Sub  ' LV: Atgriežas izsaucējā ar pašreizējo rezultāta/kļūdas karogu | EN: Returns to caller with the current result/error flag
+    End If
+
+    If (isTclFrame = 1) And (phaseCount >= TCL_FRAME_PHASES) Then  ' LV: TCL beidz uzreiz pēc 51. fāzes, pēdējā LOW beigās | EN: TCL stops immediately after phase 51, at the final LOW end
+      T1CON = 0  ' LV: Aptur Timer1; konfigurēs pirms nākamās uztveres | EN: Stops Timer1; configures it before the next capture
+      Exit Sub  ' LV: Atgriežas izsaucējā ar pašreizējo rezultāta/kļūdas karogu | EN: Returns to caller with the current result/error flag
+    End If
+    If pulseLevel = 0 Then  ' LV: Pēc LOW nāk HIGH; pēc HIGH nāk LOW | EN: LOW is followed by HIGH; HIGH is followed by LOW
+      pulseLevel = 1  ' LV: Nākamā mērāmā fāze ir HIGH | EN: The next phase to measure is HIGH
+    Else
+      pulseLevel = 0  ' LV: Izvēlas LOW fāzi; ar LOW sāk arī visu uztveri | EN: Selects the LOW phase; capture also starts at LOW
+    End If
   Loop
-
 End Sub
 
+' ----------------------------------------------------------------------
+' LV: Pārbauda 3 fāžu NEC atkārtojumu tikai jau aktīvam NEC slotam.
+' EN: Checks a 3-phase NEC repeat only for an already active NEC slot.
+Sub CheckShortRepeat()
+  repeatOK = 0  ' LV: Pirms pārbaudēm atkārtojums nav pieņemts | EN: Repeat is not accepted until checks pass
+  If phaseCount <> 3 Then Exit Sub  ' LV: NEC turēšanas atkārtojumam jābūt tieši 3 fāzēm | EN: A NEC hold repeat must contain exactly 3 phases
+  If isTclFrame = 1 Then Exit Sub  ' LV: TCL paketi nekad nepieņem kā īso NEC atkārtojumu | EN: Never accepts a TCL-like capture as a short NEC repeat
+  eeAdr = 200 + activeCh - 1  ' LV: Aktīvā slota protokola tipa adrese 200..203 | EN: Protocol-type address 200..203 for the active slot
+  EPRead eeAdr, storedType  ' LV: Nolasa saglabāto TCL/NEC protokola tipu | EN: Reads the stored TCL/NEC protocol type
+  If storedType <> TYPE_NEC Then Exit Sub  ' LV: Atkārtojums nedrīkst pagarināt TCL komandu | EN: A short repeat must not extend a TCL command
 
-'------------------------------------------------------------
-'==================== LV: Neblokejosa pogas turesana / EN: Non-blocking button hold ====================
-' LV: learn_LED deg stabili, ja poga ir atpazita un tureta. / EN: learn_LED stays ON when a learned button is recognized and held.
-'------------------------------------------------------------
-Sub IR_HoldUpdate()
+  If (sigRx(0) >= 55) And (sigRx(0) <= 85) Then  ' LV: Sākuma LOW pielaide 7.04..10.88 ms | EN: Leading LOW tolerance: 7.04..10.88 ms
+    If (sigRx(1) >= 8) And (sigRx(1) <= 26) Then  ' LV: Atkārtojuma HIGH pielaide 1.024..3.328 ms | EN: Repeat HIGH tolerance: 1.024..3.328 ms
+      If sigRx(2) <= 9 Then repeatOK = 1  ' LV: Pēdējais īsais LOW <=1.152 ms; pārbaude saglabāta no V7 | EN: Final short LOW <=1.152 ms; check retained from V7
+    End If
+  End If
+End Sub
 
-  IR_out_1 = 0
-  IR_out_2 = 0
-  IR_out_3 = 0
-  IR_out_4 = 0
+' ----------------------------------------------------------------------
+' LV: Tikai TCL: salīdzina jau aktīvā slota fāzes 2..47, ignorējot 0/1.
+' EN: TCL only: compares active-slot phases 2..47, ignoring phases 0/1.
+Sub MatchActiveRepeat()
+  activeMatch = 0  ' LV: Sākotnēji nav aktīvā TCL slota sakritības | EN: Initially no active TCL-slot match
+  If activeCh = 0 Then Exit Sub  ' LV: Bez aktīva slota šo ceļu neizmanto | EN: Does not use this path without an active slot
+  If isTclFrame = 0 Then Exit Sub  ' LV: Šī salīdzināšana paredzēta tikai TCL klasifikācijai | EN: This matching path requires TCL-like classification
+  If phaseCount <> TCL_FRAME_PHASES Then Exit Sub  ' LV: Nepieciešamas visas 51 fāzes; saīsinātu TCL paketi noraida | EN: Requires all 51 phases; rejects a truncated TCL frame
+  chSel = activeCh  ' LV: Salīdzināšanai izvēlas tikai aktīvo slotu | EN: Selects only the active slot for comparison
+  Call HaveGet  ' LV: eeA=1, ja izvēlētais slots ir iemācīts | EN: eeA=1 if the selected slot is learned
+  If eeA = 0 Then Exit Sub  ' LV: Tukšam/nevalidētam slotam salīdzināšanu neveic | EN: Skips matching an empty/unvalidated slot
+  eeAdr = 200 + activeCh - 1  ' LV: Aktīvā slota protokola tipa adrese 200..203 | EN: Protocol-type address 200..203 for the active slot
+  EPRead eeAdr, storedType  ' LV: Nolasa saglabāto TCL/NEC protokola tipu | EN: Reads the stored TCL/NEC protocol type
+  If storedType <> TYPE_TCL Then Exit Sub  ' LV: TCL atkārtojums nedrīkst pagarināt NEC slotu | EN: A TCL repeat must not extend a NEC slot
+  startByte = (activeCh - 1) * SIG_BYTES  ' LV: Aktīvā slota 48 baitu sākuma adrese | EN: Start address of the active 48-byte slot
+  activeBad = 0  ' LV: Vēl nav TCL neatbilstošo fāžu | EN: No out-of-tolerance TCL phases yet
+  For byteIdx = 2 To SIG_BYTES - 1  ' LV: Salīdzina fāzes 2..47; mainīgos sākuma ilgumus 0/1 izlaiž | EN: Compares phases 2..47; skips variable leading timings 0/1
+    eeAdr = startByte + byteIdx  ' LV: Izvēlētā slota konkrētā baita adrese | EN: Address of the selected byte within the slot
+    EPRead eeAdr, eeTmp  ' LV: Nolasa vienu EEPROM baitu | EN: Reads one EEPROM byte
+    If sigRx(byteIdx) >= eeTmp Then  ' LV: Izvēlas atņemšanas virzienu bez negatīva rezultāta | EN: Chooses subtraction order to avoid a negative unsigned value
+      pulseDelta = sigRx(byteIdx) - eeTmp  ' LV: Absolūtā saņemtā un iemācītā ilguma starpība | EN: Absolute received-versus-learned duration difference
+    Else
+      pulseDelta = eeTmp - sigRx(byteIdx)  ' LV: Tas pats absolūtais ilguma atlikums pretējā secībā | EN: The same absolute duration difference in the opposite order
+    End If
+    If pulseDelta > PULSE_TOL Then  ' LV: Atšķirība pārsniedz TCL fāzes laika pielaidi | EN: Deviation exceeds the per-phase TCL timing tolerance
+      activeBad = activeBad + 1  ' LV: Pieskaita aktīvā TCL slota neatbilstošu fāzi | EN: Counts an out-of-tolerance phase for the active TCL slot
+      If activeBad > MAX_BAD_ACTIVE_PULSES Then Exit Sub  ' LV: Pie 0 iestatījuma noraida jau pirmo fāzi ārpus laika pielaides | EN: With setting 0, rejects the first phase outside timing tolerance
+    End If
+  Next
+  activeMatch = 1  ' LV: Visas pārbaudes izturētas: aktīvās komandas turpinājums | EN: All checks passed: continuation of the active command
+End Sub
 
-  If IR_holdCh = 0 Then Exit Sub
+' ----------------------------------------------------------------------
+' LV: Tikai TCL: starp iemācītajiem TCL slotiem izvēlas labāko signatūru.
+' EN: TCL only: selects the closest signature among learned TCL slots.
+Sub MatchFullFrame()
+  bestCh = 0  ' LV: Sākotnēji nav atrasta pieņemama komanda | EN: Initially no acceptable command has been found
+  If isTclFrame = 0 Then Exit Sub  ' LV: Šī salīdzināšana paredzēta tikai TCL klasifikācijai | EN: This matching path requires TCL-like classification
+  If phaseCount <> TCL_FRAME_PHASES Then Exit Sub  ' LV: Nepieciešamas visas 51 fāzes; saīsinātu TCL paketi noraida | EN: Requires all 51 phases; rejects a truncated TCL frame
+  bestDelta = 65535  ' LV: Sāk ar lielāko Word vērtību, lai pirmā derīgā summa būtu labāka | EN: Starts at maximum Word so the first valid sum is better
+  For chSel = 1 To 4  ' LV: Pārbauda visus četrus iemācāmos slotus | EN: Checks all four learnable slots
+    Call HaveGet  ' LV: eeA=1, ja izvēlētais slots ir iemācīts | EN: eeA=1 if the selected slot is learned
+    eeAdr = 200 + chSel - 1  ' LV: Izvēlētā slota protokola tipa adrese 200..203 | EN: Selected slot protocol-type address, 200..203
+    EPRead eeAdr, storedType  ' LV: Nolasa saglabāto TCL/NEC protokola tipu | EN: Reads the stored TCL/NEC protocol type
+    If (eeA = 1) And (storedType = TYPE_TCL) Then  ' LV: Salīdzina tikai iemācītu TCL slotu | EN: Compares only a learned TCL slot
+      startByte = (chSel - 1) * SIG_BYTES  ' LV: Slota sākums: 0,48,96 vai 144 | EN: Slot start: 0,48,96 or 144
+      diffCount = 0  ' LV: Sāk šī slota atšķirību skaitīšanu no 0 | EN: Resets the difference count for this slot
+      totalDelta = 0  ' LV: Sāk šī TCL slota noviržu summu no 0 | EN: Resets the deviation sum for this TCL slot
+      For byteIdx = 0 To SIG_BYTES - 1  ' LV: Pārstaigā visus 48 TCL signatūras baitus | EN: Iterates through all 48 TCL signature bytes
+        eeAdr = startByte + byteIdx  ' LV: Izvēlētā slota konkrētā baita adrese | EN: Address of the selected byte within the slot
+        EPRead eeAdr, eeTmp  ' LV: Nolasa vienu EEPROM baitu | EN: Reads one EEPROM byte
+        If sigRx(byteIdx) >= eeTmp Then  ' LV: Izvēlas atņemšanas virzienu bez negatīva rezultāta | EN: Chooses subtraction order to avoid a negative unsigned value
+          pulseDelta = sigRx(byteIdx) - eeTmp  ' LV: Absolūtā saņemtā un iemācītā ilguma starpība | EN: Absolute received-versus-learned duration difference
+        Else
+          pulseDelta = eeTmp - sigRx(byteIdx)  ' LV: Tas pats absolūtais ilguma atlikums pretējā secībā | EN: The same absolute duration difference in the opposite order
+        End If
+        totalDelta = totalDelta + pulseDelta  ' LV: Uzkrāj ilgumu novirzes labākā TCL slota izvēlei | EN: Accumulates deviations for choosing the best TCL slot
+        If byteIdx = 0 Then  ' LV: Pirmajam TCL LOW ir atsevišķa plašāka pielaide | EN: The first TCL LOW has a separate wider tolerance
+          If pulseDelta > 9 Then diffCount = diffCount + 1  ' LV: Pirmajai fāzei pieļauj līdz 9*128 us novirzi | EN: Allows first-phase deviation up to 9*128 us
+        Else
+          If pulseDelta > PULSE_TOL Then diffCount = diffCount + 1  ' LV: Pārējām fāzēm izmanto kopējo PULSE_TOL robežu | EN: Uses the common PULSE_TOL limit for other phases
+        End If
+      Next
+      If diffCount <= MAX_BAD_PULSES Then  ' LV: TCL slotu pieņem tikai pie atļauta neatbilstošo fāžu skaita | EN: TCL candidate must stay within the allowed bad-phase count
+        If totalDelta < bestDelta Then  ' LV: Izvēlas mazāku kopējo novirzi; vienādas summas nemaina izvēli | EN: Selects a lower total deviation; equal scores keep the earlier slot
+          bestDelta = totalDelta  ' LV: Saglabā līdz šim labāko noviržu summu | EN: Saves the best deviation sum so far
+          bestCh = chSel  ' LV: Saglabā pašreizējo atbilstošo slotu | EN: Saves the currently matching slot
+        End If
+      End If
+    End If
+  Next
+End Sub
 
-  learn_LED = 1
+' ----------------------------------------------------------------------
+' LV: 67 fāzes pārvērš 4 baitos; saīsinātu/ārpus laikiem paketi noraida.
+' EN: Converts 67 phases into 4 bytes; rejects wrong-length/out-of-range frames.
+Sub DecodeNEC()
+  necValid = 0  ' LV: Atceļ iepriekšējās NEC dekodēšanas derīgumu | EN: Clears validity from any previous NEC decode
+  If phaseCount <> 67 Then Exit Sub  ' LV: 2 sākuma fāzes +32 LOW/HIGH pāri +1 beigu LOW =67 | EN: 2 leader phases +32 LOW/HIGH pairs +1 final LOW =67
+  If (sigRx(0) < 55) Or (sigRx(0) > 85) Then Exit Sub  ' LV: Pilnās NEC paketes sākuma LOW robežas | EN: Leading LOW limits for a full NEC frame
+  If (sigRx(1) < 25) Or (sigRx(1) > 44) Then Exit Sub  ' LV: Pilnās NEC paketes sākuma HIGH 3.2..5.632 ms | EN: Full NEC leading HIGH range: 3.2..5.632 ms
+  For byteIdx = 2 To 66 Step 2  ' LV: Pārbauda datu LOW impulsus un pēdējo LOW | EN: Checks data LOW marks and the final LOW mark
+    If (sigRx(byteIdx) < 1) Or (sigRx(byteIdx) > 8) Then Exit Sub  ' LV: LOW jābūt īsam: 1..8 vienības, jeb128..1024 us | EN: LOW must be short: 1..8 units, or128..1024 us
+  Next
+  byteIdx = 3  ' LV: Pirmais datu HIGH ir masīva indeksā3 | EN: The first data HIGH is at array index3
+  For necByte = 0 To 3  ' LV: Dekodē adreses/datu četrus baitus pārraides secībā | EN: Decodes four address/data bytes in transmission order
+    necCode(necByte) = 0  ' LV: Pirms bita OR uzkrāšanas notīra šo datu baitu | EN: Clears this byte before OR-ing decoded bits
+    necMask = 1  ' LV: NEC katru baitu sāk ar jaunāko bitu, maska1 | EN: NEC starts each byte with the least significant bit, mask1
+    For necBit = 0 To 7  ' LV: Katram datu baitam dekodē astoņus bitus | EN: Decodes eight bits for each data byte
+      If (sigRx(byteIdx) < 1) Or (sigRx(byteIdx) > 18) Then Exit Sub  ' LV: Datu HIGH nedrīkst būt nulle vai garāks par18*128 us | EN: Data HIGH must be nonzero and no longer than18*128 us
+      If sigRx(byteIdx) > 8 Then  ' LV: HIGH >8 vienībām ir bita1 grupa; citādi bita0 grupa | EN: HIGH >8 units is classified as bit1; otherwise bit0
+        necCode(necByte) = necCode(necByte) Or necMask  ' LV: Iestata attiecīgo1 bitu datu baitā | EN: Sets the corresponding1 bit in the data byte
+      End If
+      byteIdx = byteIdx + 2  ' LV: Pāriet uz nākamā bita HIGH, izlaižot LOW | EN: Moves to the next bit HIGH, skipping its LOW mark
+      If necBit < 7 Then necMask = necMask * 2  ' LV: Masku pārbīda līdz128; pēdējā bitā vairs nereizina | EN: Shifts mask up to128; does not multiply after the last bit
+    Next
+  Next
+  necValid = 1  ' LV: Visi32 biti un laika/garuma pārbaudes izturētas | EN: All 32 bits plus timing/length checks passed
+End Sub
 
-  If IR_sens = 0 Then
-     quietLoops = 0
+' ----------------------------------------------------------------------
+' LV: Visiem četriem baitiem jāsakrīt precīzi ar tieši vienu NEC slotu.
+' EN: All four bytes must exactly match exactly one NEC slot.
+Sub MatchNEC()
+  bestCh = 0  ' LV: Sākotnēji nav atrasta pieņemama komanda | EN: Initially no acceptable command has been found
+  If necValid = 0 Then Exit Sub  ' LV: Nedrīkst salīdzināt daļēji dekodētus vai vecus datus | EN: Must not match partially decoded or stale data
+  matchCount = 0  ' LV: Sāk precīzo NEC sakritību skaitīšanu no 0 | EN: Resets the exact NEC match count
+  For chSel = 1 To 4  ' LV: Pārbauda visus četrus iemācāmos slotus | EN: Checks all four learnable slots
+    Call HaveGet  ' LV: eeA=1, ja izvēlētais slots ir iemācīts | EN: eeA=1 if the selected slot is learned
+    eeAdr = 200 + chSel - 1  ' LV: Izvēlētā slota protokola tipa adrese 200..203 | EN: Selected slot protocol-type address, 200..203
+    EPRead eeAdr, storedType  ' LV: Nolasa saglabāto TCL/NEC protokola tipu | EN: Reads the stored TCL/NEC protocol type
+    If (eeA = 1) And (storedType = TYPE_NEC) Then  ' LV: Salīdzina tikai iemācītu NEC slotu | EN: Compares only a learned NEC slot
+      startByte = (chSel - 1) * SIG_BYTES  ' LV: Slota sākums: 0,48,96 vai 144 | EN: Slot start: 0,48,96 or 144
+      diffCount = 0  ' LV: Sāk šī slota atšķirību skaitīšanu no 0 | EN: Resets the difference count for this slot
+      For byteIdx = 0 To 3  ' LV: Salīdzina/saglabā četrus pilnā NEC koda baitus | EN: Compares/stores the four full NEC code bytes
+        eeAdr = startByte + byteIdx  ' LV: Izvēlētā slota konkrētā baita adrese | EN: Address of the selected byte within the slot
+        EPRead eeAdr, eeTmp  ' LV: Nolasa vienu EEPROM baitu | EN: Reads one EEPROM byte
+        If eeTmp <> necCode(byteIdx) Then diffCount = diffCount + 1  ' LV: Jebkurš atšķirīgs baits nozīmē, ka šis slots nesakrīt | EN: Any unequal byte means this slot does not match
+      Next
+      If diffCount = 0 Then  ' LV: NEC vajag precīzu visu četru baitu sakritību | EN: NEC requires an exact match of all four bytes
+        bestCh = chSel  ' LV: Saglabā pašreizējo atbilstošo slotu | EN: Saves the currently matching slot
+        matchCount = matchCount + 1  ' LV: Uzskaita slotus ar šo pašu NEC kodu | EN: Counts slots with this same NEC code
+      End If
+    End If
+  Next
+
+  If matchCount <> 1 Then bestCh = 0  ' LV: Noraida gan0, gan vairākas sakritības; arī dublikātus vienai izejai | EN: Rejects zero or multiple matches, including same-output duplicates
+End Sub
+
+' ----------------------------------------------------------------------
+' LV: Saglabā viena slota datus un tikai beigās ieraksta derīguma marķieri.
+' EN: Saves one slot and writes its validity marker only after the data.
+Sub SaveLearned()
+
+  eeAdr = 192 + (chSel - 1) * 2  ' LV: Šī slota marķiera pirmā baita adrese | EN: Address of this slot first validity-marker byte
+  eeTmp = 0  ' LV: Pirms datu rakstīšanas padara marķieri nederīgu | EN: Invalidates marker before writing the data
+  EPWrite eeAdr, eeTmp  ' LV: Ieraksta vienu EEPROM baitu; tikai apmācības laikā | EN: Writes one EEPROM byte; only during learning
+  startByte = (chSel - 1) * SIG_BYTES  ' LV: Slota sākums: 0,48,96 vai 144 | EN: Slot start: 0,48,96 or 144
+  If isTclFrame = 1 Then  ' LV: TCL signatūras atpazīšanas zars | EN: TCL signature-matching branch
+    currentType = TYPE_TCL  ' LV: Iemācāmā pakete ir TCL; glabā 48 ilgumus | EN: Learned frame is TCL; stores 48 duration values
+    For byteIdx = 0 To SIG_BYTES - 1  ' LV: Pārstaigā visus 48 TCL signatūras baitus | EN: Iterates through all 48 TCL signature bytes
+      eeAdr = startByte + byteIdx  ' LV: Izvēlētā slota konkrētā baita adrese | EN: Address of the selected byte within the slot
+      eeTmp = sigRx(byteIdx)  ' LV: Sagatavo vienas TCL fāzes ilgumu saglabāšanai | EN: Prepares one TCL phase duration for storage
+      EPWrite eeAdr, eeTmp  ' LV: Ieraksta vienu EEPROM baitu; tikai apmācības laikā | EN: Writes one EEPROM byte; only during learning
+    Next
   Else
-     quietLoops = quietLoops + 1
-     If quietLoops >= HOLD_RELEASE_LOOPS Then
-        IR_holdCh = 0
-        learn_LED = 0
-        Exit Sub
-     End If
+    currentType = TYPE_NEC  ' LV: Iemācāmā pakete ir NEC; glabā 4 datu baitus | EN: Learned frame is NEC; stores 4 data bytes
+    For byteIdx = 0 To 3  ' LV: Salīdzina/saglabā četrus pilnā NEC koda baitus | EN: Compares/stores the four full NEC code bytes
+      eeAdr = startByte + byteIdx  ' LV: Izvēlētā slota konkrētā baita adrese | EN: Address of the selected byte within the slot
+      eeTmp = necCode(byteIdx)  ' LV: Sagatavo vienu pilnā NEC koda datu baitu | EN: Prepares one full NEC code byte
+      EPWrite eeAdr, eeTmp  ' LV: Ieraksta vienu EEPROM baitu; tikai apmācības laikā | EN: Writes one EEPROM byte; only during learning
+    Next
   End If
+  eeAdr = 200 + chSel - 1  ' LV: Izvēlētā slota protokola tipa adrese 200..203 | EN: Selected slot protocol-type address, 200..203
+  eeTmp = currentType  ' LV: Sagatavo protokola tipu saglabāšanai adresē200..203 | EN: Prepares protocol type for storage at200..203
+  EPWrite eeAdr, eeTmp  ' LV: Ieraksta vienu EEPROM baitu; tikai apmācības laikā | EN: Writes one EEPROM byte; only during learning
+  eeAdr = 192 + (chSel - 1) * 2  ' LV: Šī slota marķiera pirmā baita adrese | EN: Address of this slot first validity-marker byte
+  eeTmp = 208 + chSel  ' LV: Versijas marķieris209..212; vecos177..180 nepieņem | EN: Version marker209..212; old177..180 markers are not accepted
+  EPWrite eeAdr, eeTmp  ' LV: Ieraksta vienu EEPROM baitu; tikai apmācības laikā | EN: Writes one EEPROM byte; only during learning
+  eeAdr = eeAdr + 1  ' LV: Pāriet uz marķiera otro, komplementāro baitu | EN: Moves to the second, complementary marker byte
+  eeTmp = eeTmp Xor 255  ' LV: Apgriež visus 8 marķiera bitus otrajam pārbaudes baitam | EN: Inverts all 8 marker bits for the second validity byte
+  EPWrite eeAdr, eeTmp  ' LV: Ieraksta vienu EEPROM baitu; tikai apmācības laikā | EN: Writes one EEPROM byte; only during learning
+  Call HaveSet  ' LV: Atzīmē šo slotu RAM maskā kā iemācītu | EN: Marks this slot as learned in the RAM mask
+End Sub
 
-  If IR_holdCh = 1 Then
-     IR_out_1 = 1
-  Else If IR_holdCh = 2 Then
-     IR_out_2 = 1
-  Else If IR_holdCh = 3 Then
-     IR_out_3 = 1
-  Else If IR_holdCh = 4 Then
-     IR_out_4 = 1
+' ----------------------------------------------------------------------
+' LV: Startā atjauno haveMask no EEPROM marķieriem; pašus kodus lasa vēlāk.
+' EN: At startup restores haveMask from EEPROM markers; codes are read later.
+Sub LoadMarkers()
+  haveMask = 0  ' LV: Startā nevienu slotu vēl neuzskata par iemācītu | EN: At startup no slot is assumed to be learned
+  For chSel = 1 To 4  ' LV: Pārbauda visus četrus iemācāmos slotus | EN: Checks all four learnable slots
+    eeAdr = 192 + (chSel - 1) * 2  ' LV: Šī slota marķiera pirmā baita adrese | EN: Address of this slot first validity-marker byte
+    EPRead eeAdr, eeA  ' LV: Nolasa saglabāto marķiera pirmo baitu | EN: Reads the first stored marker byte
+    eeAdr = eeAdr + 1  ' LV: Pāriet uz marķiera otro, komplementāro baitu | EN: Moves to the second, complementary marker byte
+    EPRead eeAdr, eeB  ' LV: Nolasa saglabāto marķiera komplementu | EN: Reads the stored marker complement
+    eeTmp = 208 + chSel  ' LV: Versijas marķieris209..212; vecos177..180 nepieņem | EN: Version marker209..212; old177..180 markers are not accepted
+    If (eeA = eeTmp) And (eeB = (eeTmp Xor 255)) Then  ' LV: Abiem versijas marķiera baitiem jāsakrīt | EN: Both version-marker bytes must match
+      eeA = 1  ' LV: Atgriež/atzīmē, ka slots ir iemācīts | EN: Returns/marks that the slot is learned
+      Call HaveSet  ' LV: Atzīmē šo slotu RAM maskā kā iemācītu | EN: Marks this slot as learned in the RAM mask
+    End If
+  Next
+End Sub
+
+' ----------------------------------------------------------------------
+' LV: Iestata haveMask bitu slotam chSel; dati jau saglabāti EEPROM.
+' EN: Sets the haveMask bit for chSel; data has already been stored in EEPROM.
+Sub HaveSet()
+  maskVal = 1  ' LV: Sāk ar1.slota masku bitā0 | EN: Starts with slot1 mask at bit0
+  For loopCnt = 1 To (chSel - 1)  ' LV: Masku reizina ar2 par katru nākamo slotu | EN: Multiplies the mask by2 for each later slot
+    maskVal = maskVal * 2  ' LV: Maska1 ->2 ->4 ->8 | EN: Mask1 ->2 ->4 ->8
+  Next
+  haveMask = haveMask Or maskVal  ' LV: Pievieno šī slota bitu, saglabājot pārējos | EN: Sets this slot bit while preserving the others
+End Sub
+
+' ----------------------------------------------------------------------
+' LV: Atgriež eeA=1, ja slotam chSel ir derīgs marķieris, citādi eeA=0.
+' EN: Returns eeA=1 if slot chSel has a valid marker, otherwise eeA=0.
+Sub HaveGet()
+  maskVal = 1  ' LV: Sāk ar1.slota masku bitā0 | EN: Starts with slot1 mask at bit0
+  For loopCnt = 1 To (chSel - 1)  ' LV: Masku reizina ar2 par katru nākamo slotu | EN: Multiplies the mask by2 for each later slot
+    maskVal = maskVal * 2  ' LV: Maska1 ->2 ->4 ->8 | EN: Mask1 ->2 ->4 ->8
+  Next
+  If (haveMask And maskVal) <> 0 Then  ' LV: Pārbauda tikai izvēlētā slota klātbūtnes bitu | EN: Tests only the selected slot presence bit
+    eeA = 1  ' LV: Atgriež/atzīmē, ka slots ir iemācīts | EN: Returns/marks that the slot is learned
+  Else
+    eeA = 0  ' LV: Atgriež, ka slots nav iemācīts | EN: Returns that the slot is not learned
   End If
-
 End Sub
 
+' ----------------------------------------------------------------------
+' LV: Apstiprina apmācību: learnStep-1 pilni mirgojumi un pēdējā ON mala.
+' EN: Confirms learning: learnStep-1 complete flashes followed by the final ON edge.
+Sub BlinkConfirm()
+  learn_LED = 0  ' LV: LED izslēgta | EN: LED OFF
+  Wait 150 ms  ' LV: Apmācības LED redzamības pauze; parastajā darbā neizpilda | EN: Learning LED visibility delay; not executed in normal operation
 
-'------------------------------------------------------------
-' LV: 4) LED apstiprinajuma mirgosana: CH1=1x, CH2=2x, CH3=3x, CH4=5x. / EN: 4) LED confirmation blink: CH1=1x, CH2=2x, CH3=3x, CH4=5x.
-'------------------------------------------------------------
-Sub LedBlink_Do()
-
-  For loopCnt = 1 To blinkCount
-     learn_LED = 1
-     Wait LED_BLINK_MS ms
-     learn_LED = 0
-     Wait LED_BLINK_MS ms
-  Next
-
-End Sub
-
-
-'------------------------------------------------------------
-' LV: Signature uztvere; Wait us ir obligats vienmerigai paraugosanai. / EN: signature capture; Wait us is required for regular sampling.
-' LV: Svarigi: uz paraugosanas bridi apturam Timer1, lai overflow interrupti nesajauc timing. / EN: important: stop Timer1 during sampling so overflow interrupts do not disturb timing.
-' LV: Pec paraugosanas Timer1 tiek palaists atpakal. / EN: after sampling, Timer1 is started again.
-'------------------------------------------------------------
-Sub IR_CaptureSignature()
-
-  StopTimer 1     ' LV: galvenais stabilitatei; PWM/Timer1 netrauce IR paraugosanu. / EN: key for stability; PWM/Timer1 does not disturb IR sampling.
-
-  For byteIdx = 0 To SIG_BYTES - 1
-     sigRx(byteIdx) = 0
-  Next
-
-  For idx = 0 To SAMPLE_COUNT - 1
-     byteIdx = idx / 8
-     bitIdx  = idx And 7
-
-     maskVal = 1
-     If bitIdx > 0 Then
-        For loopCnt = 1 To bitIdx
-           maskVal = maskVal * 2
-        Next
-     End If
-
-     If IR_sens = 0 Then
-        sigRx(byteIdx) = sigRx(byteIdx) Or maskVal
-     End If
-
-     Wait SAMPLE_US us
-  Next
-
-  StartTimer 1
-
-End Sub
-
-
-'------------------------------------------------------------
-' LV: RX signature ir pedejais uztvertais IR paraugu logs. / EN: RX signature is the last captured IR sample window.
-'------------------------------------------------------------
-Sub IR_CopyRxToLearnSelected()
-
-  startByte = (chSel - 1) * SIG_BYTES   ' LV: kanala sakuma nobide: CH1=0, CH2=40, CH3=80, CH4=120. / EN: channel start offset: CH1=0, CH2=40, CH3=80, CH4=120.
-
-  For byteIdx = 0 To SIG_BYTES - 1
-     sigLearnAll(startByte + byteIdx) = sigRx(byteIdx)
-  Next
-
-End Sub
-
-
-'------------------------------------------------------------
-'==================== LV: Salidzinasanas logs / EN: Comparison window ====================
-' LV: XOR parbaude un atskirigo bitu skaitisana, rezultats diffBits. / EN: XOR check and different-bit counting, result in diffBits.
-'------------------------------------------------------------
-Sub IR_CompareWithLearnSelected()
-
-  diffBits = 0
-
-  startByte = (chSel - 1) * SIG_BYTES
-  endByte = (SKIP_SAMPLES / 8) + CMP_BYTES - 1
-
-  byteIdx = SKIP_SAMPLES / 8
-
-  Do While byteIdx <= endByte
-     xorVal = sigRx(byteIdx) Xor sigLearnAll(startByte + byteIdx)
-     For bitLoop = 0 To 7
-        If (xorVal And 1) = 1 Then diffBits = diffBits + 1
-        xorVal = xorVal / 2
-     Next
-     byteIdx = byteIdx + 1
+  Do While blinkCount > 0  ' LV: Veic tikai atlikušos pilnos mirgojumus; pie0 neieiet | EN: Runs only remaining full flashes; zero skips the loop
+    learn_LED = 1  ' LV: Mirgojuma ON mala; pēdējā ON ir arī apmācības gatavības gaisma | EN: Flash ON edge; the final ON also serves as the learning-ready light
+    Wait 80 ms  ' LV: Apmācības LED redzamības pauze; parastajā darbā neizpilda | EN: Learning LED visibility delay; not executed in normal operation
+    learn_LED = 0  ' LV: LED izslēgta | EN: LED OFF
+    Wait 80 ms  ' LV: Apmācības LED redzamības pauze; parastajā darbā neizpilda | EN: Learning LED visibility delay; not executed in normal operation
+    blinkCount = blinkCount - 1  ' LV: Viens pilns mirgojums pabeigts | EN: One complete flash has finished
   Loop
-
+  learn_LED = 1  ' LV: Mirgojuma ON mala; pēdējā ON ir arī apmācības gatavības gaisma | EN: Flash ON edge; the final ON also serves as the learning-ready light
+  Wait 80 ms  ' LV: Apmācības LED redzamības pauze; parastajā darbā neizpilda | EN: Learning LED visibility delay; not executed in normal operation
 End Sub
 
-
-'------------------------------------------------------------
-' LV: haveMask bit0=CH1, bit1=CH2, bit2=CH3, bit3=CH4; 1 nozime, ka kanals ir iemacits. / EN: haveMask bit0=CH1, bit1=CH2, bit2=CH3, bit3=CH4; 1 means the channel is learned.
-' LV: Have_Set ievade: chSel=1..4 un eeA=0/1. / EN: Have_Set input: chSel=1..4 and eeA=0/1.
-' LV: Have_Get ievade: chSel=1..4, izvade: eeA=0/1. / EN: Have_Get input: chSel=1..4, output: eeA=0/1.
-'------------------------------------------------------------
-Sub Have_Set()
-
-  maskVal = 1
-  For loopCnt = 1 To (chSel - 1)
-     maskVal = maskVal * 2
-  Next
-
-  If eeA = 1 Then
-     haveMask = haveMask Or maskVal
-  Else
-     haveMask = haveMask And (maskVal Xor 255)
-  End If
-
-End Sub
-
-
-Sub Have_Get()
-
-  maskVal = 1
-  For loopCnt = 1 To (chSel - 1)
-     maskVal = maskVal * 2
-  Next
-
-  If (haveMask And maskVal) <> 0 Then
-     eeA = 1
-  Else
-     eeA = 0
-  End If
-
-End Sub
-
-
-'------------------------------------------------------------
-' LV: EEPROM saglabasana izveletajam kanalam, chSel=1..4. / EN: EEPROM save for selected channel, chSel=1..4.
-' LV: 2) Markeri; tie sakas no EE_MRK_BASE (=160), nevis 128. / EN: 2) markers; they start from EE_MRK_BASE (=160), not 128.
-'------------------------------------------------------------
-Sub EEPROM_Save_Selected()
-
-  startByte = (chSel - 1) * SIG_BYTES
-
-  ' LV: 1) Signature baiti. / EN: 1) signature bytes.
-  For byteIdx = 0 To SIG_BYTES - 1
-     eeAdr = EE_SIG_BASE + startByte + byteIdx
-     eeTmp = sigLearnAll(startByte + byteIdx)
-     EPWrite eeAdr, eeTmp
-     Wait 5 ms
-  Next
-
-  ' LV: 2) Markeri; tie sakas no EE_MRK_BASE (=160), nevis 128. / EN: 2) markers; they start from EE_MRK_BASE (=160), not 128.
-  eeAdr = EE_MRK_BASE + (chSel - 1) * 2
-
-  eeA = 160 + chSel     ' LV: magic markeris 161..164. / EN: magic marker 161..164.
-
-  eeTmp = eeA
-  EPWrite eeAdr, eeTmp
-  Wait 5 ms
-
-  eeTmp = (eeA Xor 255)
-  EPWrite (eeAdr + 1), eeTmp
-  Wait 5 ms
-
-End Sub
-
-
-'------------------------------------------------------------
-'==================== LV: EEPROM ielade starta / EN: Load learned data from EEPROM at start-up ====================
-' LV: 2) Markeri; tie sakas no EE_MRK_BASE (=160), nevis 128. / EN: 2) markers; they start from EE_MRK_BASE (=160), not 128.
-'------------------------------------------------------------
-Sub EEPROM_LoadLearned()
-
-  haveMask = 0
-
-  chSel = 1
-  Do While chSel <= 4
-
-     eeAdr = EE_MRK_BASE + (chSel - 1) * 2
-
-     EPRead eeAdr, eeA
-     EPRead (eeAdr + 1), eeB
-
-     xorVal = 160 + chSel   ' LV: sagaidamais magic markeris 161..164. / EN: expected magic marker 161..164.
-
-     If (eeA = xorVal) And (eeB = (xorVal Xor 255)) Then
-
-        startByte = (chSel - 1) * SIG_BYTES
-        For byteIdx = 0 To SIG_BYTES - 1
-           eeAdr = EE_SIG_BASE + startByte + byteIdx
-           EPRead eeAdr, eeTmp
-           sigLearnAll(startByte + byteIdx) = eeTmp
-        Next
-
-        eeA = 1
-        Call Have_Set()
-
-     Else
-        eeA = 0
-        Call Have_Set()
-     End If
-
-     chSel = chSel + 1
+' ----------------------------------------------------------------------
+' LV: Pirms nākamās apmācības gaida pietiekami ilgu IR klusumu.
+' EN: Waits for enough IR silence before allowing the next learning step.
+Sub WaitRelease()
+  stableMs = 0  ' LV: LOW pārtrauc secīgo klusumu; sāk skaitīšanu no 0 | EN: LOW breaks consecutive silence; counting restarts at 0
+  Do While stableMs < LEARN_RELEASE_MS  ' LV: Gaida 160 secīgus HIGH novērojumus, nevis pamatcikla taimautu | EN: Waits for 160 consecutive HIGH samples, not main-loop timeout
+    If IR_sens = 1 Then  ' LV: TSOP pašlaik kluss: nesējs netiek uztverts | EN: TSOP is currently quiet: no carrier detected
+      stableMs = stableMs + 1  ' LV: Pieskaita vienu klusuma paraugu | EN: Counts one quiet sample
+    Else
+      stableMs = 0  ' LV: LOW pārtrauc secīgo klusumu; sāk skaitīšanu no 0 | EN: LOW breaks consecutive silence; counting restarts at 0
+    End If
+    Wait 1 ms  ' LV: Klusuma paraugiem nodrošina1 ms atstarpi | EN: Provides1 ms spacing between quiet samples
   Loop
-
 End Sub

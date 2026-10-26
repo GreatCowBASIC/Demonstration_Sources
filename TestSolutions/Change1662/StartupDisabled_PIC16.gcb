@@ -1,0 +1,13 @@
+' Change 1662: #option StartupMethodsDisabled, PIC16 (enhanced midrange), with Random.
+' Expected (build 1662): ";!  call INITSYS" and ";!  call INITRANDOM" in the asm, and no INITSYS or INITRANDOM
+' routine. Build 1661 compiled both although they were never called.
+#chip 16F1829, 32
+#option explicit
+#option StartupMethodsDisabled
+
+Dir PORTC Out
+Randomize 0x1234
+Do
+    PORTC = Random
+    Wait 100 ms
+Loop

@@ -11,7 +11,7 @@
 '    the screen to GLCDMirror.exe on the PC (1.1, 2026-10-16; programs without it are unchanged).
 '
 '    Include it after #chip / #option / #config:
-'        #include "PIC18StarterKit1.h"
+'        #include <PIC18StarterKit1.h>
 '
 '    Gives
 '      pins         APP_POWER, SD_CS, ACCEL_CS, OLED_RD / WR / CS / DC, MENU_BUTTON
@@ -25,6 +25,17 @@
 '    Uses the variables Col, OledPage (Byte) and FontIndex (Word): do not use them for anything
 '    else. MENU_GCB's variable Page is renamed OledPage here: PAGE is an MPASM directive, so
 '    a variable of that name stops the build when use.ini selects MPASM.
+'
+'    Copyright (C) 2014-2026 Hugh Considine and Evan R. Venn
+'    Licence: LGPL 2.1 for everyone, or a commercial licence for products that do not want the LGPL's conditions.
+'    Licensor: Evan R. Venn, on behalf of the GCBASIC project.
+'    For commercial inquiries and licensing, email: license_management AT anobium.co.uk
+'
+'    This file is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General
+'    Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your
+'    option) any later version. It is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+'    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+'    General Public License for more details.
 
 ' ----- Pins
 #define APP_POWER    LATC.0           ' high = APP_VDD off
@@ -35,6 +46,10 @@
 #define OLED_CS      LATE.2
 #define OLED_DC      LATB.5
 #define MENU_BUTTON  PORTB.0          ' low when pressed
+#define OLED_RESET   LATB.4           ' the OLED's reset (does nothing on boards without R44)
+#define SPI2_SCK     LATC.2           ' MSSP2 by PPS (SCK2 = RP13): the SD card and the BMA150
+#define SPI2_DO      LATB.3           ' SDO2 = RP6
+#define SPI2_DI      PORTD.6          ' SDI2 = RP23
 #define OLED_OFFSET  2                ' the SH1101A's first visible column
 
 ' ----- Variables used by the OLED routines
@@ -46,7 +61,7 @@ Dim FontIndex As Word
 ' ramped by Timer4 until CCPR1L reaches 0x40, then the PFET is switched fully on.
 Sub AppPowerOn
     APP_POWER = 1                    ' PFET off to start
-    Dir PORTC.0 Out
+    Dir APP_POWER Out
 
     EECON2 = 0x55                    ' PPS unlock
     EECON2 = 0xAA
@@ -117,10 +132,10 @@ Sub OLED_Data(In OledByte)
 End Sub
 
 Sub OLED_Init
-    OLED_WR = 0 : Dir PORTE.1 Out
-    OLED_RD = 0 : Dir PORTE.0 Out
-    OLED_CS = 1 : Dir PORTE.2 Out
-    OLED_DC = 0 : Dir PORTB.5 Out
+    OLED_WR = 0 : Dir OLED_WR Out
+    OLED_RD = 0 : Dir OLED_RD Out
+    OLED_CS = 1 : Dir OLED_CS Out
+    OLED_DC = 0 : Dir OLED_DC Out
     Wait 1 ms
 
     ' Same sequence as the kit's oled.c ResetDevice()

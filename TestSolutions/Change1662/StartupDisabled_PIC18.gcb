@@ -1,0 +1,15 @@
+' Change 1662: #option StartupMethodsDisabled, PIC18.
+' Expected (build 1662): ";!  call INITSYS" and ";!  call INITRANDOM" in the asm, and no INITSYS or INITRANDOM
+' routine: nothing calls them. Build 1661 compiled both routines (about 60 bytes) although they were never called.
+#chip 18F46J50, 48
+#option explicit
+#option StartupMethodsDisabled
+
+Dim Value As Byte
+TBLPTRU = 0                     ' what InitSys would have done that this program needs
+Dir PORTB Out
+Randomize 0x1234
+Do
+    Value = Random
+    PORTB = Value
+Loop

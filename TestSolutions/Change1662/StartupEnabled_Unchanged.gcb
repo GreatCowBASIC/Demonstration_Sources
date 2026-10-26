@@ -1,0 +1,11 @@
+' Change 1662: no #option StartupMethodsDisabled.
+' Expected (build 1662): "call INITSYS" at the start and the INITSYS routine compiled: the same asm as build 1661.
+' (No Random here: InitRandom's seed is made at compile time, so every compile would differ.)
+#chip 18F46J50, 48
+#option explicit
+
+Dir PORTB Out
+Do
+    PORTB = PORTB + 1
+    Wait 100 ms
+Loop
