@@ -1,0 +1,11 @@
+'''Change1661 test: a search folder that does not exist
+'''#option IncludePath "folder;folder" - the folders searched for #include <...> before GCBASIC's include folder.
+'''Expected: a warning "#option IncludePath: folder not found: ...\nosuchfolder", and it compiles
+#chip 16F877A, 20
+#option explicit
+#option IncludePath "nosuchfolder;lib1"
+#include <a_lib1.h>
+
+FromLib1
+Do
+Loop

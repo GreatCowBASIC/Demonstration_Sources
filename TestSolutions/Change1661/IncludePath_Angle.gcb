@@ -1,0 +1,11 @@
+'''Change1661 test: a library in a project folder
+'''#option IncludePath "folder;folder" - the folders searched for #include <...> before GCBASIC's include folder.
+'''Expected: compiles; PORTB = 0x11 (lib1\a_lib1.h)
+#chip 16F877A, 20
+#option explicit
+#option IncludePath "lib1"
+#include <a_lib1.h>
+
+FromLib1
+Do
+Loop

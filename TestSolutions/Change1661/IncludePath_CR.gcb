@@ -1,0 +1,10 @@
+'''Change1661 test: the unquoted form on a line that ends with a carriage return (as a CRLF file read on Linux)
+'''Expected: compiles, no warning; PORTB = 0x11 (lib1\a_lib1.h). The #option line below ends CR CR LF on purpose. On Windows it passes with or without the CR fix (Windows reads a lone CR as a line end too): it is the check to run on a Linux build.
+#chip 16F877A, 20
+#option explicit
+#option IncludePath lib1
+#include <a_lib1.h>
+
+FromLib1
+Do
+Loop

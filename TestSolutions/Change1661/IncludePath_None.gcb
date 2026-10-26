@@ -1,0 +1,12 @@
+'''Change1661 test: no #option IncludePath
+'''#option IncludePath "folder;folder" - the folders searched for #include <...> before GCBASIC's include folder.
+'''Expected: compiles; the same code as build 1660
+#chip 16F877A, 20
+#option explicit
+#include <maths.h>
+
+Dim Result As Word
+Result = Power(2, 3)
+PORTB = Result
+Do
+Loop

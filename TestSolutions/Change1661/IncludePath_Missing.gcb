@@ -1,0 +1,11 @@
+#SKIPTEST
+'''Change1661 test: a file that is in none of the folders
+'''#option IncludePath "folder;folder" - the folders searched for #include <...> before GCBASIC's include folder.
+'''Expected: error "Cannot find ...\include\not_there.h (searched: ...\lib1; ...\lib2; ...\include)"
+#chip 16F877A, 20
+#option explicit
+#option IncludePath "lib1;lib2"
+#include <not_there.h>
+
+Do
+Loop

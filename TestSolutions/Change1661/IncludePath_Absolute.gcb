@@ -1,0 +1,11 @@
+'''Change1661 test: an absolute folder, unquoted, with a comment after it
+'''#option IncludePath "folder;folder" - the folders searched for #include <...> before GCBASIC's include folder.
+'''Expected: compiles; PORTB = 0x11
+#chip 16F877A, 20
+#option explicit
+#option IncludePath D:\GreatCowBASICGits\Demonstration_Sources.git\TestSolutions\Change1661\lib1   ' the folder
+#include <a_lib1.h>
+
+FromLib1
+Do
+Loop

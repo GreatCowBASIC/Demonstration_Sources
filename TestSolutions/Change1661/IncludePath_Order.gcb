@@ -1,0 +1,11 @@
+'''Change1661 test: the first folder wins
+'''#option IncludePath "folder;folder" - the folders searched for #include <...> before GCBASIC's include folder.
+'''Expected: compiles; PORTB = 1 (lib1\same_name.h, not lib2)
+#chip 16F877A, 20
+#option explicit
+#option IncludePath "lib1;lib2"
+#include <same_name.h>
+
+PORTB = SAME_NAME_FROM
+Do
+Loop

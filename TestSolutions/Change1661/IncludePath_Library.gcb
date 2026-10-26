@@ -1,0 +1,14 @@
+'''Change1661 test: GCBASIC's own libraries are still found
+'''#option IncludePath "folder;folder" - the folders searched for #include <...> before GCBASIC's include folder.
+'''Expected: compiles; <maths.h> from the include folder, PORTB = 0x11 from lib1
+#chip 16F877A, 20
+#option explicit
+#option IncludePath "lib1"
+#include <a_lib1.h>
+#include <maths.h>
+
+FromLib1
+Dim Result As Word
+Result = Power(2, 3)
+Do
+Loop

@@ -1,0 +1,11 @@
+'''Change1661 test: an include inside a library uses the search path too
+'''#option IncludePath "folder;folder" - the folders searched for #include <...> before GCBASIC's include folder.
+'''Expected: compiles; PORTB = 0x22 (lib2\inner_lib2.h, included by lib1\outer_lib1.h)
+#chip 16F877A, 20
+#option explicit
+#option IncludePath "lib1;lib2"
+#include <outer_lib1.h>
+
+Outer
+Do
+Loop
