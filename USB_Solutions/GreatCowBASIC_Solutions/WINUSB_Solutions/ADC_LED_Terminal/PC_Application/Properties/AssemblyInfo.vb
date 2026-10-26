@@ -8,5 +8,5 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyCopyright("Anobium Business Services 2026")>
 <Assembly: ComVisible(False)>
 
-<Assembly: AssemblyVersion("1.0.0")>
-<Assembly: AssemblyFileVersion("1.0.0")>
+<Assembly: AssemblyVersion("1.1.0")>
+<Assembly: AssemblyFileVersion("1.1.0")>

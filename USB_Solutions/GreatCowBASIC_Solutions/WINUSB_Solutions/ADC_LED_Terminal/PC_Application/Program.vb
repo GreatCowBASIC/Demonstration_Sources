@@ -1,6 +1,10 @@
 '
-' ADC LED Terminal: shows the PICDEM FS USB board's potentiometer and its four LEDs, read over USB (WinUSB, no driver).
-' The board (WINUSB_18F4550_ADC_LEDs.gcb) sets the LEDs to the reading itself; this terminal only reads and shows them.
+' ADC LED Terminal: a USB comms demonstration with the PICDEM FS USB board (WinUSB, no driver) and
+' WINUSB_18F4550_ADC_LEDs.gcb. The loop:
+'   1. Send request 150: the board replies with its potentiometer's reading
+'   2. Work out the LEDs from the reading, here on the PC
+'   3. Send request 151 with the LEDs: the board sets them
+'   4. Back to 1
 '
 ' User: Evan R. Venn
 ' Date: 2026
@@ -17,8 +21,10 @@ Module Program
     Private Const UsbPid = &H52
     Private Const UsbRev = 200
 
-    'Request 150: the reading (a Word, low byte first, 0 to 1023), then the LEDs (0 to 15)
-    Private Const AdcLedsRead As Byte = 150
+    'Request 150: read the reading (a Word, low byte first, 0 to 1023)
+    'Request 151: write the LEDs (0 to 15, D1 the lowest bit) in wValue
+    Private Const AdcRead As Byte = 150
+    Private Const LedsWrite As Byte = 151
     Private Const MaxReplySize = 64
 
     Private Const AdcMax = 1023
@@ -40,7 +46,8 @@ Module Program
 
         Console.WriteLine(Title)
         Console.WriteLine("The PICDEM FS USB board's potentiometer (RA0, AN0) and its LEDs D1 to D4 (RD0 to RD3).")
-        Console.WriteLine("The board sets the LEDs to the top four bits of the reading. Q or Esc: quit.")
+        Console.WriteLine("Read the ADC (request 150), work out the LEDs here (the top four bits),")
+        Console.WriteLine("send them (request 151), repeat. Q or Esc: quit.")
         Console.WriteLine()
 
         Dim Waiting = False
@@ -71,12 +78,21 @@ Module Program
         Console.WriteLine("Bye.")
     End Sub
 
-    'Read and show the board until it is removed (False) or Q is pressed (True)
+    'Read the ADC, set the LEDs and show them, until the board is removed (False) or Q is pressed (True)
     Private Function Show(Device As UsbDevice) As Boolean
         Do
-            Dim Reply = ReadReply(Device, AdcLedsRead)
-            If Reply Is Nothing OrElse Reply.Length < 3 Then Return False
-            ShowLine(Reply(0) + 256 * Reply(1), Reply(2))
+            '1. Read the ADC
+            Dim Reply = ReadReply(Device, AdcRead)
+            If Reply Is Nothing OrElse Reply.Length < 2 Then Return False
+            Dim AdcValue = Reply(0) + 256 * Reply(1)
+
+            '2. The LEDs: the top four bits of the reading, 0 to 15
+            Dim Leds = AdcValue \ 64
+
+            '3. Send the LEDs
+            If Not WriteRequest(Device, LedsWrite, Leds) Then Return False
+
+            ShowLine(AdcValue, Leds)
             If QuitPressed(PollMilliseconds) Then Return True
         Loop
     End Function
@@ -135,6 +151,19 @@ Module Program
         Dim Reply(Count - 1) As Byte
         Array.Copy(Buffer, Reply, Count)
         Return Reply
+    End Function
+
+    'A vendor request to the device with a value and no data: False when the transfer fails (the board has gone)
+    Private Function WriteRequest(Device As UsbDevice, Request As Byte, Value As Integer) As Boolean
+        '66: host to device, vendor request, to the device
+        Dim Setup As New UsbSetupPacket(66, Request, CShort(Value), 0, 0)
+        Dim Buffer(0) As Byte
+        Dim Count As Integer
+        Try
+            Return Device.ControlTransfer(Setup, Buffer, 0, Count)
+        Catch
+            Return False
+        End Try
     End Function
 
     'Wait, and say whether Q or Esc was pressed meanwhile

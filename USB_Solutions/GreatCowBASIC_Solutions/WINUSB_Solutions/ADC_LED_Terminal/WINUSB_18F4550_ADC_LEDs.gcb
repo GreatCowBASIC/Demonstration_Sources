@@ -1,18 +1,22 @@
 '''A program  for GCGB and GCB.
 '''--------------------------------------------------------------------------------------------------------------------------------
 '''
-'''The four LEDs show the ADC: the PICDEM FS USB board's potentiometer, as a 4-bit number on its LEDs D1 to D4.
+'''USB comms demonstration: the PC reads the PICDEM FS USB board's potentiometer and sets its four LEDs.
 '''
-'''The board does the work: its main loop reads the potentiometer (AN0, 10 bits) about every 20 ms and sets the LEDs
-'''to the top four bits of the reading (0 to 15, D1 the lowest bit). It works with no PC. Over USB (WinUSB, no driver
-'''to install) the PC can read the reading and the LEDs: the ADC LED Terminal (ADC_LED_Terminal.exe) shows them.
+'''The loop, driven by the PC (the ADC LED Terminal, ADC_LED_Terminal.exe), over USB (WinUSB, no driver to install):
+'''  1. The PC sends request 150: the board reads the potentiometer (AN0, 10 bits) and replies with the reading
+'''  2. The PC works out the LEDs from the reading (the top four bits, 0 to 15)
+'''  3. The PC sends request 151 with the LEDs: the board sets D1 to D4
+'''  4. Back to 1
+'''The board makes no decisions: with no PC, the LEDs stay as the PC last set them.
 '''
 '''The PICDEM FS USB Demo Board, 2004, with a PIC18F4550
 '''  USB: the board's USB connector (D+ RC5, D- RC4), 20 MHz crystal, PLL (48 MHz)
 '''  Potentiometer RV1 on RA0 (AN0)
 '''  LEDs D1, D2, D3, D4 on RD0, RD1, RD2, RD3
 '''
-''' Request 150: three bytes: the reading (a Word: low byte, then high byte, 0 to 1023), then the LEDs (0 to 15)
+''' Request 150: read: two bytes, the reading (a Word: low byte, then high byte, 0 to 1023)
+''' Request 151: write: the LEDs in wValue's low byte (0 to 15, D1 the lowest bit), no data
 ''' Request 255: the keep-alive: answers 255
 '''
 ''' Its own USB identity: 04D8:0052 with bcdDevice 0x0200 and its own GUID, so the WinUSB Demo Program (bcdDevice
@@ -20,7 +24,7 @@
 '''
 '''@author     EvanV
 '''@licence    GPL
-'''@version    1.0
+'''@version    1.1
 '''@date       25/10/2026
 '''********************************************************************************
 
@@ -53,7 +57,11 @@
 
 
     ' ----- The requests
-    #define ADCLEDSREAD                 150         'the reading (2 bytes, low first), then the LEDs (1 byte)
+    #define ADCREAD                     150         'read: the reading, 2 bytes, low first
+    #define LEDSWRITE                   151         'write: the LEDs in wValue's low byte
+
+    'The setup packet's wValue low byte (usb.h keeps the setup packet in USBTempBuffer: 2 is wValue's low byte)
+    #define USBREQUESTVALUE             USBTempBuffer(2)
 
 
     ' ----- The board
@@ -67,28 +75,14 @@
     Dir PORTD.3 Out
     Dir POTENTIOMETER_PIN In
 
+    'All off until the PC sets them
+    LATD = LATD And 0xF0
 
-    ' ----- The last reading and LEDs, for the USB interrupt to send
-    Dim ADCValue As Word                        'the main loop's reading
-    Dim LEDValue As Byte                        'the main loop's LEDs: ADCValue / 64, 0 to 15
-    Dim SentADCValue As Word                    'copies for the USB interrupt, set with interrupts off,
-    Dim SentLEDValue As Byte                    'so it never sends half of an old reading and half of a new one
+    Dim ADCValue As Word                        'the reading, for request 150
 
 
-    ' ----- Main body of program commences here: read the potentiometer, show it on the LEDs
+    ' ----- Main body of program commences here: nothing to do, the USB interrupt answers the PC
     Do
-        ADCValue = ReadAD10( POTENTIOMETER )
-        LEDValue = ADCValue / 64
-
-        'D1 to D4 (RD0 to RD3); RD4 to RD7 unchanged
-        LATD = ( LATD And 0xF0 ) Or LEDValue
-
-        IntOff
-        SentADCValue = ADCValue
-        SentLEDValue = LEDValue
-        IntOn
-
-        Wait 20 ms
         'Do not sleep the MCU!!
     Loop
 
@@ -100,10 +94,14 @@
 
         Select Case USBRequest
 
-            'The reading, then the LEDs: three bytes
-            Case ADCLEDSREAD
-                USBBufferWrite( SentADCValue )          'a Word: its low byte, then its high byte
-                USBBufferWrite( SentLEDValue )
+            'Read the potentiometer and send the reading: a Word, its low byte, then its high byte
+            Case ADCREAD
+                ADCValue = ReadAD10( POTENTIOMETER )
+                USBBufferWrite( ADCValue )
+
+            'Set D1 to D4 (RD0 to RD3) to the PC's LEDs; RD4 to RD7 unchanged
+            Case LEDSWRITE
+                LATD = ( LATD And 0xF0 ) Or ( USBREQUESTVALUE And 0x0F )
 
             'The keep-alive
             Case USBDEVICEKEEPALIVE
