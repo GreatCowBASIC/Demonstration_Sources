@@ -1,0 +1,14 @@
+#SKIPTEST
+' Change 1663: a variable with the name of a bit on the chip is an error.
+' CON is bit 7 of CM1CON on the PIC18F46J50. Build 1662 only warned, and compiled "COn = PORTA" as bcf/bsf CM1CON,CON:
+' the program changed a comparator bit instead of storing a byte.
+' Expected (build 1663): Error: Variable name CON is the name of bit CM1CON.7 on the current chip: the compiler would use
+' that bit, not a variable. Rename it (#define DISABLE1663 makes this a warning)
+#chip 18F46J50, 48
+#option explicit
+Dim COn As Byte
+Dir PORTB Out
+Do
+    COn = PORTA
+    PORTB = COn
+Loop

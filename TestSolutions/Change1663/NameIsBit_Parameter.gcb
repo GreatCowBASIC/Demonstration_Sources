@@ -1,0 +1,15 @@
+#SKIPTEST
+' Change 1663: a sub parameter with the name of a bit on the chip is an error, with the line of the sub.
+' Build 1662 gave no warning: Show(1) compiled to bsf CM1CON,CON, and the assembler stopped with
+' "Conflicting definition for CON sub parameter variable. %var% is a %type%. Invalid source variable type".
+' Expected (build 1663): Error: Parameter name CON is the name of bit CM1CON.7 on the current chip: ...
+#chip 18F46J50, 48
+#option explicit
+Dir PORTB Out
+Do
+    Show(1)
+Loop
+
+Sub Show(In COn)
+    PORTB = COn
+End Sub

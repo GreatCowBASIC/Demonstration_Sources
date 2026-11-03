@@ -1,0 +1,23 @@
+' Change 1663: a Byte array element in a sub that also uses an Integer array.
+' The array temporaries (SysArrayTemp1, 2...) are Integers in such a sub. Build 1662 compiled the read of a Byte element
+' into one as part of the main program, so its high byte was not cleared, and the comparison used whatever the Integer
+' element had left there (0xFF from -6 here): Size(Idx) > 0 was false although Size(Idx) is 3.
+' Expected (build 1663): clrf SysArrayTemp1_H / clrf SysArrayTemp2_H after each Byte element read; Hits = 1.
+#chip 18F46J50, 48
+#option explicit
+Dim PosX(4), Speed(4) As Integer
+Dim Size(4), Shown(4) As Byte
+Dim Hits As Byte
+Speed(1) = -6
+PosX(1) = 100
+Size(1) = 3
+Shown(1) = 20
+Check(1)
+Do
+Loop
+
+Sub Check(In Idx)
+    PosX(Idx) = PosX(Idx) + Speed(Idx)                     ' leaves 0xFF (from -6) in an array temporary's high byte
+    Hits = 0
+    If Size(Idx) > 0 And Shown(Idx) <> 255 Then Hits = 1   ' Size is 3, Shown is 20: Hits = 1
+End Sub

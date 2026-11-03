@@ -1,0 +1,29 @@
+' Change 1663: an interrupt that reads a table (PIC18).
+' ReadTable sets the table pointer (TBLPTRL/H/U) and reads the latch (TABLAT). Build 1662 did not save these in the
+' interrupt, so an interrupt that also reads a table could change what a ReadTable in the main program read, if it
+' came in the middle of it. (Found in the kit's USB programs: the USB interrupt reads its descriptor tables.)
+' Expected (build 1663): the interrupt saves and restores TBLPTRL, TBLPTRH, TBLPTRU and TABLAT.
+#chip 18F46J50, 48
+#option explicit
+Dim Tick, MainValue, IntValue, Idx As Byte
+On Interrupt Timer0Overflow Call TimerTick
+InitTimer0 Osc, PRE0_16 + TMR0_FOSC4, POST0_1
+StartTimer 0
+Idx = 1
+Do
+    ReadTable Numbers, Idx, MainValue
+    Idx++
+    If Idx > 4 Then Idx = 1
+Loop
+
+Sub TimerTick
+    Tick++
+    ReadTable Numbers, (Tick And 3) + 1, IntValue
+End Sub
+
+Table Numbers
+    10
+    20
+    30
+    40
+End Table

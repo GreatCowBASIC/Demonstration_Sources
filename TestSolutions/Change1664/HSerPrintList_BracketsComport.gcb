@@ -1,0 +1,15 @@
+#chip 18F46J50, 48
+
+#define USART_BAUD_RATE 9600
+#define USART2_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+
+'Demonstrates Change1664: brackets round a list with a leading [comport] -
+'HSerPrintList ([2], "d", inchar, ":") sends every value to comport 2, as HSerPrintList [2], "d", inchar, ":"
+
+Dim inchar As Byte = 65
+
+Do
+  HSerPrintList ([2], "d", inchar, ":")
+  Wait 1 s
+Loop

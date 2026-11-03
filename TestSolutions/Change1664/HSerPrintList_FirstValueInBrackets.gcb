@@ -1,0 +1,16 @@
+#chip 16F877A, 20
+
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+'Demonstrates Change1664: brackets are taken off only when they hold the whole list.
+'HSerPrintList (inchar + 1) * 2, inchar is still two values: (inchar + 1) * 2, then inchar
+'- the same code as HSerPrint (inchar + 1) * 2 : HSerPrint inchar
+
+Dim inchar As Byte = 65
+
+Do
+  HSerPrintList (inchar + 1) * 2, inchar
+  Wait 1 s
+Loop

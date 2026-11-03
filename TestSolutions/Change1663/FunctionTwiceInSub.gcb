@@ -1,0 +1,20 @@
+' Change 1663: two calls of an Integer function in one line inside a sub.
+' The compiler keeps the first result in a temporary (SysFnINTEGER1) while it makes the second call. Build 1662
+' compiled that copy as part of the main program, where the temporary is not known, so only its low byte was copied:
+'     movff HALF,SysFnINTEGER1        (and no movff HALF_H,SysFnINTEGER1_H)
+' and Result was wrong. Word and Long functions had the same fault; the same line in the main program was right.
+' Expected (build 1663): movff HALF,SysFnINTEGER1 and movff HALF_H,SysFnINTEGER1_H; Result = -200.
+#chip 18F46J50, 48
+#option explicit
+Dim Result As Integer
+Calc
+Do
+Loop
+
+Sub Calc
+    Result = Half(-300) + Half(-100)       ' -150 + -50 = -200
+End Sub
+
+Function Half(In HalfIn As Integer) As Integer
+    Half = HalfIn / 2
+End Function

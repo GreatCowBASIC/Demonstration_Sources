@@ -1,0 +1,235 @@
+'''********************************************************************************
+''' RC5-Decoder
+'''********************************************************************************
+''' This app receives RC5 codes from a remote control and displays them on an LCD.
+''' A demonstration program for GCBASIC.
+'''
+''' author        Ralf Pagel
+''' licence       GPL
+''' version       1.0
+''' date          01.11.2026
+'''
+'''********************************************************************************
+/*
+  Prozessor:          PIC16(L)F188xx
+  Start address:      0x0200 
+  Command clock:      7,372 MHz
+
+  Information on wiring:
+  Outputs:            LCD at PORTD, 4 daten line, RS, RW und E
+  Inputs:             LEDgn (PORTB.2), LEDrt (PORTB.1)
+  Input:              IR-Receiver (PORTC.3)
+  
+***********************************************************************************
+Functionality:
+
+This program uses the IOC interrupt to call a routine every time the state 
+of the pin with the IR receiver changes. Timer1 is used to measure the time 
+elapsed between these state changes. A state machine within the routine 
+processes these timings to determine the received code. When the last bit 
+of the code has been received, or when no state changes occur for a certain 
+period of time, Timer1 overflows, ensuring that the state machine and all 
+involved variables are reset. The program is characterized by high tolerances 
+and operates perfectly even in the vicinity of other IR transmissions.
+
+The "odd" quartz frequency used here is due to the bootloader used.
+If a different clock frequency is used, the following values ​​must be adjusted:
+short_time, med_time, long_time,
+and potentially the Timer1 prescaler value ('T1CLK').
+
+I took the interrupt routine from the website
+https://simple-circuit.com/mplab-xc8-rc5-remote-control-decoder/
+and translated it from XC8 to GCB.
+That site also provides a detailed explanation of how the state machine works.
+
+This program works perfectly in conjunction with my "RC5-Transmitter", 
+which I have also published here.
+
+***********************************************************************************
+*/
+
+#option Explicit
+#chip 16F18877, 29.488 ; PLL 7.372 x 4
+#option Bootloader  0x200
+
+#config RSTOSC = EXT4X, FEXTOSC = HS
+#config BOREN = OFF, PWRTE = ON, MCLRE = ON
+#config SCANE = not_available, WRT = WRT_upper
+
+#define LEDprt PORTB    ; The LEDs are connected to PortB via a 1K resistor.
+#define LEDgn PORTB.2
+#define LEDrt PORTB.1
+LEDprt = off
+DIR LEDprt 0b11111001   ; LEDgn + LEDrt are output
+
+; config LCD
+#DEFINE LCD_IO 4
+#DEFINE LCD_SPEED OPTIMAL
+
+#DEFINE LCD_DB7 PORTD.7
+#DEFINE LCD_DB6 PORTD.6
+#DEFINE LCD_DB5 PORTD.5
+#DEFINE LCD_DB4 PORTD.4
+
+#DEFINE LCD_RS PORTD.0
+#DEFINE LCD_RW PORTD.1    'Must be defined for RW Mode
+#DEFINE LCD_ENABLE PORTD.2
+#DEFINE LCD_LIGHT PORTD.3
+
+Dir LCD_LIGHT out
+
+; Expected Timer1 values: Long Pulse = 13107, Short Pulse = 6553
+#define short_time  5160  ; = 700 us - used as a minimum time for short pulse or short space
+#define   med_time  8846  ; = 1200 us - used as a maximum time for short pulse or short space
+#define  long_time  14744 ; = 2000 us - used as a maximum time for long pulse or long space
+
+
+InitTimer1 Osc, PS1_1/1 
+T1CLK = 1     ; source = (fosz/4) = 7,372 MHz (135,65 ns)
+TMR1IE = 1    ; enables the interrupt
+
+; Enable port changed interrupt at PORTC.3
+IOCCP3 = 1    ; detect rising edge (bit)
+IOCCN3 = 1    ; detect falling edge (bit)
+IOCCF = 0     ; PORTC interrupt flag (register)
+IOCIF = 0     ; common IOC interrupt flag (bit)
+IOCIE = 1     ; enable IOC interrupt (bit)
+
+Dim timer_value, rc5_code as Word
+Dim address, command, rc5_state, bit_nbr as Byte
+Dim field, toggle, rc5_ok as Bit
+address = 0
+command = 0
+toggle = 0
+rc5_state = 0
+rc5_ok = 0
+
+CLS
+Print "RC5-Decoder"
+
+
+mainloop:
+  do while !rc5_ok : Loop   ; wait until rc5 code receiver
+
+  rc5_ok = 0
+  rc5_state = 0   ; reset decoding process
+  TMR1ON = 0      ; disable Timer1
+
+  field = rc5_code.12           ; second start bit ore field bit is bit number 12
+  toggle = rc5_code.11          ; toggle bit is bit number 11
+  command = rc5_code & 0x3F     ; the 6 LSBits are command bits
+  if !field then command.6 = 1  ; add 64 if second start bit is used as upper field bit
+  rotate rc5_code left          ; shift rc5_code 1 bit left
+  rotate rc5_code left          ; shift rc5_code 1 bit left again
+  address = rc5_code_h & 0x1F   ; now the 5 LSBits are the address
+  
+  CLS
+  Print "Adr: ": Print address : Print "  Tgl: " : Print toggle
+  Locate 1,0
+  Print "Cmd: " : Print command
+
+  IOCIE = 1       ; enable PORTC change interrupt
+goto mainloop
+
+
+Sub Interrupt() 
+  /*************** start port changed interrupt ***************/
+  ; The PortChanged interrupt occurs whenever the state of PORTC.3 changes.
+  ; Expected Timer1 values: Long Pulse = 13107, Short Pulse = 6553
+  if (IOCIF = 1) & (IOCCF3 = 1) then
+    IOCIF = 0
+    IOCCF = 0
+    LEDgn = !LEDgn
+    timer_value = TMR1L : timer_value_h = TMR1H ; save Timer1 value (used at rc5_state > 0)
+    TMR1H = 0 : TMR1L = 0   ; clr Timer1
+
+    select case rc5_state
+      case 0      ; start receiving IR data (initially we're at the beginning of mid1)
+        TMR1ON = 1              ; enable Timer1
+        rc5_state = 1           ; next state: end of mid1
+        bit_nbr = 0             ; reset bit number
+        rc5_code = 0            ; clr
+ 
+      case 1      ; end of mid1 ==> check if we're at the beginning of start1 or mid0
+        if (timer_value > long_time) | (timer_value < short_time) then
+          ; invalid interval ==> stop decoding and reset
+          rc5_state = 0         ; reset decoding process
+          TMR1ON = 0            ; disable Timer1
+        else
+          rc5_code = rc5_code | (0x8001 << (13 - bit_nbr)) ; set bit (13 - bit_n)
+          bit_nbr += 1
+          if bit_nbr > 13 then  ; if all bits have been received
+            rc5_ok = 1          ; decoding process is OK
+            IOCIE = 0           ; disable PORTC change interrupt
+          else
+            if timer_value > med_time then  ; we're at the beginning of mid0
+              rc5_state = 2     ; next state: end of mid0
+                if bit_nbr = 13 then    ; if we're at the LSB bit
+                  rc5_ok = 1        ; decoding process is OK
+                  rc5_code.0 = 0    ; clear the LSB bit
+                  IOCIE = 0         ; disable PORTC change interrupt
+                end if
+            else                ; we're at the beginning of start1
+              rc5_state = 3     ; next state: end of start1
+            end if
+          end if
+        end if
+ 
+      case 2 :   // end of mid0 ==> check if we're at the beginning of start0 or mid1
+        if (timer_value > long_time) | (timer_value < short_time) then
+          ; time interval invalid ==> stop decoding
+          rc5_state = 0         ; reset decoding process
+          TMR1ON = 0            ; disable Timer1
+        else
+          rc5_code = rc5_code & !(0x8001 << (13 - bit_nbr))  ; clear (13 - bit_n)
+          bit_nbr += 1
+          if timer_value > med_time then  ; we're at the beginning of mid1
+            rc5_state = 1       ; next state: end of mid1
+          else              ; we're at the beginning of start0
+            rc5_state = 4       ; next state: end of start0
+          end if
+        end if
+ 
+      case 3 ; end of start1 ==> check if we're at the beginning of mid1
+        if (timer_value > med_time) | (timer_value < short_time) then
+          ; time interval invalid ==> stop decoding
+          rc5_state = 0         ; reset decoding process
+          TMR1ON = 0            ; disable Timer1
+        else                ; we're at the beginning of mid1
+          rc5_state = 1         ; next state: end of mid1
+        end if
+ 
+      case 4  ; end of start0 ==> check if we're at the beginning of mid0
+        if (timer_value > med_time) | (timer_value < short_time) then
+          ; time interval invalid ==> stop decoding
+          rc5_state = 0         ; reset decoding process
+          TMR1ON = 0            ; disable Timer1
+        else                ; we're at the beginning of mid0
+          rc5_state = 2         ; next state: end of mid0
+          if bit_nbr = 13 then    ; if we're at the LSB bit
+            rc5_ok = 1    	    ; decoding process is OK
+            rc5_code.0 = 0      ; clear the LSB bit
+            IOCIE = 0           ; disable PORTC change interrupt
+          end if
+        end if
+    end select
+
+  end if
+  /*************** end port changed interrupt ***************/
+
+  /*************** start timer overflow interrupt ***************/
+  ; The Timer1 overflow occurs after 8.89 ms, whenever no further IOC takes place.
+  if TMR1IF = 1 then
+    TMR1IF = 0
+    TMR1ON = 0 ; StopTimer1
+    rc5_state = 0
+    PulseOut LEDrt, 300 ms
+    CLS
+    Print "not recognized"    
+
+  end if
+  /*************** end timer overflow interrupt ***************/
+
+End Sub
+
+

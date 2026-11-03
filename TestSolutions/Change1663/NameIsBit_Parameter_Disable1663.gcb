@@ -1,0 +1,17 @@
+#SKIPTEST
+' Change 1663: with #define DISABLE1663 the parameter is a warning, and the assembler then stops with its own,
+' readable message (build 1662's had placeholders left in it):
+' Expected (build 1663): Warning: Variable name CON is used for a system bit on the current chip, then
+' Error: GCASM: CON is defined twice, as 7 and as 1: a variable, parameter, label or constant has the same name as a
+' register or bit on the current chip. Rename it
+#define DISABLE1663
+#chip 18F46J50, 48
+#option explicit
+Dir PORTB Out
+Do
+    Show(1)
+Loop
+
+Sub Show(In COn)
+    PORTB = COn
+End Sub

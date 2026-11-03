@@ -1,0 +1,12 @@
+' Change 1663: the escape. With #define DISABLE1663 a variable with the name of a bit is a warning again, as in build
+' 1662 (and the compiler still uses the bit: rename the variable instead when you can).
+' Expected (build 1663): compiles, with Warning: Variable name CON is used for a system bit on the current chip
+#define DISABLE1663
+#chip 18F46J50, 48
+#option explicit
+Dim COn As Byte
+Dir PORTB Out
+Do
+    COn = PORTA
+    PORTB = COn
+Loop

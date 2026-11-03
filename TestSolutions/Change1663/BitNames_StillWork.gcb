@@ -1,0 +1,11 @@
+' Change 1663: using a bit by its name is unchanged: no error, no warning.
+' Expected (build 1663): compiles; the same asm as build 1662.
+#chip 18F46J50, 48
+#option explicit
+Dir PORTB Out
+Do
+    CON = 1
+    ADIF = 0
+    GIE = 0
+    CM1CON.CON = 0
+Loop

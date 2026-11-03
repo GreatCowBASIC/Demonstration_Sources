@@ -1,0 +1,17 @@
+#chip 16F877A, 20
+
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+'Demonstrates Change1664: the list of values may be in brackets, as a sub call may be.
+'HSerPrintList ("d", inchar, ":") is the same as HSerPrintList "d", inchar, ":" - the same code.
+'Build 1663: Error: No matching overload found for HSERPRINT with these argument types
+
+Dim inchar As Byte = 65
+
+Do
+  HSerPrintList ("d", inchar, ":")
+  HSerPrintList "d", inchar, ":"
+  Wait 1 s
+Loop

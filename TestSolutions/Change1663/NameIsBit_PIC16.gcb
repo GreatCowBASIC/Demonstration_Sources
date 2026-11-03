@@ -1,0 +1,7 @@
+#SKIPTEST
+' Change 1663: PIC16. TMR1ON is bit 0 of T1CON on the 16F1829.
+' Expected (build 1663): Error: Variable name TMR1ON is the name of bit T1CON.0 on the current chip: ...
+#chip 16F1829, 32
+#option explicit
+Dim TMR1ON As Byte
+TMR1ON = 5

@@ -1,0 +1,188 @@
+'''********************************************************************************
+''' RC5-Transmitter
+'''********************************************************************************
+''' This app send RC5-Code like a remote control.
+''' A demonstration program for GCBASIC.
+'''
+''' author        Ralf Pagel
+''' licence       GPL
+''' version       1.0
+''' date          01.11.2026
+'''********************************************************************************
+/*
+This program demonstrates how to use the 'RC5Send' command — included in GCB — to ensure that a 
+device expecting an RC5 code from a remote control responds correctly to the commands.
+
+To achieve this, two errors in the code within the 'remote.h' file were corrected, and the 
+timing was slightly adjusted. The time adjustments may be due to deviations in the 
+calculations for different oscillator frequencies.
+
+The automatic toggling of the 'toggle bit' has been removed from the command; instead, 
+an 'RC5Tggl' parameter has been added. In an RC5 remote control system, the code is 
+transmitted with an unchanged toggle bit for as long as a button is held down. 
+The toggle bit only changes once the button is released and either the same button 
+is pressed again or a different button is pressed.
+
+At the end of the file, you will find the 'RC5Send' command along with its two associated subroutines.
+
+_______________
+
+Instead of a matrix keypad, this program uses a single button to select the command to be transmitted, 
+which is displayed on an LCD screen. A second button is then used to send the selected command. 
+This program was developed for the purpose of programming a 'learning' (programmable) remote control.
+
+This program works exceptionally well in conjunction with my 'RC5-Decoder' that I have also published here.
+
+********************************************************************************
+*/
+
+; Configuration
+#chip 16f1459, 16
+#config OSC = HS
+#option explicit            ; All variables must be declared!
+
+;#include <lowlevel\remote.h>
+
+; LCD connection settings
+#define HI2C_BAUD_RATE 100
+#define HI2C_DATA PORTB.4
+#define HI2C_CLOCK PORTB.6
+
+#define LCD_IO 10
+#define LCD_WIDTH 16                ; specified lcd width
+
+Dir HI2C_DATA in
+Dir HI2C_CLOCK in
+HI2CMode Master
+
+; common hardware settings
+#define LEDrt  PORTC.0
+#define RC5Out PORTC.2    ; IR-LED
+#define SW1    PORTA.3    ; select command
+#define SW2    PORTB.7    ; send command
+
+Dir LEDrt  out
+Dir RC5Out out
+Dir SW1 in
+Dir SW2 in
+
+Dim addres, command, toggle, RC5Temp, RC5Pulse as Byte
+Dim tgglbit as Bit
+addres = 19         ; The device address is set here.
+command = 1
+toggle = 0
+
+printLCD()
+
+do forever
+
+  ; This sequence is used to select the command.
+  if SW1 = 0 then
+    wait 20 ms        ; debounce
+    if SW1 = 0 then 
+      command += 1
+      if command = 32 then command = 1
+      printLCD()
+      wait 300 ms
+    end if
+  end if
+  
+  ; Send the previously set command
+  if SW2 = 0 then
+    wait 20 ms        ; debounce
+    do while SW2 = 0 
+      LEDrt = 1
+      RC5Send (addres, command, toggle)   ; 25ms
+      LEDrt = 0
+      wait 89 ms      ; As long as a button is pressed, the transmission must be repeated every 114 ms.
+      tgglbit = 1
+    loop
+    if tgglbit then
+      tgglbit = 0
+      incf toggle,f   ; The toggle bit switches with each key press.
+      printLCD()
+    end if
+  end if
+
+loop
+
+
+sub printLCD()
+  CLS
+  Print "Addr: " : Print addres 
+  if toggle.0 = 0 then 
+    Print "  TB: 0"
+  else 
+    Print "  TB: 1"
+  end if
+  Locate 1,0
+  Print "Comm: " : Print command
+end sub
+
+
+; All of the following lines were copied from the file <lowlevel\remote.h> and adjusted accordingly.
+
+sub RC5Send (in RC5Add, in RC5Data, in RC5Tggl)
+
+  'Start bit
+  RC5High
+
+  'The second start bit can be used to select commands 64...127. 
+  if RC5Data.6 off then RC5High
+  if RC5Data.6 on then RC5Low
+
+  'Toggle bit
+  if RC5Tggl.0 off then RC5Low
+  if RC5Tggl.0 on then RC5High
+  
+  'Address
+  RC5Temp = 5
+  RC5SendAdd:
+    if RC5Add.4 on then RC5High
+    if RC5Add.4 off then RC5Low
+    rotate RC5Add left
+  decfsz RC5Temp, F
+  goto RC5SendAdd
+
+  'Command
+  RC5Temp = 6
+  RC5SendCom:
+    if RC5Data.5 on then RC5High
+    if RC5Data.5 off then RC5Low
+    rotate RC5Data left
+  decfsz RC5Temp, F
+  goto RC5SendCom
+end sub
+
+
+sub RC5High
+ 'Emit low
+ wait 89 10us ; 88 has been changed
+ 
+ 'Emit high
+ For RC5Pulse = 1 to 32 ; 64 is changed - a mistake had crept in here
+  set RC5Out on
+  wait 7 us
+  set RC5Out off
+  wait 21 us ; 20 has been changed
+ next
+end sub
+
+
+sub RC5Low
+ 'Emit high
+ For RC5Pulse = 1 to 32 ; 64 has been changed - a mistake had crept in here
+  set RC5Out on
+  wait 7 us
+  set RC5Out off
+  wait 21 us ; 20 has been changed
+ next
+
+ 'Emit low
+ wait 89 10us ; 88 has been changed
+end sub
+
+
+
+
+

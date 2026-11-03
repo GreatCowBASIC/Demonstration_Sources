@@ -1,0 +1,7 @@
+#SKIPTEST
+' Change 1663: AVR. TOV0 is bit 0 of TIFR0 on the mega328p.
+' Expected (build 1663): Error: Variable name TOV0 is the name of bit TIFR0.0 on the current chip: ...
+#chip mega328p, 16
+#option explicit
+Dim TOV0 As Byte
+TOV0 = 5

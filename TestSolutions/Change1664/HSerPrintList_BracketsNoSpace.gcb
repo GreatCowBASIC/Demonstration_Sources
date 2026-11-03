@@ -1,0 +1,16 @@
+#chip 16F877A, 20
+
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+#define USART_DELAY OFF
+
+'Demonstrates Change1664: the bracket may follow the name with no space -
+'HSerPrintList("d", inchar, ":"). Ser1PrintList, Ser2PrintList and Ser3PrintList take brackets the same way.
+'Build 1663: Error: Array/Function HSERPRINTLIST has not been declared
+
+Dim inchar As Byte = 65
+
+Do
+  HSerPrintList("d", inchar, ":")
+  Wait 1 s
+Loop
