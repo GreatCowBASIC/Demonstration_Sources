@@ -1,0 +1,36 @@
+#SKIPTEST
+// Build 1666: a Function may not declare an Out parameter - expected to FAIL to compile
+// A Function's parameters are input only, so an Out value never reaches the caller. Expected errors:
+//   Invalid syntax: Function GETTWO declares Out parameter RetA ... (and RetB)
+//   Invalid syntax: Function GETONE declares Out parameter ONEVAL ...
+//   Invalid syntax: Function GETOPT declares Out parameter OPTVAL ...
+
+    #chip 16F18877, 32
+
+    Dim B1, B2, B3 As Byte
+
+    If GetTwo(B1, B2) Then B3 = 1
+    B3 = GetOne(B1)
+    B3 = GetOpt(B1)
+
+    Do Forever
+    Loop
+
+// Two Out parameters
+Function GetTwo(Out RetA, Out RetB) As Byte
+    RetA = 192
+    RetB = 168
+    GetTwo = 1
+End Function
+
+// One Out parameter, lower case
+Function GetOne( out OneVal )
+    OneVal = 1
+    GetOne = 2
+End Function
+
+// Optional Out, after an input parameter
+Function GetOpt(In InVal, Optional Out OptVal As Byte = 0) As Byte
+    OptVal = InVal
+    GetOpt = 3
+End Function

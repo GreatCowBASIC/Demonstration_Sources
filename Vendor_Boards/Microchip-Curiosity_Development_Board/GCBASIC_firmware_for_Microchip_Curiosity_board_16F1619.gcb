@@ -1,0 +1,352 @@
+/*
+A demonstration program for GCBASIC.
+--------------------------------------------------------------------------------
+ This program recreation of Microchip Curiosity firmware for the 16F1619
+
+ Microchip Curiosity 8/14/20 pin 8 bit demo board
+  o PIC16F1619
+  o LEDs D4-D7 on RA5, RA1/PGEC, RA2, RC5
+  o Switch SWITCH1 on RC4
+  o Switch S2 on RA3/MCLRE
+  o Touch Switch S3 on RC1/AN5
+  o Potentiometer POT1 on RC0/AN4
+
+ Capacitive Voltage Divider (CVD) – AN1298
+
+ On startup LEDs D4-D7 turn on and off
+ LED D6 turns on while S3 is touched
+ LED D7 is the PWM signal
+ LED D4 turns on when S1 is pressed
+
+
+
+The working version does these things:
+    Builds a solid baseline during a long learning phase (first ~50 samples).
+    Uses two different thresholds (PRESS_DELTA and RELEASE_DELTA) → hysteresis.
+    Completely freezes the baseline the moment a press is detected (Exit Sub).
+    Only allows the baseline to move after several consecutive clear “released” samples.
+    Moves it extremely slowly (/128 filter).
+    That combination stops the baseline from chasing the touched value, which is why detection now survives many presses.
+
+
+
+@author    Evan R. Venn (original) + fixes
+@license   GPL
+@version   1.03
+*/
+
+
+' ---- Configuration
+#CHIP 16F1619, 32
+#CONFIG MCLRE_ON
+
+#startup InitPPS, 85
+#define PPSToolPart 16f1619
+
+Sub InitPPS
+    RC5PPS = 0x000E          'PWM3OUT > RC5
+End Sub
+
+#OPTION Explicit
+
+' ---- Hardware
+#DEFINE SWITCH1 PORTC.4
+Dir SWITCH1 In
+
+#DEFINE LED4 PORTA.5
+Dir PORTA.5 Out
+
+#DEFINE LED5 PORTA.1
+Dir PORTA.1 Out
+
+#DEFINE LED6 PORTA.2
+Dir PORTA.2 Out
+
+#DEFINE LED7 PORTC.5
+Dir PORTC.5 Out
+
+#DEFINE POT1 AN4
+Dir PORTC.0 In
+
+#DEFINE WAITSECS 1
+
+' ---- Variables
+Dim PWMSetCounter As Word
+PWMSetCounter = 0
+
+Dim TouchBaseline As Word
+Dim TouchDebounce As Byte
+Dim LearningCount As Byte
+
+TouchBaseline = 0
+TouchDebounce = 0
+LearningCount = 0
+
+' ---- Main
+Wait WAITSECS s
+Set LED4 = 1
+Set LED5 = 1
+Set LED6 = 1
+Set LED7 = 1
+Wait WAITSECS s
+Set LED7 = 0
+Set LED6 = 0
+Set LED5 = 1
+Set LED4 = 0
+
+#DEFINE HPWM_FAST
+Dim PWMDutyValue As Byte
+Dim PWMDirection As Integer
+PWMDirection = 1
+PWMDutyValue = 127
+HPWM 3, 3, PWMDutyValue, 2
+
+Do Forever
+
+    LED4 = !SWITCH1
+
+    If PWMSetCounter MOD 64 = 0 Then
+        HPWMUpdate 3, ReadAD(AN4)
+
+        PWMDutyValue = PWMDutyValue + PWMDirection
+        If PWMDutyValue = 255 Then
+            PWMDirection = -1
+        Else If PWMDutyValue = 0 Then
+            PWMDirection = 1
+        End If
+
+        ReadmTouch
+    End If
+
+    PWMSetCounter++
+
+Loop
+
+' ---- CVD Touch routine (AN1298 style)
+'
+' Capacitive Voltage Divider (CVD) measurement of the touch pad on RC1/AN5.
+'
+' Principle (from Microchip AN1298):
+'   1. Charge the internal ADC sample-and-hold capacitor (CHOLD) from a
+'      secondary channel (here AN6 / RC2).
+'   2. Discharge the external sensor pad (RC1).
+'   3. Release the sensor to high-impedance and connect it to the ADC.
+'   4. Charge is shared between CHOLD and the sensor capacitance.
+'   5. The resulting voltage is converted by the ADC.
+'
+' When a finger touches the pad the sensor capacitance increases.
+' This lowers the voltage after charge sharing, so the ADC reading drops.
+'
+' Detection strategy (anti-drift):
+'   - First 50 samples are used only to build a solid “untouched” baseline.
+'   - Strong hysteresis between PRESS_DELTA and RELEASE_DELTA prevents chatter.
+'   - While the pad is considered pressed the baseline is completely frozen.
+'   - The baseline is only allowed to move after several consecutive clear
+'     “released” samples, and then only with a very slow filter (/128).
+'   - This stops the classic problem of the baseline slowly chasing the
+'     touched value and eventually losing detection after a few presses.
+'
+Sub ReadmTouch
+
+    Dim ADCvalueWord As Word
+    Dim SaveADCON0, SaveANSELC, SaveTRISC, SaveLATC As Byte
+
+    SaveADCON0 = ADCON0
+    SaveANSELC = ANSELC
+    SaveTRISC  = TRISC
+    SaveLATC   = LATC
+
+    IntOff
+
+    '--- Step 1 & 2: Charge CHOLD from secondary channel (RC2 / AN6) ---
+    Dir PORTC.2 Out
+    Set ANSELC.2 = 0                 ' digital
+    Set PORTC.2 = 1                  ' drive high → charge CHOLD
+    ADCON0 = 0b00011001              ' select AN6, ADC on
+    Wait 10 us                       ' give CHOLD time to charge
+
+    '--- Step 3: Discharge the sensor (RC1 / AN5) ---
+    Dir PORTC.1 Out
+    Set ANSELC.1 = 0
+    Set PORTC.1 = 0
+    Wait 5 us
+
+    '--- Step 4: Release sensor to high-Z (input) ---
+    Dir PORTC.1 In
+    Set ANSELC.1 = 1                 ' analog again
+
+    '--- Step 5: Switch ADC to sensor → charge sharing ---
+    ADCON0 = 0b00010101              ' select AN5, ADC on
+    Wait 30 us                       ' important – let charge redistribute
+
+    '--- Step 6 & 7: Convert ---
+    SET ADFM ON
+    Set ADCON0.GO = 1
+    Wait While ADCON0.GO = 1
+
+    ADCvalueWord = ReadAD10(AN5)
+
+    ' Restore pins / registers first
+    TRISC  = SaveTRISC
+    ANSELC = SaveANSELC
+    LATC   = SaveLATC
+    ADCON0 = SaveADCON0
+    ADCON0.ADON = 0
+
+    IntOn
+
+    '===== Detection – anti-drift version =====
+    '
+    ' Learning phase (first 50 samples)
+    ' ---------------------------------
+    ' Simply average the readings to create a reliable untouched baseline.
+    ' LED6 is forced off during this period.
+    '
+    If LearningCount < 50 Then
+        LearningCount = LearningCount + 1
+        If LearningCount = 1 Then
+            TouchBaseline = ADCvalueWord
+        Else
+            TouchBaseline = (TouchBaseline * 7 + ADCvalueWord) / 8
+        End If
+        LED6 = 0
+        Exit Sub
+    End If
+
+    ' Hysteresis thresholds
+    ' ---------------------
+    ' PRESS_DELTA  : reading must fall by at least this amount to be a press
+    ' RELEASE_DELTA: reading must rise to within this amount of baseline to
+    '                be considered released.
+    ' The gap between the two values creates hysteresis.
+    '
+    #DEFINE PRESS_DELTA     70
+    #DEFINE RELEASE_DELTA   25
+
+    Dim Diff As Integer
+    Diff = TouchBaseline - ADCvalueWord
+
+    If Diff > PRESS_DELTA Then
+        ' ===== PRESSED =====
+        ' Debounce: require several consecutive samples before lighting LED6
+        If TouchDebounce < 8 Then TouchDebounce = TouchDebounce + 1
+        If TouchDebounce >= 3 Then
+            LED6 = 1
+        End If
+        ' Baseline completely frozen while pressed
+        Exit Sub                                  ' important – leave immediately
+    End If
+
+    ' From here we are NOT strongly pressed
+    If Diff < RELEASE_DELTA Then
+        ' Clearly released
+        TouchDebounce = 0
+        LED6 = 0
+
+        ' Only update baseline after several consecutive clear-release samples.
+        ' This prevents slow drift caused by residual charge or minor
+        ' environmental changes after repeated touches.
+        If TouchDebounce = 0 Then                 ' already 0
+            Dim ReleaseCount As Byte = 0
+            ReleaseCount = ReleaseCount + 1
+            If ReleaseCount >= 8 Then             ' must be released for 8 samples
+                TouchBaseline = (TouchBaseline * 127 + ADCvalueWord) / 128
+                ReleaseCount = 0
+            End If
+        End If
+    Else
+        ' Middle zone – do nothing
+        ' keeps previous state and freezes baseline
+        ' (this is what keeps LED6 solidly on while the finger remains on the pad)
+    End If
+End Sub
+
+' ---- ADC optimisation (must enable AN5)
+#DEFINE USE_AD0 FALSE
+#DEFINE USE_AD1 FALSE
+#DEFINE USE_AD2 TRUE
+#DEFINE USE_AD3 FALSE
+#DEFINE USE_AD4 TRUE
+#DEFINE USE_AD5 TRUE          ' REQUIRED
+#DEFINE USE_AD6 FALSE
+#DEFINE USE_AD7 FALSE
+#DEFINE USE_AD8 FALSE
+#DEFINE USE_AD9 FALSE
+#DEFINE USE_AD10 FALSE
+#DEFINE USE_AD11 FALSE
+#DEFINE USE_AD12 FALSE
+#DEFINE USE_AD13 FALSE
+#DEFINE USE_AD14 FALSE
+#DEFINE USE_AD15 FALSE
+#DEFINE USE_AD16 FALSE
+#DEFINE USE_AD17 FALSE
+#DEFINE USE_AD18 FALSE
+#DEFINE USE_AD19 FALSE
+#DEFINE USE_AD20 FALSE
+#DEFINE USE_AD21 FALSE
+#DEFINE USE_AD22 FALSE
+#DEFINE USE_AD23 FALSE
+#DEFINE USE_AD24 FALSE
+#DEFINE USE_AD25 FALSE
+#DEFINE USE_AD26 FALSE
+#DEFINE USE_AD27 FALSE
+#DEFINE USE_AD28 FALSE
+#DEFINE USE_AD29 FALSE
+#DEFINE USE_AD30 FALSE
+#DEFINE USE_AD31 FALSE
+#DEFINE USE_AD32 FALSE
+#DEFINE USE_AD33 FALSE
+#DEFINE USE_AD34 FALSE
+
+#DEFINE USE_ADA0 FALSE
+#DEFINE USE_ADA1 FALSE
+#DEFINE USE_ADA2 TRUE
+#DEFINE USE_ADA3 FALSE
+#DEFINE USE_ADA4 TRUE
+#DEFINE USE_ADA5 TRUE         ' REQUIRED
+#DEFINE USE_ADA6 FALSE
+#DEFINE USE_ADA7 FALSE
+#DEFINE USE_ADB0 FALSE
+#DEFINE USE_ADB1 FALSE
+#DEFINE USE_ADB2 FALSE
+#DEFINE USE_ADB3 FALSE
+#DEFINE USE_ADB4 FALSE
+#DEFINE USE_ADB5 FALSE
+#DEFINE USE_ADB6 FALSE
+#DEFINE USE_ADB7 FALSE
+#DEFINE USE_ADC0 FALSE
+#DEFINE USE_ADC1 FALSE
+#DEFINE USE_ADC2 FALSE
+#DEFINE USE_ADC3 FALSE
+#DEFINE USE_ADC4 FALSE
+#DEFINE USE_ADC5 FALSE
+#DEFINE USE_ADC6 FALSE
+#DEFINE USE_ADC7 FALSE
+#DEFINE USE_ADD0 FALSE
+#DEFINE USE_ADD1 FALSE
+#DEFINE USE_ADD2 FALSE
+#DEFINE USE_ADD3 FALSE
+#DEFINE USE_ADD4 FALSE
+#DEFINE USE_ADD5 FALSE
+#DEFINE USE_ADD6 FALSE
+#DEFINE USE_ADD7 FALSE
+#DEFINE USE_ADE0 FALSE
+#DEFINE USE_ADE1 FALSE
+#DEFINE USE_ADE2 FALSE
+
+' ---- PWM optimisation
+#DEFINE USE_HPWMCCP1 TRUE
+#DEFINE USE_HPWMCCP2 FALSE
+#DEFINE USE_HPWMCCP4 FALSE
+#DEFINE USE_HPWMCCP5 FALSE
+#DEFINE USE_HPWM1 TRUE
+#DEFINE USE_HPWM2 FALSE
+#DEFINE USE_HPWM3 TRUE
+#DEFINE USE_HPWM4 FALSE
+#DEFINE USE_HPWM5 FALSE
+#DEFINE USE_HPWM6 FALSE
+#DEFINE USE_HPWM7 FALSE
+#DEFINE USE_HPWM8 FALSE
+#DEFINE USE_HPWM_TIMER2 TRUE
+#DEFINE USE_HPWM_TIMER4 FALSE
+#DEFINE USE_HPWM_TIMER6 FALSE

@@ -1,0 +1,37 @@
+// Build 1666: what is still allowed - expected to compile
+//   - a Sub with Out parameters (copied back to the caller)
+//   - a Function with input parameters, including names that contain "Out"
+//   - a Function returning a value through its name
+
+    #chip 16F18877, 32
+
+    Dim B1, B2, B3 As Byte
+    Dim TimeOutMs As Word
+
+    GetTwo B1, B2, B3
+    TimeOutMs = 500
+    B3 = Larger(B1, B2)
+    If WaitDone(TimeOutMs) Then B3 = 0
+
+    Do Forever
+    Loop
+
+// Sub with Out parameters and a status, as DNS_Resolve does
+Sub GetTwo(Out RetA, Out RetB, Out GotIt)
+    RetA = 192
+    RetB = 168
+    GotIt = 1
+End Sub
+
+Function Larger(In ValA, In ValB) As Byte
+    Larger = ValA
+    If ValB > ValA Then Larger = ValB
+End Function
+
+// Parameter names that contain OUT are not Out parameters
+Function WaitDone(TimeOut As Word) As Byte
+    Dim OutCount As Byte
+    OutCount = 0
+    WaitDone = 1
+    If TimeOut = 0 Then WaitDone = 0
+End Function
