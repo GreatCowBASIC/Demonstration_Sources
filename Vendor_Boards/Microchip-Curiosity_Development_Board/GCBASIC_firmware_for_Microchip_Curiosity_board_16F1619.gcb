@@ -20,23 +20,35 @@ A demonstration program for GCBASIC.
 
 
 
-The working version does these things:
-    Builds a solid baseline during a long learning phase (first ~50 samples).
-    Uses two different thresholds (PRESS_DELTA and RELEASE_DELTA) → hysteresis.
-    Completely freezes the baseline the moment a press is detected (Exit Sub).
-    Only allows the baseline to move after several consecutive clear “released” samples.
-    Moves it extremely slowly (/128 filter).
-    That combination stops the baseline from chasing the touched value, which is why detection now survives many presses.
+The touch sensing follows Microchip's own Curiosity firmware (Curiosity_Development_Board_rev2_Original_Firmware.hex,
+disassembled): a two-phase differential CVD reading on the pad pin RC1/AN5 alone, no second pin.
+    Phase A: the hold capacitor (CHOLD) is charged high through the pad, isolated, the pad is driven low, then pad
+             and CHOLD share their charge and the ADC converts at once.
+    Phase B: the same with the polarities swapped. Reading = A - B + 1024: a touch raises it, noise common to both
+             phases cancels.
+    Each reading moves a slew-limited value by at most 1; eight of those are summed.
+    Press when the sum is 250 above the baseline, release below 125 (hysteresis). The baseline is the first sum,
+    then follows the sum slowly (/16) only while the pad is released.
 
 
 
 @author    Evan R. Venn (original) + fixes
 @license   GPL
-@version   1.03
+@version   1.05
+
+1.04  The CVD result is read from ADRESH:ADRESL (ReadAD10 started a second, ordinary conversion and the
+      charge-sharing value was lost); ReleaseCount is a global started at 0 (the "Dim ... = 0" inside the routine
+      reset it on every pass, so the baseline never moved after learning); the slow baseline filter is worked out
+      in a Long (baseline * 127 overflowed a Word)
+1.05  Touch sensing rewritten to Microchip's two-phase differential CVD on RC1/AN5 only (RC2/AN6 no longer used),
+      with its slew-limited 8-sample sum, press 250 / release 125 hysteresis and /16 baseline while released;
+      the pad is driven again only after each conversion (with the Fosc/32 ADC clock, driving it straight after GO
+      overwrote the reading); the first reading is taken after the start-up flash;
+      reading A - B (B - A fell with a touch on the Curiosity board: D6 inverted)
 */
 
 
-' ---- Configuration
+// ---- Configuration
 #CHIP 16F1619, 32
 #CONFIG MCLRE_ON
 
@@ -44,12 +56,12 @@ The working version does these things:
 #define PPSToolPart 16f1619
 
 Sub InitPPS
-    RC5PPS = 0x000E          'PWM3OUT > RC5
+    RC5PPS = 0x000E          //PWM3OUT > RC5
 End Sub
 
 #OPTION Explicit
 
-' ---- Hardware
+// ---- Hardware
 #DEFINE SWITCH1 PORTC.4
 Dir SWITCH1 In
 
@@ -70,19 +82,26 @@ Dir PORTC.0 In
 
 #DEFINE WAITSECS 1
 
-' ---- Variables
+// ---- Variables
 Dim PWMSetCounter As Word
 PWMSetCounter = 0
 
+// Touch: the slew-limited reading, the sum of 8 of them, the baseline, and the state (0 start, 1 released, 2 pressed)
+Dim TouchFiltered As Word
+Dim TouchSum As Word
 Dim TouchBaseline As Word
-Dim TouchDebounce As Byte
-Dim LearningCount As Byte
+Dim TouchState As Byte
 
+// The pad: an output (driven low between measurements), analog
+Set ANSELC.1 = 1
+Set LATC.1 = 0
+Dir PORTC.1 Out
+TouchFiltered = 0
+TouchSum = 0
 TouchBaseline = 0
-TouchDebounce = 0
-LearningCount = 0
+TouchState = 0
 
-' ---- Main
+// ---- Main
 Wait WAITSECS s
 Set LED4 = 1
 Set LED5 = 1
@@ -93,6 +112,10 @@ Set LED7 = 0
 Set LED6 = 0
 Set LED5 = 1
 Set LED4 = 0
+
+// The pad has settled during the start-up flash: the slew-limited value starts at a real reading. Keep off the pad
+// now - the first sum (ReadmTouch) becomes the baseline
+TouchFiltered = CVDRead
 
 #DEFINE HPWM_FAST
 Dim PWMDutyValue As Byte
@@ -122,152 +145,108 @@ Do Forever
 
 Loop
 
-' ---- CVD Touch routine (AN1298 style)
-'
-' Capacitive Voltage Divider (CVD) measurement of the touch pad on RC1/AN5.
-'
-' Principle (from Microchip AN1298):
-'   1. Charge the internal ADC sample-and-hold capacitor (CHOLD) from a
-'      secondary channel (here AN6 / RC2).
-'   2. Discharge the external sensor pad (RC1).
-'   3. Release the sensor to high-impedance and connect it to the ADC.
-'   4. Charge is shared between CHOLD and the sensor capacitance.
-'   5. The resulting voltage is converted by the ADC.
-'
-' When a finger touches the pad the sensor capacitance increases.
-' This lowers the voltage after charge sharing, so the ADC reading drops.
-'
-' Detection strategy (anti-drift):
-'   - First 50 samples are used only to build a solid “untouched” baseline.
-'   - Strong hysteresis between PRESS_DELTA and RELEASE_DELTA prevents chatter.
-'   - While the pad is considered pressed the baseline is completely frozen.
-'   - The baseline is only allowed to move after several consecutive clear
-'     “released” samples, and then only with a very slow filter (/128).
-'   - This stops the classic problem of the baseline slowly chasing the
-'     touched value and eventually losing detection after a few presses.
-'
-Sub ReadmTouch
+// ---- CVD touch (as Microchip's Curiosity firmware)
+//
+// ADCON0 values: CVD_PAD selects AN5 (the pad, RC1) with the ADC on; CVD_ISOLATE selects channel 16, an input with
+// nothing on it, so CHOLD keeps its charge while the pad is set the other way.
+#DEFINE CVD_PAD      0x15
+#DEFINE CVD_ISOLATE  0x41
+// ADCON1: right justified, ADC clock Fosc/32 (1 us at 32 MHz). Microchip's firmware uses Fosc/2 (0x80), out of spec
+// at 32 MHz; the pad is left alone until the conversion is done (see CVDRead), so the slower clock is safe
+#DEFINE CVD_ADCON1   0xA0
+// Hysteresis on the 8-sample sum above the baseline (Microchip's values)
+#DEFINE TOUCH_PRESS    250
+#DEFINE TOUCH_RELEASE  125
 
-    Dim ADCvalueWord As Word
-    Dim SaveADCON0, SaveANSELC, SaveTRISC, SaveLATC As Byte
-
-    SaveADCON0 = ADCON0
-    SaveANSELC = ANSELC
-    SaveTRISC  = TRISC
-    SaveLATC   = LATC
-
+Function CVDRead As Word
+    // One differential reading: phase A - phase B + 1024 (a touch raises it on this board). Microchip's sequence: no waits - the
+    // conversion starts as soon as CHOLD is connected to the pad. Microchip drives the pad again straight after GO, which
+    // is safe only with its Fosc/2 ADC clock: the sample is taken one ADC clock after GO, so with Fosc/32 (1 us) the
+    // pad was still connected and its drive overwrote the shared voltage (D6 stuck on, or inverted). The pad is driven
+    // again here once the conversion is done, safe with any ADC clock
+    Dim CVDPhaseA, CVDPhaseB As Word
+    Dim CVDSaveADCON1 As Byte
+    CVDSaveADCON1 = ADCON1
+    ADCON1 = CVD_ADCON1
     IntOff
 
-    '--- Step 1 & 2: Charge CHOLD from secondary channel (RC2 / AN6) ---
-    Dir PORTC.2 Out
-    Set ANSELC.2 = 0                 ' digital
-    Set PORTC.2 = 1                  ' drive high → charge CHOLD
-    ADCON0 = 0b00011001              ' select AN6, ADC on
-    Wait 10 us                       ' give CHOLD time to charge
-
-    '--- Step 3: Discharge the sensor (RC1 / AN5) ---
-    Dir PORTC.1 Out
-    Set ANSELC.1 = 0
-    Set PORTC.1 = 0
-    Wait 5 us
-
-    '--- Step 4: Release sensor to high-Z (input) ---
-    Dir PORTC.1 In
-    Set ANSELC.1 = 1                 ' analog again
-
-    '--- Step 5: Switch ADC to sensor → charge sharing ---
-    ADCON0 = 0b00010101              ' select AN5, ADC on
-    Wait 30 us                       ' important – let charge redistribute
-
-    '--- Step 6 & 7: Convert ---
-    SET ADFM ON
+    // Phase A: CHOLD charged high through the pad, isolated, pad low, then share and convert
+    Set LATC.1 = 1
+    ADCON0 = CVD_PAD
+    ADCON0 = CVD_ISOLATE
+    Set LATC.1 = 0
+    Set TRISC.1 = 1
+    ADCON0 = CVD_PAD
     Set ADCON0.GO = 1
     Wait While ADCON0.GO = 1
+    Set LATC.1 = 1
+    Set TRISC.1 = 0
+    CVDPhaseA = ADRESL
+    CVDPhaseA_H = ADRESH
 
-    ADCvalueWord = ReadAD10(AN5)
-
-    ' Restore pins / registers first
-    TRISC  = SaveTRISC
-    ANSELC = SaveANSELC
-    LATC   = SaveLATC
-    ADCON0 = SaveADCON0
-    ADCON0.ADON = 0
+    // Phase B: CHOLD discharged through the pad, isolated, pad high, then share and convert
+    Set LATC.1 = 0
+    ADCON0 = CVD_PAD
+    ADCON0 = CVD_ISOLATE
+    Set LATC.1 = 1
+    Set TRISC.1 = 1
+    ADCON0 = CVD_PAD
+    Set ADCON0.GO = 1
+    Wait While ADCON0.GO = 1
+    Set LATC.1 = 0
+    Set TRISC.1 = 0
+    CVDPhaseB = ADRESL
+    CVDPhaseB_H = ADRESH
 
     IntOn
+    ADCON1 = CVDSaveADCON1
+    ADCON0.ADON = 0
+    CVDRead = CVDPhaseA - CVDPhaseB + 1024
+End Function
 
-    '===== Detection – anti-drift version =====
-    '
-    ' Learning phase (first 50 samples)
-    ' ---------------------------------
-    ' Simply average the readings to create a reliable untouched baseline.
-    ' LED6 is forced off during this period.
-    '
-    If LearningCount < 50 Then
-        LearningCount = LearningCount + 1
-        If LearningCount = 1 Then
-            TouchBaseline = ADCvalueWord
-        Else
-            TouchBaseline = (TouchBaseline * 7 + ADCvalueWord) / 8
-        End If
-        LED6 = 0
-        Exit Sub
-    End If
+Sub ReadmTouch
+    // Eight readings, each moving the slew-limited value by at most 1, summed; then the press / release decision and,
+    // while released, the slow baseline
+    Dim TouchCount As Byte
+    Dim TouchRaw, TouchDelta As Word
 
-    ' Hysteresis thresholds
-    ' ---------------------
-    ' PRESS_DELTA  : reading must fall by at least this amount to be a press
-    ' RELEASE_DELTA: reading must rise to within this amount of baseline to
-    '                be considered released.
-    ' The gap between the two values creates hysteresis.
-    '
-    #DEFINE PRESS_DELTA     70
-    #DEFINE RELEASE_DELTA   25
+    TouchSum = 0
+    For TouchCount = 1 To 8
+        TouchRaw = CVDRead
+        If TouchRaw > TouchFiltered Then TouchFiltered++
+        If TouchRaw < TouchFiltered Then TouchFiltered--
+        TouchSum = TouchSum + TouchFiltered
+    Next
 
-    Dim Diff As Integer
-    Diff = TouchBaseline - ADCvalueWord
+    // How far above the baseline (0 when below)
+    TouchDelta = 0
+    If TouchSum > TouchBaseline Then TouchDelta = TouchSum - TouchBaseline
 
-    If Diff > PRESS_DELTA Then
-        ' ===== PRESSED =====
-        ' Debounce: require several consecutive samples before lighting LED6
-        If TouchDebounce < 8 Then TouchDebounce = TouchDebounce + 1
-        If TouchDebounce >= 3 Then
-            LED6 = 1
-        End If
-        ' Baseline completely frozen while pressed
-        Exit Sub                                  ' important – leave immediately
-    End If
+    Select Case TouchState
+        Case 0
+            // Start: the first sum is the baseline
+            TouchBaseline = TouchSum
+            TouchState = 1
+        Case 1
+            If TouchDelta >= TOUCH_PRESS Then TouchState = 2
+        Case 2
+            If TouchDelta < TOUCH_RELEASE Then TouchState = 1
+    End Select
 
-    ' From here we are NOT strongly pressed
-    If Diff < RELEASE_DELTA Then
-        ' Clearly released
-        TouchDebounce = 0
-        LED6 = 0
+    // The baseline follows slowly (1/16 of the difference), only while the pad is released
+    If TouchState = 1 Then TouchBaseline = TouchBaseline - TouchBaseline / 16 + TouchSum / 16
 
-        ' Only update baseline after several consecutive clear-release samples.
-        ' This prevents slow drift caused by residual charge or minor
-        ' environmental changes after repeated touches.
-        If TouchDebounce = 0 Then                 ' already 0
-            Dim ReleaseCount As Byte = 0
-            ReleaseCount = ReleaseCount + 1
-            If ReleaseCount >= 8 Then             ' must be released for 8 samples
-                TouchBaseline = (TouchBaseline * 127 + ADCvalueWord) / 128
-                ReleaseCount = 0
-            End If
-        End If
-    Else
-        ' Middle zone – do nothing
-        ' keeps previous state and freezes baseline
-        ' (this is what keeps LED6 solidly on while the finger remains on the pad)
-    End If
+    LED6 = 0
+    If TouchState = 2 Then LED6 = 1
 End Sub
 
-' ---- ADC optimisation (must enable AN5)
+// ---- ADC optimisation (must enable AN5)
 #DEFINE USE_AD0 FALSE
 #DEFINE USE_AD1 FALSE
 #DEFINE USE_AD2 TRUE
 #DEFINE USE_AD3 FALSE
 #DEFINE USE_AD4 TRUE
-#DEFINE USE_AD5 TRUE          ' REQUIRED
+#DEFINE USE_AD5 TRUE          // REQUIRED
 #DEFINE USE_AD6 FALSE
 #DEFINE USE_AD7 FALSE
 #DEFINE USE_AD8 FALSE
@@ -303,7 +282,7 @@ End Sub
 #DEFINE USE_ADA2 TRUE
 #DEFINE USE_ADA3 FALSE
 #DEFINE USE_ADA4 TRUE
-#DEFINE USE_ADA5 TRUE         ' REQUIRED
+#DEFINE USE_ADA5 TRUE         // REQUIRED
 #DEFINE USE_ADA6 FALSE
 #DEFINE USE_ADA7 FALSE
 #DEFINE USE_ADB0 FALSE
@@ -334,7 +313,7 @@ End Sub
 #DEFINE USE_ADE1 FALSE
 #DEFINE USE_ADE2 FALSE
 
-' ---- PWM optimisation
+// ---- PWM optimisation
 #DEFINE USE_HPWMCCP1 TRUE
 #DEFINE USE_HPWMCCP2 FALSE
 #DEFINE USE_HPWMCCP4 FALSE
