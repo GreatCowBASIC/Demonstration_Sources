@@ -1,0 +1,396 @@
+/*
+A demonstration program for GCBASIC.
+--------------------------------------------------------------------------------
+ mTouch capacitive touch on the Microchip Curiosity board (PIC16F1619), implemented as Microchip's
+ mTouch Framework v2.3 (mTouch SW Package 1.43) does it, in plain GCBASIC: no library, no interrupt routine of its own.
+ See GCBASIC_mTouch_Framework_CVD_explained.md for how it works.
+
+ Microchip Curiosity 8/14/20 pin 8 bit demo board
+  o PIC16F1619 at 32 MHz
+  o LEDs D4-D7 on RA5, RA1/PGEC, RA2, RC5
+  o Switch SWITCH1 on RC4
+  o Switch S2 on RA3/MCLRE
+  o Touch Switch S3 on RC1/AN5
+  o Potentiometer POT1 on RC0/AN4
+
+ On startup LEDs D4-D7 turn on and off
+ LED D6 turns on while S3 is touched
+ LED D7 is the PWM signal (brightness from POT1)
+ LED D4 turns on when S1 is pressed
+
+ Touch sensing: a two-phase differential capacitive voltage divider (CVD) reading on the pad pin RC1/AN5 alone.
+    Phase A: the hold capacitor (CHOLD) is charged high through the pad and isolated; the pad is driven low, then
+             pad and CHOLD share their charge, settle, and the ADC converts.
+    Phase B: the same with the polarities swapped. Reading = A - B + 1024: on the Curiosity board a touch raises
+             it (the framework uses B - A; check the sign on other hardware). Noise common to both phases cancels.
+    A random delay before each reading (jitter) keeps the readings from locking on to periodic noise.
+    Each reading moves a slew-limited value by at most 1; eight of those are summed, a scan every 10 ms (millis).
+    Power-up: the baseline follows the sum for 0.3 s. Then press when the sum is 250 above the baseline, release
+    below 125 (hysteresis); the baseline follows slowly (1/16 every 10th scan) only while released. A press held
+    for 10 s (something left on the pad) starts the power-up learning again.
+
+ The simpler implementation, as Microchip's original Curiosity firmware, is
+ GCBASIC_firmware_for_Microchip_Curiosity_board_16F1619.gcb (mTouch_CVD_explained.md).
+
+@author    Evan R. Venn
+@license   GPL
+@version   1.00
+
+1.00  New implementation, from GCBASIC_firmware_for_Microchip_Curiosity_board_16F1619.gcb 1.05 and the mTouch
+      Framework v2.3: CHOLD charge and settling delays (1 us each), jitter before each reading, scans timed by
+      millis, power-up learning for 30 scans, baseline every 10th scan, press time-out 10 s. Reading A - B (B - A
+      fell with a touch on the Curiosity board, with or without the delays)
+*/
+
+
+// ---- Configuration
+#CHIP 16F1619, 32
+#CONFIG MCLRE_ON
+
+#startup InitPPS, 85
+#define PPSToolPart 16f1619
+
+Sub InitPPS
+    RC5PPS = 0x000E          //PWM3OUT > RC5
+End Sub
+
+#OPTION Explicit
+
+// ---- Hardware
+#DEFINE SWITCH1 PORTC.4
+Dir SWITCH1 In
+
+#DEFINE LED4 PORTA.5
+Dir PORTA.5 Out
+
+#DEFINE LED5 PORTA.1
+Dir PORTA.1 Out
+
+#DEFINE LED6 PORTA.2
+Dir PORTA.2 Out
+
+#DEFINE LED7 PORTC.5
+Dir PORTC.5 Out
+
+#DEFINE POT1 AN4
+Dir PORTC.0 In
+
+#DEFINE WAITSECS 1
+
+// ---- Variables
+Dim PWMSetCounter As Word
+PWMSetCounter = 0
+
+// Touch: the slew-limited reading, the sum of 8 of them, the baseline, and the state (0 power-up, 1 released,
+// 2 pressed); scans counted for the power-up, the press time-out and the baseline rate; the jitter seed; the time
+Dim TouchFiltered As Word
+Dim TouchSum As Word
+Dim TouchBaseline As Word
+Dim TouchState As Byte
+Dim TouchScans As Word
+Dim TouchBaselineScans As Byte
+Dim TouchJitterSeed As Byte
+Dim TouchNowMs, TouchLastMs, TouchElapsedMs As Long
+
+// The pad: an output (driven low between measurements), analog
+Set ANSELC.1 = 1
+Set LATC.1 = 0
+Dir PORTC.1 Out
+TouchFiltered = 0
+TouchSum = 0
+TouchBaseline = 0
+TouchState = 0
+TouchScans = 0
+TouchBaselineScans = 0
+TouchJitterSeed = 0xA5                  // any value but 0
+
+// ---- Main
+Wait WAITSECS s
+Set LED4 = 1
+Set LED5 = 1
+Set LED6 = 1
+Set LED7 = 1
+Wait WAITSECS s
+Set LED7 = 0
+Set LED6 = 0
+Set LED5 = 1
+Set LED4 = 0
+
+// The pad has settled during the start-up flash: the slew-limited value starts at a real reading. Keep off the pad
+// now - the scans of the next 0.3 s set the baseline
+TouchFiltered = CVDRead
+TouchLastMs = millis()
+
+#DEFINE HPWM_FAST
+Dim PWMDutyValue As Byte
+Dim PWMDirection As Integer
+PWMDirection = 1
+PWMDutyValue = 127
+HPWM 3, 3, PWMDutyValue, 2
+
+Do Forever
+
+    LED4 = !SWITCH1
+
+    If PWMSetCounter MOD 64 = 0 Then
+        HPWMUpdate 3, ReadAD(AN4)
+
+        PWMDutyValue = PWMDutyValue + PWMDirection
+        If PWMDutyValue = 255 Then
+            PWMDirection = -1
+        Else If PWMDutyValue = 0 Then
+            PWMDirection = 1
+        End If
+    End If
+
+    // A touch scan every TOUCH_PERIOD_MS, whatever the speed of the loop
+    TouchNowMs = millis()
+    TouchElapsedMs = TouchNowMs - TouchLastMs
+    If TouchElapsedMs >= TOUCH_PERIOD_MS Then
+        TouchLastMs = TouchNowMs
+        ReadmTouch
+    End If
+
+    PWMSetCounter++
+
+Loop
+
+// ---- CVD touch (as Microchip's Curiosity firmware and mTouch Framework v2.3)
+//
+// ADCON0 values: CVD_PAD selects AN5 (the pad, RC1) with the ADC on; CVD_ISOLATE selects channel 16, an input with
+// nothing on it, so CHOLD keeps its charge while the pad is set the other way.
+#DEFINE CVD_PAD      0x15
+#DEFINE CVD_ISOLATE  0x41
+// ADCON1: right justified, ADC clock Fosc/32 (1 us at 32 MHz, the framework's setting for 32 MHz)
+#DEFINE CVD_ADCON1   0xA0
+// Hysteresis on the 8-sample sum above the baseline (Microchip's values)
+#DEFINE TOUCH_PRESS    250
+#DEFINE TOUCH_RELEASE  125
+// Timing, in scans of TOUCH_PERIOD_MS: power-up learning 0.3 s, baseline updated every 10th scan (1/16 each time),
+// a press held 10 s learns again (the framework's MTOUCH_POWER_UP_SAMPLES, MTOUCH_BASELINE_RATE, MTOUCH_BUTTON_TIMEOUT)
+#DEFINE TOUCH_PERIOD_MS      10
+#DEFINE TOUCH_POWERUP        30
+#DEFINE TOUCH_BASELINE_RATE  10
+#DEFINE TOUCH_TIMEOUT        1000
+// Jitter: up to 63 delay loops before each reading (the framework's MTOUCH_JITTER_BITS 6)
+#DEFINE TOUCH_JITTER_MASK    0x3F
+
+#include <millis.h>
+
+Function CVDRead As Word
+    // One differential reading: phase A - phase B + 1024. On the Curiosity board a touch raises it; the framework
+    // stores (B | 0x400) - A, but on this board B - A fell with a touch (D6 inverted), with or without the delays,
+    // so check the sign on other hardware: if D6 is inverted, swap the phases. Each phase: charge CHOLD through the pad, isolate it, drive the pad the other way, make the
+    // pad an input and connect CHOLD to it, let the charge settle, convert. The two delays are the framework's
+    // CVD_CHOLD_CHARGE_DELAY and CVD_SETTLING_DELAY: CHOLD fully charged, and the shared charge settled before the
+    // conversion. The pad is
+    // driven again only once the conversion is done (CHOLD is still connected for part of the first ADC clock)
+    Dim CVDPhaseA, CVDPhaseB As Word
+    Dim CVDSaveADCON1 As Byte
+    CVDSaveADCON1 = ADCON1
+    ADCON1 = CVD_ADCON1
+    IntOff
+
+    // Phase A: CHOLD charged high through the pad, isolated, pad low, then share, settle and convert
+    Set LATC.1 = 1
+    ADCON0 = CVD_PAD
+    Wait 1 us                           // CHOLD charges
+    ADCON0 = CVD_ISOLATE
+    Set LATC.1 = 0
+    Set TRISC.1 = 1
+    ADCON0 = CVD_PAD
+    Wait 1 us                           // the shared charge settles
+    Set ADCON0.GO = 1
+    Wait While ADCON0.GO = 1
+    Set LATC.1 = 1
+    Set TRISC.1 = 0
+    CVDPhaseA = ADRESL
+    CVDPhaseA_H = ADRESH
+
+    // Phase B: CHOLD discharged through the pad, isolated, pad high, then share, settle and convert
+    Set LATC.1 = 0
+    ADCON0 = CVD_PAD
+    Wait 1 us                           // CHOLD discharges
+    ADCON0 = CVD_ISOLATE
+    Set LATC.1 = 1
+    Set TRISC.1 = 1
+    ADCON0 = CVD_PAD
+    Wait 1 us                           // the shared charge settles
+    Set ADCON0.GO = 1
+    Wait While ADCON0.GO = 1
+    Set LATC.1 = 0
+    Set TRISC.1 = 0
+    CVDPhaseB = ADRESL
+    CVDPhaseB_H = ADRESH
+
+    IntOn
+    ADCON1 = CVDSaveADCON1
+    ADCON0.ADON = 0
+    CVDRead = CVDPhaseA - CVDPhaseB + 1024
+End Function
+
+Sub TouchJitter
+    // A random delay of 0 to 63 loops before each reading, from the framework's 8-bit LFSR (shift right, XOR 0xB4
+    // when a 1 is shifted out), so the readings do not lock on to noise at a fixed frequency
+    Dim TouchJitterCount As Byte
+    If TouchJitterSeed.0 = 1 Then
+        TouchJitterSeed = TouchJitterSeed / 2
+        TouchJitterSeed = TouchJitterSeed Xor 0xB4
+    Else
+        TouchJitterSeed = TouchJitterSeed / 2
+    End If
+    TouchJitterCount = TouchJitterSeed And TOUCH_JITTER_MASK
+    Do While TouchJitterCount > 0
+        TouchJitterCount--
+    Loop
+End Sub
+
+Sub ReadmTouch
+    // One scan: eight readings, each after a random delay and each moving the slew-limited value by at most 1,
+    // summed; then the power-up / released / pressed decision and, while released, the slow baseline
+    Dim TouchCount As Byte
+    Dim TouchRaw, TouchDelta As Word
+
+    TouchSum = 0
+    For TouchCount = 1 To 8
+        TouchJitter
+        TouchRaw = CVDRead
+        If TouchRaw > TouchFiltered Then TouchFiltered++
+        If TouchRaw < TouchFiltered Then TouchFiltered--
+        TouchSum = TouchSum + TouchFiltered
+    Next
+
+    // How far above the baseline (0 when below)
+    TouchDelta = 0
+    If TouchSum > TouchBaseline Then TouchDelta = TouchSum - TouchBaseline
+
+    Select Case TouchState
+        Case 0
+            // Power-up (and after a time-out): the baseline follows the sum for TOUCH_POWERUP scans
+            TouchBaseline = TouchSum
+            TouchScans++
+            If TouchScans >= TOUCH_POWERUP Then
+                TouchScans = 0
+                TouchBaselineScans = 0
+                TouchState = 1
+            End If
+        Case 1
+            // Released: press above TOUCH_PRESS, else the baseline follows slowly (1/16 every TOUCH_BASELINE_RATE
+            // scans)
+            If TouchDelta >= TOUCH_PRESS Then
+                TouchScans = 0
+                TouchState = 2
+            Else
+                TouchBaselineScans++
+                If TouchBaselineScans >= TOUCH_BASELINE_RATE Then
+                    TouchBaselineScans = 0
+                    TouchBaseline = TouchBaseline - TouchBaseline / 16 + TouchSum / 16
+                End If
+            End If
+        Case 2
+            // Pressed: release below TOUCH_RELEASE; held for TOUCH_TIMEOUT scans means something is left on the
+            // pad, so learn the baseline again
+            If TouchDelta < TOUCH_RELEASE Then
+                TouchState = 1
+            Else
+                TouchScans++
+                If TouchScans >= TOUCH_TIMEOUT Then
+                    TouchScans = 0
+                    TouchState = 0
+                End If
+            End If
+    End Select
+
+    LED6 = 0
+    If TouchState = 2 Then LED6 = 1
+End Sub
+
+// ---- ADC optimisation (must enable AN5)
+#DEFINE USE_AD0 FALSE
+#DEFINE USE_AD1 FALSE
+#DEFINE USE_AD2 TRUE
+#DEFINE USE_AD3 FALSE
+#DEFINE USE_AD4 TRUE
+#DEFINE USE_AD5 TRUE          // REQUIRED
+#DEFINE USE_AD6 FALSE
+#DEFINE USE_AD7 FALSE
+#DEFINE USE_AD8 FALSE
+#DEFINE USE_AD9 FALSE
+#DEFINE USE_AD10 FALSE
+#DEFINE USE_AD11 FALSE
+#DEFINE USE_AD12 FALSE
+#DEFINE USE_AD13 FALSE
+#DEFINE USE_AD14 FALSE
+#DEFINE USE_AD15 FALSE
+#DEFINE USE_AD16 FALSE
+#DEFINE USE_AD17 FALSE
+#DEFINE USE_AD18 FALSE
+#DEFINE USE_AD19 FALSE
+#DEFINE USE_AD20 FALSE
+#DEFINE USE_AD21 FALSE
+#DEFINE USE_AD22 FALSE
+#DEFINE USE_AD23 FALSE
+#DEFINE USE_AD24 FALSE
+#DEFINE USE_AD25 FALSE
+#DEFINE USE_AD26 FALSE
+#DEFINE USE_AD27 FALSE
+#DEFINE USE_AD28 FALSE
+#DEFINE USE_AD29 FALSE
+#DEFINE USE_AD30 FALSE
+#DEFINE USE_AD31 FALSE
+#DEFINE USE_AD32 FALSE
+#DEFINE USE_AD33 FALSE
+#DEFINE USE_AD34 FALSE
+
+#DEFINE USE_ADA0 FALSE
+#DEFINE USE_ADA1 FALSE
+#DEFINE USE_ADA2 TRUE
+#DEFINE USE_ADA3 FALSE
+#DEFINE USE_ADA4 TRUE
+#DEFINE USE_ADA5 TRUE         // REQUIRED
+#DEFINE USE_ADA6 FALSE
+#DEFINE USE_ADA7 FALSE
+#DEFINE USE_ADB0 FALSE
+#DEFINE USE_ADB1 FALSE
+#DEFINE USE_ADB2 FALSE
+#DEFINE USE_ADB3 FALSE
+#DEFINE USE_ADB4 FALSE
+#DEFINE USE_ADB5 FALSE
+#DEFINE USE_ADB6 FALSE
+#DEFINE USE_ADB7 FALSE
+#DEFINE USE_ADC0 FALSE
+#DEFINE USE_ADC1 FALSE
+#DEFINE USE_ADC2 FALSE
+#DEFINE USE_ADC3 FALSE
+#DEFINE USE_ADC4 FALSE
+#DEFINE USE_ADC5 FALSE
+#DEFINE USE_ADC6 FALSE
+#DEFINE USE_ADC7 FALSE
+#DEFINE USE_ADD0 FALSE
+#DEFINE USE_ADD1 FALSE
+#DEFINE USE_ADD2 FALSE
+#DEFINE USE_ADD3 FALSE
+#DEFINE USE_ADD4 FALSE
+#DEFINE USE_ADD5 FALSE
+#DEFINE USE_ADD6 FALSE
+#DEFINE USE_ADD7 FALSE
+#DEFINE USE_ADE0 FALSE
+#DEFINE USE_ADE1 FALSE
+#DEFINE USE_ADE2 FALSE
+
+// ---- PWM optimisation
+#DEFINE USE_HPWMCCP1 TRUE
+#DEFINE USE_HPWMCCP2 FALSE
+#DEFINE USE_HPWMCCP4 FALSE
+#DEFINE USE_HPWMCCP5 FALSE
+#DEFINE USE_HPWM1 TRUE
+#DEFINE USE_HPWM2 FALSE
+#DEFINE USE_HPWM3 TRUE
+#DEFINE USE_HPWM4 FALSE
+#DEFINE USE_HPWM5 FALSE
+#DEFINE USE_HPWM6 FALSE
+#DEFINE USE_HPWM7 FALSE
+#DEFINE USE_HPWM8 FALSE
+#DEFINE USE_HPWM_TIMER2 TRUE
+#DEFINE USE_HPWM_TIMER4 FALSE
+#DEFINE USE_HPWM_TIMER6 FALSE
