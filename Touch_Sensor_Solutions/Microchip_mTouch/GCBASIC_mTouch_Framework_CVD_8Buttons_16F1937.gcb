@@ -1,0 +1,133 @@
+/*
+A demonstration program for GCBASIC.
+--------------------------------------------------------------------------------
+ mTouch capacitive touch, eight buttons, on the Microchip mTouch CVD Evaluation Board (PIC16F1937, assembly
+ 02-02091) with the 8-button sensor board (02-02094), implemented as Microchip's mTouch Framework v2.3
+ (mTouch SW Package 1.43, project "02-02091-R3 CVD Eval Board\8 Buttons") does it, in plain GCBASIC.
+ The touch sensing is in the library mTouchCVD_8Buttons.h, shared with the serial version
+ GCBASIC_mTouch_Framework_CVD_8Buttons_Serial_16F1937.gcb.
+ See GCBASIC_mTouch_Framework_CVD_8Buttons_explained.md for how it works.
+
+ Board
+  o PIC16F1937 at 32 MHz (internal oscillator with the PLL)
+  o Sensors 0-7 on AN0-AN7: RA0, RA1, RA2, RA3, RA5, RE0, RE1, RE2
+  o LEDs for sensors 0-7 (on when low): RC2, RC1, RC0, RA7, RA6, RA4, RD7, RD6
+
+ On startup all eight LEDs light for one second. Then each LED lights while its button is touched.
+
+ Touch sensing: a two-phase differential capacitive voltage divider (CVD) reading per sensor. With several
+ sensors the framework charges the ADC's hold capacitor (CHOLD) through another sensor's pin, the reference
+ (sensor n uses sensor n - 1, sensor 0 uses sensor 7), not through the pad itself.
+    Scan A: the reference is driven high and CHOLD connected to it (CHOLD charges high); the sensor, driven low
+            until now, is made an input and CHOLD connected to it: they share their charge, settle, and the ADC
+            converts. Then the sensor is driven high.
+    Scan B: the same with the levels swapped (CHOLD low, sensor high). Then the sensor is driven low again.
+    Reading = B - A + 1024, as the framework: a touch raises it. Noise common to both scans cancels.
+    A random delay before each reading (jitter) keeps the readings from locking on to periodic noise.
+    Each reading moves a slew-limited value by at most 10 (the framework's decimation filter); eight of those
+    are summed. All eight sensors are scanned every 10 ms (millis).
+    Power-up: the baseline follows the sum for 0.3 s. Then press when the sum is TOUCH_PRESS above the baseline,
+    release below TOUCH_RELEASE (hysteresis); the baseline follows slowly (1/16 every 10th scan) only while
+    released. A press held for 10 s (something left on the pad) starts the power-up learning again.
+
+ The one-sensor version of the same method is GCBASIC_mTouch_Framework_CVD_Curiosity_board_16F1619.gcb.
+
+@author    Evan R. Venn
+@license   GPL
+@version   1.01
+
+1.00  New implementation for the mTouch CVD Evaluation Board with the 8-button sensor board, from the mTouch
+      Framework v2.3 8 Buttons project: reference sensor charging, charge and settling delays (1 us each), jitter,
+      decimation step 10, power-up learning for 30 scans, baseline every 10th scan, press time-out 10 s
+1.01  The touch sensing moved to the shared library mTouchCVD_8Buttons.h (unchanged)
+*/
+
+
+// ---- Configuration
+#CHIP 16F1937, 32
+#CONFIG MCLRE_OFF                       // as Microchip's firmware for the board
+
+#OPTION Explicit
+
+#include "mTouchCVD_8Buttons.h"
+
+// ---- LEDs, one per sensor, on when low
+#DEFINE LED0 PORTC.2
+#DEFINE LED1 PORTC.1
+#DEFINE LED2 PORTC.0
+#DEFINE LED3 PORTA.7
+#DEFINE LED4 PORTA.6
+#DEFINE LED5 PORTA.4
+#DEFINE LED6 PORTD.7
+#DEFINE LED7 PORTD.6
+Dir LED0 Out
+Dir LED1 Out
+Dir LED2 Out
+Dir LED3 Out
+Dir LED4 Out
+Dir LED5 Out
+Dir LED6 Out
+Dir LED7 Out
+
+// ---- Main
+// LEDs off, the sensor pins driven low
+LedsOff
+TouchInit
+
+// Start-up: all LEDs on for one second while the pads settle. Keep off the pads until 0.3 s after they go out:
+// the scans then set the baselines
+LedsOn
+Wait 1 s
+LedsOff
+TouchStart
+
+Do Forever
+    TouchService
+    If TouchNewScan = 1 Then
+        TouchShowLeds
+    End If
+Loop
+
+Sub LedsOn
+    // Every LED on
+    LED0 = 0
+    LED1 = 0
+    LED2 = 0
+    LED3 = 0
+    LED4 = 0
+    LED5 = 0
+    LED6 = 0
+    LED7 = 0
+End Sub
+
+Sub LedsOff
+    // Every LED off
+    LED0 = 1
+    LED1 = 1
+    LED2 = 1
+    LED3 = 1
+    LED4 = 1
+    LED5 = 1
+    LED6 = 1
+    LED7 = 1
+End Sub
+
+Sub TouchShowLeds
+    // Each LED on (low) while its sensor is pressed
+    LED0 = 1
+    If TouchState(0) = 2 Then LED0 = 0
+    LED1 = 1
+    If TouchState(1) = 2 Then LED1 = 0
+    LED2 = 1
+    If TouchState(2) = 2 Then LED2 = 0
+    LED3 = 1
+    If TouchState(3) = 2 Then LED3 = 0
+    LED4 = 1
+    If TouchState(4) = 2 Then LED4 = 0
+    LED5 = 1
+    If TouchState(5) = 2 Then LED5 = 0
+    LED6 = 1
+    If TouchState(6) = 2 Then LED6 = 0
+    LED7 = 1
+    If TouchState(7) = 2 Then LED7 = 0
+End Sub

@@ -1,0 +1,290 @@
+/*
+A demonstration program for GCBASIC.
+--------------------------------------------------------------------------------
+ mTouch capacitive touch, eight buttons, with the readings on the serial port, on the Microchip mTouch CVD
+ Evaluation Board (PIC16F1937, assembly 02-02091) with the 8-button sensor board (02-02094). The touch sensing is
+ the library mTouchCVD_8Buttons.h, the same as GCBASIC_mTouch_Framework_CVD_8Buttons_16F1937.gcb: Microchip's
+ mTouch Framework v2.3 method. This version adds the serial output, to watch the readings and tune the thresholds.
+ See GCBASIC_mTouch_Framework_CVD_8Buttons_explained.md for how it works.
+
+ Board
+  o PIC16F1937 at 32 MHz (internal oscillator with the PLL)
+  o Sensors 0-7 on AN0-AN7: RA0, RA1, RA2, RA3, RA5, RE0, RE1, RE2
+  o LEDs for sensors 0-7 (on when low): RC2, RC1, RC0, RA7, RA6, RA4, RD7, RD6
+  o EUSART TX on RC6, 115200 baud 8N1 (the mTouch One-Way GUI's rate), to a TTL / USB serial adapter
+
+ On startup all eight LEDs light for one second. Then each LED lights while its button is touched, and the serial
+ port sends one of two outputs, chosen by SERIAL_MTOUCH_GUI:
+
+ SERIAL_MTOUCH_GUI 0 - text for a terminal: a banner, then
+    a line when a pad is pressed or released, by its label on the sensor board (sensor 0-7 = pad 8, 9, A-F):
+        Pad B pressed
+    every 0.25 s, each pad's delta above its baseline and its state (L learning, . released, P pressed), under
+    a heading line of the pad labels sent at start-up:
+        pad    8   9   A   B   C   D   E   F
+        d     12   0   3 310   0   1   0   0  ...P....
+    Tuning: touch each button and note its delta; TOUCH_PRESS (in mTouchCVD_8Buttons.h) should sit well below
+    the smallest touched delta and well above the largest untouched one, with TOUCH_RELEASE at about half of it.
+
+ SERIAL_MTOUCH_GUI 1 - the mTouch Framework's one-way format, for Microchip's mTouch One-Way GUI (mComm.c,
+    MCOMM_UART_ONE_WAY, decimal): every 50 ms one line of zero-padded fields, each followed by a comma, then CR LF
+        state mask (5 digits, bit n = sensor n pressed), toggle mask (5, 0), slider (3, 0), then each sensor's
+        reading (5): its last 8-reading sum
+        00008,00000,000,08190,08201,08187,08597,08176,08199,08204,08188,
+    View it with mTouch_Monitor.html (start mTouch_Monitor.cmd): pads, states and a live graph in Chrome or Edge.
+
+@author    Evan R. Venn
+@license   GPL
+@version   1.02
+
+1.00  New: the 8-button demo with press / release lines and the deltas every 0.25 s on the serial port
+1.01  SERIAL_MTOUCH_GUI 1: the mTouch Framework's one-way format for the mTouch One-Way GUI; 115200 baud for both
+      outputs
+1.02  Text output names the pads by their labels on the sensor board (8, 9, A-F), with a heading line
+*/
+
+
+// ---- Configuration
+#CHIP 16F1937, 32
+#CONFIG MCLRE_OFF                       // as Microchip's firmware for the board
+
+#OPTION Explicit
+
+// ---- Serial: EUSART TX RC6
+// SERIAL_MTOUCH_GUI 1: the mTouch One-Way GUI format; 0: text for a terminal
+#DEFINE SERIAL_MTOUCH_GUI 0
+#DEFINE USART_BAUD_RATE 115200
+#DEFINE USART_TX_BLOCKING
+#DEFINE USART_DELAY OFF
+
+#include "mTouchCVD_8Buttons.h"
+
+// Text: the deltas every REPORT_SCANS scans of TOUCH_PERIOD_MS (25 x 10 ms = 0.25 s). GUI: a line every GUI_SCANS
+// scans (5 x 10 ms = 50 ms; a line is 64 characters, about 5.6 ms at 115200)
+#DEFINE REPORT_SCANS 25
+#DEFINE GUI_SCANS    5
+
+// ---- LEDs, one per sensor, on when low
+#DEFINE LED0 PORTC.2
+#DEFINE LED1 PORTC.1
+#DEFINE LED2 PORTC.0
+#DEFINE LED3 PORTA.7
+#DEFINE LED4 PORTA.6
+#DEFINE LED5 PORTA.4
+#DEFINE LED6 PORTD.7
+#DEFINE LED7 PORTD.6
+Dir LED0 Out
+Dir LED1 Out
+Dir LED2 Out
+Dir LED3 Out
+Dir LED4 Out
+Dir LED5 Out
+Dir LED6 Out
+Dir LED7 Out
+
+// Each sensor's state at the last scan, to see a press or a release; scans since the last report
+Dim ReportLastState(TOUCH_SENSORS) As Byte
+Dim ReportScans As Byte
+Dim ReportSensor As Byte
+
+// ---- Main
+// LEDs off, the sensor pins driven low
+LedsOff
+TouchInit
+
+// Start-up: all LEDs on for one second while the pads settle. Keep off the pads until 0.3 s after they go out:
+// the scans then set the baselines
+LedsOn
+#if SERIAL_MTOUCH_GUI = 0
+    HSerPrintCRLF
+    HSerPrint "mTouch CVD 8 buttons, press "
+    HSerPrint TOUCH_PRESS
+    HSerPrint ", release "
+    HSerPrint TOUCH_RELEASE
+    HSerPrintCRLF
+    HSerPrint "pad  "
+    For ReportSensor = 0 To TOUCH_SENSORS - 1
+        HSerPrint "    "
+        PadLabelSend ReportSensor
+    Next
+    HSerPrintCRLF
+#endif
+Wait 1 s
+LedsOff
+TouchStart
+
+For ReportSensor = 0 To TOUCH_SENSORS - 1
+    ReportLastState(ReportSensor) = 0
+Next
+ReportScans = 0
+
+Do Forever
+    TouchService
+    If TouchNewScan = 1 Then
+        TouchShowLeds
+        ReportScans++
+        #if SERIAL_MTOUCH_GUI = 0
+            ReportChanges
+            If ReportScans >= REPORT_SCANS Then
+                ReportScans = 0
+                ReportDeltas
+            End If
+        #endif
+        #if SERIAL_MTOUCH_GUI = 1
+            If ReportScans >= GUI_SCANS Then
+                ReportScans = 0
+                ReportGui
+            End If
+        #endif
+    End If
+Loop
+
+Sub LedsOn
+    // Every LED on
+    LED0 = 0
+    LED1 = 0
+    LED2 = 0
+    LED3 = 0
+    LED4 = 0
+    LED5 = 0
+    LED6 = 0
+    LED7 = 0
+End Sub
+
+Sub LedsOff
+    // Every LED off
+    LED0 = 1
+    LED1 = 1
+    LED2 = 1
+    LED3 = 1
+    LED4 = 1
+    LED5 = 1
+    LED6 = 1
+    LED7 = 1
+End Sub
+
+Sub TouchShowLeds
+    // Each LED on (low) while its sensor is pressed
+    LED0 = 1
+    If TouchState(0) = 2 Then LED0 = 0
+    LED1 = 1
+    If TouchState(1) = 2 Then LED1 = 0
+    LED2 = 1
+    If TouchState(2) = 2 Then LED2 = 0
+    LED3 = 1
+    If TouchState(3) = 2 Then LED3 = 0
+    LED4 = 1
+    If TouchState(4) = 2 Then LED4 = 0
+    LED5 = 1
+    If TouchState(5) = 2 Then LED5 = 0
+    LED6 = 1
+    If TouchState(6) = 2 Then LED6 = 0
+    LED7 = 1
+    If TouchState(7) = 2 Then LED7 = 0
+End Sub
+
+Sub ReportChanges
+    // A line for each button pressed or released since the last scan
+    Dim ChangeSensor, ChangeState As Byte
+    For ChangeSensor = 0 To TOUCH_SENSORS - 1
+        ChangeState = TouchState(ChangeSensor)
+        If ChangeState <> ReportLastState(ChangeSensor) Then
+            If ChangeState = 2 Then
+                HSerPrint "Pad "
+                PadLabelSend ChangeSensor
+                HSerPrint " pressed"
+                HSerPrintCRLF
+            End If
+            If ChangeState = 1 Then
+                If ReportLastState(ChangeSensor) = 2 Then
+                    HSerPrint "Pad "
+                    PadLabelSend ChangeSensor
+                    HSerPrint " released"
+                    HSerPrintCRLF
+                End If
+            End If
+            ReportLastState(ChangeSensor) = ChangeState
+        End If
+    Next
+End Sub
+
+Sub ReportDeltas
+    // Each button's delta above its baseline, right-aligned in 4 characters, then its state: L learning,
+    // . released, P pressed
+    Dim DeltaSensor As Byte
+    Dim DeltaValue As Word
+    HSerPrint "d    "
+    For DeltaSensor = 0 To TOUCH_SENSORS - 1
+        DeltaValue = TouchDeltas(DeltaSensor)
+        HSerSend 32
+        If DeltaValue < 1000 Then HSerSend 32
+        If DeltaValue < 100 Then HSerSend 32
+        If DeltaValue < 10 Then HSerSend 32
+        HSerPrint DeltaValue
+    Next
+    HSerSend 32
+    HSerSend 32
+    For DeltaSensor = 0 To TOUCH_SENSORS - 1
+        Select Case TouchState(DeltaSensor)
+            Case 0
+                HSerSend 76             // L
+            Case 2
+                HSerSend 80             // P
+            Case Else
+                HSerSend 46             // .
+        End Select
+    Next
+    HSerPrintCRLF
+End Sub
+
+Sub ReportGui
+    // One line in the mTouch Framework's one-way format (mComm.c): the state mask, the toggle mask (0), the slider
+    // (0), then each sensor's reading (its last 8-reading sum); every field zero-padded and followed by a comma;
+    // CR LF
+    Dim GuiSensor As Byte
+    Dim GuiMask, GuiBit As Word
+    GuiMask = 0
+    GuiBit = 1
+    For GuiSensor = 0 To TOUCH_SENSORS - 1
+        If TouchState(GuiSensor) = 2 Then GuiMask = GuiMask Or GuiBit
+        GuiBit = GuiBit * 2
+    Next
+    GuiPrint5 GuiMask
+    GuiPrint5 0
+    HSerPrint "000,"
+    For GuiSensor = 0 To TOUCH_SENSORS - 1
+        GuiPrint5 TouchSums(GuiSensor)
+    Next
+    HSerSend 13
+    HSerSend 10
+End Sub
+
+Sub GuiPrint5(In GuiValue As Word)
+    // GuiValue as five decimal digits with leading zeros, then a comma (mComm_UART_Int2ASCII)
+    If GuiValue < 10000 Then HSerSend 48
+    If GuiValue < 1000 Then HSerSend 48
+    If GuiValue < 100 Then HSerSend 48
+    If GuiValue < 10 Then HSerSend 48
+    HSerPrint GuiValue
+    HSerSend 44
+End Sub
+
+// The pad labels on the 8-button sensor board, as character codes: sensor 0-7 = 8, 9, A, B, C, D, E, F
+Table PadLabels
+    56
+    57
+    65
+    66
+    67
+    68
+    69
+    70
+End Table
+
+Sub PadLabelSend(In PadLabelSensor)
+    // Sends sensor PadLabelSensor's label (one character)
+    Dim PadLabelIndex, PadLabelChar As Byte
+    PadLabelIndex = PadLabelSensor + 1
+    ReadTable PadLabels, PadLabelIndex, PadLabelChar
+    HSerSend PadLabelChar
+End Sub

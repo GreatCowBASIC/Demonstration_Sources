@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Compilation Report</title>
+<style>
+    body {
+        font-family: monospace;
+        line-height: 1.4;
+        margin: 20px;
+        max-width: 1400px;
+    }
+    h1, h2 {
+        font-family: monospace;
+    }
+    table {
+        font-family: monospace;
+        border-collapse: collapse;
+        width: 100%;
+        margin: 1em 0;
+    }
+    th, td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+    }
+    thead tr {
+        background-color: #e0e0e0;
+    }
+    .summary p {
+        margin: 0.4em 0;
+    }
+    .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 1em 0;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    .table-wrapper table {
+        min-width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    .table-wrapper th, .table-wrapper td {
+        white-space: nowrap;
+    }
+    .table-wrapper::-webkit-scrollbar {
+        height: 8px;
+    }
+    .table-wrapper::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    .table-wrapper::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+    .table-wrapper::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+    details {
+        margin: 1em 0;
+    }
+    details > summary {
+        cursor: pointer;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 0.4em;
+        user-select: none;
+    }
+    details > summary::-webkit-details-marker { display: none; }
+    details > summary::marker { display: none; }
+    .toggle-icon {
+        width: 1em; height: 1em;
+        transition: transform 0.2s;
+        flex-shrink: 0;
+    }
+    details[open] .toggle-icon {
+        transform: rotate(90deg);
+    }
+    details > summary h2 {
+        display: inline;
+        margin: 0;
+    }
+    th { cursor: pointer; }
+    th.sort-asc::after  { content: ' \25B2'; font-size: 0.75em; }
+    th.sort-desc::after { content: ' \25BC'; font-size: 0.75em; }
+</style>
+</head>
+<body>
+<h1>Compilation Report</h1>
+<p>Compiler Version (YYYY-MM-DD): 2026.11.05 (Windows 64 bit) : Build 1667)</p>
+<h2>Compilation time</h2>
+<p> Compile time: 2.3125 seconds</p>
+<p> Assembly time: 0.1875 seconds</p>
+<p> Download time: 0 seconds</p>
+<p> Total time: 2.5 seconds</p>
+<h2>Chip resource usage:</h2>
+<p>Chip Model: 16F1937</p>
+<p>Program Memory: 2339/8192 words (28.55%)</p>
+<p>RAM: 220/512 bytes (42.97%)</p>
+<p> OSC: INTOSC, 32Mhz (Internal oscillator)</p>
+<script>
+function sortTableById(tableId, numericCols, n) {
+  var table = document.getElementById(tableId);
+  if (!table) return;
+  var tbody = table.tBodies[0];
+  var rows = Array.from(tbody.rows);
+  var th = table.tHead.rows[0].cells[n];
+  var asc = th.classList.contains('sort-desc');
+  var ths = table.tHead.rows[0].cells;
+  for (var k = 0; k < ths.length; k++) {
+    ths[k].classList.remove('sort-asc','sort-desc');
+  }
+  th.classList.add(asc ? 'sort-asc' : 'sort-desc');
+  var isNum = numericCols.indexOf(n) >= 0;
+  rows.sort(function(a, b) {
+    var x = a.cells[n].textContent.trim();
+    var y = b.cells[n].textContent.trim();
+    if (isNum) { x = parseFloat(x) || 0; y = parseFloat(y) || 0; }
+    else { x = x.toLowerCase(); y = y.toLowerCase(); }
+    if (x < y) return asc ? -1 : 1;
+    if (x > y) return asc ? 1 : -1;
+    return 0;
+  });
+  rows.forEach(function(r) { tbody.appendChild(r); });
+}
+</script>
+<details><summary><svg class="toggle-icon" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><polygon points="4,2 12,8 4,14"/></svg><h2>Variable Memory Map</h2></summary>
+<div class="table-wrapper">
+<table id="varTable">
+<thead><tr>
+<th onclick="sortTableById('varTable',[1,3],0)">Variable Name</th>
+<th onclick="sortTableById('varTable',[1,3],1)">Address (Dec)</th>
+<th onclick="sortTableById('varTable',[1,3],2)">Address (Hex)</th>
+<th onclick="sortTableById('varTable',[1,3],3)">Size Allocated (bytes)</th>
+<th onclick="sortTableById('varTable',[1,3],4)">Bank / Location</th>
+</tr></thead><tbody>
+<tr>
+<td>CHANGESENSOR</td>
+<td>32</td>
+<td>0x0020</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>CHANGESTATE</td>
+<td>33</td>
+<td>0x0021</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>COMPORT</td>
+<td>34</td>
+<td>0x0022</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>CVDDRIVEINVERSE</td>
+<td>35</td>
+<td>0x0023</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>CVDDRIVELEVEL</td>
+<td>36</td>
+<td>0x0024</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>CVDDRIVEMASK</td>
+<td>37</td>
+<td>0x0025</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>CVDDRIVEPORT</td>
+<td>38</td>
+<td>0x0026</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>CVDFLOATMASK</td>
+<td>39</td>
+<td>0x0027</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>CVDFLOATPORT</td>
+<td>40</td>
+<td>0x0028</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>CVDLOOKUPINDEX</td>
+<td>41</td>
+<td>0x0029</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>CVDLOOKUPMASK</td>
+<td>42</td>
+<td>0x002A</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>CVDLOOKUPPORT</td>
+<td>43</td>
+<td>0x002B</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>CVDLOOKUPSENSOR</td>
+<td>44</td>
+<td>0x002C</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>CVDPHASEA</td>
+<td>45</td>
+<td>0x002D</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>CVDPHASEB</td>
+<td>47</td>
+<td>0x002F</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>CVDREAD</td>
+<td>49</td>
+<td>0x0031</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>CVDREF</td>
+<td>51</td>
+<td>0x0033</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>CVDREFCHANNEL</td>
+<td>52</td>
+<td>0x0034</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>CVDREFMASK</td>
+<td>53</td>
+<td>0x0035</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>CVDREFPORT</td>
+<td>54</td>
+<td>0x0036</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>CVDSENSOR</td>
+<td>55</td>
+<td>0x0037</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>CVDSENSORCHANNEL</td>
+<td>56</td>
+<td>0x0038</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>CVDSENSORMASK</td>
+<td>57</td>
+<td>0x0039</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>CVDSENSORPORT</td>
+<td>58</td>
+<td>0x003A</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>DELAYTEMP</td>
+<td>112</td>
+<td>0x0070</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>DELAYTEMP2</td>
+<td>113</td>
+<td>0x0071</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>DELTASENSOR</td>
+<td>59</td>
+<td>0x003B</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>DELTAVALUE</td>
+<td>60</td>
+<td>0x003C</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>HSERPRINTCRLFCOUNT</td>
+<td>62</td>
+<td>0x003E</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>MILLIS</td>
+<td>63</td>
+<td>0x003F</td>
+<td>4</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>MSCTR_</td>
+<td>67</td>
+<td>0x0043</td>
+<td>4</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>OUTVALUETEMP</td>
+<td>71</td>
+<td>0x0047</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>PADLABELCHAR</td>
+<td>72</td>
+<td>0x0048</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>PADLABELINDEX</td>
+<td>73</td>
+<td>0x0049</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>PADLABELSENSOR</td>
+<td>74</td>
+<td>0x004A</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>PRINTLEN</td>
+<td>75</td>
+<td>0x004B</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>REPORTLASTSTATE</td>
+<td>8679</td>
+<td>0x21E7</td>
+<td>9</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>REPORTSCANS</td>
+<td>76</td>
+<td>0x004C</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>REPORTSENSOR</td>
+<td>77</td>
+<td>0x004D</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SAVEPCLATH</td>
+<td>78</td>
+<td>0x004E</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SERDATA</td>
+<td>79</td>
+<td>0x004F</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SERPRINTVAL</td>
+<td>80</td>
+<td>0x0050</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>STRINGPOINTER</td>
+<td>82</td>
+<td>0x0052</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSARRAYTEMP1</td>
+<td>83</td>
+<td>0x0053</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSARRAYTEMP2</td>
+<td>85</td>
+<td>0x0055</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSBSR</td>
+<td>86</td>
+<td>0x0056</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSBYTETEMPA</td>
+<td>117</td>
+<td>0x0075</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSBYTETEMPB</td>
+<td>121</td>
+<td>0x0079</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSBYTETEMPX</td>
+<td>112</td>
+<td>0x0070</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSCALCTEMPX</td>
+<td>112</td>
+<td>0x0070</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSDIVLOOP</td>
+<td>116</td>
+<td>0x0074</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSDIVMULTA</td>
+<td>119</td>
+<td>0x0077</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSDIVMULTB</td>
+<td>123</td>
+<td>0x007B</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSDIVMULTX</td>
+<td>114</td>
+<td>0x0072</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSINTSTATESAVE0</td>
+<td>87</td>
+<td>0x0057</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSLONGTEMPA</td>
+<td>117</td>
+<td>0x0075</td>
+<td>4</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSLONGTEMPB</td>
+<td>121</td>
+<td>0x0079</td>
+<td>4</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSPRINTDATAHANDLER</td>
+<td>88</td>
+<td>0x0058</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSPRINTTEMP</td>
+<td>90</td>
+<td>0x005A</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSREPEATTEMP1</td>
+<td>91</td>
+<td>0x005B</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSSTATUS</td>
+<td>127</td>
+<td>0x007F</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSSTRINGA</td>
+<td>119</td>
+<td>0x0077</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSTEMP1</td>
+<td>92</td>
+<td>0x005C</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSTEMP2</td>
+<td>94</td>
+<td>0x005E</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>SYSW</td>
+<td>126</td>
+<td>0x007E</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSWAITTEMPMS</td>
+<td>114</td>
+<td>0x0072</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSWAITTEMPS</td>
+<td>116</td>
+<td>0x0074</td>
+<td>1</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSWAITTEMPUS</td>
+<td>117</td>
+<td>0x0075</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSWORDTEMPA</td>
+<td>117</td>
+<td>0x0075</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSWORDTEMPB</td>
+<td>121</td>
+<td>0x0079</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>SYSWORDTEMPX</td>
+<td>112</td>
+<td>0x0070</td>
+<td>2</td>
+<td>Shared/Access RAM (SA)</td>
+</tr>
+<tr>
+<td>TMRPRES</td>
+<td>96</td>
+<td>0x0060</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TMRSOURCE</td>
+<td>97</td>
+<td>0x0061</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHBASE</td>
+<td>98</td>
+<td>0x0062</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHBASELINE</td>
+<td>8661</td>
+<td>0x21D5</td>
+<td>18</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHBASELINESCANS</td>
+<td>8652</td>
+<td>0x21CC</td>
+<td>9</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHCOUNT</td>
+<td>100</td>
+<td>0x0064</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHCOUNTED</td>
+<td>101</td>
+<td>0x0065</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHDELTA</td>
+<td>103</td>
+<td>0x0067</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHDELTAS</td>
+<td>8634</td>
+<td>0x21BA</td>
+<td>18</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHDOWN</td>
+<td>105</td>
+<td>0x0069</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHELAPSEDMS</td>
+<td>107</td>
+<td>0x006B</td>
+<td>4</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHFILTERED</td>
+<td>8616</td>
+<td>0x21A8</td>
+<td>18</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHINITSENSOR</td>
+<td>111</td>
+<td>0x006F</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHJITTERCOUNT</td>
+<td>160</td>
+<td>0x00A0</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHJITTERSEED</td>
+<td>161</td>
+<td>0x00A1</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHLASTMS</td>
+<td>162</td>
+<td>0x00A2</td>
+<td>4</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHNEWSCAN</td>
+<td>166</td>
+<td>0x00A6</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHNOWMS</td>
+<td>167</td>
+<td>0x00A7</td>
+<td>4</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHNOWSTATE</td>
+<td>171</td>
+<td>0x00AB</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHRAW</td>
+<td>172</td>
+<td>0x00AC</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHSCANINDEX</td>
+<td>174</td>
+<td>0x00AE</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHSCANS</td>
+<td>8598</td>
+<td>0x2196</td>
+<td>18</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHSERVICESENSOR</td>
+<td>175</td>
+<td>0x00AF</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHSTARTSENSOR</td>
+<td>176</td>
+<td>0x00B0</td>
+<td>1</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHSTATE</td>
+<td>8589</td>
+<td>0x218D</td>
+<td>9</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHSUM</td>
+<td>177</td>
+<td>0x00B1</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHSUMS</td>
+<td>8571</td>
+<td>0x217B</td>
+<td>18</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHUP</td>
+<td>179</td>
+<td>0x00B3</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+<tr>
+<td>TOUCHVALUE</td>
+<td>181</td>
+<td>0x00B5</td>
+<td>2</td>
+<td>General RAM</td>
+</tr>
+</tbody></table>
+</div>
+</details>
+<details><summary><svg class="toggle-icon" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><polygon points="4,2 12,8 4,14"/></svg><h2>Subroutines</h2></summary>
+<div class="table-wrapper">
+<table id="subTable">
+<thead>
+<tr><th onclick="sortTableById('subTable',[1,2],0)">Name</th><th onclick="sortTableById('subTable',[1,2],1)">Code Size (lines)</th><th onclick="sortTableById('subTable',[1,2],2)">Compiled Size (words)</th><th onclick="sortTableById('subTable',[1,2],3)">Page</th><th onclick="sortTableById('subTable',[1,2],4)">Outgoing calls</th></tr>
+</thead><tbody>
+<tr><td>Main</td><td>70</td><td>150</td><td>1</td><td>MSCTR_INT_HDLR ×1, SYSCOMPLESSTHAN ×2, Delay_S ×1, REPORTDELTAS ×1, REPORTCHANGES ×1, TOUCHSHOWLEDS ×1, TOUCHSERVICE ×1, TOUCHSTART ×1, PADLABELSEND ×1, HSERPRINT ×2, HSERPRINT ×4, HSERPRINTCRLF ×3, LEDSON ×1, TOUCHINIT ×1, LEDSOFF ×2, INITSYS ×29</td></tr>
+<tr><td>LEDSON</td><td>8</td><td>11</td><td>2</td><td></td></tr>
+<tr><td>LEDSOFF</td><td>8</td><td>11</td><td>2</td><td></td></tr>
+<tr><td>TOUCHSHOWLEDS</td><td>32</td><td>74</td><td>1</td><td></td></tr>
+<tr><td>REPORTCHANGES</td><td>21</td><td>112</td><td>1</td><td>SYSCOMPLESSTHAN ×1, HSERPRINTCRLF ×2, PADLABELSEND ×2, HSERPRINT ×4</td></tr>
+<tr><td>REPORTDELTAS</td><td>30</td><td>163</td><td>1</td><td>SYSCOMPLESSTHAN ×2, SYSCOMPLESSTHAN16 ×3, HSERPRINTCRLF ×1, HSERPRINT ×1, HSERSEND ×9, HSERPRINT ×1</td></tr>
+<tr><td>PADLABELSEND</td><td>4</td><td>7</td><td>2</td><td>HSERSEND ×1</td></tr>
+<tr><td>TOUCHINIT</td><td>7</td><td>31</td><td>1</td><td>SYSCOMPLESSTHAN ×1, CVDDRIVE ×1, CVDPINLOOKUP ×1</td></tr>
+<tr><td>TOUCHSTART</td><td>13</td><td>164</td><td>1</td><td>SYSCOMPLESSTHAN ×1, MILLIS ×1, CVDREAD ×1</td></tr>
+<tr><td>TOUCHSERVICE</td><td>11</td><td>92</td><td>1</td><td>SYSCOMPLESSTHAN ×1, SYSCOMPLESSTHAN32 ×1, TOUCHSCANSENSOR ×1, MILLIS ×1</td></tr>
+<tr><td>CVDPINLOOKUP</td><td>7</td><td>13</td><td>2</td><td></td></tr>
+<tr><td>CVDDRIVE</td><td>17</td><td>52</td><td>1</td><td></td></tr>
+<tr><td>CVDFLOAT</td><td>5</td><td>18</td><td>2</td><td></td></tr>
+<tr><td>CVDREAD</td><td>40</td><td>165</td><td>1</td><td>SYSMULTSUB ×2, CVDFLOAT ×2, CVDDRIVE ×4, CVDPINLOOKUP ×2</td></tr>
+<tr><td>TOUCHJITTER</td><td>11</td><td>21</td><td>2</td><td></td></tr>
+<tr><td>TOUCHSCANSENSOR</td><td>65</td><td>547</td><td>1</td><td>SYSDIVSUB16 ×2, SYSCOMPLESSTHAN16 ×8, CVDREAD ×1, TOUCHJITTER ×1</td></tr>
+<tr><td>MSCTR_INT_HDLR</td><td>8</td><td>10</td><td>2</td><td></td></tr>
+<tr><td>INIT_MSCTR_INT</td><td>181</td><td>16</td><td>1</td><td>INITTIMER0 ×1, MILLIS ×1</td></tr>
+<tr><td>MILLIS</td><td>4</td><td>17</td><td>2</td><td></td></tr>
+<tr><td>INITTIMER0</td><td>93</td><td>22</td><td>1</td><td></td></tr>
+<tr><td>INITSYS</td><td>1223</td><td>23</td><td>1</td><td></td></tr>
+<tr><td>SYSMULTSUB</td><td>39</td><td>12</td><td>2</td><td></td></tr>
+<tr><td>SYSDIVSUB</td><td>48</td><td>20</td><td>2</td><td></td></tr>
+<tr><td>SYSDIVSUB16</td><td>38</td><td>54</td><td>1</td><td>SYSCOMPEQUAL16 ×1</td></tr>
+<tr><td>SYSCOMPEQUAL16</td><td>34</td><td>11</td><td>2</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHAN</td><td>23</td><td>7</td><td>2</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHAN16</td><td>38</td><td>15</td><td>2</td><td></td></tr>
+<tr><td>SYSCOMPLESSTHAN32</td><td>63</td><td>25</td><td>2</td><td></td></tr>
+<tr><td>INITUSART</td><td>399</td><td>15</td><td>1</td><td></td></tr>
+<tr><td>HSERSEND</td><td>77</td><td>11</td><td>2</td><td></td></tr>
+<tr><td>HSERSEND</td><td>366</td><td>11</td><td>2</td><td></td></tr>
+<tr><td>HSERPRINT</td><td>42</td><td>31</td><td>1</td><td>HSERSEND ×1</td></tr>
+<tr><td>HSERPRINT</td><td>18</td><td>65</td><td>1</td><td>SYSDIVSUB ×2, SYSCOMPLESSTHAN ×2, HSERSEND ×3</td></tr>
+<tr><td>HSERPRINT</td><td>36</td><td>147</td><td>1</td><td>SYSDIVSUB16 ×4, SYSCOMPLESSTHAN16 ×4, HSERSEND ×5</td></tr>
+<tr><td>HSERPRINTCRLF</td><td>4</td><td>13</td><td>2</td><td>HSERSEND ×2</td></tr>
+<tr><td>Delay_MS</td><td>0</td><td>14</td><td>2</td><td></td></tr>
+<tr><td>Delay_S</td><td>0</td><td>8</td><td>2</td><td>Delay_MS ×1</td></tr>
+<tr><td>SysStringTables</td><td>0</td><td>88</td><td>1</td><td></td></tr>
+<tr><td>PADLABELS</td><td>0</td><td>22</td><td>2</td><td></td></tr>
+<tr><td>CVDPINMASKS</td><td>0</td><td>22</td><td>2</td><td></td></tr>
+</tbody></table>
+</div>
+</details>
+</body>
+</html>

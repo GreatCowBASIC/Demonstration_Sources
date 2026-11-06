@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mTouch Monitor</title>
+<!--
+  mTouch Monitor - a replacement for Microchip's mTouch One-Way GUI.
+
+  Reads the mTouch one-way serial format from a COM port (Web Serial: Chrome or Edge) and shows each pad's state,
+  value and delta, with a live graph. Open this file in Chrome or Edge, press Connect and choose the port.
+
+  The line format (mTouch Framework mComm.c, and the PIC18/PIC24 mTouch Library MTouchDebugLog...):
+      state mask , toggle mask , slider , value pad 0 , value pad 1 , ... CR LF
+  Fields may be zero-padded, separated by ',' or ';'. Bit n of the state mask is set while pad n is pressed.
+  Sent by GCBASIC_mTouch_Framework_CVD_8Buttons_Serial_16F1937.gcb with SERIAL_MTOUCH_GUI 1 (115200 baud).
+
+  Pads are labelled as on the 8-button sensor board: sensor 0-7 = pad 8, 9, A, B, C, D, E, F (PAD_LABELS).
+
+  Version 1.02 - the GCBASIC logo shows at start until the first click or key
+-->
+<style>
+:root {
+  color-scheme: light;
+  --surface-0: #f3f2ef;
+  --surface-1: #fcfcfb;
+  --surface-2: #ecebe7;
+  --border: #d9d8d2;
+  --grid: #e6e5e0;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #7a7973;
+  --accent: #2a78d6;
+  --accent-ink: #ffffff;
+  --pressed-bg: #e9f1fb;
+  --critical: #c83a3a;
+  --good: #1f7a3a;
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-5: #e87ba4;
+  --series-6: #008300;
+  --series-7: #6250d6;
+  --series-8: #e34948;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --surface-0: #121211;
+    --surface-1: #1a1a19;
+    --surface-2: #252523;
+    --border: #353532;
+    --grid: #2b2b29;
+    --text-primary: #f0efec;
+    --text-secondary: #c3c2b7;
+    --text-muted: #8f8e86;
+    --accent: #3987e5;
+    --accent-ink: #ffffff;
+    --pressed-bg: #1c2a3c;
+    --critical: #e66767;
+    --good: #4fb56d;
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-4: #c98500;
+    --series-5: #d55181;
+    --series-6: #008300;
+    --series-7: #9085e9;
+    --series-8: #e66767;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-0: #121211;
+  --surface-1: #1a1a19;
+  --surface-2: #252523;
+  --border: #353532;
+  --grid: #2b2b29;
+  --text-primary: #f0efec;
+  --text-secondary: #c3c2b7;
+  --text-muted: #8f8e86;
+  --accent: #3987e5;
+  --accent-ink: #ffffff;
+  --pressed-bg: #1c2a3c;
+  --critical: #e66767;
+  --good: #4fb56d;
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --series-6: #008300;
+  --series-7: #9085e9;
+  --series-8: #e66767;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--surface-0);
+  color: var(--text-primary);
+  font: 14px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+main { max-width: 1200px; margin: 0 auto; padding: 16px; }
+header { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-bottom: 12px; }
+h1 { font-size: 18px; margin: 0; font-weight: 600; }
+.status { display: flex; align-items: center; gap: 6px; color: var(--text-secondary); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); }
+.dot.on { background: var(--good); }
+.dot.err { background: var(--critical); }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-left: auto; }
+button, select {
+  font: inherit; color: var(--text-primary); background: var(--surface-1);
+  border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; cursor: pointer;
+}
+button:hover, select:hover { border-color: var(--text-muted); }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+button.active { background: var(--critical); border-color: var(--critical); color: #fff; }
+button:disabled { opacity: .5; cursor: default; }
+label.inline { color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+.pads { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; margin-bottom: 12px; }
+.pad {
+  background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+  cursor: pointer; user-select: none; text-align: left; font: inherit; color: inherit;
+}
+.pad.pressed { background: var(--pressed-bg); border-color: var(--accent); }
+.pad.hidden { opacity: .45; }
+.pad .top { display: flex; align-items: center; gap: 6px; }
+.pad .swatch { width: 12px; height: 3px; border-radius: 2px; }
+.pad .name { font-weight: 600; }
+.pad .state { margin-left: auto; font-size: 12px; color: var(--text-muted); }
+.pad.pressed .state { color: var(--accent); font-weight: 600; }
+.pad .delta { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.pad .meta { font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+.chart-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-bottom: 8px; }
+.chart-head h2 { font-size: 14px; margin: 0; font-weight: 600; }
+.chart-head .hint { color: var(--text-muted); font-size: 12px; }
+.chart-head .controls { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+.chart-wrap { position: relative; height: 340px; }
+canvas { width: 100%; height: 100%; display: block; }
+.tip {
+  position: absolute; pointer-events: none; background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 6px 8px; font-size: 12px; font-variant-numeric: tabular-nums; display: none;
+  white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.15);
+}
+.tip .row { display: flex; align-items: center; gap: 6px; }
+.tip .sw { width: 10px; height: 3px; border-radius: 2px; }
+footer { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 12px; color: var(--text-muted); font-size: 12px; }
+footer code { color: var(--text-secondary); word-break: break-all; }
+.notice { background: var(--surface-1); border: 1px solid var(--critical); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; display: none; }
+/* Start-up splash: the GCBASIC logo until the first click or key */
+.splash {
+  position: fixed; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 12px; background: var(--surface-0); cursor: pointer; text-align: center;
+  padding: 16px; transition: opacity .3s;
+}
+.splash.gone { opacity: 0; pointer-events: none; }
+.splash img { width: 150px; height: 150px; }
+.splash .brand { font-size: 28px; font-weight: 700; letter-spacing: .02em; }
+.splash .app { font-size: 16px; color: var(--text-secondary); }
+.splash .go { margin-top: 12px; font-size: 13px; color: var(--text-muted); }
+@media (max-width: 600px) {
+  .toolbar { margin-left: 0; }
+  .chart-wrap { height: 260px; }
+}
+</style>
+</head>
+<body>
+<div class="splash" id="splash" role="dialog" aria-label="GCBASIC mTouch Monitor" tabindex="0">
+  <img alt="GCBASIC logo" src="data:image/png;base64,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">
+  <div class="brand">GCBASIC</div>
+  <div class="app">mTouch Monitor</div>
+  <div class="go">Click anywhere or press a key to start</div>
+</div>
+<main>
+  <header>
+    <h1>mTouch Monitor</h1>
+    <div class="status"><span class="dot" id="dot"></span><span id="status">Not connected</span></div>
+    <div class="toolbar">
+      <label class="inline">Baud
+        <select id="baud">
+          <option>9600</option><option>19200</option><option>38400</option><option>57600</option>
+          <option selected>115200</option>
+        </select>
+      </label>
+      <button class="primary" id="connect">Connect</button>
+      <button id="zero" title="Take each pad's current value as its baseline">Zero</button>
+      <button id="record" title="Record lines for a CSV file">Record</button>
+      <button id="save" disabled>Save CSV</button>
+      <button id="theme" title="Light / dark">Theme</button>
+    </div>
+  </header>
+
+  <div class="notice" id="notice"></div>
+
+  <section class="pads" id="pads" aria-label="Pads"></section>
+
+  <section class="card">
+    <div class="chart-head">
+      <h2 id="chartTitle">Delta from baseline</h2>
+      <span class="hint">Click a pad to show or hide its line</span>
+      <div class="controls">
+        <select id="mode" aria-label="Graph values">
+          <option value="delta" selected>Delta</option>
+          <option value="raw">Raw value</option>
+        </select>
+        <select id="span" aria-label="Time span">
+          <option value="5">5 s</option>
+          <option value="10" selected>10 s</option>
+          <option value="30">30 s</option>
+          <option value="60">60 s</option>
+        </select>
+        <button id="pause">Pause</button>
+      </div>
+    </div>
+    <div class="chart-wrap" id="wrap">
+      <canvas id="chart" role="img" aria-label="Live graph of each pad's value over time"></canvas>
+      <div class="tip" id="tip"></div>
+    </div>
+  </section>
+
+  <footer>
+    <span id="rate">0 lines/s</span>
+    <span id="count">0 lines</span>
+    <span id="bad">0 ignored</span>
+    <span>Last line: <code id="last">-</code></span>
+  </footer>
+</main>
+
+<script>
+(() => {
+  "use strict";
+  const MAX_PADS = 12;
+  // The pad labels on the 8-button sensor board (02-02094): sensor 0 is pad 8 ... sensor 7 is pad F
+  const PAD_LABELS = ["8", "9", "A", "B", "C", "D", "E", "F"];
+  const padLabel = i => i < PAD_LABELS.length ? PAD_LABELS[i] : String(i);
+  const BASELINE_LINES = 20;
+  const HISTORY_MS = 65000;
+
+  const $ = id => document.getElementById(id);
+  const ui = {
+    dot: $("dot"), status: $("status"), baud: $("baud"), connect: $("connect"), zero: $("zero"),
+    record: $("record"), save: $("save"), theme: $("theme"), notice: $("notice"), pads: $("pads"),
+    mode: $("mode"), span: $("span"), pause: $("pause"), chart: $("chart"), wrap: $("wrap"), tip: $("tip"),
+    chartTitle: $("chartTitle"), rate: $("rate"), count: $("count"), bad: $("bad"), last: $("last")
+  };
+
+  // ---- State
+  let padCount = 8;
+  let samples = [];                  // { t, mask, values[] }
+  let baseline = new Array(MAX_PADS).fill(null);
+  let baseAcc = null;                // collecting the baseline: { n, sums[] }
+  let minSeen = new Array(MAX_PADS).fill(Infinity);
+  let maxSeen = new Array(MAX_PADS).fill(-Infinity);
+  let visible = new Array(MAX_PADS).fill(true);
+  let lineCount = 0, badCount = 0, rateCount = 0;
+  let recording = false, recorded = [];
+  let paused = false, pausedAt = 0;
+  let port = null, reader = null, keepReading = false;
+  let hoverX = null;
+
+  function seriesColor(i) {
+    return getComputedStyle(document.documentElement).getPropertyValue("--series-" + ((i % 8) + 1)).trim();
+  }
+  function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  // ---- Pads
+  const padEls = [];
+  function buildPads() {
+    ui.pads.innerHTML = "";
+    padEls.length = 0;
+    for (let i = 0; i < padCount; i++) {
+      const b = document.createElement("button");
+      b.className = "pad" + (visible[i] ? "" : " hidden");
+      b.setAttribute("aria-pressed", "false");
+      b.innerHTML =
+        '<div class="top"><span class="swatch"></span><span class="name">Pad ' + padLabel(i) + '</span>' +
+        '<span class="state">-</span></div>' +
+        '<div class="delta">-</div>' +
+        '<div class="meta">value <span class="v">-</span></div>' +
+        '<div class="meta">min <span class="mn">-</span> max <span class="mx">-</span></div>';
+      b.querySelector(".swatch").style.background = seriesColor(i);
+      b.addEventListener("click", () => {
+        visible[i] = !visible[i];
+        b.classList.toggle("hidden", !visible[i]);
+      });
+      ui.pads.appendChild(b);
+      padEls.push({
+        root: b, state: b.querySelector(".state"), delta: b.querySelector(".delta"),
+        v: b.querySelector(".v"), mn: b.querySelector(".mn"), mx: b.querySelector(".mx")
+      });
+    }
+  }
+
+  function updatePads() {
+    const s = samples[samples.length - 1];
+    if (!s) return;
+    for (let i = 0; i < padCount; i++) {
+      const el = padEls[i];
+      const pressed = ((s.mask >> i) & 1) === 1;
+      const v = s.values[i];
+      el.root.classList.toggle("pressed", pressed);
+      el.root.setAttribute("aria-pressed", pressed ? "true" : "false");
+      el.state.textContent = pressed ? "Pressed" : (baseline[i] === null ? "Learning" : "Released");
+      el.v.textContent = v === undefined ? "-" : v;
+      el.delta.textContent = baseline[i] === null || v === undefined ? "-" : signed(v - baseline[i]);
+      el.mn.textContent = isFinite(minSeen[i]) ? minSeen[i] : "-";
+      el.mx.textContent = isFinite(maxSeen[i]) ? maxSeen[i] : "-";
+    }
+  }
+  function signed(n) { return (n > 0 ? "+" : "") + n; }
+
+  // ---- Parsing
+  function handleLine(text) {
+    const line = text.trim();
+    if (!line) return;
+    const fields = line.split(/[,;]/).map(f => f.trim()).filter(f => f.length);
+    if (fields.length < 4 || !fields.every(f => /^\d+$/.test(f))) {
+      badCount++;
+      return;
+    }
+    const nums = fields.map(f => parseInt(f, 10));
+    const values = nums.slice(3, 3 + MAX_PADS);
+    if (values.length !== padCount) {
+      padCount = values.length;
+      buildPads();
+    }
+    const t = performance.now();
+    samples.push({ t, mask: nums[0], values });
+    while (samples.length && t - samples[0].t > HISTORY_MS) samples.shift();
+    lineCount++;
+    rateCount++;
+    ui.last.textContent = line;
+
+    for (let i = 0; i < values.length; i++) {
+      if (values[i] < minSeen[i]) minSeen[i] = values[i];
+      if (values[i] > maxSeen[i]) maxSeen[i] = values[i];
+    }
+    // The baseline: the average of the first BASELINE_LINES lines (again after Zero)
+    if (baseline[0] === null && baseAcc === null) baseAcc = { n: 0, sums: new Array(MAX_PADS).fill(0) };
+    if (baseAcc) {
+      for (let i = 0; i < values.length; i++) baseAcc.sums[i] += values[i];
+      baseAcc.n++;
+      if (baseAcc.n >= BASELINE_LINES) {
+        for (let i = 0; i < values.length; i++) baseline[i] = Math.round(baseAcc.sums[i] / baseAcc.n);
+        baseAcc = null;
+        minSeen.fill(Infinity);
+        maxSeen.fill(-Infinity);
+      }
+    }
+    if (recording) recorded.push([new Date().toISOString(), nums[0]].concat(values));
+    updatePads();
+  }
+
+  // Lets the page be tried without a board: mTouchFeed("00001,00000,000,08190,...")
+  window.mTouchFeed = handleLine;
+
+  // ---- Serial
+  async function connect() {
+    if (!("serial" in navigator)) {
+      showNotice("This browser has no Web Serial. Open the page in Chrome or Edge (version 89 or later).");
+      return;
+    }
+    try {
+      port = await navigator.serial.requestPort();
+      await port.open({ baudRate: parseInt(ui.baud.value, 10) });
+    } catch (e) {
+      port = null;
+      if (e && e.name === "NotFoundError") return;   // no port chosen
+      setStatus("err", "Could not open the port: " + (e && e.message ? e.message : e) +
+        " - is another program (a terminal) using it?");
+      return;
+    }
+    hideNotice();
+    setStatus("on", "Connected at " + ui.baud.value + " baud");
+    ui.connect.textContent = "Disconnect";
+    ui.connect.classList.remove("primary");
+    ui.baud.disabled = true;
+    keepReading = true;
+    readLoop();
+  }
+
+  async function readLoop() {
+    const decoder = new TextDecoder();
+    let buffer = "";
+    while (port && port.readable && keepReading) {
+      reader = port.readable.getReader();
+      try {
+        for (;;) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          let nl;
+          while ((nl = buffer.search(/[\r\n]/)) >= 0) {
+            handleLine(buffer.slice(0, nl));
+            buffer = buffer.slice(nl + 1);
+          }
+          if (buffer.length > 1000) buffer = "";
+        }
+      } catch (e) {
+        if (keepReading) setStatus("err", "Read error: " + (e && e.message ? e.message : e));
+      } finally {
+        reader.releaseLock();
+        reader = null;
+      }
+    }
+  }
+
+  async function disconnect() {
+    keepReading = false;
+    try { if (reader) await reader.cancel(); } catch (e) { }
+    try { if (port) await port.close(); } catch (e) { }
+    port = null;
+    setStatus("", "Not connected");
+    ui.connect.textContent = "Connect";
+    ui.connect.classList.add("primary");
+    ui.baud.disabled = false;
+  }
+
+  function setStatus(kind, text) {
+    ui.dot.className = "dot" + (kind ? " " + kind : "");
+    ui.status.textContent = text;
+  }
+  function showNotice(text) { ui.notice.textContent = text; ui.notice.style.display = "block"; }
+  function hideNotice() { ui.notice.style.display = "none"; }
+
+  // ---- Graph
+  const ctx = ui.chart.getContext("2d");
+  const PAD = { l: 56, r: 12, t: 10, b: 26 };
+
+  function plotValue(s, i) {
+    const v = s.values[i];
+    if (v === undefined) return null;
+    if (ui.mode.value === "raw") return v;
+    return baseline[i] === null ? null : v - baseline[i];
+  }
+
+  function niceStep(range, target) {
+    const raw = range / target;
+    const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const n = raw / mag;
+    return (n < 1.5 ? 1 : n < 3 ? 2 : n < 7 ? 5 : 10) * mag;
+  }
+
+  function draw() {
+    const dpr = window.devicePixelRatio || 1;
+    const w = ui.wrap.clientWidth, h = ui.wrap.clientHeight;
+    if (ui.chart.width !== Math.round(w * dpr) || ui.chart.height !== Math.round(h * dpr)) {
+      ui.chart.width = Math.round(w * dpr);
+      ui.chart.height = Math.round(h * dpr);
+    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+
+    const now = paused ? pausedAt : performance.now();
+    const spanMs = parseInt(ui.span.value, 10) * 1000;
+    const t0 = now - spanMs;
+    const view = samples.filter(s => s.t >= t0 - 200 && s.t <= now);
+
+    // Y range over the visible lines
+    let lo = Infinity, hi = -Infinity;
+    for (const s of view) for (let i = 0; i < padCount; i++) {
+      if (!visible[i]) continue;
+      const v = plotValue(s, i);
+      if (v === null) continue;
+      if (v < lo) lo = v;
+      if (v > hi) hi = v;
+    }
+    if (!isFinite(lo)) { lo = 0; hi = 100; }
+    if (ui.mode.value === "delta") { lo = Math.min(lo, 0); hi = Math.max(hi, 0); }
+    if (hi - lo < 20) { const m = (hi + lo) / 2; lo = m - 10; hi = m + 10; }
+    const padY = (hi - lo) * 0.08;
+    lo -= padY; hi += padY;
+    const step = niceStep(hi - lo, 5);
+    lo = Math.floor(lo / step) * step;
+    hi = Math.ceil(hi / step) * step;
+
+    const pw = w - PAD.l - PAD.r, ph = h - PAD.t - PAD.b;
+    const xOf = t => PAD.l + (t - t0) / spanMs * pw;
+    const yOf = v => PAD.t + (hi - v) / (hi - lo) * ph;
+
+    // Grid and axes (recessive)
+    ctx.font = "12px system-ui, sans-serif";
+    ctx.fillStyle = cssVar("--text-muted");
+    ctx.strokeStyle = cssVar("--grid");
+    ctx.lineWidth = 1;
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    for (let v = lo; v <= hi + step / 2; v += step) {
+      const y = Math.round(yOf(v)) + 0.5;
+      ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(w - PAD.r, y); ctx.stroke();
+      ctx.fillText(Math.round(v), PAD.l - 8, y);
+    }
+    if (ui.mode.value === "delta" && lo < 0 && hi > 0) {
+      ctx.strokeStyle = cssVar("--text-muted");
+      const y = Math.round(yOf(0)) + 0.5;
+      ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(w - PAD.r, y); ctx.stroke();
+    }
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    const secs = spanMs / 1000;
+    const tStep = secs <= 10 ? 1 : secs <= 30 ? 5 : 10;
+    for (let s = 0; s <= secs; s += tStep) {
+      const x = xOf(now - s * 1000);
+      ctx.fillText(s === 0 ? "now" : "-" + s + " s", x, h - PAD.b + 8);
+    }
+
+    // Lines, 2px
+    ctx.save();
+    ctx.beginPath(); ctx.rect(PAD.l, PAD.t, pw, ph); ctx.clip();
+    ctx.lineWidth = 2;
+    ctx.lineJoin = "round";
+    for (let i = 0; i < padCount; i++) {
+      if (!visible[i]) continue;
+      ctx.strokeStyle = seriesColor(i);
+      ctx.beginPath();
+      let started = false;
+      for (const s of view) {
+        const v = plotValue(s, i);
+        if (v === null) { started = false; continue; }
+        const x = xOf(s.t), y = yOf(v);
+        if (!started) { ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // Crosshair and tooltip
+    if (hoverX !== null && hoverX >= PAD.l && hoverX <= w - PAD.r && view.length) {
+      const tHover = t0 + (hoverX - PAD.l) / pw * spanMs;
+      let best = view[0];
+      for (const s of view) if (Math.abs(s.t - tHover) < Math.abs(best.t - tHover)) best = s;
+      const x = Math.round(xOf(best.t)) + 0.5;
+      ctx.strokeStyle = cssVar("--text-muted");
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x, PAD.t); ctx.lineTo(x, PAD.t + ph); ctx.stroke();
+      const ring = cssVar("--surface-1");
+      let rows = "";
+      for (let i = 0; i < padCount; i++) {
+        if (!visible[i]) continue;
+        const v = plotValue(best, i);
+        if (v === null) continue;
+        ctx.beginPath(); ctx.arc(x, yOf(v), 4, 0, Math.PI * 2);
+        ctx.fillStyle = seriesColor(i); ctx.fill();
+        ctx.lineWidth = 2; ctx.strokeStyle = ring; ctx.stroke();
+        const pressed = ((best.mask >> i) & 1) === 1;
+        rows += '<div class="row"><span class="sw" style="background:' + seriesColor(i) + '"></span>Pad ' + padLabel(i) +
+          ': ' + (ui.mode.value === "delta" ? signed(v) : v) + (pressed ? " (pressed)" : "") + '</div>';
+      }
+      ui.tip.innerHTML = '<div style="color:var(--text-muted)">' + ((now - best.t) / 1000).toFixed(2) +
+        ' s ago</div>' + rows;
+      ui.tip.style.display = rows ? "block" : "none";
+      const tw = ui.tip.offsetWidth;
+      ui.tip.style.left = (x + 12 + tw > w ? x - 12 - tw : x + 12) + "px";
+      ui.tip.style.top = PAD.t + "px";
+    } else {
+      ui.tip.style.display = "none";
+    }
+    requestAnimationFrame(draw);
+  }
+
+  ui.wrap.addEventListener("mousemove", e => { hoverX = e.clientX - ui.wrap.getBoundingClientRect().left; });
+  ui.wrap.addEventListener("mouseleave", () => { hoverX = null; });
+
+  // ---- Controls
+  ui.connect.addEventListener("click", () => port ? disconnect() : connect());
+  ui.zero.addEventListener("click", () => {
+    baseline.fill(null);
+    baseAcc = { n: 0, sums: new Array(MAX_PADS).fill(0) };
+    updatePads();
+  });
+  ui.record.addEventListener("click", () => {
+    recording = !recording;
+    if (recording) recorded = [];
+    ui.record.textContent = recording ? "Stop" : "Record";
+    ui.record.classList.toggle("active", recording);
+    ui.save.disabled = recording || recorded.length === 0;
+  });
+  ui.save.addEventListener("click", () => {
+    const head = ["time", "state_mask"];
+    for (let i = 0; i < padCount; i++) head.push("pad_" + padLabel(i));
+    const csv = [head.join(",")].concat(recorded.map(r => r.join(","))).join("\r\n") + "\r\n";
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    a.download = "mtouch_" + new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19) + ".csv";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+  ui.pause.addEventListener("click", () => {
+    paused = !paused;
+    if (paused) pausedAt = performance.now();
+    ui.pause.textContent = paused ? "Resume" : "Pause";
+  });
+  ui.mode.addEventListener("change", () => {
+    ui.chartTitle.textContent = ui.mode.value === "raw" ? "Raw value" : "Delta from baseline";
+  });
+  ui.theme.addEventListener("click", () => {
+    const dark = document.documentElement.getAttribute("data-theme") === "dark" ||
+      (!document.documentElement.getAttribute("data-theme") && matchMedia("(prefers-color-scheme: dark)").matches);
+    document.documentElement.setAttribute("data-theme", dark ? "light" : "dark");
+    try { localStorage.setItem("mtouch-theme", dark ? "light" : "dark"); } catch (e) { }
+    buildPads();
+    updatePads();
+  });
+  try {
+    const saved = localStorage.getItem("mtouch-theme");
+    if (saved) document.documentElement.setAttribute("data-theme", saved);
+  } catch (e) { }
+
+  setInterval(() => {
+    ui.rate.textContent = rateCount + " lines/s";
+    ui.count.textContent = lineCount + " lines";
+    ui.bad.textContent = badCount + " ignored";
+    rateCount = 0;
+  }, 1000);
+
+  if (!("serial" in navigator)) {
+    showNotice("This browser has no Web Serial. Open the page in Chrome or Edge (version 89 or later).");
+    ui.connect.disabled = true;
+  }
+  if ("serial" in navigator) {
+    navigator.serial.addEventListener("disconnect", e => { if (port && e.target === port) disconnect(); });
+  }
+
+  // The splash goes on the first click or key
+  const splash = $("splash");
+  function hideSplash() {
+    splash.classList.add("gone");
+    document.removeEventListener("keydown", hideSplash);
+    setTimeout(() => splash.remove(), 400);
+  }
+  splash.addEventListener("click", hideSplash);
+  document.addEventListener("keydown", hideSplash);
+
+  buildPads();
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>
