@@ -1,0 +1,99 @@
+// Build 1668: over the stack - expected: compiles, with a Warning
+// 17 nested subs on a 16-level stack. Expected: Stack: 17 of 16 levels (main 17, interrupt none) and
+//   Warning: Worst-case call stack 17 exceeds the 16 available: LEVEL1 -> LEVEL2 -> ... -> LEVEL17 ...
+
+    #chip 16F18877, 32
+    #option explicit
+
+    Dim StackCount As Byte
+    StackCount = 0
+
+    Level1
+
+    Do Forever
+    Loop
+
+Sub Level1
+    Level2
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level2
+    Level3
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level3
+    Level4
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level4
+    Level5
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level5
+    Level6
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level6
+    Level7
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level7
+    Level8
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level8
+    Level9
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level9
+    Level10
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level10
+    Level11
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level11
+    Level12
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level12
+    Level13
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level13
+    Level14
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level14
+    Level15
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level15
+    Level16
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level16
+    Level17
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level17
+    StackCount = StackCount + 1
+End Sub
+

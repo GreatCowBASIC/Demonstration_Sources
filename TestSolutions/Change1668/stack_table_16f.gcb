@@ -1,0 +1,70 @@
+// Build 1668: a table read at the deepest point counts one level (the PIC16 calls the table, retlw returns)
+// 10 nested subs, the last reads a table. Expected: Stack: 11 of 16 levels (main 11, interrupt none)
+
+    #chip 16F18877, 32
+    #option explicit
+
+    Dim StackCount As Byte
+    StackCount = 0
+
+    Level1
+
+    Do Forever
+    Loop
+
+Sub Level1
+    Level2
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level2
+    Level3
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level3
+    Level4
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level4
+    Level5
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level5
+    Level6
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level6
+    Level7
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level7
+    Level8
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level8
+    Level9
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level9
+    Level10
+    StackCount = StackCount + 1
+End Sub
+
+Sub Level10
+    ReadTable Values, StackCount + 1, StackCount
+    StackCount = StackCount + 1
+End Sub
+
+Table Values
+    10
+    20
+    30
+End Table
+
