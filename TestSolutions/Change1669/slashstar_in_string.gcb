@@ -1,0 +1,25 @@
+// Build 1669: "/*" inside a string, or after a ' comment, does not start a block comment
+// Expected: compiles. Before 1669 the "/*" in the string opened a block comment that hid the rest of
+//   the program, and the errors named SetCount as "not declared".
+// Expected in the .asm: the string table holds 47,65,47,42 ("/A/*"), Count is set to 1 and 2,
+//   and a real "/* ... */" comment that starts after code still works.
+
+    #chip 16F18877, 32
+    #option explicit
+
+    Dim Pattern As String * 8
+    Dim Count As Byte
+
+    Pattern = "/A/*"                    ' a slash then a star in a string
+    Count = 0                            ' and in a comment: /* not a block
+    SetCount(1)
+    Count = Count + 1 /* a real C style comment after code,
+                       that ends on this line */
+    SetCount(2)
+
+    Do
+    Loop
+
+    Sub SetCount(In CountValue)
+        Count = CountValue
+    End Sub
