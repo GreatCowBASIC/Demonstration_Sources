@@ -1,0 +1,52 @@
+// Build 1670: two Subs of the same name in #ifdef blocks that exclude each other - the one in the
+// block that is true is used. Before 1670 the FIRST one was always used, with no warning.
+// Expected: compiles; in the .asm, Mode = 22 (from the ZZ_UART copy of SetMode),
+//   Level = 2 (from the #else copy of SetLevel) and Depth = 3 (from the nested block).
+
+    #chip 16F18877, 32
+    #option explicit
+
+    #define ZZ_UART
+
+    Dim Mode, Level, Depth As Byte
+
+    SetMode
+    SetLevel
+    SetDepth
+
+    Do
+    Loop
+
+    #ifdef ZZ_SPI
+    Sub SetMode
+        Mode = 11
+    End Sub
+    #endif
+    #ifdef ZZ_UART
+    Sub SetMode
+        Mode = 22
+    End Sub
+    #endif
+
+    #ifdef ZZ_SPI
+    Sub SetLevel
+        Level = 1
+    End Sub
+    #else
+    Sub SetLevel
+        Level = 2
+    End Sub
+    #endif
+
+    #ifdef ZZ_UART
+      #ifdef ZZ_SPI
+      Sub SetDepth
+          Depth = 1
+      End Sub
+      #endif
+      #ifndef ZZ_SPI
+      Sub SetDepth
+          Depth = 3
+      End Sub
+      #endif
+    #endif

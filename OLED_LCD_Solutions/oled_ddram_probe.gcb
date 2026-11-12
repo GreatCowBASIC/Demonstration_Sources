@@ -1,0 +1,49 @@
+'DDRAM probe for the SEH1602-A: which DDRAM addresses are visible on which line?
+'Same config as oled_ws0010_test.gcb. Needs the LCD_OLED1602 init in lcd.h.
+'
+'Writes a marker at DDRAM 0x00, 0x10, 0x14, 0x20 and 0x40 and leaves it on screen.
+'Read the result:
+'  M00 and M40 visible on line 1 and 2   -> normal 16x2 mapping (line 2 at 0x40)
+'  M20 visible on line 2                 -> controller maps line 2 at 0x20 (2002-style layout)
+'  M10 / M14 visible                     -> the visible window is wider than 16 chars
+
+#CHIP 16F1829, 32
+#OPTION Explicit
+
+#DEFINE LCD_IO 4
+#DEFINE LCD_SPEED FAST
+#DEFINE LCD_NO_RW
+#DEFINE LCD_WIDTH 16
+#DEFINE LCD_OLED1602
+
+#DEFINE LCD_RS        PortA.0
+#DEFINE LCD_Enable    PortA.1
+
+#DEFINE LCD_DB4       PortA.2
+#DEFINE LCD_DB5       PortC.0
+#DEFINE LCD_DB6       PortC.1
+#DEFINE LCD_DB7       PortC.2
+
+Wait 100 ms
+Cls
+Wait 5 ms
+
+Probe 0x00
+Print "M00"
+Probe 0x10
+Print "M10"
+Probe 0x14
+Print "M14"
+Probe 0x20
+Print "M20"
+Probe 0x40
+Print "M40"
+
+Do
+Loop
+
+Sub Probe(In ProbeAddr)
+    Set LCD_RS OFF
+    LCDWriteByte 0x80 + ProbeAddr
+    Wait 2 ms
+End Sub

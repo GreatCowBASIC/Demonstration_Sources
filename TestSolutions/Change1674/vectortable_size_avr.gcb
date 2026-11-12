@@ -1,0 +1,13 @@
+// Build 1674: the program size counts the AVR interrupt vector table's unused words.
+// Each vector has a 2-word slot; a 1-word reti or rjmp leaves a word the program cannot use. Before 1674
+// those words were not counted (26 on the ATmega328P), so "Program Memory" was short and the size check
+// could pass a program that did not fit. Expected: Program Memory = Code Segment + 1024 (ReserveHighProg).
+#Chip mega328p, 16
+#option ReserveHighProg OPTIBOOT
+On Interrupt Timer1Overflow Call TimerTick
+Do
+Loop
+
+Sub TimerTick
+    PortB = 1
+End Sub

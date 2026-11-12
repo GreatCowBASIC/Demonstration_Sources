@@ -1,0 +1,16 @@
+// Build 1670: a library with the same Sub name in three #ifdef blocks, one per interface.
+// Expected: compiles; in the .asm, ZTest = 22 (the ZZ_UART copy).
+// Before 1670: Error "ZZ_SPI_CS, or your Defined CONSTANT, is not a valid I/O pin or port", because
+//   the first copy (ZZ_SPI) was compiled although ZZ_SPI is not defined. Without that Dir line it
+//   compiled cleanly with ZTest = 11 - the wrong copy, silently.
+
+    #chip 16F18877, 32
+    #option explicit
+
+    #define ZZ_UART
+    #include "samesub_ifdef_library.h"
+
+    ZSet
+
+    Do
+    Loop

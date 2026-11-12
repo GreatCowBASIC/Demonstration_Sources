@@ -1,0 +1,98 @@
+'Graphic-mode ruler for the SEH1602-A
+'Same config as oled_ws0010_test.gcb. Needs the LCD_OLED1602 init in lcd.h.
+'
+'Draws, on the 80 x 16 pixel visible area (columns 0 to GfxRight, rows 0 to 15):
+'  a one pixel box around the extremes of the display
+'  vertical rules from row 3 to row 12 (3 pixels in from the top and bottom box lines)
+'  every RuleStep columns, starting at column RuleStep
+'
+'Note: the panel is built from 5 column character cells with a gap between cells, so a
+'step that is not a multiple of 5 columns looks slightly uneven on the glass.
+
+#CHIP 16F1829, 32
+#OPTION Explicit
+
+#DEFINE LCD_IO 4
+#DEFINE LCD_SPEED FAST
+#DEFINE LCD_NO_RW
+#DEFINE LCD_WIDTH 16
+#DEFINE LCD_OLED1602
+
+#DEFINE LCD_RS        PortA.0
+#DEFINE LCD_Enable    PortA.1
+
+#DEFINE LCD_DB4       PortA.2
+#DEFINE LCD_DB5       PortC.0
+#DEFINE LCD_DB6       PortC.1
+#DEFINE LCD_DB7       PortC.2
+
+'Last visible graphic column. The panel shows 80 of the controller's 100 columns.
+#DEFINE GfxRight    79
+
+'Columns between rules
+#DEFINE RuleStep    9
+
+'Pixel orientation: bit 0 of each graphic byte is the TOP row of its page.
+'Comment this out if the box lines or the rule ends look swapped top to bottom.
+#DEFINE BIT0_TOP
+
+Dim GX As Byte
+Dim Pg As Byte
+Dim LineByte As Byte                 'the box line on this page (row 0 on page 0, row 15 on page 1)
+Dim RuleByte As Byte                 'rows 3..7 on page 0, rows 8..12 on page 1
+Dim ColByte As Byte
+
+Wait 200 ms
+OLED_Cmd 0x1F                        'graphic mode, DC-DC on
+Wait 10 ms
+
+For Pg = 0 To 1
+    #IFDEF BIT0_TOP
+        If Pg = 0 Then
+            LineByte = 0x01          'row 0
+            RuleByte = 0xF8          'rows 3..7
+        Else
+            LineByte = 0x80          'row 15
+            RuleByte = 0x1F          'rows 8..12
+        End If
+    #ENDIF
+    #IFNDEF BIT0_TOP
+        If Pg = 0 Then
+            LineByte = 0x80          'row 0
+            RuleByte = 0x1F          'rows 3..7
+        Else
+            LineByte = 0x01          'row 15
+            RuleByte = 0xF8          'rows 8..12
+        End If
+    #ENDIF
+
+    OLED_Cmd 0x40 + Pg
+    OLED_Cmd 0x80
+    For GX = 0 To GfxRight
+        If GX = 0 Or GX = GfxRight Then
+            ColByte = 0xFF                       'left and right sides of the box
+        Else If GX % RuleStep = 0 Then
+            ColByte = LineByte Or RuleByte       'rule plus the box line
+        Else
+            ColByte = LineByte                   'box line only
+        End If
+        OLED_Data ColByte
+    Next
+Next
+
+Do
+Loop
+
+'Send a raw command; LCD_NO_RW is defined so there is no busy flag, wait instead
+Sub OLED_Cmd(In OCmd)
+    Set LCD_RS OFF
+    LCDWriteByte OCmd
+    Wait 2 ms
+End Sub
+
+'200 us: shorter waits corrupted the 4-bit interface on this module.
+Sub OLED_Data(In ODat)
+    Set LCD_RS ON
+    LCDWriteByte ODat
+    Wait 200 us
+End Sub

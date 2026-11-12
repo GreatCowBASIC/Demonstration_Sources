@@ -1,0 +1,40 @@
+'Change 1672: #DEFINE DISABLE1672 keeps the behaviour before build 1672.
+'The sub is given a reference to the function's own variable, so the second call of Echo changes the
+'first value too. Expected output (the old behaviour):
+'1. xxxxx xxxxx
+'done
+
+#chip 18F27Q43, 64
+#option Explicit
+
+#define DISABLE1672
+
+#define USART_BAUD_RATE 115200
+#define USART_TX_BLOCKING
+
+#startup PPSInit, 85
+
+CallSub("1.", Echo(" yyyy"), Echo(" xxxxx"))
+
+HSerPrint "done"
+HSerSend 13
+HSerSend 10
+
+Do
+Loop
+
+Sub PPSInit
+  RC6PPS = 0x20           'RC6 is UART1 TX
+End Sub
+
+Sub CallSub(In FirstString As String, In SecondString As String, In ThirdString As String)
+  HSerPrint FirstString
+  HSerPrint SecondString
+  HSerPrint ThirdString
+  HSerSend 13
+  HSerSend 10
+End Sub
+
+Function Echo(In InText As String) As String
+  Echo = InText
+End Function

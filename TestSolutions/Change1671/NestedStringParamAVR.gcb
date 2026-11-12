@@ -1,0 +1,40 @@
+'Change 1671 (AVR): a string constant passed to a sub must survive a function call in a later parameter
+'that also needs a string constant. Before 1671 both constants were copied into SYSSTRINGPARAM1, the
+'outer one first, so Check received "CH376" instead of "FatChDir CH376".
+
+#chip mega328p, 16
+#option Explicit
+
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+
+Dim Result As Byte
+
+'The outer sub prints the name it was given
+Check("FatChDir CH376", FatChDir("CH376"), 0)
+
+'Same again with a function, not a sub
+Result = Combine("Outer", FatChDir("Inner"))
+
+'Two nested string functions after the outer string
+Check("Two calls", FatChDir("A") + FatChDir("BB"), 3)
+
+Do
+Loop
+
+Sub Check(In CheckName As String, In CheckGot, In CheckWant)
+  HSerPrint CheckName
+  HSerPrint ": "
+  HSerPrint CheckGot
+  HSerSend 13
+  HSerSend 10
+End Sub
+
+Function FatChDir(In CDName As String) As Byte
+  FatChDir = CDName(0)
+End Function
+
+Function Combine(In CombineName As String, In CombineValue) As Byte
+  HSerPrint CombineName
+  Combine = CombineValue
+End Function

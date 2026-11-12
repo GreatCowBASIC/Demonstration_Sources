@@ -1,0 +1,235 @@
+﻿'Oscilloscope on the SEH1602-A WS0010 OLED, PIC 16F1829 @ 32 MHz
+'
+'Uses graphic mode: 80 visible columns x 16 pixel rows (see GfxRight in oled_ws0010_test.gcb).
+'Rising-edge trigger at mid level, 80 samples per sweep, dotted centre line,
+'tick marks every 10 columns on the top and bottom rows.
+'
+'Signal source:
+'  SCOPE_SIM defined   -> built-in test signal (sine-like, frequency changes every 40 sweeps)
+'  SCOPE_SIM commented -> ADC input AN3 on RA4 (0 V .. Vdd, 8 bit)
+'
+'Time base: one sample is roughly 130 us (Wait 100 us + ADC), so one sweep is about 10 ms.
+'Change the Wait in Acquire for a different time base.
+
+#CHIP 16F1829, 32
+#OPTION Explicit
+
+'LCD config: same as the project
+#DEFINE LCD_IO 4
+#DEFINE LCD_SPEED FAST
+#DEFINE LCD_NO_RW
+#DEFINE LCD_WIDTH 16
+#DEFINE LCD_OLED1602
+
+#DEFINE LCD_RS        PortA.0
+#DEFINE LCD_Enable    PortA.1
+
+#DEFINE LCD_DB4       PortA.2
+#DEFINE LCD_DB5       PortC.0
+#DEFINE LCD_DB6       PortC.1
+#DEFINE LCD_DB7       PortC.2
+
+'Test signal on/off
+#DEFINE SCOPE_SIM
+
+'Pixel orientation: bit 0 of each graphic byte is the TOP row of its page.
+'Comment this out if the trace appears upside down.
+#DEFINE BIT0_TOP
+
+Dim TraceY(80)
+Dim LoBuf(80)
+Dim HiBuf(80)
+
+Dim GX As Byte
+Dim RowN As Byte
+Dim BitN As Byte
+Dim BitMask As Byte
+Dim K As Byte
+Dim ColLo As Byte
+Dim ColHi As Byte
+Dim SampleV As Byte
+Dim PrevSample As Byte
+Dim YPrev As Byte
+Dim YLo As Byte
+Dim YHi As Byte
+Dim TrigWait As Word
+
+Dim Phase As Byte
+Dim FreqStep As Byte
+Dim SimV As Byte
+Dim FrameNo As Byte
+
+'=== main ===
+Wait 200 ms
+OLED_Cmd 0x1F                        'graphic mode, DC-DC on
+Wait 10 ms
+
+#IFNDEF SCOPE_SIM
+    Dir PortA.4 In
+#ENDIF
+
+Phase = 0
+FreqStep = 1
+FrameNo = 0
+
+Do
+    Acquire
+    Render
+    Display
+
+    FrameNo = FrameNo + 1
+    If FrameNo >= 40 Then
+        FrameNo = 0
+        FreqStep = FreqStep + 1
+        If FreqStep > 4 Then FreqStep = 1
+    End If
+Loop
+
+'=== acquisition ===
+
+'One sample, 0..255
+Sub GetSample
+    #IFDEF SCOPE_SIM
+        'Parabola approximation of a sine, period 32 phase steps
+        Phase = (Phase + FreqStep) And 31
+        SimV = Phase And 15
+        SimV = SimV * (16 - (Phase And 15))      '0..64
+        SimV = SimV + SimV                       '0..128
+        If Phase < 16 Then
+            If SimV >= 127 Then
+                SampleV = 255
+            Else
+                SampleV = 128 + SimV
+            End If
+        Else
+            If SimV >= 128 Then
+                SampleV = 0
+            Else
+                SampleV = 128 - SimV
+            End If
+        End If
+    #ENDIF
+    #IFNDEF SCOPE_SIM
+        SampleV = ReadAD(AN3)
+    #ENDIF
+End Sub
+
+'Wait for a rising edge through mid level, then capture 80 samples as rows 0..15.
+'Free-runs if there is no trigger, so a flat line is still drawn.
+Sub Acquire
+    GetSample
+    PrevSample = SampleV
+    TrigWait = 0
+    Do
+        GetSample
+        If PrevSample < 128 And SampleV >= 128 Then Exit Do
+        PrevSample = SampleV
+        TrigWait = TrigWait + 1
+        If TrigWait > 4000 Then Exit Do
+    Loop
+
+    TraceY(1) = SampleV / 16
+    For GX = 2 To 80
+        Wait 100 us
+        GetSample
+        TraceY(GX) = SampleV / 16
+    Next
+End Sub
+
+'=== rendering ===
+
+'Set the pixel for display row RowN (0 = bottom .. 15 = top) in the current column
+Sub PlotRow
+    #IFDEF BIT0_TOP
+        BitN = 15 - RowN
+    #ENDIF
+    #IFNDEF BIT0_TOP
+        BitN = RowN
+    #ENDIF
+
+    BitMask = 1
+    K = 0
+    Do While K < (BitN And 7)
+        BitMask = BitMask + BitMask
+        K = K + 1
+    Loop
+
+    If BitN < 8 Then
+        ColLo = ColLo Or BitMask
+    Else
+        ColHi = ColHi Or BitMask
+    End If
+End Sub
+
+'Build the column bytes for all 80 columns: trace joined with vertical lines, plus graticule
+Sub Render
+    For GX = 1 To 80
+        ColLo = 0
+        ColHi = 0
+
+        If GX = 1 Then
+            YPrev = TraceY(1)
+        Else
+            YPrev = TraceY(GX - 1)
+        End If
+
+        If YPrev < TraceY(GX) Then
+            YLo = YPrev
+            YHi = TraceY(GX)
+        Else
+            YLo = TraceY(GX)
+            YHi = YPrev
+        End If
+
+        For RowN = YLo To YHi
+            PlotRow
+        Next
+
+        'Graticule: ticks every 10 columns on the top and bottom rows, dotted centre line
+        If (GX - 1) Mod 10 = 0 Then
+            RowN = 0
+            PlotRow
+            RowN = 15
+            PlotRow
+        End If
+        If GX Mod 4 = 0 Then
+            RowN = 7
+            PlotRow
+        End If
+
+        LoBuf(GX) = ColLo
+        HiBuf(GX) = ColHi
+    Next
+End Sub
+
+'=== display output ===
+
+Sub Display
+    OLED_Cmd 0x40
+    OLED_Cmd 0x80
+    For GX = 1 To 80
+        OLED_Data LoBuf(GX)
+    Next
+
+    OLED_Cmd 0x41
+    OLED_Cmd 0x80
+    For GX = 1 To 80
+        OLED_Data HiBuf(GX)
+    Next
+End Sub
+
+'Send a raw command; LCD_NO_RW is defined so there is no busy flag, wait instead
+Sub OLED_Cmd(In OCmd)
+    Set LCD_RS OFF
+    LCDWriteByte OCmd
+    Wait 2 ms
+End Sub
+
+'Send a raw data byte (an 8 pixel column in graphic mode).
+'200 us: shorter waits corrupted the 4-bit interface on this module.
+Sub OLED_Data(In ODat)
+    Set LCD_RS ON
+    LCDWriteByte ODat
+    Wait 200 us
+End Sub
+

@@ -1,0 +1,37 @@
+'Change 1672 (AVR): two string function results passed to one sub must both arrive.
+'Before 1672 the second call of Echo changed Echo again before CallSub ran, so
+'CallSub("1.", Echo(" yyyy"), Echo(" xxxxx")) printed "1. xxxxx xxxxx".
+'Expected output, one line each:
+'1. yyyy xxxxx
+'ABC
+'ABC
+'done
+
+#chip mega328p, 16
+#option Explicit
+
+#define USART_BAUD_RATE 9600
+#define USART_TX_BLOCKING
+
+CallSub("1.", Echo(" yyyy"), Echo(" xxxxx"))
+CallSub(Echo("A"), Echo("B"), "C")
+CallSub(Echo("A"), "B", Echo("C"))
+
+HSerPrint "done"
+HSerSend 13
+HSerSend 10
+
+Do
+Loop
+
+Sub CallSub(In FirstString As String, In SecondString As String, In ThirdString As String)
+  HSerPrint FirstString
+  HSerPrint SecondString
+  HSerPrint ThirdString
+  HSerSend 13
+  HSerSend 10
+End Sub
+
+Function Echo(In InText As String) As String
+  Echo = InText
+End Function

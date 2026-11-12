@@ -1,0 +1,26 @@
+// Build 1670: as samesub_ifdef_main.gcb with #DEFINE DISABLE1670 - the behaviour before 1670
+// Expected: compiles; in the .asm, Mode = 11 (the first copy of SetMode, although ZZ_SPI is not defined)
+
+    #chip 16F18877, 32
+    #option explicit
+
+    // #define ZZ_UART
+    #define DISABLE1670
+
+    Dim Mode As Byte
+
+    SetMode
+
+    Do
+    Loop
+
+    #ifdef ZZ_SPI
+    Sub SetMode
+        Mode = 11
+    End Sub
+    #endif
+    #ifdef ZZ_UART
+    Sub SetMode
+        Mode = 22
+    End Sub
+    #endif

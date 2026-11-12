@@ -1,0 +1,283 @@
+'WS0010 OLED 1602 (SEH1602-A) feature test for PIC 16F1829 @ 32 MHz
+'Needs the LCD_OLED1602 init in lcd.h, so the display also starts after a warm reset.
+'
+'Demos, in a loop:
+'  1  Text, Locate, Cls
+'  2  Custom characters (CGRAM): smooth 128-step bar graph
+'  3  The four built-in font tables (FT1:FT0)
+'  4  Display shift (scrolling) using the 40-char DDRAM line
+'  5  Graphic mode: 100 x 16 pixel bitmap (frame, progress bar, checker)
+'  6  DC-DC power off / on (burn-in protection)
+
+#CHIP 16F1829, 32
+#OPTION Explicit
+
+'LCD config: same as the project
+#DEFINE LCD_IO 4
+#DEFINE LCD_SPEED FAST
+#DEFINE LCD_NO_RW
+#DEFINE LCD_WIDTH 16
+#DEFINE LCD_OLED1602
+
+#DEFINE LCD_RS        PortA.0
+#DEFINE LCD_Enable    PortA.1
+
+#DEFINE LCD_DB4       PortA.2
+#DEFINE LCD_DB5       PortC.0
+#DEFINE LCD_DB6       PortC.1
+#DEFINE LCD_DB7       PortC.2
+
+Dim CGArray(8)
+Dim Level As Byte
+Dim Row As Byte
+Dim Value As Byte
+Dim Seg As Integer
+Dim GX As Byte
+Dim Pg As Byte
+Dim FT As Byte
+Dim Cnt As Byte
+
+'Seconds-scale pause between demos
+#DEFINE DemoPause   Wait 2 s
+
+'Last visible graphic column. The ruler test showed only ~80 of 100 columns are visible;
+'lower this by 1 or 2 if the right edge is still cut off.
+#DEFINE GfxRight    79
+
+'=== main ===
+Wait 100 ms
+MakeBarChars
+
+Do
+    DemoText
+    DemoBarGraph
+    DemoFonts
+    DemoShift
+    DemoGraphics
+    DemoPower
+Loop
+
+'=== low level helpers ===
+
+'Send a raw command; LCD_NO_RW is defined so there is no busy flag, wait instead
+Sub OLED_Cmd(In OCmd)
+    Set LCD_RS OFF
+    LCDWriteByte OCmd
+    Wait 2 ms
+End Sub
+
+'Send a raw data byte (character code in character mode, 8 pixel column in graphic mode)
+Sub OLED_Data(In ODat)
+    Set LCD_RS ON
+    LCDWriteByte ODat
+    Wait 200 us                      'graphic writes are slower than character writes
+End Sub
+
+'Re-sync the 4-bit interface and restore character mode (safe whatever state the OLED is in)
+Sub OLED_Resync
+    Wait 20 ms
+    Set LCD_RS OFF
+    Set LCD_DB7 OFF
+    Set LCD_DB6 OFF
+    Set LCD_DB5 ON
+    Set LCD_DB4 ON
+    Repeat 3
+        PulseOut LCD_Enable, 2 us
+        Wait 5 ms
+    End Repeat
+    Set LCD_DB4 OFF                  '0x2 -> 4 bit mode
+    PulseOut LCD_Enable, 2 us
+    Wait 1 ms
+    OLED_Cmd 0x28
+    OLED_Cmd 0x08
+    OLED_Cmd 0x01
+    Wait 10 ms
+    OLED_Cmd 0x06
+    OLED_Cmd 0x17                    'character mode, DC-DC on
+    Wait 10 ms
+    OLED_Cmd 0x0C
+    Wait 5 ms
+End Sub
+
+'=== demo 1: text ===
+Sub DemoText
+    Cls
+    Locate 0, 0
+    Print "WS0010 OLED"
+    Locate 1, 0
+    Print "SEH1602-A  OK"
+    DemoPause
+End Sub
+
+'=== demo 2: custom characters ===
+'Chars 0..7 are bars 1..8 pixel rows high, filled from the bottom
+Sub MakeBarChars
+    For Level = 0 To 7
+        For Row = 1 To 8
+            If Row > 7 - Level Then
+                CGArray(Row) = 31
+            Else
+                CGArray(Row) = 0
+            End If
+        Next
+        LCDCreateChar Level, CGArray()
+    Next
+End Sub
+
+Sub DemoBarGraph
+    Cls
+    Locate 0, 0
+    Print "Bar graph 128"
+    For Value = 0 To 128
+        BarGraph Value
+        Wait 20 ms
+    Next
+    For Value = 128 To 0 Step -1
+        BarGraph Value
+        Wait 20 ms
+    Next
+End Sub
+
+'Draw Value (0..128) as a 16 character bar on the second line
+Sub BarGraph(In BarValue)
+    Locate 1, 0
+    For GX = 0 To 15
+        Seg = BarValue
+        Seg = Seg - (GX * 8)
+        If Seg <= 0 Then
+            LCDWriteChar 32
+        Else If Seg >= 8 Then
+            LCDWriteChar 7
+        Else
+            LCDWriteChar Seg - 1
+        End If
+    Next
+End Sub
+
+'=== demo 3: font tables ===
+'Function set 0b0010_1000 | FT1:FT0 selects one of the four built-in fonts: English/Japanese,
+'West European, Scandinavian European and Cyrillic (vendor list; the vendor text does not
+'give which FT value is which, so the screen shows the font for FT = 0 to 3 in turn)
+Sub DemoFonts
+    For FT = 0 To 3
+        OLED_Cmd 0x28 + FT
+        Cls
+        Locate 0, 0
+        Print "Font table "
+        LCDWriteChar 48 + FT
+        Locate 1, 0
+        For Cnt = 0xC0 To 0xCF
+            LCDWriteChar Cnt
+        Next
+        Wait 2 s
+    Next
+    OLED_Cmd 0x28
+End Sub
+
+'=== demo 4: display shift ===
+'0x18 = shift display left, 0x1C = shift display right
+Sub DemoShift
+    Cls
+    Locate 0, 0
+    Print "Display shift..."
+    Locate 1, 0
+    Print "<<<<<<<<>>>>>>>>"
+    Wait 500 ms
+    For Cnt = 1 To 16
+        OLED_Cmd 0x18
+        Wait 120 ms
+    Next
+    For Cnt = 1 To 16
+        OLED_Cmd 0x1C
+        Wait 120 ms
+    Next
+    OLED_Cmd 0x02                    'return home, undoes any shift
+    Wait 2 ms
+End Sub
+
+'=== demo 5: graphic mode ===
+'0x1F = graphic mode + DC-DC on, 0x17 = character mode + DC-DC on.
+'In graphic mode: 0x80 + n sets the column (0..99), 0x40 + n sets the page (0..1).
+'Each data byte is one column of 8 pixels in that page; the column then auto-increments.
+Sub DemoGraphics
+    OLED_Cmd 0x1F
+    Wait 10 ms
+    GfxClear
+
+    'Frame: full height edges, one pixel top and bottom lines
+    'The panel shows ~80 of the controller's 100 columns, so the right edge is GfxRight
+    For Pg = 0 To 1
+        OLED_Cmd 0x40 + Pg
+        OLED_Cmd 0x80
+        OLED_Data 0xFF
+        For GX = 1 To GfxRight - 1
+            If Pg = 0 Then
+                OLED_Data 0x01
+            Else
+                OLED_Data 0x80
+            End If
+        Next
+        OLED_Data 0xFF
+    Next
+    Wait 1 s
+
+    'Progress bar growing across the frame
+    For GX = 2 To GfxRight - 2
+        For Pg = 0 To 1
+            OLED_Cmd 0x40 + Pg
+            OLED_Cmd 0x80 + GX
+            OLED_Data 0x7E
+        Next
+        Wait 15 ms
+    Next
+    Wait 1 s
+
+    'Checkerboard
+    GfxClear
+    For Pg = 0 To 1
+        OLED_Cmd 0x40 + Pg
+        OLED_Cmd 0x80
+        For GX = 0 To (GfxRight - 1) / 2
+            OLED_Data 0xAA
+            OLED_Data 0x55
+        Next
+    Next
+    Wait 2 s
+
+    'Back to character mode
+    OLED_Resync
+    MakeBarChars                     'graphic data shares CGRAM, so rebuild the custom chars
+End Sub
+
+Sub GfxClear
+    For Pg = 0 To 1
+        OLED_Cmd 0x40 + Pg
+        OLED_Cmd 0x80
+        For GX = 1 To 100
+            OLED_Data 0
+        Next
+    Next
+End Sub
+
+'=== demo 6: DC-DC power off ===
+'0x13 = character mode, internal DC-DC off (panel dark). 0x17 turns it back on.
+Sub DemoPower
+    OLED_Cmd 0x02                    'home: clears any display shift left by earlier demos
+    Wait 2 ms
+    Cls
+    Wait 2 ms
+    Locate 0, 0
+    Print "Power off in 2s"
+    Wait 2 s
+    OLED_Cmd 0x13
+    Wait 2 s
+    OLED_Cmd 0x17
+    Wait 100 ms                      'allow the DC-DC to start
+    OLED_Cmd 0x02
+    Wait 2 ms
+    Cls
+    Wait 2 ms
+    Locate 0, 0
+    Print "Power back on"
+    Wait 2 s
+End Sub

@@ -1,0 +1,24 @@
+// Build 1674: the program size counts every Case jump of a Select Case on AVR.
+// Before 1674 the jump to the end of each Case between the first and the last was not counted, so
+// "Program Memory" was 1 word short for each (5 here). Expected: Program Memory = Code Segment.
+#Chip mega328p, 16
+Dim CaseValue As Byte
+CaseValue = PinB
+Select Case CaseValue
+    Case 0
+        PortD = 9
+    Case 1
+        PortD = 1
+    Case 2
+        PortD = 2
+    Case 3
+        PortD = 3
+    Case 4
+        PortD = 4
+    Case 5
+        PortD = 5
+    Case 6, 7
+        PortD = 6
+End Select
+Do
+Loop

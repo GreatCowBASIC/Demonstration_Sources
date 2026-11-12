@@ -1,0 +1,58 @@
+'Change 1673: a sub, function or macro with a one or two character name, and the bracket straight after the
+'name, keeps its parameters. Before 1673 they were lost: AB(5) called AB without setting Value (no message),
+'and SS("Hello") failed with "Byte INTEXT cannot be assigned/appended to a string variable".
+'With a space before the bracket (Function SS (In InText As String)) it already worked.
+'Expected output, one line each:
+'6
+'7
+'Hello
+'done
+
+#chip 18F27Q43, 64
+#option Explicit
+
+#define USART_BAUD_RATE 115200
+#define USART_TX_BLOCKING
+
+#startup PPSInit, 85
+
+Dim Result As Byte
+
+'Two character function, byte parameter
+Result = AB(5)
+HSerPrint Result
+HSerSend 13
+HSerSend 10
+
+'Two character sub, two parameters
+P2(3, 4)
+
+'Two character function, string parameter
+HSerPrint SS("Hello")
+HSerSend 13
+HSerSend 10
+
+HSerPrint "done"
+HSerSend 13
+HSerSend 10
+
+Do
+Loop
+
+Sub PPSInit
+  RC6PPS = 0x20           'RC6 is UART1 TX
+End Sub
+
+Function AB(In Value) As Byte
+  AB = Value + 1
+End Function
+
+Sub P2(In First, In Second)
+  HSerPrint First + Second
+  HSerSend 13
+  HSerSend 10
+End Sub
+
+Function SS(In InText As String) As String
+  SS = InText
+End Function
