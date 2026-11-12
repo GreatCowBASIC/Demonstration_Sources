@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>WIZnet configuration</title>
+<style>
+body{font-family:system-ui,sans-serif;background:#0f172a;color:#e2e8f0;margin:0;padding:16px}
+h1{font-size:20px;margin:0}
+h2{font-size:13px;color:#94a3b8;margin:0 0 8px}
+.s{color:#94a3b8;font-size:13px;margin:4px 0 16px}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.c{background:#1e293b;border-radius:12px;padding:14px}
+.r{display:flex;align-items:center;gap:10px;margin:6px 0;font-size:14px}
+.r b{width:90px}
+.r i{color:#94a3b8;font-size:12px;font-style:normal}
+.off,.on{margin-left:auto;padding:2px 10px;border-radius:10px;font-size:12px;background:#334155}
+.on{background:#22c55e;color:#052e16}
+.v{margin-left:auto}
+a{color:#38bdf8;text-decoration:none;font-size:12px;border:1px solid;border-radius:8px;padding:2px 10px}
+</style>
+</head>
+<body>
+<h1>Configuration</h1>
+<div class="s">Modules chosen with the STACK_ switches when compiling &middot; <a href="/">Dashboard</a> <a href="/s">Solution</a></div>
+<div class="g">
+<div class="c"><h2>NETWORK</h2><div id="net"></div></div>
+<div class="c"><h2>TCP/IP STACK</h2><div id="mod"></div></div>
+</div>
+<script>
+var ICMP_GCB_BYTE=1;
+var PING_GCB_BYTE=1;
+var UDP_GCB_BYTE=1;
+var ECHO_GCB_BYTE=1;
+var SYSLOG_GCB_BYTE=1;
+var SNTP_GCB_BYTE=1;
+var DHCP_GCB_BYTE=1;
+var DNS_GCB_BYTE=1;
+var TCP_GCB_BYTE=1;
+var HTTP_GCB_BYTE=1;
+var STATS_GCB_BYTE=1;
+var IP1_GCB_BYTE=192;
+var IP2_GCB_BYTE=168;
+var IP3_GCB_BYTE=0;
+var IP4_GCB_BYTE=3;
+var MASK1_GCB_BYTE=255;
+var MASK2_GCB_BYTE=255;
+var MASK3_GCB_BYTE=255;
+var MASK4_GCB_BYTE=0;
+var GW1_GCB_BYTE=192;
+var GW2_GCB_BYTE=168;
+var GW3_GCB_BYTE=0;
+var GW4_GCB_BYTE=250;
+var DNS1_GCB_BYTE=192;
+var DNS2_GCB_BYTE=168;
+var DNS3_GCB_BYTE=0;
+var DNS4_GCB_BYTE=250;
+var MAC1_GCB_BYTE=0;
+var MAC2_GCB_BYTE=30;
+var MAC3_GCB_BYTE=192;
+var MAC4_GCB_BYTE=0;
+var MAC5_GCB_BYTE=0;
+var MAC6_GCB_BYTE=3;
+var LEASE_GCB_BYTE=0;
+var MQTT_GCB_BYTE=1;
+var CONSOLE_GCB_BYTE=2;
+var SERUDP_GCB_BYTE=1;
+function row(name, text, on) {
+  return '<div class="r"><b>' + name + '</b><i>' + text + '</i><span class="' + (on ? 'on">ON' : 'off">OFF') + '</span></div>';
+}
+function conrow(n) {
+  var kind = ['headless', 'serial port', 'TCP terminal, telnet port 23'];
+  return '<div class="r"><b>CONSOLE</b><i>' + kind[n] + '</i><span class="' + (n ? 'on">ON' : 'off">OFF') + '</span></div>';
+}
+function info(name, value) {
+  return '<div class="r"><b>' + name + '</b><span class="v">' + value + '</span></div>';
+}
+function ip(a, b, c, d) {
+  return a + '.' + b + '.' + c + '.' + d;
+}
+function hex(n) {
+  return ('0' + n.toString(16)).slice(-2).toUpperCase();
+}
+document.getElementById('mod').innerHTML =
+  row('SPI Driver', 'WIZnet W5200 / W5500, sockets', 1) +
+  row('ARP', 'in the WIZnet chip', 1) +
+  conrow(CONSOLE_GCB_BYTE) +
+  row('DHCP', 'address from the router', DHCP_GCB_BYTE) +
+  row('DNS', 'host names', DNS_GCB_BYTE) +
+  row('ECHO', 'UDP echo, port 7', ECHO_GCB_BYTE) +
+  row('HTTP', 'this web server', HTTP_GCB_BYTE) +
+  row('ICMP', 'answers ping', ICMP_GCB_BYTE) +
+  row('IPv4', 'in the WIZnet chip', 1) +
+  row('MQTT', 'messages to Home Assistant', MQTT_GCB_BYTE) +
+  row('PING', 'pings other hosts', PING_GCB_BYTE) +
+  row('SERIAL UDP', 'Serial UDP:50001 Bridge', SERUDP_GCB_BYTE) +
+  row('SNTP', 'time from a time server', SNTP_GCB_BYTE) +
+  row('STATS', 'statistics counters', STATS_GCB_BYTE) +
+  row('SYSLOG', 'messages to a log server', SYSLOG_GCB_BYTE) +
+  row('TCP', 'connections', TCP_GCB_BYTE) +
+  row('UDP', 'datagrams', UDP_GCB_BYTE);
+document.getElementById('net').innerHTML =
+  info('IP', ip(IP1_GCB_BYTE, IP2_GCB_BYTE, IP3_GCB_BYTE, IP4_GCB_BYTE)) +
+  info('Mask', ip(MASK1_GCB_BYTE, MASK2_GCB_BYTE, MASK3_GCB_BYTE, MASK4_GCB_BYTE)) +
+  info('Gateway', ip(GW1_GCB_BYTE, GW2_GCB_BYTE, GW3_GCB_BYTE, GW4_GCB_BYTE)) +
+  info('DNS', ip(DNS1_GCB_BYTE, DNS2_GCB_BYTE, DNS3_GCB_BYTE, DNS4_GCB_BYTE)) +
+  info('MAC', hex(MAC1_GCB_BYTE) + ':' + hex(MAC2_GCB_BYTE) + ':' + hex(MAC3_GCB_BYTE) + ':' + hex(MAC4_GCB_BYTE) + ':' + hex(MAC5_GCB_BYTE) + ':' + hex(MAC6_GCB_BYTE)) +
+  info('Address', LEASE_GCB_BYTE ? 'DHCP lease' : 'fixed');
+</script>
+</body>
+</html>

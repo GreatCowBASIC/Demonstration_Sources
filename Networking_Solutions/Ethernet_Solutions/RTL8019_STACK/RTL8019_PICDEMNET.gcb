@@ -1,0 +1,651 @@
+//--------------------------------------------------------------------------------------------------------------------------------
+// Test 021 - PICDEMNET: a minimal web server on the original PICDEM.net (PIC16F877 + RTL8019AS)
+//
+// The 020 ideas cut down to fit 8K words and 368 bytes of RAM: fixed address, ARP reply, ping (ICMP echo), TCP on
+// port 80 without connection state, and one page (PageHome.htm) with the potentiometers AN0 and AN1, the switch RB5 and the user
+// LEDs RA2 / RA3 with Toggle. The page asks for /v (the values as JSON) every 2 s; /t0 and /t1 toggle a LED and answer
+// with the values. The LCD shows the address and the values; the system LED (RA4) blinks.
+//
+// How it fits: frames stay in the RTL8019AS's buffer (RTL8019_Driver.h); only the first 58 bytes of each (receive
+// header, Ethernet, IPv4, TCP) are read into RxHdr. Replies are written straight into the transmit buffer. The page is
+// sent in 536-byte segments without waiting for acknowledgements and without retransmission: a lost segment means
+// the browser asks again. No ARP cache: the reply goes to the MAC the request came from.
+//
+// Hardware (ENC28J60\hardware\16f877): hardwareconfig.h
+// Library (ENC28J60\libraries): RTL8019_Driver.h
+// Configuration and testing: README.md in this folder
+//
+//@author    Evan R. Venn
+//@licence   GPL
+//@date      07/11/2026
+//
+// Changes:
+//   02/11/2026  First version
+//   02/11/2026  /v JSON values polled by the page; /t0 /t1 answer with the values (no redirect, no page reload); LCD
+//               cleared (CLS) and written with Locate each second
+//   02/11/2026  TCP without connection state (a reload's second connection replaced the first: F5 failed); Update
+//               button on the page
+//   02/11/2026  LCD: RS (RD4) made an output again before each update (the RTL8019AS routines leave PORTD an input)
+//   02/11/2026  LCD initialised again at the start of the program, after its pins and 100 ms (cold start was wrong)
+//   02/11/2026  Boot screen "GCBASIC  2026" / "Web Server" for 4 s
+//   02/11/2026  BoardInit again at the start of the program, before the second InitLCD (cold start garbled 1 in 2)
+//   02/11/2026  Page: Auto Update (2 s) can be switched off; Update asks once
+//   02/11/2026  Auto Update a red (off) / green (on) button, off at start; the page is now two tables (both read)
+//   03/11/2026  Renamed from 021_PICDEMNET\021_PICDEMNET_Solution.gcb (now Development\021_PICDEMNET); the firmware name on /s and in syslog is the file name
+//   07/11/2026  Page: Update shown only while Auto Update is off; the Auto Update choice is kept by the browser (on
+//               again after a reload when it was left on)
+//--------------------------------------------------------------------------------------------------------------------------------
+
+    #option explicit
+
+// ----- Hardware: chip, clock, pins, LCD, RTL8019AS bus
+
+    #option IncludePath "..\libraries;..\hardware\16f877"
+    #include <hardwareconfig.h>
+
+// ----- Configuration
+
+    // This device: fixed address and MAC
+    #define MY_IP1 192
+    #define MY_IP2 168
+    #define MY_IP3 0
+    #define MY_IP4 125
+    #define MY_MAC1 0x00
+    #define MY_MAC2 0x1E
+    #define MY_MAC3 0xC0
+    #define MY_MAC4 0x00
+    #define MY_MAC5 0x00
+    #define MY_MAC6 0x07
+
+    // Largest TCP segment sent: 536 bytes, the size every host accepts without an MSS option
+    #define TCP_SEGMENT 536
+
+    #include <RTL8019_Driver.h>
+
+    // The page: PageHome.htm, converted when included (Tables PageHome1, PageHome2, PageHome_Size1, PageHome_Size2). Each value line becomes one 0
+    // byte in the table, sent as three characters: AN0, AN1, switch, LED0, LED1
+    #include "webpages\PageHome.htm"
+    #define PAGE_VALUES 5
+
+// ----- Offsets in RxHdr: the frame's first 58 bytes, from the 4-byte receive header
+
+    #define RX_STATUS    0
+    #define RX_NEXT      1
+    #define RX_ETH_SRC   10
+    #define RX_ETH_TYPE  16
+    #define RX_ARP_OP    25
+    #define RX_ARP_SHA   26
+    #define RX_ARP_SPA   32
+    #define RX_ARP_TPA   42
+    #define RX_IP_VHL    18
+    #define RX_IP_LEN    20
+    #define RX_IP_PROTO  27
+    #define RX_IP_SRC    30
+    #define RX_IP_DST    34
+    #define RX_L4        38                     // ICMP or TCP header (IPv4 header without options)
+    #define RX_TCP_DPORT 40
+    #define RX_TCP_SEQ   42
+    #define RX_TCP_ACKNO 46
+    #define RX_TCP_OFF   50
+    #define RX_TCP_FLAGS 51
+    #define RX_SIZE      58
+
+    #define TCP_FIN 0x01
+    #define TCP_SYN 0x02
+    #define TCP_RST 0x04
+    #define TCP_PSH 0x08
+    #define TCP_ACK 0x10
+
+    // Responses
+    #define RESP_PAGE 0
+    #define RESP_VALUES 1
+
+// ----- HTTP headers (CR LF as 13, 10)
+
+Table HttpOk
+    "HTTP/1.0 200 OK"
+    13, 10
+    "Content-Type: text/html"
+    13, 10
+    "Connection: close"
+    13, 10, 13, 10
+End Table
+
+Table HttpJson
+    "HTTP/1.0 200 OK"
+    13, 10
+    "Content-Type: application/json"
+    13, 10
+    "Connection: close"
+    13, 10, 13, 10
+End Table
+
+// The values as JSON, each 0 replaced by a value (three characters): {"a":AN0,"b":AN1,"s":switch,"l":LED0,"m":LED1}
+Table JsonValues
+    123, 34, 97, 34, 58, 0
+    44, 34, 98, 34, 58, 0
+    44, 34, 115, 34, 58, 0
+    44, 34, 108, 34, 58, 0
+    44, 34, 109, 34, 58, 0
+    125
+End Table
+
+// ----- Variables
+
+    Dim RxHdr(RX_SIZE)
+    Dim Chunk(16)
+    Dim PageVal(PAGE_VALUES)
+    // The peer of the segment being answered
+    Dim TcpPeerMac1, TcpPeerMac2, TcpPeerMac3, TcpPeerMac4, TcpPeerMac5, TcpPeerMac6 As Byte
+    Dim TcpPeerIp1, TcpPeerIp2, TcpPeerIp3, TcpPeerIp4 As Byte
+    Dim TcpPeerPort As Word
+    Dim TcpSeq, TcpAck, TcpIsn As Long
+    Dim IpIdent, IpLength, TcpPayload As Word
+    // Checksum: EmitMode 0 adds each byte to CsSum, 1 writes it to the RTL8019AS
+    Dim CsSum As Long
+    Dim CsWord, IpCsum, TcpCsum As Word
+    Dim CsOdd, EmitMode As Byte
+    // Response generator: 0 header, 1 page, 2 done; the saved copy for the second pass
+    Dim RespKind, GenPhase, GenDigit, GenValueNo, GenSavePhase, GenSaveDigit, GenSaveValueNo As Byte
+    Dim GenIdx, GenSaveIdx As Word
+    Dim TickCount, SysLed As Byte
+
+// ----- Main program
+
+    // Cold start: the library's start-up InitLCD can run before the LCD is ready after power-up. All pins to their
+    // board state again (RTL8019AS strobes inactive, LEDs off, RW low), the LCD pins, time, then initialise it again
+    BoardInit
+    Dir LCD_RS Out
+    Set BOARD_LCD_RW Off
+    Dir BOARD_LCD_RW Out
+    Wait 100 ms
+    InitLCD
+
+    // Boot screen, 4 s
+    CLS
+    Print "GCBASIC  2026"
+    Locate 1, 0
+    Print "Web Server"
+    Wait 4 s
+
+    CLS
+    Print "PICDEM.net"
+    If NicInit = 0 Then
+        Locate 1, 0
+        Print "RTL8019AS failed"
+        Do Forever
+        Loop
+    End If
+
+    TcpIsn = 0x12345678
+    IpIdent = 0
+    TickCount = 0
+    SysLed = 0
+    // Timer1, Fosc/4 / 8: overflows every 107 ms; 9 overflows make the LCD's second
+    InitTimer1 Osc, PS1_8
+    StartTimer 1
+
+    Do Forever
+        If NicPacket = 1 Then
+            HandleFrame
+            NicDiscard
+        End If
+        If TMR1IF = 1 Then
+            TMR1IF = 0
+            TickCount++
+            If TickCount >= 9 Then
+                TickCount = 0
+                ShowStatus
+            End If
+        End If
+    Loop
+
+// ----- LCD and values
+
+Sub ShowStatus
+    // Line 1 the address, line 2 the values; the system LED blinks (RA4, on when low)
+    // PORTD back to the LCD: the RTL8019AS routines leave it an input, but the LCD library only sets the data pins'
+    // direction on each write - RS (RD4) and RW (RD5) must be outputs, RW low
+    Dir LCD_RS Out
+    Set BOARD_LCD_RW Off
+    Dir BOARD_LCD_RW Out
+    CLS
+    Locate 0, 0
+    Print MY_IP1 : Print "." : Print MY_IP2 : Print "." : Print MY_IP3 : Print "." : Print MY_IP4
+    TakeValues
+    Locate 1, 0
+    Print "A0 " : LCDThree PageVal(1)
+    Print " A1 " : LCDThree PageVal(2)
+    Print " S" : Print PageVal(3)
+    SysLed = SysLed Xor 1
+    If SysLed = 1 Then
+        Set BOARD_SYS_LED Off
+    Else
+        Set BOARD_SYS_LED On
+    End If
+End Sub
+
+Sub LCDThree(In LcdNumber)
+    If LcdNumber < 100 Then Print " "
+    If LcdNumber < 10 Then Print " "
+    Print LcdNumber
+End Sub
+
+Sub TakeValues
+    // AN0, AN1, switch (1 released), LED0, LED1 (1 on: the LEDs light when their pin is low)
+    PageVal(1) = ReadAD(BOARD_POT0)
+    PageVal(2) = ReadAD(BOARD_POT1)
+    PageVal(3) = 0
+    If BOARD_SWITCH = 1 Then PageVal(3) = 1
+    PageVal(4) = 0
+    If BOARD_LED0 = 0 Then PageVal(4) = 1
+    PageVal(5) = 0
+    If BOARD_LED1 = 0 Then PageVal(5) = 1
+End Sub
+
+// ----- Frames
+
+Sub HandleFrame
+    // Read the first RX_SIZE bytes (receive header and headers), then ARP or IPv4 for us
+    Dim RxIndex As Byte
+    NicReadStart NicRxAddr(0), RX_SIZE
+    For RxIndex = 0 To RX_SIZE - 1
+        RxHdr(RxIndex) = NicRead(NIC_DATAPORT)
+    Next
+    NicNext = RxHdr(RX_NEXT)
+    If (RxHdr(RX_STATUS) And 1) = 0 Then Exit Sub
+    If RxHdr(RX_ETH_TYPE) <> 0x08 Then Exit Sub
+    If RxHdr(RX_ETH_TYPE + 1) = 0x06 Then
+        HandleArp
+        Exit Sub
+    End If
+    If RxHdr(RX_ETH_TYPE + 1) <> 0x00 Then Exit Sub
+    // IPv4 without options, to our address
+    If RxHdr(RX_IP_VHL) <> 0x45 Then Exit Sub
+    If IsMyIp(RX_IP_DST) = 0 Then Exit Sub
+    IpLength_H = RxHdr(RX_IP_LEN)
+    [byte]IpLength = RxHdr(RX_IP_LEN + 1)
+    If RxHdr(RX_IP_PROTO) = 1 Then HandleIcmp
+    If RxHdr(RX_IP_PROTO) = 6 Then HandleTcp
+End Sub
+
+Function IsMyIp(In IpAt) As Byte
+    // 1 when the four bytes at RxHdr(IpAt) are our address
+    IsMyIp = 0
+    If RxHdr(IpAt) <> MY_IP1 Then Exit Function
+    If RxHdr(IpAt + 1) <> MY_IP2 Then Exit Function
+    If RxHdr(IpAt + 2) <> MY_IP3 Then Exit Function
+    If RxHdr(IpAt + 3) <> MY_IP4 Then Exit Function
+    IsMyIp = 1
+End Function
+
+Sub HandleArp
+    // A request for our address: the reply, built from the request, to the requester's MAC
+    If RxHdr(RX_ARP_OP) <> 1 Then Exit Sub
+    If IsMyIp(RX_ARP_TPA) = 0 Then Exit Sub
+    EmitMode = 1
+    NicWriteStart NIC_TXSTART * 256, 60
+    EmitRx RX_ARP_SHA, 6
+    EmitMyMac
+    Emit 0x08 : Emit 0x06
+    Emit 0x00 : Emit 0x01 : Emit 0x08 : Emit 0x00 : Emit 6 : Emit 4 : Emit 0x00 : Emit 0x02
+    EmitMyMac
+    EmitMyIp
+    EmitRx RX_ARP_SHA, 6
+    EmitRx RX_ARP_SPA, 4
+    EmitZeros 18
+    NicSend 60
+End Sub
+
+Sub HandleIcmp
+    // Echo request: the same frame back with the addresses swapped and type 0 (echo reply). The IPv4 checksum stays
+    // right (the same words); the ICMP checksum gets 0x0800 added for the type change. Data copied in 16-byte chunks
+    Dim IcmpCopied, IcmpLeft, IcmpCsum As Word
+    Dim IcmpCount, IcmpIndex As Byte
+    If RxHdr(RX_L4) <> 8 Then Exit Sub
+    If IpLength > 1500 Then Exit Sub
+    If IpLength < 28 Then Exit Sub
+    IcmpCsum_H = RxHdr(RX_L4 + 2)
+    [byte]IcmpCsum = RxHdr(RX_L4 + 3)
+    IcmpCsum = IcmpCsum + 0x0800
+    If IcmpCsum < 0x0800 Then IcmpCsum++
+
+    EmitMode = 1
+    NicWriteStart NIC_TXSTART * 256, 38
+    EmitRx RX_ETH_SRC, 6
+    EmitMyMac
+    EmitRx RX_ETH_TYPE, 14
+    EmitRx RX_IP_DST, 4
+    EmitRx RX_IP_SRC, 4
+    Emit 0
+    Emit RxHdr(RX_L4 + 1)
+    Emit IcmpCsum_H
+    Emit [byte]IcmpCsum
+
+    // The rest of the ICMP message: frame offset 42 (4-byte receive header + 14 + 20 + 4) to transmit offset 38
+    IcmpCopied = 0
+    IcmpLeft = IpLength - 24
+    Do While IcmpLeft > 0
+        IcmpCount = 16
+        If IcmpLeft < 16 Then IcmpCount = IcmpLeft
+        NicReadStart NicRxAddr(42 + IcmpCopied), IcmpCount
+        For IcmpIndex = 1 To IcmpCount
+            Chunk(IcmpIndex) = NicRead(NIC_DATAPORT)
+        Next
+        NicWriteStart NIC_TXSTART * 256 + 38 + IcmpCopied, IcmpCount
+        For IcmpIndex = 1 To IcmpCount
+            NicWrite NIC_DATAPORT, Chunk(IcmpIndex)
+        Next
+        IcmpCopied = IcmpCopied + IcmpCount
+        IcmpLeft = IcmpLeft - IcmpCount
+    Loop
+    NicSend 14 + IpLength
+End Sub
+
+// ----- TCP
+
+Sub HandleTcp
+    // Port 80 without connection state: each segment is answered from its own numbers, so any number of connections
+    // (a browser opens two on a reload) work. SYN: SYN-ACK. Data (the HTTP request): the response, ending with FIN.
+    // FIN alone: acknowledged
+    Dim TcpFlags, TcpOffset As Byte
+    If RxHdr(RX_TCP_DPORT) <> 0 Then Exit Sub
+    If RxHdr(RX_TCP_DPORT + 1) <> 80 Then Exit Sub
+    TcpFlags = RxHdr(RX_TCP_FLAGS)
+    If (TcpFlags And TCP_RST) <> 0 Then Exit Sub
+
+    // The peer: MAC, address and port from this frame
+    TcpPeerMac1 = RxHdr(RX_ETH_SRC)
+    TcpPeerMac2 = RxHdr(RX_ETH_SRC + 1)
+    TcpPeerMac3 = RxHdr(RX_ETH_SRC + 2)
+    TcpPeerMac4 = RxHdr(RX_ETH_SRC + 3)
+    TcpPeerMac5 = RxHdr(RX_ETH_SRC + 4)
+    TcpPeerMac6 = RxHdr(RX_ETH_SRC + 5)
+    TcpPeerIp1 = RxHdr(RX_IP_SRC)
+    TcpPeerIp2 = RxHdr(RX_IP_SRC + 1)
+    TcpPeerIp3 = RxHdr(RX_IP_SRC + 2)
+    TcpPeerIp4 = RxHdr(RX_IP_SRC + 3)
+    TcpPeerPort_H = RxHdr(RX_L4)
+    [byte]TcpPeerPort = RxHdr(RX_L4 + 1)
+
+    // We acknowledge their sequence number; we send from the number they acknowledge
+    TcpAck_E = RxHdr(RX_TCP_SEQ)
+    TcpAck_U = RxHdr(RX_TCP_SEQ + 1)
+    TcpAck_H = RxHdr(RX_TCP_SEQ + 2)
+    [byte]TcpAck = RxHdr(RX_TCP_SEQ + 3)
+    TcpSeq_E = RxHdr(RX_TCP_ACKNO)
+    TcpSeq_U = RxHdr(RX_TCP_ACKNO + 1)
+    TcpSeq_H = RxHdr(RX_TCP_ACKNO + 2)
+    [byte]TcpSeq = RxHdr(RX_TCP_ACKNO + 3)
+
+    If (TcpFlags And TCP_SYN) <> 0 Then
+        TcpAck = TcpAck + 1
+        TcpIsn = TcpIsn + 0x00010000
+        TcpSeq = TcpIsn
+        SendSegment TCP_SYN Or TCP_ACK, 0
+        Exit Sub
+    End If
+
+    TcpOffset = RxHdr(RX_TCP_OFF) / 4
+    TcpOffset = TcpOffset And 0xFC
+    TcpPayload = IpLength - 20 - TcpOffset
+    If TcpPayload > 0 Then
+        // The request (and a FIN with it)
+        TcpAck = TcpAck + TcpPayload
+        If (TcpFlags And TCP_FIN) <> 0 Then TcpAck = TcpAck + 1
+        ReadRequest TcpOffset
+        SendResponse
+        Exit Sub
+    End If
+    If (TcpFlags And TCP_FIN) <> 0 Then
+        TcpAck = TcpAck + 1
+        SendSegment TCP_ACK, 0
+    End If
+End Sub
+
+Sub ReadRequest(In ReqOffset)
+    // The first 8 bytes of the request: "GET /v" the values, "GET /t0" or "GET /t1" toggles that LED and answers with
+    // the values, anything else is the page. The LEDs light when their pin is low
+    Dim ReqIndex As Byte
+    NicReadStart NicRxAddr(RX_L4 + ReqOffset), 8
+    For ReqIndex = 1 To 8
+        Chunk(ReqIndex) = NicRead(NIC_DATAPORT)
+    Next
+    RespKind = RESP_PAGE
+    If Chunk(5) <> 47 Then Exit Sub         // "/"
+    If Chunk(6) = 118 Then RespKind = RESP_VALUES   // "v"
+    If Chunk(6) <> 116 Then Exit Sub        // "t"
+    If Chunk(7) = 48 Then
+        If BOARD_LED0 = 1 Then
+            Set BOARD_LED0 Off
+        Else
+            Set BOARD_LED0 On
+        End If
+        RespKind = RESP_VALUES
+    End If
+    If Chunk(7) = 49 Then
+        If BOARD_LED1 = 1 Then
+            Set BOARD_LED1 Off
+        Else
+            Set BOARD_LED1 On
+        End If
+        RespKind = RESP_VALUES
+    End If
+End Sub
+
+Sub SendResponse
+    // The HTTP header and the page or the values, in segments of up to TCP_SEGMENT bytes; the last one carries FIN
+    Dim RespLeft, RespSeg As Word
+    Dim RespFlags As Byte
+    TakeValues
+    If RespKind = RESP_PAGE Then
+        ReadTable HttpOk, 0, RespLeft
+        RespLeft = RespLeft + PageHome_Size1 + PageHome_Size2 + PAGE_VALUES * 2
+    Else
+        ReadTable HttpJson, 0, RespLeft
+        ReadTable JsonValues, 0, RespSeg
+        RespLeft = RespLeft + RespSeg + PAGE_VALUES * 2
+    End If
+    GenPhase = 0
+    GenIdx = 1
+    GenDigit = 0
+    GenValueNo = 0
+    Do While RespLeft > 0
+        RespSeg = TCP_SEGMENT
+        If RespLeft < TCP_SEGMENT Then RespSeg = RespLeft
+        RespFlags = TCP_ACK Or TCP_PSH
+        If RespSeg = RespLeft Then RespFlags = RespFlags Or TCP_FIN
+        SendSegment RespFlags, RespSeg
+        TcpSeq = TcpSeq + RespSeg
+        RespLeft = RespLeft - RespSeg
+    Loop
+    TcpSeq = TcpSeq + 1
+End Sub
+
+Sub SendSegment(In SegFlags, In SegLength As Word)
+    // One TCP segment to the peer with SegLength bytes from the response generator. First pass: the checksums; second
+    // pass: the frame into the transmit buffer
+    Dim SegIndex, SegTcpLength As Word
+
+    // TCP checksum: pseudo-header, TCP header (checksum 0), data
+    GenSavePhase = GenPhase
+    GenSaveIdx = GenIdx
+    GenSaveDigit = GenDigit
+    GenSaveValueNo = GenValueNo
+    EmitMode = 0
+    CsSum = 0
+    CsOdd = 0
+    EmitMyIp
+    EmitPeerIp
+    Emit 0 : Emit 6
+    SegTcpLength = SegLength + 20
+    Emit SegTcpLength_H : Emit [byte]SegTcpLength
+    TcpCsum = 0
+    EmitTcpHeader SegFlags
+    For SegIndex = 1 To SegLength
+        Emit GenNext
+    Next
+    TcpCsum = CsResult
+
+    // IPv4 header checksum
+    CsSum = 0
+    CsOdd = 0
+    IpCsum = 0
+    IpLength = SegLength + 40
+    EmitIpHeader
+    IpCsum = CsResult
+
+    // The frame
+    GenPhase = GenSavePhase
+    GenIdx = GenSaveIdx
+    GenDigit = GenSaveDigit
+    GenValueNo = GenSaveValueNo
+    EmitMode = 1
+    NicWriteStart NIC_TXSTART * 256, SegLength + 54
+    Emit TcpPeerMac1 : Emit TcpPeerMac2 : Emit TcpPeerMac3 : Emit TcpPeerMac4 : Emit TcpPeerMac5 : Emit TcpPeerMac6
+    EmitMyMac
+    Emit 0x08 : Emit 0x00
+    EmitIpHeader
+    EmitTcpHeader SegFlags
+    For SegIndex = 1 To SegLength
+        Emit GenNext
+    Next
+    NicSend SegLength + 54
+    IpIdent++
+End Sub
+
+Sub EmitIpHeader
+    // 20 bytes: version 4, length IpLength, identification, don't fragment, TTL 64, TCP, IpCsum, our address, the peer
+    Emit 0x45 : Emit 0
+    Emit IpLength_H : Emit [byte]IpLength
+    Emit IpIdent_H : Emit [byte]IpIdent
+    Emit 0x40 : Emit 0
+    Emit 64 : Emit 6
+    Emit IpCsum_H : Emit [byte]IpCsum
+    EmitMyIp
+    EmitPeerIp
+End Sub
+
+Sub EmitTcpHeader(In HdrFlags)
+    // 20 bytes: port 80 to the peer's port, TcpSeq, TcpAck, header length 20, HdrFlags, window 1460, TcpCsum
+    Emit 0 : Emit 80
+    Emit TcpPeerPort_H : Emit [byte]TcpPeerPort
+    Emit TcpSeq_E : Emit TcpSeq_U : Emit TcpSeq_H : Emit [byte]TcpSeq
+    Emit TcpAck_E : Emit TcpAck_U : Emit TcpAck_H : Emit [byte]TcpAck
+    Emit 0x50 : Emit HdrFlags
+    Emit 0x05 : Emit 0xB4
+    Emit TcpCsum_H : Emit [byte]TcpCsum
+    Emit 0 : Emit 0
+End Sub
+
+// ----- Byte output: to the checksum (EmitMode 0) or to the RTL8019AS (EmitMode 1)
+
+Sub Emit(In EmitByte)
+    If EmitMode = 1 Then
+        NicWrite NIC_DATAPORT, EmitByte
+        Exit Sub
+    End If
+    // The checksum is the one's-complement sum of 16-bit words: the first byte of each word is the high byte
+    If CsOdd = 0 Then
+        CsWord_H = EmitByte
+        [byte]CsWord = 0
+    Else
+        CsWord = EmitByte
+    End If
+    CsSum = CsSum + CsWord
+    CsOdd = CsOdd Xor 1
+End Sub
+
+Function CsResult As Word
+    // Fold the carries into 16 bits and complement
+    Do While CsSum_U <> 0
+        CsWord_H = CsSum_E
+        [byte]CsWord = CsSum_U
+        CsSum_E = 0
+        CsSum_U = 0
+        CsSum = CsSum + CsWord
+    Loop
+    CsWord = CsSum
+    CsResult = CsWord Xor 0xFFFF
+End Function
+
+Sub EmitRx(In EmitFrom, In EmitCount)
+    // EmitCount bytes from RxHdr, starting at EmitFrom
+    Dim EmitIndex As Byte
+    For EmitIndex = 1 To EmitCount
+        Emit RxHdr(EmitFrom)
+        EmitFrom++
+    Next
+End Sub
+
+Sub EmitZeros(In ZeroCount)
+    Dim ZeroIndex As Byte
+    For ZeroIndex = 1 To ZeroCount
+        Emit 0
+    Next
+End Sub
+
+Sub EmitMyMac
+    Emit MY_MAC1 : Emit MY_MAC2 : Emit MY_MAC3 : Emit MY_MAC4 : Emit MY_MAC5 : Emit MY_MAC6
+End Sub
+
+Sub EmitMyIp
+    Emit MY_IP1 : Emit MY_IP2 : Emit MY_IP3 : Emit MY_IP4
+End Sub
+
+Sub EmitPeerIp
+    Emit TcpPeerIp1 : Emit TcpPeerIp2 : Emit TcpPeerIp3 : Emit TcpPeerIp4
+End Sub
+
+// ----- Response generator: the HTTP header, then the page or the JSON with each 0 byte replaced by a value (three
+// characters)
+
+Function GenNext As Byte
+    Dim GenByte, GenLength, GenValue As Byte
+    If GenDigit = 0 Then
+        If GenPhase = 0 Then
+            If RespKind = RESP_PAGE Then
+                ReadTable HttpOk, GenIdx, GenByte
+                ReadTable HttpOk, 0, GenLength
+            Else
+                ReadTable HttpJson, GenIdx, GenByte
+                ReadTable HttpJson, 0, GenLength
+            End If
+            GenNext = GenByte
+            If [byte]GenIdx = GenLength Then
+                GenPhase = 1
+                GenIdx = 0
+            End If
+            GenIdx++
+            Exit Function
+        End If
+        If RespKind = RESP_PAGE Then
+            // The page is in two tables: PageHome1, then PageHome2
+            If GenIdx <= PageHome_Size1 Then
+                ReadTable PageHome1, GenIdx, GenByte
+            Else
+                ReadTable PageHome2, GenIdx - PageHome_Size1, GenByte
+            End If
+        Else
+            ReadTable JsonValues, GenIdx, GenByte
+        End If
+        GenIdx++
+        If GenByte <> 0 Then
+            GenNext = GenByte
+            Exit Function
+        End If
+        GenValueNo++
+        GenDigit = 3
+    End If
+    // A value, right aligned in three characters
+    GenValue = PageVal(GenValueNo)
+    GenNext = 32
+    If GenDigit = 3 Then
+        If GenValue >= 100 Then GenNext = GenValue / 100 + 48
+    End If
+    If GenDigit = 2 Then
+        If GenValue >= 10 Then GenNext = (GenValue / 10) % 10 + 48
+    End If
+    If GenDigit = 1 Then GenNext = GenValue % 10 + 48
+    GenDigit--
+End Function

@@ -1,0 +1,26 @@
+{
+"dev": {"ids": "enc28j60-4", "name": "ENC28J60-4", "mf": "GCBASIC", "mdl": "PIC18F47Q43 + ENC28J60"},
+"o": {"name": "GCBASIC ENC28J60 stack"},
+"stat_t": "enc28j60-4/values",
+"avty_t": "enc28j60-4/status",
+"cmps": {
+"an2": {"p": "sensor", "name": "AN2", "stat_cla": "measurement", "val_tpl": "{{ value_json.a }}", "uniq_id": "enc28j60-4_an2"},
+"an3": {"p": "sensor", "name": "AN3", "stat_cla": "measurement", "val_tpl": "{{ value_json.b }}", "uniq_id": "enc28j60-4_an3"},
+"rd0": {"p": "switch", "name": "RD0", "cmd_t": "enc28j60-4/led/0", "val_tpl": "{{ 'ON' if value_json.d|int|bitwise_and(1) else 'OFF' }}", "uniq_id": "enc28j60-4_rd0"},
+"rd1": {"p": "switch", "name": "RD1", "cmd_t": "enc28j60-4/led/1", "val_tpl": "{{ 'ON' if value_json.d|int|bitwise_and(2) else 'OFF' }}", "uniq_id": "enc28j60-4_rd1"},
+"rd2": {"p": "switch", "name": "RD2", "cmd_t": "enc28j60-4/led/2", "val_tpl": "{{ 'ON' if value_json.d|int|bitwise_and(4) else 'OFF' }}", "uniq_id": "enc28j60-4_rd2"},
+"rd3": {"p": "switch", "name": "RD3", "cmd_t": "enc28j60-4/led/3", "val_tpl": "{{ 'ON' if value_json.d|int|bitwise_and(8) else 'OFF' }}", "uniq_id": "enc28j60-4_rd3"},
+"rd4": {"p": "switch", "name": "RD4", "cmd_t": "enc28j60-4/led/4", "val_tpl": "{{ 'ON' if value_json.d|int|bitwise_and(16) else 'OFF' }}", "uniq_id": "enc28j60-4_rd4"},
+"rd5": {"p": "switch", "name": "RD5", "cmd_t": "enc28j60-4/led/5", "val_tpl": "{{ 'ON' if value_json.d|int|bitwise_and(32) else 'OFF' }}", "uniq_id": "enc28j60-4_rd5"},
+"rd6": {"p": "switch", "name": "RD6", "cmd_t": "enc28j60-4/led/6", "val_tpl": "{{ 'ON' if value_json.d|int|bitwise_and(64) else 'OFF' }}", "uniq_id": "enc28j60-4_rd6"},
+"rd7": {"p": "switch", "name": "RD7", "cmd_t": "enc28j60-4/led/7", "val_tpl": "{{ 'ON' if value_json.d|int|bitwise_and(128) else 'OFF' }}", "uniq_id": "enc28j60-4_rd7"},
+"rb0": {"p": "binary_sensor", "name": "RB0", "val_tpl": "{{ 'ON' if value_json.p|int|bitwise_and(1) else 'OFF' }}", "uniq_id": "enc28j60-4_rb0"},
+"rb1": {"p": "binary_sensor", "name": "RB1", "val_tpl": "{{ 'ON' if value_json.p|int|bitwise_and(2) else 'OFF' }}", "uniq_id": "enc28j60-4_rb1"},
+"rb2": {"p": "binary_sensor", "name": "RB2", "val_tpl": "{{ 'ON' if value_json.p|int|bitwise_and(4) else 'OFF' }}", "uniq_id": "enc28j60-4_rb2"},
+"rb3": {"p": "binary_sensor", "name": "RB3", "val_tpl": "{{ 'ON' if value_json.p|int|bitwise_and(8) else 'OFF' }}", "uniq_id": "enc28j60-4_rb3"},
+"rb4": {"p": "binary_sensor", "name": "RB4", "val_tpl": "{{ 'ON' if value_json.p|int|bitwise_and(16) else 'OFF' }}", "uniq_id": "enc28j60-4_rb4"},
+"rb5": {"p": "binary_sensor", "name": "RB5", "val_tpl": "{{ 'ON' if value_json.p|int|bitwise_and(32) else 'OFF' }}", "uniq_id": "enc28j60-4_rb5"},
+"rb6": {"p": "binary_sensor", "name": "RB6", "val_tpl": "{{ 'ON' if value_json.p|int|bitwise_and(64) else 'OFF' }}", "uniq_id": "enc28j60-4_rb6"},
+"rb7": {"p": "binary_sensor", "name": "RB7", "val_tpl": "{{ 'ON' if value_json.p|int|bitwise_and(128) else 'OFF' }}", "uniq_id": "enc28j60-4_rb7"}
+}
+}

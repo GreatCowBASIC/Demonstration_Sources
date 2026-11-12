@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html><head><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>W5100 solution</title>
+<style>
+body{font-family:system-ui,sans-serif;background:#0f172a;color:#e2e8f0;margin:0;padding:16px}
+h1{font-size:20px;margin:0}
+h2{font-size:13px;color:#94a3b8;margin:0 0 8px}
+.s{color:#94a3b8;font-size:13px;margin:4px 0 16px}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.c{background:#1e293b;border-radius:12px;padding:14px}
+.r{display:flex;gap:10px;margin:6px 0;font-size:14px}
+.r span{margin-left:auto}
+a{color:#38bdf8;text-decoration:none;font-size:12px;border:1px solid;border-radius:8px;padding:2px 10px}
+</style></head><body>
+<h1>Solution and configuration</h1>
+<div class="s">ATmega328P &middot; Ethernet shield &middot; <a href="/">Dashboard</a> <a href="/f/">Files</a></div>
+<div class="g" id="g"></div>
+<script>
+var BY_GCB_BYTE=26;
+var BM_GCB_BYTE=1;
+var BD_GCB_BYTE=1;
+var BH_GCB_BYTE=0;
+var BMI_GCB_BYTE=0;
+var BS_GCB_BYTE=0;
+var BNH_GCB_BYTE=0;
+var BNL_GCB_BYTE=1;
+var TS_GCB_BYTE=0;
+var TY_GCB_BYTE=26;
+var TMO_GCB_BYTE=1;
+var TD_GCB_BYTE=1;
+var TH_GCB_BYTE=0;
+var TMI_GCB_BYTE=0;
+var TSE_GCB_BYTE=0;
+var STR_GCB_BYTE=0;
+var WOK_GCB_BYTE=0;
+var SK0_GCB_BYTE=0;
+var SK1_GCB_BYTE=0;
+var SK2_GCB_BYTE=0;
+var SK3_GCB_BYTE=0;
+var SDT_GCB_BYTE=0;
+var SMH_GCB_BYTE=0;
+var SML_GCB_BYTE=0;
+var FAT_GCB_BYTE=0;
+function Z(n){return ('0'+n).slice(-2);}
+function W(y,mo,d,h,mi,s){return (2000+y)+'-'+Z(mo)+'-'+Z(d)+' '+Z(h)+':'+Z(mi)+':'+Z(s);}
+function I(n,v){return '<div class="r"><b>'+n+'</b><span>'+v+'</span></div>';}
+function C(h,r){return '<div class="c"><h2>'+h+'</h2>'+r+'</div>';}
+function K(v){return {0:'closed',19:'init',20:'listen',23:'established',28:'close wait',34:'UDP'}[v]||v;}
+function P(h){document.getElementById('g').innerHTML=h;}
+P(C('FIRMWARE',I('Firmware','WIZNET_MEGA328P_W5100-10')+I('Built',W(BY_GCB_BYTE,BM_GCB_BYTE,BD_GCB_BYTE,BH_GCB_BYTE,BMI_GCB_BYTE,BS_GCB_BYTE))+I('Build',BNH_GCB_BYTE*256+BNL_GCB_BYTE)+I('Rig','ATmega328P, 16 MHz, 5 V'))
++C('TIME',I('Time',TS_GCB_BYTE<2?'waiting':W(TY_GCB_BYTE,TMO_GCB_BYTE,TD_GCB_BYTE,TH_GCB_BYTE,TMI_GCB_BYTE,TSE_GCB_BYTE)+' UTC')+I('Time server','192.168.0.250')+I('Stratum',STR_GCB_BYTE))
++C('NETWORK',I('Address','192.168.0.129 fixed')+I('Mask','255.255.255.0')+I('Gateway','192.168.0.250')+I('MAC','00:1E:C0:00:00:0A'))
++C('W5100',I('Chip',WOK_GCB_BYTE?'answering':'not answering')+I('Socket 0','web, '+K(SK0_GCB_BYTE))+I('Socket 1','web, '+K(SK1_GCB_BYTE))+I('Socket 2','SNTP, syslog, '+K(SK2_GCB_BYTE))+I('Socket 3','spare, '+K(SK3_GCB_BYTE)))
++C('SD CARD',SDT_GCB_BYTE?I('Card',['','SD 1','SD 2','SDHC / SDXC'][SDT_GCB_BYTE])+I('Size',(SMH_GCB_BYTE*256+SML_GCB_BYTE)+' MB')+I('File system',FAT_GCB_BYTE?'FAT'+FAT_GCB_BYTE:'none'):I('Card','none'))
++C('CONFIG',I('Serial','D.0 (D0) RX, D.1 (D1) TX, 9600')+I('SPI','B.5 (D13), B.3 (D11), B.4 (D12), 4 MHz')+I('W5100 CS','B.2 (D10)')+I('SD card CS','D.4 (D4)')));
+function L(){fetch('/s').then(r=>r.text()).then(t=>{document.open();document.write(t);document.close();}).catch(()=>setTimeout(L,500));}
+setTimeout(L,10000-Date.now()%10000);
+</script>
+</body></html>

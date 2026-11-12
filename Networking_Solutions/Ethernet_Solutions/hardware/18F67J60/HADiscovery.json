@@ -1,0 +1,12 @@
+{
+"dev": {"ids": "enc28j60-5", "name": "ENC28J60-5", "mf": "GCBASIC", "mdl": "PIC18F67J60 (Olimex PIC-WEB)"},
+"o": {"name": "GCBASIC ENC28J60 stack"},
+"stat_t": "enc28j60-5/values",
+"avty_t": "enc28j60-5/status",
+"cmps": {
+"pot": {"p": "sensor", "name": "Potentiometer", "unit_of_meas": "%", "stat_cla": "measurement", "val_tpl": "{{ (value_json.a|int * 100 / 255)|round(0) }}", "uniq_id": "enc28j60-5_pot"},
+"temp": {"p": "sensor", "name": "Temperature", "dev_cla": "temperature", "unit_of_meas": "\u00b0C", "stat_cla": "measurement", "val_tpl": "{% set r = [[value_json.b|int, 1]|max, 254]|min %}{{ (1 / (1 / 298.15 + log(10000 * (255 / r - 1) / 10000) / 4100) - 273.15)|round(1) }}", "uniq_id": "enc28j60-5_temp"},
+"led": {"p": "switch", "name": "LED", "cmd_t": "enc28j60-5/led/0", "val_tpl": "{{ 'ON' if value_json.d|int|bitwise_and(1) else 'OFF' }}", "uniq_id": "enc28j60-5_led"},
+"but": {"p": "binary_sensor", "name": "Button", "val_tpl": "{{ 'OFF' if value_json.p|int|bitwise_and(1) else 'ON' }}", "uniq_id": "enc28j60-5_button"}
+}
+}

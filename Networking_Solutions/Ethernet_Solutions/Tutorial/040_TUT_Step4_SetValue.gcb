@@ -1,0 +1,227 @@
+//------------------------------------------------------------------------------------------------------------------------------
+// Tutorial step 4 - one value to set
+//
+// A link on the page switches the red LED on the PIC-WEB (RB4); the page shows whether the LED is on or off.
+//
+// The link is an action link: /t0. The browser asks for /t0, the web server calls HTTP_Action(0), the program
+// switches the LED, and the server answers "302 Found, go to /" - the browser shows the page again, with the new state.
+// There are ten action links, /t0 to /t9; each is one fixed action (the browser cannot send a number of its own).
+// In the page:  LED_GCB_BYTE>0  and not  LED_GCB_BYTE==1 : a line with = and a _GCB_BYTE name becomes a hole.
+//
+// Lines marked // MANDATED cannot be left out: without them the program does not compile, or the board does not
+// answer on the network. Everything else is a choice.
+// Lines marked //! are what changed from the step before: the page (a second value, LED_GCB_BYTE, and the Toggle link), MyLed, HTTP_UpdateValues, HTTP_PageValue and HTTP_Action
+//
+// Board: the Olimex PIC-WEB (PIC18F67J60, Ethernet built into the PIC), at http://192.168.0.123/
+// Hardware (ENC28J60\hardware\18F67J60): hardwareconfig.h - the PIC-WEB board and its Ethernet driver
+// Libraries (ENC28J60\libraries): ENC28J60_Stack.h, which includes the rest as switched
+// Tutorial: https://claude.ai/artifact/3hW1NfDYK6GcsLTbUUsvKb
+//------------------------------------------------------------------------------------------------------------------------------
+
+    // Not mandated, but recommended: every variable must be declared with Dim, so a mistyped name is an error
+    #option explicit
+
+// ----- Hardware: chip, clock, board, Ethernet driver
+
+    // MANDATED: where the libraries and the board file are. Without it every #include <...> below fails
+    #option IncludePath "..\libraries;..\hardware\18F67J60"
+
+    // MANDATED: the chip and its clock - all timing (millis, waits, Ethernet) depends on them. 25 MHz, straight from
+    // the crystal. The program sets them, not the board file: #Chip and #Config inside #if are not conditional
+    #Chip 18F67J60, 25
+    #Config FOSC = HS
+
+    // MANDATED: the board - pins, LED, and the Ethernet driver (ENC_Init, ENC_Service)
+    #include <hardwareconfig.h>
+
+// ----- Stack modules: 1 = in the program, 0 = not in the program at all
+
+    // MANDATED: all 14 switches. The stack has no defaults: its #script checks each one, and a missing switch gives a
+    // warning (and counts as 0). Set the modules you do not need to 0 - do not delete the line
+    #define STACK_ICMP       0       // answer ping
+    #define STACK_PING       0       // ping other hosts
+    #define STACK_UDP        0       // UDP
+    #define STACK_UDP_ECHO   0       // UDP echo on port 7
+    #define STACK_SYSLOG     0       // syslog messages
+    #define STACK_SNTP       0       // time from a time server
+    #define STACK_DNS        0       // DNS resolver
+    #define STACK_DHCP       0       // 0 = fixed address MY_IP
+    #define STACK_TCP        1       // TCP connections (the web server needs it)
+    #define STACK_HTTP       1       // web server on port 80
+    #define STACK_MQTT       0       // MQTT client
+    #define STACK_STATS      0       // statistics counters
+    #define STACK_CONSOLE    0       // 0 headless, 1 serial console, 2 TCP terminal (telnet port 23)
+    #define STACK_SERIAL_UDP 0       // serial port to UDP and back
+
+// ----- Network
+
+    // MANDATED: the board's identity on the network. The MAC must be unique on your network. The address, mask and
+    // gateway are the fixed address (with STACK_DHCP 1 they are the fall-back when no DHCP server answers).
+    // Here: 192.168.0.123, the router's lease for this MAC
+    #define MY_IP1 192
+    #define MY_IP2 168
+    #define MY_IP3 0
+    #define MY_IP4 123
+    #define MY_MAC1 0x00
+    #define MY_MAC2 0x1E
+    #define MY_MAC3 0xC0
+    #define MY_MAC4 0x00
+    #define MY_MAC5 0x00
+    #define MY_MAC6 0x05
+    #define IP_NETMASK1 255
+    #define IP_NETMASK2 255
+    #define IP_NETMASK3 255
+    #define IP_NETMASK4 0
+    #define IP_GATEWAY1 192
+    #define IP_GATEWAY2 168
+    #define IP_GATEWAY3 0
+    #define IP_GATEWAY4 250
+
+// ----- The web page
+
+    // MANDATED: the page. The converter turns Step4Page.htm into Table Step4Page1 and Step4Page_Size1 (in
+    // Step4Page.GCB), which routines 2 and 3 below read
+    //! The page now has two values (POT_GCB_BYTE, LED_GCB_BYTE) and the link /t0
+    #include "webpages\Step4Page.htm"
+
+    // MANDATED: the stack itself; it includes the other libraries as the switches say
+    #include <ENC28J60_Stack.h>
+
+// ----- Variables
+
+    Dim LastSecond, TimeNow As Long
+    // MANDATED: Stack_StartAddress and Stack_Tick are functions: their results go into TickResult (this program does
+    // not look at them)
+    Dim TickResult As Byte
+
+    // The potentiometer, read once per request in HTTP_UpdateValues
+    Dim MyPot As Byte
+    //! The LED state for the page: 1 = on
+    Dim MyLed As Byte
+
+// ----- Main program
+
+    // MANDATED: start the Ethernet controller and check that it answers. If it returns False nothing else can work,
+    // so the program stops here
+    // ENC_Init is a function that returns True or False
+    If ENC_Init = False Then
+        wait 100 ms
+        End
+    End If
+
+    // MANDATED: RAM is not cleared at reset - every module (ARP, IP, TCP, HTTP) gets its start state here, before
+    // anything is used
+    // Call Stack_Init to initialise the full stack you defined
+    Stack_Init
+
+    // MANDATED: wait for the link (can be up to 30 s), set the IP address (from DHCP when STACK_DHCP is 1, else the
+    // fixed MY_IP) and announce it. Without it the board's IP address is 0.0.0.0: the board would answer nothing and
+    // no browser could reach it
+    TickResult = Stack_StartAddress
+
+    LastSecond = Millis()
+    Do Forever
+        // MANDATED: call it all the time - it receives each frame and answers it (ARP, HTTP web requests). When it is
+        // not called, no client (typically a web browser) gets a response
+        // ENC_Service is the routine that services everything
+        ENC_Service
+
+        // MANDATED: Stack_Tick (a stack function) once a second - ARP cache ageing, TCP time-outs and resends, link up
+        // and down. Without it a lost TCP segment is never sent again and a dead connection blocks new ones
+        TimeNow = Millis()
+        If TimeNow - LastSecond >= 1000 Then
+            LastSecond = LastSecond + 1000
+            TickResult = Stack_Tick
+        End If
+    Loop
+
+// ----- Web site: the seven routines ENC28J60_HTTP.h calls
+//
+// All seven, with exactly these names and parameters. They replace the library's defaults, which answer every address
+// with a built-in OK page (step 1). Define all seven or none: with only some, the others stay the defaults
+
+// 1 of 7  HTTP_Route: which page for this address
+//
+// PathChar is what the browser asked for. The web server looks only at the character after the "/", and only when
+// a space follows it:
+//   /                           PathChar 0
+//   /c  /v  /s  /x ...          one character: PathChar is its character code (c = 99, v = 118, s = 115, x = 120)
+//   /t0 to /t9                  action links: HTTP_Route is not called - the server calls HTTP_Action (0 to 9),
+//                               then sends the browser back to / (302)
+//   /config  /favicon.ico ...   more than one character: HTTP_Route is not called - always 404. Browsers ask for
+//                               /favicon.ico by themselves: that 404 is harmless
+//
+// The result is a page number that you choose: 0 = no page (the browser gets 404), 1 to 255 = your label for one
+// page. The web server hands it back to the other six routines as PageNo, so they know which page to send. With one
+// page, 1 is "my page"; with more pages give each a name, e.g. #define PAGE_HOME 1, #define PAGE_CONFIG 2
+Function HTTP_Route(In PathChar) As Byte
+    // "/" is PathChar 0. 0 means "no page" (404)
+    HTTP_Route = 0
+    If PathChar = 0 Then HTTP_Route = 1
+
+    // To send the single page for "/" and for any one-character address (/x, /c ...), delete the two lines above,
+    // so, unconditionally set the following:
+    // HTTP_Route = 1
+    // Longer addresses (/config, /favicon.ico) never reach HTTP_Route: they always get 404
+End Function
+
+// 2 of 7  HTTP_PageLength: how long the page is
+Function HTTP_PageLength(In PageNo) As Word
+    // How many bytes the page has.
+    // Step4Page_Size1 is a constant made by the HTML2GCB converter. When the program is compiled,
+    // #include "webpages\Step4Page.htm" runs the converter, which writes webpages\Step4Page.GCB next to the page and includes it.
+    // Near the end of Step4Page.GCB is the line   #define Step4Page_Size1 <n>   - the number of bytes in the page.
+    // The name is the page's file name + _Size + the table number (a long page is split: _Size2, _Size3 ...)
+    HTTP_PageLength = Step4Page_Size1
+End Function
+
+// 3 of 7  HTTP_PageByte: one byte of the page
+Function HTTP_PageByte(In PageNo, In PageIndex As Word) As Byte
+    // PageIndex starts at 1
+    // Step4Page1 is the table the converter made in Step4Page.GCB (Table Step4Page1 as Byte ... End Table): the
+    // page, one character code per line, kept in program memory. The name is the page's file name + the table
+    // number (a long page is split: Step4Page2, Step4Page3 ...). ReadTable takes byte PageIndex of it
+    Dim PageByte As Byte
+    ReadTable Step4Page1, PageIndex, PageByte
+    HTTP_PageByte = PageByte
+End Function
+
+// 4 of 7  HTTP_PageType: HTML page or JSON values
+Function HTTP_PageType(In PageNo) As Byte
+    HTTP_PageType = HTTP_TYPE_HTML
+End Function
+
+// 5 of 7  HTTP_UpdateValues: take the values, once per request
+Sub HTTP_UpdateValues(In PageNo)
+    // Read the hardware here, not in HTTP_PageValue: a part of the page that is lost on the network is sent again,
+    // and the second copy must have the same number as the first. This runs once per request, so it stays the same.
+    // ReadAD gives the top 8 bits (0 to 255); the first reading after a channel switch is thrown away
+    MyPot = ReadAD(BOARD_POT)
+    MyPot = ReadAD(BOARD_POT)
+    //! The LED state: 1 = on. The PIC-WEB's LED is on when its pin is low
+    MyLed = 0
+    If BOARD_LED_LAT = 0 Then MyLed = 1
+End Sub
+
+// 6 of 7  HTTP_PageValue: one value for the page
+Function HTTP_PageValue(In PageNo, In ValueNo) As Byte
+    // ValueNo 1 = the first _GCB_BYTE line of the page, ValueNo 2 the second, and so on (the list is at the end of
+    // the .GCB: <page>_Mapping(1), <page>_Mapping(2) ...). A value is one byte, 0 to 255
+    HTTP_PageValue = 0
+    If ValueNo = 1 Then HTTP_PageValue = MyPot
+    //! Value 2: the LED (LED_GCB_BYTE, the second _GCB_BYTE line of the page)
+    If ValueNo = 2 Then HTTP_PageValue = MyLed
+End Function
+
+// 7 of 7  HTTP_Action: carry out an action link /t0 to /t9
+Sub HTTP_Action(In ActionNo)
+    //! The browser asked for /t0 (the Toggle link): switch the LED. After this the web server answers "302 Found, go
+    //! to /", so the browser loads the page again and shows the new LED state. /t1 to /t9 do nothing here
+    If ActionNo = 0 Then
+        If BOARD_LED_LAT = 1 Then
+            BOARD_LED_LAT = 0
+        Else
+            BOARD_LED_LAT = 1
+        End If
+    End If
+End Sub

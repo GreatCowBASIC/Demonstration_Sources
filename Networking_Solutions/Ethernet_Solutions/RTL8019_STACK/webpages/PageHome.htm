@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,">
+<title>PICDEM.net</title>
+<style>
+body{font-family:system-ui,sans-serif;background:#0f172a;color:#e2e8f0;margin:0;padding:16px}
+.c{background:#1e293b;border-radius:12px;padding:14px;max-width:420px}
+.r{display:flex;align-items:center;gap:10px;margin:8px 0}
+.r b{width:70px}
+.p{padding:2px 10px;border-radius:10px;font-size:12px;background:#334155}
+.on{background:#22c55e;color:#052e16}
+a{margin-left:auto;color:#38bdf8;text-decoration:none;font-size:12px;border:1px solid;border-radius:8px;padding:2px 10px}
+.ab{background:#dc2626;color:#fff;border-color:#dc2626}.ab.on{background:#16a34a;border-color:#16a34a}
+</style></head><body>
+<h3>PICDEM.net (PIC16F877 + RTL8019AS)</h3><div class="c"><div id="m"></div><div class="r"><a href="#" id="au" class="ab" onclick="X();return false">Auto Update (2 s)</a><a href="#" id="up" onclick="V();return false">Update</a></div></div>
+<script>
+var A0_GCB_BYTE=0;
+var A1_GCB_BYTE=0;
+var SW_GCB_BYTE=0;
+var L0_GCB_BYTE=0;
+var L1_GCB_BYTE=0;
+function B(n,v){return '<div class="r"><b>'+n+'</b><progress max="255" value="'+v+'"></progress>'+v+'</div>';}
+function P(n,c,t){return '<div class="r"><b>'+n+'</b><span class="p'+(c?' on':'')+'">'+t+'</span></div>';}
+function L(i,v){return '<div class="r"><b>LED'+i+'</b><span class="p'+(v?' on">ON':'">OFF')+'</span><a href="#" onclick="T('+i+');return false">Toggle</a></div>';}
+function S(a,b,s,l,m){document.getElementById('m').innerHTML=B('AN0',a)+B('AN1',b)+P('RB5',!s,s?'released':'pressed')+L(0,l)+L(1,m);}
+function J(r){return r.json();}
+function W(j){S(j.a,j.b,j.s,j.l,j.m);}
+var AU=0,RU=0;
+function U(){if(!AU){RU=0;return;}fetch('/v').then(J).then(W).then(function(){setTimeout(U,2000);}).catch(function(){setTimeout(U,500);});}
+function X(){AU=!AU;au.className=AU?'ab on':'ab';up.hidden=AU;try{localStorage.au=AU?1:0}catch(e){}if(AU&&!RU){RU=1;U();}}
+function T(i){fetch('/t'+i).then(J).then(W).catch(function(){});}
+function V(){fetch('/v').then(J).then(W).catch(function(){});}
+S(A0_GCB_BYTE,A1_GCB_BYTE,SW_GCB_BYTE,L0_GCB_BYTE,L1_GCB_BYTE);
+try{if(localStorage.au==1)X();}catch(e){}
+</script>
+</body></html>

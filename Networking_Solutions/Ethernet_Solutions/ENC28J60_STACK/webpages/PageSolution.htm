@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>GCBASIC solution</title>
+<style>
+body{font-family:system-ui,sans-serif;background:#0f172a;color:#e2e8f0;margin:0;padding:16px}
+h1{font-size:20px;margin:0}
+h2{font-size:13px;color:#94a3b8;margin:0 0 8px}
+.s{color:#94a3b8;font-size:13px;margin:4px 0 16px}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.c{background:#1e293b;border-radius:12px;padding:14px}
+.r{display:flex;align-items:center;gap:10px;margin:6px 0;font-size:14px}
+.r b{width:90px}
+.v{margin-left:auto}
+a{color:#38bdf8;text-decoration:none;font-size:12px;border:1px solid;border-radius:8px;padding:2px 10px}
+</style>
+</head>
+<body>
+<h1>Solution</h1>
+<div class="s">The program in the PIC &middot; <a href="/">Dashboard</a> <a href="/c">Configuration</a></div>
+<div class="g">
+<div class="c"><h2>FIRMWARE</h2><div id="fw"></div></div>
+<div class="c" id="tc"><h2>TIME</h2><div id="tm"></div></div>
+</div>
+<script>
+var N01_GCB_BYTE=32;
+var N02_GCB_BYTE=32;
+var N03_GCB_BYTE=32;
+var N04_GCB_BYTE=32;
+var N05_GCB_BYTE=32;
+var N06_GCB_BYTE=32;
+var N07_GCB_BYTE=32;
+var N08_GCB_BYTE=32;
+var N09_GCB_BYTE=32;
+var N10_GCB_BYTE=32;
+var N11_GCB_BYTE=32;
+var N12_GCB_BYTE=32;
+var N13_GCB_BYTE=32;
+var N14_GCB_BYTE=32;
+var N15_GCB_BYTE=32;
+var N16_GCB_BYTE=32;
+var N17_GCB_BYTE=32;
+var N18_GCB_BYTE=32;
+var N19_GCB_BYTE=32;
+var N20_GCB_BYTE=32;
+var N21_GCB_BYTE=32;
+var N22_GCB_BYTE=32;
+var N23_GCB_BYTE=32;
+var N24_GCB_BYTE=32;
+var BY_GCB_BYTE=26;
+var BM_GCB_BYTE=1;
+var BD_GCB_BYTE=1;
+var BH_GCB_BYTE=0;
+var BMI_GCB_BYTE=0;
+var BS_GCB_BYTE=0;
+var BNH_GCB_BYTE=0;
+var BNL_GCB_BYTE=1;
+var TS_GCB_BYTE=0;
+var TY_GCB_BYTE=26;
+var TMO_GCB_BYTE=1;
+var TD_GCB_BYTE=1;
+var TH_GCB_BYTE=0;
+var TMI_GCB_BYTE=0;
+var TSE_GCB_BYTE=0;
+var SV1_GCB_BYTE=0;
+var SV2_GCB_BYTE=0;
+var SV3_GCB_BYTE=0;
+var SV4_GCB_BYTE=0;
+var STR_GCB_BYTE=0;
+var R01_GCB_BYTE=32;
+var R02_GCB_BYTE=32;
+var R03_GCB_BYTE=32;
+var R04_GCB_BYTE=32;
+var R05_GCB_BYTE=32;
+var R06_GCB_BYTE=32;
+var R07_GCB_BYTE=32;
+var R08_GCB_BYTE=32;
+var R09_GCB_BYTE=32;
+var R10_GCB_BYTE=32;
+var R11_GCB_BYTE=32;
+var R12_GCB_BYTE=32;
+var MHZ_GCB_BYTE=64;
+var VDD_GCB_BYTE=33;
+var SPI_GCB_BYTE=12;
+function T(codes) {
+  return String.fromCharCode.apply(null, codes).trim();
+}
+function Z(n) {
+  return ('0' + n).slice(-2);
+}
+function stamp(y, mo, d, h, mi, s) {
+  return (2000 + y) + '-' + Z(mo) + '-' + Z(d) + ' ' + Z(h) + ':' + Z(mi) + ':' + Z(s);
+}
+function when(st, y, mo, d, h, mi, s) {
+  if (st < 2) return 'waiting for the time server';
+  return stamp(y, mo, d, h, mi, s) + ' UTC';
+}
+function spi(n) {
+  return ['none', 'MasterSlow', 'Master', 'MasterFast', 'MasterUltraFast'][n < 11 ? 0 : n - 10] || 'none';
+}
+function info(name, value) {
+  return '<div class="r"><b>' + name + '</b><span class="v">' + value + '</span></div>';
+}
+function ip(a, b, c, d) {
+  return a + '.' + b + '.' + c + '.' + d;
+}
+function timecard(st) {
+  document.getElementById('tc').hidden = !st;
+}
+document.getElementById('fw').innerHTML =
+  info('Firmware', T([N01_GCB_BYTE, N02_GCB_BYTE, N03_GCB_BYTE, N04_GCB_BYTE, N05_GCB_BYTE, N06_GCB_BYTE, N07_GCB_BYTE, N08_GCB_BYTE, N09_GCB_BYTE, N10_GCB_BYTE, N11_GCB_BYTE, N12_GCB_BYTE, N13_GCB_BYTE, N14_GCB_BYTE, N15_GCB_BYTE, N16_GCB_BYTE, N17_GCB_BYTE, N18_GCB_BYTE, N19_GCB_BYTE, N20_GCB_BYTE, N21_GCB_BYTE, N22_GCB_BYTE, N23_GCB_BYTE, N24_GCB_BYTE])) +
+  info('Built', stamp(BY_GCB_BYTE, BM_GCB_BYTE, BD_GCB_BYTE, BH_GCB_BYTE, BMI_GCB_BYTE, BS_GCB_BYTE)) +
+  info('Build', BNH_GCB_BYTE * 256 + BNL_GCB_BYTE) +
+  info('Rig', 'PIC' + T([R01_GCB_BYTE, R02_GCB_BYTE, R03_GCB_BYTE, R04_GCB_BYTE, R05_GCB_BYTE, R06_GCB_BYTE, R07_GCB_BYTE, R08_GCB_BYTE, R09_GCB_BYTE, R10_GCB_BYTE, R11_GCB_BYTE, R12_GCB_BYTE]) + ', ' + MHZ_GCB_BYTE + ' MHz, ' + (VDD_GCB_BYTE / 10).toFixed(1) + ' V') +
+  info('SPI', spi(SPI_GCB_BYTE));
+document.getElementById('tm').innerHTML =
+  info('Time', when(TS_GCB_BYTE, TY_GCB_BYTE, TMO_GCB_BYTE, TD_GCB_BYTE, TH_GCB_BYTE, TMI_GCB_BYTE, TSE_GCB_BYTE)) +
+  info('Time server', ip(SV1_GCB_BYTE, SV2_GCB_BYTE, SV3_GCB_BYTE, SV4_GCB_BYTE)) + info('Stratum', STR_GCB_BYTE);
+timecard(TS_GCB_BYTE);
+function reload() {
+  fetch('/s').then(function (r) { return r.text(); }).then(function (t) {
+    document.open(); document.write(t); document.close();
+  }).catch(function () { setTimeout(reload, 500); });
+}
+setTimeout(reload, 10000 - Date.now() % 10000);
+</script>
+</body>
+</html>

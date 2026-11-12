@@ -1,0 +1,1089 @@
+//--------------------------------------------------------------------------------------------------------------------------------
+// WIZNET_MEGA328P_W5100-10 - a web server on an Arduino Uno with the Arduino Ethernet shield (W5100) and its microSD card
+//
+// The stack boards' web site, cut down to the ATmega328P (15,360 words below the bootloader, 2 KB RAM):
+//   /           dashboard: C.0 (A0), C.1 (A1), PORTB, PORTD with Toggle (D.2, D.3, D.5, D.6, D.7), the time; Auto Update every 2 s
+//   /v          the values as JSON (the same keys as the stack boards: a b q p d t Y M D h m s)
+//   /s, /c      solution and configuration on one page (two pages did not fit): firmware, build, time, time server,
+//               address, MAC, the W5100's sockets, the SD card
+//   /t0 - /t7   toggle that PORTD bit (bits 0, 1 and 4 are refused: serial port, SD card chip select); answers /v
+//   /f/         the SD card's root folder; /f/DIR/ a folder; /f/DIR/NAME.EXT downloads that file
+// The time comes from the router by SNTP (every 15 minutes); syslog to the NAS at start-up and at each time update.
+// No MQTT, no DHCP: they do not fit beside the FAT code.
+//
+// How it fits: the W5100 does ARP, IPv4, ICMP (it answers ping) and TCP / UDP itself, in 4 sockets. Its driver
+// (W5100_Driver.h) moves single bytes, so every reply is written straight into the socket's TX buffer: no frame buffer.
+// The only large buffer is the SD card library's 512-byte sector buffer.
+//
+// Sockets: 0 and 1 web server (port 80, both listening, served one at a time), 2 UDP (SNTP and syslog), 3 spare
+//
+// Hardware (ENC28J60\hardware\UNO_W5100): hardwareconfig.h - Arduino Uno, Ethernet shield: W5100 CS B.2 (D10), SD CS D.4 (D4)
+// Libraries: ..\libraries\W5100_Driver.h, and, from C:\GCstudio\gcbasic\AdditionalLibraries, sd_card.h (with sd_card_avr.h) and sd_fat.h
+// Console: the Uno's USB serial port, COM32, 9600 8N1 (opening it resets the Uno)
+//
+//@author    Evan R. Venn
+//@licence   GPL
+//@date      09/11/2026
+//
+// Changes:
+//   09/11/2026  First version
+//   09/11/2026  Pins named port.bit with the Arduino pin, e.g. B.5 (D13), on the pages; one Solution button (/s and /c
+//               are one page)
+//   09/11/2026  Dashboard: only the free pins (B.0, B.1; D.2, D.3, D.5-D.7); Toggle asks /t in the background and stays on
+//               the page; title without "W5100". The pins the program uses are fixed text on the /s CONFIG card.
+//               Cache-Control header dropped (room)
+//   09/11/2026  Comments: the variables, each start-up step, the main loop and every routine explained. The main loop
+//               as the stack programs': WIZ_Service (macro: ServeSocket 0, 1, SntpPoll) and OneSecond
+//   09/11/2026  SdStart starts the card with FatInit() (sd_fat.h 1.2: SDCInit, then FatMount). For room: the console
+//               start line "W5100 ok" without the address; the 404 reply without a Content-Type line
+//--------------------------------------------------------------------------------------------------------------------------------
+
+    #option explicit
+
+// ----- Hardware: chip, pins, SPI speeds
+
+    #option IncludePath "..\libraries;..\hardware\UNO_W5100;C:\GCstudio\gcbasic\AdditionalLibraries"
+    #define USART_BAUD_RATE 9600
+    #include <hardwareconfig.h>
+
+// ----- Configuration
+
+    // This device: fixed address
+    #define MY_IP1 192
+    #define MY_IP2 168
+    #define MY_IP3 0
+    #define MY_IP4 129
+    #define MY_MAC1 0x00
+    #define MY_MAC2 0x1E
+    #define MY_MAC3 0xC0
+    #define MY_MAC4 0x00
+    #define MY_MAC5 0x00
+    #define MY_MAC6 0x0A
+    #define IP_NETMASK1 255
+    #define IP_NETMASK2 255
+    #define IP_NETMASK3 255
+    #define IP_NETMASK4 0
+    #define IP_GATEWAY1 192
+    #define IP_GATEWAY2 168
+    #define IP_GATEWAY3 0
+    #define IP_GATEWAY4 250
+
+    // Time server (the router) and syslog server (the NAS)
+    #define SNTP_SERVER_IP1 192
+    #define SNTP_SERVER_IP2 168
+    #define SNTP_SERVER_IP3 0
+    #define SNTP_SERVER_IP4 250
+    #define SNTP_LOCAL_PORT 50123
+    #define SNTP_INTERVAL_S 900
+    #define SNTP_RETRY_S 60
+    #define SNTP_UNIX_OFFSET 2208988800
+    #define SYSLOG_IP1 192
+    #define SYSLOG_IP2 168
+    #define SYSLOG_IP3 0
+    #define SYSLOG_IP4 245
+
+    // Sockets
+    #define SOCK_UDP 2
+    #define WEB_PORT 80
+    // A web socket neither listening nor closed for this many seconds gets DISCON, 5 s later CLOSE
+    #define WEB_IDLE_S 10
+
+    // Pages
+    #define PAGE_HOME 1
+    #define PAGE_SOLUTION 2
+    #define PAGE_VALUES 4
+
+    // Request line kept: "GET /f/FOLDER/NAME.EXT HTTP/1.1" fits
+    #define REQ_SIZE 64
+
+    #include <millis.h>
+    #include <W5100_Driver.h>
+    #include <sd_card.h>
+    #include <sd_fat.h>
+
+    // Build number and time (GCBBuildStr, GCBBuildTimeStr "mm-dd-yyyy hh:mm:ss")
+    #include "GCBVersionNumber.cnt"
+
+    // The pages, converted when included (Tables UnoHome1.., UnoHome_Size1.., UnoHome_Tables). Each value line becomes
+    // a 0 byte in the table, sent as three characters by PageValue
+    #include "webpages\UnoHome.htm"
+    #include "webpages\UnoSolution.htm"
+    // /v: the JSON table shared with the W5200 / W5500 programs (values 1 to 12)
+    #include "webpages\PageValues.h"
+
+// ----- Variables
+//
+// RAM is 2 KB and is NOT cleared at reset, so every variable that is read before it is written gets a start value in
+// "Start" below. Routines keep their own working variables (Dim inside the Sub / Function, each with its own prefix:
+// GCBASIC variables are global by name, so two routines must never share a name).
+// The SD card library adds its own: FatBuf (the 512-byte sector buffer, the largest single block of RAM), the FAT
+// state and FatListName / FatListSize for listings. The W5100 driver adds W51_Sock, W51_RxPtr, W51_TxPtr ... for the
+// socket being read or written.
+
+    // --- The web request being served
+    // ReqBuf    the first REQ_SIZE bytes of the browser's request, i.e. the request line "GET /path HTTP/1.1".
+    //           Only the path is needed, so the headers after it are read past and dropped (no room to keep them).
+    // ReqLen    how many bytes of ReqBuf hold the request (it may be shorter than REQ_SIZE).
+    // ReqCount  requests served since the start, 0..255 then round again: the dashboard's "request" number ("q" in
+    //           /v), which shows at a glance that the page is live.
+    Dim ReqBuf(REQ_SIZE) As Byte
+    Dim ReqLen, ReqCount As Byte
+
+    // --- What the start-up found, shown on /s
+    // W51Ok     1 = the W5100 answered (its gateway and IP registers read back what was written), 0 = not answering.
+    // SdType    0 no card (or it did not start), 1 SD version 1, 2 SD version 2, 3 SDHC / SDXC (SDCCardType).
+    // SdFat     0 no FAT file system found, else 16 or 32. Also the "card ready" flag: /f tries the card again
+    //           (SdStart) while it is 0, so a card put in after the start is found.
+    // SdMB      the card's size in MB (SDCBlocks / 2048: 512-byte blocks), a Word: up to 65,535 MB.
+    Dim W51Ok, SdType, SdFat As Byte
+    Dim SdMB As Word
+
+    // --- Web socket watchdog (OneSecond)
+    // WebIdle(n)  seconds web socket n has been neither listening nor closed. A browser that goes away mid-request
+    //             leaves a socket open that would otherwise block that socket for good: at WEB_IDLE_S seconds it
+    //             gets DISCON, 5 s later CLOSE, and ServeSocket opens it again.
+    Dim WebIdle(2) As Byte
+
+    // --- The one-second tick (main loop)
+    // TickStart  millis() at the start of the current second. Advanced by exactly 1000 each time, not set to
+    //            millis(), so the seconds do not drift by the time the loop takes.
+    Dim TickStart As Long
+
+    // --- File path piece (ServeFiles)
+    // FileSeg  one folder or file name from the URL, eg "SDCARD" or "HELLO.TXT": 8.3 names, so 12 characters at most.
+    //          The FAT routines take a String, so the URL is cut into pieces here.
+    Dim FileSeg As String * 12
+
+    // --- Time (SNTP)
+    // The board has no clock chip. The time server's answer (seconds since 1900) is kept with the millis() value
+    // when it arrived; the time now is that plus the milliseconds since, worked out by SntpNow when a page needs it.
+    // SntpSeconds    the server's time, seconds since 1 January 1900 (UTC), from the last good answer.
+    // SntpSync       millis() when that answer arrived.
+    // SntpNonce      the request number, sent in the request and copied back by the server: an answer whose copy
+    //                differs is an old or a stray datagram, and is ignored.
+    // SntpState      1 no time yet, 2 time valid. The pages show it as "t" (1 "waiting", 2 the time).
+    // SntpStratum    the server's stratum from its answer (shown on /s): 1 = it has a reference clock, 2 = it gets
+    //                its time from a stratum 1 server, ...
+    // SntpWaiting    seconds left to wait for an answer (0 = not waiting). An answer after that is ignored.
+    // SntpCountdown  seconds to the next request: SNTP_INTERVAL_S (15 min) after a good answer, SNTP_RETRY_S (1 min)
+    //                after none.
+    // TimeYear .. TimeSecond  the date and time, UTC, as SntpNow last worked it out.
+    Dim SntpSeconds, SntpSync, SntpNonce As Long
+    Dim SntpState, SntpStratum, SntpWaiting As Byte
+    Dim SntpCountdown As Word
+    Dim TimeYear As Word
+    Dim TimeMonth, TimeDay, TimeHour, TimeMinute, TimeSecond As Byte
+
+    // --- The build (shown on /s and in the syslog start line)
+    // BuildTime  when this program was compiled, "mm-dd-yyyy hh:mm:ss" (GCBBuildTimeStr from GCBVersionNumber.cnt).
+    //            Kept as a string: BuildTwo picks out two digits at a time for the page.
+    // BuildNo    the compile's build number (GCBBuildStr), so a page shows which program is on the board.
+    Dim BuildTime As String * 19
+    Dim BuildNo As Word
+
+// ----- Start
+//
+// Runs once after every reset: power on, the reset button, programming, or opening the serial port (the Uno's USB
+// serial chip pulses reset when the port opens).
+
+    // 1. Pins first: both chip selects high (W5100 B.2, SD card D.4) so neither chip listens to the SPI while the
+    //    other is being set up, then the SPI pins and the toggle outputs (hardwareconfig.h).
+    BoardInit
+
+    // 2. Give the terminal time: the serial port opening resets the Uno, and a terminal that opens slowly would
+    //    miss the first lines.
+    Wait 1 s
+
+    // 3. Start values (RAM is not cleared at reset). SntpCountdown 2: the first time request 2 s after the start,
+    //    once the network is up, rather than the full 15 minutes.
+    ReqCount = 0
+    SntpState = 1
+    SntpWaiting = 0
+    SntpNonce = 0
+    SntpCountdown = 2
+    WebIdle(0) = 0
+    WebIdle(1) = 0
+
+    // 4. The build: time and number, read once (the functions return constants made at compile time).
+    BuildTime = GCBBuildTimeStr()
+    BuildNo = Val(GCBBuildStr())
+
+    // 5. Console: which program and build is running.
+    HSerPrintCRLF
+    HSerPrint "WIZNET_MEGA328P_W5100-10 build " : HSerPrint BuildNo : HSerPrintCRLF
+
+    // 6. The W5100: reset it, give each socket 2 KB to send and 2 KB to receive, write the gateway, mask, MAC and IP,
+    //    then check one register reads back. From here the W5100 answers ARP and ping on its own.
+    W51Ok = W51_Init()
+    If W51Ok = 1 Then
+        HSerPrint "W5100 ok"
+    Else
+        HSerPrint "W5100 not answering"
+    End If
+    HSerPrintCRLF
+
+    // 7. The SD card: start it (it needs the slow SPI clock first, then the fast one) and read its file system.
+    //    No card is not an error: the web site works without it, and /f tries again later.
+    SdStart
+    If SdType = 0 Then
+        HSerPrint "No SD card"
+    Else
+        HSerPrint "SD card " : HSerPrint SdMB : HSerPrint " MB, FAT" : HSerPrint SdFat
+    End If
+    HSerPrintCRLF
+
+    // 8. Socket 2 as UDP, on local port SNTP_LOCAL_PORT: the time server answers to this port, and syslog messages
+    //    go out from it. The two web sockets are not opened here: ServeSocket opens a closed socket itself, the same
+    //    way at the start as after every connection.
+    W51_Open SOCK_UDP, W51_MODE_UDP, SNTP_LOCAL_PORT
+
+    // 9. Syslog: "Start WIZNET_MEGA328P_W5100-10 build n ..." to the NAS, as the other boards do at start-up.
+    SyslogStart
+
+    // 10. The first second starts now.
+    TickStart = Millis()
+
+// ----- Main loop
+//
+// The same shape as the ENC28J60 stack programs' main loop:
+//     ENC_Service             as often as possible: everything that has arrived from the network
+//     Stack_Tick              once a second: timers, watchdogs, renewals
+// Here:
+//     WIZ_Service             (a macro, below) as often as possible:
+//                               ServeSocket 0, 1  each web socket in turn: open and listen if it is closed; if a
+//                                                 browser has sent a request, read it, send the reply and close the
+//                                                 connection (HTTP/1.0, one request per connection). Two sockets so
+//                                                 that a second browser (or the dashboard's next /v) can connect
+//                                                 while the first is still being answered.
+//                               SntpPoll          a datagram on the UDP socket: if it is the time server's answer to
+//                                                 our request, set the time.
+//     OneSecond               once a second (the Stack_Tick of this program): the web socket watchdog, reopening the
+//                             UDP socket if needed, and the SNTP schedule (ask again every 15 minutes, or every minute
+//                             while there is no time).
+// The second is timed here, by the program, as the stack programs time Stack_Tick, so WIZ_Service stays "serve what
+// has arrived" and nothing else. "If Millis() - TickStart >= 1000" works across the millis() roll-over (49 days),
+// as the subtraction is unsigned.
+//
+// Runs for ever. Nothing in it waits for the network: each call looks at one thing, does what is ready and returns,
+// so one slow browser cannot stop the others or the clock. One pass takes well under a millisecond when there is
+// nothing to do; serving a page takes 0.5 to 1 s (the W5100 is written one byte at a time).
+
+    Do
+        WIZ_Service
+        If Millis() - TickStart >= 1000 Then
+            TickStart = TickStart + 1000
+            OneSecond
+        End If
+    Loop
+
+// ----- Serve what has arrived (the ENC_Service of this program)
+
+Macro WIZ_Service
+    // WIZ_Service: everything that may have arrived from the network, looked at once per pass of the main loop.
+    // It is this program's ENC_Service (the ENC28J60 boards' "serve what has arrived"); OneSecond is its Stack_Tick.
+    //
+    // Why a Macro and not a Sub
+    //   The compiler copies a macro's lines to the place its name is used, as if they were typed there: the main loop
+    //   compiles to "ServeSocket 0 : ServeSocket 1 : SntpPoll". A Sub would be a call and a return: one more level on
+    //   the call stack (on the ATmega328P the return addresses use the same 2 KB of RAM, and ServeSocket already goes
+    //   HandleRequest -> SendPage -> W51_TxByte -> W51_Write below it) and a few words of program memory (the Uno has
+    //   16 to spare). A macro costs neither. It is used once only: a macro used in several places is copied each time.
+    //
+    // Why two calls, ServeSocket 0 and ServeSocket 1
+    //   Each W5100 socket holds one TCP connection. Both sockets listen on port 80, so the W5100 hands a new
+    //   browser connection to whichever is free. With one socket, a second request arriving while a page is being
+    //   sent (another browser, the dashboard's /v every 2 s, the page's favicon or a reload) would be refused until
+    //   the first connection closed, and the browser would wait and retry. With two, the second connection is
+    //   accepted at once and waits in its socket; ServeSocket 1 answers it on the next pass. The replies still go one
+    //   at a time (each ServeSocket sends its whole reply before returning), which is all the Uno has time and room
+    //   for. The ENC28J60 stack also has two web connections (0 and 3), for the same reason.
+    //   Each call is one step for its socket (open and listen, read a request and reply, or close): see ServeSocket.
+    //
+    // Why SntpPoll
+    //   The time request is sent by OneSecond (SntpRequest: 2 s after the start, then every 15 minutes, or every minute
+    //   while there is no time), and the time server's answer arrives a few milliseconds to a second later. Waiting for it would stop the web sockets for that time. So the request
+    //   is sent and the program carries on; SntpPoll looks at the UDP socket on every pass and, when a datagram is
+    //   there, reads it and sets the time if it is the answer to our request. "Poll": look, act if there is something,
+    //   return at once if not. Syslog uses the same UDP socket but only sends, so nothing comes back for it.
+    ServeSocket 0
+    ServeSocket 1
+    SntpPoll
+End Macro
+
+// ----- Once a second: web socket watchdog, SNTP schedule
+
+Sub OneSecond
+    // Called by the main loop once a second. Three jobs, none of which waits:
+    //  1. Watchdog for the two web sockets. A socket that is listening (waiting for a browser) or closed (about to be
+    //     opened again) is fine: its count goes back to 0. Any other state - connected, closing, waiting for the
+    //     browser's last ACK - should pass in well under a second; a browser that disappeared can leave the socket
+    //     there for minutes, and while it is stuck no browser can use it. So after WEB_IDLE_S seconds the connection
+    //     is ended politely (DISCON: a TCP FIN), and if that does not work within 5 s the socket is closed outright
+    //     (CLOSE); ServeSocket then opens it and listens again.
+    //  2. The UDP socket must stay open for SNTP and syslog: if anything closed it, it is opened again.
+    //  3. SNTP timing: while waiting for an answer, SntpWaiting counts down (3 s); no answer by then means a retry in
+    //     SNTP_RETRY_S. Otherwise SntpCountdown counts down to the next request (SntpPoll sets it to SNTP_INTERVAL_S
+    //     after each good answer).
+    Dim OsSock, OsState As Byte
+
+    // --- 1. Watchdog for the two web sockets (0 and 1), one after the other
+    For OsSock = 0 To 1
+        // The socket's state as the W5100 reports it (W51_SOCK_... in W5100_Driver.h)
+        OsState = W51_Status(OsSock)
+        If OsState = W51_SOCK_LISTEN Or OsState = W51_SOCK_CLOSED Then
+            // Listening for a browser, or closed and about to be opened again by ServeSocket: nothing is stuck,
+            // so the count starts again from 0
+            WebIdle(OsSock) = 0
+        Else
+            // Any other state (connected, or one of the closing states): one more second in it
+            WebIdle(OsSock)++
+            // WEB_IDLE_S (10) seconds: far longer than any request takes. End the connection politely - DISCON sends
+            // a TCP FIN, as at the end of a normal reply - which frees the socket if the browser is still there
+            If WebIdle(OsSock) = WEB_IDLE_S Then W51_Command OsSock, W51_CMD_DISCON
+            // 5 s after that and still not free (the browser has gone and will never answer the FIN): close the
+            // socket outright. CLOSE needs no answer from the other end; the socket is CLOSED at once, and the next
+            // ServeSocket opens it and listens again. The count starts again from 0
+            If WebIdle(OsSock) >= WEB_IDLE_S + 5 Then
+                W51_Command OsSock, W51_CMD_CLOSE
+                WebIdle(OsSock) = 0
+            End If
+        End If
+    Next
+
+    // --- 2. The UDP socket (2) must stay open: the time server's answers arrive on it and syslog messages leave from
+    // it. It is opened at the start; if it is ever found in another state (closed by a W5100 problem), it is opened
+    // again on the same local port, so the next request and its answer still match
+    If W51_Status(SOCK_UDP) <> W51_SOCK_UDP Then W51_Open SOCK_UDP, W51_MODE_UDP, SNTP_LOCAL_PORT
+
+    // --- 3. SNTP timing: two counters, only one of them running at a time
+    If SntpWaiting > 0 Then
+        // A request has been sent (SntpRequest set SntpWaiting to 3) and no good answer yet: one second less to wait.
+        // When SntpPoll finds the answer it sets SntpWaiting to 0 and SntpCountdown to 15 minutes itself
+        SntpWaiting--
+        // 3 s without an answer: give up on this one (SntpPoll now ignores a late answer, as SntpWaiting is 0) and
+        // ask again in SNTP_RETRY_S (1 minute)
+        If SntpWaiting = 0 Then SntpCountdown = SNTP_RETRY_S
+    Else
+        // Not waiting: one second nearer the next request. The countdown is 2 s at the start, 15 minutes after a good
+        // answer, 1 minute after none
+        SntpCountdown--
+        // Time for the next request: SntpRequest sends it and starts SntpWaiting
+        If SntpCountdown = 0 Then SntpRequest
+    End If
+End Sub
+
+// ----- SD card
+
+Sub SdStart
+    // Start the card and mount its file system: SdType 0 = no card, SdFat 0 = no FAT16 / FAT32 found.
+    // Called at the start and again by /f while SdFat is 0 (a card put in later, or taken out and put back).
+    // FatInit (sd_fat.h) is SDCInit, then FatMount. SDCInit talks to the card at 250 kHz until it is ready, then
+    // switches the SPI to 4 MHz (mode 0, the same as the W5100 uses, so the two chips share the SPI without setting
+    // it up again). FatMount reads the boot sector and makes the root folder the current folder. Afterwards the
+    // library's SDCCardType, SDCBlocks and FatType describe the card; they are kept here for /s.
+    // FAT_ERR_NO_DRIVE: no card, or it did not answer. Any other error: a card, but no FAT16 / FAT32 on it
+    Dim SdResult As Byte
+    SdType = 0
+    SdFat = 0
+    SdMB = 0
+    SdResult = FatInit()
+    If SdResult = FAT_ERR_NO_DRIVE Then Exit Sub
+    SdType = SDCCardType
+    SdMB = SDCBlocks / 2048
+    If SdResult = FAT_OK Then SdFat = FatType
+End Sub
+
+// ----- Web sockets
+
+Sub ServeSocket(In SsSock)
+    // One web socket, one step, according to the state the W5100 reports for it:
+    //   CLOSED       open it as TCP on port 80 and LISTEN (at the start, and after each connection has ended)
+    //   INIT         opened but not yet listening: LISTEN
+    //   LISTEN       waiting for a browser: nothing to do (the W5100 answers the browser's SYN itself)
+    //   ESTABLISHED  a browser is connected. Once its request has arrived (bytes in the receive buffer): read the
+    //                request line, build and send the whole reply, then DISCON (HTTP/1.0: the reply ends when the
+    //                connection closes, so no Content-Length is needed for the pages)
+    //   CLOSE_WAIT   the browser closed its side first: DISCON ours
+    //   others       closing states the W5100 finishes by itself; the watchdog in OneSecond catches one that hangs
+    Dim SsState As Byte
+    SsState = W51_Status(SsSock)
+    If SsState = W51_SOCK_CLOSED Then
+        W51_Open SsSock, W51_MODE_TCP, WEB_PORT
+        W51_Command SsSock, W51_CMD_LISTEN
+        Exit Sub
+    End If
+    If SsState = W51_SOCK_INIT Then
+        W51_Command SsSock, W51_CMD_LISTEN
+        Exit Sub
+    End If
+    If SsState = W51_SOCK_CLOSE_WAIT Then
+        W51_Command SsSock, W51_CMD_DISCON
+        Exit Sub
+    End If
+    If SsState = W51_SOCK_ESTABLISHED Then
+        // A browser is connected. The W5100 accepted the connection on its own (the TCP handshake); the program only
+        // sees it now, from the socket's state
+        If W51_RxSize(SsSock) > 0 Then
+            // Bytes have arrived: the request. A connection with nothing received yet is left alone - the browser
+            // sends its request a moment after connecting - and the next pass looks again
+            ReadRequest SsSock
+            // ReqBuf now holds the request line ("GET /v HTTP/1.1"), and the W5100's receive buffer is empty again
+            ReqCount++
+            // One more request served: the dashboard shows it ("request", "q" in /v) as a sign the board is live
+            W51_TxBegin SsSock
+            // The reply goes to this socket: from here W51_TxByte writes into its 2 KB TX buffer, at the point the
+            // W5100 says is next (Sn_TX_WR), and sends a piece each time 1 KB is written
+            HandleRequest
+            // Looks at the path in ReqBuf and writes the whole reply: the HTTP status and headers, then the page,
+            // the values, the file listing or the file
+            W51_TxFlush
+            // Sends what is still in the TX buffer (the last piece) and waits until the W5100 reports it sent
+            // (SEND_OK), at most 2 s
+            W51_Command SsSock, W51_CMD_DISCON
+            // Ends the connection (TCP FIN): HTTP/1.0 with "Connection: close", so the browser knows the reply is
+            // complete. The socket goes through the closing states to CLOSED, and the next ServeSocket opens it and
+            // listens again for the next browser
+            WebIdle(SsSock) = 0
+            // The socket did its work: the watchdog (OneSecond) starts counting from 0 again
+        End If
+    End If
+End Sub
+
+Sub ReadRequest(In RrSock)
+    // The first REQ_SIZE bytes of the request into ReqBuf (the request line); the rest is dropped.
+    // A browser's request is several hundred bytes (the request line, then headers: Host, User-Agent, Accept ...).
+    // Only the request line matters here. The bytes not read are skipped by moving the read pointer past them, and
+    // W51_RxEnd hands the whole lot back to the W5100 (RECV), so its receive buffer is empty for the next request.
+    Dim RrSize As Word
+    RrSize = W51_RxSize(RrSock)
+    W51_RxBegin RrSock
+    ReqLen = 0
+    Do While ReqLen < REQ_SIZE And RrSize > 0
+        ReqBuf(ReqLen) = W51_RxByte()
+        ReqLen++
+        RrSize--
+    Loop
+    W51_RxPtr = W51_RxPtr + RrSize
+    W51_RxEnd
+End Sub
+
+Sub HandleRequest
+    // Decide what was asked for, and send it. ReqBuf holds "GET /x...": byte 0 is "G" (71), bytes 4 is "/" (47)
+    // and byte 5 the path's first character, which is enough to tell the paths apart (ASCII codes, as GCBASIC
+    // compares bytes):
+    //   32 " " or 63 "?"  /           the dashboard
+    //   118 "v"           /v          the values (JSON)
+    //   115 "s", 99 "c"   /s, /c      solution and configuration
+    //   116 "t"           /t0 - /t7   toggle that PORTD bit, then the values (the dashboard redraws from them)
+    //   102 "f"           /f/...      files on the SD card
+    // Anything else, or a request that is not a GET, gets 404.
+    // The reply is written into the socket's TX buffer by W51_TxByte; ServeSocket sends what is left and closes.
+    Dim HrChar, HrBit, HrMask As Byte
+    If ReqLen < 6 Or ReqBuf(0) <> 71 Or ReqBuf(4) <> 47 Then
+        SendNotFound
+        Exit Sub
+    End If
+    HrChar = ReqBuf(5)
+    Select Case HrChar
+        Case 32, 63
+            // "/ " or "/?"
+            SendPage PAGE_HOME
+        Case 118
+            // v
+            SendPage PAGE_VALUES
+        Case 115, 99
+            // s, c: solution and configuration
+            SendPage PAGE_SOLUTION
+        Case 116
+            // t0 - t7: toggle a PORTD bit allowed by TOGGLE_MASK, then the values. ReqBuf(6) is the digit ("0" is
+            // 48); HrMask becomes that bit (1, 2, 4 ... 128). TOGGLE_MASK (hardwareconfig.h) has only the free pins,
+            // so /t0, /t1 (serial port) and /t4 (SD card chip select) change nothing
+            HrBit = ReqBuf(6) - 48
+            If HrBit < 8 Then
+                HrMask = 1
+                Repeat HrBit
+                    HrMask = HrMask * 2
+                End Repeat
+                If (HrMask And TOGGLE_MASK) <> 0 Then PortD = PortD Xor HrMask
+            End If
+            SendPage PAGE_VALUES
+        Case 102
+            // f: files
+            ServeFiles
+        Case Else
+            SendNotFound
+    End Select
+End Sub
+
+// ----- Replies
+//
+// Everything sent goes through W51_TxByte, one byte at a time, into the socket chosen by W51_TxBegin. The driver
+// sends a piece whenever 1 KB has been written (half the 2 KB buffer, so the next piece can be written while one is
+// on its way), and W51_TxFlush sends the rest. If the browser has gone, W51_TxOk becomes 0 and further bytes are
+// dropped; the long loops check it to stop early.
+// The routines below turn text and numbers into those bytes.
+
+Sub TxText(In TxString As String)
+    // A string, byte by byte (TxString(0) is its length)
+    Dim TxPos As Byte
+    For TxPos = 1 To TxString(0)
+        W51_TxByte TxString(TxPos)
+    Next
+End Sub
+
+Sub TxCRLF
+    // CR LF: HTTP ends each header line with it, and an empty line (two in a row) ends the headers
+    W51_TxByte 13
+    W51_TxByte 10
+End Sub
+
+Sub TxNumber3(In TnValue)
+    // A value as three characters, right-aligned: "  7", " 42", "255". Always three, because the page's script
+    // reads "var X_GCB_BYTE=" followed by the number, and /v's JSON keeps the same width (as the other boards)
+    If TnValue >= 100 Then
+        W51_TxByte TnValue / 100 + 48
+    Else
+        W51_TxByte 32
+    End If
+    If TnValue >= 10 Then
+        W51_TxByte (TnValue / 10) % 10 + 48
+    Else
+        W51_TxByte 32
+    End If
+    W51_TxByte TnValue % 10 + 48
+End Sub
+
+Sub TxLong(In TlValue As Long)
+    // A Long in decimal, no leading zeros: file sizes, Content-Length, the build number. The digits come out lowest
+    // first (% 10, / 10), so they are kept in TlDigits and sent in reverse
+    Dim TlDigits(10) As Byte
+    Dim TlCount As Byte
+    TlCount = 0
+    Do
+        TlDigits(TlCount) = TlValue % 10
+        TlValue = TlValue / 10
+        TlCount++
+    Loop While TlValue > 0
+    Do While TlCount > 0
+        TlCount--
+        W51_TxByte TlDigits(TlCount) + 48
+    Loop
+End Sub
+
+Sub TxTwo(In TtValue)
+    // Two digits with a leading zero (hh:mm:ss in the syslog "Time set" line)
+    W51_TxByte TtValue / 10 + 48
+    W51_TxByte TtValue % 10 + 48
+End Sub
+
+Sub TxStatus(In TsType)
+    // "HTTP/1.0 200 OK" and Content-Type: TsType 0 text/html, 1 application/json, 2 application/octet-stream
+    TxText "HTTP/1.0 200 OK" : TxCRLF
+    TxText "Content-Type: "
+    If TsType = 0 Then TxText "text/html"
+    If TsType = 1 Then TxText "application/json"
+    If TsType = 2 Then TxText "application/octet-stream"
+    TxCRLF
+End Sub
+
+Sub TxEndHeader
+    // The last header line, then the empty line that ends the headers: what follows is the body. "Connection:
+    // close" tells the browser not to send a second request on this connection (the program closes it)
+    TxText "Connection: close" : TxCRLF
+    TxCRLF
+End Sub
+
+Sub SendNotFound
+    // A path the program does not know, a file or folder that is not on the card, or a request that is not a GET
+    TxText "HTTP/1.0 404 Not Found" : TxCRLF
+    TxEndHeader
+    TxText "Not found"
+End Sub
+
+Sub SendRedirectSlash
+    // A folder asked for without its last "/": 302 to the same path with it, so the listing's links work.
+    // The listing's links are relative ("HELLO.TXT", "SUB/", "../"), which the browser adds to the folder's URL;
+    // that only works when the URL ends with "/". The path is copied from ReqBuf (from byte 4 up to the space).
+    Dim RsPos As Byte
+    TxText "HTTP/1.0 302 Found" : TxCRLF
+    TxText "Location: "
+    RsPos = 4
+    Do While RsPos < ReqLen And ReqBuf(RsPos) <> 32
+        W51_TxByte ReqBuf(RsPos)
+        RsPos++
+    Loop
+    W51_TxByte 47
+    TxCRLF
+    TxEndHeader
+End Sub
+
+// ----- Pages: the table bytes, each 0 replaced by the page's next value
+//
+// The pages are written as ordinary HTML files (UnoHome.htm, UnoSolution.htm). When the program is compiled, the
+// HTML2GCB converter turns each into tables of bytes in program memory (a table holds about 2 KB, so a longer page
+// is two tables). Each line "var NAME_GCB_BYTE=n;" in the page's script becomes "var NAME_GCB_BYTE=" then a 0
+// byte then ";". Sending the page, a 0 byte is replaced by the next live value as three digits, so the browser's
+// script starts with the values of the moment. /v uses PageValues.h, a hand-made table of the same kind.
+
+Sub SendPage(In SpPage)
+    // The HTTP headers, then the page byte by byte: each 0 byte is value 1, 2, 3 ... of that page (PageValue).
+    // SntpNow first works out the date and time, so all the time values on the page agree with each other.
+    Dim SpIndex, SpLength As Word
+    Dim SpByte, SpValueNo As Byte
+    If SpPage = PAGE_VALUES Then
+        TxStatus 1
+    Else
+        TxStatus 0
+    End If
+    TxEndHeader
+    SntpNow
+    SpLength = PageLength(SpPage)
+    SpValueNo = 0
+    For SpIndex = 1 To SpLength
+        SpByte = PageByte(SpPage, SpIndex)
+        If SpByte = 0 Then
+            SpValueNo++
+            TxNumber3 PageValue(SpPage, SpValueNo)
+        Else
+            W51_TxByte SpByte
+        End If
+        If W51_TxOk = 0 Then Exit Sub
+    Next
+End Sub
+
+Function PageLength(In PlPage) As Word
+    // Bytes in the page: the sizes of its tables (UnoHome_Size1 ..., made by the converter). The #if takes in a
+    // second table only when the converter made one. /v is 12 groups of 6 bytes and the closing "}": 73
+    PageLength = 0
+    If PlPage = PAGE_HOME Then
+        PageLength = UnoHome_Size1
+        #if UnoHome_Tables > 1
+            PageLength = PageLength + UnoHome_Size2
+        #endif
+    End If
+    If PlPage = PAGE_SOLUTION Then
+        PageLength = UnoSolution_Size1
+        #if UnoSolution_Tables > 1
+            PageLength = PageLength + UnoSolution_Size2
+        #endif
+    End If
+    If PlPage = PAGE_VALUES Then PageLength = 73
+End Function
+
+Function PageByte(In PbPage, In PbIndex As Word) As Byte
+    // Byte PbIndex (from 1) of the page; a page of two tables is the first, then the second
+    Dim PbByte As Byte
+    PbByte = 32
+    If PbPage = PAGE_HOME Then
+        If PbIndex <= UnoHome_Size1 Then
+            ReadTable UnoHome1, PbIndex, PbByte
+        #if UnoHome_Tables > 1
+        Else
+            ReadTable UnoHome2, PbIndex - UnoHome_Size1, PbByte
+        #endif
+        End If
+    End If
+    If PbPage = PAGE_SOLUTION Then
+        If PbIndex <= UnoSolution_Size1 Then
+            ReadTable UnoSolution1, PbIndex, PbByte
+        #if UnoSolution_Tables > 1
+        Else
+            ReadTable UnoSolution2, PbIndex - UnoSolution_Size1, PbByte
+        #endif
+        End If
+    End If
+    If PbPage = PAGE_VALUES Then ReadTable PageValues, PbIndex, PbByte
+    PageByte = PbByte
+End Function
+
+Function PageValue(In PvPage, In PvNo) As Byte
+    // Value PvNo (from 1) of the page, in the order of its _GCB_BYTE lines. The dashboard and /v share their first
+    // twelve values (same order), so one function serves both
+    PageValue = 0
+    If PvPage = PAGE_HOME Or PvPage = PAGE_VALUES Then PageValue = DashValue(PvNo)
+    If PvPage = PAGE_SOLUTION Then PageValue = SolutionValue(PvNo)
+End Function
+
+Function DashValue(In DvNo) As Byte
+    // The dashboard and /v: C.0 (A0), C.1 (A1), request, PORTB, PORTD, then the time state and the time.
+    // ReadAD gives 0 .. 255 for 0 .. 5 V. PINB / PIND are the pins as they read now (PORTx would be what was last
+    // written to them), so an output and an input both show their real level
+    Select Case DvNo
+        Case 1: DashValue = ReadAD(AN0)
+        Case 2: DashValue = ReadAD(AN1)
+        Case 3: DashValue = ReqCount
+        Case 4: DashValue = PINB
+        Case 5: DashValue = PIND
+        Case Else
+            DashValue = TimeValue(DvNo - 5)
+    End Select
+End Function
+
+Function TimeValue(In TvNo) As Byte
+    // 1 the time state (1 waiting, 2 valid), 2 year - 2000, 3 month, 4 day, 5 hour, 6 minute, 7 second.
+    // Shared by the dashboard, /v and /s; the values are those SntpNow last worked out (SendPage calls it first)
+    Select Case TvNo
+        Case 1: TimeValue = SntpState
+        Case 2: TimeValue = TimeYear - 2000
+        Case 3: TimeValue = TimeMonth
+        Case 4: TimeValue = TimeDay
+        Case 5: TimeValue = TimeHour
+        Case 6: TimeValue = TimeMinute
+        Case 7: TimeValue = TimeSecond
+        Case Else
+            TimeValue = 0
+    End Select
+End Function
+
+Function SolutionValue(In SvNo) As Byte
+    // Build year, month, day, hour, minute, second, number high, low; the time (9 to 15); stratum; W5100 ok, socket
+    // states 0 to 3; SD card type, MB high, low, FAT type. The order is that of the _GCB_BYTE lines in
+    // UnoSolution.htm: a value added there must be added here at the same place. Words (build number, MB) go as two
+    // bytes, high then low, and the page's script joins them (high * 256 + low)
+    Select Case SvNo
+        Case 1: SolutionValue = BuildTwo(9)
+        Case 2: SolutionValue = BuildTwo(1)
+        Case 3: SolutionValue = BuildTwo(4)
+        Case 4: SolutionValue = BuildTwo(12)
+        Case 5: SolutionValue = BuildTwo(15)
+        Case 6: SolutionValue = BuildTwo(18)
+        Case 7: SolutionValue = BuildNo_H
+        Case 8: SolutionValue = [byte]BuildNo
+        Case 16: SolutionValue = SntpStratum
+        Case 17: SolutionValue = W51Ok
+        Case 18: SolutionValue = W51_Status(0)
+        Case 19: SolutionValue = W51_Status(1)
+        Case 20: SolutionValue = W51_Status(2)
+        Case 21: SolutionValue = W51_Status(3)
+        Case 22: SolutionValue = SdType
+        Case 23: SolutionValue = SdMB_H
+        Case 24: SolutionValue = [byte]SdMB
+        Case 25: SolutionValue = SdFat
+        Case Else
+            SolutionValue = TimeValue(SvNo - 8)
+    End Select
+End Function
+
+Function BuildTwo(In BtPos) As Byte
+    // Two digits of BuildTime ("mm-dd-yyyy hh:mm:ss") from position BtPos, as a number: 1 month, 4 day, 9 year
+    // (the last two digits), 12 hour, 15 minute, 18 second. A digit's ASCII code less 48 is its value
+    BuildTwo = (BuildTime(BtPos) - 48) * 10 + BuildTime(BtPos + 1) - 48
+End Function
+
+// ----- Files: /f/ lists the root, /f/DIR/ a folder, /f/DIR/NAME.EXT downloads a file
+
+Sub ServeFiles
+    // The path after "/f/" is walked one name at a time, starting from the card's root folder:
+    //   "/f/"                    list the root folder
+    //   "/f/SDCARD/"             change into SDCARD, then list it
+    //   "/f/SDCARD/HELLO.TXT"    change into SDCARD, then send HELLO.TXT
+    //   "/f/SDCARD"              a folder without its "/": 302 to "/f/SDCARD/" (see SendRedirectSlash)
+    // A name ends at "/" (a folder follows), at the space before " HTTP/1.1", or at "?" (anything after is ignored).
+    // Names are 8.3, as the card stores them; the FAT library makes them upper case, so "hello.txt" also works.
+    Dim SfPos, SfChar, SfResult As Byte
+    // "/f" alone: to "/f/"
+    If ReqBuf(6) <> 47 Then
+        SendRedirectSlash
+        Exit Sub
+    End If
+    // No card yet (or it was changed): start it again
+    If SdFat = 0 Then SdStart
+    If SdFat = 0 Then
+        TxStatus 0
+        TxEndHeader
+        TxText "No SD card"
+        Exit Sub
+    End If
+    // Start from the root folder: the FAT library keeps a current folder, left wherever the last request went
+    SfResult = FatChDir("/")
+    // Each name up to a "/" is a folder; the last name, if any, a file. SfPos 7 is the first character after
+    // "GET /f/". The inner loop copies one name into FileSeg; the outer loop changes into it if it was a folder
+    SfPos = 7
+    Do
+        FileSeg(0) = 0
+        Do While SfPos < ReqLen
+            SfChar = ReqBuf(SfPos)
+            If SfChar = 47 Or SfChar = 32 Or SfChar = 63 Then Exit Do
+            If FileSeg(0) < 12 Then
+                FileSeg(0) = FileSeg(0) + 1
+                FileSeg(FileSeg(0)) = SfChar
+            End If
+            SfPos++
+        Loop
+        If SfPos >= ReqLen Then SfChar = 32
+        If SfChar <> 47 Then Exit Do
+        // A folder
+        If FatChDir(FileSeg) <> FAT_OK Then
+            // The card may have been pulled out: started again at the next request
+            SdFat = 0
+            SendNotFound
+            Exit Sub
+        End If
+        SfPos++
+    Loop
+    If FileSeg(0) = 0 Then
+        SendListing
+        Exit Sub
+    End If
+    SfResult = FatOpenRead(FileSeg)
+    If SfResult = FAT_ERR_IS_DIR Then
+        SendRedirectSlash
+        Exit Sub
+    End If
+    If SfResult <> FAT_OK Then
+        SendNotFound
+        Exit Sub
+    End If
+    SendFile
+End Sub
+
+Sub SendListing
+    // The current folder as a table: folders end with "/", files have their size; "." is left out ("..", the folder
+    // above, is kept as the way back). The HTML is written here, not from a page table: it depends on the card.
+    // FatListFirst / FatListNext return 1 for each entry with FatListName, FatListAttr and FatListSize set, 0 at
+    // the end. The links are relative (see SendRedirectSlash)
+    Dim SlMore As Byte
+    TxStatus 0
+    TxEndHeader
+    TxText "<!DOCTYPE html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'>"
+    TxText "<title>Files</title><style>body{font-family:system-ui,sans-serif;background:#0f172a;color:#e2e8f0;"
+    TxText "padding:16px}a{color:#38bdf8;text-decoration:none}td{padding:3px 14px 3px 0}"
+    TxText "</style></head><body><h1>Files</h1><p><a href='/'>Dashboard</a> &middot; "
+    // The path asked for
+    SlMore = 4
+    Do While SlMore < ReqLen And ReqBuf(SlMore) <> 32
+        W51_TxByte ReqBuf(SlMore)
+        SlMore++
+    Loop
+    TxText "</p><table>"
+    SlMore = FatListFirst()
+    Do While SlMore = 1
+        If FatListName <> "." Then
+            TxText "<tr><td><a href='"
+            TxText FatListName
+            If (FatListAttr And FAT_ATTR_DIR) <> 0 Then
+                TxText "/'>"
+                TxText FatListName
+                TxText "/</a></td><td></td></tr>"
+            Else
+                TxText "'>"
+                TxText FatListName
+                TxText "</a></td><td>"
+                TxLong FatListSize
+                TxText "</td></tr>"
+            End If
+        End If
+        If W51_TxOk = 0 Then Exit Sub
+        SlMore = FatListNext()
+    Loop
+    TxText "</table></body></html>"
+End Sub
+
+Sub SendFile
+    // The open file (FatOpenRead) as a download. "application/octet-stream" with "Content-Disposition: attachment"
+    // makes the browser save the file rather than show it; Content-Length lets it show the progress and check the
+    // whole file arrived. FatReadByte reads the card a 512-byte sector at a time into FatBuf and hands out one byte
+    // per call; FatEOF becomes 1 with the last byte. Stops early if the browser goes away (W51_TxOk 0)
+    TxStatus 2
+    TxText "Content-Disposition: attachment; filename=" : TxText FileSeg : TxCRLF
+    TxText "Content-Length: " : TxLong FatFileSize : TxCRLF
+    TxEndHeader
+    Do While FatEOF = 0
+        W51_TxByte FatReadByte()
+        If W51_TxOk = 0 Then Exit Sub
+    Loop
+End Sub
+
+// ----- SNTP on the UDP socket
+//
+// SNTP (RFC 4330): one 48-byte datagram to the time server's port 123, one 48-byte answer back. The request is sent
+// by OneSecond (SntpRequest) and the answer picked up by the main loop (SntpPoll), so nothing waits for it.
+
+Sub SntpRequest
+    // 48 bytes: flags 0x23 (version 4, client), the request number as the transmit time (the server copies it back).
+    // Bytes 0 .. 47 of the message: 0 flags, 1 .. 39 zero, 40 .. 43 the transmit time (here: SntpNonce), 44 .. 47 zero.
+    // The W5100 adds the UDP and IP headers. SntpWaiting 3: OneSecond gives up after 3 s without an answer
+    Dim SrIndex As Byte
+    SntpNonce++
+    W51_UdpTo SOCK_UDP, SNTP_SERVER_IP1, SNTP_SERVER_IP2, SNTP_SERVER_IP3, SNTP_SERVER_IP4, 123
+    W51_TxBegin SOCK_UDP
+    W51_TxByte 0x23
+    For SrIndex = 1 To 39
+        W51_TxByte 0
+    Next
+    W51_TxByte SntpNonce_E
+    W51_TxByte SntpNonce_U
+    W51_TxByte SntpNonce_H
+    W51_TxByte [byte]SntpNonce
+    For SrIndex = 1 To 4
+        W51_TxByte 0
+    Next
+    W51_TxFlush
+    SntpWaiting = 3
+End Sub
+
+Sub SntpPoll
+    // A datagram on the UDP socket: the W5100's 8-byte header (address, port, length), then the data. An SNTP
+    // answer to our latest request sets the time; anything else is dropped.
+    // The answer's bytes used: 0 flags (leap indicator, version, mode), 1 stratum, 24 .. 27 the originate time
+    // (our transmit time copied back: must be SntpNonce), 40 .. 43 the server's transmit time in whole seconds
+    // since 1900, 44 the first byte of its fraction (128 or more: past the half second, so round up).
+    // Checks before the time is taken: we are waiting (SntpWaiting), mode 4 (server), stratum 1 .. 15 (0 is a
+    // refusal, 16 unsynchronised), leap indicator not 3 (the server's clock not set), and our request number.
+    // Then: the time, millis() now, the next request in 15 minutes, the console and a syslog "Time set" line
+    Dim SpSize, SpLength, SpIndex As Word
+    Dim SpData, SpFlags, SpStratum, SpMatch, SpRound As Byte
+    Dim SpSeconds As Long
+    SpSize = W51_RxSize(SOCK_UDP)
+    If SpSize < 8 Then Exit Sub
+    W51_RxBegin SOCK_UDP
+    For SpIndex = 1 To 6
+        SpData = W51_RxByte()
+    Next
+    SpLength_H = W51_RxByte()
+    [byte]SpLength = W51_RxByte()
+    SpMatch = 0
+    SpFlags = 0
+    SpStratum = 0
+    SpRound = 0
+    For SpIndex = 0 To SpLength - 1
+        SpData = W51_RxByte()
+        Select Case SpIndex
+            Case 0: SpFlags = SpData
+            Case 1: SpStratum = SpData
+            Case 24
+                If SpData = SntpNonce_E Then SpMatch++
+            Case 25
+                If SpData = SntpNonce_U Then SpMatch++
+            Case 26
+                If SpData = SntpNonce_H Then SpMatch++
+            Case 27
+                If SpData = [byte]SntpNonce Then SpMatch++
+            Case 40: SpSeconds_E = SpData
+            Case 41: SpSeconds_U = SpData
+            Case 42: SpSeconds_H = SpData
+            Case 43: [byte]SpSeconds = SpData
+            Case 44: SpRound = SpData
+        End Select
+    Next
+    W51_RxEnd
+    If SntpWaiting = 0 Then Exit Sub
+    // Server mode, a usable stratum, leap indicator not 3, our request
+    If (SpFlags And 7) <> 4 Then Exit Sub
+    If SpStratum = 0 Or SpStratum > 15 Then Exit Sub
+    If (SpFlags And 0xC0) = 0xC0 Then Exit Sub
+    If SpMatch <> 4 Then Exit Sub
+    If SpRound >= 128 Then SpSeconds++
+    SntpSeconds = SpSeconds
+    SntpSync = Millis()
+    SntpStratum = SpStratum
+    SntpState = 2
+    SntpWaiting = 0
+    SntpCountdown = SNTP_INTERVAL_S
+    SntpNow
+    HSerPrint "Time set " : HSerPrint TimeHour : HSerPrint ":" : HSerPrint TimeMinute : HSerPrintCRLF
+    SyslogBegin
+    TxText "Time set "
+    TxTwo TimeHour : W51_TxByte 58 : TxTwo TimeMinute : W51_TxByte 58 : TxTwo TimeSecond
+    W51_TxFlush
+End Sub
+
+Sub SntpNow
+    // UTC now into TimeYear, TimeMonth, TimeDay, TimeHour, TimeMinute, TimeSecond (as ENC28J60_SNTP.h SNTP_Now).
+    // Seconds now = the server's seconds + the seconds since the answer (millis). Less SNTP_UNIX_OFFSET (the seconds
+    // from 1900 to 1970) gives Unix time. Days = Unix time / 86400; the rest of the day gives the hours, minutes
+    // and seconds; the days are counted off year by year from 1970, then month by month. Each Long step is a
+    // separate line on purpose: GCBASIC works out a mixed expression in the size of its parts, and a Byte * 3600 or
+    // a sum inside an If would overflow
+    Dim SnUnix, SnDays, SnRest, SnHourSeconds, SnElapsed As Long
+    Dim SnDaysInYear As Word
+    Dim SnMonthDays As Byte
+    If SntpState < 2 Then Exit Sub
+    SnElapsed = Millis() - SntpSync
+    SnElapsed = SnElapsed / 1000
+    SnUnix = SntpSeconds - SNTP_UNIX_OFFSET
+    SnUnix = SnUnix + SnElapsed
+    SnDays = SnUnix / 86400
+    SnRest = SnDays * 86400
+    SnRest = SnUnix - SnRest
+    TimeHour = SnRest / 3600
+    // In Long: TimeHour * 3600 is worked out in Word and overflows from 19:00 (19 * 3600 = 68400)
+    SnHourSeconds = TimeHour
+    SnHourSeconds = SnHourSeconds * 3600
+    SnRest = SnRest - SnHourSeconds
+    TimeMinute = SnRest / 60
+    TimeSecond = SnRest - TimeMinute * 60
+    TimeYear = 1970
+    Do
+        SnDaysInYear = 365
+        If IsLeap(TimeYear) = 1 Then SnDaysInYear = 366
+        If SnDays < SnDaysInYear Then Exit Do
+        SnDays = SnDays - SnDaysInYear
+        TimeYear++
+    Loop
+    TimeMonth = 1
+    Do
+        SnMonthDays = DaysInMonth(TimeMonth, TimeYear)
+        If SnDays < SnMonthDays Then Exit Do
+        SnDays = SnDays - SnMonthDays
+        TimeMonth++
+    Loop
+    TimeDay = SnDays + 1
+End Sub
+
+Function IsLeap(In LeapYear As Word) As Byte
+    // 1 for a leap year: every 4th year, except whole centuries unless divisible by 400 (2000 was, 2100 is not)
+    IsLeap = 0
+    If LeapYear Mod 4 = 0 Then
+        IsLeap = 1
+        If LeapYear Mod 100 = 0 And LeapYear Mod 400 <> 0 Then IsLeap = 0
+    End If
+End Function
+
+Function DaysInMonth(In DmMonth, In DmYear As Word) As Byte
+    Select Case DmMonth
+        Case 4, 6, 9, 11
+            DaysInMonth = 30
+        Case 2
+            DaysInMonth = 28
+            If IsLeap(DmYear) = 1 Then DaysInMonth = 29
+        Case Else
+            DaysInMonth = 31
+    End Select
+End Function
+
+// ----- Syslog: "<134>wiz5100-10: text" to the NAS, UDP 514
+//
+// A syslog message is one UDP datagram of text. <134> is the priority: facility 16 (local0) * 8 + severity 6
+// (informational), as the other boards send. The NAS's syslog log then shows "wiz5100-10: ..." with the time.
+
+Sub SyslogBegin
+    // Point the UDP socket at the NAS and start the datagram with the priority and host name; the caller adds the
+    // text and sends it with W51_TxFlush
+    W51_UdpTo SOCK_UDP, SYSLOG_IP1, SYSLOG_IP2, SYSLOG_IP3, SYSLOG_IP4, 514
+    W51_TxBegin SOCK_UDP
+    TxText "<134>wiz5100-10: "
+End Sub
+
+Sub SyslogStart
+    // "Start WIZNET_MEGA328P_W5100-10 build n dd/mm/yyyy hh:mm, fixed, MAC 00:1E:C0:00:00:0A, web 80, SD FATnn"
+    Dim SsPos As Byte
+    SyslogBegin
+    TxText "Start WIZNET_MEGA328P_W5100-10 build "
+    TxLong BuildNo
+    W51_TxByte 32
+    // BuildTime "mm-dd-yyyy hh:mm:ss" as dd/mm/yyyy hh:mm
+    W51_TxByte BuildTime(4) : W51_TxByte BuildTime(5) : W51_TxByte 47
+    W51_TxByte BuildTime(1) : W51_TxByte BuildTime(2) : W51_TxByte 47
+    For SsPos = 7 To 16
+        W51_TxByte BuildTime(SsPos)
+    Next
+    TxText ", fixed, MAC 00:1E:C0:00:00:0A, web 80, "
+    If SdFat = 0 Then
+        TxText "no SD card"
+    Else
+        TxText "SD FAT"
+        TxLong SdFat
+    End If
+    W51_TxFlush
+End Sub

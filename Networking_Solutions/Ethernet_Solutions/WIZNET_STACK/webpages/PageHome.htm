@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html><head><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>WIZnet</title>
+<style>
+body{font-family:system-ui,sans-serif;background:#0f172a;color:#e2e8f0;margin:0;padding:16px}
+h1{font-size:20px;margin:0}
+.s{color:#94a3b8;font-size:13px;margin:4px 0 16px}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.c{background:#1e293b;border-radius:12px;padding:14px}
+h2{font-size:13px;color:#94a3b8;margin:0 0 8px}
+.r{display:flex;align-items:center;gap:10px;margin:6px 0;font-size:14px}
+.r b{width:34px}
+.b{flex:1;height:8px;background:#334155;border-radius:4px}
+.b i{display:block;height:8px;border-radius:4px;background:#38bdf8}
+.p{padding:2px 10px;border-radius:10px;font-size:12px;background:#334155}
+.on{background:#22c55e;color:#052e16}
+a{margin-left:auto;color:#38bdf8;text-decoration:none;font-size:12px;border:1px solid;border-radius:8px;padding:2px 10px}
+.ab{background:#dc2626;color:#fff;border-color:#dc2626}.ab.on{background:#16a34a;border-color:#16a34a}
+</style></head><body>
+<h1>GCBASIC WIZnet Web Server</h1>
+<div id="m"></div>
+<script>
+var AN2_GCB_BYTE=255;
+var AN3_GCB_BYTE=255;
+var REQ_GCB_BYTE=0;
+var PORTB_GCB_BYTE=170;
+var PORTD_GCB_BYTE=85;
+var TS_GCB_BYTE=0;
+var TY_GCB_BYTE=26;
+var TMO_GCB_BYTE=1;
+var TD_GCB_BYTE=1;
+var TH_GCB_BYTE=0;
+var TMI_GCB_BYTE=0;
+var TSE_GCB_BYTE=0;
+var R01_GCB_BYTE=32;
+var R02_GCB_BYTE=32;
+var R03_GCB_BYTE=32;
+var R04_GCB_BYTE=32;
+var R05_GCB_BYTE=32;
+var R06_GCB_BYTE=32;
+var R07_GCB_BYTE=32;
+var R08_GCB_BYTE=32;
+var R09_GCB_BYTE=32;
+var R10_GCB_BYTE=32;
+var R11_GCB_BYTE=32;
+var R12_GCB_BYTE=32;
+var MQ_GCB_BYTE=0;
+var R='';
+function A(l,v){return '<div class="r"><b>'+l+'</b><span class="b"><i style="width:'+Math.round(v/2.55)+'%"></i></span>'+("00"+v).slice(-3)+'</div>';}
+function D(p,v,t){var h='',i;for(i=0;i<8;i++)h+='<div class="r"><b>'+p+i+'</b><span class="p'+((v>>i)&1?' on">ON':'">OFF')+'</span>'+(t?'<a href="/t'+i+'">Toggle</a>':'')+'</div>';return h;}
+function N(c){R='PIC'+String.fromCharCode.apply(null,c).trim();}
+function Z(n){return ('0'+n).slice(-2);}
+function T(st,y,mo,d,h,mi,s){if(st<1)return '';if(st<2)return ' &middot; waiting for the time server';return ' &middot; '+(2000+y)+'-'+Z(mo)+'-'+Z(d)+' '+Z(h)+':'+Z(mi)+':'+Z(s)+' UTC';}
+function S(a2,a3,q,pb,pd,tm){document.getElementById('m').innerHTML='<div class="s">'+R+' &middot; request '+q+tm+'<div style="margin-top:8px"><a href="/c">Config</a> <a href="/s">Solution</a> <a href="#" id="au" class="'+(AU?'ab on':'ab')+'" onclick="X();return false">Auto Update (2 s)</a> <a href="#" id="up"'+(AU?' hidden':'')+' onclick="G(0);return false">Update</a></div></div><div class="g"><div class="c"><h2>ADC</h2>'+A('AN2',a2)+A('AN3',a3)+'</div><div class="c"><h2>PORTB</h2>'+D('RB',pb,0)+'</div><div class="c"><h2>PORTD</h2>'+D('RD',pd,1)+'</div></div>';}
+var AU=0,RU=0;
+function Q(m){try{m=localStorage.au||m}catch(e){}if(m>0){AU=1;RU=1;setTimeout(G,2000,1);}}
+Q(MQ_GCB_BYTE);
+N([R01_GCB_BYTE,R02_GCB_BYTE,R03_GCB_BYTE,R04_GCB_BYTE,R05_GCB_BYTE,R06_GCB_BYTE,R07_GCB_BYTE,R08_GCB_BYTE,R09_GCB_BYTE,R10_GCB_BYTE,R11_GCB_BYTE,R12_GCB_BYTE]);
+S(AN2_GCB_BYTE,AN3_GCB_BYTE,REQ_GCB_BYTE,PORTB_GCB_BYTE,PORTD_GCB_BYTE,T(TS_GCB_BYTE,TY_GCB_BYTE,TMO_GCB_BYTE,TD_GCB_BYTE,TH_GCB_BYTE,TMI_GCB_BYTE,TSE_GCB_BYTE));
+function G(a){if(a&&!AU){RU=0;return;}fetch('/v').then(r=>r.json()).then(j=>{S(j.a,j.b,j.q,j.p,j.d,T(j.t,j.Y,j.M,j.D,j.h,j.m,j.s));if(a)setTimeout(G,2000,1);}).catch(()=>setTimeout(G,500,a));}
+function X(){AU=!AU;au.className=AU?'ab on':'ab';up.hidden=AU;try{localStorage.au=AU?1:0}catch(e){}if(AU&&!RU){RU=1;G(1);}}
+</script>
+</body></html>

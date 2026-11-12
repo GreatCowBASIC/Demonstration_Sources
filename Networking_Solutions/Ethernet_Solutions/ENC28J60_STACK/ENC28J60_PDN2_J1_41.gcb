@@ -1,0 +1,933 @@
+//--------------------------------------------------------------------------------------------------------------------------------
+// Test 020 - Serial terminal, no UDP, as many modules as fit
+//
+// The serial console (115200) with ICMP (answer ping), TCP, the web site (dashboard, /c, /v), MQTT with Home Assistant
+// and SNTP (UDP only for SNTP; time server the router 192.168.0.250). The dashboard and /c show the time (UTC), /c also
+// the time server and stratum, the firmware file name, build time and build number - the time only when STACK_SNTP is 1.
+// Ping client and statistics are off for room (98% of program memory). No DHCP or DNS: the address is the fixed MY_IP.
+//
+// Hardware (ENC28J60\hardware\18F97J60): hardwareconfig.h - Microchip PICDEM.net 2, the built-in Ethernet port (J1), 41.667 MHz, the 25 MHz crystal through the PLL (/ 3 x 5)
+// Libraries (ENC28J60\libraries): ENC28J60_Stack.h, which includes the rest as switched
+// Configuration and testing: README.md in this folder
+//
+// Console commands (serial 115200 8N1, or telnet with STACK_CONSOLE 2; keys of switched-off modules are not there):
+//   ?  help                  r  resolve router         a  resolve the address typed next
+//   g  gratuitous ARP        c  show cache             x  clear cache               f  toggle receive filter
+//   d  ENC28J60 registers    h  show the address       p  statistics (STACK_STATS)
+//   i  ping router           e  ping the address typed next                          (STACK_PING)
+//   l  send a syslog test message                                                    (STACK_SYSLOG)
+//   t  show the time         y  update the time now                                  (STACK_SNTP)
+//   w  renew the lease (or get one)                                                  (STACK_DHCP)
+//   n  look up DNS_NAME1-3                                                           (STACK_DNS)
+//   u  serial/UDP counters: sent, received, rejected, unreachable                    (STACK_SERIAL_UDP)
+//      "failed <n>": 1 no DNS server, 2 bad name, 3 no answer, 4 name not found, 5 server error
+//
+//@author    Evan R. Venn
+//@licence   GPL
+//@date      01/11/2026
+//
+// Changes:
+//   01/11/2026  2026 initial release
+//   01/11/2026  For the Olimex PIC-WEB (PIC18F67J60), from 020_FULLSTACK_Solution18F.gcb
+//   01/11/2026  Syslog "Time set" as hh:mm:ss (was 19:0:38)
+//   01/11/2026  Time updated every 15 minutes (SNTP_INTERVAL_S 900, was 600)
+//   01/11/2026  Syslog at start-up: file name, build, address, web port, MQTT broker (was "Test 020 start")
+//   02/11/2026  /s shows BOARD_MHZ (the board file's whole MHz): ChipMHz 41.667 does not fit a byte
+//   02/11/2026  For the Microchip PICDEM.net 2 (PIC18F97J60), from 020_FULLSTACK_SolutionJ60.gcb: the built-in Ethernet port (J1),
+//               41.667 MHz, the 25 MHz crystal through the PLL (/ 3 x 5); dashboard PageHome97J60.htm (potentiometer AN2, TC1047A AN3, buttons RB3-RB0, LEDs
+//               RJ0-RJ7), /t0-/t7 and MQTT led/0-7; LCD line 1 the address, line 2 the time (UTC)
+//   02/11/2026  Temperature the average of 8 readings (single readings varied by about 3 C)
+//   02/11/2026  1 ms between the temperature readings, for the input to settle
+//   03/11/2026  Dashboard value 25 = STACK_MQTT: Auto Update starts on when MQTT is in
+//   03/11/2026  Configuration value 38: the Ethernet controller (ENC28J60 on SPI, or built into the PIC)
+//   03/11/2026  Solution value 59: the SPI speed setting (MasterSlow / Master / MasterFast, or none)
+//   03/11/2026  Renamed from 020_FULLSTACK\020_FULLSTACK_Solution97J60_41.gcb (now Development\020_FULLSTACK); the firmware name on /s and in syslog is the file name
+//   03/11/2026  ReadIP is a Sub with an Out status (ReadIPOk): build 1666 rejects a Function with Out parameters
+//   04/11/2026  The start-up announce is in Stack_StartAddress (was a loop here, with WaitServicing)
+//   06/11/2026  Home page title is the host name (DHCP_HOSTNAME): dashboard values 26-37, one character each;
+//               the dashboard is now three tables (PageHome97J601 to PageHome97J603)
+//--------------------------------------------------------------------------------------------------------------------------------
+
+    #option explicit
+
+// ----- Hardware: chip, supply, pins, serial port, Ethernet driver
+
+    #option IncludePath "..\libraries;..\hardware\18F97J60"
+    // Serial speed: the serial console
+    #define USART_BAUD_RATE 115200
+    // Chip and clock: 41.667 MHz, the 25 MHz crystal through the PLL (/ 3 x 5) (#Chip and #Config are not conditional, so the program sets them)
+    #Chip 18F97J60, 41.667
+    #Config FOSC = HSPLL
+    #include <hardwareconfig.h>
+    // Ethernet: the built-in Ethernet port (J1) (the board has two ports, so the program includes the driver)
+    #include <ENC28J60_J60Driver.h>
+
+// ----- Stack modules: 1 = in the program, 0 = not in the program at all
+
+    #define STACK_ICMP       1       // answer ping
+    #define STACK_PING       1       // ping other hosts (i, e)
+    #define STACK_UDP        1       // UDP (here only for SNTP)
+    #define STACK_UDP_ECHO   1       // UDP echo on port 7
+    #define STACK_SYSLOG     1       // syslog messages to SYSLOG_IP (l)
+    #define STACK_SNTP       1       // time from a time server (t, y)
+    #define STACK_DNS        1       // DNS resolver (n)
+    #define STACK_DHCP       1       // 1 = address from DHCP (fixed MY_IP if none), 0 = fixed MY_IP
+    #define STACK_TCP        1       // TCP connections
+    #define STACK_HTTP       1       // web server on port 80
+    #define STACK_MQTT       1       // MQTT client to Home Assistant
+    #define STACK_STATS      1       // statistics counters and the p command 
+    #define STACK_CONSOLE    1       // 0 headless, 1 serial console, 2 TCP terminal (telnet port 23)
+    #define STACK_SERIAL_UDP 0       // serial port to UDP port 50001 and back
+
+// ----- Test configuration
+
+    // This device. MY_IP, IP_NETMASK and IP_GATEWAY are the fixed address (and the fall-back with DHCP)
+    #define MY_IP1 192
+    #define MY_IP2 168
+    #define MY_IP3 0
+    #define MY_IP4 124
+    #define MY_MAC1 0x00
+    #define MY_MAC2 0x1E
+    #define MY_MAC3 0xC0
+    #define MY_MAC4 0x00
+    #define MY_MAC5 0x00
+    #define MY_MAC6 0x06
+    #define IP_NETMASK1 255
+    #define IP_NETMASK2 255
+    #define IP_NETMASK3 255
+    #define IP_NETMASK4 0
+    #define IP_GATEWAY1 192
+    #define IP_GATEWAY2 168
+    #define IP_GATEWAY3 0
+    #define IP_GATEWAY4 250
+
+    // Hosts
+    #define ROUTER_IP1 192
+    #define ROUTER_IP2 168
+    #define ROUTER_IP3 0
+    #define ROUTER_IP4 250
+    #define SYSLOG_IP1 192
+    #define SYSLOG_IP2 168
+    #define SYSLOG_IP3 0
+    #define SYSLOG_IP4 245
+
+    // Time server: looked up by name with STACK_DNS, else the fixed address - here the router 192.168.0.250 (DNS off)
+    #define SNTP_HOST "time.nist.gov"
+    #define SNTP_HOST_WAIT_MS 3000
+    #define SNTP_SERVER_IP1 192
+    #define SNTP_SERVER_IP2 168
+    #define SNTP_SERVER_IP3 0
+    #define SNTP_SERVER_IP4 250
+    #define SNTP_INTERVAL_S 900
+
+    // DNS: the server for a fixed address (with DHCP the lease names it), and the names n looks up
+    #define DNS_SERVER1 192
+    #define DNS_SERVER2 168
+    #define DNS_SERVER3 0
+    #define DNS_SERVER4 250
+    #define DNS_NAME1 "time.nist.gov"
+    #define DNS_NAME2 "www.github.com"
+    #define DNS_NAME3 "no-such-host.invalid"
+
+    // Web pages. Each .htm is converted when included: PageHome97J60.htm (the PICDEM.net 2 dashboard) gives Table
+    // PageHome97J601 and PageHome97J60_Size1;
+    // PageConfig.htm is longer than one table can be (2048 words), so it gives PageConfig1 to PageConfig3 with
+    // PageConfig_Size1 to PageConfig_Size3. PageValues.h is the JSON reply, written as a table of character codes
+    #include "webpages\PageHome97J60.htm"
+    #include "webpages\PageConfig.htm"
+    #include "webpages\PageSolution.htm"
+    #include "webpages\PageValues.h"
+    // Build number and time: the compiler counts each build in GCBVersionNumber.cnt and makes GCBBuildStr ("21") and
+    // GCBBuildTimeStr ("10-31-2026 10:15:00", month-day-year) from it; SOURCEFILE is the program's file name
+    #include "GCBVersionNumber.cnt"
+    #define PAGE_HOME   1
+    #define PAGE_CONFIG 2
+    #define PAGE_VALUES 3
+    #define PAGE_SOLUTION 4
+
+    // ARP
+    #define ARP_CACHE_SIZE 4
+    #define ARP_CACHE_TIMEOUT_S 60
+    #define ARP_RETRIES 3
+    #define ARP_REPLY_TIMEOUT_MS 500
+
+    // Frame buffer: 600 bytes holds the 576-byte datagram every host must accept (DHCP answers are 590-byte frames)
+    #define ETH_BUFFER_SIZE 600
+
+// ----- Libraries
+
+    // Report each web request on the console (0: off, for room)
+    #define HTTP_LOG 0
+    #define HTTP_NOT_FOUND_HOME 1       // an unknown path goes back to the dashboard (302), not 404
+    // MQTT: the broker (Home Assistant) and the login - a Home Assistant user for this device.
+    // TYPE THE PASSWORD of that user between the quotes of MQTT_PASSWORD
+    #define MQTT_BROKER1 192
+    #define MQTT_BROKER2 168
+    #define MQTT_BROKER3 0
+    #define MQTT_BROKER4 126
+    #define MQTT_USER "enc28j60"
+    #define MQTT_PASSWORD "Anobium!"
+
+    // Home Assistant discovery: HADiscovery.json (converted when included: Table HADiscovery1, HADiscovery_Size1) is
+    // published, retained, to this topic after each connection. It names the chip, so it is in the hardware folder
+    #include <HADiscovery.json>
+    #define MQTT_DISCOVERY_TOPIC "homeassistant/device/enc28j60-6/config"
+
+    #include <ENC28J60_Stack.h>
+
+// ----- Variables
+    Dim LastSecond, TimeNow As Long
+    Dim Command, TickResult As Byte
+    #if STACK_SYSLOG = 1
+        Dim SyslogCount As Word
+    #endif
+    #if STACK_SNTP = 1
+        Dim SntpCountdown As Word
+    #endif
+    // Dashboard values for the current request, and the number of page requests
+    Dim PageValue(12)
+    Dim RequestCount As Byte
+    Dim TempMv As Long
+    Dim TempSample As Byte
+    // Firmware for the configuration page: file name, build time, build number
+    Dim FwName As String * 32
+    Dim RigName As String * 12
+    // The host name for the home page title
+    Dim HostName As String * 12
+    Dim FwTime As String * 19
+    Dim FwBuild As String * 5
+    Dim FwBuildNo As Word
+    #if STACK_DNS = 1
+        // The latest look-up: address and DNS_RESULT_...
+        Dim DNS_IP1, DNS_IP2, DNS_IP3, DNS_IP4, DNS_Status As Byte
+    #endif
+
+// ----- Main program
+
+    // Prevents the terminal becoming active too early, during reprogramming
+    wait 2 s
+    CLS
+    Print "PICDEM.net 2"
+    #if STACK_CONSOLE <> 0
+        CONSOLE_Init
+    #endif
+    #if STACK_CONSOLE <> 0
+        CONSOLE_CRLF 2
+        CONSOLE_Print "Test 020 FULLSTACK" : CONSOLE_CRLF
+        CONSOLE_Print "MAC " : PrintMACConst : CONSOLE_CRLF
+        HardwarePrintConfig
+    #endif
+
+    If ENC_Init = False Then
+        wait 100 ms
+        End
+    End If
+    #if STACK_CONSOLE <> 0
+        ShowENCStatus
+    #endif
+
+    Stack_Init
+    // RAM is not cleared at reset
+    RequestCount = 0
+    #if STACK_DHCP = 1
+        #if STACK_CONSOLE <> 0
+            CONSOLE_Print "DHCP: "
+        #endif
+        If Stack_StartAddress Then
+            #if STACK_CONSOLE <> 0
+                CONSOLE_Print "from " : PrintIP DHCP_Server1, DHCP_Server2, DHCP_Server3, DHCP_Server4 : CONSOLE_CRLF
+            #endif
+        Else
+            #if STACK_CONSOLE <> 0
+                CONSOLE_Print "failed, fixed IP" : CONSOLE_CRLF
+            #endif
+        End If
+    #endif
+    #if STACK_DHCP = 0
+        TickResult = Stack_StartAddress
+    #endif
+    #if STACK_CONSOLE <> 0
+        PrintNetConfig
+    #endif
+
+    // Stack_StartAddress has announced our address (RFC 5227): find the router
+    #if STACK_CONSOLE <> 0
+        ARP_ResolveAndReport ROUTER_IP1, ROUTER_IP2, ROUTER_IP3, ROUTER_IP4
+    #endif
+
+    #if STACK_SYSLOG = 1
+        SyslogCount = 0
+        // "Start <program> build <n> <build time>, reset <cause>, DHCP or fixed, MAC, link time, web, MQTT"
+        Syslog_SendStart
+    #endif
+    #if STACK_SNTP = 1
+        UpdateTime
+    #endif
+    LCDStatus
+    #if STACK_CONSOLE <> 0
+        PrintHelp
+    #endif
+
+    LastSecond = Millis()
+    Do Forever
+        ENC_Service
+        #if STACK_SERIAL_UDP = 1
+            SerUdp_Service
+        #endif
+
+        TimeNow = Millis()
+        If TimeNow - LastSecond >= 1000 Then
+            LastSecond = LastSecond + 1000
+            TickResult = Stack_Tick
+            #if STACK_CONSOLE <> 0
+                If TickResult = STACK_TICK_LINK_UP Then CONSOLE_Print "Link up" : CONSOLE_CRLF
+            #endif
+            #if STACK_CONSOLE <> 0
+                If TickResult = STACK_TICK_LINK_DOWN Then CONSOLE_Print "Link down" : CONSOLE_CRLF
+            #endif
+            #if STACK_DHCP = 1
+                #if STACK_CONSOLE <> 0
+                    If Stack_DhcpEvent = DHCP_TICK_RENEWED Then CONSOLE_Print "DHCP renewed" : CONSOLE_CRLF
+                #endif
+                #if STACK_CONSOLE <> 0
+                    If Stack_DhcpEvent = DHCP_TICK_FAILED Then CONSOLE_Print "DHCP renew failed" : CONSOLE_CRLF
+                #endif
+                #if STACK_CONSOLE <> 0
+                    If Stack_DhcpEvent = DHCP_TICK_EXPIRED Then PrintNetConfig
+                #endif
+            #endif
+            #if STACK_SNTP = 1
+                SntpCountdown--
+                If SntpCountdown = 0 Then UpdateTime
+            #endif
+            LCDStatus
+        End If
+
+        #if STACK_CONSOLE <> 0
+            If CONSOLE_Available Then
+                Command = CONSOLE_Read
+                #if STACK_CONSOLE <> 0
+                    DoCommand Command
+                #endif
+            End If
+        #endif
+    Loop
+
+// ----- Test console
+
+#if STACK_CONSOLE <> 0
+Sub DoCommand(In CommandChar)
+    Dim IP1, IP2, IP3, IP4, ReadOk As Byte
+    Select Case CommandChar
+        Case "?"
+            PrintHelp
+        Case "r"
+            ARP_ResolveAndReport ROUTER_IP1, ROUTER_IP2, ROUTER_IP3, ROUTER_IP4
+        Case "a"
+            CONSOLE_Print "IP: "
+            ReadIP IP1, IP2, IP3, IP4, ReadOk
+            If ReadOk = 1 Then
+                ARP_ResolveAndReport IP1, IP2, IP3, IP4
+            Else
+                CONSOLE_Print "not an IP address" : CONSOLE_CRLF
+            End If
+        Case "g"
+            // Announce our address: one broadcast ARP for our own IP
+            // Texts kept short: on the 16F1 every string shares one 2048-word table
+            If NET_IsConfigured = 0 Then
+                CONSOLE_Print "No IP"
+            Else
+                ARP_SendGratuitous
+                CONSOLE_Print "Announced " : PrintIP Net_IP1, Net_IP2, Net_IP3, Net_IP4
+                CONSOLE_Print " " : PrintMACConst
+            End If
+            CONSOLE_CRLF
+        Case "c"
+            ARP_PrintCache
+        Case "x"
+            ARP_CacheClear
+            CONSOLE_Print "Cache cleared" : CONSOLE_CRLF
+        Case "f"
+            If ENC_RxFilter = ENC_RXFILTER_NORMAL Then
+                ENC_SetReceiveFilter ENC_RXFILTER_ALL
+                CONSOLE_Print "Filter: all"
+            Else
+                ENC_SetReceiveFilter ENC_RXFILTER_NORMAL
+                CONSOLE_Print "Filter: normal"
+            End If
+            CONSOLE_CRLF
+        Case "d"
+            ShowENCStatus
+        #if STACK_STATS = 1
+        Case "p"
+            Stack_PrintStats
+        #endif
+        Case "h"
+            PrintNetConfig
+        #if STACK_PING = 1
+        Case "i"
+            ICMP_Ping ROUTER_IP1, ROUTER_IP2, ROUTER_IP3, ROUTER_IP4
+        Case "e"
+            CONSOLE_Print "IP: "
+            ReadIP IP1, IP2, IP3, IP4, ReadOk
+            If ReadOk = 1 Then
+                ICMP_Ping IP1, IP2, IP3, IP4
+            Else
+                CONSOLE_Print "not an IP address" : CONSOLE_CRLF
+            End If
+        #endif
+        #if STACK_SYSLOG = 1
+        Case "l"
+            SyslogCount++
+            If Syslog_Begin Then
+                Syslog_Text "Console msg "
+                Syslog_Number SyslogCount
+                Syslog_End
+                CONSOLE_Print "Syslog sent" : CONSOLE_CRLF
+            Else
+                CONSOLE_Print "No syslog" : CONSOLE_CRLF
+            End If
+        #endif
+        #if STACK_SNTP = 1
+        Case "t"
+            SNTP_PrintNow
+            CONSOLE_CRLF
+        Case "y"
+            UpdateTime
+        #endif
+        #if STACK_DHCP = 1
+        Case "w"
+            If DHCP_Bound Then
+                If DHCP_Renew Then
+                    CONSOLE_Print "DHCP renewed" : CONSOLE_CRLF
+                Else
+                    CONSOLE_Print "DHCP renew failed" : CONSOLE_CRLF
+                End If
+            Else
+                If Stack_StartAddress = 0 Then CONSOLE_Print "DHCP failed, fixed IP" : CONSOLE_CRLF
+                ARP_SendGratuitous
+            End If
+            PrintNetConfig
+        #endif
+        #if STACK_DNS = 1
+        Case "n"
+            LookUp DNS_NAME1
+            LookUp DNS_NAME2
+            LookUp DNS_NAME3
+        #endif
+        #if STACK_SERIAL_UDP = 1
+        Case "u"
+            CONSOLE_Print "Serial to UDP " : CONSOLE_Number SerUdp_Sent : CONSOLE_Print "  UDP to serial " : CONSOLE_Number SerUdp_Received
+            #ifdef SERUDP_REMOTE_IP1
+                CONSOLE_Print "  rejected " : CONSOLE_Number SerUdp_Rejected : CONSOLE_Print "  unreachable " : CONSOLE_Number SerUdp_Unreachable
+            #endif
+            CONSOLE_CRLF
+        #endif
+        Case 10, 13
+            // ignore line ends
+        Case Else
+            CONSOLE_Print "? for help" : CONSOLE_CRLF
+    End Select
+End Sub
+#endif
+
+#if STACK_CONSOLE <> 0
+Sub PrintHelp
+    CONSOLE_Print "Keys: r a g c x f d h"
+    #if STACK_STATS = 1
+        CONSOLE_Print " p"
+    #endif
+    #if STACK_PING = 1
+        CONSOLE_Print " i e"
+    #endif
+    #if STACK_SYSLOG = 1
+        CONSOLE_Print " l"
+    #endif
+    #if STACK_SNTP = 1
+        CONSOLE_Print " t y"
+    #endif
+    #if STACK_DHCP = 1
+        CONSOLE_Print " w"
+    #endif
+    #if STACK_DNS = 1
+        CONSOLE_Print " n"
+    #endif
+    #if STACK_SERIAL_UDP = 1
+        CONSOLE_Print " u"
+    #endif
+    CONSOLE_Print " ?"
+    CONSOLE_CRLF
+End Sub
+#endif
+
+#if STACK_SNTP = 1
+Sub UpdateTime
+    // Ask the time server, report on the console (and to syslog), restart the countdown
+    SntpCountdown = SNTP_INTERVAL_S
+    #if STACK_DNS = 1
+        // The servers behind the name change: look it up each time. A failure leaves 0.0.0.0 (no request)
+        #if STACK_CONSOLE <> 0
+            CONSOLE_Print SNTP_HOST : CONSOLE_Print " "
+        #endif
+        DNS_Resolve SNTP_HOST, SNTP_ServerIP1, SNTP_ServerIP2, SNTP_ServerIP3, SNTP_ServerIP4, DNS_Status, SNTP_HOST_WAIT_MS
+        #if STACK_CONSOLE <> 0
+            If DNS_Status <> DNS_RESULT_OK Then CONSOLE_Print "failed " : CONSOLE_Number DNS_Status : CONSOLE_Print " "
+        #endif
+    #endif
+    #if STACK_CONSOLE <> 0
+        CONSOLE_Print "SNTP " : PrintIP SNTP_ServerIP1, SNTP_ServerIP2, SNTP_ServerIP3, SNTP_ServerIP4 : CONSOLE_Print " "
+    #endif
+    If SNTP_Request Then
+        #if STACK_CONSOLE <> 0
+            SNTP_PrintNow
+            CONSOLE_CRLF
+        #endif
+        #if STACK_SYSLOG = 1
+            If Syslog_Begin Then
+                SNTP_Now
+                Syslog_Text "Time set "
+                // hh:mm:ss, two digits each
+                If SNTP_Hour < 10 Then Syslog_Text "0"
+                Syslog_Number SNTP_Hour : Syslog_Text ":"
+                If SNTP_Minute < 10 Then Syslog_Text "0"
+                Syslog_Number SNTP_Minute : Syslog_Text ":"
+                If SNTP_Second < 10 Then Syslog_Text "0"
+                Syslog_Number SNTP_Second
+                Syslog_End
+            End If
+        #endif
+    Else
+        #if STACK_CONSOLE <> 0
+            CONSOLE_Print "no answer" : CONSOLE_CRLF
+        #endif
+        SntpCountdown = 60
+    End If
+End Sub
+#endif
+
+#if STACK_DNS = 1
+#if STACK_CONSOLE <> 0
+Sub LookUp(In LookUpName As String)
+    // Resolve a name and report the address, or why there is none
+    CONSOLE_Print LookUpName : CONSOLE_Print " "
+    DNS_Resolve LookUpName, DNS_IP1, DNS_IP2, DNS_IP3, DNS_IP4, DNS_Status
+    If DNS_Status = DNS_RESULT_OK Then
+        PrintIP DNS_IP1, DNS_IP2, DNS_IP3, DNS_IP4
+    Else
+        CONSOLE_Print "failed "
+        CONSOLE_Number DNS_Status
+    End If
+    CONSOLE_CRLF
+End Sub
+#endif
+#endif
+
+// ----- Web site: the functions ENC28J60_HTTP.h calls
+
+Function HTTP_Route(In PathChar) As Byte
+    // "/" dashboard, "/c" configuration, "/s" solution (firmware, time), "/v" values; anything else 404
+    HTTP_Route = 0
+    If PathChar = 0 Then HTTP_Route = PAGE_HOME
+    If PathChar = 99 Then HTTP_Route = PAGE_CONFIG
+    If PathChar = 118 Then HTTP_Route = PAGE_VALUES
+    If PathChar = 115 Then HTTP_Route = PAGE_SOLUTION
+End Function
+
+Function HTTP_PageLength(In PageNo) As Word
+    // The page's length in bytes: the sizes the converter wrote, or element 0 of a table (its length)
+    Dim PageLength As Word
+    PageLength = 0
+    If PageNo = PAGE_HOME Then PageLength = PageHome97J60_Size1 + PageHome97J60_Size2 + PageHome97J60_Size3
+    If PageNo = PAGE_CONFIG Then PageLength = PageConfig_Size1 + PageConfig_Size2 + PageConfig_Size3
+    If PageNo = PAGE_VALUES Then ReadTable PageValues, 0, PageLength
+    If PageNo = PAGE_SOLUTION Then PageLength = PageSolution_Size1 + PageSolution_Size2 + PageSolution_Size3
+    HTTP_PageLength = PageLength
+End Function
+
+Function HTTP_PageByte(In PageNo, In PageIndex As Word) As Byte
+    // Byte PageIndex (from 1) of the page
+    Dim PageByte As Byte
+    PageByte = 32
+    If PageNo = PAGE_HOME Then
+        // The dashboard is in three tables, one after the other: PageHome97J601 to PageHome97J603
+        If PageIndex <= PageHome97J60_Size1 Then
+            ReadTable PageHome97J601, PageIndex, PageByte
+        Else
+            PageIndex = PageIndex - PageHome97J60_Size1
+            If PageIndex <= PageHome97J60_Size2 Then
+                ReadTable PageHome97J602, PageIndex, PageByte
+            Else
+                ReadTable PageHome97J603, PageIndex - PageHome97J60_Size2, PageByte
+            End If
+        End If
+    End If
+    If PageNo = PAGE_CONFIG Then
+        // The page is in three tables, one after the other: PageConfig1 to PageConfig3
+        If PageIndex <= PageConfig_Size1 Then
+            ReadTable PageConfig1, PageIndex, PageByte
+        Else
+            PageIndex = PageIndex - PageConfig_Size1
+            If PageIndex <= PageConfig_Size2 Then
+                ReadTable PageConfig2, PageIndex, PageByte
+            Else
+                ReadTable PageConfig3, PageIndex - PageConfig_Size2, PageByte
+            End If
+        End If
+    End If
+    If PageNo = PAGE_VALUES Then ReadTable PageValues, PageIndex, PageByte
+    If PageNo = PAGE_SOLUTION Then
+        // The page is in three tables, one after the other: PageSolution1 to PageSolution3
+        If PageIndex <= PageSolution_Size1 Then
+            ReadTable PageSolution1, PageIndex, PageByte
+        Else
+            PageIndex = PageIndex - PageSolution_Size1
+            If PageIndex <= PageSolution_Size2 Then
+                ReadTable PageSolution2, PageIndex, PageByte
+            Else
+                ReadTable PageSolution3, PageIndex - PageSolution_Size2, PageByte
+            End If
+        End If
+    End If
+    HTTP_PageByte = PageByte
+End Function
+
+Function HTTP_PageType(In PageNo) As Byte
+    HTTP_PageType = HTTP_TYPE_HTML
+    If PageNo = PAGE_VALUES Then HTTP_PageType = HTTP_TYPE_JSON
+End Function
+
+Sub HTTP_UpdateValues(In PageNo)
+    // Called once per request: the dashboard values, taken now so that a retransmission repeats them
+    RigName = ChipNameStr
+    HostName = DHCP_HOSTNAME
+    If PageNo = PAGE_CONFIG Then Exit Sub
+    If PageNo = PAGE_SOLUTION Then
+        TakeValues
+        FwName = SOURCEFILE
+        FwTime = GCBBuildTimeStr
+        FwBuild = GCBBuildStr
+        FwBuildNo = Val(FwBuild)
+        Exit Sub
+    End If
+    RequestCount++
+    TakeValues
+End Sub
+
+Sub TakeValues
+    // The dashboard values now: potentiometer, temperature in C, page requests, PORTB (the buttons are bits 3-0), the
+    // LEDs (LATJ). First reading after a channel switch discarded
+    PageValue(1) = ReadAD(BOARD_POT)
+    PageValue(1) = ReadAD(BOARD_POT)
+    // Temperature: the average of 8 readings (single readings varied by about 3 C)
+    TempMv = ReadAD10(BOARD_TEMP)
+    TempMv = 0
+    For TempSample = 1 To 8
+        // Time for the input to settle between readings (back to back they read about 5 C low)
+        Wait 1 ms
+        TempMv = TempMv + ReadAD10(BOARD_TEMP)
+    Next
+    // TC1047A: 500 mV at 0 C, 10 mV per C; below 0 C gives 0. The sum of 8 readings: x VDD / (1023 x 8)
+    TempMv = TempMv * SYSTEM_VDD_MV / 8184
+    PageValue(2) = 0
+    If TempMv > 500 Then PageValue(2) = (TempMv - 500) / 10
+    PageValue(3) = RequestCount
+    PageValue(4) = PORTB
+    PageValue(5) = BOARD_LEDS
+    // The time: 6 = 0 no SNTP in the build, 1 no time yet, 2 valid; 7-12 year - 2000, month, day, hour, minute, second
+    PageValue(6) = 0
+    #if STACK_SNTP = 1
+        PageValue(6) = 1
+        If SNTP_Valid = 1 Then
+            SNTP_Now
+            PageValue(6) = 2
+            PageValue(7) = SNTP_Year - 2000
+            PageValue(8) = SNTP_Month
+            PageValue(9) = SNTP_Day
+            PageValue(10) = SNTP_Hour
+            PageValue(11) = SNTP_Minute
+            PageValue(12) = SNTP_Second
+        End If
+    #endif
+End Sub
+
+Function HTTP_PageValue(In PageNo, In ValueNo) As Byte
+    // Value ValueNo of the page: the n-th "_GCB_BYTE" line of the .htm (or the n-th 0 of PageValues).
+    // Dashboard and values page: 1 potentiometer, 2 temperature, 3 request, 4 PORTB, 5 LEDs (taken in HTTP_UpdateValues);
+    // 6-12 the time; dashboard only: 13-24 the chip name (one character each, space after the end), 25 the MQTT
+    // switch, 26-37 the host name for the page title (as the chip name).
+    // Configuration page, in the order of PageConfig.htm: 1-11 the module switches ICMP to STATS, 12-15 IP,
+    // 16-19 mask, 20-23 gateway, 24-27 DNS server, 28-33 MAC, 34 = 1 for a DHCP lease, 35 the MQTT switch,
+    // 36 the console switch (0 headless, 1 serial, 2 TCP terminal), 37 the serial-to-UDP switch, 38 1 = Ethernet built
+    // into the PIC (0 an ENC28J60 on SPI)
+    If PageNo = PAGE_SOLUTION Then
+        HTTP_PageValue = SolutionValue(ValueNo)
+        Exit Function
+    End If
+    If PageNo <> PAGE_CONFIG Then
+        // Dashboard values 26-37: the host name (DHCP_HOSTNAME), one character each, space after the end - the page
+        // script makes it the title
+        If ValueNo > 25 Then
+            HTTP_PageValue = FwChar(HostName, ValueNo - 25)
+            Exit Function
+        End If
+        // Dashboard value 25: the MQTT switch (the page's Auto Update starts on when MQTT is in)
+        If ValueNo = 25 Then
+            HTTP_PageValue = STACK_MQTT
+            Exit Function
+        End If
+        If ValueNo > 12 Then
+            HTTP_PageValue = FwChar(RigName, ValueNo - 12)
+            Exit Function
+        End If
+        HTTP_PageValue = PageValue(ValueNo)
+        Exit Function
+    End If
+    HTTP_PageValue = 0
+    Select Case ValueNo
+        Case 1: HTTP_PageValue = STACK_ICMP
+        Case 2: HTTP_PageValue = STACK_PING
+        Case 3: HTTP_PageValue = STACK_UDP
+        Case 4: HTTP_PageValue = STACK_UDP_ECHO
+        Case 5: HTTP_PageValue = STACK_SYSLOG
+        Case 6: HTTP_PageValue = STACK_SNTP
+        Case 7: HTTP_PageValue = STACK_DHCP
+        Case 8: HTTP_PageValue = STACK_DNS
+        Case 9: HTTP_PageValue = STACK_TCP
+        Case 10: HTTP_PageValue = STACK_HTTP
+        Case 11: HTTP_PageValue = STACK_STATS
+        Case 12: HTTP_PageValue = Net_IP1
+        Case 13: HTTP_PageValue = Net_IP2
+        Case 14: HTTP_PageValue = Net_IP3
+        Case 15: HTTP_PageValue = Net_IP4
+        Case 16: HTTP_PageValue = Net_Mask1
+        Case 17: HTTP_PageValue = Net_Mask2
+        Case 18: HTTP_PageValue = Net_Mask3
+        Case 19: HTTP_PageValue = Net_Mask4
+        Case 20: HTTP_PageValue = Net_Gateway1
+        Case 21: HTTP_PageValue = Net_Gateway2
+        Case 22: HTTP_PageValue = Net_Gateway3
+        Case 23: HTTP_PageValue = Net_Gateway4
+        #if STACK_DNS = 1
+        Case 24: HTTP_PageValue = DNS_ServerIP1
+        Case 25: HTTP_PageValue = DNS_ServerIP2
+        Case 26: HTTP_PageValue = DNS_ServerIP3
+        Case 27: HTTP_PageValue = DNS_ServerIP4
+        #endif
+        Case 28: HTTP_PageValue = MY_MAC1
+        Case 29: HTTP_PageValue = MY_MAC2
+        Case 30: HTTP_PageValue = MY_MAC3
+        Case 31: HTTP_PageValue = MY_MAC4
+        Case 32: HTTP_PageValue = MY_MAC5
+        Case 33: HTTP_PageValue = MY_MAC6
+        #if STACK_DHCP = 1
+        Case 34: HTTP_PageValue = DHCP_Bound
+        #endif
+        Case 35: HTTP_PageValue = STACK_MQTT
+        Case 36: HTTP_PageValue = STACK_CONSOLE
+        Case 37: HTTP_PageValue = STACK_SERIAL_UDP
+        Case 38: HTTP_PageValue = ENC_ETH_BUILTIN
+    End Select
+End Function
+
+Function SolutionValue(In SolValueNo) As Byte
+    // Value SolValueNo of PageSolution.htm: 1-24 the file name (one character each, space after the end); 25-30 the
+    // build time as numbers: year - 2000, month, day, hour, minute, second; 31-32 the build number, high and low byte;
+    // 33-39 the time (as dashboard values 6-12); 40-43 the time server; 44 its stratum; 45-56 the chip name (one
+    // character each, space after the end); 57 the clock in MHz; 58 the supply in 0.1 V;
+    // 59 the SPI speed setting (0 none)
+    SolutionValue = 0
+    If SolValueNo <= 24 Then
+        SolutionValue = FwChar(FwName, SolValueNo)
+        Exit Function
+    End If
+    // GCBBuildTimeStr is "MM-DD-YYYY HH:MM:SS"
+    Select Case SolValueNo
+        Case 25: SolutionValue = FwTwoDigits(9)
+        Case 26: SolutionValue = FwTwoDigits(1)
+        Case 27: SolutionValue = FwTwoDigits(4)
+        Case 28: SolutionValue = FwTwoDigits(12)
+        Case 29: SolutionValue = FwTwoDigits(15)
+        Case 30: SolutionValue = FwTwoDigits(18)
+        Case 31: SolutionValue = FwBuildNo_H
+        Case 32: SolutionValue = [byte]FwBuildNo
+    End Select
+    If SolValueNo >= 33 Then
+        If SolValueNo <= 39 Then SolutionValue = PageValue(SolValueNo - 27)
+    End If
+    #if STACK_SNTP = 1
+        If SolValueNo = 40 Then SolutionValue = SNTP_ServerIP1
+        If SolValueNo = 41 Then SolutionValue = SNTP_ServerIP2
+        If SolValueNo = 42 Then SolutionValue = SNTP_ServerIP3
+        If SolValueNo = 43 Then SolutionValue = SNTP_ServerIP4
+        If SolValueNo = 44 Then SolutionValue = SNTP_Stratum
+    #endif
+    If SolValueNo >= 45 Then
+        If SolValueNo <= 56 Then SolutionValue = FwChar(RigName, SolValueNo - 44)
+    End If
+    If SolValueNo = 57 Then SolutionValue = BOARD_MHZ
+    If SolValueNo = 58 Then SolutionValue = SYSTEM_VDD_MV / 100
+    // 59: the SPI speed setting of the ENC28J60 (SPIMode: MasterSlow 11, Master 12, MasterFast 13); 0 without SPI
+    // (Ethernet built into the PIC: its driver has no ENC_SPI_SPEED)
+    #ifdef ENC_SPI_SPEED
+        If SolValueNo = 59 Then SolutionValue = ENC_SPI_SPEED
+    #endif
+End Function
+
+Function FwTwoDigits(In FwDigitPos) As Byte
+    // The two-digit number at FwDigitPos in the build time
+    FwTwoDigits = (FwTime(FwDigitPos) - 48) * 10 + FwTime(FwDigitPos + 1) - 48
+End Function
+
+Function FwChar(In FwText As String, In FwIndex) As Byte
+    // Character FwIndex (from 1) of FwText, a space past its end
+    FwChar = 32
+    If FwIndex <= Len(FwText) Then FwChar = FwText(FwIndex)
+End Function
+
+Sub HTTP_Action(In ActionNo)
+    // Called by the web server for /t0 to /t9: toggle LED ActionNo (0 to 7, LATJ)
+    Dim ActionMask As Byte
+    If ActionNo > 7 Then Exit Sub
+    ActionMask = FnLSL(1, ActionNo)
+    BOARD_LEDS = BOARD_LEDS Xor ActionMask
+End Sub
+
+// ----- MQTT: the functions ENC28J60_MQTT.h calls
+
+Sub MQTT_BuildValues
+    // The payload for enc28j60/values: the first five values of /v (PageValues.h), each 0 replaced by a value, then }.
+    // Not all twelve: the message must fit MQTT_TX_SIZE (100 bytes) - with the time values it was cut short
+    Dim JsonIndex, JsonLength As Word
+    Dim JsonByte, JsonValueNo As Byte
+    TakeValues
+    ReadTable PageValues, 0, JsonLength
+    JsonValueNo = 0
+    For JsonIndex = 1 To JsonLength
+        ReadTable PageValues, JsonIndex, JsonByte
+        If JsonByte = 0 Then
+            JsonValueNo++
+            MQTT_PutValue PageValue(JsonValueNo)
+            If JsonValueNo = 5 Then
+                MQTT_Put 125
+                Exit Sub
+            End If
+        Else
+            MQTT_Put JsonByte
+        End If
+    Next
+End Sub
+
+Function MQTT_DiscoveryLength As Word
+    // The discovery payload: HADiscovery.json without its line ends (two tables: 14 entities)
+    MQTT_DiscoveryLength = HADiscovery_Size1 + HADiscovery_Size2
+End Function
+
+Function MQTT_DiscoveryByte(In DiscoveryIndex As Word) As Byte
+    // Byte DiscoveryIndex (from 1) of the discovery payload
+    Dim DiscoveryValue As Byte
+    If DiscoveryIndex <= HADiscovery_Size1 Then
+        ReadTable HADiscovery1, DiscoveryIndex, DiscoveryValue
+    Else
+        ReadTable HADiscovery2, DiscoveryIndex - HADiscovery_Size1, DiscoveryValue
+    End If
+    MQTT_DiscoveryByte = DiscoveryValue
+End Function
+
+Sub MQTT_Command(In CommandPin, In CommandSet)
+    // enc28j60-6/led/<CommandPin>: set, clear or toggle LED0-LED7, as the web Toggle buttons do
+    Dim CommandMask As Byte
+    If CommandPin < 48 Then Exit Sub
+    If CommandPin > 55 Then Exit Sub
+    CommandMask = FnLSL(1, CommandPin - 48)
+    If CommandSet = MQTT_SET_ON Then BOARD_LEDS = BOARD_LEDS Or CommandMask
+    If CommandSet = MQTT_SET_OFF Then BOARD_LEDS = BOARD_LEDS And (CommandMask Xor 255)
+    If CommandSet = MQTT_SET_TOGGLE Then BOARD_LEDS = BOARD_LEDS Xor CommandMask
+End Sub
+
+// ----- LCD (GCBASIC lcd.h, pins in the board file)
+
+Sub LCDStatus
+    // Line 1: the address; line 2: the time (UTC), or "waiting for time"
+    Locate 0, 0
+    Print Net_IP1 : Print "." : Print Net_IP2 : Print "." : Print Net_IP3 : Print "." : Print Net_IP4
+    Print "    "
+    Locate 1, 0
+    #if STACK_SNTP = 1
+        If SNTP_Valid = 1 Then
+            SNTP_Now
+            LCDTwoDigits SNTP_Hour : Print ":" : LCDTwoDigits SNTP_Minute : Print ":" : LCDTwoDigits SNTP_Second
+            Print " UTC    "
+            Exit Sub
+        End If
+    #endif
+    Print "waiting for time"
+End Sub
+
+Sub LCDTwoDigits(In LcdValue)
+    If LcdValue < 10 Then Print "0"
+    Print LcdValue
+End Sub
+
+#if STACK_CONSOLE <> 0
+Sub PrintNetConfig
+    CONSOLE_Print "IP " : PrintIP Net_IP1, Net_IP2, Net_IP3, Net_IP4
+    CONSOLE_Print "  mask " : PrintIP Net_Mask1, Net_Mask2, Net_Mask3, Net_Mask4
+    CONSOLE_Print "  gateway " : PrintIP Net_Gateway1, Net_Gateway2, Net_Gateway3, Net_Gateway4
+    #if STACK_DHCP = 1
+        If DHCP_Bound Then
+            CONSOLE_Print "  lease " : CONSOLE_Number DHCP_LeaseTime - DHCP_Elapsed : CONSOLE_Print " s left"
+        Else
+            CONSOLE_Print "  fixed"
+        End If
+    #endif
+    #if STACK_DHCP = 0
+        CONSOLE_Print "  fixed"
+    #endif
+    #if STACK_DNS = 1
+        CONSOLE_Print "  DNS " : PrintIP DNS_ServerIP1, DNS_ServerIP2, DNS_ServerIP3, DNS_ServerIP4
+    #endif
+    CONSOLE_CRLF
+End Sub
+#endif
+
+#if STACK_CONSOLE <> 0
+Sub ReadIP(Out ReadIP1, Out ReadIP2, Out ReadIP3, Out ReadIP4, Out ReadIPOk)
+    // Reads a.b.c.d from the terminal. ReadIPOk = 1 when four parts of 0 to 255 were typed.
+    // A Sub, not a Function: a Function may not have Out parameters (build 1666)
+    Dim Part(4) As Word
+    Dim PartNo, InChar As Byte
+    ReadIPOk = 0
+    PartNo = 1
+    Part(1) = 0 : Part(2) = 0 : Part(3) = 0 : Part(4) = 0
+    Do
+        InChar = CONSOLE_Read
+        If InChar = 13 Or InChar = 10 Then Exit Do
+        If InChar = "." Then
+            PartNo++
+            If PartNo > 4 Then Exit Sub
+        Else
+            If InChar < "0" Or InChar > "9" Then Exit Sub
+            Part(PartNo) = (Part(PartNo) * 10) + (InChar - 48)
+            If Part(PartNo) > 255 Then Exit Sub
+        End If
+    Loop
+    If PartNo <> 4 Then Exit Sub
+    ReadIP1 = Part(1) : ReadIP2 = Part(2) : ReadIP3 = Part(3) : ReadIP4 = Part(4)
+    PrintIP ReadIP1, ReadIP2, ReadIP3, ReadIP4 : CONSOLE_CRLF
+    ReadIPOk = 1
+End Sub
+#endif
+
+
+#if STACK_CONSOLE <> 0
+Sub PrintIP(In PrIP1, In PrIP2, In PrIP3, In PrIP4)
+    CONSOLE_Number PrIP1 : CONSOLE_Print "." : CONSOLE_Number PrIP2 : CONSOLE_Print "." : CONSOLE_Number PrIP3 : CONSOLE_Print "." : CONSOLE_Number PrIP4
+End Sub
+#endif
+
+#if STACK_CONSOLE <> 0
+Sub PrintMACConst
+    CONSOLE_Print hex(MY_MAC1) : CONSOLE_Print ":" : CONSOLE_Print hex(MY_MAC2) : CONSOLE_Print ":" : CONSOLE_Print hex(MY_MAC3) : CONSOLE_Print ":"
+    CONSOLE_Print hex(MY_MAC4) : CONSOLE_Print ":" : CONSOLE_Print hex(MY_MAC5) : CONSOLE_Print ":" : CONSOLE_Print hex(MY_MAC6)
+End Sub
+#endif

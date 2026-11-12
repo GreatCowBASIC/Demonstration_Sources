@@ -1,0 +1,26 @@
+{
+"dev": {"ids": "wiz5200-8", "name": "WIZ5200-8", "mf": "GCBASIC", "mdl": "PIC18F47Q43 + WIZnet W5200"},
+"o": {"name": "GCBASIC ENC28J60 stack"},
+"stat_t": "wiz5200-8/values",
+"avty_t": "wiz5200-8/status",
+"cmps": {
+"an2": {"p": "sensor", "name": "AN2", "stat_cla": "measurement", "val_tpl": "{{ value_json.a }}", "uniq_id": "wiz5200-8_an2"},
+"an3": {"p": "sensor", "name": "AN3", "stat_cla": "measurement", "val_tpl": "{{ value_json.b }}", "uniq_id": "wiz5200-8_an3"},
+"rd0": {"p": "switch", "name": "RD0", "cmd_t": "wiz5200-8/led/0", "val_tpl": "{{ 'ON' if value_json.d|int|bitwise_and(1) else 'OFF' }}", "uniq_id": "wiz5200-8_rd0"},
+"rd1": {"p": "switch", "name": "RD1", "cmd_t": "wiz5200-8/led/1", "val_tpl": "{{ 'ON' if value_json.d|int|bitwise_and(2) else 'OFF' }}", "uniq_id": "wiz5200-8_rd1"},
+"rd2": {"p": "switch", "name": "RD2", "cmd_t": "wiz5200-8/led/2", "val_tpl": "{{ 'ON' if value_json.d|int|bitwise_and(4) else 'OFF' }}", "uniq_id": "wiz5200-8_rd2"},
+"rd3": {"p": "switch", "name": "RD3", "cmd_t": "wiz5200-8/led/3", "val_tpl": "{{ 'ON' if value_json.d|int|bitwise_and(8) else 'OFF' }}", "uniq_id": "wiz5200-8_rd3"},
+"rd4": {"p": "switch", "name": "RD4", "cmd_t": "wiz5200-8/led/4", "val_tpl": "{{ 'ON' if value_json.d|int|bitwise_and(16) else 'OFF' }}", "uniq_id": "wiz5200-8_rd4"},
+"rd5": {"p": "switch", "name": "RD5", "cmd_t": "wiz5200-8/led/5", "val_tpl": "{{ 'ON' if value_json.d|int|bitwise_and(32) else 'OFF' }}", "uniq_id": "wiz5200-8_rd5"},
+"rd6": {"p": "switch", "name": "RD6", "cmd_t": "wiz5200-8/led/6", "val_tpl": "{{ 'ON' if value_json.d|int|bitwise_and(64) else 'OFF' }}", "uniq_id": "wiz5200-8_rd6"},
+"rd7": {"p": "switch", "name": "RD7", "cmd_t": "wiz5200-8/led/7", "val_tpl": "{{ 'ON' if value_json.d|int|bitwise_and(128) else 'OFF' }}", "uniq_id": "wiz5200-8_rd7"},
+"rb0": {"p": "binary_sensor", "name": "RB0", "val_tpl": "{{ 'ON' if value_json.p|int|bitwise_and(1) else 'OFF' }}", "uniq_id": "wiz5200-8_rb0"},
+"rb1": {"p": "binary_sensor", "name": "RB1", "val_tpl": "{{ 'ON' if value_json.p|int|bitwise_and(2) else 'OFF' }}", "uniq_id": "wiz5200-8_rb1"},
+"rb2": {"p": "binary_sensor", "name": "RB2", "val_tpl": "{{ 'ON' if value_json.p|int|bitwise_and(4) else 'OFF' }}", "uniq_id": "wiz5200-8_rb2"},
+"rb3": {"p": "binary_sensor", "name": "RB3", "val_tpl": "{{ 'ON' if value_json.p|int|bitwise_and(8) else 'OFF' }}", "uniq_id": "wiz5200-8_rb3"},
+"rb4": {"p": "binary_sensor", "name": "RB4", "val_tpl": "{{ 'ON' if value_json.p|int|bitwise_and(16) else 'OFF' }}", "uniq_id": "wiz5200-8_rb4"},
+"rb5": {"p": "binary_sensor", "name": "RB5", "val_tpl": "{{ 'ON' if value_json.p|int|bitwise_and(32) else 'OFF' }}", "uniq_id": "wiz5200-8_rb5"},
+"rb6": {"p": "binary_sensor", "name": "RB6", "val_tpl": "{{ 'ON' if value_json.p|int|bitwise_and(64) else 'OFF' }}", "uniq_id": "wiz5200-8_rb6"},
+"rb7": {"p": "binary_sensor", "name": "RB7", "val_tpl": "{{ 'ON' if value_json.p|int|bitwise_and(128) else 'OFF' }}", "uniq_id": "wiz5200-8_rb7"}
+}
+}

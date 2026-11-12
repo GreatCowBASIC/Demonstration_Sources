@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html><head><title>My PIC</title>
+<style>
+body{font-family:Arial,sans-serif;max-width:40em;margin:1em auto;padding:0 1em;color:#222}
+h1{color:#036}
+.c{border:1px solid #ccc;border-radius:6px;padding:0.5em 1em;margin:1em 0;background:#f6f8fa}
+</style>
+</head>
+<body>
+<h1>Hello from my PIC</h1>
+<script>
+var POT_GCB_BYTE = 128;
+var LED_GCB_BYTE = 1;
+</script>
+<div class="c">
+<p>Pot: <script>document.write(POT_GCB_BYTE)</script></p>
+<p>LED: <script>document.write(LED_GCB_BYTE>0?'ON':'OFF')</script>
+<a href="/t0">Toggle</a></p>
+</div>
+<h2>About this board</h2>
+<p>This page comes from a PIC18F67J60 on an Olimex PIC-WEB board. The PIC has its own Ethernet controller,
+so there is no network chip on the board: the PIC itself sends every byte of this page.</p>
+<p>The page is not a file. It is a table in program memory, the same memory as the program. The HTML2GCB
+converter made the table from Step5Page.htm when the program was compiled.</p>
+<h2>Why this page is long</h2>
+<p>One table must fit in one block of the PIC's program memory. So the converter starts a new table when the
+next line would take the table past 2024 bytes. It cuts only between lines, never inside a line.</p>
+<p>This page is longer than 2024 bytes, so the converter made two tables: Step5Page1 and Step5Page2, and two
+sizes: Step5Page_Size1 and Step5Page_Size2. The program must read both, or the page stops in the middle.</p>
+<p>If you can read the last line of this page, both tables were sent.</p>
+<h2>How to keep a page small</h2>
+<ul>
+<li>Use short names for CSS classes and JavaScript functions.</li>
+<li>Draw repeated rows with a JavaScript loop, not as many copies of the same HTML.</li>
+<li>Do not send the whole page again to update the numbers. Send a small JSON answer instead (step 6).</li>
+<li>Every byte of the page uses program memory, and sending 2000 bytes takes about half a second.</li>
+</ul>
+<h2>The rules for values</h2>
+<ul>
+<li>One value on each line: var, a name that ends in _GCB_BYTE, an equals sign, a number and a semicolon.</li>
+<li>No other line may have both an equals sign and a value name.</li>
+<li>A value is one byte: 0 to 255. For a bigger number use two values and add them in the page.</li>
+<li>For text use one value per letter (its character code) and join them with String.fromCharCode.</li>
+</ul>
+<h2>Where the values come from</h2>
+<p>The first value of the page is the potentiometer on AN8, read with ReadAD when the request arrives.
+The second value is the red LED on RB4: 1 when it is on. The Toggle link asks for /t0, and the program
+switches the LED in HTTP_Action.</p>
+<p>This is the last line of the page.</p>
+</body></html>
