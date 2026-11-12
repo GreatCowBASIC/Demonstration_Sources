@@ -27,14 +27,16 @@ The generic `lcd.h` start-up works only after a power cycle on this OLED, so the
 | Extra command | None | `0x17` = character mode + internal DC-DC on |
 | Timing with `LCD_NO_RW` | Library waits are enough | Raw commands need explicit waits: 2 ms per command, 10 ms after clear |
 | DDRAM layout | Line 1 at `0x00`, line 2 at `0x40` | Same; 16 characters visible |
-| Font tables | One fixed ROM | Four (English/Japanese, West European, Scandinavian European, Cyrillic), chosen by the low two bits of `0x28` |
+| Font tables | One fixed ROM | Four, chosen by FT1:FT0 in `0x28`: 00 English/Japanese (default), 01 Western European I, 10 English/Russian, 11 Western European II (WS0010 datasheet). The vendor listing calls them English/Japanese, West European, Scandinavian European and Cyrillic |
 | Custom characters | 8 in CGRAM | 8 in CGRAM (shared with graphic data) |
 | Display shift | `0x18` / `0x1C` | Same |
 | Graphic mode | None | 100 x 16 pixels, 80 columns visible |
 
+The vendor's own initialisation (module datasheet, `SEH1602-A.pdf`, pages 9 and 10) waits **500 ms** after power on. For the 4-bit bus it first synchronises the nibble order by writing the instruction `0000` five times, then sends the function set. The datasheet says this recovers from noise that mixes up the upper and lower four bits, and marks the code "for reference only". The `LCD_OLED1602` block in `lcd.h` uses a 300 ms wait and 3 x `0x3` then `0x2`, and works on this unit. The vendor sequence is the alternative to try if a warm restart ever misbehaves.
+
 ## Power management
 
-The OLED has an internal DC-DC converter that firmware can switch off, so a program can darken the panel without cutting the supply. The commands below are from my memory of the WS0010 datasheet, and demo 6 exercises them.
+The OLED has an internal DC-DC converter that firmware can switch off, so a program can darken the panel without cutting the supply. The commands below are the WS0010 datasheet's graphic/power instruction (`0001 G/C PWR 1 1`: G/C = 1 graphic, PWR = 1 internal power on), and demo 6 exercises them.
 
 | Command | Effect |
 | --- | --- |
@@ -60,6 +62,8 @@ Graphic mode gives a bitmap of 2 pages x 8 rows = 16 pixel rows. Only about 80 o
 | `0x80` + column | Set the column (0 to 99, only the first ~80 visible) |
 | Data byte (RS = 1) | One column of 8 vertical pixels; the column then advances |
 | `0x17` | Return to character mode |
+
+The WS0010 datasheet ("Graphic mode addressing", PDF page 20) gives the addressing: the X address is set with the DDRAM address instruction (`0x80` + column, 100 columns), and the Y address with the CGRAM address instruction (`0x40` + page 0 or 1).
 
 Three things are needed for stable graphics on this unit:
 
@@ -94,14 +98,19 @@ From the vendor's text and drawings for the SEH1602A-OLED (simair listing, saved
 | --- | --- |
 | Display | 16 characters x 2 lines, no backlight (self-luminous) |
 | Driver IC | WS0010-TX |
-| Operating voltage | 5 V / 3.3 V |
+| Operating voltage | 5 V / 3.3 V in the listing; the module datasheet gives VDD = 5.0 V (4.8 to 5.3 V) and says not to use 3 V or 3.3 V logic I/O when VDD is 5 V |
+| Supply current | 31 mA typical, 46.5 mA maximum at 5 V (50% check board) |
 | Driving method | 1/16 duty, 1/5 bias |
 | Display mode | 10000:1 |
 | Operating temperature | -20 to +70 C |
 | Storage temperature | -30 to +80 C |
 | Module size | 80 (L) x 36 (W) x 10 (H) mm |
-| View area | 64.5 x 16 mm in the text table; 66.0 x 16.0 mm (VA) in the drawing |
-| Active area (drawing) | 56.95 x 11.85 mm |
+| View area | 66.0 x 16.0 mm (module datasheet and drawing); the listing's text table says 64.5 x 16 mm |
+| Active area | 56.95 x 11.85 mm |
+| Dot size, dot pitch | 0.55 x 0.65 mm, 0.60 x 0.70 mm |
+| Character size, pitch | 2.95 x 5.55 mm, 3.6 x 6.3 mm |
+
+The character pitch (3.6 mm) is 6 times the dot pitch (0.60 mm), so each character cell is 5 dot columns plus one blank column. That is the gap seen between character cells in the graphic-mode photos.
 | Header | 16 pins, 2.54 mm pitch, 1.0 mm holes |
 | Mounting holes (drawing) | 4 x 2.5 mm, 75.0 x 31.0 mm apart, 5.0 mm pads |
 | Colours | Yellow, white, blue, red, green |
@@ -150,4 +159,48 @@ On the back of the board (an `EH1602A REV.L`, from a photo of this unit):
 
 - `lcd.h` has no direct SPI mode for this display. `LCD_IO 14` and `LCD_IO 16` drive a port expander (MCP23S17 or PIC16LF72), not the display controller.
 - In serial mode the header becomes: pin 12 = SCL, pin 13 = SDO, pin 14 = SDI, pin 16 = /CS (active low). See the pin table above.
-- A serial driver still needs the serial timing (clock polarity, bit order and length of the frame, how a read works). These are not in the vendor material above; the WS0010 datasheet is required.
+
+The vendor's own picture of the change, from a Winstar board (`WEH001602AWPP5N00100`, `EH1602A REV.K`): remove the `J68` resistor, move the `PSH` resistor to `PSL`, and move the `CSL` resistor to `JCS`. Your board is a REV.L, so check the silkscreen before changing anything.
+
+![Vendor SPI modification: remove J68, move PSH to PSL, move CSL to JCS](SPI%20modify%20moethod.JPG)
+
+### Serial interface timing
+
+From the IST0010 specification (`IST0010.pdf`, "3-line serial write cycle", pages 43 to 44 and "Serial Interface Characteristics", page 51) and the WS0010 specification (page 35). The IST0010 is the same family of controller as the WS0010, with the same instruction set text, but I have not confirmed it is identical, so check anything critical against the WS0010 pages.
+
+- The chip's serial pins are DB5 = SCL, DB6 = SDO and DB7 = SDI, which are header pins 12, 13 and 14.
+- **Clock:** SCL idles high. SDI changes while SCL is low and is sampled on the **rising edge** of SCL.
+- **Frame:** /CS (`CSB`) goes low, then RS, R/W (low for a write), then DB7 down to DB0, 10 bits in all. RS = 0 is a command and RS = 1 is a RAM write.
+- **Chip select:** for a command or a single RAM write, /CS goes high again after each frame. A continuous RAM write (RS = 1 only) keeps /CS low and sends RS and R/W once, followed by back-to-back data bytes.
+- **Reads:** SDO returns a dummy byte first and then the valid data.
+
+| Timing | Symbol | Minimum |
+| --- | --- | --- |
+| Serial clock cycle | tCYS | 300 ns |
+| SCL high pulse width | tWHS | 100 ns |
+| SCL low pulse width | tWLS | 100 ns |
+| /CS setup time | tCSS | 150 ns |
+| /CS hold time | tCHS | 150 ns |
+| Data setup time | tDSS | 100 ns |
+| Data hold time | tDHS | 100 ns |
+| Read access time (SDO) | tACCS | 80 ns maximum |
+
+A bit-banged clock in GCBASIC at 32 MHz (125 ns per instruction) takes several instructions per edge, so it should be slower than the 300 ns minimum. That has not been measured.
+
+## Datasheets and photos
+
+Files in this folder:
+
+| File | What it is |
+| --- | --- |
+| `SEH1602-A.pdf` | Module datasheet from the vendor (simair), 19 pages: specification, drawing, pin functions, electrical characteristics, and the vendor's initialisation (pages 9 and 10) |
+| `IST0010.pdf` | IST0010 OLED controller specification, 65 pages, including the serial timing (pages 43, 44 and 51) |
+| `datasheets/WS0010_specification_WS-RD-0001.pdf` | WS0010 specification from Winstar, document WS-RD-0001 Rev 001 (21 Oct 2010), 38 pages. Shift and power instruction: PDF page 30. Function set and font tables: page 31. Graphic addressing: page 20. Serial figure: page 37. Downloaded from [sos.sk](https://www.sos.sk/a_info/resource/Winstar/WS0010.pdf) |
+| `SPI modify moethod.JPG` | Vendor picture of the SPI modification on a Winstar board |
+| `images/seh1602a_back_view.jpg` | Back of this unit (an `EH1602A REV.L`) |
+| `images/ruler_display_photo.jpg` | Display photo with the ruler ticks |
+| `images/seh1602a_pin_descriptions.jpg`, `images/seh1602a_dimensions.jpg` | Vendor pin tables and outline drawing from the product listing |
+
+The WS0010 and IST0010 documents describe the controller chip. The SEH1602-A datasheet describes this module.
+
+![Back of the SEH1602-A module, EH1602A REV.L](images/seh1602a_back_view.jpg)

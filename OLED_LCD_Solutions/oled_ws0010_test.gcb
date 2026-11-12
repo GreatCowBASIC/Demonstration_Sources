@@ -155,9 +155,8 @@ Sub BarGraph(In BarValue)
 End Sub
 
 '=== demo 3: font tables ===
-'Function set 0b0010_1000 | FT1:FT0 selects one of the four built-in fonts: English/Japanese,
-'West European, Scandinavian European and Cyrillic (vendor list; the vendor text does not
-'give which FT value is which, so the screen shows the font for FT = 0 to 3 in turn)
+'Function set 0b0010_1000 | FT1:FT0 (WS0010 datasheet): FT = 0 English/Japanese (default),
+'1 Western European I, 2 English/Russian, 3 Western European II
 Sub DemoFonts
     For FT = 0 To 3
         OLED_Cmd 0x28 + FT
