@@ -1,0 +1,227 @@
+// A simple data logger: every 5 s, ReadAD(AN1) is added to DATALOG.TXT on the CH376's drive.
+//
+// Each line is "seconds,value", eg "15,128", with a heading line "Seconds,AN1" when the file is new. The file
+// is opened once and kept open. FatCommit after each line puts the data, and the file's size, on the drive,
+// so the file is good if the power goes off or the drive is pulled out between samples.
+// Recovery from the drive (card or stick) pulled out: a failed write is not ignored. The program says so on
+// the serial console, starts the drive again (FatInit resets the CH376) and writes the line again, so a drive
+// put back between two samples loses no sample. With no drive it tries again at each sample. When samples
+// were lost, a "Restarted" line goes into the file before the next sample, and the seconds show the gap.
+//
+// The file name must be 8.3 (8 characters, a dot, 3 characters): the CH376 has no long names, so
+// "DATALOGGER.TXT" would not fit. The files are dated 2026-01-01 00:00 (FatDate / FatTime) as there is no clock.
+// The 5 s is a Wait after each sample, so the time drifts a little later each sample (the write time).
+//
+// Board: PIC18F27Q43 (28-pin), 64 MHz internal oscillator, 3.3 V: the same set-up and pins as CH376_SPI_Test_18F27Q43.gcb
+//        AN1    the analogue input, RA1 (0 .. 3.3 V gives 0 .. 255)
+//        SPI1   SCK RB1, SDI RB0 (from the CH376's SDO), SDO RB3 (to the CH376's SDI)
+//        CH376  chip select RA4, INT# RB4 (CH376_INT)
+//        UART1  TX RC6 (and RC5), RX RC7, 115200 8N1: what is logged, and any error. Only when USART_BAUD_RATE
+//               is defined: leave that #define out and the logger runs without the serial port.
+// CH376EVT board with a USB stick (the default): supply 5V0 on P2 pin 7, J2 off, J3 1-2 (North), SPI selected
+//        (J1 off, J5 on, J6 on). For an SD card: J3 2-3, J2 on, and #define CH376_MEDIA_SDCARD below.
+//        Wiring: README.md
+//
+//@author    Evan R. Venn
+//@licence   LGPL 2.1
+//@date      09/11/2026
+//
+// Change log
+//   09/11/2026  First version
+//   09/11/2026  The interface is #define CH376_COMMS_METHOD CH376_COMMS_SPI (was #define CH376_SPI)
+//   09/11/2026  FatCreated() is a Function
+//   09/11/2026  A Function with no parameters is called with (), eg SDCInit(), FatCommit()
+//   09/11/2026  FatCommit fails (drive pulled out): the drive is started again and the line written again at once;
+//               "Restarted" in the file after lost samples. LogReady and LogLost are Bits
+//   09/11/2026  The drive is started with FatInit() (ch376_sd.h 0.2): SDCInit and FatMount in one call
+
+    #option explicit
+    #option IncludePath "C:\GCstudio\gcbasic\AdditionalLibraries;GCBASICLibraries"
+
+// ----- Chip (the set-up of the ENC28J60 18F47Q43 rig)
+
+    #Chip 18F27Q43, 64
+    #Config FEXTOSC = OFF               // no external oscillator
+    #Config RSTOSC = HFINTOSC_64MHZ     // internal oscillator, 64 MHz
+    #Config MCLRE = EXTMCLR             // MCLR pin is reset (programmer)
+    #Config WDTE = OFF
+    #Config LVP = OFF
+    #Config BOREN = OFF
+    #Config STVREN = ON
+    #Config XINST = OFF
+    #Config PPS1WAY = OFF               // PPS may be set more than once
+
+    // No I2C1 baud rate check message from the compiler (I2C is not used)
+    #DEFINE MASKI2C1BAUDCHECKMESSAGE
+
+// ----- Serial port: the console. Optional: leave USART_BAUD_RATE out for no serial output (ConsoleText /
+// ConsoleCRLF below then do nothing)
+
+    #define USART_BAUD_RATE 115200
+    #define USART_BLOCKING
+
+// ----- Pins
+
+    #define LOG_INPUT       PortA.1     // AN1, the input that is logged
+    #define CH376_SCK       PortB.1     // SPI1 SCK out
+    #define CH376_DO        PortB.3     // SPI1 SDO, to the CH376's D6/SDI
+    #define CH376_DI        PortB.0     // SPI1 SDI, from the CH376's D7/SDO
+    #define CH376_CS        PortA.4     // the CH376's D3/SCS
+    #define CH376_INT       PortB.4     // the CH376's INT#. Leave it out to have the interrupt on SDO (CH376_DI)
+    // Choose the media: define one (neither is the USB stick). Both is a compile error
+    // #define CH376_MEDIA_SDCARD               // the CH376's SD card socket (3V3)
+    #define CH376_MEDIA_USBSTICK                // the CH376's USB socket (5V0), the default
+
+    // PPS: the serial port and SPI1, as the ENC28J60 rig. Only one #startup is allowed in a program
+    #startup PPSInit, 85
+
+    Sub PPSInit
+        U1RXPPS = 0x17          // RC7 is UART1 RX
+        RC6PPS = 0x20           // RC6 is UART1 TX
+        RC5PPS = 0x20           // RC5 is UART1 TX (second terminal)
+
+        SPI1SCKPPS = 0x09       // RB1 is SPI1 SCK in
+        RB1PPS = 0x31           // RB1 is SPI1 SCK out
+        SPI1SDIPPS = 0x08       // RB0 is SPI1 SDI
+        RB3PPS = 0x32           // RB3 is SPI1 SDO
+
+        CH376_CS = 1            // CH376 deselected from the start
+        Dir CH376_CS Out
+        Dir CH376_DI In
+        Dir CH376_DO Out
+        Dir CH376_SCK Out
+    End Sub
+
+// ----- The drive: a CH376 on SPI1, with the SD card methods (in place of sd_card.h and sd_fat.h)
+
+    #define CH376_COMMS_METHOD CH376_COMMS_SPI   // the CH376 on SPI (also CH376_COMMS_USART, CH376_COMMS_PARALLEL)
+    #define CH376_SPI_SPEED Master               // 4 MHz at 64 MHz (SPI1BAUD 7); MasterFast is 8 MHz
+    #include <ch376_sd.h>
+
+// ----- Main program
+
+    Dim Seconds As Long                 // time since the start, the first column
+    Dim Sample As Byte                  // ReadAD(AN1)
+    Dim LogReady As Bit                 // 1 = the drive is started and DATALOG.TXT is open
+    Dim LogLost As Bit                  // 1 = a sample was not written: a "Restarted" line goes in first
+    Dim LogLine As String * 20
+
+    Dir LOG_INPUT In
+
+    // Prevents the terminal becoming active too early, during reprogramming
+    Wait 2 s
+    ConsoleCRLF()
+    ConsoleText("CH376 data logger: ReadAD(AN1) to DATALOG.TXT every 5 s")
+    ConsoleCRLF()
+
+    Seconds = 0
+    LogReady = 0
+    LogLost = 0
+    Do
+        Sample = ReadAD(AN1)
+        LogLine = Str32(Seconds) + "," + Str(Sample)
+        ConsoleText(LogLine)
+
+        // Write the line. A failure (eg the card pulled out) closes the drive
+        If LogReady = 1 Then
+            If LogWrite() = 0 Then LogReady = 0
+        End If
+        // No drive, at the start or after a failure: start it again (a card put back is found here)
+        // and write the line, so a card put back between two samples loses no sample
+        If LogReady = 0 Then
+            LogReady = LogStart()
+            If LogReady = 1 Then
+                If LogWrite() = 0 Then LogReady = 0
+            End If
+        End If
+        If LogReady = 1 Then
+            ConsoleText("  written")
+        Else
+            ConsoleText("  NOT written, no drive: trying again at the next sample")
+            LogLost = 1                 // a "Restarted" line before the next line written
+        End If
+        ConsoleCRLF()
+
+        Wait 5 s
+        Seconds = Seconds + 5
+    Loop
+
+// ----- The log file
+
+'''Start the drive, mount it, and open DATALOG.TXT to add to it (it is made if it is not there).
+'''Returns 1 when the file is open, or 0 with the reason on the serial console.
+'''FatInit (SDCInit, then FatMount) resets the CH376, so this also starts again after a card is pulled out
+'''and put back.
+Function LogStart As Byte
+    LogStart = 0
+    ConsoleCRLF()
+    If FatInit() <> FAT_OK Then
+        If FatError = FAT_ERR_NO_DRIVE Then
+            ConsoleText("   No drive, SDCError ") : ConsoleText(Str(SDCError))
+            ConsoleText(", CH376Error 0x") : ConsoleText(Hex(CH376Error)) : ConsoleCRLF()
+        Else
+            ConsoleText("   No FAT file system, FatError ") : ConsoleText(Str(FatError)) : ConsoleCRLF()
+        End If
+        Exit Function
+    End If
+    If FatOpen("DATALOG.TXT") <> FAT_OK Then
+        ConsoleText("   DATALOG.TXT cannot be opened, FatError ") : ConsoleText(Str(FatError)) : ConsoleCRLF()
+        Exit Function
+    End If
+    If FatCreated() = 1 Then
+        LogText("Seconds,AN1")          // a new file: the heading line first
+        LogCRLF()
+        ConsoleText("   DATALOG.TXT made") : ConsoleCRLF()
+    Else
+        ConsoleText("   DATALOG.TXT opened, adding to it") : ConsoleCRLF()
+    End If
+    LogStart = 1
+End Function
+
+'''Add LogLine to the file, after a "Restarted" line when samples were lost, and put it on the drive.
+'''Returns 1 when FatCommit says it is on the drive, or 0 with the FatError on the serial console.
+Function LogWrite As Byte
+    LogWrite = 0
+    If LogLost = 1 Then
+        LogText("Restarted")            // the samples before this line were not written
+        LogCRLF()
+    End If
+    LogText(LogLine)
+    LogCRLF()
+    If FatCommit() <> FAT_OK Then
+        ConsoleText("  NOT written, FatError ") : ConsoleText(Str(FatError))
+        Exit Function
+    End If
+    LogLost = 0
+    LogWrite = 1
+End Function
+
+'''Add a string to the open file
+Sub LogText(In LogString As String)
+    Dim LogPos As Byte
+    For LogPos = 1 To LogString(0)
+        FatAppendByte(LogString(LogPos))
+    Next
+End Sub
+
+'''End the line: CR LF
+Sub LogCRLF
+    FatAppendByte(13)
+    FatAppendByte(10)
+End Sub
+
+// ----- The serial console: used only when USART_BAUD_RATE is defined
+
+'''Send a string to the serial console
+Sub ConsoleText(In ConsoleString As String)
+    #ifdef USART_BAUD_RATE
+        HSerPrint ConsoleString
+    #endif
+End Sub
+
+'''End the console line: CR LF
+Sub ConsoleCRLF
+    #ifdef USART_BAUD_RATE
+        HSerPrintCRLF
+    #endif
+End Sub

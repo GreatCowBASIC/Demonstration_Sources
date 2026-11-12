@@ -1,0 +1,335 @@
+//--------------------------------------------------------------------------------------------------------------------------------
+// CH376 test - PIC18F27Q43, bare metal, CH376 on SPI1, the SD card methods, results on the serial console
+//
+// The same methods as an SD card program (sd_card.h, sd_fat.h: SDCInit, FatMount, FatOpen, FatAppendByte, FatCommit ...),
+// here from ch376_sd.h, with a FAT USB flash drive in the CH376EVT board's USB socket. It starts the drive, reads sector 0,
+// makes the folder CH376 and goes into it, writes TEST.TXT (100 lines), lists the folder while the file is still open,
+// appends a line, reads the file back, deletes it, makes and removes a folder SUB, and leaves CH376\HELLO.TXT (dated
+// 2026-11-08 12:00) for a look on a PC. One line per check on the serial console, then the totals.
+//
+// Board: PIC18F27Q43 (28-pin), 64 MHz internal oscillator, 3.3 V - the same chip set-up, SPI1 pins and serial port as
+//        the ENC28J60 18F47Q43 rig (ENC28J60\hardware\18F47Q43\hardwareconfig.h); the pins used are on both chips
+//        SPI1   SCK RB1, SDI RB0 (from the CH376's SDO), SDO RB3 (to the CH376's SDI)
+//        CH376  chip select RA4, INT# RB4 (CH376_INT). Without CH376_INT the interrupt comes on SDO (RB0) instead
+//        UART1  TX RC6 (and RC5), RX RC7, 115200 8N1
+// CH376EVT board with a USB stick: supply 5V0 on P2 pin 7, J2 off, J3 1-2 (North), SPI selected (J1 off, J5 on,
+//        J6 on). Wiring: ..\README.md
+//
+//@author    Evan R. Venn
+//@licence   LGPL 2.1
+//@date      08/11/2026
+//
+// Changes:
+//   08/11/2026  First version (ch376.h calls)
+//   08/11/2026  The SD card methods (ch376_sd.h) in place of ch376.h's own calls
+//   08/11/2026  PIC18F27Q43 (was 18F47Q43): same registers, PPS and pins; renamed from CH376_18F47Q43.gcb
+//   08/11/2026  Fat calls with a string made before Check: nested string literals share one buffer (build 1668)
+//   08/11/2026  Fat calls passed straight to Check again: fixed in build 1671 (needs build 1671 or later)
+//   09/11/2026  Run on the board: 26 checks, 0 failed. INT# is on RB4 (was RB2 here); without CH376_INT, SDO is used
+//   09/11/2026  Check and CheckLong are functions that return 1 for a failure; the caller adds to Failed
+//   09/11/2026  The block buffer is BlockBuffer (was Sector): a raw block for SDCReadBlock, not the FAT library's buffer
+//   09/11/2026  Notes on checking each result in a real program (this test runs on to count every failure)
+//   09/11/2026  Board set-up for a USB stick: 5V0, J2 off, J3 1-2 (North), SPI (was J3 2-3, J2 on)
+
+//   09/11/2026  On an SD card (CH376_MEDIA_SDCARD) checks 3..4 expect the block read to be refused
+//   09/11/2026  The drive is chosen with #define CH376_MEDIA_SDCARD or CH376_MEDIA_USBSTICK; the USB stick is the default
+//   09/11/2026  The interface is #define CH376_COMMS_METHOD CH376_COMMS_SPI (was #define CH376_SPI)
+//   09/11/2026  FatCreated() is a Function
+//   09/11/2026  A Function with no parameters is called with (), eg SDCInit(), FatCommit()
+//--------------------------------------------------------------------------------------------------------------------------------
+
+    #option explicit
+    #option IncludePath "C:\GCstudio\gcbasic\AdditionalLibraries;..\GCBASICLibraries"
+
+// ----- Chip (the set-up of the ENC28J60 18F47Q43 rig)
+
+    #Chip 18F27Q43, 64
+    #Config FEXTOSC = OFF               // no external oscillator
+    #Config RSTOSC = HFINTOSC_64MHZ     // internal oscillator, 64 MHz
+    #Config MCLRE = EXTMCLR             // MCLR pin is reset (programmer)
+    #Config WDTE = OFF
+    #Config LVP = OFF
+    #Config BOREN = OFF
+    #Config STVREN = ON
+    #Config XINST = OFF
+    #Config PPS1WAY = OFF               // PPS may be set more than once
+
+    // No I2C1 baud rate check message from the compiler (I2C is not used)
+    #DEFINE MASKI2C1BAUDCHECKMESSAGE
+
+// ----- Serial port: the console
+
+    #define USART_BAUD_RATE 115200
+    #define USART_BLOCKING
+
+// ----- Pins
+
+    #define CH376_SCK       PortB.1     // SPI1 SCK out
+    #define CH376_DO        PortB.3     // SPI1 SDO, to the CH376's D6/SDI
+    #define CH376_DI        PortB.0     // SPI1 SDI, from the CH376's D7/SDO
+    #define CH376_CS        PortA.4     // the CH376's D3/SCS
+    #define CH376_INT       PortB.4     // the CH376's INT#. Leave it out to have the interrupt on SDO (CH376_DI)
+
+    //! Choose the media: define one (neither is the USB stick). Both is a compile error
+    // #define CH376_MEDIA_SDCARD               // the CH376's SD card socket (3V3)
+    #define CH376_MEDIA_USBSTICK                // the CH376's USB socket (5V0), the default
+
+    // PPS: the serial port and SPI1, as the ENC28J60 rig. Only one #startup is allowed in a program
+    #startup PPSInit, 85
+
+    Sub PPSInit
+        U1RXPPS = 0x17          // RC7 is UART1 RX
+        RC6PPS = 0x20           // RC6 is UART1 TX
+        RC5PPS = 0x20           // RC5 is UART1 TX (second terminal)
+
+        SPI1SCKPPS = 0x09       // RB1 is SPI1 SCK in
+        RB1PPS = 0x31           // RB1 is SPI1 SCK out
+        SPI1SDIPPS = 0x08       // RB0 is SPI1 SDI
+        RB3PPS = 0x32           // RB3 is SPI1 SDO
+
+        CH376_CS = 1            // CH376 deselected from the start
+        Dir CH376_CS Out
+        Dir CH376_DI In
+        Dir CH376_DO Out
+        Dir CH376_SCK Out
+    End Sub
+
+// ----- The drive: a CH376 on SPI1, with the SD card methods (in place of sd_card.h and sd_fat.h)
+
+    #define CH376_COMMS_METHOD CH376_COMMS_SPI   // the CH376 on SPI (also CH376_COMMS_USART, CH376_COMMS_PARALLEL)
+    #define CH376_SPI_SPEED Master      // 4 MHz at 64 MHz (SPI1BAUD 7); MasterFast is 8 MHz
+    #include <ch376_sd.h>
+
+// ----- Variables
+
+    Dim CheckNo, Failed, Got, LineNo, ReadChar, Expect, Found As Byte
+    Dim BytePos As Word
+    Dim BlockBuffer(511) As Byte        // one block, 0..511
+
+// ----- Main program
+
+    // Prevents the terminal becoming active too early, during reprogramming
+    Wait 2 s
+    HSerPrintCRLF 2
+    HSerPrint "CH376 test, the operating methods, PIC18F27Q43 " : HSerPrint ChipMHz : HSerPrint " MHz, SPI1"
+    HSerPrintCRLF
+
+    // This is a test: it runs every step, counts the failures, and stops only when there is no drive or
+    // no file system. A step after a failure is then expected to fail as well, safely: the library does
+    // nothing without an open file (FatAppendByte is ignored, FatCommit returns FAT_ERR_NOT_OPEN,
+    // FatReadByte sets FatEOF), so the drive is not written to.
+    // A real program checks each result before it goes on, and decides what a failure means for it:
+    // try again, tell the user, or leave out the steps that need it. See the FatOpen example below.
+    CheckNo = 0
+    Failed = 0
+
+    // ----- 1..2: the drive (waits for one to be plugged in) and its file system
+    If CH376SD_DRIVEMODE = CH376_MODE_SDCARD Then
+        HSerPrint "   Insert an SD card" : HSerPrintCRLF
+    Else
+        HSerPrint "   Insert a USB drive" : HSerPrintCRLF
+    End If
+    Do
+        Got = SDCInit()
+        If Got <> SDC_ERR_NO_CARD Then Exit Do
+        Wait 500 ms
+    Loop
+    Failed = Failed + Check("SDCInit", Got, SDC_OK)
+    If Failed > 0 Then
+        HSerPrint "   CH376Error 0x" : HSerPrint Hex(CH376Error) : HSerPrint " (0xF0: no answer from the CH376)" : HSerPrintCRLF
+        StopHere
+    End If
+    HSerPrint "   CH376 version 0x" : HSerPrint Hex(CH376Version)
+    HSerPrint ", " : HSerPrint SDCBlocks / 2048 : HSerPrint " MB" : HSerPrintCRLF
+    Failed = Failed + Check("FatMount", FatMount(), FAT_OK)
+    If Failed > 0 Then StopHere
+    HSerPrint "   FAT" : HSerPrint FatType : HSerPrintCRLF
+
+    // ----- 3..4: sector 0 (the partition table, or the boot sector) ends 55 AA
+    // An SD card in the CH376's socket has no block access: the CH376 answers DISK_READ with a disk error
+    // (0x1F, found on the board), so the library refuses it with SDC_ERR_CMD, and the test expects that.
+    If SDCCardType = SDC_TYPE_CH376_SD Then
+        Failed = Failed + Check("SDCReadBlock 0 refused (SD)", SDCReadBlock(0, BlockBuffer), SDC_ERR_CMD)
+        Failed = Failed + Check("No block access (SD)", SDCError, SDC_ERR_CMD)
+    Else
+        Failed = Failed + Check("SDCReadBlock 0", SDCReadBlock(0, BlockBuffer), SDC_OK)
+        Found = 0
+        If BlockBuffer(510) = 0x55 And BlockBuffer(511) = 0xAA Then Found = 1
+        Failed = Failed + Check("Sector 0 ends 55 AA", Found, 1)
+    End If
+
+    // ----- 5..6: the folder CH376 (made, or there already from an earlier run), and into it
+    Got = FatMkDir("CH376")
+    If Got = FAT_ERR_EXISTS Then Got = FAT_OK
+    Failed = Failed + Check("FatMkDir CH376", Got, FAT_OK)
+    Failed = Failed + Check("FatChDir CH376", FatChDir("CH376"), FAT_OK)
+
+    // ----- 7..10: TEST.TXT, new: 100 lines "Line 001" .. "Line 100", 1000 bytes
+    Got = FatDelete("TEST.TXT")         // from an earlier run that stopped part way
+    // In a real program, check the open before writing, eg
+    //     If FatOpen("LOG.TXT") <> FAT_OK Then
+    //         HSerPrint "Cannot open LOG.TXT, error 0x" : HSerPrint Hex(FatError) : HSerPrintCRLF
+    //         Exit Sub                        // or try again, or carry on without the log
+    //     End If
+    //     ... FatAppendByte ...
+    //     If FatCommit <> FAT_OK Then ...      // the data is on the drive only when this is FAT_OK
+    // FatCreated() says whether FatOpen made the file (1) or opened one already there (0): eg to write
+    // a heading line only into a new file.
+    Failed = Failed + Check("FatOpen TEST.TXT", FatOpen("TEST.TXT"), FAT_OK)
+    Failed = Failed + Check("FatCreated", FatCreated(), 1)
+    For LineNo = 1 To 100
+        FatAppendByte(76)               // L
+        FatAppendByte(105)              // i
+        FatAppendByte(110)              // n
+        FatAppendByte(101)              // e
+        FatAppendByte(32)
+        FatAppendByte(48 + LineNo / 100)
+        FatAppendByte(48 + (LineNo / 10) % 10)
+        FatAppendByte(48 + LineNo % 10)
+        FatAppendByte(13)
+        FatAppendByte(10)
+    Next
+    Failed = Failed + Check("FatCommit", FatCommit(), FAT_OK)
+    Failed = Failed + CheckLong("FatFileSize 1000", FatFileSize, 1000)
+
+    // ----- 11: list the folder while TEST.TXT is open: ".", "..", TEST.TXT 1000 bytes
+    Found = 0
+    Got = FatListFirst()
+    Do While Got = 1
+        HSerPrint "   " : HSerPrint FatListName : HSerPrint " " : HSerPrint FatListSize : HSerPrintCRLF
+        If FatListName = "TEST.TXT" Then
+            If FatListSize = 1000 Then Found = 1
+        End If
+        Got = FatListNext()
+    Loop
+    Failed = Failed + Check("Listed TEST.TXT 1000", Found, 1)
+
+    // ----- 12..13: append "END" CR LF to the file that is still open
+    FatAppendByte(69) : FatAppendByte(78) : FatAppendByte(68)    // END
+    FatAppendByte(13) : FatAppendByte(10)
+    Failed = Failed + Check("FatCommit after list", FatCommit(), FAT_OK)
+    Failed = Failed + CheckLong("FatFileSize 1005", FatFileSize, 1005)
+
+    // ----- 14..17: read it back
+    Failed = Failed + Check("FatOpenRead TEST.TXT", FatOpenRead("TEST.TXT"), FAT_OK)
+    Failed = Failed + CheckLong("Size read 1005", FatFileSize, 1005)
+    Found = 0
+    BytePos = 0
+    Do While FatEOF = 0
+        ReadChar = FatReadByte()
+        Expect = ExpectedByte(BytePos)
+        If ReadChar <> Expect Then
+            If Found = 0 Then HSerPrint "   first difference at byte " : HSerPrint BytePos : HSerPrintCRLF
+            Found = 1
+        End If
+        BytePos++
+    Loop
+    Failed = Failed + Check("Bytes match", Found, 0)
+    Failed = Failed + CheckLong("1005 bytes read", BytePos, 1005)
+
+    // ----- 18..19: delete it; it is gone
+    Failed = Failed + Check("FatDelete TEST.TXT", FatDelete("TEST.TXT"), FAT_OK)
+    Failed = Failed + Check("TEST.TXT gone", FatOpenRead("TEST.TXT"), FAT_ERR_NOT_FOUND)
+
+    // ----- 20..23: a folder made and removed
+    Got = FatMkDir("SUB")
+    If Got = FAT_ERR_EXISTS Then Got = FAT_OK
+    Failed = Failed + Check("FatMkDir SUB", Got, FAT_OK)
+    Failed = Failed + Check("FatRmDir SUB", FatRmDir("SUB"), FAT_OK)
+    Failed = Failed + Check("SUB gone", FatChDir("SUB"), FAT_ERR_NOT_FOUND)
+    Failed = Failed + Check("FatChDir ..", FatChDir(".."), FAT_OK)
+
+    // ----- 24..26: CH376\HELLO.TXT for the PC, dated 2026-11-08 12:00:00
+    Failed = Failed + Check("FatChDir CH376", FatChDir("CH376"), FAT_OK)
+    FatDate = 0x5D68                    // (2026 - 1980) * 512 + 11 * 32 + 8
+    FatTime = 0x6000                    // 12 * 2048
+    Got = FatDelete("HELLO.TXT")
+    Failed = Failed + Check("FatOpen HELLO.TXT", FatOpen("HELLO.TXT"), FAT_OK)
+    AppendText("Hello from GCBASIC and the CH376")
+    AppendText("PIC18F27Q43, SPI1, the SD card methods")
+    Failed = Failed + Check("FatCommit", FatCommit(), FAT_OK)
+
+    StopHere
+
+// ----- Routines
+
+// One check: a line "nn OK   name", or "nn FAIL name - got g (0xhh), FatError f, CH376Error 0xhh".
+// Returns 1 when it failed, 0 when it passed: the caller adds it up (Failed = Failed + Check(...))
+Function Check(In CheckName As String, In CheckGot, In CheckWant) As Byte
+    CheckNo++
+    If CheckNo < 10 Then HSerPrint "0"
+    HSerPrint CheckNo
+    If CheckGot = CheckWant Then
+        Check = 0
+        HSerPrint " OK   "
+        HSerPrint CheckName
+    Else
+        Check = 1
+        HSerPrint " FAIL "
+        HSerPrint CheckName
+        HSerPrint " - got " : HSerPrint CheckGot : HSerPrint " (0x" : HSerPrint Hex(CheckGot)
+        HSerPrint "), FatError " : HSerPrint FatError
+        HSerPrint ", CH376Error 0x" : HSerPrint Hex(CH376Error)
+    End If
+    HSerPrintCRLF
+End Function
+
+// The same for a Long: 1 when it failed, and then the value on a second line
+Function CheckLong(In CheckLongName As String, In CheckGotL As Long, In CheckWantL As Long) As Byte
+    If CheckGotL = CheckWantL Then
+        CheckLong = Check(CheckLongName, 0, 0)
+    Else
+        CheckLong = Check(CheckLongName, 1, 0)
+        HSerPrint "   value " : HSerPrint CheckGotL : HSerPrintCRLF
+    End If
+End Function
+
+// A line of text and CR LF at the end of the open file
+Sub AppendText(In AppendString As String)
+    Dim AppendPos As Byte
+    For AppendPos = 1 To AppendString(0)
+        FatAppendByte(AppendString(AppendPos))
+    Next
+    FatAppendByte(13)
+    FatAppendByte(10)
+End Sub
+
+// The byte at TestPos of TEST.TXT: line TestPos / 10 + 1, "Line nnn" CR LF; from 1000 "END" CR LF
+Function ExpectedByte(In TestPos As Word) As Byte
+    Dim TestLine As Word
+    Dim TestCol As Byte
+    If TestPos >= 1000 Then
+        Select Case TestPos - 1000
+            Case 0: ExpectedByte = 69   // E
+            Case 1: ExpectedByte = 78   // N
+            Case 2: ExpectedByte = 68   // D
+            Case 3: ExpectedByte = 13
+            Case Else: ExpectedByte = 10
+        End Select
+        Exit Function
+    End If
+    TestLine = TestPos / 10 + 1
+    TestCol = TestPos % 10
+    Select Case TestCol
+        Case 0: ExpectedByte = 76       // L
+        Case 1: ExpectedByte = 105      // i
+        Case 2: ExpectedByte = 110      // n
+        Case 3: ExpectedByte = 101      // e
+        Case 4: ExpectedByte = 32       // space
+        Case 5: ExpectedByte = 48 + TestLine / 100
+        Case 6: ExpectedByte = 48 + (TestLine / 10) % 10
+        Case 7: ExpectedByte = 48 + TestLine % 10
+        Case 8: ExpectedByte = 13
+        Case 9: ExpectedByte = 10
+    End Select
+End Function
+
+// The totals, then stop
+Sub StopHere
+    HSerPrintCRLF
+    HSerPrint CheckNo : HSerPrint " checks, " : HSerPrint Failed : HSerPrint " failed"
+    If Failed = 0 Then HSerPrint " - PASS"
+    HSerPrintCRLF
+    Do
+    Loop
+End Sub

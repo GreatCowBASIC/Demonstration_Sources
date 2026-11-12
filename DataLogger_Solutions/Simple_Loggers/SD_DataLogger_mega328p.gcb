@@ -1,0 +1,190 @@
+// A simple data logger: every 5 s, ReadAD(AN1) is added to DATALOG.TXT on an SD card, on an ATmega328P.
+//
+// Each line is "seconds,value", eg "15,128", with a heading line "Seconds,AN1" when the file is new. The file
+// is opened once and kept open. FatCommit after each line puts the data, and the file's size, on the card,
+// so the file is good if the power goes off or the card is pulled out between samples.
+// Recovery from the card pulled out: a failed write is not ignored. The program says so on the serial
+// console, starts the card again (FatInit) and writes the line again, so a card put back between two
+// samples loses no sample. With no card it tries again at each sample. When samples were lost, a
+// "Restarted" line goes into the file before the next sample, and the seconds show the gap.
+//
+// The same program as CH376_SPI_DataLogger_18F27Q43.gcb: only the chip set-up and the include lines differ
+// (sd_card.h and sd_fat.h, with sd_card.h's AVR shim sd_card_avr.h, in place of ch376_sd.h).
+// The file name must be 8.3 (8 characters, a dot, 3 characters): sd_fat.h makes no long names, so
+// "DATALOGGER.TXT" would not fit. The files are dated 2026-01-01 00:00 (FatDate / FatTime): the shield's DS1307
+// clock is not used. The 5 s is a Wait after each sample, so the time drifts a little later each sample.
+//
+// Board: Arduino Uno (ATmega328P, 16 MHz crystal, 5 V) with a Deek-Robot data logging shield v1.0 (SD card at 3V3)
+//        AN1    the analogue input, A1 (PC1): 0 .. 5 V gives 0 .. 255
+//        SPI    SCK D13 (PB5), MOSI D11 (PB3), MISO D12 (PB4); the card's chip select D10 (PB2)
+//        UART   TX D1, RX D0: the Uno's USB serial port, 9600 8N1: what is logged, and any error. Only when
+//               USART_BAUD_RATE is defined: leave that #define out and the logger runs without the serial port.
+// Programming: use.ini's Arduino UNO programmer (avrdude, the Uno's bootloader). Opening the serial port resets
+//        the Uno, so the program starts again then (and adds to DATALOG.TXT).
+//
+//@author    Evan R. Venn
+//@licence   LGPL 2.1
+//@date      09/11/2026
+//
+// Change log
+//   09/11/2026  First version: CH376_SPI_DataLogger_18F27Q43.gcb with sd_card.h and sd_fat.h in place of ch376_sd.h
+//   09/11/2026  #option ReserveHighProg OPTIBOOT: a program too large for the space below the bootloader is
+//               a compile error, not a programming failure that overwrites the bootloader
+//   09/11/2026  The drive is started with FatInit() (sd_fat.h 1.2): SDCInit and FatMount in one call
+
+    #option explicit
+    #option IncludePath "C:\GCstudio\gcbasic\AdditionalLibraries"
+
+// ----- Chip
+
+    #Chip mega328p, 16
+    #option ReserveHighProg OPTIBOOT    // the Uno's bootloader at the top of the flash: 1,024 words kept free
+
+// ----- Serial port: the console. Optional: leave USART_BAUD_RATE out for no serial output (ConsoleText /
+// ConsoleCRLF below then do nothing). 9600: at 16 MHz the AVR's USART is 0.2 % out (2 % or more at 57600, 115200)
+
+    #define USART_BAUD_RATE 9600
+    #define USART_BLOCKING
+
+// ----- Pins
+
+    #define LOG_INPUT       PortC.1     // A1 (AN1), the input that is logged
+    #define SDC_SCK         PortB.5     // D13, SCK
+    #define SDC_DO          PortB.3     // D11, MOSI: to the card's DI
+    #define SDC_DI          PortB.4     // D12, MISO: from the card's DO
+    #define SDC_CS          PortB.2     // D10: the card's chip select, and the AVR's SS pin (so no SDC_SS)
+
+// ----- The drive: an SD card on the SPI (sd_card.h picks its AVR shim, sd_card_avr.h)
+
+    #define SDC_SPI_SLOW    MasterSlow  // start-up: Fosc / 64, 250 kHz (the card needs 100 to 400 kHz)
+    #define SDC_SPI_FAST    MasterFast  // data: Fosc / 4, 4 MHz
+    #include <sd_card.h>
+    #include <sd_fat.h>
+
+// ----- Main program
+
+    Dim Seconds As Long                 // time since the start, the first column
+    Dim Sample As Byte                  // ReadAD(AN1)
+    Dim LogReady As Bit                 // 1 = the drive is started and DATALOG.TXT is open
+    Dim LogLost As Bit                  // 1 = a sample was not written: a "Restarted" line goes in first
+    Dim LogLine As String * 20
+
+    Dir LOG_INPUT In
+
+    // Prevents the terminal becoming active too early, during reprogramming
+    Wait 2 s
+    ConsoleCRLF()
+    ConsoleText("SD card data logger: ReadAD(AN1) to DATALOG.TXT every 5 s, ATmega328P")
+    ConsoleCRLF()
+
+    Seconds = 0
+    LogReady = 0
+    LogLost = 0
+    Do
+        Sample = ReadAD(AN1)
+        LogLine = Str32(Seconds) + "," + Str(Sample)
+        ConsoleText(LogLine)
+
+        // Write the line. A failure (eg the card pulled out) closes the drive
+        If LogReady = 1 Then
+            If LogWrite() = 0 Then LogReady = 0
+        End If
+        // No drive, at the start or after a failure: start it again (a card put back is found here)
+        // and write the line, so a card put back between two samples loses no sample
+        If LogReady = 0 Then
+            LogReady = LogStart()
+            If LogReady = 1 Then
+                If LogWrite() = 0 Then LogReady = 0
+            End If
+        End If
+        If LogReady = 1 Then
+            ConsoleText("  written")
+        Else
+            ConsoleText("  NOT written, no drive: trying again at the next sample")
+            LogLost = 1                 // a "Restarted" line before the next line written
+        End If
+        ConsoleCRLF()
+
+        Wait 5 s
+        Seconds = Seconds + 5
+    Loop
+
+// ----- The log file
+
+'''Start the drive, mount it, and open DATALOG.TXT to add to it (it is made if it is not there).
+'''Returns 1 when the file is open, or 0 with the reason on the serial console.
+'''FatInit (SDCInit, then FatMount) starts the card from the beginning, so this also works after a card is
+'''pulled out and put back.
+Function LogStart As Byte
+    LogStart = 0
+    ConsoleCRLF()
+    If FatInit() <> FAT_OK Then
+        If FatError = FAT_ERR_NO_DRIVE Then
+            ConsoleText("   No drive, SDCError ") : ConsoleText(Str(SDCError))
+            ConsoleText(", SDCR1 0x") : ConsoleText(Hex(SDCR1)) : ConsoleCRLF()    // the card's last answer; 0xFF: none
+        Else
+            ConsoleText("   No FAT file system, FatError ") : ConsoleText(Str(FatError)) : ConsoleCRLF()
+        End If
+        Exit Function
+    End If
+    If FatOpen("DATALOG.TXT") <> FAT_OK Then
+        ConsoleText("   DATALOG.TXT cannot be opened, FatError ") : ConsoleText(Str(FatError)) : ConsoleCRLF()
+        Exit Function
+    End If
+    If FatCreated() = 1 Then
+        LogText("Seconds,AN1")          // a new file: the heading line first
+        LogCRLF()
+        ConsoleText("   DATALOG.TXT made") : ConsoleCRLF()
+    Else
+        ConsoleText("   DATALOG.TXT opened, adding to it") : ConsoleCRLF()
+    End If
+    LogStart = 1
+End Function
+
+'''Add LogLine to the file, after a "Restarted" line when samples were lost, and put it on the drive.
+'''Returns 1 when FatCommit says it is on the drive, or 0 with the FatError on the serial console.
+Function LogWrite As Byte
+    LogWrite = 0
+    If LogLost = 1 Then
+        LogText("Restarted")            // the samples before this line were not written
+        LogCRLF()
+    End If
+    LogText(LogLine)
+    LogCRLF()
+    If FatCommit() <> FAT_OK Then
+        ConsoleText("  NOT written, FatError ") : ConsoleText(Str(FatError))
+        Exit Function
+    End If
+    LogLost = 0
+    LogWrite = 1
+End Function
+
+'''Add a string to the open file
+Sub LogText(In LogString As String)
+    Dim LogPos As Byte
+    For LogPos = 1 To LogString(0)
+        FatAppendByte(LogString(LogPos))
+    Next
+End Sub
+
+'''End the line: CR LF
+Sub LogCRLF
+    FatAppendByte(13)
+    FatAppendByte(10)
+End Sub
+
+// ----- The serial console: used only when USART_BAUD_RATE is defined
+
+'''Send a string to the serial console
+Sub ConsoleText(In ConsoleString As String)
+    #ifdef USART_BAUD_RATE
+        HSerPrint ConsoleString
+    #endif
+End Sub
+
+'''End the console line: CR LF
+Sub ConsoleCRLF
+    #ifdef USART_BAUD_RATE
+        HSerPrintCRLF
+    #endif
+End Sub

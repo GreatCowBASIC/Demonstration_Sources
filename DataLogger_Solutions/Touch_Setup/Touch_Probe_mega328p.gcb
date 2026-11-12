@@ -1,0 +1,221 @@
+// Touch probe: finds and reports the 4-wire resistive touch panel of an 8-bit ILI9341 "UNO" shield, on the serial
+// console (9600 baud).
+//
+// 1. The wiring. The panel's four wires share the display's pins, and the makers wire them differently. Each of
+//    A0 .. A3 (input, pull-up) is read with each of D6 .. D9 driven low in turn: a pair joined by a plate (a few
+//    hundred ohms) reads low, eg "A2 - D8  31  plate". The two pairs are the X and the Y plate.
+// 2. The touches, with touch_4wire.h and the pins below (the usual MCUFRIEND wiring: if step 1 finds other pairs,
+//    change the TOUCH_ pins). Each press is reported once ("Touch"), then, while it is held, the readings every
+//    200 ms: Z (the pressed reading: lower is harder), and the raw X and Y (0 .. 1023, not calibrated). Then
+//    "Released".
+//
+// No display library: the display is not used, only its pins.
+//
+// Board: Arduino Uno (ATmega328P, 16 MHz) with the 8-bit ILI9341 shield. Console: the Uno's USB serial, 9600.
+//
+// Change log
+//   09/11/2026  First version
+//--------------------------------------------------------------------------------------------------------------------------------
+
+    #option explicit
+    #option IncludePath "C:\GCstudio\gcbasic\AdditionalLibraries"
+
+// ----- Chip
+
+    #Chip mega328p, 16
+    #option ReserveHighProg OPTIBOOT    // the Uno's bootloader at the top of the flash: 1,024 words kept free
+
+// ----- The console
+
+    #define USART_BAUD_RATE 9600
+    #define USART_TX_BLOCKING
+    #define USART_DELAY OFF
+
+// ----- The touch panel (touch_4wire.h)
+
+    #define TOUCH_XP        PortB.0     // D8, the display's DB0
+    #define TOUCH_XM        PortC.2     // A2, the display's RS
+    #define TOUCH_YP        PortC.3     // A3, the display's CS
+    #define TOUCH_YM        PortB.1     // D9, the display's DB1
+    #define TOUCH_YP_AN     AN3
+    #define TOUCH_XM_AN     AN2         // for the raw Y reading here (not used by the library)
+    #define TOUCH_THRESHOLD 500
+    #define TOUCH_DEBOUNCE  2
+    #include <touch_4wire.h>
+
+    // the display's control lines, held so the display ignores the probe: RD, WR high (A0, A1); RESET high (A4)
+    #define LCD_RD          PortC.0
+    #define LCD_WR          PortC.1
+    #define LCD_RESET       PortC.4
+
+    // step 1: a pair reading below this is joined by a plate
+    #define PLATE_LEVEL     300
+
+// ----- Variables
+
+    Dim ProbeA, ProbeD, PlatesFound As Byte
+    Dim ProbeReading As Word
+    Dim TouchHeld As Bit
+    Dim HeldTicks As Byte
+
+// ----- Main
+
+    Wait 1500 ms
+    ConsoleText("Touch probe: the 4-wire panel on A0 .. A3 and D6 .. D9") : ConsoleCRLF()
+
+    // ----- 1. The wiring
+    ConsoleText("1. The plates (analog pin with pull-up, digital pin low; low = joined)") : ConsoleCRLF()
+    PlatesFound = 0
+    For ProbeA = 0 To 3
+        For ProbeD = 6 To 9
+            ProbeReading = PairReading(ProbeA, ProbeD)
+            If ProbeReading < PLATE_LEVEL Then
+                ConsoleText("   A") : HSerPrint ProbeA : ConsoleText(" - D") : HSerPrint ProbeD
+                ConsoleText("  ") : HSerPrint ProbeReading : ConsoleText("  plate") : ConsoleCRLF()
+                PlatesFound++
+            End If
+        Next
+    Next
+    PinsBack
+    If PlatesFound = 2 Then
+        ConsoleText("   2 plates found") : ConsoleCRLF()
+    Else
+        ConsoleText("   ") : HSerPrint PlatesFound : ConsoleText(" pairs found, not 2: every pair:") : ConsoleCRLF()
+        For ProbeA = 0 To 3
+            ConsoleText("   A") : HSerPrint ProbeA : ConsoleText(":")
+            For ProbeD = 6 To 9
+                ProbeReading = PairReading(ProbeA, ProbeD)
+                ConsoleText("  D") : HSerPrint ProbeD : ConsoleText(" ") : HSerPrint ProbeReading
+            Next
+            ConsoleCRLF()
+        Next
+        PinsBack
+    End If
+    ConsoleText("   touch_4wire.h is set to XP D8, XM A2, YP A3, YM D9") : ConsoleCRLF()
+
+    // ----- 2. The touches
+    ConsoleText("2. Touch the panel") : ConsoleCRLF()
+    TouchHeld = 0
+    HeldTicks = 0
+    Do
+        If TouchEvent() = 1 Then
+            ConsoleText("Touch") : ConsoleCRLF()
+            TouchHeld = 1
+            HeldTicks = 0
+        End If
+        If TouchHeld = 1 Then
+            If TouchPressed() = 0 Then
+                // released: TouchEvent sees it too, and is ready for the next press
+                Wait 20 ms
+                If TouchPressed() = 0 Then
+                    ConsoleText("Released") : ConsoleCRLF()
+                    TouchHeld = 0
+                End If
+            Else
+                HeldTicks++
+                If HeldTicks >= 10 Then            // every 200 ms (10 x 20 ms)
+                    HeldTicks = 0
+                    ReportReadings
+                End If
+            End If
+        End If
+        Wait 20 ms
+    Loop
+
+// ----- Step 1
+
+'''The analog pin A<AnPin> (input, pull-up) read with the digital pin D<DigPin> low and the other probe pins open
+Function PairReading(In AnPin As Byte, In DigPin As Byte) As Word
+    AllOpen
+    Select Case AnPin
+        Case 0 : PortC.0 = 1
+        Case 1 : PortC.1 = 1
+        Case 2 : PortC.2 = 1
+        Case 3 : PortC.3 = 1
+    End Select
+    Select Case DigPin
+        Case 6 : Dir PortD.6 Out
+        Case 7 : Dir PortD.7 Out
+        Case 8 : Dir PortB.0 Out
+        Case 9 : Dir PortB.1 Out
+    End Select
+    Wait 2 ms
+    PairReading = 0
+    Select Case AnPin
+        Case 0 : PairReading = ReadAD10(AN0)
+        Case 1 : PairReading = ReadAD10(AN1)
+        Case 2 : PairReading = ReadAD10(AN2)
+        Case 3 : PairReading = ReadAD10(AN3)
+    End Select
+End Function
+
+'''A0 .. A3 and D6 .. D9 inputs, no pull-ups, port bits 0 (so a pin made an output is low)
+Sub AllOpen
+    PortC = PortC And 0xF0
+    DDRC = DDRC And 0xF0
+    PortD = PortD And 0x3F
+    DDRD = DDRD And 0x3F
+    PortB = PortB And 0xFC
+    DDRB = DDRB And 0xFC
+End Sub
+
+'''The probe pins back as touch_4wire.h leaves them, and the display's RD, WR and RESET high
+Sub PinsBack
+    AllOpen
+    Dir LCD_RD Out : LCD_RD = 1
+    Dir LCD_WR Out : LCD_WR = 1
+    Dir LCD_RESET Out : LCD_RESET = 1
+    Dir TOUCH_YP Out : TOUCH_YP = 1
+    Dir TOUCH_XM Out : TOUCH_XM = 1
+    Dir TOUCH_XP Out
+    Dir TOUCH_YM Out
+End Sub
+
+// ----- Step 2
+
+'''Z, X and Y while pressed. X: the X plate from 0 V (XM) to 5 V (XP), read on YP with YM open. Y: the Y plate from
+'''0 V (YM) to 5 V (YP), read on XM with XP open. Raw readings, 0 .. 1023.
+Sub ReportReadings
+    Dim RawX, RawY, RawZ As Word
+
+    // Z: as TouchPressed (X plate at 0 V, YP pulled up)
+    TOUCH_XP = 0 : TOUCH_XM = 0
+    Dir TOUCH_XP Out : Dir TOUCH_XM Out
+    Dir TOUCH_YM In : TOUCH_YM = 0
+    Dir TOUCH_YP In : TOUCH_YP = 1
+    Wait 100 us
+    RawZ = ReadAD10(TOUCH_YP_AN)
+
+    // X
+    TOUCH_XP = 1 : TOUCH_XM = 0
+    Dir TOUCH_XP Out : Dir TOUCH_XM Out
+    Dir TOUCH_YP In : TOUCH_YP = 0
+    Dir TOUCH_YM In : TOUCH_YM = 0
+    Wait 100 us
+    RawX = ReadAD10(TOUCH_YP_AN)
+
+    // Y
+    TOUCH_YP = 1 : TOUCH_YM = 0
+    Dir TOUCH_YP Out : Dir TOUCH_YM Out
+    Dir TOUCH_XP In : TOUCH_XP = 0
+    Dir TOUCH_XM In : TOUCH_XM = 0
+    Wait 100 us
+    RawY = ReadAD10(TOUCH_XM_AN)
+
+    PinsBack
+    ConsoleText("   Z ") : HSerPrint RawZ
+    ConsoleText("  X ") : HSerPrint RawX
+    ConsoleText("  Y ") : HSerPrint RawY
+    ConsoleCRLF()
+End Sub
+
+// ----- The console
+
+Sub ConsoleText(In ConsoleString As String)
+    HSerPrint ConsoleString
+End Sub
+
+Sub ConsoleCRLF
+    HSerSend 13
+    HSerSend 10
+End Sub

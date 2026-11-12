@@ -1,6 +1,6 @@
 # SEH1602-A OLED: Differences, Power Management, Graphics
 
-2026-11-11
+2026-11-12
 
 ## Overview
 
@@ -77,7 +77,7 @@ The oscilloscope program uses these limits: 80 samples per sweep, 16 rows, risin
 
 ## The four demo programs
 
-All four are in `C:\temp`, use the same pin configuration, and compile with the GC Studio Make HEX command.
+All four are in this folder, use the same pin configuration, and compile with the GC Studio Make HEX command.
 
 | Program | What it shows | Result |
 | --- | --- | --- |
@@ -109,12 +109,12 @@ From the vendor's text and drawings for the SEH1602A-OLED (simair listing, saved
 | Active area | 56.95 x 11.85 mm |
 | Dot size, dot pitch | 0.55 x 0.65 mm, 0.60 x 0.70 mm |
 | Character size, pitch | 2.95 x 5.55 mm, 3.6 x 6.3 mm |
-
-The character pitch (3.6 mm) is 6 times the dot pitch (0.60 mm), so each character cell is 5 dot columns plus one blank column. That is the gap seen between character cells in the graphic-mode photos.
 | Header | 16 pins, 2.54 mm pitch, 1.0 mm holes |
 | Mounting holes (drawing) | 4 x 2.5 mm, 75.0 x 31.0 mm apart, 5.0 mm pads |
 | Colours | Yellow, white, blue, red, green |
 | Weight | 50 g |
+
+The character pitch (3.6 mm) is 6 times the dot pitch (0.60 mm), so each character cell is 5 dot columns plus one blank column. That is the gap seen between character cells in the graphic-mode photos.
 
 ### Pin descriptions
 
@@ -159,6 +159,7 @@ On the back of the board (an `EH1602A REV.L`, from a photo of this unit):
 
 - `lcd.h` has no direct SPI mode for this display. `LCD_IO 14` and `LCD_IO 16` drive a port expander (MCP23S17 or PIC16LF72), not the display controller.
 - In serial mode the header becomes: pin 12 = SCL, pin 13 = SDO, pin 14 = SDI, pin 16 = /CS (active low). See the pin table above.
+- The plan for a serial driver is in `SPI_Library_Project_Note.md`.
 
 The vendor's own picture of the change, from a Winstar board (`WEH001602AWPP5N00100`, `EH1602A REV.K`): remove the `J68` resistor, move the `PSH` resistor to `PSL`, and move the `CSL` resistor to `JCS`. Your board is a REV.L, so check the silkscreen before changing anything.
 
@@ -196,6 +197,7 @@ Files in this folder:
 | `SEH1602-A.pdf` | Module datasheet from the vendor (simair), 19 pages: specification, drawing, pin functions, electrical characteristics, and the vendor's initialisation (pages 9 and 10) |
 | `IST0010.pdf` | IST0010 OLED controller specification, 65 pages, including the serial timing (pages 43, 44 and 51) |
 | `datasheets/WS0010_specification_WS-RD-0001.pdf` | WS0010 specification from Winstar, document WS-RD-0001 Rev 001 (21 Oct 2010), 38 pages. Shift and power instruction: PDF page 30. Function set and font tables: page 31. Graphic addressing: page 20. Serial figure: page 37. Downloaded from [sos.sk](https://www.sos.sk/a_info/resource/Winstar/WS0010.pdf) |
+| `SPI_Library_Project_Note.md` | Plan for writing a serial (SPI) driver for this module: wiring, protocol, design decisions, phases, risks |
 | `SPI modify moethod.JPG` | Vendor picture of the SPI modification on a Winstar board |
 | `images/seh1602a_back_view.jpg` | Back of this unit (an `EH1602A REV.L`) |
 | `images/ruler_display_photo.jpg` | Display photo with the ruler ticks |

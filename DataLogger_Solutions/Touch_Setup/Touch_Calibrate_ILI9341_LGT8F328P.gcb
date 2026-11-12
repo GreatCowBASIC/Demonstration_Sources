@@ -1,0 +1,218 @@
+// Touch calibration: where the touch panel's raw readings (touch_4wire.h TouchRawX, TouchRawY) are on the
+// screen of an 8-bit ILI9341 "UNO" shield, landscape (320 x 240).
+//
+// The screen shows a cross, five in turn: near the four corners, then the middle. Tap each one (a stylus or a
+// fingernail is best). For each, the console (9600 baud) shows the raw X and Y. After the five, the screen and the
+// console show which raw reading goes with the screen's x and which with y, and the four constants a program
+// needs to turn a touch into a place on the screen:
+//     TOUCH_RAW_X20, TOUCH_RAW_X220   the raw reading that follows x, at the screen's x 20 and x 220
+//     TOUCH_RAW_Y20, TOUCH_RAW_Y220   the raw reading that follows y, at the screen's y 20 and y 220
+// The console shows them as #define lines: copy them into the main program (SD_RTCLogger_ILI9341_LGT8F328P.gcb).
+// X220 is worked out from the crosses at x 20 and x 300 (200/280 of the way). A tap on the results starts again.
+//
+// Board: an LGT8F328P Uno-style board (32 MHz, the chip on 3.3 V) with the 8-bit ILI9341 shield (the pins of
+// SD_RTCLogger_ILI9341_mega328p.gcb). Console: the board's USB serial, 9600.
+// The LGT8F328P's ADC is 12 bits: ReadAD10 (in TouchRawX, TouchRawY) gives 0 .. 4095, so the readings are about
+// 4 times the ATmega328P's, and the press threshold is 2000 (touch_4wire.h's default, 500, is for 0 .. 1023).
+//
+// Change log
+//   09/11/2026  First version (Touch_Calibrate_ILI9341_mega328p.gcb)
+//   10/11/2026  The LGT8F328P version: the chip, and TOUCH_THRESHOLD 2000
+//   10/11/2026  The results on the screen as well as the console; a tap on them starts again (it was 3 s)
+//   10/11/2026  The results as the four constants TOUCH_RAW_X20, X220, Y20 and Y220 the main program uses
+//--------------------------------------------------------------------------------------------------------------------------------
+
+    #option explicit
+    #option IncludePath "C:\GCstudio\gcbasic\AdditionalLibraries"
+
+// ----- Chip
+
+    #Chip LGT8F328P, 32
+    #option ReserveHighProg OPTIBOOT    // the bootloader at the top of the flash (0x7400 up): 1,024 words kept free
+
+// ----- The display: an ILI9341 on the 8-bit bus
+
+    #include <glcd.h>
+    #define GLCD_TYPE GLCD_TYPE_ILI9341
+    #define GLCD_RD       PortC.0           // A0, read
+    #define GLCD_WR       PortC.1           // A1, write
+    #define GLCD_RS       PortC.2           // A2, command / data
+    #define GLCD_CS       PortC.3           // A3, chip select
+    #define GLCD_RESET    PortC.4           // A4, reset
+    #define GLCD_DB0      PortB.0           // D8
+    #define GLCD_DB1      PortB.1           // D9
+    #define GLCD_DB2      PortD.2           // D2
+    #define GLCD_DB3      PortD.3           // D3
+    #define GLCD_DB4      PortD.4           // D4
+    #define GLCD_DB5      PortD.5           // D5
+    #define GLCD_DB6      PortD.6           // D6
+    #define GLCD_DB7      PortD.7           // D7
+
+// ----- The touch panel (touch_4wire.h): its wires share the display's pins
+
+    #define TOUCH_XP        PortB.0     // D8, the display's DB0
+    #define TOUCH_XM        PortC.2     // A2, the display's RS
+    #define TOUCH_YP        PortC.3     // A3, the display's CS
+    #define TOUCH_YM        PortB.1     // D9, the display's DB1
+    #define TOUCH_YP_AN     AN3
+    #define TOUCH_XM_AN     AN2
+    #define TOUCH_THRESHOLD 2000        // a reading below this (of 4095) is pressed
+    #include <touch_4wire.h>
+
+// ----- The console
+
+    #define USART_BAUD_RATE 9600
+    #define USART_TX_BLOCKING
+    #define USART_DELAY OFF
+
+// ----- Variables
+
+    Dim CalX(5), CalY(5) As Word        // the crosses' places
+    Dim RawX(5), RawY(5) As Word        // the raw readings at each
+    Dim CalNum As Byte
+    Dim SpanXonX, SpanYonX As Word      // how much each raw reading changes from the left crosses to the right
+    Dim AtX20, AtX300, AtY20, AtY220 As Word    // the raw readings at x 20 and 300, y 20 and 220
+    Dim AtX220 As Word                  // the raw reading at x 220 (TOUCH_RAW_X220)
+    Dim XonRawX As Bit                  // 1 = screen x is raw X (and y raw Y); 0 = screen x is raw Y, y raw X
+
+    CalX(1) = 20  : CalY(1) = 20
+    CalX(2) = 300 : CalY(2) = 20
+    CalX(3) = 20  : CalY(3) = 220
+    CalX(4) = 300 : CalY(4) = 220
+    CalX(5) = 160 : CalY(5) = 120
+
+// ----- Main
+
+    Wait 1500 ms
+    ConsoleText("Touch calibration, landscape 320 x 240: tap each cross") : ConsoleCRLF()
+    GLCDRotate(Landscape)
+    Do
+        For CalNum = 1 To 5
+            GLCDCLS ILI9341_BLACK
+            GLCDfntDefaultsize = 2
+            GLCDPrint(70, 112, "Tap the cross", ILI9341_WHITE)
+            DrawCross(CalX(CalNum), CalY(CalNum), ILI9341_YELLOW)
+
+            // wait for a press, let it settle, read it
+            Do
+                Wait 20 ms
+            Loop Until TouchEvent() = 1
+            Wait 30 ms
+            RawX(CalNum) = TouchRawX()
+            RawY(CalNum) = TouchRawY()
+
+            ConsoleText("   Cross ") : HSerPrint CalNum
+            ConsoleText(" at x ") : HSerPrint CalX(CalNum) : ConsoleText(", y ") : HSerPrint CalY(CalNum)
+            ConsoleText(":  raw X ") : HSerPrint RawX(CalNum) : ConsoleText("  raw Y ") : HSerPrint RawY(CalNum)
+            ConsoleCRLF()
+            DrawCross(CalX(CalNum), CalY(CalNum), ILI9341_GREEN)
+
+            // wait for the release
+            Do
+                Wait 20 ms
+            Loop While TouchPressed() = 1
+            Wait 300 ms
+        Next
+
+        // the raw reading that follows the screen's x: the one that changes most from the left crosses (1, 3)
+        // to the right (2, 4); the other follows y
+        SpanXonX = Spread(RawX(1) + RawX(3), RawX(2) + RawX(4))
+        SpanYonX = Spread(RawY(1) + RawY(3), RawY(2) + RawY(4))
+        If SpanXonX >= SpanYonX Then
+            XonRawX = 1
+            AtX20 = Mean(RawX(1), RawX(3)) : AtX300 = Mean(RawX(2), RawX(4))
+            AtY20 = Mean(RawY(1), RawY(2)) : AtY220 = Mean(RawY(3), RawY(4))
+        Else
+            XonRawX = 0
+            AtX20 = Mean(RawY(1), RawY(3)) : AtX300 = Mean(RawY(2), RawY(4))
+            AtY20 = Mean(RawX(1), RawX(2)) : AtY220 = Mean(RawX(3), RawX(4))
+        End If
+        // x 220 is 200/280 (5/7) of the way from x 20 to x 300
+        If AtX300 >= AtX20 Then
+            AtX220 = AtX20 + (AtX300 - AtX20) * 5 / 7
+        Else
+            AtX220 = AtX20 - (AtX20 - AtX300) * 5 / 7
+        End If
+
+        // the console: the four constants as #define lines for the main program
+        If XonRawX = 1 Then
+            ConsoleText("   Screen x is raw X, screen y is raw Y") : ConsoleCRLF()
+        Else
+            ConsoleText("   Screen x is raw Y, screen y is raw X") : ConsoleCRLF()
+        End If
+        ConsoleText("   For the main program:") : ConsoleCRLF()
+        ConsoleDefine("X20 ", AtX20)
+        ConsoleDefine("X220", AtX220)
+        ConsoleDefine("Y20 ", AtY20)
+        ConsoleDefine("Y220", AtY220)
+        ConsoleText("   the middle (160, 120): raw X ") : HSerPrint RawX(5)
+        ConsoleText("  raw Y ") : HSerPrint RawY(5) : ConsoleCRLF()
+
+        // the screen: the same, then a tap to start again
+        GLCDCLS ILI9341_BLACK
+        GLCDfntDefaultsize = 2
+        GLCDPrint(4, 4, "Calibration", ILI9341_CYAN)
+        If XonRawX = 1 Then
+            GLCDPrint(4, 34, "x is raw X, y is raw Y", ILI9341_WHITE)
+        Else
+            GLCDPrint(4, 34, "x is raw Y, y is raw X", ILI9341_WHITE)
+        End If
+        GLCDPrint(4, 66, "TOUCH_RAW_X20", ILI9341_YELLOW)
+        GLCDPrint(196, 66, Str(AtX20), ILI9341_GREEN)
+        GLCDPrint(4, 90, "TOUCH_RAW_X220", ILI9341_YELLOW)
+        GLCDPrint(196, 90, Str(AtX220), ILI9341_GREEN)
+        GLCDPrint(4, 114, "TOUCH_RAW_Y20", ILI9341_YELLOW)
+        GLCDPrint(196, 114, Str(AtY20), ILI9341_GREEN)
+        GLCDPrint(4, 138, "TOUCH_RAW_Y220", ILI9341_YELLOW)
+        GLCDPrint(196, 138, Str(AtY220), ILI9341_GREEN)
+        GLCDPrint(4, 172, "middle   X ", ILI9341_YELLOW)
+        GLCDPrint(148, 172, Str(RawX(5)), ILI9341_GREEN)
+        GLCDPrint(208, 172, " Y ", ILI9341_YELLOW)
+        GLCDPrint(250, 172, Str(RawY(5)), ILI9341_GREEN)
+        GLCDPrint(4, 214, "Tap to start again", ILI9341_CYAN)
+        Do
+            Wait 20 ms
+        Loop Until TouchEvent() = 1
+        Do
+            Wait 20 ms
+        Loop While TouchPressed() = 1
+        Wait 300 ms
+    Loop
+
+'''A cross, 21 pixels across, centred at (CrossX, CrossY)
+Sub DrawCross(In CrossX As Word, In CrossY As Word, In CrossColour As Word)
+    FilledBox(CrossX - 10, CrossY - 1, CrossX + 10, CrossY + 1, CrossColour)
+    FilledBox(CrossX - 1, CrossY - 10, CrossX + 1, CrossY + 10, CrossColour)
+End Sub
+
+'''How far apart two sums are (either order)
+Function Spread(In SumA As Word, In SumB As Word) As Word
+    If SumA > SumB Then
+        Spread = SumA - SumB
+    Else
+        Spread = SumB - SumA
+    End If
+End Function
+
+'''The mean of two readings
+Function Mean(In ValA As Word, In ValB As Word) As Word
+    Mean = (ValA + ValB) / 2
+End Function
+
+// ----- The console
+
+Sub ConsoleText(In ConsoleString As String)
+    HSerPrint ConsoleString
+End Sub
+
+Sub ConsoleCRLF
+    HSerSend 13
+    HSerSend 10
+End Sub
+
+'''One constant as a #define line: "#define TOUCH_RAW_" DefName, padded, DefValue
+Sub ConsoleDefine(In DefName As String, In DefValue As Word)
+    ConsoleText("    #define TOUCH_RAW_") : ConsoleText(DefName) : ConsoleText("      ")
+    HSerPrint DefValue
+    ConsoleCRLF()
+End Sub

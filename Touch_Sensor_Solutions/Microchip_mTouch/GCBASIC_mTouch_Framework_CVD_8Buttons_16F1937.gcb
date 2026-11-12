@@ -49,7 +49,8 @@ A demonstration program for GCBASIC.
 
 #OPTION Explicit
 
-#include "mTouchCVD_8Buttons.h"
+#option IncludePath "C:\GCstudio\gcbasic\AdditionalLibraries;GCBASICLibraries"
+#include <mTouchCVD_8Buttons.h>
 
 // ---- LEDs, one per sensor, on when low
 #DEFINE LED0 PORTC.2

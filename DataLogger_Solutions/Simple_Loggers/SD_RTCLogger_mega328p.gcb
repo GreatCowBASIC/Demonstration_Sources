@@ -1,0 +1,375 @@
+// A data logger with a real time clock: the time is set from the serial console, then every 5 s ReadAD(AN1) is added
+// to RTCLOG.CSV on an SD card, with the date and time from the DS1307, on an ATmega328P.
+//
+// Setting the clock: at the start the program shows the DS1307's date and time and waits 10 s for a line
+//     T2026-11-09 14:30:00        (T, then year, month, day, hour, minute, second: 14 digits, any separators)
+// sent from the terminal, ending with Enter (CR or LF). The day of the week is worked out from the date.
+// When the clock is not running (a new DS1307, or its battery was flat: the CH bit is set) it waits until the
+// time is sent, so nothing is logged with a wrong date. Send nothing and the clock keeps the time it has: the
+// shield's battery keeps it while the power is off.
+//
+// Logging: each line is "date,time,value", eg "2026-11-09,14:30:05,128", with a heading line "Date,Time,AN1"
+// when the file is new. A sample is taken when the DS1307's seconds reach a multiple of 5, so the samples do not
+// drift (a Wait would add the write time to every sample). The file's date and time in the folder (what a PC
+// shows) are the DS1307's too: FatDate and FatTime are set before each write.
+// The file is kept open, and FatCommit after each line puts the data and the file's size on the card. A card
+// pulled out and put back is started again, and a "Restarted" line marks lost samples, as SD_DataLogger_mega328p.gcb.
+//
+// Board: Arduino Uno (ATmega328P, 16 MHz crystal, 5 V) with a Deek-Robot data logging shield v1.0 (SD card at 3V3,
+//        DS1307 with a CR1220 battery)
+//        AN1    the analogue input, A1 (PC1): 0 .. 5 V gives 0 .. 255
+//        SPI    SCK D13 (PB5), MOSI D11 (PB3), MISO D12 (PB4); the card's chip select D10 (PB2)
+//        I2C    SDA A4 (PC4), SCL A5 (PC5): the DS1307 (the shield has the pull-ups), 100 kHz
+//        UART   TX D1, RX D0: the Uno's USB serial port, 9600 8N1: the clock setting, what is logged, and any error
+// Programming: use.ini's Arduino UNO programmer (avrdude, the Uno's bootloader). Opening the serial port resets
+//        the Uno, so the program starts again then (and adds to RTCLOG.CSV).
+//
+//@author    Evan R. Venn
+//@licence   LGPL 2.1
+//@date      09/11/2026
+//
+// Change log
+//   09/11/2026  First version: SD_DataLogger_mega328p.gcb with the DS1307 (ds1307.h) for the time
+//   09/11/2026  FatDate / FatTime in one place, ClockToFat, called by LogWrite before FatCommit
+//   09/11/2026  #option ReserveHighProg OPTIBOOT: a program too large for the space below the bootloader is
+//               a compile error, not a programming failure that overwrites the bootloader
+//   09/11/2026  The drive is started with FatInit() (sd_fat.h 1.2): SDCInit and FatMount in one call
+
+    #option explicit
+    #option IncludePath "C:\GCstudio\gcbasic\AdditionalLibraries"
+
+// ----- Chip
+
+    #Chip mega328p, 16
+    #option ReserveHighProg OPTIBOOT    // the Uno's bootloader at the top of the flash: 1,024 words kept free
+
+// ----- Serial port: the console, needed to set the clock. 9600: at 16 MHz the AVR's USART is 0.2 % out
+
+    #define USART_BAUD_RATE 9600
+    #define USART_BLOCKING
+
+// ----- Pins
+
+    #define LOG_INPUT       PortC.1     // A1 (AN1), the input that is logged
+    #define SDC_SCK         PortB.5     // D13, SCK
+    #define SDC_DO          PortB.3     // D11, MOSI: to the card's DI
+    #define SDC_DI          PortB.4     // D12, MISO: from the card's DO
+    #define SDC_CS          PortB.2     // D10: the card's chip select, and the AVR's SS pin (so no SDC_SS)
+
+// ----- The clock: a DS1307 on the hardware I2C (TWI)
+
+    #define HI2C_BAUD_RATE  100         // kHz: the DS1307's top speed
+    #define HI2C_DATA       PortC.4     // A4, SDA
+    #define HI2C_CLOCK      PortC.5     // A5, SCL
+    #include <ds1307.h>
+
+// ----- The drive: an SD card on the SPI (sd_card.h picks its AVR shim, sd_card_avr.h)
+
+    #define SDC_SPI_SLOW    MasterSlow  // start-up: Fosc / 64, 250 kHz (the card needs 100 to 400 kHz)
+    #define SDC_SPI_FAST    MasterFast  // data: Fosc / 4, 4 MHz
+    #include <sd_card.h>
+    #include <sd_fat.h>
+
+// ----- Settings
+
+    #define LOG_EVERY       5           // seconds between samples: a divisor of 60 (1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30)
+    #define SET_WAIT        10          // seconds to wait for the time at the start, when the clock is running
+
+// ----- Main program
+
+    Dim RTCHour, RTCMin, RTCSec, RTCAmPm, RTCDow, RTCDay, RTCMonth, RTCYear As Byte    // the DS1307's time
+    Dim LastSec As Byte                 // the second of the last sample
+    Dim Sample As Byte                  // ReadAD(AN1)
+    Dim LogReady As Bit                 // 1 = the drive is started and RTCLOG.CSV is open
+    Dim LogLost As Bit                  // 1 = a sample was not written: a "Restarted" line goes in first
+    Dim LogLine As String * 24
+
+    Dir LOG_INPUT In
+
+    // Prevents the terminal becoming active too early, during reprogramming
+    Wait 2 s
+    ConsoleCRLF()
+    ConsoleText("SD card data logger with a DS1307: ReadAD(AN1) to RTCLOG.CSV every ") : ConsoleText(Str(LOG_EVERY))
+    ConsoleText(" s, ATmega328P") : ConsoleCRLF()
+
+    // ----- The clock: there, and running?
+    HI2CMode Master                     // the TWI as master at HI2C_BAUD_RATE (the AVR needs this before any I2C)
+    If ClockFound() = 0 Then
+        ConsoleText("   No DS1307 on the I2C: stopped") : ConsoleCRLF()
+        Do
+        Loop
+    End If
+    DS1307_SetHourMode(24)
+    If ClockRunning() = 1 Then
+        ClockRead
+        ConsoleText("   DS1307 time ") : ConsoleText(LogLine) : ConsoleCRLF()
+        ConsoleText("   To set it, send T and the time within ") : ConsoleText(Str(SET_WAIT)) : ConsoleText(" s, eg T2026-11-09 14:30:00")
+        ConsoleCRLF()
+        If ClockSet(SET_WAIT) = 0 Then
+            ConsoleText("   Not set: the DS1307 keeps its time") : ConsoleCRLF()
+        End If
+    Else
+        ConsoleText("   The DS1307 is not running: send T and the time, eg T2026-11-09 14:30:00") : ConsoleCRLF()
+        Do
+        Loop Until ClockSet(0) = 1
+    End If
+
+    // ----- Logging
+    LogReady = 0
+    LogLost = 0
+    LastSec = 255
+    Do
+        // the next sample: the seconds a multiple of LOG_EVERY, and a new second
+        Do
+            DS1307_ReadTime(RTCHour, RTCMin, RTCSec, RTCAmPm)
+            If RTCSec <> LastSec Then
+                If RTCSec % LOG_EVERY = 0 Then Exit Do
+            End If
+            Wait 50 ms
+        Loop
+        LastSec = RTCSec
+
+        Sample = ReadAD(AN1)
+        ClockRead                       // LogLine = "yyyy-mm-dd,hh:mm:ss" and the date
+        LogLine = LogLine + "," + Str(Sample)
+        ConsoleText(LogLine)
+
+        // Write the line. A failure (eg the card pulled out) closes the drive
+        If LogReady = 1 Then
+            If LogWrite() = 0 Then LogReady = 0
+        End If
+        // No drive, at the start or after a failure: start it again (a card put back is found here)
+        // and write the line, so a card put back between two samples loses no sample
+        If LogReady = 0 Then
+            LogReady = LogStart()
+            If LogReady = 1 Then
+                If LogWrite() = 0 Then LogReady = 0
+            End If
+        End If
+        If LogReady = 1 Then
+            ConsoleText("  written")
+        Else
+            ConsoleText("  NOT written, no drive: trying again at the next sample")
+            LogLost = 1                 // a "Restarted" line before the next line written
+        End If
+        ConsoleCRLF()
+    Loop
+
+// ----- The clock
+
+'''1 when the DS1307 answers on the I2C. The ds1307.h routines wait for an answer for ever, so this is asked first.
+Function ClockFound As Byte
+    ClockFound = 0
+    HI2CReStart
+    HI2CSend(DS_AddrWrite)
+    HI2CStop
+    If HI2CAckPollState = False Then ClockFound = 1
+End Function
+
+'''1 when the DS1307's oscillator runs (the CH bit, bit 7 of register 0, is clear)
+Function ClockRunning As Byte
+    Dim ClockReg As Byte
+    DS1307_Read(0, ClockReg)
+    ClockRunning = 1
+    If ClockReg.7 = 1 Then ClockRunning = 0
+End Function
+
+'''Read the date and time into RTCDay ... RTCSec, and LogLine = "yyyy-mm-dd,hh:mm:ss"
+Sub ClockRead
+    DS1307_ReadClock(RTCHour, RTCMin, RTCSec, RTCAmPm, RTCDow, RTCDay, RTCMonth, RTCYear)
+    LogLine = "20"
+    AddTwo(RTCYear) : LogLine = LogLine + "-"
+    AddTwo(RTCMonth) : LogLine = LogLine + "-"
+    AddTwo(RTCDay) : LogLine = LogLine + ","
+    AddTwo(RTCHour) : LogLine = LogLine + ":"
+    AddTwo(RTCMin) : LogLine = LogLine + ":"
+    AddTwo(RTCSec)
+End Sub
+
+'''FatDate and FatTime (FAT format) from the DS1307's date and time: the date and time FatCommit writes
+'''into the file's entry in the folder. Set before each FatCommit: FatMount sets them to 2026-01-01.
+Sub ClockToFat
+    FatDate = (RTCYear + 20) * 512 + RTCMonth * 32 + RTCDay       // years from 1980, month, day
+    FatTime = RTCHour * 2048 + RTCMin * 32 + RTCSec / 2           // hours, minutes, 2-second steps
+End Sub
+
+'''Add a number 0 .. 99 to LogLine as two digits
+Sub AddTwo(In TwoValue)
+    Dim TwoLen As Byte
+    // the string is its length (element 0) and the characters: add two characters at the end
+    TwoLen = LogLine(0)
+    LogLine(TwoLen + 1) = 48 + TwoValue / 10
+    LogLine(TwoLen + 2) = 48 + TwoValue % 10
+    LogLine(0) = TwoLen + 2
+End Sub
+
+'''Wait for "T" and the time on the serial port, then set the DS1307: 14 digits yyyymmddhhmmss, any separators,
+'''ending with CR or LF. SetSecs: how long to wait (0: until a good time comes). Returns 1 when the clock was set.
+Function ClockSet(In SetSecs) As Byte
+    Dim SetChar, SetCount, SetYear, SetMonth, SetDay, SetHour, SetMin, SetSec, SetDow As Byte
+    Dim SetDigits(14) As Byte
+    Dim SetTaking As Bit
+    Dim SetWait As Word
+    Dim SetYearFull As Word
+
+    Dim SetLimit As Word
+
+    ClockSet = 0
+    SetTaking = 0
+    SetCount = 0
+    SetWait = 0
+    SetLimit = SetSecs * 1000           // in 1 ms steps
+    Do
+        If USARTHasData Then
+            SetChar = HSerReceiveFrom(1)
+            If SetChar = 84 Or SetChar = 116 Then           // T or t: the start
+                SetTaking = 1
+                SetCount = 0
+            End If
+            If SetChar = 13 Or SetChar = 10 Then            // CR or LF: the end
+                If SetTaking = 1 Then Exit Do
+            End If
+            If SetChar >= 48 And SetChar <= 57 Then         // a digit
+                If SetTaking = 1 And SetCount < 14 Then
+                    SetCount++
+                    SetDigits(SetCount) = SetChar - 48
+                End If
+            End If
+        Else
+            Wait 1 ms
+            If SetSecs > 0 Then
+                SetWait++
+                If SetWait >= SetLimit Then Exit Function
+            End If
+        End If
+    Loop
+
+    // 14 digits: yyyy mm dd hh mm ss
+    If SetCount <> 14 Then
+        ConsoleText("   Not 14 digits: send eg T2026-11-09 14:30:00") : ConsoleCRLF()
+        Exit Function
+    End If
+    If SetDigits(1) <> 2 Or SetDigits(2) <> 0 Then
+        ConsoleText("   The DS1307 holds 2000 .. 2099") : ConsoleCRLF()
+        Exit Function
+    End If
+    SetYear = SetDigits(3) * 10 + SetDigits(4)
+    SetMonth = SetDigits(5) * 10 + SetDigits(6)
+    SetDay = SetDigits(7) * 10 + SetDigits(8)
+    SetHour = SetDigits(9) * 10 + SetDigits(10)
+    SetMin = SetDigits(11) * 10 + SetDigits(12)
+    SetSec = SetDigits(13) * 10 + SetDigits(14)
+    If SetMonth < 1 Or SetMonth > 12 Or SetDay < 1 Or SetDay > 31 Or SetHour > 23 Or SetMin > 59 Or SetSec > 59 Then
+        ConsoleText("   A value is out of range") : ConsoleCRLF()
+        Exit Function
+    End If
+
+    // the day of the week, 1 = Sunday (as the ds1307.h demonstration): Sakamoto's method
+    SetYearFull = 2000 + SetYear
+    If SetMonth < 3 Then SetYearFull--
+    SetDow = (SetYearFull + SetYearFull / 4 - SetYearFull / 100 + SetYearFull / 400 + MonthKey(SetMonth) + SetDay) % 7 + 1
+
+    DS1307_SetHourMode(24)
+    DS1307_SetClock(SetHour, SetMin, SetSec, SetDow, SetDay, SetMonth, SetYear)
+    DS1307_EnableOscillator(True)      // the CH bit clear: the clock runs
+    ClockRead
+    ConsoleText("   DS1307 set to ") : ConsoleText(LogLine) : ConsoleCRLF()
+    ClockSet = 1
+End Function
+
+'''Sakamoto's month key, for the day of the week
+Function MonthKey(In KeyMonth) As Byte
+    ReadTable MonthKeys, KeyMonth, MonthKey
+End Function
+
+Table MonthKeys
+    0
+    3
+    2
+    5
+    0
+    3
+    5
+    1
+    4
+    6
+    2
+    4
+End Table
+
+// ----- The log file
+
+'''Start the drive, mount it, and open RTCLOG.CSV to add to it (it is made if it is not there).
+'''Returns 1 when the file is open, or 0 with the reason on the serial console.
+'''FatInit (SDCInit, then FatMount) starts the card from the beginning, so this also works after a card is
+'''pulled out and put back.
+Function LogStart As Byte
+    LogStart = 0
+    ConsoleCRLF()
+    If FatInit() <> FAT_OK Then
+        If FatError = FAT_ERR_NO_DRIVE Then
+            ConsoleText("   No drive, SDCError ") : ConsoleText(Str(SDCError))
+            ConsoleText(", SDCR1 0x") : ConsoleText(Hex(SDCR1)) : ConsoleCRLF()    // the card's last answer; 0xFF: none
+        Else
+            ConsoleText("   No FAT file system, FatError ") : ConsoleText(Str(FatError)) : ConsoleCRLF()
+        End If
+        Exit Function
+    End If
+    If FatOpen("RTCLOG.CSV") <> FAT_OK Then
+        ConsoleText("   RTCLOG.CSV cannot be opened, FatError ") : ConsoleText(Str(FatError)) : ConsoleCRLF()
+        Exit Function
+    End If
+    If FatCreated() = 1 Then
+        LogText("Date,Time,AN1")        // a new file: the heading line first
+        LogCRLF()
+        ConsoleText("   RTCLOG.CSV made") : ConsoleCRLF()
+    Else
+        ConsoleText("   RTCLOG.CSV opened, adding to it") : ConsoleCRLF()
+    End If
+    LogStart = 1
+End Function
+
+'''Add LogLine to the file, after a "Restarted" line when samples were lost, and put it on the drive.
+'''Returns 1 when FatCommit says it is on the drive, or 0 with the FatError on the serial console.
+Function LogWrite As Byte
+    LogWrite = 0
+    If LogLost = 1 Then
+        LogText("Restarted")            // the samples before this line were not written
+        LogCRLF()
+    End If
+    LogText(LogLine)
+    LogCRLF()
+    ClockToFat                          // the file's date and time in the folder: now
+    If FatCommit() <> FAT_OK Then
+        ConsoleText("  NOT written, FatError ") : ConsoleText(Str(FatError))
+        Exit Function
+    End If
+    LogLost = 0
+    LogWrite = 1
+End Function
+
+'''Add a string to the open file
+Sub LogText(In LogString As String)
+    Dim LogPos As Byte
+    For LogPos = 1 To LogString(0)
+        FatAppendByte(LogString(LogPos))
+    Next
+End Sub
+
+'''End the line: CR LF
+Sub LogCRLF
+    FatAppendByte(13)
+    FatAppendByte(10)
+End Sub
+
+// ----- The serial console
+
+'''Send a string to the serial console
+Sub ConsoleText(In ConsoleString As String)
+    HSerPrint ConsoleString
+End Sub
+
+'''End the console line: CR LF
+Sub ConsoleCRLF
+    HSerPrintCRLF
+End Sub

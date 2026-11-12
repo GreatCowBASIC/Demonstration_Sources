@@ -1,0 +1,280 @@
+//--------------------------------------------------------------------------------------------------------------------------------
+// SD card test - ATmega328P (Arduino Uno), an SD card on the SPI, the SD card methods, results on the serial console
+//
+// The SD card methods (sd_card.h, sd_fat.h: SDCInit, FatMount, FatOpen, FatAppendByte, FatCommit ...) on an AVR, through
+// sd_card.h's AVR shim (sd_card_avr.h, on hwspi.h). The same checks as the CH376 test (CH376_SPI_Test_18F27Q43.gcb): it
+// starts the card, reads sector 0, makes the folder SDCARD and goes into it, writes TEST.TXT (100 lines), lists the folder
+// while the file is still open, appends a line, reads the file back, deletes it, makes and removes a folder SUB, and leaves
+// SDCARD\HELLO.TXT (dated 2026-11-08 12:00) for a look on a PC. One line per check on the serial console, then the totals.
+//
+// Board: Arduino Uno (ATmega328P, 16 MHz crystal, 5 V) with a Deek-Robot data logging shield v1.0 (SD card at 3V3)
+//        SPI    SCK D13 (PB5), MOSI D11 (PB3), MISO D12 (PB4)
+//        SD     chip select D10 (PB2), the AVR's SS pin
+//        UART   TX D1, RX D0: the Uno's USB serial port, 9600 8N1
+// Programming: use.ini's Arduino UNO programmer (avrdude, the Uno's bootloader, on its USB serial port).
+//        Opening the serial port resets the Uno, so the program starts again then.
+//
+//@author    Evan R. Venn
+//@licence   LGPL 2.1
+//@date      09/11/2026
+//
+// Changes:
+//   09/11/2026  First version: CH376_SPI_Test_18F27Q43.gcb with sd_card.h and sd_fat.h in place of ch376_sd.h
+//   09/11/2026  #option ReserveHighProg OPTIBOOT: a program too large for the space below the bootloader is
+//               a compile error, not a programming failure that overwrites the bootloader
+//--------------------------------------------------------------------------------------------------------------------------------
+
+    #option explicit
+    #option IncludePath "C:\GCstudio\gcbasic\AdditionalLibraries"
+
+// ----- Chip
+
+    #Chip mega328p, 16
+    #option ReserveHighProg OPTIBOOT    // the Uno's bootloader at the top of the flash: 1,024 words kept free
+
+// ----- Serial port: the console. 9600: at 16 MHz the AVR's USART is 0.2 % out at 9600 (2 % or more at 57600 and 115200)
+
+    #define USART_BAUD_RATE 9600
+    #define USART_BLOCKING
+
+// ----- Pins: the SPI and the card's chip select (sd_card_avr.h sets their directions)
+
+    #define SDC_SCK         PortB.5     // D13, SCK
+    #define SDC_DO          PortB.3     // D11, MOSI: to the card's DI
+    #define SDC_DI          PortB.4     // D12, MISO: from the card's DO
+    #define SDC_CS          PortB.2     // D10: the card's chip select, and the AVR's SS pin (so no SDC_SS)
+
+// ----- The drive: an SD card on the SPI (sd_card.h picks its AVR shim, sd_card_avr.h)
+
+    #define SDC_SPI_SLOW    MasterSlow  // start-up: Fosc / 64, 250 kHz (the card needs 100 to 400 kHz)
+    #define SDC_SPI_FAST    MasterFast  // data: Fosc / 4, 4 MHz
+    #include <sd_card.h>
+    #include <sd_fat.h>
+
+// ----- Variables
+
+    Dim CheckNo, Failed, Got, LineNo, ReadChar, Expect, Found As Byte
+    Dim BytePos As Word
+    Dim BlockBuffer(511) As Byte        // one block, 0..511
+
+// ----- Main program
+
+    // Prevents the terminal becoming active too early, during reprogramming
+    Wait 2 s
+    HSerPrintCRLF 2
+    HSerPrint "SD card test, the operating methods, ATmega328P " : HSerPrint ChipMHz : HSerPrint " MHz, SPI"
+    HSerPrintCRLF
+
+    // This is a test: it runs every step, counts the failures, and stops only when there is no drive or
+    // no file system. A step after a failure is then expected to fail as well, safely: the library does
+    // nothing without an open file (FatAppendByte is ignored, FatCommit returns FAT_ERR_NOT_OPEN,
+    // FatReadByte sets FatEOF), so the drive is not written to.
+    // A real program checks each result before it goes on, and decides what a failure means for it:
+    // try again, tell the user, or leave out the steps that need it. See the FatOpen example below.
+    CheckNo = 0
+    Failed = 0
+
+    // ----- 1..2: the drive (waits for one to be plugged in) and its file system
+    HSerPrint "   Insert an SD card" : HSerPrintCRLF
+    Do
+        Got = SDCInit()
+        If Got <> SDC_ERR_NO_CARD Then Exit Do
+        Wait 500 ms
+    Loop
+    Failed = Failed + Check("SDCInit", Got, SDC_OK)
+    If Failed > 0 Then
+        HSerPrint "   SDCR1 0x" : HSerPrint Hex(SDCR1) : HSerPrint " (the card's last answer; 0xFF: none)" : HSerPrintCRLF
+        StopHere
+    End If
+    HSerPrint "   "
+    Select Case SDCCardType
+        Case SDC_TYPE_SD1:  HSerPrint "SD version 1"
+        Case SDC_TYPE_SD2:  HSerPrint "SD version 2"
+        Case SDC_TYPE_SDHC: HSerPrint "SDHC / SDXC"
+    End Select
+    HSerPrint ", " : HSerPrint SDCBlocks / 2048 : HSerPrint " MB" : HSerPrintCRLF
+    Failed = Failed + Check("FatMount", FatMount(), FAT_OK)
+    If Failed > 0 Then StopHere
+    HSerPrint "   FAT" : HSerPrint FatType : HSerPrintCRLF
+
+    // ----- 3..4: sector 0 (the partition table, or the boot sector) ends 55 AA
+    Failed = Failed + Check("SDCReadBlock 0", SDCReadBlock(0, BlockBuffer), SDC_OK)
+    Found = 0
+    If BlockBuffer(510) = 0x55 And BlockBuffer(511) = 0xAA Then Found = 1
+    Failed = Failed + Check("Sector 0 ends 55 AA", Found, 1)
+
+    // ----- 5..6: the folder SDCARD (made, or there already from an earlier run), and into it
+    Got = FatMkDir("SDCARD")
+    If Got = FAT_ERR_EXISTS Then Got = FAT_OK
+    Failed = Failed + Check("FatMkDir SDCARD", Got, FAT_OK)
+    Failed = Failed + Check("FatChDir SDCARD", FatChDir("SDCARD"), FAT_OK)
+
+    // ----- 7..10: TEST.TXT, new: 100 lines "Line 001" .. "Line 100", 1000 bytes
+    Got = FatDelete("TEST.TXT")         // from an earlier run that stopped part way
+    // In a real program, check the open before writing, eg
+    //     If FatOpen("LOG.TXT") <> FAT_OK Then
+    //         HSerPrint "Cannot open LOG.TXT, error 0x" : HSerPrint Hex(FatError) : HSerPrintCRLF
+    //         Exit Sub                        // or try again, or carry on without the log
+    //     End If
+    //     ... FatAppendByte ...
+    //     If FatCommit <> FAT_OK Then ...      // the data is on the drive only when this is FAT_OK
+    // FatCreated() says whether FatOpen made the file (1) or opened one already there (0): eg to write
+    // a heading line only into a new file.
+    Failed = Failed + Check("FatOpen TEST.TXT", FatOpen("TEST.TXT"), FAT_OK)
+    Failed = Failed + Check("FatCreated", FatCreated(), 1)
+    For LineNo = 1 To 100
+        FatAppendByte(76)               // L
+        FatAppendByte(105)              // i
+        FatAppendByte(110)              // n
+        FatAppendByte(101)              // e
+        FatAppendByte(32)
+        FatAppendByte(48 + LineNo / 100)
+        FatAppendByte(48 + (LineNo / 10) % 10)
+        FatAppendByte(48 + LineNo % 10)
+        FatAppendByte(13)
+        FatAppendByte(10)
+    Next
+    Failed = Failed + Check("FatCommit", FatCommit(), FAT_OK)
+    Failed = Failed + CheckLong("FatFileSize 1000", FatFileSize, 1000)
+
+    // ----- 11: list the folder while TEST.TXT is open: ".", "..", TEST.TXT 1000 bytes
+    Found = 0
+    Got = FatListFirst()
+    Do While Got = 1
+        HSerPrint "   " : HSerPrint FatListName : HSerPrint " " : HSerPrint FatListSize : HSerPrintCRLF
+        If FatListName = "TEST.TXT" Then
+            If FatListSize = 1000 Then Found = 1
+        End If
+        Got = FatListNext()
+    Loop
+    Failed = Failed + Check("Listed TEST.TXT 1000", Found, 1)
+
+    // ----- 12..13: append "END" CR LF to the file that is still open
+    FatAppendByte(69) : FatAppendByte(78) : FatAppendByte(68)    // END
+    FatAppendByte(13) : FatAppendByte(10)
+    Failed = Failed + Check("FatCommit after list", FatCommit(), FAT_OK)
+    Failed = Failed + CheckLong("FatFileSize 1005", FatFileSize, 1005)
+
+    // ----- 14..17: read it back
+    Failed = Failed + Check("FatOpenRead TEST.TXT", FatOpenRead("TEST.TXT"), FAT_OK)
+    Failed = Failed + CheckLong("Size read 1005", FatFileSize, 1005)
+    Found = 0
+    BytePos = 0
+    Do While FatEOF = 0
+        ReadChar = FatReadByte()
+        Expect = ExpectedByte(BytePos)
+        If ReadChar <> Expect Then
+            If Found = 0 Then HSerPrint "   first difference at byte " : HSerPrint BytePos : HSerPrintCRLF
+            Found = 1
+        End If
+        BytePos++
+    Loop
+    Failed = Failed + Check("Bytes match", Found, 0)
+    Failed = Failed + CheckLong("1005 bytes read", BytePos, 1005)
+
+    // ----- 18..19: delete it; it is gone
+    Failed = Failed + Check("FatDelete TEST.TXT", FatDelete("TEST.TXT"), FAT_OK)
+    Failed = Failed + Check("TEST.TXT gone", FatOpenRead("TEST.TXT"), FAT_ERR_NOT_FOUND)
+
+    // ----- 20..23: a folder made and removed
+    Got = FatMkDir("SUB")
+    If Got = FAT_ERR_EXISTS Then Got = FAT_OK
+    Failed = Failed + Check("FatMkDir SUB", Got, FAT_OK)
+    Failed = Failed + Check("FatRmDir SUB", FatRmDir("SUB"), FAT_OK)
+    Failed = Failed + Check("SUB gone", FatChDir("SUB"), FAT_ERR_NOT_FOUND)
+    Failed = Failed + Check("FatChDir ..", FatChDir(".."), FAT_OK)
+
+    // ----- 24..26: SDCARD\HELLO.TXT for the PC, dated 2026-11-08 12:00:00
+    Failed = Failed + Check("FatChDir SDCARD", FatChDir("SDCARD"), FAT_OK)
+    FatDate = 0x5D68                    // (2026 - 1980) * 512 + 11 * 32 + 8
+    FatTime = 0x6000                    // 12 * 2048
+    Got = FatDelete("HELLO.TXT")
+    Failed = Failed + Check("FatOpen HELLO.TXT", FatOpen("HELLO.TXT"), FAT_OK)
+    AppendText("Hello from GCBASIC and an SD card")
+    AppendText("ATmega328P, SPI, the SD card methods")
+    Failed = Failed + Check("FatCommit", FatCommit(), FAT_OK)
+
+    StopHere
+
+// ----- Routines
+
+// One check: a line "nn OK   name", or "nn FAIL name - got g (0xhh), FatError f, SDCError s".
+// Returns 1 when it failed, 0 when it passed: the caller adds it up (Failed = Failed + Check(...))
+Function Check(In CheckName As String, In CheckGot, In CheckWant) As Byte
+    CheckNo++
+    If CheckNo < 10 Then HSerPrint "0"
+    HSerPrint CheckNo
+    If CheckGot = CheckWant Then
+        Check = 0
+        HSerPrint " OK   "
+        HSerPrint CheckName
+    Else
+        Check = 1
+        HSerPrint " FAIL "
+        HSerPrint CheckName
+        HSerPrint " - got " : HSerPrint CheckGot : HSerPrint " (0x" : HSerPrint Hex(CheckGot)
+        HSerPrint "), FatError " : HSerPrint FatError
+        HSerPrint ", SDCError " : HSerPrint SDCError
+    End If
+    HSerPrintCRLF
+End Function
+
+// The same for a Long: 1 when it failed, and then the value on a second line
+Function CheckLong(In CheckLongName As String, In CheckGotL As Long, In CheckWantL As Long) As Byte
+    If CheckGotL = CheckWantL Then
+        CheckLong = Check(CheckLongName, 0, 0)
+    Else
+        CheckLong = Check(CheckLongName, 1, 0)
+        HSerPrint "   value " : HSerPrint CheckGotL : HSerPrintCRLF
+    End If
+End Function
+
+// A line of text and CR LF at the end of the open file
+Sub AppendText(In AppendString As String)
+    Dim AppendPos As Byte
+    For AppendPos = 1 To AppendString(0)
+        FatAppendByte(AppendString(AppendPos))
+    Next
+    FatAppendByte(13)
+    FatAppendByte(10)
+End Sub
+
+// The byte at TestPos of TEST.TXT: line TestPos / 10 + 1, "Line nnn" CR LF; from 1000 "END" CR LF
+Function ExpectedByte(In TestPos As Word) As Byte
+    Dim TestLine As Word
+    Dim TestCol As Byte
+    If TestPos >= 1000 Then
+        Select Case TestPos - 1000
+            Case 0: ExpectedByte = 69   // E
+            Case 1: ExpectedByte = 78   // N
+            Case 2: ExpectedByte = 68   // D
+            Case 3: ExpectedByte = 13
+            Case Else: ExpectedByte = 10
+        End Select
+        Exit Function
+    End If
+    TestLine = TestPos / 10 + 1
+    TestCol = TestPos % 10
+    Select Case TestCol
+        Case 0: ExpectedByte = 76       // L
+        Case 1: ExpectedByte = 105      // i
+        Case 2: ExpectedByte = 110      // n
+        Case 3: ExpectedByte = 101      // e
+        Case 4: ExpectedByte = 32       // space
+        Case 5: ExpectedByte = 48 + TestLine / 100
+        Case 6: ExpectedByte = 48 + (TestLine / 10) % 10
+        Case 7: ExpectedByte = 48 + TestLine % 10
+        Case 8: ExpectedByte = 13
+        Case 9: ExpectedByte = 10
+    End Select
+End Function
+
+// The totals, then stop
+Sub StopHere
+    HSerPrintCRLF
+    HSerPrint CheckNo : HSerPrint " checks, " : HSerPrint Failed : HSerPrint " failed"
+    If Failed = 0 Then HSerPrint " - PASS"
+    HSerPrintCRLF
+    Do
+    Loop
+End Sub

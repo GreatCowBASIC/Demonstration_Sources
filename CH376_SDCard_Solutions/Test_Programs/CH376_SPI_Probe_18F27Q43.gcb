@@ -1,0 +1,102 @@
+'''CH376 SPI probe: is the CH376 answering? PIC18F27Q43, SPI1, serial console 115200 on RC6/RC5.
+'''Twice a second it sends CHECK_EXIST 0x55 (the CH376 answers 0xAA, the inverse) and GET_IC_VER
+'''(answers 0x4n), and prints what came back and the INT# level, eg
+'''   CHECK_EXIST 55 -> AA  OK   IC_VER 43  INT# 1
+'''What the answer tells you:
+'''   FF  nothing drives SDO: D7/SDO (P2 pin 3) not wired to RB0, the CH376 not selected
+'''       (SCS / RA4), no power, or not in SPI mode (J1 off, J5 on, J6 on, set with the power off)
+'''   00  SDO held low: wiring, or the CH376 still in reset (RSTI, P2 pin 6, must be low or open)
+'''   55  the byte sent comes straight back: SDI and SDO joined, or the wrong pins
+'''   other  the chip answers but bits slip: SPI mode or speed, long wires, or 3.3 V / 5 V levels
+'''@author  Evan Venn / Claude
+'''@date    09/11/2026
+
+#chip 18F27Q43, 64
+#Config FEXTOSC = OFF
+#Config RSTOSC = HFINTOSC_64MHZ
+#Config MCLRE = EXTMCLR
+#Config WDTE = OFF
+#Config LVP = OFF
+#Config BOREN = OFF
+#Config STVREN = ON
+#Config XINST = OFF
+#Config PPS1WAY = OFF
+
+#define USART_BAUD_RATE 115200
+#define MASKI2C1BAUDCHECKMESSAGE
+
+#define CH376_SCK       PortB.1     // SPI1 SCK out, to P2 pin 5 D5/SCK
+#define CH376_DO        PortB.3     // SPI1 SDO, to P2 pin 4 D6/SDI
+#define CH376_DI        PortB.0     // SPI1 SDI, from P2 pin 3 D7/SDO
+#define CH376_CS        PortA.4     // P2 pin 1 D3/SCS, low = selected
+#define CH376_INT       PortB.4     // P2 pin 2 INT#
+
+#startup PPSInit, 85
+
+Dir CH376_SCK Out
+Dir CH376_DO  Out
+Dir CH376_DI  In
+Dir CH376_CS  Out
+Dir CH376_INT In
+CH376_CS = 1                        // not selected
+
+SPIMode MasterSlow, 0               // SPI1 on, master, mode 0
+
+Dim ProbeRx As Byte
+Dim ProbeVer As Byte
+
+Wait 1 s
+HSerPrint "CH376 SPI probe"
+HSerSend 13
+HSerSend 10
+
+// RESET_ALL, then 50 ms for the chip to start (WCH: 35 ms)
+CH376_CS = 0
+FastHWSPITransfer 0x05
+CH376_CS = 1
+Wait 50 ms
+
+Do
+  // CHECK_EXIST 0x06, data 0x55: the chip answers 0xAA
+  CH376_CS = 0
+  FastHWSPITransfer 0x06
+  Wait 2 us                         // WCH: 1.5 us between the command and its data
+  FastHWSPITransfer 0x55
+  Wait 2 us
+  HWSPITransfer 0xFF, ProbeRx
+  CH376_CS = 1
+  Wait 2 us
+
+  // GET_IC_VER 0x01: the chip answers 0x40 + its version
+  CH376_CS = 0
+  FastHWSPITransfer 0x01
+  Wait 2 us
+  HWSPITransfer 0xFF, ProbeVer
+  CH376_CS = 1
+
+  HSerPrint "CHECK_EXIST 55 -> "
+  HSerPrint Hex(ProbeRx)
+  If ProbeRx = 0xAA Then
+    HSerPrint "  OK  "
+  Else
+    HSerPrint "  BAD "
+  End If
+  HSerPrint " IC_VER "
+  HSerPrint Hex(ProbeVer)
+  HSerPrint "  INT# "
+  HSerPrint CH376_INT
+  HSerSend 13
+  HSerSend 10
+
+  Wait 500 ms
+Loop
+
+Sub PPSInit
+  U1RXPPS = 0x17                    // RC7 is UART1 RX
+  RC6PPS = 0x20                     // RC6 is UART1 TX
+  RC5PPS = 0x20                     // RC5 is UART1 TX (second terminal)
+  SPI1SCKPPS = 0x09                 // RB1 is SPI1 SCK in
+  RB1PPS = 0x31                     // RB1 is SPI1 SCK out
+  SPI1SDIPPS = 0x08                 // RB0 is SPI1 SDI
+  RB3PPS = 0x32                     // RB3 is SPI1 SDO
+End Sub

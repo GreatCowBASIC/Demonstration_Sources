@@ -57,7 +57,8 @@ A demonstration program for GCBASIC.
 #DEFINE USART_TX_BLOCKING
 #DEFINE USART_DELAY OFF
 
-#include "mTouchCVD_8Buttons.h"
+#option IncludePath "C:\GCstudio\gcbasic\AdditionalLibraries;GCBASICLibraries"
+#include <mTouchCVD_8Buttons.h>
 
 // Text: the deltas every REPORT_SCANS scans of TOUCH_PERIOD_MS (25 x 10 ms = 0.25 s). GUI: a line every GUI_SCANS
 // scans (5 x 10 ms = 50 ms; a line is 64 characters, about 5.6 ms at 115200)

@@ -1,0 +1,1389 @@
+// A data logger with a real time clock and a display, on an LGT8F328P (SD_RTCLogger_ILI9341_mega328p.gcb for this
+// chip): SD_RTCLogger_mega328p.gcb with an ILI9341 (320 x 240)
+// that shows the clock, every second, and the data logger: the last sample, the file, lines written and lost.
+//
+// Setting the clock: on the clock screen (the menu's button 4, below), or from the serial terminal: at the start
+// the program shows the DS1307's date and time and waits SET_WAIT (10) s for a line
+//     T2026-11-09 14:30:00        (T, then year, month, day, hour, minute, second: 14 digits, any separators)
+// ending with Enter. When the clock is not running and no time is sent, the clock screen opens.
+//
+// What is logged: the number of taps on the screen so far, eg "2026-11-09,14:30:05,3", heading
+// "Date,Time,Touches". The LGT8F328P has no temperature sensor, and its supply monitor (V5D1, ADC channel 8) read
+// about 1.35 V with the divider on or off on the board tried (the display shield takes A0 .. A3 and the clock
+// A4 / A5, so no analogue pin is free).
+// Each tap on the screen is a line too: "date,time,touch,screen,raw x,raw y,button", eg
+// "2026-11-09,14:30:07,touch,1,512,480,2": the screen (0 main, 1 menu, 2 black, 3 the clock screen), the panel's raw
+// X reading (up and down the screen), its raw Y (across), and the menu button for it (0 the title, 1 .. 4).
+// The heading goes in a new file; a line every 5 s on the clock's seconds. The file's date in the folder is the clock's. A card pulled out and
+// put back is started again, and a "Restarted" line marks lost samples.
+//
+// The clock: A4 is both the display's RESET and the DS1307's SDA, so every I2C transfer resets the display (it
+// goes blank). So the DS1307 is read only at the start, when it is set, and once an hour (at hh:00:00). In
+// between, the program keeps the time itself: Timer1 interrupts once a second, from the 32 MHz clock (a few
+// seconds a day at most; each hourly read puts it right). After each I2C transfer the screen is started again
+// (InitGLCD) and drawn again: a short blank once an hour. With the shield's A4 pin lifted and the display's RST
+// tied high, the hourly blank goes, but the program does not need that.
+//
+// Touch (touch_4wire.h): a tap on the screen shows the menu, four buttons across the screen:
+//   1  Stop logging / Start logging    while off, the samples and taps are counted and shown, not written
+//   2  Rotate screen                   the screen turned round 180 degrees (landscape, landscape reversed)
+//   3  Black screen                    all black and nothing drawn, until the next tap (the ILI9341's Display
+//                                      Off shows white on this panel)
+//   4  Set clock                       the clock screen: the date, the time and the drift, with six buttons
+//                                      along the foot: < > (the field), - + (its value), OK (set), X (cancel)
+// A tap on the menu's title, or no tap for MENU_WAIT seconds (the clock screen: CLOCK_WAIT), goes back without a
+// change. The clock and the logging go on while the menu, the clock screen or the black screen is up.
+//
+// Drift: the DS1307's crystal is a few ppm (millionths) fast or slow. Set it on the clock screen, in ppm
+// (+ the clock gains, - it loses, -250 .. 250): measure it over a week or more, ppm = seconds gained / seconds
+// gone * 1000000. Each hour (at hh:00:30) the drift is added up, and each whole second of it moves the DS1307's
+// seconds back (or on) by one. The drift and its running total are kept in the DS1307's battery-backed RAM, so a
+// reset loses neither. CLOCK_DRIFT is the drift until the clock screen first sets one.
+//
+// Where a tap is up and down the screen comes from the panel's raw X reading (TOUCH_RAW_Y20 and TOUCH_RAW_Y220),
+// and across the screen (the clock screen's buttons) from its raw Y reading (TOUCH_RAW_X20, TOUCH_RAW_X220): from Touch_Calibrate_ILI9341_LGT8F328P.gcb.
+// The panel is read between screen updates (it shares the display's RS, CS, DB0 and DB1).
+//
+// Board: an LGT8F328P Uno-style board (32 MHz; the chip runs from 3.3 V, the 5V pin is USB 5 V) with
+//        a Deek-Robot data logging shield v1.0 (SD card at 3V3, DS1307 with a CR1220 battery), and
+//        an ILI9341 8-bit UNO display shield
+//        ILI9341 RD A0, WR A1, RS A2, CS A3, RESET A4; DB0 D8, DB1 D9, DB2 .. DB7 D2 .. D7
+//        Touch   XP D8, XM A2, YP A3, YM D9
+//        SPI     SCK D13 (PB5), MOSI D11 (PB3), MISO D12 (PB4); the card's chip select D10 (PB2)
+//        I2C     SDA A4 (PC4), SCL A5 (PC5): the DS1307, 100 kHz. A4 is also the display's RESET: see above
+//        UART    TX D1, RX D0: the board's USB serial port, 9600 8N1: the clock setting, what is logged, any error
+// Needs: lgt8f328p.dat with SPFR,25 and the compiler's hwspi.h with the ChipFamily 122 FIFO handling (10/11/2026)
+// Programming: use.ini's LGT8F328P programmer (avrdude, the board's bootloader, 57600). Opening the serial port
+//        resets the board, so the program starts again then (and adds to RTCLOG.CSV).
+//
+//@author    Evan R. Venn
+//@licence   LGPL 2.1
+//@date      09/11/2026
+//
+// Change log
+//   09/11/2026  First version: SD_RTCLogger_mega328p.gcb with an ILI9341 8-bit display, logging the chip temperature
+//   09/11/2026  FatDate / FatTime in one place, ClockToFat, called by LogWrite before FatCommit
+//   09/11/2026  The screen went blank: each DS1307 read (SDA on A4) reset the display (RESET on A4). The time is
+//               kept by Timer1 and read from the DS1307 only at the start and hourly; the screen is started
+//               again after each read
+//   09/11/2026  #option ReserveHighProg OPTIBOOT: a program too large for the space below the bootloader is
+//               a compile error, not a programming failure that overwrites the bootloader
+//   09/11/2026  Touch: a tap turns the display off and on (touch_4wire.h)
+//   09/11/2026  Blank is the screen cleared to black and nothing drawn, not Display Off (white on this panel)
+//   09/11/2026  ChipTemp waits 40 ms for the 1.1 V reference: after a touch reading (AVcc) it read 0 C
+//   09/11/2026  TEMP_OFFSET 328, from this chip: 350 at 22.5 C (the datasheet's 267 read 84 C)
+//   09/11/2026  A double tap turns the screen round 180 degrees (TouchTaps); a single tap blanks it, as before
+//   09/11/2026  A tap shows a menu: start / stop logging, rotate the screen, black screen (in place of the taps)
+//   09/11/2026  The temperature in each log line again
+//   09/11/2026  The drive is started with FatInit() (sd_fat.h 1.2): SDCInit and FatMount in one call
+//   10/11/2026  The LGT8F328P version (from SD_RTCLogger_ILI9341_mega328p.gcb): 32 MHz, Timer1 at clock / 1024
+//               (OCR1A 31249); the number of taps logged (no temperature sensor); its own touch calibration and
+//               TOUCH_THRESHOLD 2000 (its 12-bit ADC: every menu tap was button 3 with the ATmega328P's)
+//   10/11/2026  SDA and SCL made inputs before HI2CMode (the LGT8F328P found no DS1307)
+//   10/11/2026  A tap on the black screen starts the display again (ScreenStart), not only draws it: the panel
+//               went white from black, and stayed white
+//   10/11/2026  Each tap is logged (TouchLog): where the panel was pressed and the button that gives
+//   10/11/2026  The menu's button edges worked out when compiling (MenuPressed: no 32-bit sums, 220 words less);
+//               the touch calibration is the four TOUCH_RAW_X20, X220, Y20, Y220 the calibration program shows
+//   10/11/2026  LOG_AT_START: logging on (LOG_ON) or off (LOG_OFF) at the start; "Not logging" (was
+//               "Logging stopped"); while not logging, the samples and taps are still counted and shown
+//   11/11/2026  The clock screen (the menu's button 4): the date, the time and the drift set by touch; the drift
+//               (ppm, kept in the DS1307's RAM) moves the DS1307 a second at a time, checked hourly at hh:00:30
+//               (the hourly read moved from hh:00:00). ClockStore: the checks and the setting, shared by the serial
+//               T line and the clock screen; a stopped clock waits SET_WAIT for the T line, then opens the clock
+//               screen. Less flash for it all: shorter console messages; the display started by ScreenInit (the
+//               library's settings from a table: #define InitGLCD_ILI9341 ScreenInit), boxes by ScreenBox, the
+//               DS1307 read and written by DsRead and DsWrite (in place of ds1307.h's routines, one for each
+//               register); MenuPressed and the clock screen take one set of edges, the reading turned round
+
+    #option explicit
+    #option IncludePath "C:\GCstudio\gcbasic\AdditionalLibraries"
+
+// ----- Chip
+
+    #Chip LGT8F328P, 32
+    #option ReserveHighProg OPTIBOOT    // the bootloader at the top of the flash (0x7400 up): 1,024 words kept
+                                        // free (the size check counts every word from build 1674)
+
+// ----- The display: an ILI9341 on the 8-bit bus
+
+    #include <glcd.h>
+    #define GLCD_TYPE GLCD_TYPE_ILI9341
+    #define InitGLCD_ILI9341 ScreenInit // the display started by ScreenInit (below), in place of the library's
+    #define GLCD_RD       PortC.0           // A0, read
+    #define GLCD_WR       PortC.1           // A1, write
+    #define GLCD_RS       PortC.2           // A2, command / data
+    #define GLCD_CS       PortC.3           // A3, chip select
+    #define GLCD_RESET    PortC.4           // A4, reset: also the DS1307's SDA, see above
+    #define GLCD_DB0      PortB.0           // D8
+    #define GLCD_DB1      PortB.1           // D9
+    #define GLCD_DB2      PortD.2           // D2
+    #define GLCD_DB3      PortD.3           // D3
+    #define GLCD_DB4      PortD.4           // D4
+    #define GLCD_DB5      PortD.5           // D5
+    #define GLCD_DB6      PortD.6           // D6
+    #define GLCD_DB7      PortD.7           // D7
+
+// ----- Serial port: the console, needed to set the clock, 9600
+
+    #define USART_BAUD_RATE 9600
+    #define USART_BLOCKING
+
+// ----- Pins
+
+    #define SDC_SCK         PortB.5     // D13, SCK
+    #define SDC_DO          PortB.3     // D11, MOSI: to the card's DI
+    #define SDC_DI          PortB.4     // D12, MISO: from the card's DO
+    #define SDC_CS          PortB.2     // D10: the card's chip select, and the AVR's SS pin (so no SDC_SS)
+
+// ----- The clock: a DS1307 on the hardware I2C (TWI)
+
+    #define HI2C_BAUD_RATE  100         // kHz: the DS1307's top speed
+    #define HI2C_DATA       PortC.4     // A4, SDA
+    #define HI2C_CLOCK      PortC.5     // A5, SCL
+    #include <ds1307.h>
+
+// ----- The drive: an SD card on the SPI (sd_card.h picks its AVR shim, sd_card_avr.h)
+
+    #define SDC_SPI_SLOW    MasterSlow  // start-up: Fosc / 64, 500 kHz at 32 MHz
+    #define SDC_SPI_FAST    MasterFast  // data: Fosc / 4, 8 MHz at 32 MHz
+    #include <sd_card.h>
+    #include <sd_fat.h>
+
+// ----- Settings
+
+    #define LOG_EVERY       5           // seconds between samples: a divisor of 60 (1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30)
+    #define SET_WAIT        10          // seconds to wait for the time at the start (T yyyy-mm-dd hh:mm:ss)
+    #define MENU_WAIT       10          // seconds the menu stays up with no tap
+    #define CLOCK_WAIT      60          // seconds the clock screen stays up with no tap
+    #define CLOCK_DRIFT     0           // ppm, -250 .. 250: the DS1307's drift until the clock screen sets it
+    #define LOG_AT_START    LOG_OFF     // logging at the start: LOG_ON, or LOG_OFF (the menu's button 1 starts it)
+    #define LOG_ON          1
+    #define LOG_OFF         0
+
+    // what is logged: the taps so far (the LGT8F328P has no temperature sensor)
+    #define SAMPLE_WHAT     "the taps so far"
+    #define SAMPLE_LABEL    "Touches"
+    #define SAMPLE_UNIT     "    "
+    #define SAMPLE_HEAD     "Date,Time,Touches"
+
+    // The touch panel (touch_4wire.h): its wires share the display's pins
+    #define TOUCH_XP        PortB.0     // D8, the display's DB0
+    #define TOUCH_XM        PortC.2     // A2, the display's RS
+    #define TOUCH_YP        PortC.3     // A3, the display's CS
+    #define TOUCH_YM        PortB.1     // D9, the display's DB1
+    #define TOUCH_YP_AN     AN3
+    #define TOUCH_XM_AN     AN2         // A2: TouchRawY (across the screen) reads on XM
+    // Touch calibration: the panel's raw readings at the screen's x 20 and x 220, y 20 and y 220 (landscape).
+    // Run Touch_Calibrate_ILI9341_LGT8F328P.gcb and copy the four #define lines it shows here. On this shield the
+    // screen's x is the panel's raw Y (TouchRawY) and its y the raw X (TouchRawX). The menu uses TOUCH_RAW_Y20
+    // and TOUCH_RAW_Y220 (its buttons go across the screen); the clock screen's buttons use all four. The LGT8F328P's ADC is 12 bits (ReadAD10 gives 0 .. 4095)
+    #define TOUCH_RAW_X20       3563
+    #define TOUCH_RAW_X220      1517
+    #define TOUCH_RAW_Y20       744
+    #define TOUCH_RAW_Y220      3380
+    #define TOUCH_THRESHOLD     2000    // pressed below this (of 4095): touch_4wire.h's 500 is for 0 .. 1023
+    #include <touch_4wire.h>
+    // Worked out when compiling, from the calibration (no 32-bit sums in the program):
+    //   the menu's four buttons' top edges (y 28, 82, 136, 190) and the clock screen's row of buttons (from y 170)
+    //   as raw X readings; TOUCH_RAW_YSUM, the raw X at y and at 239 - y added (turned round, MenuPressed takes the
+    //   reading from it, so the same edges do); the five edges between the clock screen's six buttons across the
+    //   screen (x 53, 106, 160, 213, 266, the same turned round) as raw Y readings. This shield's raw Y goes down
+    //   as x goes up (X20 more than X220)
+    #script
+        TOUCH_RAW_B1 = Int(TOUCH_RAW_Y20 + (28 - 20) * (TOUCH_RAW_Y220 - TOUCH_RAW_Y20) / 200)
+        TOUCH_RAW_B2 = Int(TOUCH_RAW_Y20 + (82 - 20) * (TOUCH_RAW_Y220 - TOUCH_RAW_Y20) / 200)
+        TOUCH_RAW_B3 = Int(TOUCH_RAW_Y20 + (136 - 20) * (TOUCH_RAW_Y220 - TOUCH_RAW_Y20) / 200)
+        TOUCH_RAW_B4 = Int(TOUCH_RAW_Y20 + (190 - 20) * (TOUCH_RAW_Y220 - TOUCH_RAW_Y20) / 200)
+        TOUCH_RAW_ROW = Int(TOUCH_RAW_Y20 + (170 - 20) * (TOUCH_RAW_Y220 - TOUCH_RAW_Y20) / 200)
+        If TOUCH_RAW_Y220 <= TOUCH_RAW_Y20 Then
+            Error "The menu needs TOUCH_RAW_Y220 more than TOUCH_RAW_Y20 (this shield's way)"
+        End If
+        TOUCH_RAW_YSUM = Int(2 * TOUCH_RAW_Y20 + 199 * (TOUCH_RAW_Y220 - TOUCH_RAW_Y20) / 200)
+        If TOUCH_RAW_X220 >= TOUCH_RAW_X20 Then
+            Error "The clock screen's buttons need TOUCH_RAW_X20 more than TOUCH_RAW_X220 (this shield's way)"
+        End If
+        TOUCH_RAW_E1 = Int(TOUCH_RAW_X20 - (53 - 20) * (TOUCH_RAW_X20 - TOUCH_RAW_X220) / 200)
+        TOUCH_RAW_E2 = Int(TOUCH_RAW_X20 - (106 - 20) * (TOUCH_RAW_X20 - TOUCH_RAW_X220) / 200)
+        TOUCH_RAW_E3 = Int(TOUCH_RAW_X20 - (160 - 20) * (TOUCH_RAW_X20 - TOUCH_RAW_X220) / 200)
+        TOUCH_RAW_E4 = Int(TOUCH_RAW_X20 - (213 - 20) * (TOUCH_RAW_X20 - TOUCH_RAW_X220) / 200)
+        TOUCH_RAW_E5 = Int(TOUCH_RAW_X20 - (266 - 20) * (TOUCH_RAW_X20 - TOUCH_RAW_X220) / 200)
+        If CLOCK_DRIFT < -250 Or CLOCK_DRIFT > 250 Then
+            Error "CLOCK_DRIFT is -250 .. 250 ppm"
+        End If
+        CLOCK_DRIFT_B = CLOCK_DRIFT + 256
+    #endscript
+
+    // Screen layout (landscape, 320 x 240) and colours
+    #define SCR_BACK        ILI9341_BLACK
+    #define SCR_BUTTON      ILI9341_NAVY
+    // what is on the screen
+    #define SCR_MAIN        0           // the clock and the logger
+    #define SCR_MENU        1           // the menu
+    #define SCR_BLACK       2           // black, nothing drawn
+    #define SCR_SETCLOCK    3           // the clock screen (the menu's button 4). Odd, as SCR_MENU: both time out
+
+    // the DS1307's battery-backed RAM (0x08 .. 0x3F): the drift, its running total, and a mark that they are set
+    #define DS_RAM_MARK     0x08        // DS_MARK when the drift and its total are there
+    #define DS_RAM_DRIFT    0x09        // 0x09 (low), 0x0A (high): the drift, ppm + 256
+    #define DS_RAM_TOTAL    0x0B        // 0x0B (low), 0x0C (high): the drift's running total, in 0.1 ms
+    #define DS_MARK         0x5B        // (0x5A was the one-byte drift: not read as this)
+    #define SCR_TITLE       ILI9341_CYAN
+    #define SCR_CLOCK       ILI9341_WHITE
+    #define SCR_TEXT        ILI9341_YELLOW
+    #define SCR_GOOD        ILI9341_GREEN
+    #define SCR_BAD         ILI9341_RED
+
+    // Timer1: compare match A once a second. 32 MHz / 1024 = 31250 counts a second, so OCR1A = 31249
+    // (32 MHz / 256 would be 125000 counts, more than Timer1's 65536)
+    #define TICK_TOP        31249
+    #define TICK_CLOCK      0x0D        // WGM12: CTC, to OCR1A; CS12 + CS10: clock / 1024
+    #script
+        If ChipMHz <> 32 Then
+            Error "TICK_TOP is for 32 MHz: work it out again for this clock"
+        End If
+    #endscript
+
+// ----- Main program
+
+    Dim RTCHour, RTCMin, RTCSec, RTCDay, RTCMonth, RTCYear As Byte    // the DS1307's time
+    Dim DsBuf(7) As Byte                // the DS1307's registers, read or to write (DsRead, DsWrite)
+    Dim Sample As Word                  // the sample: the taps so far
+    Dim TapCount As Word                // taps since the start (not TouchCount: touch_4wire.h's debounce count)
+    Dim TouchRaw As Word                // the last tap: the panel's raw X (MenuPressed)
+    Dim LinesWritten, LinesLost As Word // for the display
+    Dim LogReady As Bit                 // 1 = the drive is started and RTCLOG.CSV is open
+    Dim LogLost As Bit                  // 1 = a sample was not written: a "Restarted" line goes in first
+    Dim LogLine As String * 24
+    Dim TickCount As Byte               // seconds counted by Timer1, not yet added to the time (ClockTick)
+    Dim ClockOK As Bit                  // 1 = the DS1307 is running
+    Dim ScrMode As Byte                 // what is on the screen: SCR_MAIN, SCR_MENU or SCR_BLACK
+    Dim ScrTurn As Byte                 // the screen's way round: LANDSCAPE or LANDSCAPE_REV (the menu's button 2)
+    Dim MenuSecs As Byte                // seconds left before the menu goes
+    Dim LogRun As Bit                   // 1 = logging; 0 = stopped (the menu's button 1)
+    Dim TouchToFile As Bit              // 1 = this tap goes in the file too (logging, the drive ready)
+    Dim MenuRaw As Word                 // the tap's raw X, the screen's way up (MenuPressed)
+    Dim ClkRaw As Word                  // the tap's raw Y, across the screen (MenuPressed, for the clock screen)
+    Dim ClockDrift As Word              // the drift: ppm + 256 (256 = none, 6 .. 506)
+    Dim EdDrift As Word                 // the clock screen's drift, ppm + 256
+    Dim DriftTotal As Word              // the drift built up, in 0.1 ms: each 10000 (1 s) moves the DS1307
+    Dim EdVal(7) As Byte                // the clock screen: year (00 .. 99), month, day, hour, minute, second (7: EdDrift)
+    Dim EdField As Byte                 // the clock screen's field, 1 .. 7
+    Dim EdTimeSet As Bit                // 1 = the clock screen's date or time changed: OK sets the DS1307
+    ScrMode = SCR_MAIN
+    ScrTurn = LANDSCAPE
+    LogRun = LOG_AT_START               // LOG_ON or LOG_OFF, from the settings
+
+    LinesWritten = 0
+    LinesLost = 0
+    TickCount = 0
+    Sample = 0                          // shown as 0 until the first sample
+    TapCount = 0
+
+    // The screen (InitGLCD has run, from glcd.h's #startup)
+    ScreenFrame
+    ScreenStatus("Starting", SCR_TEXT)
+
+    // Prevents the terminal becoming active too early, during reprogramming
+    Wait 2 s
+    ConsoleCRLF()
+    ConsoleText("RTCLOG.CSV: ") : ConsoleText(SAMPLE_LABEL) : ConsoleText(", ")
+    ConsoleText("LGT8F328P")
+    ConsoleCRLF()
+
+    // ----- The clock: there, and running? (each I2C transfer resets the display: the screen is started again after)
+    // SDA and SCL inputs first: InitGLCD left SDA (A4, the display's RESET) a driven output, and the LGT8F328P's
+    // TWI does not take the pins over
+    Dir HI2C_DATA In
+    Dir HI2C_CLOCK In
+    If ClockFound() = 0 Then            // (it starts the TWI too)
+        // where the date and the time go on the main screen (ScreenClock: LogLine's characters 1 .. 10 and 12 .. 19)
+        LogLine = "No DS1307 ,No clock"
+        ScreenStart
+        ScreenStatus("Data Logging and LCD Operations Disabled", SCR_BAD)
+        Do
+        Loop
+    End If
+    DriftStart                          // the drift and its total from the DS1307's RAM
+    ClockOK = ClockRunning()
+    ClockRead
+    ScreenStart
+    // the time can be sent for SET_WAIT seconds (T yyyy-mm-dd hh:mm:ss); a stopped clock not set then opens the
+    // clock screen
+    ConsoleText("   Time ") : ConsoleLine(LogLine)
+    Dim SendColour As Word              // the prompt red when the clock is stopped (one string: less flash)
+    SendColour = SCR_TEXT
+    If ClockOK = 0 Then SendColour = SCR_BAD
+    ScreenStatus("Send T yyyy-mm-dd hh:mm:ss", SendColour)
+    ConsoleLine("   Send T")
+    If ClockSet(SET_WAIT) = 0 Then
+        If ClockOK = 0 Then ClockScrOpen
+    End If
+
+    // ----- The time from here on: Timer1, once a second, and the DS1307 once an hour
+    ClockRead                           // the DS1307's time now
+    ScreenStart
+    TickStart
+
+    // ----- Logging
+    LogReady = 0
+    LogLost = 0
+    Do
+        // each second from Timer1: the time on, and on the screen; a sample when the seconds are a multiple of
+        // LOG_EVERY. Seconds missed while the card or the screen was busy are caught up here, one at a time.
+        Do
+            ScreenTouch                 // a tap: the menu, a button, or back from black
+        Loop While TickCount = 0
+        IntOff
+        TickCount--
+        IntOn
+        ClockAddSecond
+        ClockLine                       // LogLine = "yyyy-mm-dd,hh:mm:ss"
+        ScreenClock
+        If ScrMode = SCR_SETCLOCK Then ClockScrTick     // the clock screen's time runs on too
+        // the menu goes after MENU_WAIT seconds with no tap, the clock screen after CLOCK_WAIT (both odd)
+        If ScrMode.0 = 1 Then
+            MenuSecs--
+            If MenuSecs = 0 Then ScreenMain
+        End If
+
+        // once an hour, at hh:00:30: the drift, then the DS1307's time again (each I2C transfer resets the display:
+        // ScreenStart draws it again). At 30 s a second moved for the drift does not change the minute
+        If RTCMin = 0 And RTCSec = 30 Then
+            DriftHour
+            ClockRead
+            TickStart
+            ScreenStart
+            ConsoleText("   Time ") : ConsoleLine(LogLine)
+        End If
+
+        If RTCSec % LOG_EVERY <> 0 Then Goto NextSecond
+        // the sample is taken and shown while not logging too; it is written only while logging
+        Sample = TapCount
+        LogLine = LogLine + "," + Str(Sample)
+        ConsoleText(LogLine)
+        If LogRun = 1 Then
+            // Write the line. A failure (eg the card pulled out) closes the drive
+            If LogReady = 1 Then
+                If LogWrite() = 0 Then LogReady = 0
+            End If
+            // No drive, at the start or after a failure: start it again (a card put back is found here)
+            // and write the line, so a card put back between two samples loses no sample
+            If LogReady = 0 Then
+                LogReady = LogStart()
+                If LogReady = 1 Then
+                    If LogWrite() = 0 Then LogReady = 0
+                End If
+            End If
+            If LogReady = 1 Then
+                ConsoleText("  written")
+                LinesWritten++
+                ScreenStatus("RTCLOG.CSV: written", SCR_GOOD)
+            Else
+                ConsoleText("   No card ")
+                LogLost = 1                 // a "Restarted" line before the next line written
+                LinesLost++
+                ScreenStatus("   No card ", SCR_BAD)
+            End If
+        End If
+        ConsoleCRLF()
+        ScreenSample
+NextSecond:
+    Loop
+
+// ----- The screen
+
+'''Start the display again (after an I2C transfer has reset it) and draw what is up: the main screen, the menu,
+'''or black
+Sub ScreenStart
+    InitGLCD
+    If ScrMode = SCR_MAIN Then ScreenDraw
+    If ScrMode = SCR_MENU Then MenuDraw
+    If ScrMode = SCR_BLACK Then GLCDCLS SCR_BACK
+    If ScrMode = SCR_SETCLOCK Then ClockScrDraw
+End Sub
+
+'''The touch panel, read every 20 ms while waiting for the next second. On the main screen a tap shows the menu;
+'''on the menu a tap is a button (or the title: back); on the black screen a tap is back to the main screen; on
+'''the clock screen a tap is one of its buttons (ClockScrTouch).
+Sub ScreenTouch
+    Dim MenuButton As Byte
+    If TouchEvent() = 1 Then
+        MenuButton = MenuPressed()      // where it was pressed (still pressed): the log, and the menu's button
+        TouchLog(MenuButton)
+        If ScrMode = SCR_SETCLOCK Then
+            ClockScrTouch
+            Goto TouchDone
+        End If
+        If ScrMode = SCR_MAIN Then
+            ScrMode = SCR_MENU
+            MenuSecs = MENU_WAIT
+            MenuDraw
+        Else
+            If ScrMode = SCR_BLACK Then
+                // the display started again (InitGLCD, then the main screen): the panel went white (display off)
+                // after the black screen, and drawing on it did not bring it back
+                ScrMode = SCR_MAIN
+                ScreenStart
+            Else
+                // the menu: the button, from MenuPressed above
+                If MenuButton = 1 Then
+                    If LogRun = 1 Then
+                        LogRun = 0
+                        ConsoleLine("   Not logging")
+                    Else
+                        LogRun = 1
+                        ConsoleLine("   Logging")
+                    End If
+                End If
+                If MenuButton = 2 Then
+                    If ScrTurn = LANDSCAPE Then
+                        ScrTurn = LANDSCAPE_REV
+                    Else
+                        ScrTurn = LANDSCAPE
+                    End If
+                End If
+                If MenuButton = 3 Then
+                    ScrMode = SCR_BLACK
+                    GLCDCLS SCR_BACK
+                Else
+                    If MenuButton = 4 Then
+                        ClockScrOpen
+                    Else
+                        ScreenMain          // buttons 1 and 2, and the title (0): back to the main screen
+                    End If
+                End If
+            End If
+        End If
+    End If
+TouchDone:
+    Wait 20 ms
+End Sub
+
+'''Back to the main screen, all of it drawn
+Sub ScreenMain
+    ScrMode = SCR_MAIN
+    ScreenDraw
+End Sub
+
+'''All of the main screen, drawn again (ScreenFrame sets the way round)
+Sub ScreenDraw
+    ScreenFrame
+    ScreenClock
+    ScreenSample
+    If LogRun = 0 Then ScreenStatus("   Not logging", SCR_BAD)
+End Sub
+
+'''The menu: a title and four buttons across the screen, y 30 .. 77, 84 .. 131, 138 .. 185 and 192 .. 239
+Sub MenuDraw
+    Dim MenuY As Word
+    ScreenBlank
+    GLCDPrint(4, 6, "Menu", SCR_TITLE)
+    MenuY = 30
+    Repeat 4
+        ScreenBox(0, MenuY, 319, MenuY + 47, SCR_BUTTON)
+        MenuY += 54
+    End Repeat
+    GLCDBackground = SCR_BUTTON         // the letters' background: the button
+    If LogRun = 1 Then
+        GLCDPrint(20, 47, "1  Stop logging", SCR_CLOCK)
+    Else
+        GLCDPrint(20, 47, "1  Start logging", SCR_CLOCK)
+    End If
+    GLCDPrint(20, 101, "2  Rotate screen", SCR_CLOCK)
+    GLCDPrint(20, 155, "3  Black screen", SCR_CLOCK)
+    GLCDPrint(20, 208, "4  Set clock", SCR_CLOCK)
+    GLCDBackground = SCR_BACK
+End Sub
+
+'''The menu button pressed: 1 .. 4 (0 = the title), from where the panel is pressed up and down the screen: the
+'''panel's raw X (TouchRaw, for the log; MenuRaw, the same the screen's way up) against TOUCH_RAW_B1 .. B4 (the
+'''button edges, worked out from the calibration when compiling: no 32-bit sums here)
+Function MenuPressed As Byte
+    // both readings now, while the panel is pressed: the tap's log (the console, at 9600 baud) comes before the
+    // clock screen looks at it, and by then the finger is often off (an open panel reads high: always "<")
+    TouchRaw = TouchRawX()
+    ClkRaw = TouchRawY()
+    MenuRaw = TouchRaw
+    If ScrTurn <> LANDSCAPE Then
+        // turned round: screen y is 239 - y, the raw X the other way from TOUCH_RAW_YSUM (0 past it: the top)
+        MenuRaw = 0
+        If TouchRaw < TOUCH_RAW_YSUM Then MenuRaw = TOUCH_RAW_YSUM - TouchRaw
+    End If
+    MenuPressed = 0
+    If MenuRaw >= TOUCH_RAW_B1 Then MenuPressed = 1
+    If MenuRaw >= TOUCH_RAW_B2 Then MenuPressed = 2
+    If MenuRaw >= TOUCH_RAW_B3 Then MenuPressed = 3
+    If MenuRaw >= TOUCH_RAW_B4 Then MenuPressed = 4
+End Function
+
+// ----- The clock screen
+
+'''Open the clock screen (the menu's button 4): the DS1307's time and the drift to change, the year first
+Sub ClockScrOpen
+    EdVal(1) = RTCYear
+    EdVal(2) = RTCMonth
+    EdVal(3) = RTCDay
+    EdVal(4) = RTCHour
+    EdVal(5) = RTCMin
+    EdVal(6) = RTCSec
+    EdDrift = ClockDrift
+    EdField = 1
+    EdTimeSet = 0
+    ScrMode = SCR_SETCLOCK
+    MenuSecs = CLOCK_WAIT
+    ClockScrDraw
+End Sub
+
+'''The clock screen: a title, what does not change in the three rows (the values go in its gaps), the values
+'''(ClockScrValues), and six buttons along the foot (from y 172): < > - + OK X, drawn as one bar and one line of
+'''labels, then five black gaps between the buttons (fewer calls: less flash)
+Sub ClockScrDraw
+    Dim ClkX As Word
+    ScreenBlank
+    GLCDPrint(4, 6, "Set clock", SCR_TITLE)
+    GLCDfntDefaultsize = 3              // 18 pixels a character
+    GLCDPrint(20, 40, "20  -  -", SCR_CLOCK)
+    GLCDPrint(56, 84, ":  :", SCR_CLOCK)
+    GLCDPrint(20, 128, "Drift      ppm", SCR_CLOCK)
+    ScreenBox(0, 172, 319, 239, SCR_BUTTON)
+    GLCDBackground = SCR_BUTTON
+    GLCDPrint(17, 194, "<  >  -  + OK  X", SCR_CLOCK)
+    GLCDBackground = SCR_BACK
+    ClkX = 52
+    Repeat 5
+        ScreenBox(ClkX, 172, ClkX + 2, 239, SCR_BACK)
+        ClkX += 53
+    End Repeat
+    ClockScrValues
+End Sub
+
+'''One second on for the clock screen's time, so OK sets the time as it is then, not as it was when the screen
+'''opened: the seconds, the minutes and the hours carry on, each drawn again as it changes (fixed elements: less
+'''flash than a loop). The hour goes from 23 to 0 without the date on (the screen open across midnight: set the date)
+Sub ClockScrTick
+    EdVal(6)++
+    If EdVal(6) = 60 Then
+        EdVal(6) = 0
+        EdVal(5)++
+        If EdVal(5) = 60 Then
+            EdVal(5) = 0
+            EdVal(4)++
+            If EdVal(4) = 24 Then EdVal(4) = 0
+            ClockScrField(4)
+        End If
+        ClockScrField(5)
+    End If
+    ClockScrField(6)
+End Sub
+
+'''The clock screen's seven values (ClockScrField)
+Sub ClockScrValues
+    Dim ClkI As Byte
+    For ClkI = 1 To 7
+        ClockScrField(ClkI)
+    Next
+End Sub
+
+'''One of the clock screen's values, at its place from ClockFieldX and ClockFieldY, digit by digit, and a bar under
+'''it: lit when it is the field being changed, black when not. The drift: its sign, then three digits. One field
+'''at a time after a tap: drawing them all (a pixel at a time, at size 3) took long enough to miss taps
+Sub ClockScrField(In ClkI)
+    Dim ClkV, ClkY, ClkW, ClkC As Byte
+    Dim ClkX, ClkBar As Word
+    GLCDfntDefaultsize = 3
+        ReadTable ClockFieldX, ClkI, ClkX
+        ReadTable ClockFieldY, ClkI, ClkY
+        ClkV = EdVal(ClkI)
+        ClkW = 35
+        If ClkI = 7 Then
+            ClkW = 53
+            ClkC = 43                   // +
+            ClkV = EdDrift              // the low byte: ppm + 256 is 0x01pp from 0 up, 0x00nn below (256 - ppm)
+            If EdDrift_H = 0 Then
+                ClkC = 45               // -
+                ClkV = 0 - ClkV
+            End If
+            GLCDDrawChar(ClkX, ClkY, ClkC, SCR_CLOCK)
+            ClkX += 18
+        End If
+        ClkBar = SCR_BACK
+        If ClkI = EdField Then ClkBar = SCR_TEXT
+        ScreenBox(ClkX, ClkY + 24, ClkX + ClkW, ClkY + 26, ClkBar)
+        If ClkI = 7 Then
+            GLCDDrawChar(ClkX, ClkY, 48 + ClkV / 100, SCR_CLOCK)
+            ClkV = ClkV % 100
+            ClkX += 18
+        End If
+        GLCDDrawChar(ClkX, ClkY, 48 + ClkV / 10, SCR_CLOCK)
+        GLCDDrawChar(ClkX + 18, ClkY, 48 + ClkV % 10, SCR_CLOCK)
+End Sub
+
+// where each field starts: yy, mm, dd (after "20", from x 20, 18 pixels a character), hh, mm, ss, the drift's sign
+// (after "Drift ")
+Table ClockFieldX
+    56
+    110
+    164
+    20
+    74
+    128
+    128
+End Table
+
+Table ClockFieldY
+    40
+    40
+    40
+    84
+    84
+    84
+    128
+End Table
+
+// each field's lowest and highest value: year 00 .. 99, month, day (the month's length is checked when set),
+// hour, minute, second (the drift: ClockStep, -250 .. 250)
+Table ClockFieldMin
+    0
+    1
+    1
+    0
+    0
+    0
+End Table
+
+Table ClockFieldMax
+    99
+    12
+    31
+    23
+    59
+    59
+End Table
+
+'''A tap on the clock screen: one of the six buttons along the foot (anywhere else does nothing). Which button is
+'''from the panel's raw Y (across the screen) against TOUCH_RAW_E1 .. E5; turned round, the buttons are the other
+'''way
+Sub ClockScrTouch
+    Dim ClkBtn, ClkOld, ClkHeld As Byte
+    // the row of buttons (MenuRaw: up and down the screen, the screen's way up, from MenuPressed)
+    If MenuRaw < TOUCH_RAW_ROW Then Exit Sub
+    ClkBtn = 1                              // ClkRaw: across the screen, from MenuPressed
+    If ClkRaw <= TOUCH_RAW_E1 Then ClkBtn = 2
+    If ClkRaw <= TOUCH_RAW_E2 Then ClkBtn = 3
+    If ClkRaw <= TOUCH_RAW_E3 Then ClkBtn = 4
+    If ClkRaw <= TOUCH_RAW_E4 Then ClkBtn = 5
+    If ClkRaw <= TOUCH_RAW_E5 Then ClkBtn = 6
+    If ScrTurn <> LANDSCAPE Then ClkBtn = 7 - ClkBtn
+    MenuSecs = CLOCK_WAIT                   // a tap: the time-out starts again
+    If ClkBtn = 6 Then                      // X: no change
+        ScreenMain
+        Exit Sub
+    End If
+    If ClkBtn = 5 Then                      // OK: the drift, then the DS1307 set
+        If EdDrift <> ClockDrift Then
+            ClockDrift = EdDrift
+            DriftTotal = 0                  // a new drift: none built up yet
+            DriftSave
+        End If
+        ScrMode = SCR_MAIN
+        If EdTimeSet = 0 Then               // the date and time not changed: the clock runs on as it is
+            ScreenStart                     // InitGLCD too: the I2C (DriftSave) upsets the display
+            Exit Sub
+        End If
+        If ClockStore() = 1 Then
+            TickStart
+        Else
+            ScrMode = SCR_SETCLOCK          // a value out of range (from a stopped clock): the clock screen stays
+        End If
+        Exit Sub
+    End If
+    If ClkBtn < 3 Then
+        ClkOld = EdField
+        If ClkBtn = 1 Then                  // <: the field before
+            EdField--
+            If EdField = 0 Then EdField = 7
+        Else                                // >: the next field
+            EdField++
+            If EdField = 8 Then EdField = 1
+        End If
+        ClockScrField(ClkOld)               // its bar off, the new field's on
+        ClockScrField(EdField)
+        Exit Sub
+    End If
+    // - and +: one step; held for half a second, steps of 10, about 3 a second while it is held
+    ClockStep(ClkBtn)
+    ClockScrField(EdField)
+    ClkHeld = 0
+    Do While TouchPressed() = 1
+        Wait 10 ms
+        ClkHeld++
+        If ClkHeld >= 50 Then
+            Repeat 10
+                ClockStep(ClkBtn)
+            End Repeat
+            ClockScrField(EdField)
+            ClkHeld = 20                    // the next in 0.3 s and the drawing
+        End If
+    Loop
+    MenuSecs = CLOCK_WAIT
+End Sub
+
+'''The field being changed one down (StepBtn 3, -) or up (4, +): the date and time round from one end to the other,
+'''the drift stops at -250 and 250
+Sub ClockStep(In StepBtn)
+    Dim StepV, StepLow, StepHigh As Byte
+    If EdField = 7 Then
+        If StepBtn = 3 Then
+            If EdDrift > 6 Then EdDrift--
+        Else
+            If EdDrift < 506 Then EdDrift++
+        End If
+        Exit Sub
+    End If
+    StepV = EdVal(EdField)
+    ReadTable ClockFieldMin, EdField, StepLow
+    ReadTable ClockFieldMax, EdField, StepHigh
+    If StepBtn = 3 Then
+        If StepV > StepLow Then
+            StepV--
+        Else
+            StepV = StepHigh
+        End If
+    Else
+        If StepV < StepHigh Then
+            StepV++
+        Else
+            StepV = StepLow
+        End If
+    End If
+    EdVal(EdField) = StepV
+    EdTimeSet = 1
+End Sub
+
+// ----- The drift
+
+'''The drift and its running total from the DS1307's RAM; CLOCK_DRIFT and 0 when they are not there (a new DS1307,
+'''or its battery taken out)
+Sub DriftStart
+    DsRead(DS_RAM_MARK, 5)              // the mark, the drift (low, high), the total (low, high)
+    If DsBuf(1) = DS_MARK Then
+        ClockDrift = DsBuf(2)
+        ClockDrift_H = DsBuf(3)
+        DriftTotal = DsBuf(4)
+        DriftTotal_H = DsBuf(5)
+    Else
+        ClockDrift = CLOCK_DRIFT_B
+        DriftTotal = 0
+        DriftSave
+    End If
+End Sub
+
+'''The mark, the drift and its running total to the DS1307's RAM
+Sub DriftSave
+    DsBuf(1) = DS_MARK
+    DsBuf(2) = ClockDrift
+    DsBuf(3) = ClockDrift_H
+    DsBuf(4) = DriftTotal
+    DsBuf(5) = DriftTotal_H
+    DsWrite(DS_RAM_MARK, 5)
+End Sub
+
+'''Once an hour (at hh:00:30): an hour's drift added to the total, 36 x ppm in 0.1 ms (3600 s x ppm / 1000000 s,
+'''in 0.0001 s). Each whole second (10000) moves the DS1307's seconds one back (it gains) or on (it loses)
+Sub DriftHour
+    Dim DriftStep As Word
+    Dim DriftPpm As Byte
+    DriftPpm = ClockDrift               // the size, as in ClockScrField: the low byte, negated below 256
+    If ClockDrift_H = 0 Then DriftPpm = 0 - DriftPpm
+    DriftStep = DriftPpm
+    DriftStep = DriftStep * 36
+    DriftTotal = DriftTotal + DriftStep
+    If DriftTotal >= 10000 Then
+        DriftTotal = DriftTotal - 10000
+        DsRead(0, 1)
+        DriftPpm = BcdToDec(DsBuf(1) And 0x7F)  // the seconds (at 30: no carry either way)
+        If ClockDrift_H = 1 Then        // + (a whole second built up: not 0 ppm)
+            DriftPpm--
+        Else
+            DriftPpm++
+        End If
+        DsBuf(1) = DecToBcd(DriftPpm)       // bit 7 (CH) clear: the clock runs on
+        DsWrite(0, 1)
+        ConsoleLine("   Drift: 1 s")
+    End If
+    DriftSave
+End Sub
+
+'''A blank screen, the way round it is set to, and the font at size 2: the main screen, the menu, the clock screen
+Sub ScreenBlank
+    GLCDRotate(ScrTurn)
+    GLCDBackground = SCR_BACK
+    GLCDCLS SCR_BACK
+    GLCDfntDefaultsize = 2
+End Sub
+
+'''The title, the rules and the labels that do not change
+Sub ScreenFrame
+    ScreenBlank
+    GLCDPrint(4, 4, "GCBASIC data logger", SCR_TITLE)
+    GLCDfntDefaultsize = 1
+    GLCDPrint(4, 24, "LGT8F328P, SD card, DS1307", SCR_TITLE)
+    // the rules: boxes, as GLCDLine runs the compiler out of registers on the ATmega328P (build 1673)
+    ScreenBox(0, 36, 319, 37, SCR_TITLE)
+    ScreenBox(0, 140, 319, 141, SCR_TITLE)
+    GLCDfntDefaultsize = 2
+    GLCDPrint(4, 150, SAMPLE_LABEL, SCR_TEXT)
+    GLCDPrint(4, 174, "Written", SCR_TEXT)
+    GLCDPrint(4, 198, "Lost", SCR_TEXT)
+End Sub
+
+'''The date and time (from LogLine, "yyyy-mm-dd,hh:mm:ss"): the time large, the date under it
+Sub ScreenClock
+    Dim ScrTime As String * 8
+    Dim ScrDate As String * 10
+    If ScrMode <> SCR_MAIN Then Exit Sub    // the menu or black is up
+    Dim ScrI As Byte
+    // LogLine's characters 1 .. 10 and 12 .. 19 (a string is its length, element 0, then its characters)
+    For ScrI = 1 To 10
+        ScrDate(ScrI) = LogLine(ScrI)
+    Next
+    ScrDate(0) = 10
+    For ScrI = 1 To 8
+        ScrTime(ScrI) = LogLine(ScrI + 11)
+    Next
+    ScrTime(0) = 8
+    GLCDfntDefaultsize = 5
+    GLCDPrint(40, 50, ScrTime, SCR_CLOCK)       // 8 x 30 = 240 pixels wide, 40 high
+    GLCDfntDefaultsize = 2
+    GLCDPrint(100, 108, ScrDate, SCR_CLOCK)
+End Sub
+
+'''The last sample, and the lines written and lost
+Sub ScreenSample
+    Dim ScrValue As String * 10
+    If ScrMode <> SCR_MAIN Then Exit Sub    // the menu or black is up
+    GLCDfntDefaultsize = 2
+    ScrValue = Str(Sample) + SAMPLE_UNIT        // spaces clear what a longer value left
+    GLCDPrint(136, 150, ScrValue, SCR_CLOCK)
+    ScrValue = Str(LinesWritten) + "    "
+    GLCDPrint(136, 174, ScrValue, SCR_GOOD)
+    ScrValue = Str(LinesLost) + "    "
+    GLCDPrint(136, 198, ScrValue, SCR_BAD)
+End Sub
+
+'''A box filled with a colour, from x1, y1 to x2, y2 (x1 <= x2, y1 <= y2): glcd_ili9341.h's FilledBox without the
+'''corners put in order, and without its 32-bit pixel count (one line at a time instead): less flash, as fast
+Sub ScreenBox(In BoxX1 As Word, In BoxY1 As Word, In BoxX2 As Word, In BoxY2 As Word, In BoxColour As Word)
+    Dim BoxWide, BoxHigh As Word
+    SetAddressWindow_ILI9341(BoxX1, BoxY1, BoxX2, BoxY2)
+    BoxWide = BoxX2 - BoxX1 + 1
+    BoxHigh = BoxY2 - BoxY1 + 1
+    Repeat BoxHigh
+        Repeat BoxWide
+            SendWord_ILI9341(BoxColour)
+        End Repeat
+    End Repeat
+End Sub
+
+'''The status line at the foot of the screen, in a colour (the rest of the line cleared)
+Sub ScreenStatus(In ScrText As String, In ScrColour As Word)
+    If ScrMode <> SCR_MAIN Then Exit Sub    // the menu or black is up
+    GLCDfntDefaultsize = 1
+    ScreenBox(4, 226, 319, 235, SCR_BACK)
+    GLCDPrint(4, 226, ScrText, ScrColour)
+End Sub
+
+// ----- The display's start
+
+'''The display started: glcd_ili9341.h's InitGLCD_ILI9341 for this shield (the 8-bit bus), its 70 setting bytes
+'''from a table instead of a call each (about 360 words less flash). The #define InitGLCD_ILI9341 ScreenInit at the
+'''top has the compiler's start-up call this in place of the library's
+Sub ScreenInit
+    Dim InitAt, InitCount, InitByte As Byte
+    Dir ILI9341_DB7 Out
+    Dir ILI9341_DB6 Out
+    Dir ILI9341_DB5 Out
+    Dir ILI9341_DB4 Out
+    Dir ILI9341_DB3 Out
+    Dir ILI9341_DB2 Out
+    Dir ILI9341_DB1 Out
+    Dir ILI9341_DB0 Out
+    Dir ILI9341_RD Out
+    Dir ILI9341_WR Out
+    Dir ILI9341_RS Out
+    Dir ILI9341_CS Out
+    Dir ILI9341_RST Out
+    Set ILI9341_RD On
+    Set ILI9341_WR On
+    Set ILI9341_RS On
+    Set ILI9341_CS On
+    Set ILI9341_RST On
+    // reset: low for at least 10 us
+    Wait 65 ms
+    Set ILI9341_RST Off
+    Wait 15 us
+    Set ILI9341_RST On
+    Wait 15 ms
+    // each entry: how many data bytes, the command, its data; 255 at the end
+    InitAt = 1
+    Do
+        ReadTable ScreenInitData, InitAt, InitCount
+        If InitCount = 255 Then Exit Do
+        InitAt++
+        ReadTable ScreenInitData, InitAt, InitByte
+        SendCommand_ILI9341(InitByte)
+        Repeat InitCount
+            InitAt++
+            ReadTable ScreenInitData, InitAt, InitByte
+            SendData_ILI9341(InitByte)
+        End Repeat
+        InitAt++
+    Loop
+    SendCommand_ILI9341(ILI9341_SLPOUT)     // out of sleep
+    Wait 150 ms
+    SendCommand_ILI9341(ILI9341_DISPON)     // display on
+    // what the library sets up for the drawing routines
+    GLCDBACKGROUND = ILI9341_BLACK
+    GLCDForeground = ILI9341_WHITE
+    ILI9341_GLCD_WIDTH = GLCD_WIDTH
+    ILI9341_GLCD_HEIGHT = GLCD_HEIGHT
+    GLCDFontWidth = 6
+    GLCDfntDefault = 0
+    GLCDfntDefaultsize = 1
+    GLCDfntDefaultHeight = 7
+    GLCDRotateState = Portrait
+    GLCDCLS
+    SendCommand_ILI9341(ILI9341_DISPON)
+End Sub
+
+// the ILI9341's settings, as glcd_ili9341.h sends them: the number of data bytes, the command, the data
+Table ScreenInitData
+    3, 0xEF, 0x03, 0x80, 0x02
+    3, 0xCF, 0x00, 0xC1, 0x30
+    4, 0xED, 0x64, 0x03, 0x12, 0x81
+    3, 0xE8, 0x85, 0x00, 0x78
+    5, 0xCB, 0x39, 0x2C, 0x00, 0x34, 0x02
+    1, 0xF7, 0x20
+    2, 0xEA, 0x00, 0x00
+    1, 0xC0, 0x2B
+    1, 0xC1, 0x10
+    2, 0xC5, 0x3E, 0x28
+    1, 0xC7, 0x86
+    1, 0x36, 0x48
+    1, 0x3A, 0x55
+    2, 0xB1, 0x00, 0x18
+    3, 0xB6, 0x08, 0x82, 0x27
+    1, 0xF2, 0x00
+    1, 0x26, 0x01
+    15, 0xE0, 0x0F, 0x31, 0x2B, 0x0C, 0x0E, 0x08, 0x4E, 0xF1, 0x37, 0x07, 0x10, 0x03, 0x0E, 0x09, 0x00
+    15, 0xE1, 0x00, 0x0E, 0x14, 0x03, 0x11, 0x07, 0x31, 0xC1, 0x48, 0x08, 0x0F, 0x0C, 0x31, 0x36, 0x0F
+    255
+End Table
+
+// ----- The clock
+
+'''1 when the DS1307 answers on the I2C. The ds1307.h routines wait for an answer for ever, so this is asked first.
+Function ClockFound As Byte
+    ClockFound = 0
+    // the bus's pull-ups first (on the DS1307's board): SDA and SCL held low, then let go, rise at once with them.
+    // With none (the board off) they stay low, and the TWI's start would wait for ever (a white screen)
+    HI2C_DATA = 0
+    HI2C_CLOCK = 0
+    Dir HI2C_DATA Out
+    Dir HI2C_CLOCK Out
+    Dir HI2C_DATA In
+    Dir HI2C_CLOCK In
+    Wait 20 us
+    If HI2C_DATA = 0 Then Exit Function
+    If HI2C_CLOCK = 0 Then Exit Function
+    HI2CMode Master                     // the TWI as master at HI2C_BAUD_RATE (the AVR needs this before any I2C)
+    HI2CReStart
+    HI2CSend(DS_AddrWrite)
+    HI2CStop
+    If HI2CAckPollState = False Then ClockFound = 1
+End Function
+
+'''1 when the DS1307's oscillator runs (the CH bit, bit 7 of register 0, is clear) in 24-hour mode (bit 6 of
+'''register 2 clear: ClockStore sets it so). 0 has the time set again
+Function ClockRunning As Byte
+    DsRead(0, 3)
+    ClockRunning = 1
+    If DsBuf(1).7 = 1 Then ClockRunning = 0
+    If DsBuf(3).6 = 1 Then ClockRunning = 0
+End Function
+
+'''Read the date and time from the DS1307 into RTCDay ... RTCSec, and LogLine = "yyyy-mm-dd,hh:mm:ss".
+'''An I2C transfer: it resets the display (A4), so call ScreenStart after it.
+Sub ClockRead
+    DsRead(0, 7)
+    RTCSec = BcdToDec(DsBuf(1) And 0x7F)    // bit 7: CH
+    RTCMin = BcdToDec(DsBuf(2))
+    RTCHour = BcdToDec(DsBuf(3) And 0x3F)   // 24-hour mode
+    RTCDay = BcdToDec(DsBuf(5))             // register 3 is the day of the week
+    RTCMonth = BcdToDec(DsBuf(6))
+    RTCYear = BcdToDec(DsBuf(7))
+    ClockLine
+End Sub
+
+'''Read DsCount (1 .. 7) of the DS1307's registers, from DsAddr, into DsBuf(1) on. The ds1307.h routines each
+'''read or write the registers their own way: these two, for all of them, take less flash
+Sub DsRead(In DsAddr, In DsCount)
+    Dim DsI, DsByte As Byte
+    HI2CReStart
+    HI2CSend(DS_AddrWrite)
+    HI2CSend(DsAddr)
+    HI2CReStart
+    HI2CSend(DS_AddrRead)
+    For DsI = 1 To DsCount
+        If DsI = DsCount Then
+            HI2CReceive(DsByte, NACK)       // the last: no ACK
+        Else
+            HI2CReceive(DsByte)
+        End If
+        DsBuf(DsI) = DsByte
+    Next
+    HI2CStop
+End Sub
+
+'''Write DsBuf(1) on to DsCount (1 .. 7) of the DS1307's registers, from DsAddr
+Sub DsWrite(In DsAddr, In DsCount)
+    Dim DsI As Byte
+    HI2CReStart
+    HI2CSend(DS_AddrWrite)
+    HI2CSend(DsAddr)
+    For DsI = 1 To DsCount
+        HI2CSend(DsBuf(DsI))
+    Next
+    HI2CStop
+End Sub
+
+'''LogLine = "yyyy-mm-dd,hh:mm:ss" from RTCYear ... RTCSec
+Sub ClockLine
+    LogLine = "20"
+    AddTwo(RTCYear, 45)                 // -
+    AddTwo(RTCMonth, 45)
+    AddTwo(RTCDay, 44)                  // ,
+    AddTwo(RTCHour, 58)                 // :
+    AddTwo(RTCMin, 58)
+    AddTwo(RTCSec, 0)
+End Sub
+
+'''Timer1 from 0: compare match A (TICK_TOP) once a second, CTC mode, the clock divided by TICK_CLOCK's
+'''prescaler, its interrupt on
+Sub TickStart
+    IntOff
+    TCCR1A = 0
+    TCCR1B = 0                          // stopped while it is set
+    TCNT1H = 0                          // 16-bit registers: the high byte first
+    TCNT1L = 0
+    OCR1AH = TICK_TOP / 256
+    OCR1AL = TICK_TOP And 255
+    TickCount = 0
+    TCCR1B = TICK_CLOCK                 // CTC, to OCR1A, and the prescaler: see TICK_TOP
+    On Interrupt Timer1Match1 Call ClockTick
+    IntOn
+End Sub
+
+'''Timer1's interrupt, once a second: count it, the main program adds it to the time
+Sub ClockTick
+    TickCount++
+End Sub
+
+'''One second on: the seconds, minutes, hours, and at midnight the date (month lengths, leap years 2000 .. 2099)
+Sub ClockAddSecond
+    Dim DaysInMonth As Byte
+    RTCSec++
+    If RTCSec < 60 Then Exit Sub
+    RTCSec = 0
+    RTCMin++
+    If RTCMin < 60 Then Exit Sub
+    RTCMin = 0
+    RTCHour++
+    If RTCHour < 24 Then Exit Sub
+    RTCHour = 0
+    RTCDay++
+    ReadTable MonthDays, RTCMonth, DaysInMonth
+    If RTCMonth = 2 Then
+        If RTCYear % 4 = 0 Then DaysInMonth = 29         // 2000 .. 2099: every fourth year
+    End If
+    If RTCDay <= DaysInMonth Then Exit Sub
+    RTCDay = 1
+    RTCMonth++
+    If RTCMonth <= 12 Then Exit Sub
+    RTCMonth = 1
+    RTCYear++
+End Sub
+
+Table MonthDays
+    31
+    28
+    31
+    30
+    31
+    30
+    31
+    31
+    30
+    31
+    30
+    31
+End Table
+
+'''FatDate and FatTime (FAT format) from the DS1307's date and time: the date and time FatCommit writes
+'''into the file's entry in the folder. Set before each FatCommit: FatMount sets them to 2026-01-01.
+Sub ClockToFat
+    FatDate = (RTCYear + 20) * 512 + RTCMonth * 32 + RTCDay       // years from 1980, month, day
+    FatTime = RTCHour * 2048 + RTCMin * 32 + RTCSec / 2           // hours, minutes, 2-second steps
+End Sub
+
+'''Add a number 0 .. 99 to LogLine as two digits, then the character TwoSep (0: none)
+Sub AddTwo(In TwoValue, In TwoSep)
+    Dim TwoLen As Byte
+    // the string is its length (element 0) and the characters: add them at the end
+    TwoLen = LogLine(0)
+    LogLine(TwoLen + 1) = 48 + TwoValue / 10
+    LogLine(TwoLen + 2) = 48 + TwoValue % 10
+    TwoLen += 2
+    If TwoSep <> 0 Then
+        TwoLen++
+        LogLine(TwoLen) = TwoSep
+    End If
+    LogLine(0) = TwoLen
+End Sub
+
+'''Wait for "T" and the time on the serial port, then set the DS1307: 14 digits yyyymmddhhmmss, any separators,
+'''ending with CR or LF. SetSecs: how long to wait (0: until a good time comes). Returns 1 when the clock was set.
+Function ClockSet(In SetSecs) As Byte
+    Dim SetChar, SetCount As Byte
+    Dim SetDigits(14) As Byte
+    Dim SetTaking As Bit
+    Dim SetWait As Word
+
+    Dim SetLimit As Word
+
+    ClockSet = 0
+    SetTaking = 0
+    SetCount = 0
+    SetWait = 0
+    SetLimit = SetSecs * 1000           // in 1 ms steps
+    Do
+        If USARTHasData Then
+            SetChar = HSerReceiveFrom(1)
+            If SetChar = 84 Or SetChar = 116 Then           // T or t: the start
+                SetTaking = 1
+                SetCount = 0
+            End If
+            If SetChar = 13 Or SetChar = 10 Then            // CR or LF: the end
+                If SetTaking = 1 Then Exit Do
+            End If
+            If SetChar >= 48 And SetChar <= 57 Then         // a digit
+                If SetTaking = 1 And SetCount < 14 Then
+                    SetCount++
+                    SetDigits(SetCount) = SetChar - 48
+                End If
+            End If
+        Else
+            Wait 1 ms
+            If SetSecs > 0 Then
+                SetWait++
+                If SetWait >= SetLimit Then Exit Function
+            End If
+        End If
+    Loop
+
+    // 14 digits: yyyy mm dd hh mm ss, 2000 .. 2099
+    If SetCount <> 14 Or SetDigits(1) <> 2 Or SetDigits(2) <> 0 Then
+        ConsoleLine("   Bad time")
+        Exit Function
+    End If
+    EdVal(1) = SetDigits(3) * 10 + SetDigits(4)
+    EdVal(2) = SetDigits(5) * 10 + SetDigits(6)
+    EdVal(3) = SetDigits(7) * 10 + SetDigits(8)
+    EdVal(4) = SetDigits(9) * 10 + SetDigits(10)
+    EdVal(5) = SetDigits(11) * 10 + SetDigits(12)
+    EdVal(6) = SetDigits(13) * 10 + SetDigits(14)
+    ClockSet = ClockStore()
+End Function
+
+'''Set the DS1307 from EdVal(1) .. EdVal(6) (year 00 .. 99, month, day, hour, minute, second: from the serial T line,
+'''or the clock screen): checks the values (a day past the month's end is its last day), works out the day of the
+'''week, and starts the clock. Then the time again from the DS1307, and the screen started again (the I2C transfers
+'''reset it). Returns 1 when set, 0 (and "Bad time") when a value is out of range
+Function ClockStore As Byte
+    Dim StDow, StDays, StYear As Byte
+    ClockStore = 0
+    // each value in range (the clock screen's limits)
+    For StYear = 1 To 6
+        ReadTable ClockFieldMin, StYear, StDow
+        ReadTable ClockFieldMax, StYear, StDays
+        If EdVal(StYear) < StDow Or EdVal(StYear) > StDays Then
+            ConsoleLine("   Bad time")
+            Exit Function
+        End If
+    Next
+    ReadTable MonthDays, EdVal(2), StDays
+    If EdVal(2) = 2 Then
+        If EdVal(1) % 4 = 0 Then StDays = 29    // 2000 .. 2099: every fourth year
+    End If
+    If EdVal(3) > StDays Then EdVal(3) = StDays
+
+    // the day of the week, 1 = Sunday (as the ds1307.h demonstration): Sakamoto's method. For 2000 + y the
+    // century's terms come to whole weeks, so y + y / 4 is enough; and 28 years on is the same day (28 + 7 days),
+    // so y + 28 keeps January and February 2000 (counted in the year before) in a byte
+    StYear = EdVal(1) + 28
+    If EdVal(2) < 3 Then StYear--
+    StDow = (StYear + StYear / 4 + MonthKey(EdVal(2)) + EdVal(3)) % 7 + 1
+
+    DsBuf(1) = DecToBcd(EdVal(6))       // bit 7 (CH) clear: the clock runs
+    DsBuf(2) = DecToBcd(EdVal(5))
+    DsBuf(3) = DecToBcd(EdVal(4))       // bit 6 clear: 24-hour mode
+    DsBuf(4) = StDow
+    DsBuf(5) = DecToBcd(EdVal(3))
+    DsBuf(6) = DecToBcd(EdVal(2))
+    DsBuf(7) = DecToBcd(EdVal(1))
+    DsWrite(0, 7)
+    ClockRead
+    ScreenStart
+    ScreenStatus("Clock set", SCR_GOOD)
+    ConsoleText("   Set ") : ConsoleLine(LogLine)
+    ClockStore = 1
+End Function
+
+'''Sakamoto's month key, for the day of the week
+Function MonthKey(In KeyMonth) As Byte
+    ReadTable MonthKeys, KeyMonth, MonthKey
+End Function
+
+Table MonthKeys
+    0
+    3
+    2
+    5
+    0
+    3
+    5
+    1
+    4
+    6
+    2
+    4
+End Table
+
+// ----- The log file
+
+'''Start the drive, mount it, and open RTCLOG.CSV to add to it (it is made if it is not there).
+'''Returns 1 when the file is open, or 0 with the reason on the serial console.
+'''FatInit (SDCInit, then FatMount) starts the card from the beginning, so this also works after a card is
+'''pulled out and put back.
+Function LogStart As Byte
+    LogStart = 0
+    ConsoleCRLF()
+    If FatInit() <> FAT_OK Then
+        If FatError = FAT_ERR_NO_DRIVE Then
+            ConsoleText("   No card ") : ConsoleText(Str(SDCError)) : ConsoleText(" ")
+            ConsoleLine(Str(SDCR1))    // SDCError, and the card's last answer (255: none)
+        Else
+            ConsoleText("   No FAT ") : ConsoleLine(Str(FatError))
+        End If
+        Exit Function
+    End If
+    If FatOpen("RTCLOG.CSV") <> FAT_OK Then
+        ConsoleText("   Not opened ") : ConsoleLine(Str(FatError))
+        Exit Function
+    End If
+    If FatCreated() = 1 Then
+        LogText(SAMPLE_HEAD)            // a new file: the heading line first
+        LogCRLF()
+        ConsoleLine("   New file")
+    Else
+        ConsoleLine("   File open")
+    End If
+    LogStart = 1
+End Function
+
+'''A tap: counted, and "date,time,touch,screen,raw x,raw y,button" to the console and, while logging with the drive
+'''ready, to the file
+'''(the screen: 0 main, 1 menu, 2 black, 3 the clock screen; raw: TouchRaw and ClkRaw from MenuPressed). LogLine is made
+'''again from the time: the main loop makes it again before it is used
+Sub TouchLog(In TouchButton)
+    TapCount++
+    TouchToFile = 0
+    If LogRun = 1 Then TouchToFile = LogReady
+    ClockLine
+    TouchText(LogLine)
+    TouchText(",touch")
+    TouchNum(ScrMode)
+    TouchNum(TouchRaw)
+    TouchNum(ClkRaw)
+    TouchNum(TouchButton)
+    ConsoleCRLF()
+    If TouchToFile = 1 Then
+        LogCRLF()
+        ClockToFat
+        If FatCommit() <> FAT_OK Then LogReady = 0      // the next sample starts the drive again
+    End If
+End Sub
+
+'''TouchLog's line: a comma and a number
+Sub TouchNum(In TouchValue As Word)
+    TouchText(",")
+    TouchText(Str(TouchValue))
+End Sub
+
+'''TouchLog's line: a string to the console and, while logging with the drive ready, to the file
+Sub TouchText(In TouchString As String)
+    ConsoleText(TouchString)
+    If TouchToFile = 1 Then LogText(TouchString)
+End Sub
+
+'''Add LogLine to the file, after a "Restarted" line when samples were lost, and put it on the drive.
+'''Returns 1 when FatCommit says it is on the drive, or 0 with the FatError on the serial console.
+Function LogWrite As Byte
+    LogWrite = 0
+    If LogLost = 1 Then
+        LogText("Restarted")            // the samples before this line were not written
+        LogCRLF()
+    End If
+    LogText(LogLine)
+    LogCRLF()
+    ClockToFat                          // the file's date and time in the folder: now
+    If FatCommit() <> FAT_OK Then
+        ConsoleText("  FatError ") : ConsoleText(Str(FatError))
+        Exit Function
+    End If
+    LogLost = 0
+    LogWrite = 1
+End Function
+
+'''Add a string to the open file
+Sub LogText(In LogString As String)
+    Dim LogPos As Byte
+    For LogPos = 1 To LogString(0)
+        FatAppendByte(LogString(LogPos))
+    Next
+End Sub
+
+'''End the line: CR LF
+Sub LogCRLF
+    FatAppendByte(13)
+    FatAppendByte(10)
+End Sub
+
+// ----- The serial console
+
+'''Send a string to the serial console
+Sub ConsoleText(In ConsoleString As String)
+    HSerPrint ConsoleString
+End Sub
+
+'''End the console line: CR LF
+Sub ConsoleCRLF
+    HSerPrintCRLF
+End Sub
+
+'''Send a string to the serial console and end the line (one call where there were two: less flash)
+Sub ConsoleLine(In LineString As String)
+    HSerPrint LineString
+    HSerPrintCRLF
+End Sub
