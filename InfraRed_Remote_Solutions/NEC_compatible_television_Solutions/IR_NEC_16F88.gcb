@@ -1,0 +1,105 @@
+'******************************************************************
+'''protocole NEC standard avec start de 9 ms
+'''programme pour carte 16F88  envoi informations sur LCD
+'''Data IR sur portA.2
+'''Led sur portA.0
+'''@author  Thierry LANCELOT
+'''******************************************************************
+;------ Décodeur NEC par Échantillonnage Fixe (100 µs) - PIC16F88
+#chip 16F88, 8
+#config OSC=INTRC_IO, MCLRE=ON
+#OPTION Explicit
+
+;------ Configuration LCD
+#define LCD_IO 4
+#define LCD_NO_RW
+#define LCD_RS PORTB.3
+#define LCD_Enable PORTB.0
+#define LCD_DB4 PORTB.4
+#define LCD_DB5 PORTB.1
+#define LCD_DB6 PORTB.6
+#define LCD_DB7 PORTB.7
+
+#define IR_DATA_PIN PORTA.2
+#define LED_PIN PORTA.0
+Dir IR_DATA_PIN In
+Dir LED_PIN Out
+LED_PIN = 0
+
+Dim IR_count As Byte
+Dim BitIdx As Byte
+Dim LowWord As Word
+Dim HighWord As Word
+Dim AdrByte As Byte
+Dim CmdByte As Byte
+
+Do
+    ; --- 1. Vérification du start NEC (9ms bas) ---
+    retour:
+    Do
+        IR_count = 0     
+        Do While IR_DATA_PIN = 0
+            Wait 100 uS 
+            IR_count = IR_count + 1
+        Loop
+    Loop While IR_count < 85  
+
+    ; --- 2. Vérification d'un appui simple ---
+    IR_count = 0
+    Do While IR_DATA_PIN = 1
+       Wait 100 uS
+       IR_count = IR_count + 1
+    Loop
+    If IR_count < 30 Then   
+       goto retour
+    End If
+
+    LowWord = 0
+    HighWord = 0
+    
+    ; --- 3. Lecture séquentielle des 32 bits ---
+    For BitIdx = 1 to 32
+        Do While IR_DATA_PIN = 0 ; attente de sortir du niveau bas pour commencer le comptage
+        ; on ne fait rien, on attend dans la boucle
+        Loop
+        
+        IR_count = 0
+        Do While IR_DATA_PIN = 1
+            Wait 100 uS
+            IR_count = IR_count + 1
+            If IR_count > 30 Then Exit Do  ;securité anti-blocage (timeout)
+        Loop            
+;Dès que le compteur dépasse 30 (3 ms), la condition If IR_count > 30 devient vraie
+;et Exit Do force la sortie immédiate de la boucle.
+;Le programme peut ainsi reprendre sa course normale sans rester figé.
+        
+        If BitIdx <= 16 Then
+            LowWord = LowWord * 2
+            If IR_count > 12 Then LowWord = LowWord + 1
+        Else
+            HighWord = HighWord * 2
+            If IR_count > 12 Then HighWord = HighWord + 1
+        End If
+    Next
+    
+    ; --- Extraction des octets utiles pour isoler l'octet de poids fort ---
+    AdrByte = LowWord / 256
+    CmdByte = HighWord / 256
+    
+    ; Signal visuel de réception réussie
+    LED_PIN = 1
+    Wait 50 ms
+    LED_PIN = 0
+    
+    ; --- 4. Affichage sur le LCD ---
+    CLS
+    Locate 0, 0    
+    Print "Adr: 0x"
+    Print hex(AdrByte)
+    
+    Locate 1, 0
+    Print "Cmd: 0x"
+    Print hex(CmdByte)
+    Locate 1, 10    
+    Print CmdByte    
+Loop

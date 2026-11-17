@@ -29,6 +29,10 @@
 #DEFINE LCD_DB6       PortC.1
 #DEFINE LCD_DB7       PortC.2
 
+'ADC clock for the A-D.H library. The default is MediumSpeed (FOSC/8), which is a 4 MHz ADC
+'clock at 32 MHz. LowSpeed (FOSC/32) gives 1 us per conversion clock period.
+#DEFINE ADSpeed LowSpeed
+
 'Test signal on/off
 #DEFINE SCOPE_SIM
 

@@ -1,6 +1,9 @@
 #CHIP tiny13a, 1.2
 //! Optiomising FOR-NEXT loops to use a legacy method.  See the HELP.
 #DEFINE USELEGACYFORNEXT 
+//! ReadAD leaves the DIDR (digital input disable) registers alone. This saves the code that
+//! disables the digital input of the channel during the reading, so the program fits the 512 words of flash.
+#DEFINE AD_NO_DIDR
 
 
 #DEFINE RS232Out PORTB.1
