@@ -1,0 +1,13 @@
+' Change 1676: #option Volatile with LATx/PORTx pairing - LATC.0 named with NoLatch: PORTC.0 writes stay on PORTC, now glitch-free
+#chip 16f1829
+#option Explicit
+#option NoLatch
+#option Volatile latc.0
+
+#define ledS portc.0
+
+Dir ledS Out
+Dir porta.1 In
+ledS = 1
+ledS = 0
+ledS = !porta.1

@@ -62,7 +62,8 @@ Here you will find information about the DCF77: https://en.wikipedia.org/wiki/DC
 INITMCU2:
 
 
-  #include "oscore328.h"        ; include the OS
+  #option IncludePath "..\..\..\Time_Based_Task_Switcher_Solutions\Thallium"   ; the Thallium OS header lives in Time_Based_Task_Switcher_Solutions\Thallium
+  #include <oscore328.h>        ; include the OS
 
 
 ; ----- OS Dashboard -----------------

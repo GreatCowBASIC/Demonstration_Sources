@@ -45,7 +45,8 @@ output, while Task0 receives no runtime.
 // Mandated Label
 INITMCU2:
 
-  #include "oscore128da28.h"      ; include the OS
+  #option IncludePath ".."   ; the Thallium OS header lives in Time_Based_Task_Switcher_Solutions\Thallium
+  #include <oscore128da28.h>      ; include the OS
 
 ; ----- OS Dashboard -----------------
   #define osTick 333              ; Task switching frequency

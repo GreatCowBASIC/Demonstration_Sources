@@ -1,0 +1,17 @@
+' Change 1676: #define name = PORTx.n kept its value in lower case, so pin writes were not
+' redirected to LATx and #option Volatile did not match. RelayLaser must compile to bcf LATC,3.
+#chip 16F1825, 32
+#option Explicit
+#option Volatile PortC.2
+
+#define Pin17PC =    PORTA.1
+#define PWMLaser =   PORTC.2
+#define RelayLaser = PORTC.3
+
+Dir Pin17PC In
+Dir PWMLaser Out
+Dir RelayLaser Out
+
+RelayLaser = 0
+RelayLaser = 1
+PWMLaser = Pin17PC

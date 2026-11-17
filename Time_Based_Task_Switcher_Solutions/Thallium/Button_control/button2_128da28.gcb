@@ -50,7 +50,8 @@ the button is released, the action is triggered and the flags are reset.
 // Mandated Label
 INITMCU2:
 
-  #include "oscore128da28.h"          ; include the OS
+  #option IncludePath ".."   ; the Thallium OS header lives in Time_Based_Task_Switcher_Solutions\Thallium
+  #include <oscore128da28.h>          ; include the OS
 
 ; ----- OS Dashboard -----------------
   #define osTick 100              ; Task switching frequency

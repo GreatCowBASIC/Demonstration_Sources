@@ -53,7 +53,8 @@ off and on again at each brightness level, both with the same button.
 // Mandated Label
 INITMCU2:
 
-  #include "oscore328.h"          ; include the OS
+  #option IncludePath ".."   ; the Thallium OS header lives in Time_Based_Task_Switcher_Solutions\Thallium
+  #include <oscore328.h>          ; include the OS
 
 ; ----- OS Dashboard -----------------
   #define osTick 100              ; Task switching frequency

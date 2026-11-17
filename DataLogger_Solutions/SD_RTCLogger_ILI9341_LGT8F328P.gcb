@@ -102,6 +102,7 @@
 // ----- Chip
 
     #Chip LGT8F328P, 32
+    #define AD_NO_DIDR                  // leave the DIDR registers alone in ReadAD10: the touch pins are switched by touch_4wire.h itself, and it saves the code
     #option ReserveHighProg OPTIBOOT    // the bootloader at the top of the flash (0x7400 up): 1,024 words kept
                                         // free (the size check counts every word from build 1674)
 

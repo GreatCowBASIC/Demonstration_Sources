@@ -1,0 +1,12 @@
+' Change 1676: #option Volatile with LATx/PORTx pairing - no option: normal clear-then-set
+#chip 16f1829
+#option Explicit
+' no #option Volatile
+
+#define ledS portc.0
+
+Dir ledS Out
+Dir porta.1 In
+ledS = 1
+ledS = 0
+ledS = !porta.1

@@ -87,7 +87,8 @@
     ' ------ The board: pins and request codes (USBCONTROL...), written by the PC program (Ctrl+G)
 
         'The header sets the directions of the board's pins at startup (#startup USBControlInit, 90)
-        #include "WINUSB_18F45K50_Demonstration.h"
+        #option IncludePath ".."        ; the board header is shared with the other WinUSB demos, one folder up
+        #include <WINUSB_18F45K50_Demonstration.h>
 
         'An ADC reading of more than 8 bits
         Dim USBControlADCValue As Word
