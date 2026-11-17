@@ -95,6 +95,8 @@
 //               library's settings from a table: #define InitGLCD_ILI9341 ScreenInit), boxes by ScreenBox, the
 //               DS1307 read and written by DsRead and DsWrite (in place of ds1307.h's routines, one for each
 //               register); MenuPressed and the clock screen take one set of edges, the reading turned round
+//   17/11/2026  The clock screen's time stops once a date or time field is changed (ClockScrTick), so the time
+//               can be set: it ran on each second, and moved the value being set
 
     #option explicit
     #option IncludePath "C:\GCstudio\gcbasic\AdditionalLibraries"
@@ -341,7 +343,7 @@
         ClockAddSecond
         ClockLine                       // LogLine = "yyyy-mm-dd,hh:mm:ss"
         ScreenClock
-        If ScrMode = SCR_SETCLOCK Then ClockScrTick     // the clock screen's time runs on too
+        If ScrMode = SCR_SETCLOCK Then ClockScrTick     // the clock screen's time runs on, until a field is changed
         // the menu goes after MENU_WAIT seconds with no tap, the clock screen after CLOCK_WAIT (both odd)
         If ScrMode.0 = 1 Then
             MenuSecs--
@@ -561,8 +563,11 @@ End Sub
 
 '''One second on for the clock screen's time, so OK sets the time as it is then, not as it was when the screen
 '''opened: the seconds, the minutes and the hours carry on, each drawn again as it changes (fixed elements: less
-'''flash than a loop). The hour goes from 23 to 0 without the date on (the screen open across midnight: set the date)
+'''flash than a loop). The hour goes from 23 to 0 without the date on (the screen open across midnight: set the date).
+'''Once a date or time field has been changed (EdTimeSet), the time stops here, so it does not move on while it is
+'''being set: OK then sets the DS1307 to the values shown
 Sub ClockScrTick
+    If EdTimeSet = 1 Then Exit Sub         // being set: the time shown stays as the user leaves it
     EdVal(6)++
     If EdVal(6) = 60 Then
         EdVal(6) = 0
